@@ -1,0 +1,236 @@
+--------------------------------------------------------
+--  DDL for Package Body HR_ORT_PKG
+--------------------------------------------------------
+
+  CREATE OR REPLACE EDITIONABLE PACKAGE BODY "APPS"."HR_ORT_PKG" as
+/* $Header: hrortlct.pkb 115.3 2002/12/10 13:27:40 hjonnala noship $ */
+procedure OWNER_TO_WHO (
+  X_OWNER in VARCHAR2,
+  X_CREATION_DATE out nocopy DATE,
+  X_CREATED_BY out nocopy NUMBER,
+  X_LAST_UPDATE_DATE out nocopy DATE,
+  X_LAST_UPDATED_BY out nocopy NUMBER,
+  X_LAST_UPDATE_LOGIN out nocopy NUMBER
+) is
+begin
+  if X_OWNER = 'SEED' then
+    X_CREATED_BY := 1;
+    X_LAST_UPDATED_BY := 1;
+  else
+    X_CREATED_BY := 0;
+    X_LAST_UPDATED_BY := 0;
+  end if;
+  X_CREATION_DATE := sysdate;
+  X_LAST_UPDATE_DATE := sysdate;
+  X_LAST_UPDATE_LOGIN := 0;
+end OWNER_TO_WHO;
+procedure INSERT_ROW (
+  X_ORGANIZATION_ID in NUMBER,
+  X_NAME in VARCHAR2,
+  X_CREATION_DATE in DATE,
+  X_CREATED_BY in NUMBER,
+  X_LAST_UPDATE_DATE in DATE,
+  X_LAST_UPDATED_BY in NUMBER,
+  X_LAST_UPDATE_LOGIN in NUMBER
+) is
+begin
+
+  insert into HR_ALL_ORGANIZATION_UNITS_TL (
+    ORGANIZATION_ID,
+    NAME,
+    LAST_UPDATE_DATE,
+    LAST_UPDATED_BY,
+    LAST_UPDATE_LOGIN,
+    CREATED_BY,
+    CREATION_DATE,
+    LANGUAGE,
+    SOURCE_LANG
+  ) values (
+    X_ORGANIZATION_ID,
+    X_NAME,
+    X_LAST_UPDATE_DATE,
+    X_LAST_UPDATED_BY,
+    X_LAST_UPDATE_LOGIN,
+    X_CREATED_BY,
+    X_CREATION_DATE,
+    userenv('LANG'),
+    userenv('LANG'));
+
+end INSERT_ROW;
+
+procedure UPDATE_ROW (
+  X_ORGANIZATION_ID in NUMBER,
+  X_NAME in VARCHAR2,
+  X_LAST_UPDATE_DATE in DATE,
+  X_LAST_UPDATED_BY in NUMBER,
+  X_LAST_UPDATE_LOGIN in NUMBER
+) is
+begin
+
+  update HR_ALL_ORGANIZATION_UNITS_TL set
+    NAME = X_NAME,
+    LAST_UPDATE_DATE = X_LAST_UPDATE_DATE,
+    LAST_UPDATED_BY = X_LAST_UPDATED_BY,
+    LAST_UPDATE_LOGIN = X_LAST_UPDATE_LOGIN,
+    SOURCE_LANG = userenv('LANG')
+  where ORGANIZATION_ID = X_ORGANIZATION_ID
+  and userenv('LANG') in (LANGUAGE, SOURCE_LANG);
+
+  if (sql%notfound) then
+    raise no_data_found;
+  end if;
+end UPDATE_ROW;
+
+procedure DELETE_ROW (
+  X_ORGANIZATION_ID in NUMBER
+) is
+begin
+  delete from HR_ALL_ORGANIZATION_UNITS_TL
+  where ORGANIZATION_ID = X_ORGANIZATION_ID;
+
+  if (sql%notfound) then
+    raise no_data_found;
+  end if;
+
+end DELETE_ROW;
+
+procedure ADD_LANGUAGE
+is
+begin
+  delete from HR_ALL_ORGANIZATION_UNITS_TL T
+  where not exists
+    (select NULL
+    from HR_ALL_ORGANIZATION_UNITS B
+    where B.ORGANIZATION_ID = T.ORGANIZATION_ID
+    );
+
+  update HR_ALL_ORGANIZATION_UNITS_TL T set (
+      NAME
+    ) = (select
+      B.NAME
+    from HR_ALL_ORGANIZATION_UNITS_TL B
+    where B.ORGANIZATION_ID = T.ORGANIZATION_ID
+    and B.LANGUAGE = T.SOURCE_LANG)
+  where (
+      T.ORGANIZATION_ID,
+      T.LANGUAGE
+  ) in (select
+      SUBT.ORGANIZATION_ID,
+      SUBT.LANGUAGE
+    from HR_ALL_ORGANIZATION_UNITS_TL SUBB, HR_ALL_ORGANIZATION_UNITS_TL SUBT
+    where SUBB.ORGANIZATION_ID = SUBT.ORGANIZATION_ID
+    and SUBB.LANGUAGE = SUBT.SOURCE_LANG
+    and (SUBB.NAME <> SUBT.NAME
+  ));
+
+  insert into HR_ALL_ORGANIZATION_UNITS_TL (
+    ORGANIZATION_ID,
+    NAME,
+    LAST_UPDATE_DATE,
+    LAST_UPDATED_BY,
+    LAST_UPDATE_LOGIN,
+    CREATED_BY,
+    CREATION_DATE,
+    LANGUAGE,
+    SOURCE_LANG
+  ) select
+    B.ORGANIZATION_ID,
+    B.NAME,
+    B.LAST_UPDATE_DATE,
+    B.LAST_UPDATED_BY,
+    B.LAST_UPDATE_LOGIN,
+    B.CREATED_BY,
+    B.CREATION_DATE,
+    L.LANGUAGE_CODE,
+    B.SOURCE_LANG
+  from HR_ALL_ORGANIZATION_UNITS_TL B, FND_LANGUAGES L
+  where L.INSTALLED_FLAG in ('I', 'B')
+  and B.LANGUAGE = userenv('LANG')
+  and not exists
+    (select NULL
+    from HR_ALL_ORGANIZATION_UNITS_TL T
+    where T.ORGANIZATION_ID = B.ORGANIZATION_ID
+    and T.LANGUAGE = L.LANGUAGE_CODE);
+end ADD_LANGUAGE;
+
+procedure LOAD_ROW(
+ X_ORGANIZATION_ID                IN VARCHAR2,
+ X_OWNER                          IN VARCHAR2,
+ X_NAME                           IN VARCHAR2) IS
+  X_ROWID ROWID;
+  X_CREATION_DATE DATE;
+  X_CREATED_BY NUMBER;
+  X_LAST_UPDATE_DATE DATE;
+  X_LAST_UPDATED_BY NUMBER;
+  X_LAST_UPDATE_LOGIN NUMBER;
+
+begin
+
+  OWNER_TO_WHO (
+    X_OWNER,
+    X_CREATION_DATE,
+    X_CREATED_BY,
+    X_LAST_UPDATE_DATE,
+    X_LAST_UPDATED_BY,
+    X_LAST_UPDATE_LOGIN
+  );
+
+ begin
+   UPDATE_ROW (
+     TO_NUMBER(X_ORGANIZATION_ID),
+     X_NAME,
+     X_LAST_UPDATE_DATE,
+     X_LAST_UPDATED_BY,
+     X_LAST_UPDATE_LOGIN
+   );
+
+ exception
+  when no_data_found then
+
+    INSERT_ROW (
+      TO_NUMBER(X_ORGANIZATION_ID),
+      X_NAME,
+      X_CREATION_DATE,
+      X_CREATED_BY,
+      X_LAST_UPDATE_DATE,
+      X_LAST_UPDATED_BY,
+      X_LAST_UPDATE_LOGIN);
+ end;
+
+end LOAD_ROW;
+
+procedure TRANSLATE_ROW(
+ X_ORGANIZATION_ID                IN VARCHAR2,
+ X_OWNER                          IN VARCHAR2,
+ X_NAME                           IN VARCHAR2) IS
+  X_ROWID ROWID;
+  X_CREATION_DATE DATE;
+  X_CREATED_BY NUMBER;
+  X_LAST_UPDATE_DATE DATE;
+  X_LAST_UPDATED_BY NUMBER;
+  X_LAST_UPDATE_LOGIN NUMBER;
+
+begin
+
+  OWNER_TO_WHO (
+    X_OWNER,
+    X_CREATION_DATE,
+    X_CREATED_BY,
+    X_LAST_UPDATE_DATE,
+    X_LAST_UPDATED_BY,
+    X_LAST_UPDATE_LOGIN
+    );
+
+ update HR_ALL_ORGANIZATION_UNITS_TL set
+  NAME = X_NAME,
+  LAST_UPDATE_DATE = X_LAST_UPDATE_DATE,
+  LAST_UPDATED_BY = X_LAST_UPDATED_BY,
+  LAST_UPDATE_LOGIN = X_LAST_UPDATE_LOGIN,
+  SOURCE_LANG = userenv('LANG')
+ where userenv('LANG') in (LANGUAGE,SOURCE_LANG)
+ and organization_id = TO_NUMBER(x_organization_id);
+
+end TRANSLATE_ROW;
+end HR_ORT_PKG;
+
+/

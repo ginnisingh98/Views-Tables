@@ -1,0 +1,71 @@
+--------------------------------------------------------
+--  DDL for Package JE_IT_LISTING_PKG
+--------------------------------------------------------
+
+  CREATE OR REPLACE EDITIONABLE PACKAGE "APPS"."JE_IT_LISTING_PKG" AUTHID CURRENT_USER AS
+/* $Header: jeitlsts.pls 120.2 2008/05/10 10:38:44 pakumare noship $ */
+
+
+TYPE tab_party_id IS TABLE OF
+	JE_IT_LIST_LINES_ALL.PARTY_ID%TYPE INDEX BY BINARY_INTEGER;
+TYPE tab_trx_type_code IS TABLE OF
+	JE_IT_LIST_LINES_ALL.TRX_TYPE_CODE%TYPE INDEX BY BINARY_INTEGER;
+TYPE tab_trx_type_id IS TABLE OF
+	JE_IT_LIST_LINES_ALL.TRX_TYPE_ID%TYPE INDEX BY BINARY_INTEGER;
+TYPE tab_doc_seq_num IS TABLE OF
+	JE_IT_LIST_LINES_ALL.DOC_SEQ_ID%TYPE INDEX BY BINARY_INTEGER;
+TYPE tab_doc_seq_val IS TABLE OF
+	JE_IT_LIST_LINES_ALL.DOC_SEQ_NUM%TYPE INDEX BY BINARY_INTEGER;
+TYPE tab_trx_date IS TABLE OF
+	JE_IT_LIST_LINES_ALL.TRX_DATE%TYPE INDEX BY BINARY_INTEGER;
+TYPE tab_trx_id IS TABLE OF
+	JE_IT_LIST_LINES_ALL.TRX_ID%TYPE INDEX BY BINARY_INTEGER;
+TYPE tab_trx_num IS TABLE OF
+	JE_IT_LIST_LINES_ALL.TRX_NUM%TYPE INDEX BY BINARY_INTEGER;
+TYPE tab_trx_dist_id IS TABLE OF
+	JE_IT_LIST_LINES_ALL.TRX_DIST_ID%TYPE INDEX BY BINARY_INTEGER;
+TYPE tab_trx_line_type_code IS TABLE OF
+	JE_IT_LIST_LINES_ALL.TRX_LINE_TYPE_CODE%TYPE INDEX BY BINARY_INTEGER;
+TYPE tab_trx_line_tax_rate_id IS TABLE OF
+	JE_IT_LIST_LINES_ALL.TAX_RATE_ID%TYPE INDEX BY BINARY_INTEGER;
+TYPE tab_inv_line_amount IS TABLE OF
+	ap_invoice_distributions_all.amount%TYPE INDEX BY BINARY_INTEGER;
+TYPE tab_inv_tax_line_amount IS TABLE OF
+	ap_invoice_distributions_all.amount%TYPE INDEX BY BINARY_INTEGER;
+TYPE tab_inv_type IS TABLE OF
+	ra_cust_trx_types_all.type%TYPE INDEX BY BINARY_INTEGER;
+TYPE tab_party_vat_reg_num IS TABLE OF
+	JE_IT_LIST_PARTIES_ALL.vat_registration_num%TYPE INDEX BY BINARY_INTEGER;
+TYPE tab_party_fiscal_id_num IS TABLE OF
+	JE_IT_LIST_PARTIES_ALL.fiscal_id_num%TYPE INDEX BY BINARY_INTEGER;
+
+
+PROCEDURE Purge_trx_data(p_vat_reporting_entity_id IN NUMBER,p_year_of_declaration IN NUMBER);
+
+PROCEDURE Final_data(
+		errbuf   	OUT 	NOCOPY VARCHAR2 ,
+  		retcode   	OUT 	NOCOPY VARCHAR2,
+		p_vat_reporting_entity_id IN NUMBER,
+		p_year_of_declaration IN NUMBER);
+
+PROCEDURE Extract_Data(
+         	errbuf   	 OUT NOCOPY VARCHAR2,
+  		retcode  	 OUT NOCOPY VARCHAR2,
+		P_VAT_REPORTING_ENTITY_ID IN NUMBER,
+		P_YEAR_OF_DECLARATION 	  IN NUMBER,
+		P_REPORT_TYPE             IN VARCHAR2,
+		P_DUMMY                   IN NUMBER,
+		P_VAT   	 IN 	    VARCHAR2,
+		P_REPORT_MODE 	 IN 	    VARCHAR2,
+		P_EFT	 	 IN 	    VARCHAR2,
+		P_PARTY_LIMIT	 IN	    NUMBER,
+		P_CUST_SORT_COL	 IN 	    VARCHAR2,
+		P_VEND_SORT_COL	 IN 	    VARCHAR2,
+		P_GROUP_PARTIES_FLAG IN		VARCHAR2
+);
+
+function get_bsv(ccid number) return varchar2;
+
+END JE_IT_LISTING_PKG;
+
+/

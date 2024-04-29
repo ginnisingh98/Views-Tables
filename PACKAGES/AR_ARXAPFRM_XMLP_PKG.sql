@@ -1,0 +1,24 @@
+--------------------------------------------------------
+--  DDL for Package AR_ARXAPFRM_XMLP_PKG
+--------------------------------------------------------
+
+  CREATE OR REPLACE EDITIONABLE PACKAGE "APPS"."AR_ARXAPFRM_XMLP_PKG" AUTHID CURRENT_USER AS
+/* $Header: ARXAPFRMS.pls 120.0 2007/12/27 13:26:29 abraghun noship $ */
+  P_CONC_REQUEST_ID NUMBER := 0;
+
+  P_COMPANY_NAME VARCHAR2(80);
+
+  P_NO_DATA_FOUND VARCHAR2(240);
+
+  P_BATCH_ID varchar2(20);
+
+  P_MASK_BNK_ACCT VARCHAR2(240);
+
+  FUNCTION BEFOREREPORT RETURN BOOLEAN;
+
+  FUNCTION AFTERREPORT RETURN BOOLEAN;
+
+END AR_ARXAPFRM_XMLP_PKG;
+
+
+/

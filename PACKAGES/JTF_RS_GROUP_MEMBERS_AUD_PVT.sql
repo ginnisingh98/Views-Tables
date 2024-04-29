@@ -1,0 +1,61 @@
+--------------------------------------------------------
+--  DDL for Package JTF_RS_GROUP_MEMBERS_AUD_PVT
+--------------------------------------------------------
+
+  CREATE OR REPLACE EDITIONABLE PACKAGE "APPS"."JTF_RS_GROUP_MEMBERS_AUD_PVT" AUTHID CURRENT_USER AS
+  /* $Header: jtfrsams.pls 120.0 2005/05/11 08:19:09 appldev ship $ */
+-- API Name	: JTF_RS_GROUP_MEMBERS_AUD_PVT
+-- Type		: Private
+-- Purpose	: Inserts IN  the JTF_RS_GROUP_MEMBERS_AUD
+-- Modification History
+-- DATE		 NAME	       PURPOSE
+-- 20 JAN 2000    S Choudhury   Created
+-- Notes:
+--
+
+
+   /*FOR INSERT  */
+   PROCEDURE   INSERT_MEMBER(
+    P_API_VERSION	    IN	NUMBER,
+    P_INIT_MSG_LIST	    IN	VARCHAR2  DEFAULT FND_API.G_FALSE,
+    P_COMMIT		    IN	VARCHAR2  DEFAULT FND_API.G_FALSE,
+    P_GROUP_MEMBER_ID       IN  NUMBER,
+    P_GROUP_ID              IN  NUMBER,
+    P_RESOURCE_ID           IN  NUMBER,
+    P_PERSON_ID             IN  NUMBER,
+    P_OBJECT_VERSION_NUMBER IN NUMBER,
+    X_RETURN_STATUS         OUT NOCOPY VARCHAR2,
+    X_MSG_COUNT             OUT NOCOPY NUMBER,
+    X_MSG_DATA              OUT NOCOPY VARCHAR2 );
+
+   /* for update */
+   PROCEDURE   UPDATE_MEMBER(
+    P_API_VERSION	    IN	NUMBER,
+    P_INIT_MSG_LIST	    IN	VARCHAR2  DEFAULT FND_API.G_FALSE,
+    P_COMMIT		    IN	VARCHAR2  DEFAULT FND_API.G_FALSE,
+    P_GROUP_MEMBER_ID       IN  NUMBER,
+    P_GROUP_ID              IN  NUMBER,
+    P_RESOURCE_ID           IN  NUMBER,
+    P_PERSON_ID             IN  NUMBER,
+    P_OBJECT_VERSION_NUMBER IN NUMBER,
+    X_RETURN_STATUS         OUT NOCOPY VARCHAR2,
+    X_MSG_COUNT             OUT NOCOPY NUMBER,
+    X_MSG_DATA              OUT NOCOPY VARCHAR2  );
+
+
+   --FOR DELETE
+
+   PROCEDURE   DELETE_MEMBER(
+    P_API_VERSION	IN  NUMBER,
+    P_INIT_MSG_LIST	IN  VARCHAR2  DEFAULT FND_API.G_FALSE,
+    P_COMMIT		IN  VARCHAR2  DEFAULT FND_API.G_FALSE,
+    P_GROUP_MEMBER_ID   IN  NUMBER,
+    X_RETURN_STATUS     OUT NOCOPY VARCHAR2,
+    X_MSG_COUNT         OUT NOCOPY NUMBER,
+    X_MSG_DATA          OUT NOCOPY VARCHAR2 );
+
+END; -- Package Specification JTF_RS_GROUP_MEMBERS_AUD_PVT
+
+ 
+
+/

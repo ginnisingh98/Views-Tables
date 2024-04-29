@@ -1,0 +1,402 @@
+--------------------------------------------------------
+--  DDL for Package Body GL_GLXRLTCL_XMLP_PKG
+--------------------------------------------------------
+
+  CREATE OR REPLACE EDITIONABLE PACKAGE BODY "APPS"."GL_GLXRLTCL_XMLP_PKG" AS
+/* $Header: GLXRLTCLB.pls 120.0 2007/12/27 15:21:48 vijranga noship $ */
+  FUNCTION BEFOREREPORT RETURN BOOLEAN IS
+  BEGIN
+    DECLARE
+      ERRBUF VARCHAR2(132);
+      ERRBUF2 VARCHAR2(132);
+      COLUMN_NAME VARCHAR2(50);
+      VSETID NUMBER;
+    BEGIN
+
+      P_CONC_REQUEST_ID := FND_GLOBAL.CONC_REQUEST_ID;
+      /*SRW.USER_EXIT('FND SRWINIT')*/NULL;
+      DECLARE
+        SOBNAME VARCHAR2(30);
+        COAID NUMBER;
+        FUNC_CURR VARCHAR2(15);
+      BEGIN
+        GL_GET_LEDGER_INFO(P_SET_OF_BOOKS_ID
+                          ,COAID
+                          ,SOBNAME
+                          ,FUNC_CURR
+                          ,ERRBUF);
+        IF (ERRBUF IS NOT NULL) THEN
+          ERRBUF2 := GET_MESSAGE('GL_PLL_ROUTINE_ERROR'
+                                ,'N'
+                                ,'ROUTINE'
+                                ,'gl_get_ledger_info');
+          /*SRW.MESSAGE('00'
+                     ,ERRBUF2)*/NULL;
+          /*SRW.MESSAGE('00'
+                     ,ERRBUF)*/NULL;
+          /*RAISE SRW.PROGRAM_ABORT*/
+	  --RAISE_APPLICATION_ERROR(-20101,null);
+        END IF;
+        STRUCT_NUM := COAID;
+        SET_OF_BOOKS_NAME := SOBNAME;
+      END;
+      SELECT
+        APPLICATION_COLUMN_NAME
+      INTO COLUMN_NAME
+      FROM
+        FND_SEGMENT_ATTRIBUTE_VALUES
+      WHERE ID_FLEX_CODE = 'GL#'
+        AND ID_FLEX_NUM = STRUCT_NUM
+        AND SEGMENT_ATTRIBUTE_TYPE = 'GL_ACCOUNT'
+        AND ATTRIBUTE_VALUE = 'Y';
+      SELECT
+        FLEX_VALUE_SET_ID
+      INTO VSETID
+      FROM
+        FND_ID_FLEX_SEGMENTS
+      WHERE ID_FLEX_CODE = 'GL#'
+        AND ENABLED_FLAG = 'Y'
+        AND ID_FLEX_NUM = STRUCT_NUM
+        AND APPLICATION_COLUMN_NAME = COLUMN_NAME;
+      VALUE_SET_ID := VSETID;
+    EXCEPTION
+      WHEN NO_DATA_FOUND THEN
+        /*SRW.MESSAGE('00'
+                   ,SQLERRM)*/NULL;
+        /*RAISE SRW.PROGRAM_ABORT*/--RAISE_APPLICATION_ERROR(-20101,null);
+    END;
+    RETURN (TRUE);
+  END BEFOREREPORT;
+
+  FUNCTION AFTERREPORT RETURN BOOLEAN IS
+  BEGIN
+    /*SRW.USER_EXIT('FND SRWEXIT')*/NULL;
+    RETURN (TRUE);
+  END AFTERREPORT;
+
+  FUNCTION SET_OF_BOOKS_NAME_P RETURN VARCHAR2 IS
+  BEGIN
+    RETURN SET_OF_BOOKS_NAME;
+  END SET_OF_BOOKS_NAME_P;
+
+  FUNCTION STRUCT_NUM_P RETURN NUMBER IS
+  BEGIN
+    RETURN STRUCT_NUM;
+  END STRUCT_NUM_P;
+
+  FUNCTION VALUE_SET_ID_P RETURN NUMBER IS
+  BEGIN
+    RETURN VALUE_SET_ID;
+  END VALUE_SET_ID_P;
+
+  FUNCTION PAGENO_P RETURN NUMBER IS
+  BEGIN
+    RETURN PAGENO;
+  END PAGENO_P;
+
+  PROCEDURE GL_GET_PERIOD_DATES(TSET_OF_BOOKS_ID IN NUMBER
+                               ,TPERIOD_NAME IN VARCHAR2
+                               ,TSTART_DATE OUT NOCOPY DATE
+                               ,TEND_DATE OUT NOCOPY DATE
+                               ,ERRBUF OUT NOCOPY VARCHAR2) IS
+  BEGIN
+ /*   STPROC.INIT('begin GL_INFO.GL_GET_PERIOD_DATES(:TSET_OF_BOOKS_ID, :TPERIOD_NAME, :TSTART_DATE, :TEND_DATE, :ERRBUF); end;');
+    STPROC.BIND_I(TSET_OF_BOOKS_ID);
+    STPROC.BIND_I(TPERIOD_NAME);
+    STPROC.BIND_O(TSTART_DATE);
+    STPROC.BIND_O(TEND_DATE);
+    STPROC.BIND_O(ERRBUF);
+    STPROC.EXECUTE;
+    STPROC.RETRIEVE(3
+                   ,TSTART_DATE);
+    STPROC.RETRIEVE(4
+                   ,TEND_DATE);
+    STPROC.RETRIEVE(5
+                   ,ERRBUF);*/null;
+  END GL_GET_PERIOD_DATES;
+
+  PROCEDURE GL_GET_LEDGER_INFO(SOBID IN NUMBER
+                              ,COAID OUT NOCOPY NUMBER
+                              ,SOBNAME OUT NOCOPY VARCHAR2
+                              ,FUNC_CURR OUT NOCOPY VARCHAR2
+                              ,ERRBUF OUT NOCOPY VARCHAR2) IS
+  BEGIN
+   /* STPROC.INIT('begin GL_INFO.GL_GET_LEDGER_INFO(:SOBID, :COAID, :SOBNAME, :FUNC_CURR, :ERRBUF); end;');
+    STPROC.BIND_I(SOBID);
+    STPROC.BIND_O(COAID);
+    STPROC.BIND_O(SOBNAME);
+    STPROC.BIND_O(FUNC_CURR);
+    STPROC.BIND_O(ERRBUF);
+    STPROC.EXECUTE;
+    STPROC.RETRIEVE(2
+                   ,COAID);
+    STPROC.RETRIEVE(3
+                   ,SOBNAME);
+    STPROC.RETRIEVE(4
+                   ,FUNC_CURR);
+    STPROC.RETRIEVE(5
+                   ,ERRBUF);*/
+
+		   GL_INFO.GL_GET_LEDGER_INFO(SOBID,COAID,SOBNAME,FUNC_CURR,ERRBUF);
+  END GL_GET_LEDGER_INFO;
+
+  PROCEDURE GL_GET_BUD_OR_ENC_NAME(ACTUAL_TYPE IN VARCHAR2
+                                  ,TYPE_ID IN NUMBER
+                                  ,NAME OUT NOCOPY VARCHAR2
+                                  ,ERRBUF OUT NOCOPY VARCHAR2) IS
+  BEGIN
+  /*  STPROC.INIT('begin GL_INFO.GL_GET_BUD_OR_ENC_NAME(:ACTUAL_TYPE, :TYPE_ID, :NAME, :ERRBUF); end;');
+    STPROC.BIND_I(ACTUAL_TYPE);
+    STPROC.BIND_I(TYPE_ID);
+    STPROC.BIND_O(NAME);
+    STPROC.BIND_O(ERRBUF);
+    STPROC.EXECUTE;
+    STPROC.RETRIEVE(3
+                   ,NAME);
+    STPROC.RETRIEVE(4
+                   ,ERRBUF);*/null;
+  END GL_GET_BUD_OR_ENC_NAME;
+
+  PROCEDURE GL_GET_LOOKUP_VALUE(LMODE IN VARCHAR2
+                               ,CODE IN VARCHAR2
+                               ,TYPE IN VARCHAR2
+                               ,VALUE OUT NOCOPY VARCHAR2
+                               ,ERRBUF OUT NOCOPY VARCHAR2) IS
+  BEGIN
+   /* STPROC.INIT('begin GL_INFO.GL_GET_LOOKUP_VALUE(:LMODE, :CODE, :TYPE, :VALUE, :ERRBUF); end;');
+    STPROC.BIND_I(LMODE);
+    STPROC.BIND_I(CODE);
+    STPROC.BIND_I(TYPE);
+    STPROC.BIND_O(VALUE);
+    STPROC.BIND_O(ERRBUF);
+    STPROC.EXECUTE;
+    STPROC.RETRIEVE(4
+                   ,VALUE);
+    STPROC.RETRIEVE(5
+                   ,ERRBUF);*/null;
+  END GL_GET_LOOKUP_VALUE;
+
+  PROCEDURE GL_GET_FIRST_PERIOD(TSET_OF_BOOKS_ID IN NUMBER
+                               ,TPERIOD_NAME IN VARCHAR2
+                               ,TFIRST_PERIOD OUT NOCOPY VARCHAR2
+                               ,ERRBUF OUT NOCOPY VARCHAR2) IS
+  BEGIN
+   /* STPROC.INIT('begin GL_INFO.GL_GET_FIRST_PERIOD(:TSET_OF_BOOKS_ID, :TPERIOD_NAME, :TFIRST_PERIOD, :ERRBUF); end;');
+    STPROC.BIND_I(TSET_OF_BOOKS_ID);
+    STPROC.BIND_I(TPERIOD_NAME);
+    STPROC.BIND_O(TFIRST_PERIOD);
+    STPROC.BIND_O(ERRBUF);
+    STPROC.EXECUTE;
+    STPROC.RETRIEVE(3
+                   ,TFIRST_PERIOD);
+    STPROC.RETRIEVE(4
+                   ,ERRBUF);*/null;
+  END GL_GET_FIRST_PERIOD;
+
+  PROCEDURE GL_GET_FIRST_PERIOD_OF_QUARTER(TSET_OF_BOOKS_ID IN NUMBER
+                                          ,TPERIOD_NAME IN VARCHAR2
+                                          ,TFIRST_PERIOD OUT NOCOPY VARCHAR2
+                                          ,ERRBUF OUT NOCOPY VARCHAR2) IS
+  BEGIN
+   /* STPROC.INIT('begin GL_INFO.GL_GET_FIRST_PERIOD_OF_QUARTER(:TSET_OF_BOOKS_ID, :TPERIOD_NAME, :TFIRST_PERIOD, :ERRBUF); end;');
+    STPROC.BIND_I(TSET_OF_BOOKS_ID);
+    STPROC.BIND_I(TPERIOD_NAME);
+    STPROC.BIND_O(TFIRST_PERIOD);
+    STPROC.BIND_O(ERRBUF);
+    STPROC.EXECUTE;
+    STPROC.RETRIEVE(3
+                   ,TFIRST_PERIOD);
+    STPROC.RETRIEVE(4
+                   ,ERRBUF);*/null;
+  END GL_GET_FIRST_PERIOD_OF_QUARTER;
+
+  PROCEDURE GL_GET_CONSOLIDATION_INFO(CONS_ID IN NUMBER
+                                     ,CONS_NAME OUT NOCOPY VARCHAR2
+                                     ,METHOD OUT NOCOPY VARCHAR2
+                                     ,CURR_CODE OUT NOCOPY VARCHAR2
+                                     ,FROM_SOBID OUT NOCOPY NUMBER
+                                     ,TO_SOBID OUT NOCOPY NUMBER
+                                     ,DESCRIPTION OUT NOCOPY VARCHAR2
+                                     ,START_DATE OUT NOCOPY DATE
+                                     ,END_DATE OUT NOCOPY DATE
+                                     ,ERRBUF OUT NOCOPY VARCHAR2) IS
+  BEGIN
+ /*   STPROC.INIT('begin GL_INFO.GL_GET_CONSOLIDATION_INFO(:CONS_ID, :CONS_NAME, :METHOD, :CURR_CODE, :FROM_SOBID, :TO_SOBID, :DESCRIPTION, :START_DATE, :END_DATE, :ERRBUF); end;');
+    STPROC.BIND_I(CONS_ID);
+    STPROC.BIND_O(CONS_NAME);
+    STPROC.BIND_O(METHOD);
+    STPROC.BIND_O(CURR_CODE);
+    STPROC.BIND_O(FROM_SOBID);
+    STPROC.BIND_O(TO_SOBID);
+    STPROC.BIND_O(DESCRIPTION);
+    STPROC.BIND_O(START_DATE);
+    STPROC.BIND_O(END_DATE);
+    STPROC.BIND_O(ERRBUF);
+    STPROC.EXECUTE;
+    STPROC.RETRIEVE(2
+                   ,CONS_NAME);
+    STPROC.RETRIEVE(3
+                   ,METHOD);
+    STPROC.RETRIEVE(4
+                   ,CURR_CODE);
+    STPROC.RETRIEVE(5
+                   ,FROM_SOBID);
+    STPROC.RETRIEVE(6
+                   ,TO_SOBID);
+    STPROC.RETRIEVE(7
+                   ,DESCRIPTION);
+    STPROC.RETRIEVE(8
+                   ,START_DATE);
+    STPROC.RETRIEVE(9
+                   ,END_DATE);
+    STPROC.RETRIEVE(10
+                   ,ERRBUF);*/null;
+  END GL_GET_CONSOLIDATION_INFO;
+
+  PROCEDURE SET_LANGUAGE(LANG_ID IN NUMBER) IS
+  BEGIN
+   /* STPROC.INIT('begin GL_MESSAGE.SET_LANGUAGE(:LANG_ID); end;');
+    STPROC.BIND_I(LANG_ID);
+    STPROC.EXECUTE;*/null;
+  END SET_LANGUAGE;
+
+  FUNCTION GET_MESSAGE(MSG_NAME IN VARCHAR2
+                      ,SHOW_NUM IN VARCHAR2) RETURN VARCHAR2 IS
+    X0 VARCHAR2(2000);
+  BEGIN
+   /* STPROC.INIT('begin :X0 := GL_MESSAGE.GET_MESSAGE(:MSG_NAME, :SHOW_NUM); end;');
+    STPROC.BIND_O(X0);
+    STPROC.BIND_I(MSG_NAME);
+    STPROC.BIND_I(SHOW_NUM);
+    STPROC.EXECUTE;
+    STPROC.RETRIEVE(1
+                   ,X0);*/
+
+		   X0 := GL_MESSAGE.GET_MESSAGE(MSG_NAME,SHOW_NUM);
+    RETURN X0;
+  END GET_MESSAGE;
+
+  FUNCTION MSG_TKN_EXPAND(MSG IN VARCHAR2
+                         ,T1 IN VARCHAR2
+                         ,V1 IN VARCHAR2) RETURN VARCHAR2 IS
+    X0 VARCHAR2(2000);
+  BEGIN
+  /*  STPROC.INIT('begin :X0 := GL_MESSAGE.MSG_TKN_EXPAND(:MSG, :T1, :V1); end;');
+    STPROC.BIND_O(X0);
+    STPROC.BIND_I(MSG);
+    STPROC.BIND_I(T1);
+    STPROC.BIND_I(V1);
+    STPROC.EXECUTE;
+    STPROC.RETRIEVE(1
+                   ,X0);*/
+    RETURN X0;
+  END MSG_TKN_EXPAND;
+
+  FUNCTION GET_MESSAGE(MSG_NAME IN VARCHAR2
+                      ,SHOW_NUM IN VARCHAR2
+                      ,T1 IN VARCHAR2
+                      ,V1 IN VARCHAR2) RETURN VARCHAR2 IS
+    X0 VARCHAR2(2000);
+  BEGIN
+  /*  STPROC.INIT('begin :X0 := GL_MESSAGE.GET_MESSAGE(:MSG_NAME, :SHOW_NUM, :T1, :V1); end;');
+    STPROC.BIND_O(X0);
+    STPROC.BIND_I(MSG_NAME);
+    STPROC.BIND_I(SHOW_NUM);
+    STPROC.BIND_I(T1);
+    STPROC.BIND_I(V1);
+    STPROC.EXECUTE;
+    STPROC.RETRIEVE(1
+                   ,X0);*/
+
+		   X0 := GL_MESSAGE.GET_MESSAGE(MSG_NAME,SHOW_NUM,T1,V1);
+    RETURN X0;
+  END GET_MESSAGE;
+
+  FUNCTION GET_MESSAGE(MSG_NAME IN VARCHAR2
+                      ,SHOW_NUM IN VARCHAR2
+                      ,T1 IN VARCHAR2
+                      ,V1 IN VARCHAR2
+                      ,T2 IN VARCHAR2
+                      ,V2 IN VARCHAR2) RETURN VARCHAR2 IS
+    X0 VARCHAR2(2000);
+  BEGIN
+    /*STPROC.INIT('begin :X0 := GL_MESSAGE.GET_MESSAGE(:MSG_NAME, :SHOW_NUM, :T1, :V1, :T2, :V2); end;');
+    STPROC.BIND_O(X0);
+    STPROC.BIND_I(MSG_NAME);
+    STPROC.BIND_I(SHOW_NUM);
+    STPROC.BIND_I(T1);
+    STPROC.BIND_I(V1);
+    STPROC.BIND_I(T2);
+    STPROC.BIND_I(V2);
+    STPROC.EXECUTE;
+    STPROC.RETRIEVE(1
+                   ,X0);*/
+
+		   X0 := GL_MESSAGE.GET_MESSAGE(MSG_NAME,SHOW_NUM,T1,V1,T2,V2);
+    RETURN X0;
+  END GET_MESSAGE;
+
+  FUNCTION GET_MESSAGE(MSG_NAME IN VARCHAR2
+                      ,SHOW_NUM IN VARCHAR2
+                      ,T1 IN VARCHAR2
+                      ,V1 IN VARCHAR2
+                      ,T2 IN VARCHAR2
+                      ,V2 IN VARCHAR2
+                      ,T3 IN VARCHAR2
+                      ,V3 IN VARCHAR2) RETURN VARCHAR2 IS
+    X0 VARCHAR2(2000);
+  BEGIN
+  /*  STPROC.INIT('begin :X0 := GL_MESSAGE.GET_MESSAGE(:MSG_NAME, :SHOW_NUM, :T1, :V1, :T2, :V2, :T3, :V3); end;');
+    STPROC.BIND_O(X0);
+    STPROC.BIND_I(MSG_NAME);
+    STPROC.BIND_I(SHOW_NUM);
+    STPROC.BIND_I(T1);
+    STPROC.BIND_I(V1);
+    STPROC.BIND_I(T2);
+    STPROC.BIND_I(V2);
+    STPROC.BIND_I(T3);
+    STPROC.BIND_I(V3);
+    STPROC.EXECUTE;
+    STPROC.RETRIEVE(1
+                   ,X0);*/
+
+		   X0 := GL_MESSAGE.GET_MESSAGE(MSG_NAME,SHOW_NUM,T1,V1,T2,V2,T3,V3);
+    RETURN X0;
+  END GET_MESSAGE;
+
+  FUNCTION GET_MESSAGE(MSG_NAME IN VARCHAR2
+                      ,SHOW_NUM IN VARCHAR2
+                      ,T1 IN VARCHAR2
+                      ,V1 IN VARCHAR2
+                      ,T2 IN VARCHAR2
+                      ,V2 IN VARCHAR2
+                      ,T3 IN VARCHAR2
+                      ,V3 IN VARCHAR2
+                      ,T4 IN VARCHAR2
+                      ,V4 IN VARCHAR2) RETURN VARCHAR2 IS
+    X0 VARCHAR2(2000);
+  BEGIN
+  /*  STPROC.INIT('begin :X0 := GL_MESSAGE.GET_MESSAGE(:MSG_NAME, :SHOW_NUM, :T1, :V1, :T2, :V2, :T3, :V3, :T4, :V4); end;');
+    STPROC.BIND_O(X0);
+    STPROC.BIND_I(MSG_NAME);
+    STPROC.BIND_I(SHOW_NUM);
+    STPROC.BIND_I(T1);
+    STPROC.BIND_I(V1);
+    STPROC.BIND_I(T2);
+    STPROC.BIND_I(V2);
+    STPROC.BIND_I(T3);
+    STPROC.BIND_I(V3);
+    STPROC.BIND_I(T4);
+    STPROC.BIND_I(V4);
+    STPROC.EXECUTE;
+    STPROC.RETRIEVE(1
+                   ,X0);*/
+
+		   X0 := GL_MESSAGE.GET_MESSAGE(MSG_NAME,SHOW_NUM,T1,V1,T2,V2,T3,V3,T4,V4);
+    RETURN X0;
+  END GET_MESSAGE;
+
+END GL_GLXRLTCL_XMLP_PKG;
+
+
+/

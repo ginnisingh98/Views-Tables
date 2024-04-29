@@ -1,0 +1,78 @@
+--------------------------------------------------------
+--  DDL for Package PQH_PQHEEO4_XMLP_PKG
+--------------------------------------------------------
+
+  CREATE OR REPLACE EDITIONABLE PACKAGE "APPS"."PQH_PQHEEO4_XMLP_PKG" AUTHID CURRENT_USER AS
+/* $Header: PQHEEO4S.pls 120.1 2007/12/07 06:48:30 vjaganat noship $ */
+  P_BUSINESS_GROUP_ID NUMBER;
+
+  P_REPORT_YEAR VARCHAR2(4);
+
+  P_CONC_REQUEST_ID NUMBER;
+
+  P_MESSAGE_1 VARCHAR2(200);
+
+  P_MESSAGE_2 VARCHAR2(200);
+
+  P_MESSAGE_3 VARCHAR2(200);
+
+  P_MESSAGE_4 VARCHAR2(200);
+
+  P_MESSAGE_5 VARCHAR2(200);
+
+  P_MESSAGE_6 VARCHAR2(200);
+
+  P_MESSAGE_7 VARCHAR2(200);
+
+  P_FUNCTION_DESC VARCHAR2(260);
+
+  P_EEO4_QUERY VARCHAR2(20000) := 'SELECT  rpad(''ALL'',10,''*'')  Job_function_code, PQH_PQHEEO4_XMLP_PKG.CP_1_P CP_1,,CF_TOTAL_TITLEFORMULA0005(rpad(''FULL-TIME'',70,''*''))
+  CF_TOTAL_TITLE,PQH_PQHEEO4_XMLP_PKG.CF_SET_FUNCTION_DESCFORMULA(rpad(''ALL'',10,''*'')) CF_set_function_desc,
+  rpad(''FULL-TIME'',70,''*'')  Employment_category,  rpad(''Job Category'',10,''*'') job_category_code,  rpad(''Job cat Name'',60,''*'') Job_category_name,
+			rpad(''0-100'',20,''*'')  Salary_range,  0  cons_total_category_emps,         0   no_cons_wmale_emps,
+			0   no_cons_bmale_emps,         0  no_cons_hmale_emps,         0  no_cons_amale_emps,         0  no_cons_imale_emps,
+			0  no_cons_wfemale_emps,         0  no_cons_bfemale_emps,         0  no_cons_hfemale_emps,         0  no_cons_afemale_emps,         0  no_cons_ifemale_emps FROM    Dual';
+
+  P_REPORT_DAY_MONTH VARCHAR2(32767);
+
+  P_BPT_FT_EMP_COUNT NUMBER;
+
+  P_BPT_EMP_COUNT_FUNC NUMBER;
+
+  CP_1 NUMBER := 1;
+
+  C_BUSINESS_GROUP_NAME VARCHAR2(60);
+
+  C_REPORT_TYPE VARCHAR2(30);
+
+  C_ORGANIZATION_HIERARCHY VARCHAR2(30);
+
+  C_EEO1_ORGANIZATION VARCHAR2(60);
+
+  C_END_OF_TIME DATE;
+
+  FUNCTION BEFOREREPORT RETURN BOOLEAN;
+
+  FUNCTION CF_TOTAL_TITLEFORMULA0005(EMPLOYMENT_CATEGORY IN VARCHAR2) RETURN CHAR;
+
+  FUNCTION CF_SET_FUNCTION_DESCFORMULA(JOB_FUNCTION_CODE IN VARCHAR2) RETURN VARCHAR2;
+
+  FUNCTION AFTERREPORT RETURN BOOLEAN;
+
+  FUNCTION CP_1_P RETURN NUMBER;
+
+  FUNCTION C_BUSINESS_GROUP_NAME_P RETURN VARCHAR2;
+
+  FUNCTION C_REPORT_TYPE_P RETURN VARCHAR2;
+
+  FUNCTION C_ORGANIZATION_HIERARCHY_P RETURN VARCHAR2;
+
+  FUNCTION C_EEO1_ORGANIZATION_P RETURN VARCHAR2;
+
+  FUNCTION C_END_OF_TIME_P RETURN DATE;
+
+  FUNCTION_DESC VARCHAR2(240);
+
+END PQH_PQHEEO4_XMLP_PKG;
+
+/

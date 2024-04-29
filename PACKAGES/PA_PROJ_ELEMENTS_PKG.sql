@@ -1,0 +1,135 @@
+--------------------------------------------------------
+--  DDL for Package PA_PROJ_ELEMENTS_PKG
+--------------------------------------------------------
+
+  CREATE OR REPLACE EDITIONABLE PACKAGE "APPS"."PA_PROJ_ELEMENTS_PKG" AUTHID CURRENT_USER AS
+/* $Header: PATSKT1S.pls 120.1.12010000.2 2009/07/21 14:32:44 anuragar ship $ */
+
+PROCEDURE Insert_Row(
+X_ROW_ID                IN OUT   NOCOPY VARCHAR2, --File.Sql.39 bug 4440895
+X_PROJ_ELEMENT_ID       IN OUT	NOCOPY NUMBER, --File.Sql.39 bug 4440895
+X_PROJECT_ID	      IN    NUMBER,
+X_OBJECT_TYPE	      IN    VARCHAR2,
+X_ELEMENT_NUMBER        IN	VARCHAR2,
+X_NAME                  IN	VARCHAR2,
+X_DESCRIPTION	      IN    VARCHAR2,
+X_STATUS_CODE	      IN    VARCHAR2,
+X_WF_STATUS_CODE        IN	VARCHAR2,
+X_PM_PRODUCT_CODE       IN	VARCHAR2,
+X_PM_TASK_REFERENCE     IN	VARCHAR2,
+X_CLOSED_DATE	      IN    DATE,
+X_LOCATION_ID	      IN    NUMBER,
+X_MANAGER_PERSON_ID	IN    NUMBER,
+X_CARRYING_OUT_ORGANIZATION_ID            IN NUMBER,
+X_TYPE_ID  	            IN    NUMBER,
+X_PRIORITY_CODE 	      IN    VARCHAR2,
+X_INC_PROJ_PROGRESS_FLAG  IN	VARCHAR2,
+X_REQUEST_ID	        IN  NUMBER,
+X_PROGRAM_APPLICATION_ID  IN  NUMBER,
+X_PROGRAM_ID	        IN  NUMBER,
+X_PROGRAM_UPDATE_DATE	  IN  DATE,
+X_LINK_TASK_FLAG          IN  VARCHAR2,
+X_ATTRIBUTE_CATEGORY	  IN VARCHAR2,
+X_ATTRIBUTE1	        IN VARCHAR2,
+X_ATTRIBUTE2	        IN VARCHAR2,
+X_ATTRIBUTE3	        IN VARCHAR2,
+X_ATTRIBUTE4	        IN VARCHAR2,
+X_ATTRIBUTE5	        IN VARCHAR2,
+X_ATTRIBUTE6	        IN VARCHAR2,
+X_ATTRIBUTE7	        IN VARCHAR2,
+X_ATTRIBUTE8	        IN VARCHAR2,
+X_ATTRIBUTE9	        IN VARCHAR2,
+X_ATTRIBUTE10	        IN VARCHAR2,
+X_ATTRIBUTE11	        IN VARCHAR2,
+X_ATTRIBUTE12	        IN VARCHAR2,
+X_ATTRIBUTE13	        IN VARCHAR2,
+X_ATTRIBUTE14	        IN VARCHAR2,
+X_ATTRIBUTE15	        IN VARCHAR2,
+X_TASK_WEIGHTING_DERIV_CODE  IN VARCHAR2,
+X_WORK_ITEM_CODE             IN VARCHAR2,
+X_UOM_CODE                   IN VARCHAR2,
+X_WQ_ACTUAL_ENTRY_CODE       IN VARCHAR2,
+X_TASK_PROGRESS_ENTRY_PAGE_ID IN NUMBER,
+x_parent_structure_id         IN NUMBER,
+x_phase_code                  IN VARCHAR,
+x_phase_version_id            IN NUMBER,
+x_progress_weight             IN NUMBER :=NULL,             -- 3279978 :: Added x_progress_weight Parameter
+x_function_code               IN VARCHAR2 := NULL,           -- 3279978 :: Added x_function_code Parameter
+x_Base_Perc_Comp_Deriv_Code   IN VARCHAR2 := PA_INTERFACE_UTILS_PUB.G_PA_MISS_CHAR,-- 3305199 : Added for FP_M changes
+-- Bug#3491609 : Workflow Chanegs FP M
+x_wf_item_type          IN VARCHAR2 :=NULL,
+x_wf_process            IN VARCHAR2 :=NULL,
+x_wf_lead_days          IN NUMBER :=NULL,
+x_wf_enabled_flag       IN VARCHAR2 :=NULL,
+ -- Bug#3491609 : Workflow Chanegs FP M
+x_source_object_id      IN NUMBER:= PA_INTERFACE_UTILS_PUB.G_PA_MISS_NUM,     --Bug No 3594635 SMukka
+x_source_object_type    IN VARCHAR2:= PA_INTERFACE_UTILS_PUB.G_PA_MISS_CHAR   --Bug No 3594635 SMukka
+,x_task_status_code      IN VARCHAR2 := NULL --Changes for 8566495 anuragag
+);
+
+PROCEDURE Update_Row(
+X_ROW_ID                IN   VARCHAR2,
+X_PROJ_ELEMENT_ID       IN	NUMBER,
+X_PROJECT_ID	      IN    NUMBER,
+X_OBJECT_TYPE	      IN    VARCHAR2,
+X_ELEMENT_NUMBER        IN	VARCHAR2,
+X_NAME                  IN	VARCHAR2,
+X_DESCRIPTION	      IN    VARCHAR2,
+X_STATUS_CODE	      IN    VARCHAR2,
+X_WF_STATUS_CODE        IN	VARCHAR2,
+X_PM_PRODUCT_CODE       IN	VARCHAR2,
+X_PM_TASK_REFERENCE     IN	VARCHAR2,
+X_CLOSED_DATE	      IN    DATE,
+X_LOCATION_ID	      IN    NUMBER,
+X_MANAGER_PERSON_ID	IN    NUMBER,
+X_CARRYING_OUT_ORGANIZATION_ID            IN NUMBER,
+X_TYPE_ID  	            IN    NUMBER,
+X_PRIORITY_CODE 	      IN    VARCHAR2,
+X_INC_PROJ_PROGRESS_FLAG  IN	VARCHAR2,
+X_RECORD_VERSION_NUMBER	  IN  NUMBER,
+X_REQUEST_ID	        IN  NUMBER,
+X_PROGRAM_APPLICATION_ID  IN  NUMBER,
+X_PROGRAM_ID	        IN  NUMBER,
+X_PROGRAM_UPDATE_DATE	  IN  DATE,
+X_ATTRIBUTE_CATEGORY	  IN VARCHAR2,
+X_ATTRIBUTE1	        IN VARCHAR2,
+X_ATTRIBUTE2	        IN VARCHAR2,
+X_ATTRIBUTE3	        IN VARCHAR2,
+X_ATTRIBUTE4	        IN VARCHAR2,
+X_ATTRIBUTE5	        IN VARCHAR2,
+X_ATTRIBUTE6	        IN VARCHAR2,
+X_ATTRIBUTE7	        IN VARCHAR2,
+X_ATTRIBUTE8	        IN VARCHAR2,
+X_ATTRIBUTE9	        IN VARCHAR2,
+X_ATTRIBUTE10	        IN VARCHAR2,
+X_ATTRIBUTE11	        IN VARCHAR2,
+X_ATTRIBUTE12	        IN VARCHAR2,
+X_ATTRIBUTE13	        IN VARCHAR2,
+X_ATTRIBUTE14	        IN VARCHAR2,
+X_ATTRIBUTE15	        IN VARCHAR2,
+X_TASK_WEIGHTING_DERIV_CODE  IN VARCHAR2,
+X_WORK_ITEM_CODE             IN VARCHAR2,
+X_UOM_CODE                   IN VARCHAR2,
+X_WQ_ACTUAL_ENTRY_CODE       IN VARCHAR2,
+X_TASK_PROGRESS_ENTRY_PAGE_ID IN NUMBER,
+x_parent_structure_id         IN NUMBER,
+x_phase_code                  IN VARCHAR,
+x_phase_version_id            IN NUMBER,
+x_progress_weight             IN NUMBER :=NULL,             -- 3279978 :: Added x_progress_weight Parameter
+x_function_code               IN VARCHAR2 := NULL,           -- 3279978 :: Added x_function_code Parameter
+x_Base_Perc_Comp_Deriv_Code   IN VARCHAR2 := PA_INTERFACE_UTILS_PUB.G_PA_MISS_CHAR, -- 3305199 : Added for FP_M changes
+-- Bug#3491609 : Workflow Chanegs FP M
+x_wf_item_type          IN VARCHAR2 :=NULL,
+x_wf_process            IN VARCHAR2 :=NULL,
+x_wf_lead_days          IN NUMBER :=NULL,
+x_wf_enabled_flag       IN VARCHAR2 :=NULL
+ -- Bug#3491609 : Workflow Chanegs FP M
+);
+
+PROCEDURE Delete_Row(
+X_ROW_ID                   IN VARCHAR2
+);
+
+END PA_PROJ_ELEMENTS_PKG;
+
+/

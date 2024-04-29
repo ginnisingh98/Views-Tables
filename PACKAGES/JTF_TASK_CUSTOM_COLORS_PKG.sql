@@ -1,0 +1,53 @@
+--------------------------------------------------------
+--  DDL for Package JTF_TASK_CUSTOM_COLORS_PKG
+--------------------------------------------------------
+
+  CREATE OR REPLACE EDITIONABLE PACKAGE "APPS"."JTF_TASK_CUSTOM_COLORS_PKG" AUTHID CURRENT_USER as
+/* $Header: jtftkcls.pls 115.2 2002/12/04 02:27:46 sachoudh ship $ */
+    procedure INSERT_ROW (
+      X_ROWID in out nocopy VARCHAR2,
+      X_RULE_ID in NUMBER,
+      X_COLOR_DETERMINATION_PRIORITY in NUMBER,
+      X_TYPE_ID in NUMBER,
+      X_PRIORITY_ID in NUMBER,
+      X_ASSIGNMENT_STATUS_ID in NUMBER,
+      X_ESCALATED_TASK in VARCHAR2,
+      X_ACTIVE_FLAG in VARCHAR2,
+      X_BACKGROUND_COL_DEC in NUMBER,
+      X_BACKGROUND_COL_RGB in VARCHAR2,
+      X_CREATION_DATE in DATE,
+      X_CREATED_BY in NUMBER,
+      X_LAST_UPDATE_DATE in DATE,
+      X_LAST_UPDATED_BY in NUMBER,
+      X_LAST_UPDATE_LOGIN in NUMBER);
+
+    procedure LOCK_ROW (
+      X_RULE_ID in NUMBER,
+      X_OBJECT_VERSION_NUMBER in NUMBER
+    );
+
+    procedure UPDATE_ROW (
+      X_RULE_ID in NUMBER,
+      X_OBJECT_VERSION_NUMBER in NUMBER,
+      X_COLOR_DETERMINATION_PRIORITY in NUMBER,
+      X_TYPE_ID in NUMBER,
+      X_PRIORITY_ID in NUMBER,
+      X_ASSIGNMENT_STATUS_ID in NUMBER,
+      X_ESCALATED_TASK in VARCHAR2,
+      X_ACTIVE_FLAG in VARCHAR2,
+      X_BACKGROUND_COL_DEC in NUMBER,
+      X_BACKGROUND_COL_RGB in VARCHAR2,
+      X_LAST_UPDATE_DATE in DATE,
+      X_LAST_UPDATED_BY in NUMBER,
+      X_LAST_UPDATE_LOGIN in NUMBER
+    );
+
+    procedure DELETE_ROW (
+      X_RULE_ID in NUMBER
+    );
+
+end JTF_TASK_CUSTOM_COLORS_PKG;
+
+ 
+
+/

@@ -1,0 +1,32 @@
+--------------------------------------------------------
+--  DDL for Package MSC_SD_RP_MASS_PKG
+--------------------------------------------------------
+
+  CREATE OR REPLACE EDITIONABLE PACKAGE "APPS"."MSC_SD_RP_MASS_PKG" AUTHID CURRENT_USER as
+/* $Header: MSCRPSDS.pls 120.0.12010000.3 2010/04/23 21:33:58 hulu noship $ */
+
+procedure TRANSLATE_ROW (
+  X_TABLE_NAME		in VARCHAR2,
+  X_COLUMN_NAME		in VARCHAR2,
+  X_FIELD_NAME		IN VARCHAR2 ,
+  X_OWNER               in VARCHAR2,
+  X_LAST_UPDATE_DATE    in VARCHAR2,
+  X_CUSTOM_MODE         in VARCHAR2);
+
+procedure LOAD_ROW (
+  X_TABLE_NAME		IN VARCHAR2,
+  X_COLUMN_NAME		IN VARCHAR2,
+  X_VALUE_TYPE		IN VARCHAR2,
+  X_OPERATION_LOV_SQL	IN VARCHAR2,
+  X_VALUE_LOV_NAME	IN VARCHAR2,
+  X_FIELD_NAME		IN VARCHAR2,
+  X_DEPENDENT_COLUMN    IN VARCHAR2,
+  X_OWNER               in VARCHAR2,
+  X_LAST_UPDATE_DATE    in VARCHAR2,
+  X_CUSTOM_MODE         in VARCHAR2
+  );
+
+procedure ADD_LANGUAGE;
+end MSC_SD_RP_MASS_PKG;
+
+/

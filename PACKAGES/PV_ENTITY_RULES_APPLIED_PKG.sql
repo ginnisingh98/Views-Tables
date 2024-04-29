@@ -1,0 +1,137 @@
+--------------------------------------------------------
+--  DDL for Package PV_ENTITY_RULES_APPLIED_PKG
+--------------------------------------------------------
+
+  CREATE OR REPLACE EDITIONABLE PACKAGE "APPS"."PV_ENTITY_RULES_APPLIED_PKG" AUTHID CURRENT_USER as
+/* $Header: pvrteras.pls 115.3 2002/12/06 21:38:38 ryellapu ship $ */
+-- Start of Comments
+-- Package name     : PV_ENTITY_RULES_APPLIED_PKG
+-- Purpose          :
+-- History          :
+-- NOTE             :
+-- End of Comments
+
+PROCEDURE Insert_Row(
+          px_ENTITY_RULE_APPLIED_ID   IN OUT NOCOPY NUMBER
+         ,p_LAST_UPDATE_DATE    DATE
+         ,p_LAST_UPDATED_BY    NUMBER
+         ,p_CREATION_DATE    DATE
+         ,p_CREATED_BY    NUMBER
+         ,p_LAST_UPDATE_LOGIN    NUMBER
+         ,p_OBJECT_VERSION_NUMBER    NUMBER
+         ,p_REQUEST_ID    NUMBER
+         ,p_PROGRAM_APPLICATION_ID    NUMBER
+         ,p_PROGRAM_ID    NUMBER
+         ,p_PROGRAM_UPDATE_DATE    DATE
+         ,p_ENTITY    VARCHAR2
+         ,p_ENTITY_ID    NUMBER
+         ,p_PROCESS_RULE_ID    NUMBER
+         ,p_PARENT_PROCESS_RULE_ID    NUMBER
+         ,p_LATEST_FLAG    VARCHAR2
+         ,p_ACTION_VALUE    VARCHAR2
+         ,p_PROCESS_TYPE    VARCHAR2
+         ,p_WINNING_RULE_FLAG    VARCHAR2
+	 ,p_ENTITY_DETAIL     VARCHAR2
+         ,p_ATTRIBUTE_CATEGORY    VARCHAR2
+         ,p_ATTRIBUTE1    VARCHAR2
+         ,p_ATTRIBUTE2    VARCHAR2
+         ,p_ATTRIBUTE3    VARCHAR2
+         ,p_ATTRIBUTE4    VARCHAR2
+         ,p_ATTRIBUTE5    VARCHAR2
+         ,p_ATTRIBUTE6    VARCHAR2
+         ,p_ATTRIBUTE7    VARCHAR2
+         ,p_ATTRIBUTE8    VARCHAR2
+         ,p_ATTRIBUTE9    VARCHAR2
+         ,p_ATTRIBUTE10    VARCHAR2
+         ,p_ATTRIBUTE11    VARCHAR2
+         ,p_ATTRIBUTE12    VARCHAR2
+         ,p_ATTRIBUTE13    VARCHAR2
+         ,p_ATTRIBUTE14    VARCHAR2
+         ,p_ATTRIBUTE15    VARCHAR2
+         ,p_PROCESS_STATUS    VARCHAR2);
+
+PROCEDURE Update_Row(
+          p_ENTITY_RULE_APPLIED_ID    NUMBER
+         ,p_LAST_UPDATE_DATE    DATE
+         ,p_LAST_UPDATED_BY    NUMBER
+         ,p_CREATION_DATE    DATE
+         ,p_CREATED_BY    NUMBER
+         ,p_LAST_UPDATE_LOGIN    NUMBER
+         ,p_OBJECT_VERSION_NUMBER    NUMBER
+         ,p_REQUEST_ID    NUMBER
+         ,p_PROGRAM_APPLICATION_ID    NUMBER
+         ,p_PROGRAM_ID    NUMBER
+         ,p_PROGRAM_UPDATE_DATE    DATE
+         ,p_ENTITY    VARCHAR2
+         ,p_ENTITY_ID    NUMBER
+         ,p_PROCESS_RULE_ID    NUMBER
+         ,p_PARENT_PROCESS_RULE_ID    NUMBER
+         ,p_LATEST_FLAG    VARCHAR2
+         ,p_ACTION_VALUE    VARCHAR2
+         ,p_PROCESS_TYPE    VARCHAR2
+         ,p_WINNING_RULE_FLAG    VARCHAR2
+	 ,p_ENTITY_DETAIL     VARCHAR2
+         ,p_ATTRIBUTE_CATEGORY    VARCHAR2
+         ,p_ATTRIBUTE1    VARCHAR2
+         ,p_ATTRIBUTE2    VARCHAR2
+         ,p_ATTRIBUTE3    VARCHAR2
+         ,p_ATTRIBUTE4    VARCHAR2
+         ,p_ATTRIBUTE5    VARCHAR2
+         ,p_ATTRIBUTE6    VARCHAR2
+         ,p_ATTRIBUTE7    VARCHAR2
+         ,p_ATTRIBUTE8    VARCHAR2
+         ,p_ATTRIBUTE9    VARCHAR2
+         ,p_ATTRIBUTE10    VARCHAR2
+         ,p_ATTRIBUTE11    VARCHAR2
+         ,p_ATTRIBUTE12    VARCHAR2
+         ,p_ATTRIBUTE13    VARCHAR2
+         ,p_ATTRIBUTE14    VARCHAR2
+         ,p_ATTRIBUTE15    VARCHAR2
+         ,p_PROCESS_STATUS    VARCHAR2);
+
+PROCEDURE Lock_Row(
+          p_ENTITY_RULE_APPLIED_ID    NUMBER
+         ,p_LAST_UPDATE_DATE    DATE
+         ,p_LAST_UPDATED_BY    NUMBER
+         ,p_CREATION_DATE    DATE
+         ,p_CREATED_BY    NUMBER
+         ,p_LAST_UPDATE_LOGIN    NUMBER
+         ,p_OBJECT_VERSION_NUMBER    NUMBER
+         ,p_REQUEST_ID    NUMBER
+         ,p_PROGRAM_APPLICATION_ID    NUMBER
+         ,p_PROGRAM_ID    NUMBER
+         ,p_PROGRAM_UPDATE_DATE    DATE
+         ,p_ENTITY    VARCHAR2
+         ,p_ENTITY_ID    NUMBER
+         ,p_PROCESS_RULE_ID    NUMBER
+         ,p_PARENT_PROCESS_RULE_ID    NUMBER
+         ,p_LATEST_FLAG    VARCHAR2
+         ,p_ACTION_VALUE    VARCHAR2
+         ,p_PROCESS_TYPE    VARCHAR2
+         ,p_WINNING_RULE_FLAG    VARCHAR2
+	 ,p_ENTITY_DETAIL     VARCHAR2
+         ,p_ATTRIBUTE_CATEGORY    VARCHAR2
+         ,p_ATTRIBUTE1    VARCHAR2
+         ,p_ATTRIBUTE2    VARCHAR2
+         ,p_ATTRIBUTE3    VARCHAR2
+         ,p_ATTRIBUTE4    VARCHAR2
+         ,p_ATTRIBUTE5    VARCHAR2
+         ,p_ATTRIBUTE6    VARCHAR2
+         ,p_ATTRIBUTE7    VARCHAR2
+         ,p_ATTRIBUTE8    VARCHAR2
+         ,p_ATTRIBUTE9    VARCHAR2
+         ,p_ATTRIBUTE10    VARCHAR2
+         ,p_ATTRIBUTE11    VARCHAR2
+         ,p_ATTRIBUTE12    VARCHAR2
+         ,p_ATTRIBUTE13    VARCHAR2
+         ,p_ATTRIBUTE14    VARCHAR2
+         ,p_ATTRIBUTE15    VARCHAR2
+         ,p_PROCESS_STATUS    VARCHAR2);
+
+PROCEDURE Delete_Row(
+    p_ENTITY_RULE_APPLIED_ID  NUMBER);
+End PV_ENTITY_RULES_APPLIED_PKG;
+
+ 
+
+/

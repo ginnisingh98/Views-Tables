@@ -1,0 +1,228 @@
+--------------------------------------------------------
+--  DDL for Package Body IEX_STRATEGY_USER_ITEMS_PKG
+--------------------------------------------------------
+
+  CREATE OR REPLACE EDITIONABLE PACKAGE BODY "APPS"."IEX_STRATEGY_USER_ITEMS_PKG" as
+/* $Header: iextsuib.pls 120.0 2004/01/24 03:23:07 appldev noship $ */
+-- Start of Comments
+-- Package name     : IEX_STRATEGY_USER_ITEMS_PKG
+-- Purpose          :
+-- History          :
+-- NOTE             :
+-- End of Comments
+
+
+G_PKG_NAME CONSTANT VARCHAR2(30):= 'IEX_STRATEGY_USER_ITEMS_PKG';
+G_FILE_NAME CONSTANT VARCHAR2(12) := 'iextsuib.pls';
+
+PG_DEBUG NUMBER(2) := TO_NUMBER(NVL(FND_PROFILE.value('IEX_DEBUG_LEVEL'), '20'));
+
+PROCEDURE Insert_Row(
+          px_STRATEGY_USER_ITEM_ID   IN OUT NOCOPY NUMBER
+         ,p_STRATEGY_ID    NUMBER
+         ,p_WORK_ITEM_TEMP_ID    NUMBER
+         ,p_WORK_ITEM_ORDER    NUMBER
+         ,p_LAST_UPDATED_BY    NUMBER
+         ,p_LAST_UPDATE_LOGIN    NUMBER
+         ,p_CREATION_DATE    DATE
+         ,p_CREATED_BY    NUMBER
+         ,p_LAST_UPDATE_DATE    DATE
+         ,p_PROGRAM_ID    NUMBER
+         ,p_OBJECT_VERSION_NUMBER    NUMBER
+         ,p_REQUEST_ID    NUMBER
+         ,p_STRATEGY_TEMPLATE_ID    NUMBER
+         ,p_PROGRAM_UPDATE_DATE    DATE
+         ,p_PROGRAM_APPLICATION_ID    NUMBER
+         ,p_OPERATION    VARCHAR2)
+
+ IS
+   CURSOR C2 IS SELECT IEX_STRATEGY_USER_ITEMS_S.nextval FROM sys.dual;
+BEGIN
+   If (px_STRATEGY_USER_ITEM_ID IS NULL) OR (px_STRATEGY_USER_ITEM_ID = FND_API.G_MISS_NUM) then
+       OPEN C2;
+       FETCH C2 INTO px_STRATEGY_USER_ITEM_ID;
+       CLOSE C2;
+   End If;
+   INSERT INTO IEX_STRATEGY_USER_ITEMS(
+           STRATEGY_USER_ITEM_ID
+          ,STRATEGY_ID
+          ,WORK_ITEM_TEMP_ID
+          ,WORK_ITEM_ORDER
+          ,LAST_UPDATED_BY
+          ,LAST_UPDATE_LOGIN
+          ,CREATION_DATE
+          ,CREATED_BY
+          ,LAST_UPDATE_DATE
+          ,PROGRAM_ID
+          ,OBJECT_VERSION_NUMBER
+          ,REQUEST_ID
+          ,STRATEGY_TEMPLATE_ID
+          ,PROGRAM_UPDATE_DATE
+          , PROGRAM_APPLICATION_ID
+          , OPERATION
+          ) VALUES (
+           px_STRATEGY_USER_ITEM_ID
+          ,decode( p_STRATEGY_ID, FND_API.G_MISS_NUM, NULL, p_STRATEGY_ID)
+          ,decode( p_WORK_ITEM_TEMP_ID, FND_API.G_MISS_NUM, NULL, p_WORK_ITEM_TEMP_ID)
+          ,decode( p_WORK_ITEM_ORDER, FND_API.G_MISS_NUM, NULL, p_WORK_ITEM_ORDER)
+          ,decode( p_LAST_UPDATED_BY, FND_API.G_MISS_NUM, NULL, p_LAST_UPDATED_BY)
+          ,decode( p_LAST_UPDATE_LOGIN, FND_API.G_MISS_NUM, NULL, p_LAST_UPDATE_LOGIN)
+          ,decode( p_CREATION_DATE, FND_API.G_MISS_DATE, TO_DATE(NULL), p_CREATION_DATE)
+          ,decode( p_CREATED_BY, FND_API.G_MISS_NUM, NULL, p_CREATED_BY)
+          ,decode( p_LAST_UPDATE_DATE, FND_API.G_MISS_DATE, TO_DATE(NULL), p_LAST_UPDATE_DATE)
+          ,decode( p_PROGRAM_ID, FND_API.G_MISS_NUM, NULL, p_PROGRAM_ID)
+          ,decode( p_OBJECT_VERSION_NUMBER, FND_API.G_MISS_NUM, NULL, p_OBJECT_VERSION_NUMBER)
+          ,decode( p_REQUEST_ID, FND_API.G_MISS_NUM, NULL, p_REQUEST_ID)
+          ,decode( p_STRATEGY_TEMPLATE_ID, FND_API.G_MISS_NUM, NULL, p_STRATEGY_TEMPLATE_ID)
+          ,decode( p_PROGRAM_UPDATE_DATE, FND_API.G_MISS_DATE, TO_DATE(NULL), p_PROGRAM_UPDATE_DATE)
+          ,decode( p_PROGRAM_APPLICATION_ID, FND_API.G_MISS_NUM, NULL, p_PROGRAM_APPLICATION_ID)
+          ,decode( p_OPERATION, FND_API.G_MISS_CHAR, NULL, p_OPERATION));
+End Insert_Row;
+
+PROCEDURE Update_Row(
+          p_STRATEGY_USER_ITEM_ID    NUMBER
+         ,p_STRATEGY_ID    NUMBER
+         ,p_WORK_ITEM_TEMP_ID    NUMBER
+         ,p_WORK_ITEM_ORDER    NUMBER
+         ,p_LAST_UPDATED_BY    NUMBER
+         ,p_LAST_UPDATE_LOGIN    NUMBER
+         ,p_CREATION_DATE    DATE
+         ,p_CREATED_BY    NUMBER
+         ,p_LAST_UPDATE_DATE    DATE
+         ,p_PROGRAM_ID    NUMBER
+         ,p_OBJECT_VERSION_NUMBER    NUMBER
+         ,p_REQUEST_ID    NUMBER
+         ,p_STRATEGY_TEMPLATE_ID    NUMBER
+         ,p_PROGRAM_UPDATE_DATE    DATE
+         ,p_PROGRAM_APPLICATION_ID    NUMBER
+         ,p_OPERATION    VARCHAR2)
+
+IS
+BEGIN
+    Update IEX_STRATEGY_USER_ITEMS
+    SET
+        STRATEGY_ID = decode( p_STRATEGY_ID, FND_API.G_MISS_NUM, STRATEGY_ID, p_STRATEGY_ID)
+       ,WORK_ITEM_TEMP_ID = decode( p_WORK_ITEM_TEMP_ID, FND_API.G_MISS_NUM, WORK_ITEM_TEMP_ID, p_WORK_ITEM_TEMP_ID)
+       ,WORK_ITEM_ORDER = decode( p_WORK_ITEM_ORDER, FND_API.G_MISS_NUM, WORK_ITEM_ORDER, p_WORK_ITEM_ORDER)
+       ,LAST_UPDATED_BY = decode( p_LAST_UPDATED_BY, FND_API.G_MISS_NUM, LAST_UPDATED_BY, p_LAST_UPDATED_BY)
+       ,LAST_UPDATE_LOGIN = decode( p_LAST_UPDATE_LOGIN, FND_API.G_MISS_NUM, LAST_UPDATE_LOGIN, p_LAST_UPDATE_LOGIN)
+       ,CREATION_DATE = decode( p_CREATION_DATE, FND_API.G_MISS_DATE, CREATION_DATE, p_CREATION_DATE)
+       ,CREATED_BY = decode( p_CREATED_BY, FND_API.G_MISS_NUM, CREATED_BY, p_CREATED_BY)
+       ,LAST_UPDATE_DATE = decode( p_LAST_UPDATE_DATE, FND_API.G_MISS_DATE, LAST_UPDATE_DATE, p_LAST_UPDATE_DATE)
+       ,PROGRAM_ID = decode( p_PROGRAM_ID, FND_API.G_MISS_NUM, PROGRAM_ID, p_PROGRAM_ID)
+       ,OBJECT_VERSION_NUMBER = decode( p_OBJECT_VERSION_NUMBER, FND_API.G_MISS_NUM, OBJECT_VERSION_NUMBER, p_OBJECT_VERSION_NUMBER)
+       ,REQUEST_ID = decode( p_REQUEST_ID, FND_API.G_MISS_NUM, REQUEST_ID, p_REQUEST_ID)
+       ,STRATEGY_TEMPLATE_ID = decode( p_STRATEGY_TEMPLATE_ID, FND_API.G_MISS_NUM, STRATEGY_TEMPLATE_ID, p_STRATEGY_TEMPLATE_ID)
+       ,PROGRAM_UPDATE_DATE = decode( p_PROGRAM_UPDATE_DATE, FND_API.G_MISS_DATE, PROGRAM_UPDATE_DATE, p_PROGRAM_UPDATE_DATE)
+       ,PROGRAM_APPLICATION_ID = decode( p_PROGRAM_APPLICATION_ID, FND_API.G_MISS_NUM, PROGRAM_APPLICATION_ID, p_PROGRAM_APPLICATION_ID)
+       ,OPERATION = decode( p_OPERATION, FND_API.G_MISS_CHAR, OPERATION, p_OPERATION)
+    where STRATEGY_USER_ITEM_ID = p_STRATEGY_USER_ITEM_ID;
+
+    If (SQL%NOTFOUND) then
+        RAISE NO_DATA_FOUND;
+    End If;
+END Update_Row;
+
+PROCEDURE Delete_Row(
+    p_STRATEGY_USER_ITEM_ID  NUMBER)
+IS
+BEGIN
+    DELETE FROM IEX_STRATEGY_USER_ITEMS
+    WHERE STRATEGY_USER_ITEM_ID = p_STRATEGY_USER_ITEM_ID;
+    If (SQL%NOTFOUND) then
+        RAISE NO_DATA_FOUND;
+    End If;
+END Delete_Row;
+
+PROCEDURE Lock_Row(
+          p_STRATEGY_USER_ITEM_ID    NUMBER
+         ,p_STRATEGY_ID    NUMBER
+         ,p_WORK_ITEM_TEMP_ID    NUMBER
+         ,p_WORK_ITEM_ORDER    NUMBER
+         ,p_LAST_UPDATED_BY    NUMBER
+         ,p_LAST_UPDATE_LOGIN    NUMBER
+         ,p_CREATION_DATE    DATE
+         ,p_CREATED_BY    NUMBER
+         ,p_LAST_UPDATE_DATE    DATE
+         ,p_PROGRAM_ID    NUMBER
+         ,p_OBJECT_VERSION_NUMBER    NUMBER
+         ,p_REQUEST_ID    NUMBER
+         ,p_STRATEGY_TEMPLATE_ID    NUMBER
+         ,p_PROGRAM_UPDATE_DATE    DATE
+         ,p_PROGRAM_APPLICATION_ID    NUMBER
+         ,p_OPERATION    VARCHAR2)
+
+ IS
+   CURSOR C IS
+       SELECT *
+       FROM IEX_STRATEGY_USER_ITEMS
+       WHERE STRATEGY_USER_ITEM_ID =  p_STRATEGY_USER_ITEM_ID
+       FOR UPDATE of STRATEGY_USER_ITEM_ID NOWAIT;
+   Recinfo C%ROWTYPE;
+BEGIN
+    OPEN C;
+    FETCH C INTO Recinfo;
+    If (C%NOTFOUND) then
+        CLOSE C;
+        FND_MESSAGE.SET_NAME('FND', 'FORM_RECORD_DELETED');
+        APP_EXCEPTION.RAISE_EXCEPTION;
+    End If;
+    CLOSE C;
+    if (
+           (      Recinfo.STRATEGY_USER_ITEM_ID = p_STRATEGY_USER_ITEM_ID)
+       AND (    ( Recinfo.STRATEGY_ID = p_STRATEGY_ID)
+            OR (    ( Recinfo.STRATEGY_ID IS NULL )
+                AND (  p_STRATEGY_ID IS NULL )))
+       AND (    ( Recinfo.WORK_ITEM_TEMP_ID = p_WORK_ITEM_TEMP_ID)
+            OR (    ( Recinfo.WORK_ITEM_TEMP_ID IS NULL )
+                AND (  p_WORK_ITEM_TEMP_ID IS NULL )))
+       AND (    ( Recinfo.WORK_ITEM_ORDER = p_WORK_ITEM_ORDER)
+            OR (    ( Recinfo.WORK_ITEM_ORDER IS NULL )
+                AND (  p_WORK_ITEM_ORDER IS NULL )))
+       AND (    ( Recinfo.LAST_UPDATED_BY = p_LAST_UPDATED_BY)
+            OR (    ( Recinfo.LAST_UPDATED_BY IS NULL )
+                AND (  p_LAST_UPDATED_BY IS NULL )))
+       AND (    ( Recinfo.LAST_UPDATE_LOGIN = p_LAST_UPDATE_LOGIN)
+            OR (    ( Recinfo.LAST_UPDATE_LOGIN IS NULL )
+                AND (  p_LAST_UPDATE_LOGIN IS NULL )))
+       AND (    ( Recinfo.CREATION_DATE = p_CREATION_DATE)
+            OR (    ( Recinfo.CREATION_DATE IS NULL )
+                AND (  p_CREATION_DATE IS NULL )))
+       AND (    ( Recinfo.CREATED_BY = p_CREATED_BY)
+            OR (    ( Recinfo.CREATED_BY IS NULL )
+                AND (  p_CREATED_BY IS NULL )))
+       AND (    ( Recinfo.LAST_UPDATE_DATE = p_LAST_UPDATE_DATE)
+            OR (    ( Recinfo.LAST_UPDATE_DATE IS NULL )
+                AND (  p_LAST_UPDATE_DATE IS NULL )))
+       AND (    ( Recinfo.PROGRAM_ID = p_PROGRAM_ID)
+            OR (    ( Recinfo.PROGRAM_ID IS NULL )
+                AND (  p_PROGRAM_ID IS NULL )))
+       AND (    ( Recinfo.OBJECT_VERSION_NUMBER = p_OBJECT_VERSION_NUMBER)
+            OR (    ( Recinfo.OBJECT_VERSION_NUMBER IS NULL )
+                AND (  p_OBJECT_VERSION_NUMBER IS NULL )))
+       AND (    ( Recinfo.REQUEST_ID = p_REQUEST_ID)
+            OR (    ( Recinfo.REQUEST_ID IS NULL )
+                AND (  p_REQUEST_ID IS NULL )))
+       AND (    ( Recinfo.STRATEGY_TEMPLATE_ID = p_STRATEGY_TEMPLATE_ID)
+            OR (    ( Recinfo.STRATEGY_TEMPLATE_ID IS NULL )
+                AND (  p_STRATEGY_TEMPLATE_ID IS NULL )))
+       AND (    ( Recinfo.PROGRAM_UPDATE_DATE = p_PROGRAM_UPDATE_DATE)
+            OR (    ( Recinfo.PROGRAM_UPDATE_DATE IS NULL )
+                AND (  p_PROGRAM_UPDATE_DATE IS NULL )))
+       AND (    ( Recinfo.PROGRAM_APPLICATION_ID = p_PROGRAM_APPLICATION_ID)
+            OR (    ( Recinfo.PROGRAM_APPLICATION_ID IS NULL )
+                AND (  p_PROGRAM_APPLICATION_ID IS NULL )))
+       AND (    ( Recinfo.OPERATION = p_OPERATION)
+            OR (    ( Recinfo.OPERATION IS NULL )
+                AND (  p_OPERATION IS NULL )))
+        ) then
+        return;
+    else
+        FND_MESSAGE.SET_NAME('FND', 'FORM_RECORD_CHANGED');
+        APP_EXCEPTION.RAISE_EXCEPTION;
+    End If;
+END Lock_Row;
+
+End IEX_STRATEGY_USER_ITEMS_PKG;
+
+/

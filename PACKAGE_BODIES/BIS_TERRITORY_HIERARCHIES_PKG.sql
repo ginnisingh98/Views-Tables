@@ -1,0 +1,156 @@
+--------------------------------------------------------
+--  DDL for Package Body BIS_TERRITORY_HIERARCHIES_PKG
+--------------------------------------------------------
+
+  CREATE OR REPLACE EDITIONABLE PACKAGE BODY "APPS"."BIS_TERRITORY_HIERARCHIES_PKG" AS
+/* $Header: BISTERHB.pls 115.1 99/07/17 16:10:54 porting shi $ */
+/*=======================================================================+
+ |  Copyright (c) 1997 Oracle Corporation Redwood Shores, California, USA|
+ |                            All rights reserved.                       |
+ +=======================================================================+
+ | FILENAME
+ | DESCRIPTION
+ |   PL/SQL body for package:  BIS_TERRITORY_HIERARCHIES_PKG
+ *=======================================================================*/
+procedure INSERT_ROW (
+  X_ROWID in out VARCHAR2,
+  X_PARENT_TERRITORY_CODE in VARCHAR2,
+  X_PARENT_TERRITORY_TYPE in VARCHAR2,
+  X_CHILD_TERRITORY_CODE in VARCHAR2,
+  X_CHILD_TERRITORY_TYPE in VARCHAR2,
+  X_START_DATE_ACTIVE in DATE,
+  X_END_DATE_ACTIVE in DATE,
+  X_CREATION_DATE in DATE,
+  X_CREATED_BY in NUMBER,
+  X_LAST_UPDATE_DATE in DATE,
+  X_LAST_UPDATED_BY in NUMBER,
+  X_LAST_UPDATE_LOGIN in NUMBER
+) is
+  cursor C is select ROWID from BIS_TERRITORY_HIERARCHIES
+    where PARENT_TERRITORY_CODE = X_PARENT_TERRITORY_CODE
+    and PARENT_TERRITORY_TYPE = X_PARENT_TERRITORY_TYPE
+    and CHILD_TERRITORY_CODE = X_CHILD_TERRITORY_CODE
+    and CHILD_TERRITORY_TYPE = X_CHILD_TERRITORY_TYPE;
+begin
+  insert into BIS_TERRITORY_HIERARCHIES (
+    PARENT_TERRITORY_CODE,
+    PARENT_TERRITORY_TYPE,
+    CHILD_TERRITORY_CODE,
+    CHILD_TERRITORY_TYPE,
+    START_DATE_ACTIVE,
+    END_DATE_ACTIVE,
+    CREATED_BY,
+    CREATION_DATE,
+    LAST_UPDATED_BY,
+    LAST_UPDATE_DATE,
+    LAST_UPDATE_LOGIN
+  ) select
+    X_PARENT_TERRITORY_CODE,
+    X_PARENT_TERRITORY_TYPE,
+    X_CHILD_TERRITORY_CODE,
+    X_CHILD_TERRITORY_TYPE,
+    X_START_DATE_ACTIVE,
+    X_END_DATE_ACTIVE,
+    X_CREATED_BY,
+    X_CREATION_DATE,
+    X_LAST_UPDATED_BY,
+    X_LAST_UPDATE_DATE,
+    X_LAST_UPDATE_LOGIN
+  from dual;
+
+  open c;
+  fetch c into X_ROWID;
+  if (c%notfound) then
+    close c;
+    raise no_data_found;
+  end if;
+  close c;
+
+end INSERT_ROW;
+
+procedure LOCK_ROW (
+  X_PARENT_TERRITORY_CODE in VARCHAR2,
+  X_PARENT_TERRITORY_TYPE in VARCHAR2,
+  X_CHILD_TERRITORY_CODE in VARCHAR2,
+  X_CHILD_TERRITORY_TYPE in VARCHAR2,
+  X_START_DATE_ACTIVE in DATE,
+  X_END_DATE_ACTIVE in DATE
+) is
+  cursor c1 is select
+      START_DATE_ACTIVE,
+      END_DATE_ACTIVE,
+      CHILD_TERRITORY_TYPE
+    from BIS_TERRITORY_HIERARCHIES
+    where PARENT_TERRITORY_CODE = X_PARENT_TERRITORY_CODE
+    and PARENT_TERRITORY_TYPE = X_PARENT_TERRITORY_TYPE
+    and CHILD_TERRITORY_CODE = X_CHILD_TERRITORY_CODE
+    and CHILD_TERRITORY_TYPE = X_CHILD_TERRITORY_TYPE
+    for update of PARENT_TERRITORY_CODE nowait;
+begin
+  for tlinfo in c1 loop
+      if (    (tlinfo.CHILD_TERRITORY_TYPE = X_CHILD_TERRITORY_TYPE)
+          AND ((tlinfo.START_DATE_ACTIVE = X_START_DATE_ACTIVE)
+               OR ((tlinfo.START_DATE_ACTIVE is null) AND (X_START_DATE_ACTIVE is null)))
+          AND ((tlinfo.END_DATE_ACTIVE = X_END_DATE_ACTIVE)
+               OR ((tlinfo.END_DATE_ACTIVE is null) AND (X_END_DATE_ACTIVE is null)))
+      ) then
+        null;
+      else
+        fnd_message.set_name('FND', 'FORM_RECORD_CHANGED');
+        app_exception.raise_exception;
+      end if;
+  end loop;
+  return;
+end LOCK_ROW;
+
+procedure UPDATE_ROW (
+  X_PARENT_TERRITORY_CODE in VARCHAR2,
+  X_PARENT_TERRITORY_TYPE in VARCHAR2,
+  X_CHILD_TERRITORY_CODE in VARCHAR2,
+  X_CHILD_TERRITORY_TYPE in VARCHAR2,
+  X_START_DATE_ACTIVE in DATE,
+  X_END_DATE_ACTIVE in DATE,
+  X_LAST_UPDATE_DATE in DATE,
+  X_LAST_UPDATED_BY in NUMBER,
+  X_LAST_UPDATE_LOGIN in NUMBER
+) is
+begin
+  update BIS_TERRITORY_HIERARCHIES set
+    START_DATE_ACTIVE = X_START_DATE_ACTIVE,
+    END_DATE_ACTIVE = X_END_DATE_ACTIVE,
+    CHILD_TERRITORY_TYPE = X_CHILD_TERRITORY_TYPE,
+    LAST_UPDATE_DATE = X_LAST_UPDATE_DATE,
+    LAST_UPDATED_BY = X_LAST_UPDATED_BY,
+    LAST_UPDATE_LOGIN = X_LAST_UPDATE_LOGIN
+  where PARENT_TERRITORY_CODE = X_PARENT_TERRITORY_CODE
+  and PARENT_TERRITORY_TYPE = X_PARENT_TERRITORY_TYPE
+  and CHILD_TERRITORY_CODE = X_CHILD_TERRITORY_CODE
+  and CHILD_TERRITORY_TYPE = X_CHILD_TERRITORY_TYPE;
+
+  if (sql%notfound) then
+    raise no_data_found;
+  end if;
+end UPDATE_ROW;
+
+procedure DELETE_ROW (
+  X_PARENT_TERRITORY_CODE in VARCHAR2,
+  X_PARENT_TERRITORY_TYPE in VARCHAR2,
+  X_CHILD_TERRITORY_CODE in VARCHAR2,
+  X_CHILD_TERRITORY_TYPE in VARCHAR2
+) is
+begin
+  delete from BIS_TERRITORY_HIERARCHIES
+  where PARENT_TERRITORY_CODE = X_PARENT_TERRITORY_CODE
+  and PARENT_TERRITORY_TYPE = X_PARENT_TERRITORY_TYPE
+  and CHILD_TERRITORY_CODE = X_CHILD_TERRITORY_CODE
+  and CHILD_TERRITORY_TYPE = X_CHILD_TERRITORY_TYPE;
+
+  if (sql%notfound) then
+    raise no_data_found;
+  end if;
+
+end DELETE_ROW;
+
+end BIS_TERRITORY_HIERARCHIES_PKG;
+
+/

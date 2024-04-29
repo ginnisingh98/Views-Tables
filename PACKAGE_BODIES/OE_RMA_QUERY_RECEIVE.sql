@@ -1,0 +1,46 @@
+--------------------------------------------------------
+--  DDL for Package Body OE_RMA_QUERY_RECEIVE
+--------------------------------------------------------
+
+  CREATE OR REPLACE EDITIONABLE PACKAGE BODY "APPS"."OE_RMA_QUERY_RECEIVE" as
+/* $Header: oexrlqrb.pls 115.1 99/07/16 08:29:28 porting ship $ */
+
+  /*
+  **  Validate the warehouse given the item.
+  **  If not avlid, the return null.
+  */
+  PROCEDURE VALIDATE_WAREHOUSE (
+		p_warehouse_id		IN OUT  NUMBER,
+		p_inventory_item_id	IN	NUMBER
+		) IS
+
+  X_SET_OF_BOOKS_ID     NUMBER := FND_PROFILE.VALUE('SO_SET_OF_BOOKS_ID');
+
+  BEGIN
+
+  SELECT ORGANIZATION_ID
+  INTO   P_WAREHOUSE_ID
+  FROM	 SO_ITEM_WAREHOUSES_V
+  WHERE	 ORGANIZATION_ID = P_WAREHOUSE_ID
+  AND	 INVENTORY_ITEM_ID = P_INVENTORY_ITEM_ID
+  AND	 NVL(RETURNABLE_FLAG, 'Y') = 'Y'
+  AND    EXISTS
+        (SELECT 'SAME CHART OF ACCOUNTS'
+         FROM   ORG_ORGANIZATION_DEFINITIONS ORGDEF1,
+                ORG_ORGANIZATION_DEFINITIONS ORGDEF2
+         WHERE  ORGDEF1.SET_OF_BOOKS_ID = X_SET_OF_BOOKS_ID
+         AND    ORGDEF2.ORGANIZATION_ID = SO_ITEM_WAREHOUSES_V.ORGANIZATION_ID
+         AND    ORGDEF1.CHART_OF_ACCOUNTS_ID = ORGDEF2.CHART_OF_ACCOUNTS_ID);
+
+  RETURN;
+
+  EXCEPTION
+   WHEN NO_DATA_FOUND THEN
+     p_warehouse_id := NULL;
+     return;
+
+  END VALIDATE_WAREHOUSE;
+
+END OE_RMA_QUERY_RECEIVE;
+
+/

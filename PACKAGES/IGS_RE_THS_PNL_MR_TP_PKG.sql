@@ -1,0 +1,77 @@
+--------------------------------------------------------
+--  DDL for Package IGS_RE_THS_PNL_MR_TP_PKG
+--------------------------------------------------------
+
+  CREATE OR REPLACE EDITIONABLE PACKAGE "APPS"."IGS_RE_THS_PNL_MR_TP_PKG" AUTHID CURRENT_USER as
+/* $Header: IGSRI23S.pls 115.5 2003/02/19 10:31:18 kpadiyar ship $ */
+procedure INSERT_ROW (
+  X_ROWID in out NOCOPY VARCHAR2,
+  X_PANEL_MEMBER_TYPE in VARCHAR2,
+  X_DESCRIPTION in VARCHAR2,
+  X_PANEL_CHAIR_IND in VARCHAR2,
+  X_CLOSED_IND in VARCHAR2,
+  X_TRACKING_TYPE in VARCHAR2,
+  X_MODE in VARCHAR2 default 'R' ,
+  X_ORG_ID in NUMBER
+  );
+procedure LOCK_ROW (
+  X_ROWID in VARCHAR2,
+  X_PANEL_MEMBER_TYPE in VARCHAR2,
+  X_DESCRIPTION in VARCHAR2,
+  X_PANEL_CHAIR_IND in VARCHAR2,
+  X_CLOSED_IND in VARCHAR2,
+  X_TRACKING_TYPE in VARCHAR2
+);
+procedure UPDATE_ROW (
+  X_ROWID in VARCHAR2,
+  X_PANEL_MEMBER_TYPE in VARCHAR2,
+  X_DESCRIPTION in VARCHAR2,
+  X_PANEL_CHAIR_IND in VARCHAR2,
+  X_CLOSED_IND in VARCHAR2,
+  X_TRACKING_TYPE in VARCHAR2,
+  X_MODE in VARCHAR2 default 'R'
+  );
+procedure ADD_ROW (
+  X_ROWID in out NOCOPY VARCHAR2,
+  X_PANEL_MEMBER_TYPE in VARCHAR2,
+  X_DESCRIPTION in VARCHAR2,
+  X_PANEL_CHAIR_IND in VARCHAR2,
+  X_CLOSED_IND in VARCHAR2,
+  X_TRACKING_TYPE in VARCHAR2,
+  X_MODE in VARCHAR2 default 'R',
+  X_ORG_ID in NUMBER
+  );
+procedure DELETE_ROW (
+  X_ROWID in VARCHAR2
+);
+
+FUNCTION Get_PK_For_Validation (
+    x_panel_member_type IN VARCHAR2
+)RETURN BOOLEAN ;
+
+ PROCEDURE Check_Constraints(
+  Column_Name IN VARCHAR2 DEFAULT NULL,
+  Column_Value IN VARCHAR2 DEFAULT NULL
+ );
+
+  PROCEDURE Before_DML (
+    p_action IN VARCHAR2,
+    x_rowid IN VARCHAR2 DEFAULT NULL,
+    x_panel_member_type IN VARCHAR2 DEFAULT NULL,
+    x_description IN VARCHAR2 DEFAULT NULL,
+    x_panel_chair_ind IN VARCHAR2 DEFAULT NULL,
+    x_closed_ind IN VARCHAR2 DEFAULT NULL,
+    x_tracking_type IN VARCHAR2 DEFAULT NULL,
+    x_creation_date IN DATE  DEFAULT NULL,
+    x_created_by IN NUMBER DEFAULT NULL,
+    x_last_update_date IN DATE DEFAULT NULL,
+    x_last_updated_by IN NUMBER DEFAULT NULL,
+    x_last_update_login IN NUMBER DEFAULT NULL,
+    X_ORG_ID in NUMBER DEFAULT NULL
+  ) ;
+
+end IGS_RE_THS_PNL_MR_TP_PKG;
+
+ 
+
+/

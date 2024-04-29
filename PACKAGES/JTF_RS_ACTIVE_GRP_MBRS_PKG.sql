@@ -1,0 +1,40 @@
+--------------------------------------------------------
+--  DDL for Package JTF_RS_ACTIVE_GRP_MBRS_PKG
+--------------------------------------------------------
+
+  CREATE OR REPLACE EDITIONABLE PACKAGE "APPS"."JTF_RS_ACTIVE_GRP_MBRS_PKG" AUTHID CURRENT_USER as
+/* $Header: jtfrshas.pls 120.0 2005/05/11 08:20:06 appldev ship $ */
+procedure INSERT_ROW (
+  X_ROWID in out nocopy VARCHAR2,
+  X_GROUP_MEMBER_ID in NUMBER,
+  X_GROUP_ID in NUMBER,
+  X_RESOURCE_ID in NUMBER,
+  X_PERSON_ID in NUMBER,
+  X_CREATION_DATE in DATE,
+  X_CREATED_BY in NUMBER,
+  X_LAST_UPDATE_DATE in DATE,
+  X_LAST_UPDATED_BY in NUMBER,
+  X_LAST_UPDATE_LOGIN in NUMBER);
+procedure LOCK_ROW (
+  X_GROUP_MEMBER_ID in NUMBER,
+  X_OBJECT_VERSION_NUMBER in NUMBER
+);
+procedure UPDATE_ROW (
+  X_GROUP_MEMBER_ID in NUMBER,
+  X_GROUP_ID in NUMBER,
+  X_OBJECT_VERSION_NUMBER in NUMBER,
+  X_RESOURCE_ID in NUMBER,
+  X_PERSON_ID in NUMBER,
+  X_LAST_UPDATE_DATE in DATE,
+  X_LAST_UPDATED_BY in NUMBER,
+  X_LAST_UPDATE_LOGIN in NUMBER
+);
+procedure DELETE_ROW (
+  X_GROUP_MEMBER_ID in NUMBER
+);
+
+end JTF_RS_ACTIVE_GRP_MBRS_PKG;
+
+ 
+
+/

@@ -1,0 +1,446 @@
+--------------------------------------------------------
+--  DDL for Package Body WMS_PAGE_FIELDS_PKG
+--------------------------------------------------------
+
+  CREATE OR REPLACE EDITIONABLE PACKAGE BODY "APPS"."WMS_PAGE_FIELDS_PKG" as
+/* $Header: WMSPFTHB.pls 115.1 2004/07/01 06:27:55 vsunkesh noship $ */
+
+procedure INSERT_ROW (
+  X_ROWID in out NOCOPY VARCHAR2,
+  X_PAGE_ID in NUMBER,
+  X_FIELD_ID in NUMBER,
+  X_FIELD_NAME in VARCHAR2,
+  X_FIELD_DISP_SEQUENCE_NUMBER in NUMBER,
+  X_FIELD_PROMPT in VARCHAR2,
+  X_FIELD_TYPE in VARCHAR2,
+  X_FIELD_CONSTRUCTOR_PARAM in VARCHAR2,
+  X_FIELD_CATEGORY in VARCHAR2,
+  X_FIELD_IS_CONFIGURABLE in VARCHAR2,
+  X_FIELD_IS_VISIBLE in VARCHAR2,
+  X_FIELD_PROPERTY1_DEFAULT_VALU in NUMBER,
+  X_FIELD_PROPERTY2_DEFAULT_VALU in NUMBER,
+  X_FIELD_USER_NAME in VARCHAR2,
+  X_CREATION_DATE in DATE,
+  X_CREATED_BY in NUMBER,
+  X_LAST_UPDATE_DATE in DATE,
+  X_LAST_UPDATED_BY in NUMBER,
+  X_LAST_UPDATE_LOGIN in NUMBER
+) is
+  cursor C is select ROWID from WMS_PAGE_FIELDS_B
+    where PAGE_ID = X_PAGE_ID
+    and FIELD_ID = X_FIELD_ID
+    ;
+begin
+  insert into WMS_PAGE_FIELDS_B (
+    PAGE_ID,
+    FIELD_ID,
+    FIELD_NAME,
+    FIELD_DISP_SEQUENCE_NUMBER,
+    FIELD_PROMPT,
+    FIELD_TYPE,
+    FIELD_CONSTRUCTOR_PARAM,
+    FIELD_CATEGORY,
+    FIELD_IS_CONFIGURABLE,
+    FIELD_IS_VISIBLE,
+    FIELD_PROPERTY1_DEFAULT_VALUE,
+    FIELD_PROPERTY2_DEFAULT_VALUE,
+    CREATION_DATE,
+    CREATED_BY,
+    LAST_UPDATE_DATE,
+    LAST_UPDATED_BY,
+    LAST_UPDATE_LOGIN
+  ) values (
+    X_PAGE_ID,
+    X_FIELD_ID,
+    X_FIELD_NAME,
+    X_FIELD_DISP_SEQUENCE_NUMBER,
+    X_FIELD_PROMPT,
+    X_FIELD_TYPE,
+    X_FIELD_CONSTRUCTOR_PARAM,
+    X_FIELD_CATEGORY,
+    X_FIELD_IS_CONFIGURABLE,
+    X_FIELD_IS_VISIBLE,
+    X_FIELD_PROPERTY1_DEFAULT_VALU,
+    X_FIELD_PROPERTY2_DEFAULT_VALU,
+    X_CREATION_DATE,
+    X_CREATED_BY,
+    X_LAST_UPDATE_DATE,
+    X_LAST_UPDATED_BY,
+    X_LAST_UPDATE_LOGIN
+  );
+
+  insert into WMS_PAGE_FIELDS_TL (
+    PAGE_ID,
+    FIELD_ID,
+    FIELD_USER_NAME,
+    LAST_UPDATE_DATE,
+    LAST_UPDATED_BY,
+    CREATION_DATE,
+    CREATED_BY,
+    LAST_UPDATE_LOGIN,
+    LANGUAGE,
+    SOURCE_LANG
+  ) select
+    X_PAGE_ID,
+    X_FIELD_ID,
+    X_FIELD_USER_NAME,
+    X_LAST_UPDATE_DATE,
+    X_LAST_UPDATED_BY,
+    X_CREATION_DATE,
+    X_CREATED_BY,
+    X_LAST_UPDATE_LOGIN,
+    L.LANGUAGE_CODE,
+    userenv('LANG')
+  from FND_LANGUAGES L
+  where L.INSTALLED_FLAG in ('I', 'B')
+  and not exists
+    (select NULL
+    from WMS_PAGE_FIELDS_TL T
+    where T.PAGE_ID = X_PAGE_ID
+    and T.FIELD_ID = X_FIELD_ID
+    and T.LANGUAGE = L.LANGUAGE_CODE);
+
+  open c;
+  fetch c into X_ROWID;
+  if (c%notfound) then
+    close c;
+    raise no_data_found;
+  end if;
+  close c;
+
+end INSERT_ROW;
+
+procedure LOCK_ROW (
+  X_PAGE_ID in NUMBER,
+  X_FIELD_ID in NUMBER,
+  X_FIELD_NAME in VARCHAR2,
+  X_FIELD_DISP_SEQUENCE_NUMBER in NUMBER,
+  X_FIELD_PROMPT in VARCHAR2,
+  X_FIELD_TYPE in VARCHAR2,
+  X_FIELD_CONSTRUCTOR_PARAM in VARCHAR2,
+  X_FIELD_CATEGORY in VARCHAR2,
+  X_FIELD_IS_CONFIGURABLE in VARCHAR2,
+  X_FIELD_IS_VISIBLE in VARCHAR2,
+  X_FIELD_PROPERTY1_DEFAULT_VALU in NUMBER,
+  X_FIELD_PROPERTY2_DEFAULT_VALU in NUMBER,
+  X_FIELD_USER_NAME in VARCHAR2
+) is
+  cursor c is select
+      FIELD_NAME,
+      FIELD_DISP_SEQUENCE_NUMBER,
+      FIELD_PROMPT,
+      FIELD_TYPE,
+      FIELD_CONSTRUCTOR_PARAM,
+      FIELD_CATEGORY,
+      FIELD_IS_CONFIGURABLE,
+      FIELD_IS_VISIBLE,
+      FIELD_PROPERTY1_DEFAULT_VALUE,
+      FIELD_PROPERTY2_DEFAULT_VALUE
+    from WMS_PAGE_FIELDS_B
+    where PAGE_ID = X_PAGE_ID
+    and FIELD_ID = X_FIELD_ID
+    for update of PAGE_ID nowait;
+  recinfo c%rowtype;
+
+  cursor c1 is select
+      FIELD_USER_NAME,
+      decode(LANGUAGE, userenv('LANG'), 'Y', 'N') BASELANG
+    from WMS_PAGE_FIELDS_TL
+    where PAGE_ID = X_PAGE_ID
+    and FIELD_ID = X_FIELD_ID
+    and userenv('LANG') in (LANGUAGE, SOURCE_LANG)
+    for update of PAGE_ID nowait;
+begin
+  open c;
+  fetch c into recinfo;
+  if (c%notfound) then
+    close c;
+    fnd_message.set_name('FND', 'FORM_RECORD_DELETED');
+    app_exception.raise_exception;
+  end if;
+  close c;
+  if (    (recinfo.FIELD_NAME = X_FIELD_NAME)
+      AND ((recinfo.FIELD_DISP_SEQUENCE_NUMBER = X_FIELD_DISP_SEQUENCE_NUMBER)
+           OR ((recinfo.FIELD_DISP_SEQUENCE_NUMBER is null) AND (X_FIELD_DISP_SEQUENCE_NUMBER is null)))
+      AND ((recinfo.FIELD_PROMPT = X_FIELD_PROMPT)
+           OR ((recinfo.FIELD_PROMPT is null) AND (X_FIELD_PROMPT is null)))
+      AND ((recinfo.FIELD_TYPE = X_FIELD_TYPE)
+           OR ((recinfo.FIELD_TYPE is null) AND (X_FIELD_TYPE is null)))
+      AND ((recinfo.FIELD_CONSTRUCTOR_PARAM = X_FIELD_CONSTRUCTOR_PARAM)
+           OR ((recinfo.FIELD_CONSTRUCTOR_PARAM is null) AND (X_FIELD_CONSTRUCTOR_PARAM is null)))
+      AND ((recinfo.FIELD_CATEGORY = X_FIELD_CATEGORY)
+           OR ((recinfo.FIELD_CATEGORY is null) AND (X_FIELD_CATEGORY is null)))
+      AND ((recinfo.FIELD_IS_CONFIGURABLE = X_FIELD_IS_CONFIGURABLE)
+           OR ((recinfo.FIELD_IS_CONFIGURABLE is null) AND (X_FIELD_IS_CONFIGURABLE is null)))
+      AND ((recinfo.FIELD_IS_VISIBLE = X_FIELD_IS_VISIBLE)
+           OR ((recinfo.FIELD_IS_VISIBLE is null) AND (X_FIELD_IS_VISIBLE is null)))
+      AND ((recinfo.FIELD_PROPERTY1_DEFAULT_VALUE = X_FIELD_PROPERTY1_DEFAULT_VALU)
+           OR ((recinfo.FIELD_PROPERTY1_DEFAULT_VALUE is null) AND (X_FIELD_PROPERTY1_DEFAULT_VALU is null)))
+      AND ((recinfo.FIELD_PROPERTY2_DEFAULT_VALUE = X_FIELD_PROPERTY2_DEFAULT_VALU)
+           OR ((recinfo.FIELD_PROPERTY2_DEFAULT_VALUE is null) AND (X_FIELD_PROPERTY2_DEFAULT_VALU is null)))
+  ) then
+    null;
+  else
+    fnd_message.set_name('FND', 'FORM_RECORD_CHANGED');
+    app_exception.raise_exception;
+  end if;
+
+  for tlinfo in c1 loop
+    if (tlinfo.BASELANG = 'Y') then
+      if (    ((tlinfo.FIELD_USER_NAME = X_FIELD_USER_NAME)
+               OR ((tlinfo.FIELD_USER_NAME is null) AND (X_FIELD_USER_NAME is null)))
+      ) then
+        null;
+      else
+        fnd_message.set_name('FND', 'FORM_RECORD_CHANGED');
+        app_exception.raise_exception;
+      end if;
+    end if;
+  end loop;
+  return;
+end LOCK_ROW;
+
+procedure UPDATE_ROW (
+  X_PAGE_ID in NUMBER,
+  X_FIELD_ID in NUMBER,
+  X_FIELD_NAME in VARCHAR2,
+  X_FIELD_DISP_SEQUENCE_NUMBER in NUMBER,
+  X_FIELD_PROMPT in VARCHAR2,
+  X_FIELD_TYPE in VARCHAR2,
+  X_FIELD_CONSTRUCTOR_PARAM in VARCHAR2,
+  X_FIELD_CATEGORY in VARCHAR2,
+  X_FIELD_IS_CONFIGURABLE in VARCHAR2,
+  X_FIELD_IS_VISIBLE in VARCHAR2,
+  X_FIELD_PROPERTY1_DEFAULT_VALU in NUMBER,
+  X_FIELD_PROPERTY2_DEFAULT_VALU in NUMBER,
+  X_FIELD_USER_NAME in VARCHAR2,
+  X_LAST_UPDATE_DATE in DATE,
+  X_LAST_UPDATED_BY in NUMBER,
+  X_LAST_UPDATE_LOGIN in NUMBER
+) is
+begin
+  update WMS_PAGE_FIELDS_B set
+    FIELD_NAME = X_FIELD_NAME,
+    FIELD_DISP_SEQUENCE_NUMBER = X_FIELD_DISP_SEQUENCE_NUMBER,
+    FIELD_PROMPT = X_FIELD_PROMPT,
+    FIELD_TYPE = X_FIELD_TYPE,
+    FIELD_CONSTRUCTOR_PARAM = X_FIELD_CONSTRUCTOR_PARAM,
+    FIELD_CATEGORY = X_FIELD_CATEGORY,
+    FIELD_IS_CONFIGURABLE = X_FIELD_IS_CONFIGURABLE,
+    FIELD_IS_VISIBLE = X_FIELD_IS_VISIBLE,
+    FIELD_PROPERTY1_DEFAULT_VALUE = X_FIELD_PROPERTY1_DEFAULT_VALU,
+    FIELD_PROPERTY2_DEFAULT_VALUE = X_FIELD_PROPERTY2_DEFAULT_VALU,
+    LAST_UPDATE_DATE = X_LAST_UPDATE_DATE,
+    LAST_UPDATED_BY = X_LAST_UPDATED_BY,
+    LAST_UPDATE_LOGIN = X_LAST_UPDATE_LOGIN
+  where PAGE_ID = X_PAGE_ID
+  and FIELD_ID = X_FIELD_ID;
+
+  if (sql%notfound) then
+    raise no_data_found;
+  end if;
+
+  update WMS_PAGE_FIELDS_TL set
+    FIELD_USER_NAME = X_FIELD_USER_NAME,
+    LAST_UPDATE_DATE = X_LAST_UPDATE_DATE,
+    LAST_UPDATED_BY = X_LAST_UPDATED_BY,
+    LAST_UPDATE_LOGIN = X_LAST_UPDATE_LOGIN,
+    SOURCE_LANG = userenv('LANG')
+  where PAGE_ID = X_PAGE_ID
+  and FIELD_ID = X_FIELD_ID
+  and userenv('LANG') in (LANGUAGE, SOURCE_LANG);
+
+  if (sql%notfound) then
+    raise no_data_found;
+  end if;
+end UPDATE_ROW;
+
+procedure TRANSLATE_ROW (
+  X_PAGE_ID in NUMBER,
+  X_FIELD_NAME in VARCHAR2,
+  X_OWNER in VARCHAR2,
+  X_LAST_UPDATE_DATE in DATE,
+  X_FIELD_USER_NAME in VARCHAR2) is
+begin
+
+  update WMS_PAGE_FIELDS_TL tl set
+    FIELD_USER_NAME = nvl(X_FIELD_USER_NAME,
+                                   FIELD_USER_NAME),
+    SOURCE_LANG              = userenv('LANG'),
+    LAST_UPDATE_DATE         = X_LAST_UPDATE_DATE,
+    LAST_UPDATED_BY          = fnd_load_util.owner_id(X_OWNER) ,
+    LAST_UPDATE_LOGIN        = 0
+  where tl.PAGE_ID = X_PAGE_ID
+  and tl.FIELD_ID = (select b.field_id from WMS_PAGE_FIELDS_B b where b.field_name = X_FIELD_NAME)
+  and userenv('LANG') in (LANGUAGE, SOURCE_LANG);
+
+end TRANSLATE_ROW;
+
+procedure LOAD_ROW (
+  X_PAGE_ID in NUMBER,
+  X_FIELD_NAME in VARCHAR2,
+  X_OWNER in VARCHAR2,
+  X_LAST_UPDATE_DATE in DATE,
+  X_FIELD_DISP_SEQUENCE_NUMBER in NUMBER,
+  X_FIELD_PROMPT in VARCHAR2,
+  X_FIELD_TYPE in VARCHAR2,
+  X_FIELD_CONSTRUCTOR_PARAM in VARCHAR2,
+  X_FIELD_CATEGORY in VARCHAR2,
+  X_FIELD_IS_CONFIGURABLE in VARCHAR2,
+  X_FIELD_IS_VISIBLE in VARCHAR2,
+  X_FIELD_PROPERTY1_DEFAULT_VALU in NUMBER,
+  X_FIELD_PROPERTY2_DEFAULT_VALU in NUMBER,
+  X_FIELD_USER_NAME in VARCHAR2) is
+begin
+
+  declare
+     l_field_id 	number := 0;
+     user_id    number := 0;
+     row_id 	varchar2(64);
+   begin
+     user_id := fnd_load_util.owner_id(X_OWNER);
+     select field_id into l_field_id
+     from   WMS_PAGE_FIELDS_VL
+     where  PAGE_ID = X_PAGE_ID AND FIELD_NAME = X_FIELD_NAME;
+
+  WMS_PAGE_FIELDS_PKG.UPDATE_ROW(
+    X_PAGE_ID => X_PAGE_ID,
+    X_FIELD_ID => l_field_id,
+    X_FIELD_NAME => X_FIELD_NAME,
+    X_FIELD_DISP_SEQUENCE_NUMBER => X_FIELD_DISP_SEQUENCE_NUMBER,
+    X_FIELD_PROMPT => X_FIELD_PROMPT,
+    X_FIELD_TYPE => X_FIELD_TYPE,
+    X_FIELD_CONSTRUCTOR_PARAM => X_FIELD_CONSTRUCTOR_PARAM,
+    X_FIELD_CATEGORY => X_FIELD_CATEGORY,
+    X_FIELD_IS_CONFIGURABLE => X_FIELD_IS_CONFIGURABLE,
+    X_FIELD_IS_VISIBLE => X_FIELD_IS_VISIBLE,
+    X_FIELD_PROPERTY1_DEFAULT_VALU => X_FIELD_PROPERTY1_DEFAULT_VALU,
+    X_FIELD_PROPERTY2_DEFAULT_VALU => X_FIELD_PROPERTY2_DEFAULT_VALU,
+    X_FIELD_USER_NAME => X_FIELD_USER_NAME,
+    X_LAST_UPDATE_DATE => X_LAST_UPDATE_DATE,
+    X_LAST_UPDATED_BY => user_id,
+    X_LAST_UPDATE_LOGIN => 0);
+
+  exception
+     when NO_DATA_FOUND then
+
+       select WMS_PAGE_FIELDS_S.nextval into l_field_id from dual;
+
+     WMS_PAGE_FIELDS_PKG.INSERT_ROW(
+    X_ROWID => row_id,
+    X_PAGE_ID => X_PAGE_ID,
+    X_FIELD_ID => l_field_id,
+    X_FIELD_NAME => X_FIELD_NAME,
+    X_FIELD_DISP_SEQUENCE_NUMBER => X_FIELD_DISP_SEQUENCE_NUMBER,
+    X_FIELD_PROMPT => X_FIELD_PROMPT,
+    X_FIELD_TYPE => X_FIELD_TYPE,
+    X_FIELD_CONSTRUCTOR_PARAM => X_FIELD_CONSTRUCTOR_PARAM,
+    X_FIELD_CATEGORY => X_FIELD_CATEGORY,
+    X_FIELD_IS_CONFIGURABLE => X_FIELD_IS_CONFIGURABLE,
+    X_FIELD_IS_VISIBLE => X_FIELD_IS_VISIBLE,
+    X_FIELD_PROPERTY1_DEFAULT_VALU => X_FIELD_PROPERTY1_DEFAULT_VALU,
+    X_FIELD_PROPERTY2_DEFAULT_VALU => X_FIELD_PROPERTY2_DEFAULT_VALU,
+    X_FIELD_USER_NAME => X_FIELD_USER_NAME,
+    X_CREATION_DATE => X_LAST_UPDATE_DATE,
+    X_CREATED_BY => user_id,
+    X_LAST_UPDATE_DATE => X_LAST_UPDATE_DATE,
+    X_LAST_UPDATED_BY => user_id,
+    X_LAST_UPDATE_LOGIN => 0);
+
+  end;
+end LOAD_ROW;
+
+procedure DELETE_ROW (
+  X_PAGE_ID in NUMBER,
+  X_FIELD_ID in NUMBER
+) is
+begin
+  delete from WMS_PAGE_FIELDS_TL
+  where PAGE_ID = X_PAGE_ID
+  and FIELD_ID = X_FIELD_ID;
+
+  if (sql%notfound) then
+    raise no_data_found;
+  end if;
+
+  delete from WMS_PAGE_FIELDS_B
+  where PAGE_ID = X_PAGE_ID
+  and FIELD_ID = X_FIELD_ID;
+
+  if (sql%notfound) then
+    raise no_data_found;
+  end if;
+end DELETE_ROW;
+
+procedure ADD_LANGUAGE
+is
+begin
+  delete from WMS_PAGE_FIELDS_TL T
+  where not exists
+    (select NULL
+    from WMS_PAGE_FIELDS_B B
+    where B.PAGE_ID = T.PAGE_ID
+    and B.FIELD_ID = T.FIELD_ID
+    );
+
+  update WMS_PAGE_FIELDS_TL T set (
+      FIELD_USER_NAME
+    ) = (select
+      B.FIELD_USER_NAME
+    from WMS_PAGE_FIELDS_TL B
+    where B.PAGE_ID = T.PAGE_ID
+    and B.FIELD_ID = T.FIELD_ID
+    and B.LANGUAGE = T.SOURCE_LANG)
+  where (
+      T.PAGE_ID,
+      T.FIELD_ID,
+      T.LANGUAGE
+  ) in (select
+      SUBT.PAGE_ID,
+      SUBT.FIELD_ID,
+      SUBT.LANGUAGE
+    from WMS_PAGE_FIELDS_TL SUBB, WMS_PAGE_FIELDS_TL SUBT
+    where SUBB.PAGE_ID = SUBT.PAGE_ID
+    and SUBB.FIELD_ID = SUBT.FIELD_ID
+    and SUBB.LANGUAGE = SUBT.SOURCE_LANG
+    and (SUBB.FIELD_USER_NAME <> SUBT.FIELD_USER_NAME
+      or (SUBB.FIELD_USER_NAME is null and SUBT.FIELD_USER_NAME is not null)
+      or (SUBB.FIELD_USER_NAME is not null and SUBT.FIELD_USER_NAME is null)
+  ));
+
+  insert into WMS_PAGE_FIELDS_TL (
+    PAGE_ID,
+    FIELD_ID,
+    FIELD_USER_NAME,
+    LAST_UPDATE_DATE,
+    LAST_UPDATED_BY,
+    CREATION_DATE,
+    CREATED_BY,
+    LAST_UPDATE_LOGIN,
+    LANGUAGE,
+    SOURCE_LANG
+  ) select
+    B.PAGE_ID,
+    B.FIELD_ID,
+    B.FIELD_USER_NAME,
+    B.LAST_UPDATE_DATE,
+    B.LAST_UPDATED_BY,
+    B.CREATION_DATE,
+    B.CREATED_BY,
+    B.LAST_UPDATE_LOGIN,
+    L.LANGUAGE_CODE,
+    B.SOURCE_LANG
+  from WMS_PAGE_FIELDS_TL B, FND_LANGUAGES L
+  where L.INSTALLED_FLAG in ('I', 'B')
+  and B.LANGUAGE = userenv('LANG')
+  and not exists
+    (select NULL
+    from WMS_PAGE_FIELDS_TL T
+    where T.PAGE_ID = B.PAGE_ID
+    and T.FIELD_ID = B.FIELD_ID
+    and T.LANGUAGE = L.LANGUAGE_CODE);
+end ADD_LANGUAGE;
+
+end WMS_PAGE_FIELDS_PKG;
+
+/

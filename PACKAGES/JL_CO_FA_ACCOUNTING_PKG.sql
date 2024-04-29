@@ -1,0 +1,144 @@
+--------------------------------------------------------
+--  DDL for Package JL_CO_FA_ACCOUNTING_PKG
+--------------------------------------------------------
+
+  CREATE OR REPLACE EDITIONABLE PACKAGE "APPS"."JL_CO_FA_ACCOUNTING_PKG" AUTHID CURRENT_USER AS
+/* $Header: jlcofgas.pls 120.2 2002/11/21 02:01:03 vsidhart ship $ */
+
+-----------------------------------------------------------------------------
+-- PROCEDURE                                                               --
+--   main                                                                  --
+--                                                                         --
+-- DESCRIPTION                                                             --
+--   Main procedure to execute the Colombian accounting to General Ledger  --
+--                                                                         --
+-- PURPOSE:                                                                --
+--   Oracle Applications Rel. 11.0                                         --
+--                                                                         --
+-- PARAMETERS:                                                             --
+--   ERRBUF       Parameter used by concurrent process                     --
+--   RETCODE      Parameter used by concurrent process                     --
+--   p_tax_book   Tax depreciation book type code                          --
+-----------------------------------------------------------------------------
+
+  PROCEDURE account_transactions (ERRBUF     OUT NOCOPY VARCHAR2,
+                                  RETCODE    OUT NOCOPY VARCHAR2,
+                                  p_tax_book IN  VARCHAR2
+                                 );
+
+  ----------------------------------------------------------------------------
+  -- PROCEDURE                                                              --
+  --   extract_account                                                      --
+  --                                                                        --
+  -- DESCRIPTION                                                            --
+  --   This procedure extracts the natural account from an input AFF        --
+  --                                                                        --
+  -- PARAMETERS                                                             --
+  --   p_chart_of_accounts_id  Identification of accounting structure       --
+  --   p_apps_short_name       Short name of the application                --
+  --   p_key_flex_code         Code identification of the key flexfield     --
+  --   p_account_segment_num   Number of the account segment into AFF       --
+  --   p_account_ccid          Default CCID of the account required         --
+  --   p_account_segment       Natural account segment                      --
+  ----------------------------------------------------------------------------
+  --    LER, 18-Jun-99   Procedure is not more used in Release 11.5         --
+  --                     because natural account segment will be            --
+  --                     directly stored in FA_BOOK_CONTROLS.GDF            --
+  ----------------------------------------------------------------------------
+
+  PROCEDURE extract_account ( p_chart_of_accounts_id IN NUMBER,
+                              p_apps_short_name      IN VARCHAR2,
+                              p_key_flex_code        IN VARCHAR2,
+                              p_account_segment_num  IN NUMBER,
+                              p_account_ccid         IN VARCHAR2,
+                              p_account_segment     OUT NOCOPY VARCHAR2
+                            );
+
+  ----------------------------------------------------------------------------
+  -- PROCEDURE                                                              --
+  --   change_account                                                       --
+  --                                                                        --
+  -- DESCRIPTION                                                            --
+  --   This procedure insert the natural account segment in the input AFF   --
+  --   and find or generate the CCID for it.                                --
+  --                                                                        --
+  -- PARAMETERS                                                             --
+  --   p_chart_of_accounts_id  Identification of accounting structure       --
+  --   p_apps_short_name       Short name of the application                --
+  --   p_key_flex_code         Code identification of the key flexfield     --
+  --   p_num_segment           Number of the natural account segment        --
+  --   p_account_ccid          CCID of the distribution line                --
+  --   p_account_segment       Natural account segment                      --
+  --   p_delimiter             Delimiter character used by application      --
+  --   p_returned_ccid         CCID find or generated by procedure          --
+  --   p_error_ccid            Error flag if a new CCID can not be inserted --
+  ----------------------------------------------------------------------------
+
+  PROCEDURE change_account ( p_chart_of_accounts_id IN NUMBER,
+                             p_apps_short_name      IN VARCHAR2,
+                             p_key_flex_code        IN VARCHAR2,
+                             p_num_segment          IN NUMBER,
+                             p_account_ccid         IN NUMBER,
+                             p_account_segment      IN VARCHAR2,
+                             p_delimiter            IN VARCHAR2,
+                             p_returned_ccid       OUT NOCOPY NUMBER,
+                             p_error_ccid       IN OUT NOCOPY BOOLEAN
+                           );
+
+  ----------------------------------------------------------------------------
+  -- PROCEDURE                                                              --
+  --   insert_adjustment                                                    --
+  --                                                                        --
+  -- DESCRIPTION                                                            --
+  --   Insert a row in the table JL_CO_FA_ADJUSTMENT                        --
+  --                                                                        --
+  -- PARAMETERS                                                             --
+  --   p_transaction_header_id                                              --
+  --   p_source_type_code                                                   --
+  --   p_je_category_name                                                   --
+  --   p_adjustment_type                                                    --
+  --   p_debit_credit_flag                                                  --
+  --   p_code_combination_id                                                --
+  --   p_book_type_code                                                     --
+  --   p_asset_id                                                           --
+  --   p_adjustment_amount                                                  --
+  --   p_distribution_id                                                    --
+  --   p_annualized_adjustment                                              --
+  --   p_je_header_reference_id                                             --
+  --   p_sequence_line                                                      --
+  --   p_period_counter_adjusted                                            --
+  --   p_period_counter_created                                             --
+  --   p_asset_invoice_id                                                   --
+  --   p_reference                                                          --
+  --   p_posting_flag                                                       --
+  ----------------------------------------------------------------------------
+
+procedure insert_adjustment ( p_transaction_header_id    IN jl_co_fa_adjustments.transaction_header_id%TYPE,
+                              p_source_type_code         IN jl_co_fa_adjustments.source_type_code%TYPE,
+                              p_je_category_name         IN jl_co_fa_adjustments.je_category_name%TYPE,
+                              p_adjustment_type          IN jl_co_fa_adjustments.adjustment_type%TYPE,
+                              p_debit_credit_flag        IN jl_co_fa_adjustments.debit_credit_flag%TYPE,
+                              p_code_combination_id      IN jl_co_fa_adjustments.code_combination_id%TYPE,
+                              p_book_type_code           IN jl_co_fa_adjustments.book_type_code%TYPE,
+                              p_asset_id                 IN jl_co_fa_adjustments.asset_id%TYPE,
+                              p_adjustment_amount        IN jl_co_fa_adjustments.adjustment_amount%TYPE,
+                              p_distribution_id          IN jl_co_fa_adjustments.distribution_id%TYPE,
+                              p_annualized_adjustment    IN jl_co_fa_adjustments.annualized_adjustment%TYPE,
+                              p_je_header_reference_id   IN jl_co_fa_adjustments.je_header_reference_id%TYPE,
+                              p_sequence_line            IN jl_co_fa_adjustments.sequence_line%TYPE,
+                              p_period_counter_adjusted  IN jl_co_fa_adjustments.period_counter_adjusted%TYPE,
+                              p_period_counter_created   IN jl_co_fa_adjustments.period_counter_created%TYPE,
+                              p_asset_invoice_id         IN jl_co_fa_adjustments.asset_invoice_id%TYPE,
+                              p_reference                IN jl_co_fa_adjustments.reference%TYPE,
+                              p_posting_flag             IN jl_co_fa_adjustments.posting_flag%TYPE
+                            );
+
+----------------------------------------------------------------------------
+--    End of specification package file                                   --
+----------------------------------------------------------------------------
+
+END jl_co_fa_accounting_pkg;
+
+ 
+
+/

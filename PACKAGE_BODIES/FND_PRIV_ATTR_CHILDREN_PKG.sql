@@ -1,0 +1,127 @@
+--------------------------------------------------------
+--  DDL for Package Body FND_PRIV_ATTR_CHILDREN_PKG
+--------------------------------------------------------
+
+  CREATE OR REPLACE EDITIONABLE PACKAGE BODY "APPS"."FND_PRIV_ATTR_CHILDREN_PKG" as
+/* $Header: fndpiagb.pls 115.0 2003/12/02 22:40:56 rcsingh noship $ */
+procedure INSERT_ROW (
+  X_ROWID in out nocopy VARCHAR2,
+  X_PARENT_ATTRIBUTE_CODE in VARCHAR2,
+  X_ATTRIBUTE_CODE in VARCHAR2,
+  X_OBJECT_VERSION_NUMBER in NUMBER,
+  X_CREATED_BY in NUMBER,
+  X_CREATION_DATE in DATE,
+  X_LAST_UPDATE_DATE in DATE,
+  X_LAST_UPDATED_BY in NUMBER,
+  X_LAST_UPDATE_LOGIN in NUMBER
+) is
+  cursor C is select ROWID from FND_PRIVACY_ATTRIBUTE_CHILDREN
+    where PARENT_ATTRIBUTE_CODE = X_PARENT_ATTRIBUTE_CODE
+    and ATTRIBUTE_CODE = X_ATTRIBUTE_CODE
+    ;
+begin
+  insert into FND_PRIVACY_ATTRIBUTE_CHILDREN (
+    PARENT_ATTRIBUTE_CODE,
+    ATTRIBUTE_CODE,
+    CREATED_BY,
+    CREATION_DATE,
+    LAST_UPDATED_BY,
+    LAST_UPDATE_DATE,
+    LAST_UPDATE_LOGIN,
+    OBJECT_VERSION_NUMBER
+  ) select
+    X_PARENT_ATTRIBUTE_CODE,
+    X_ATTRIBUTE_CODE,
+    X_CREATED_BY,
+    X_CREATION_DATE,
+    X_LAST_UPDATED_BY,
+    X_LAST_UPDATE_DATE,
+    X_LAST_UPDATE_LOGIN,
+    X_OBJECT_VERSION_NUMBER
+  from FND_LANGUAGES L
+  where L.INSTALLED_FLAG in ('I', 'B')
+  and not exists
+    (select NULL
+    from FND_PRIVACY_ATTRIBUTE_CHILDREN T
+    where T.PARENT_ATTRIBUTE_CODE = X_PARENT_ATTRIBUTE_CODE
+    and T.ATTRIBUTE_CODE = X_ATTRIBUTE_CODE);
+
+  open c;
+  fetch c into X_ROWID;
+  if (c%notfound) then
+    close c;
+    raise no_data_found;
+  end if;
+  close c;
+
+end INSERT_ROW;
+
+procedure LOCK_ROW (
+  X_PARENT_ATTRIBUTE_CODE in VARCHAR2,
+  X_ATTRIBUTE_CODE in VARCHAR2,
+  X_OBJECT_VERSION_NUMBER in NUMBER,
+  X_CREATED_BY in NUMBER
+) is
+  cursor c1 is select
+      OBJECT_VERSION_NUMBER,
+      CREATED_BY
+    from FND_PRIVACY_ATTRIBUTE_CHILDREN
+    where PARENT_ATTRIBUTE_CODE = X_PARENT_ATTRIBUTE_CODE
+    and ATTRIBUTE_CODE = X_ATTRIBUTE_CODE
+    for update of PARENT_ATTRIBUTE_CODE nowait;
+begin
+  for tlinfo in c1 loop
+      if (    (tlinfo.CREATED_BY = X_CREATED_BY)
+          AND (tlinfo.OBJECT_VERSION_NUMBER = X_OBJECT_VERSION_NUMBER)
+      ) then
+        null;
+      else
+        fnd_message.set_name('FND', 'FORM_RECORD_CHANGED');
+        app_exception.raise_exception;
+      end if;
+  end loop;
+  return;
+end LOCK_ROW;
+
+procedure UPDATE_ROW (
+  X_PARENT_ATTRIBUTE_CODE in VARCHAR2,
+  X_ATTRIBUTE_CODE in VARCHAR2,
+  X_OBJECT_VERSION_NUMBER in NUMBER,
+  X_CREATED_BY in NUMBER,
+  X_LAST_UPDATE_DATE in DATE,
+  X_LAST_UPDATED_BY in NUMBER,
+  X_LAST_UPDATE_LOGIN in NUMBER
+) is
+begin
+  update FND_PRIVACY_ATTRIBUTE_CHILDREN set
+    OBJECT_VERSION_NUMBER = X_OBJECT_VERSION_NUMBER,
+    CREATED_BY = X_CREATED_BY,
+    LAST_UPDATE_DATE = X_LAST_UPDATE_DATE,
+    LAST_UPDATED_BY = X_LAST_UPDATED_BY,
+    LAST_UPDATE_LOGIN = X_LAST_UPDATE_LOGIN
+  where PARENT_ATTRIBUTE_CODE = X_PARENT_ATTRIBUTE_CODE
+  and ATTRIBUTE_CODE = X_ATTRIBUTE_CODE;
+
+  if (sql%notfound) then
+    raise no_data_found;
+  end if;
+end UPDATE_ROW;
+
+procedure DELETE_ROW (
+  X_PARENT_ATTRIBUTE_CODE in VARCHAR2,
+  X_ATTRIBUTE_CODE in VARCHAR2
+) is
+begin
+  delete from FND_PRIVACY_ATTRIBUTE_CHILDREN
+  where PARENT_ATTRIBUTE_CODE = X_PARENT_ATTRIBUTE_CODE
+  and ATTRIBUTE_CODE = X_ATTRIBUTE_CODE;
+
+  if (sql%notfound) then
+    raise no_data_found;
+  end if;
+
+end DELETE_ROW;
+
+end FND_PRIV_ATTR_CHILDREN_PKG;
+
+/

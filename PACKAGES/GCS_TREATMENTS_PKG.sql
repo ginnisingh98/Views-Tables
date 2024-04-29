@@ -1,0 +1,211 @@
+--------------------------------------------------------
+--  DDL for Package GCS_TREATMENTS_PKG
+--------------------------------------------------------
+
+  CREATE OR REPLACE EDITIONABLE PACKAGE "APPS"."GCS_TREATMENTS_PKG" AUTHID CURRENT_USER AS
+/* $Header: gcstreatmentss.pls 120.1 2005/10/30 05:19:20 appldev noship $ */
+
+--
+  -- Procedure
+  --   Insert_Row
+  -- Purpose
+  --   Inserts a row into the gcs_treatments_b table.
+  -- Arguments
+	-- row_id
+	-- TREATMENT_ID
+	-- CONSOLIDATION_TYPE_CODE
+	-- ENABLED_FLAG
+	-- OPERATOR_LOW_CODE
+	-- OPERATOR_HIGH_CODE
+	-- LAST_UPDATE_DATE
+	-- LAST_UPDATED_BY
+	-- CREATION_DATE
+	-- CREATED_BY
+	-- LAST_UPDATE_LOGIN
+	-- OWNERSHIP_PERCENT_LOW
+	-- OWNERSHIP_PERCENT_HIGH
+	-- OBJECT_VERSION_NUMBER
+	-- DESCRIPTION
+	-- TREATMENT_NAME
+
+  -- Example
+  --   GCS_TREATMENTS_PKG.Insert_Row(...);
+  -- Notes
+  --
+
+PROCEDURE Insert_Row
+(
+ row_id	IN OUT NOCOPY			VARCHAR2,
+ TREATMENT_ID				NUMBER,
+ CONSOLIDATION_TYPE_CODE		VARCHAR2,
+ ENABLED_FLAG				VARCHAR2,
+ OPERATOR_LOW_CODE			VARCHAR2,
+ OPERATOR_HIGH_CODE			VARCHAR2,
+ LAST_UPDATE_DATE			DATE,
+ LAST_UPDATED_BY			NUMBER,
+ CREATION_DATE				DATE,
+ CREATED_BY				NUMBER,
+ LAST_UPDATE_LOGIN			NUMBER,
+ OWNERSHIP_PERCENT_LOW			NUMBER,
+ OWNERSHIP_PERCENT_HIGH			NUMBER,
+ OBJECT_VERSION_NUMBER			NUMBER,
+ DESCRIPTION				VARCHAR2,
+ TREATMENT_NAME				VARCHAR2
+
+);
+
+
+  -- Procedure
+  --   Update_Row
+  -- Purpose
+  --   Updates a row into the gcs_treatments_b table.
+  -- Arguments
+	-- row_id
+	-- TREATMENT_ID
+	-- CONSOLIDATION_TYPE_CODE
+	-- ENABLED_FLAG
+	-- OPERATOR_LOW_CODE
+	-- OPERATOR_HIGH_CODE
+	-- LAST_UPDATE_DATE
+	-- LAST_UPDATED_BY
+	-- CREATION_DATE
+	-- CREATED_BY
+	-- LAST_UPDATE_LOGIN
+	-- OWNERSHIP_PERCENT_LOW
+	-- OWNERSHIP_PERCENT_HIGH
+	-- OBJECT_VERSION_NUMBER
+	-- DESCRIPTION
+	-- TREATMENT_NAME
+
+  -- Example
+  --   GCS_TREATMENTS_PKG.Update_Row(...);
+  -- Notes
+  --
+
+ PROCEDURE Update_Row
+ (
+ row_id	IN OUT NOCOPY			VARCHAR2,
+ TREATMENT_ID				NUMBER,
+ CONSOLIDATION_TYPE_CODE		VARCHAR2,
+ ENABLED_FLAG				VARCHAR2,
+ OPERATOR_LOW_CODE			VARCHAR2,
+ OPERATOR_HIGH_CODE			VARCHAR2,
+ LAST_UPDATE_DATE			DATE,
+ LAST_UPDATED_BY			NUMBER,
+ CREATION_DATE				DATE,
+ CREATED_BY				NUMBER,
+ LAST_UPDATE_LOGIN			NUMBER,
+ OWNERSHIP_PERCENT_LOW			NUMBER,
+ OWNERSHIP_PERCENT_HIGH			NUMBER,
+ OBJECT_VERSION_NUMBER			NUMBER,
+ DESCRIPTION				VARCHAR2,
+ TREATMENT_NAME				VARCHAR2
+
+);
+
+
+
+  -- Procedure
+  --   Load_Row
+  -- Purpose
+  --   loads a row into the gcs_treatments_b table.
+  -- Arguments
+	-- row_id
+	-- TREATMENT_ID
+	-- CONSOLIDATION_TYPE_CODE
+	-- ENABLED_FLAG
+	-- OPERATOR_LOW_CODE
+	-- OPERATOR_HIGH_CODE
+	-- LAST_UPDATE_DATE
+	-- LAST_UPDATED_BY
+	-- CREATION_DATE
+	-- CREATED_BY
+	-- LAST_UPDATE_LOGIN
+	-- OWNERSHIP_PERCENT_LOW
+	-- OWNERSHIP_PERCENT_HIGH
+	-- OBJECT_VERSION_NUMBER
+	-- owner
+	-- custom_mode
+	-- DESCRIPTION
+	-- TREATMENT_NAME
+
+  -- Example
+  --   GCS_TREATMENTS_PKG.Load_Row(...);
+  -- Notes
+  --
+
+
+PROCEDURE Load_Row
+(
+ row_id	IN OUT NOCOPY			VARCHAR2,
+ TREATMENT_ID				NUMBER,
+ CONSOLIDATION_TYPE_CODE		VARCHAR2,
+ ENABLED_FLAG				VARCHAR2,
+ OPERATOR_LOW_CODE			VARCHAR2,
+ OPERATOR_HIGH_CODE			VARCHAR2,
+ LAST_UPDATE_DATE			DATE,
+ LAST_UPDATED_BY			NUMBER,
+ CREATION_DATE				DATE,
+ CREATED_BY				NUMBER,
+ LAST_UPDATE_LOGIN			NUMBER,
+ OWNERSHIP_PERCENT_LOW			NUMBER,
+ OWNERSHIP_PERCENT_HIGH			NUMBER,
+ OBJECT_VERSION_NUMBER			NUMBER,
+ owner					VARCHAR2,
+ custom_mode				VARCHAR2,
+ DESCRIPTION				VARCHAR2,
+ TREATMENT_NAME				VARCHAR2
+
+ );
+
+
+
+
+     -- Procedure
+     --   Translate_Row
+     -- Purpose
+     --   Updates translated infromation for a row in the
+     --   gcs_treatments_tl table.
+     -- Arguments
+	-- TREATMENT_ID
+	-- LANGUAGE
+	-- SOURCE_LANG
+	-- TREATMENT_NAME
+	-- LAST_UPDATE_DATE
+	-- LAST_UPDATED_BY
+	-- CREATION_DATE
+	-- CREATED_BY
+	-- LAST_UPDATE_LOGIN
+	-- DESCRIPTION
+	-- owner
+	-- custom_mode
+
+     -- Example
+     --   GCS_TREATMENTS_PKG.Translate_Row(...);
+     -- Notes
+     --
+
+
+  PROCEDURE Translate_Row
+  (
+	 TREATMENT_ID                   NUMBER,
+	 TREATMENT_NAME                 VARCHAR2,
+	 LAST_UPDATE_DATE               DATE,
+	 LAST_UPDATED_BY                NUMBER,
+	 CREATION_DATE                  DATE,
+	 CREATED_BY                     NUMBER,
+	 LAST_UPDATE_LOGIN              NUMBER,
+	 DESCRIPTION                    VARCHAR2,
+	 owner                          VARCHAR2,
+	 custom_mode                    VARCHAR2
+  );
+
+ procedure ADD_LANGUAGE ;
+
+
+
+END GCS_TREATMENTS_PKG;
+
+ 
+
+/

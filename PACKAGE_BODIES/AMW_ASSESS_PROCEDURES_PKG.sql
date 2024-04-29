@@ -1,0 +1,78 @@
+--------------------------------------------------------
+--  DDL for Package Body AMW_ASSESS_PROCEDURES_PKG
+--------------------------------------------------------
+
+  CREATE OR REPLACE EDITIONABLE PACKAGE BODY "APPS"."AMW_ASSESS_PROCEDURES_PKG" as
+/* $Header: amwtaspb.pls 120.0 2005/12/05 10:31:28 appldev noship $ */
+
+
+procedure ADD_LANGUAGE
+is
+begin
+  delete from AMW_ASSESS_PROCEDURES_TL T
+  where not exists
+    (select NULL
+    from AMW_ASSESS_PROCEDURES_B B
+    where B.ASSESS_PROCEDURE_ID = T.ASSESS_PROCEDURE_ID
+    );
+
+  update AMW_ASSESS_PROCEDURES_TL T set (
+      NAME,
+      DESCRIPTION
+    ) = (select
+      B.NAME,
+      B.DESCRIPTION
+    from AMW_ASSESS_PROCEDURES_TL B
+    where B.ASSESS_PROCEDURE_ID = T.ASSESS_PROCEDURE_ID
+    and B.LANGUAGE = T.SOURCE_LANG)
+  where (
+      T.ASSESS_PROCEDURE_ID,
+      T.LANGUAGE
+  ) in (select
+      SUBT.ASSESS_PROCEDURE_ID,
+      SUBT.LANGUAGE
+    from AMW_ASSESS_PROCEDURES_TL SUBB, AMW_ASSESS_PROCEDURES_TL SUBT
+    where SUBB.ASSESS_PROCEDURE_ID = SUBT.ASSESS_PROCEDURE_ID
+    and SUBB.LANGUAGE = SUBT.SOURCE_LANG
+    and (SUBB.NAME <> SUBT.NAME
+      or SUBB.DESCRIPTION <> SUBT.DESCRIPTION
+      or (SUBB.DESCRIPTION is null and SUBT.DESCRIPTION is not null)
+      or (SUBB.DESCRIPTION is not null and SUBT.DESCRIPTION is null)
+  ));
+
+  insert into AMW_ASSESS_PROCEDURES_TL (
+    LAST_UPDATED_BY,
+    LAST_UPDATE_DATE,
+    CREATED_BY,
+    DESCRIPTION,
+    SOURCE_LANG,
+    CREATION_DATE,
+    LAST_UPDATE_LOGIN,
+    ASSESS_PROCEDURE_ID,
+    NAME,
+    LANGUAGE
+ ) select /*+ ORDERED */
+    B.LAST_UPDATED_BY,
+    B.LAST_UPDATE_DATE,
+    B.CREATED_BY,
+    B.DESCRIPTION,
+    B.SOURCE_LANG,
+    B.CREATION_DATE,
+    B.LAST_UPDATE_LOGIN,
+    B.ASSESS_PROCEDURE_ID,
+    B.NAME,
+    L.LANGUAGE_CODE
+  from AMW_ASSESS_PROCEDURES_TL B, FND_LANGUAGES L
+  where L.INSTALLED_FLAG in ('I', 'B')
+  and B.LANGUAGE = userenv('LANG')
+  and not exists
+    (select NULL
+    from AMW_ASSESS_PROCEDURES_TL T
+    where T.ASSESS_PROCEDURE_ID = B.ASSESS_PROCEDURE_ID
+    and T.LANGUAGE = L.LANGUAGE_CODE);
+end ADD_LANGUAGE;
+
+
+end AMW_ASSESS_PROCEDURES_PKG;
+
+/

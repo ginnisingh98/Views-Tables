@@ -1,0 +1,22 @@
+--------------------------------------------------------
+--  DDL for Package CSI_DRT_PKG
+--------------------------------------------------------
+
+  CREATE OR REPLACE EDITIONABLE PACKAGE "APPS"."CSI_DRT_PKG" AUTHID CURRENT_USER AS
+/* $Header: csidrtps.pls 120.0.12010000.2 2018/04/03 04:47:49 aabmishr noship $ */
+
+  ENTITY_TYPE_HR  CONSTANT VARCHAR2(3) := 'HR';
+  ENTITY_TYPE_TCA CONSTANT VARCHAR2(3) := 'TCA';
+  ENTITY_TYPE_FND CONSTANT VARCHAR2(3) := 'FND';
+
+PROCEDURE CSI_TCA_DRC(PERSON_ID       IN NUMBER,
+                      RESULT_TBL      OUT NOCOPY PER_DRT_PKG.RESULT_TBL_TYPE);
+
+PROCEDURE CSI_HR_DRC(PERSON_ID       IN NUMBER,
+                      RESULT_TBL      OUT NOCOPY PER_DRT_PKG.RESULT_TBL_TYPE);
+
+PROCEDURE CSI_FND_DRC(PERSON_ID       IN NUMBER,
+                      RESULT_TBL      OUT NOCOPY PER_DRT_PKG.RESULT_TBL_TYPE);
+END CSI_DRT_PKG;
+
+/

@@ -1,0 +1,100 @@
+--------------------------------------------------------
+--  DDL for Package IGS_PE_PERSON_ALIAS_PKG
+--------------------------------------------------------
+
+  CREATE OR REPLACE EDITIONABLE PACKAGE "APPS"."IGS_PE_PERSON_ALIAS_PKG" AUTHID CURRENT_USER AS
+ /* $Header: IGSNI11S.pls 120.0 2005/06/01 16:51:44 appldev noship $ */
+
+procedure INSERT_ROW (
+  X_ROWID in out NOCOPY VARCHAR2,
+  X_PERSON_ID in NUMBER,
+  X_ALIAS_TYPE in VARCHAR2,
+  X_SEQUENCE_NUMBER in NUMBER,
+  X_TITLE in VARCHAR2,
+  X_ALIAS_COMMENT in VARCHAR2,
+  X_START_DT in DATE,
+  X_END_DT in DATE,
+  X_SURNAME in VARCHAR2,
+  X_GIVEN_NAMES in VARCHAR2,
+  X_MODE in VARCHAR2 default 'R'
+  );
+procedure LOCK_ROW (
+  X_ROWID in VARCHAR2,
+  X_PERSON_ID in NUMBER,
+  X_ALIAS_TYPE in VARCHAR2,
+  X_SEQUENCE_NUMBER in NUMBER,
+  X_TITLE in VARCHAR2,
+  X_ALIAS_COMMENT in VARCHAR2,
+  X_START_DT in DATE,
+  X_END_DT in DATE,
+  X_SURNAME in VARCHAR2,
+  X_GIVEN_NAMES in VARCHAR2
+);
+procedure UPDATE_ROW (
+  X_ROWID in VARCHAR2,
+  X_PERSON_ID in NUMBER,
+  X_ALIAS_TYPE in VARCHAR2,
+  X_SEQUENCE_NUMBER in NUMBER,
+  X_TITLE in VARCHAR2,
+  X_ALIAS_COMMENT in VARCHAR2,
+  X_START_DT in DATE,
+  X_END_DT in DATE,
+  X_SURNAME in VARCHAR2,
+  X_GIVEN_NAMES in VARCHAR2,
+  X_MODE in VARCHAR2 default 'R'
+  );
+procedure ADD_ROW (
+  X_ROWID in out NOCOPY VARCHAR2,
+  X_PERSON_ID in NUMBER,
+  X_ALIAS_TYPE in VARCHAR2,
+  X_SEQUENCE_NUMBER in NUMBER,
+  X_TITLE in VARCHAR2,
+  X_ALIAS_COMMENT in VARCHAR2,
+  X_START_DT in DATE,
+  X_END_DT in DATE,
+  X_SURNAME in VARCHAR2,
+  X_GIVEN_NAMES in VARCHAR2,
+  X_MODE in VARCHAR2 default 'R'
+  );
+procedure DELETE_ROW (
+  X_ROWID in VARCHAR2,
+  x_mode IN VARCHAR2 DEFAULT 'R'
+);
+FUNCTION  Get_PK_For_Validation (
+    x_person_id IN NUMBER,
+    x_sequence_number IN NUMBER
+    ) RETURN BOOLEAN ;
+
+  PROCEDURE GET_FK_IGS_PE_PERSON (
+    x_person_id IN NUMBER
+    );
+
+ PROCEDURE Check_Constraints (
+ Column_Name    IN      VARCHAR2        DEFAULT NULL,
+ Column_Value   IN      VARCHAR2        DEFAULT NULL
+ );
+
+ PROCEDURE Before_DML (
+    p_action IN VARCHAR2,
+    x_rowid IN VARCHAR2 DEFAULT NULL,
+    x_person_id IN NUMBER DEFAULT NULL,
+    X_ALIAS_TYPE in VARCHAR2 DEFAULT NULL,
+    x_sequence_number IN NUMBER DEFAULT NULL,
+    x_start_dt IN DATE DEFAULT NULL,
+    x_end_dt IN DATE DEFAULT NULL,
+    x_surname IN VARCHAR2 DEFAULT NULL,
+    x_given_names IN VARCHAR2 DEFAULT NULL,
+    x_title IN VARCHAR2 DEFAULT NULL,
+    x_alias_comment IN VARCHAR2 DEFAULT NULL,
+    x_creation_date IN DATE DEFAULT NULL,
+    x_created_by IN NUMBER DEFAULT NULL,
+    x_last_update_date IN DATE DEFAULT NULL,
+    x_last_updated_by IN NUMBER DEFAULT NULL,
+    x_last_update_login IN NUMBER DEFAULT NULL
+  );
+
+end IGS_PE_PERSON_ALIAS_PKG;
+
+ 
+
+/

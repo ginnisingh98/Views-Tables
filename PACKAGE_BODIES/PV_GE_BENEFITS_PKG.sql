@@ -1,0 +1,865 @@
+--------------------------------------------------------
+--  DDL for Package Body PV_GE_BENEFITS_PKG
+--------------------------------------------------------
+
+  CREATE OR REPLACE EDITIONABLE PACKAGE BODY "APPS"."PV_GE_BENEFITS_PKG" as
+/* $Header: pvxtpgbb.pls 120.1 2005/06/30 14:54:27 appldev ship $ */
+procedure INSERT_ROW (
+  X_ROWID in out nocopy VARCHAR2,
+  X_BENEFIT_ID in NUMBER,
+  X_OBJECT_VERSION_NUMBER in NUMBER,
+  X_BENEFIT_TYPE_CODE in VARCHAR2,
+  X_BENEFIT_STATUS_CODE in VARCHAR2,
+  X_BENEFIT_CODE in VARCHAR2,
+  X_DELETE_FLAG in VARCHAR2,
+  X_ADDITIONAL_INFO_1 in NUMBER,
+  X_ADDITIONAL_INFO_2 in VARCHAR2,
+  X_ATTRIBUTE_CATEGORY in VARCHAR2,
+  X_ATTRIBUTE1 in VARCHAR2,
+  X_ATTRIBUTE2 in VARCHAR2,
+  X_ATTRIBUTE3 in VARCHAR2,
+  X_ATTRIBUTE4 in VARCHAR2,
+  X_ATTRIBUTE5 in VARCHAR2,
+  X_ATTRIBUTE6 in VARCHAR2,
+  X_ATTRIBUTE7 in VARCHAR2,
+  X_ATTRIBUTE8 in VARCHAR2,
+  X_ATTRIBUTE9 in VARCHAR2,
+  X_ATTRIBUTE10 in VARCHAR2,
+  X_ATTRIBUTE11 in VARCHAR2,
+  X_ATTRIBUTE12 in VARCHAR2,
+  X_ATTRIBUTE13 in VARCHAR2,
+  X_ATTRIBUTE14 in VARCHAR2,
+  X_ATTRIBUTE15 in VARCHAR2,
+  X_BENEFIT_NAME in VARCHAR2,
+  X_DESCRIPTION in VARCHAR2,
+  X_CREATION_DATE in DATE,
+  X_CREATED_BY in NUMBER,
+  X_LAST_UPDATE_DATE in DATE,
+  X_LAST_UPDATED_BY in NUMBER,
+  X_LAST_UPDATE_LOGIN in NUMBER
+) is
+  cursor C is select ROWID from PV_GE_BENEFITS_B
+    where BENEFIT_ID = X_BENEFIT_ID
+    ;
+begin
+  insert into PV_GE_BENEFITS_B (
+    BENEFIT_ID,
+    OBJECT_VERSION_NUMBER,
+    BENEFIT_TYPE_CODE,
+    BENEFIT_STATUS_CODE,
+    BENEFIT_CODE,
+    DELETE_FLAG,
+    ADDITIONAL_INFO_1,
+    ADDITIONAL_INFO_2,
+    ATTRIBUTE_CATEGORY,
+    ATTRIBUTE1,
+    ATTRIBUTE2,
+    ATTRIBUTE3,
+    ATTRIBUTE4,
+    ATTRIBUTE5,
+    ATTRIBUTE6,
+    ATTRIBUTE7,
+    ATTRIBUTE8,
+    ATTRIBUTE9,
+    ATTRIBUTE10,
+    ATTRIBUTE11,
+    ATTRIBUTE12,
+    ATTRIBUTE13,
+    ATTRIBUTE14,
+    ATTRIBUTE15,
+    CREATION_DATE,
+    CREATED_BY,
+    LAST_UPDATE_DATE,
+    LAST_UPDATED_BY,
+    LAST_UPDATE_LOGIN
+  ) values (
+    X_BENEFIT_ID,
+    X_OBJECT_VERSION_NUMBER,
+    X_BENEFIT_TYPE_CODE,
+    X_BENEFIT_STATUS_CODE,
+    X_BENEFIT_CODE,
+    X_DELETE_FLAG,
+    X_ADDITIONAL_INFO_1,
+    X_ADDITIONAL_INFO_2,
+    X_ATTRIBUTE_CATEGORY,
+    X_ATTRIBUTE1,
+    X_ATTRIBUTE2,
+    X_ATTRIBUTE3,
+    X_ATTRIBUTE4,
+    X_ATTRIBUTE5,
+    X_ATTRIBUTE6,
+    X_ATTRIBUTE7,
+    X_ATTRIBUTE8,
+    X_ATTRIBUTE9,
+    X_ATTRIBUTE10,
+    X_ATTRIBUTE11,
+    X_ATTRIBUTE12,
+    X_ATTRIBUTE13,
+    X_ATTRIBUTE14,
+    X_ATTRIBUTE15,
+    X_CREATION_DATE,
+    X_CREATED_BY,
+    X_LAST_UPDATE_DATE,
+    X_LAST_UPDATED_BY,
+    X_LAST_UPDATE_LOGIN
+  );
+
+  insert into PV_GE_BENEFITS_TL (
+    BENEFIT_ID,
+    BENEFIT_NAME,
+    DESCRIPTION,
+    CREATED_BY,
+    CREATION_DATE,
+    LAST_UPDATED_BY,
+    LAST_UPDATE_DATE,
+    LAST_UPDATE_LOGIN,
+    LANGUAGE,
+    SOURCE_LANG
+  ) select
+    X_BENEFIT_ID,
+    X_BENEFIT_NAME,
+    X_DESCRIPTION,
+    X_CREATED_BY,
+    X_CREATION_DATE,
+    X_LAST_UPDATED_BY,
+    X_LAST_UPDATE_DATE,
+    X_LAST_UPDATE_LOGIN,
+    L.LANGUAGE_CODE,
+    userenv('LANG')
+  from FND_LANGUAGES L
+  where L.INSTALLED_FLAG in ('I', 'B')
+  and not exists
+    (select NULL
+    from PV_GE_BENEFITS_TL T
+    where T.BENEFIT_ID = X_BENEFIT_ID
+    and T.LANGUAGE = L.LANGUAGE_CODE);
+
+  open c;
+  fetch c into X_ROWID;
+  if (c%notfound) then
+    close c;
+    raise no_data_found;
+  end if;
+  close c;
+
+end INSERT_ROW;
+
+procedure LOCK_ROW (
+  X_BENEFIT_ID in NUMBER,
+  X_OBJECT_VERSION_NUMBER in NUMBER,
+  X_BENEFIT_TYPE_CODE in VARCHAR2,
+  X_BENEFIT_STATUS_CODE in VARCHAR2,
+  X_BENEFIT_CODE in VARCHAR2,
+  X_DELETE_FLAG in VARCHAR2,
+  X_ADDITIONAL_INFO_1 in NUMBER,
+  X_ADDITIONAL_INFO_2 in VARCHAR2,
+  X_ATTRIBUTE_CATEGORY in VARCHAR2,
+  X_ATTRIBUTE1 in VARCHAR2,
+  X_ATTRIBUTE2 in VARCHAR2,
+  X_ATTRIBUTE3 in VARCHAR2,
+  X_ATTRIBUTE4 in VARCHAR2,
+  X_ATTRIBUTE5 in VARCHAR2,
+  X_ATTRIBUTE6 in VARCHAR2,
+  X_ATTRIBUTE7 in VARCHAR2,
+  X_ATTRIBUTE8 in VARCHAR2,
+  X_ATTRIBUTE9 in VARCHAR2,
+  X_ATTRIBUTE10 in VARCHAR2,
+  X_ATTRIBUTE11 in VARCHAR2,
+  X_ATTRIBUTE12 in VARCHAR2,
+  X_ATTRIBUTE13 in VARCHAR2,
+  X_ATTRIBUTE14 in VARCHAR2,
+  X_ATTRIBUTE15 in VARCHAR2,
+  X_BENEFIT_NAME in VARCHAR2,
+  X_DESCRIPTION in VARCHAR2
+) is
+  cursor c is select
+      OBJECT_VERSION_NUMBER,
+      BENEFIT_TYPE_CODE,
+      BENEFIT_STATUS_CODE,
+      BENEFIT_CODE,
+      DELETE_FLAG,
+      ADDITIONAL_INFO_1,
+      ADDITIONAL_INFO_2,
+      ATTRIBUTE_CATEGORY,
+      ATTRIBUTE1,
+      ATTRIBUTE2,
+      ATTRIBUTE3,
+      ATTRIBUTE4,
+      ATTRIBUTE5,
+      ATTRIBUTE6,
+      ATTRIBUTE7,
+      ATTRIBUTE8,
+      ATTRIBUTE9,
+      ATTRIBUTE10,
+      ATTRIBUTE11,
+      ATTRIBUTE12,
+      ATTRIBUTE13,
+      ATTRIBUTE14,
+      ATTRIBUTE15
+    from PV_GE_BENEFITS_B
+    where BENEFIT_ID = X_BENEFIT_ID
+    for update of BENEFIT_ID nowait;
+  recinfo c%rowtype;
+
+  cursor c1 is select
+      BENEFIT_NAME,
+      DESCRIPTION,
+      decode(LANGUAGE, userenv('LANG'), 'Y', 'N') BASELANG
+    from PV_GE_BENEFITS_TL
+    where BENEFIT_ID = X_BENEFIT_ID
+    and userenv('LANG') in (LANGUAGE, SOURCE_LANG)
+    for update of BENEFIT_ID nowait;
+begin
+  open c;
+  fetch c into recinfo;
+  if (c%notfound) then
+    close c;
+    fnd_message.set_name('FND', 'FORM_RECORD_DELETED');
+    app_exception.raise_exception;
+  end if;
+  close c;
+  if (    (recinfo.OBJECT_VERSION_NUMBER = X_OBJECT_VERSION_NUMBER)
+      AND (recinfo.BENEFIT_TYPE_CODE = X_BENEFIT_TYPE_CODE)
+      AND (recinfo.BENEFIT_STATUS_CODE = X_BENEFIT_STATUS_CODE)
+      AND ((recinfo.BENEFIT_CODE = X_BENEFIT_CODE)
+           OR ((recinfo.BENEFIT_CODE is null) AND (X_BENEFIT_CODE is null)))
+      AND (recinfo.DELETE_FLAG = X_DELETE_FLAG)
+      AND ((recinfo.ADDITIONAL_INFO_1 = X_ADDITIONAL_INFO_1)
+           OR ((recinfo.ADDITIONAL_INFO_1 is null) AND (X_ADDITIONAL_INFO_1 is null)))
+      AND ((recinfo.ADDITIONAL_INFO_2 = X_ADDITIONAL_INFO_2)
+           OR ((recinfo.ADDITIONAL_INFO_2 is null) AND (X_ADDITIONAL_INFO_2 is null)))
+      AND ((recinfo.ATTRIBUTE_CATEGORY = X_ATTRIBUTE_CATEGORY)
+           OR ((recinfo.ATTRIBUTE_CATEGORY is null) AND (X_ATTRIBUTE_CATEGORY is null)))
+      AND ((recinfo.ATTRIBUTE1 = X_ATTRIBUTE1)
+           OR ((recinfo.ATTRIBUTE1 is null) AND (X_ATTRIBUTE1 is null)))
+      AND ((recinfo.ATTRIBUTE2 = X_ATTRIBUTE2)
+           OR ((recinfo.ATTRIBUTE2 is null) AND (X_ATTRIBUTE2 is null)))
+      AND ((recinfo.ATTRIBUTE3 = X_ATTRIBUTE3)
+           OR ((recinfo.ATTRIBUTE3 is null) AND (X_ATTRIBUTE3 is null)))
+      AND ((recinfo.ATTRIBUTE4 = X_ATTRIBUTE4)
+           OR ((recinfo.ATTRIBUTE4 is null) AND (X_ATTRIBUTE4 is null)))
+      AND ((recinfo.ATTRIBUTE5 = X_ATTRIBUTE5)
+           OR ((recinfo.ATTRIBUTE5 is null) AND (X_ATTRIBUTE5 is null)))
+      AND ((recinfo.ATTRIBUTE6 = X_ATTRIBUTE6)
+           OR ((recinfo.ATTRIBUTE6 is null) AND (X_ATTRIBUTE6 is null)))
+      AND ((recinfo.ATTRIBUTE7 = X_ATTRIBUTE7)
+           OR ((recinfo.ATTRIBUTE7 is null) AND (X_ATTRIBUTE7 is null)))
+      AND ((recinfo.ATTRIBUTE8 = X_ATTRIBUTE8)
+           OR ((recinfo.ATTRIBUTE8 is null) AND (X_ATTRIBUTE8 is null)))
+      AND ((recinfo.ATTRIBUTE9 = X_ATTRIBUTE9)
+           OR ((recinfo.ATTRIBUTE9 is null) AND (X_ATTRIBUTE9 is null)))
+      AND ((recinfo.ATTRIBUTE10 = X_ATTRIBUTE10)
+           OR ((recinfo.ATTRIBUTE10 is null) AND (X_ATTRIBUTE10 is null)))
+      AND ((recinfo.ATTRIBUTE11 = X_ATTRIBUTE11)
+           OR ((recinfo.ATTRIBUTE11 is null) AND (X_ATTRIBUTE11 is null)))
+      AND ((recinfo.ATTRIBUTE12 = X_ATTRIBUTE12)
+           OR ((recinfo.ATTRIBUTE12 is null) AND (X_ATTRIBUTE12 is null)))
+      AND ((recinfo.ATTRIBUTE13 = X_ATTRIBUTE13)
+           OR ((recinfo.ATTRIBUTE13 is null) AND (X_ATTRIBUTE13 is null)))
+      AND ((recinfo.ATTRIBUTE14 = X_ATTRIBUTE14)
+           OR ((recinfo.ATTRIBUTE14 is null) AND (X_ATTRIBUTE14 is null)))
+      AND ((recinfo.ATTRIBUTE15 = X_ATTRIBUTE15)
+           OR ((recinfo.ATTRIBUTE15 is null) AND (X_ATTRIBUTE15 is null)))
+  ) then
+    null;
+  else
+    fnd_message.set_name('FND', 'FORM_RECORD_CHANGED');
+    app_exception.raise_exception;
+  end if;
+
+  for tlinfo in c1 loop
+    if (tlinfo.BASELANG = 'Y') then
+      if (    ((tlinfo.BENEFIT_NAME = X_BENEFIT_NAME)
+               OR ((tlinfo.BENEFIT_NAME is null) AND (X_BENEFIT_NAME is null)))
+          AND ((tlinfo.DESCRIPTION = X_DESCRIPTION)
+               OR ((tlinfo.DESCRIPTION is null) AND (X_DESCRIPTION is null)))
+      ) then
+        null;
+      else
+        fnd_message.set_name('FND', 'FORM_RECORD_CHANGED');
+        app_exception.raise_exception;
+      end if;
+    end if;
+  end loop;
+  return;
+end LOCK_ROW;
+
+procedure UPDATE_ROW (
+  X_BENEFIT_ID in NUMBER,
+  X_OBJECT_VERSION_NUMBER in NUMBER,
+  X_BENEFIT_TYPE_CODE in VARCHAR2,
+  X_BENEFIT_STATUS_CODE in VARCHAR2,
+  X_BENEFIT_CODE in VARCHAR2,
+  X_DELETE_FLAG in VARCHAR2,
+  X_ADDITIONAL_INFO_1 in NUMBER,
+  X_ADDITIONAL_INFO_2 in VARCHAR2,
+  X_ATTRIBUTE_CATEGORY in VARCHAR2,
+  X_ATTRIBUTE1 in VARCHAR2,
+  X_ATTRIBUTE2 in VARCHAR2,
+  X_ATTRIBUTE3 in VARCHAR2,
+  X_ATTRIBUTE4 in VARCHAR2,
+  X_ATTRIBUTE5 in VARCHAR2,
+  X_ATTRIBUTE6 in VARCHAR2,
+  X_ATTRIBUTE7 in VARCHAR2,
+  X_ATTRIBUTE8 in VARCHAR2,
+  X_ATTRIBUTE9 in VARCHAR2,
+  X_ATTRIBUTE10 in VARCHAR2,
+  X_ATTRIBUTE11 in VARCHAR2,
+  X_ATTRIBUTE12 in VARCHAR2,
+  X_ATTRIBUTE13 in VARCHAR2,
+  X_ATTRIBUTE14 in VARCHAR2,
+  X_ATTRIBUTE15 in VARCHAR2,
+  X_BENEFIT_NAME in VARCHAR2,
+  X_DESCRIPTION in VARCHAR2,
+  X_LAST_UPDATE_DATE in DATE,
+  X_LAST_UPDATED_BY in NUMBER,
+  X_LAST_UPDATE_LOGIN in NUMBER
+) is
+begin
+  update PV_GE_BENEFITS_B set
+    OBJECT_VERSION_NUMBER = X_OBJECT_VERSION_NUMBER,
+    BENEFIT_TYPE_CODE = X_BENEFIT_TYPE_CODE,
+    BENEFIT_STATUS_CODE = X_BENEFIT_STATUS_CODE,
+    BENEFIT_CODE = X_BENEFIT_CODE,
+    DELETE_FLAG = X_DELETE_FLAG,
+    ADDITIONAL_INFO_1 = X_ADDITIONAL_INFO_1,
+    ADDITIONAL_INFO_2 = X_ADDITIONAL_INFO_2,
+    ATTRIBUTE_CATEGORY = X_ATTRIBUTE_CATEGORY,
+    ATTRIBUTE1 = X_ATTRIBUTE1,
+    ATTRIBUTE2 = X_ATTRIBUTE2,
+    ATTRIBUTE3 = X_ATTRIBUTE3,
+    ATTRIBUTE4 = X_ATTRIBUTE4,
+    ATTRIBUTE5 = X_ATTRIBUTE5,
+    ATTRIBUTE6 = X_ATTRIBUTE6,
+    ATTRIBUTE7 = X_ATTRIBUTE7,
+    ATTRIBUTE8 = X_ATTRIBUTE8,
+    ATTRIBUTE9 = X_ATTRIBUTE9,
+    ATTRIBUTE10 = X_ATTRIBUTE10,
+    ATTRIBUTE11 = X_ATTRIBUTE11,
+    ATTRIBUTE12 = X_ATTRIBUTE12,
+    ATTRIBUTE13 = X_ATTRIBUTE13,
+    ATTRIBUTE14 = X_ATTRIBUTE14,
+    ATTRIBUTE15 = X_ATTRIBUTE15,
+    LAST_UPDATE_DATE = X_LAST_UPDATE_DATE,
+    LAST_UPDATED_BY = X_LAST_UPDATED_BY,
+    LAST_UPDATE_LOGIN = X_LAST_UPDATE_LOGIN
+  where BENEFIT_ID = X_BENEFIT_ID;
+
+  if (sql%notfound) then
+	 RAISE  FND_API.G_EXC_UNEXPECTED_ERROR;
+  end if;
+
+  update PV_GE_BENEFITS_TL set
+    BENEFIT_NAME = X_BENEFIT_NAME,
+    DESCRIPTION = X_DESCRIPTION,
+    LAST_UPDATE_DATE = X_LAST_UPDATE_DATE,
+    LAST_UPDATED_BY = X_LAST_UPDATED_BY,
+    LAST_UPDATE_LOGIN = X_LAST_UPDATE_LOGIN,
+    SOURCE_LANG = userenv('LANG')
+  where BENEFIT_ID = X_BENEFIT_ID
+  and userenv('LANG') in (LANGUAGE, SOURCE_LANG);
+
+  if (sql%notfound) then
+	 RAISE  FND_API.G_EXC_UNEXPECTED_ERROR;
+  end if;
+end UPDATE_ROW;
+
+procedure UPDATE_SEED_ROW (
+  X_BENEFIT_ID in NUMBER,
+  X_OBJECT_VERSION_NUMBER in NUMBER,
+  X_BENEFIT_TYPE_CODE in VARCHAR2,
+  X_BENEFIT_STATUS_CODE in VARCHAR2,
+  X_BENEFIT_CODE in VARCHAR2,
+  X_DELETE_FLAG in VARCHAR2,
+  X_ADDITIONAL_INFO_1 in NUMBER,
+  X_ADDITIONAL_INFO_2 in VARCHAR2,
+  X_ATTRIBUTE_CATEGORY in VARCHAR2,
+  X_ATTRIBUTE1 in VARCHAR2,
+  X_ATTRIBUTE2 in VARCHAR2,
+  X_ATTRIBUTE3 in VARCHAR2,
+  X_ATTRIBUTE4 in VARCHAR2,
+  X_ATTRIBUTE5 in VARCHAR2,
+  X_ATTRIBUTE6 in VARCHAR2,
+  X_ATTRIBUTE7 in VARCHAR2,
+  X_ATTRIBUTE8 in VARCHAR2,
+  X_ATTRIBUTE9 in VARCHAR2,
+  X_ATTRIBUTE10 in VARCHAR2,
+  X_ATTRIBUTE11 in VARCHAR2,
+  X_ATTRIBUTE12 in VARCHAR2,
+  X_ATTRIBUTE13 in VARCHAR2,
+  X_ATTRIBUTE14 in VARCHAR2,
+  X_ATTRIBUTE15 in VARCHAR2,
+  X_BENEFIT_NAME in VARCHAR2,
+  X_DESCRIPTION in VARCHAR2,
+  X_LAST_UPDATE_DATE in DATE,
+  X_LAST_UPDATED_BY in NUMBER,
+  X_LAST_UPDATE_LOGIN in NUMBER
+)
+IS
+
+  CURSOR  c_updated_by
+  IS
+  SELECT last_updated_by
+  FROM   pv_ge_benefits_vl
+  WHERE  benefit_id = X_BENEFIT_ID;
+
+    l_last_updated_by number;
+
+BEGIN
+
+     for x in c_updated_by
+     loop
+		l_last_updated_by :=  x.last_updated_by;
+     end loop;
+
+     IF ( l_last_updated_by = 1) THEN
+          PV_GE_BENEFITS_PKG.UPDATE_ROW (
+		  X_BENEFIT_ID			=> x_BENEFIT_ID
+		 , X_OBJECT_VERSION_NUMBER	=> X_OBJECT_VERSION_NUMBER
+		 , X_BENEFIT_TYPE_CODE		=> x_BENEFIT_TYPE_CODE
+		 , X_BENEFIT_STATUS_CODE	=> x_BENEFIT_STATUS_CODE
+		 , X_BENEFIT_CODE		=> x_BENEFIT_CODE
+		 , X_DELETE_FLAG		=> x_DELETE_FLAG
+		 , X_ADDITIONAL_INFO_1		=> x_ADDITIONAL_INFO_1
+		 , X_ADDITIONAL_INFO_2		=> x_ADDITIONAL_INFO_2
+		 , X_ATTRIBUTE_CATEGORY		=> x_ATTRIBUTE_CATEGORY
+		 , X_ATTRIBUTE1			=> x_ATTRIBUTE1
+		 , X_ATTRIBUTE2			=> x_ATTRIBUTE2
+		 , X_ATTRIBUTE3			=> x_ATTRIBUTE3
+		 , X_ATTRIBUTE4			=> x_ATTRIBUTE4
+		 , X_ATTRIBUTE5			=> x_ATTRIBUTE5
+		 , X_ATTRIBUTE6			=> x_ATTRIBUTE6
+		 , X_ATTRIBUTE7			=> x_ATTRIBUTE7
+		 , X_ATTRIBUTE8			=> x_ATTRIBUTE8
+		 , X_ATTRIBUTE9			=> x_ATTRIBUTE9
+		 , X_ATTRIBUTE10		=> x_ATTRIBUTE10
+		 , X_ATTRIBUTE11		=> x_ATTRIBUTE11
+		 , X_ATTRIBUTE12		=> x_ATTRIBUTE12
+		 , X_ATTRIBUTE13		=> x_ATTRIBUTE13
+		 , X_ATTRIBUTE14		=> x_ATTRIBUTE14
+		 , X_ATTRIBUTE15		=> x_ATTRIBUTE15
+		 , X_BENEFIT_NAME		=> x_BENEFIT_NAME
+		 , X_DESCRIPTION		=> x_DESCRIPTION
+		 , X_LAST_UPDATE_DATE		=> X_LAST_UPDATE_DATE
+		 , X_LAST_UPDATED_BY		=> X_LAST_UPDATED_BY
+		 , X_LAST_UPDATE_LOGIN		=> X_LAST_UPDATE_LOGIN
+		);
+     ELSE
+         PV_GE_BENEFITS_PKG.SEED_UPDATE_ROW (
+		  X_BENEFIT_ID			=> x_BENEFIT_ID
+		 , X_OBJECT_VERSION_NUMBER	=> X_OBJECT_VERSION_NUMBER
+		 , X_BENEFIT_TYPE_CODE		=> x_BENEFIT_TYPE_CODE
+		 , X_BENEFIT_STATUS_CODE	=> x_BENEFIT_STATUS_CODE
+		 , X_BENEFIT_CODE		=> x_BENEFIT_CODE
+		 , X_DELETE_FLAG		=> x_DELETE_FLAG
+		 , X_ADDITIONAL_INFO_1		=> x_ADDITIONAL_INFO_1
+		 , X_ADDITIONAL_INFO_2		=> x_ADDITIONAL_INFO_2
+		 , X_ATTRIBUTE_CATEGORY		=> x_ATTRIBUTE_CATEGORY
+		 , X_ATTRIBUTE1			=> x_ATTRIBUTE1
+		 , X_ATTRIBUTE2			=> x_ATTRIBUTE2
+		 , X_ATTRIBUTE3			=> x_ATTRIBUTE3
+		 , X_ATTRIBUTE4			=> x_ATTRIBUTE4
+		 , X_ATTRIBUTE5			=> x_ATTRIBUTE5
+		 , X_ATTRIBUTE6			=> x_ATTRIBUTE6
+		 , X_ATTRIBUTE7			=> x_ATTRIBUTE7
+		 , X_ATTRIBUTE8			=> x_ATTRIBUTE8
+		 , X_ATTRIBUTE9			=> x_ATTRIBUTE9
+		 , X_ATTRIBUTE10		=> x_ATTRIBUTE10
+		 , X_ATTRIBUTE11		=> x_ATTRIBUTE11
+		 , X_ATTRIBUTE12		=> x_ATTRIBUTE12
+		 , X_ATTRIBUTE13		=> x_ATTRIBUTE13
+		 , X_ATTRIBUTE14		=> x_ATTRIBUTE14
+		 , X_ATTRIBUTE15		=> x_ATTRIBUTE15
+		 , X_LAST_UPDATE_DATE		=> X_LAST_UPDATE_DATE
+		 , X_LAST_UPDATED_BY		=> X_LAST_UPDATED_BY
+		 , X_LAST_UPDATE_LOGIN		=> X_LAST_UPDATE_LOGIN
+		);
+     END IF;
+
+
+END UPDATE_SEED_ROW;
+
+procedure SEED_UPDATE_ROW (
+  X_BENEFIT_ID in NUMBER,
+  X_OBJECT_VERSION_NUMBER in NUMBER,
+  X_BENEFIT_TYPE_CODE in VARCHAR2,
+  X_BENEFIT_STATUS_CODE in VARCHAR2,
+  X_BENEFIT_CODE in VARCHAR2,
+  X_DELETE_FLAG in VARCHAR2,
+  X_ADDITIONAL_INFO_1 in NUMBER,
+  X_ADDITIONAL_INFO_2 in VARCHAR2,
+  X_ATTRIBUTE_CATEGORY in VARCHAR2,
+  X_ATTRIBUTE1 in VARCHAR2,
+  X_ATTRIBUTE2 in VARCHAR2,
+  X_ATTRIBUTE3 in VARCHAR2,
+  X_ATTRIBUTE4 in VARCHAR2,
+  X_ATTRIBUTE5 in VARCHAR2,
+  X_ATTRIBUTE6 in VARCHAR2,
+  X_ATTRIBUTE7 in VARCHAR2,
+  X_ATTRIBUTE8 in VARCHAR2,
+  X_ATTRIBUTE9 in VARCHAR2,
+  X_ATTRIBUTE10 in VARCHAR2,
+  X_ATTRIBUTE11 in VARCHAR2,
+  X_ATTRIBUTE12 in VARCHAR2,
+  X_ATTRIBUTE13 in VARCHAR2,
+  X_ATTRIBUTE14 in VARCHAR2,
+  X_ATTRIBUTE15 in VARCHAR2,
+  X_LAST_UPDATE_DATE in DATE,
+  X_LAST_UPDATED_BY in NUMBER,
+  X_LAST_UPDATE_LOGIN in NUMBER
+)
+IS
+BEGIN
+     update PV_GE_BENEFITS_B set
+    OBJECT_VERSION_NUMBER = X_OBJECT_VERSION_NUMBER,
+    BENEFIT_TYPE_CODE = X_BENEFIT_TYPE_CODE,
+    BENEFIT_STATUS_CODE = X_BENEFIT_STATUS_CODE,
+    BENEFIT_CODE = X_BENEFIT_CODE,
+    DELETE_FLAG = X_DELETE_FLAG,
+    ADDITIONAL_INFO_1 = X_ADDITIONAL_INFO_1,
+    ADDITIONAL_INFO_2 = X_ADDITIONAL_INFO_2,
+    ATTRIBUTE_CATEGORY = X_ATTRIBUTE_CATEGORY,
+    ATTRIBUTE1 = X_ATTRIBUTE1,
+    ATTRIBUTE2 = X_ATTRIBUTE2,
+    ATTRIBUTE3 = X_ATTRIBUTE3,
+    ATTRIBUTE4 = X_ATTRIBUTE4,
+    ATTRIBUTE5 = X_ATTRIBUTE5,
+    ATTRIBUTE6 = X_ATTRIBUTE6,
+    ATTRIBUTE7 = X_ATTRIBUTE7,
+    ATTRIBUTE8 = X_ATTRIBUTE8,
+    ATTRIBUTE9 = X_ATTRIBUTE9,
+    ATTRIBUTE10 = X_ATTRIBUTE10,
+    ATTRIBUTE11 = X_ATTRIBUTE11,
+    ATTRIBUTE12 = X_ATTRIBUTE12,
+    ATTRIBUTE13 = X_ATTRIBUTE13,
+    ATTRIBUTE14 = X_ATTRIBUTE14,
+    ATTRIBUTE15 = X_ATTRIBUTE15,
+    LAST_UPDATE_DATE = X_LAST_UPDATE_DATE,
+    LAST_UPDATED_BY = X_LAST_UPDATED_BY,
+    LAST_UPDATE_LOGIN = X_LAST_UPDATE_LOGIN
+  where BENEFIT_ID = X_BENEFIT_ID;
+
+  if (sql%notfound) then
+	 RAISE  FND_API.G_EXC_UNEXPECTED_ERROR;
+  end if;
+END SEED_UPDATE_ROW;
+
+procedure DELETE_ROW (
+  X_BENEFIT_ID in NUMBER
+) is
+begin
+  delete from PV_GE_BENEFITS_TL
+  where BENEFIT_ID = X_BENEFIT_ID;
+
+  if (sql%notfound) then
+	 RAISE  FND_API.G_EXC_UNEXPECTED_ERROR;
+  end if;
+
+  delete from PV_GE_BENEFITS_B
+  where BENEFIT_ID = X_BENEFIT_ID;
+
+  if (sql%notfound) then
+	 RAISE  FND_API.G_EXC_UNEXPECTED_ERROR;
+  end if;
+end DELETE_ROW;
+
+procedure ADD_LANGUAGE
+is
+begin
+  delete from PV_GE_BENEFITS_TL T
+  where not exists
+    (select NULL
+    from PV_GE_BENEFITS_B B
+    where B.BENEFIT_ID = T.BENEFIT_ID
+    );
+
+  update PV_GE_BENEFITS_TL T set (
+      BENEFIT_NAME,
+      DESCRIPTION
+    ) = (select
+      B.BENEFIT_NAME,
+      B.DESCRIPTION
+    from PV_GE_BENEFITS_TL B
+    where B.BENEFIT_ID = T.BENEFIT_ID
+    and B.LANGUAGE = T.SOURCE_LANG)
+  where (
+      T.BENEFIT_ID,
+      T.LANGUAGE
+  ) in (select
+      SUBT.BENEFIT_ID,
+      SUBT.LANGUAGE
+    from PV_GE_BENEFITS_TL SUBB, PV_GE_BENEFITS_TL SUBT
+    where SUBB.BENEFIT_ID = SUBT.BENEFIT_ID
+    and SUBB.LANGUAGE = SUBT.SOURCE_LANG
+    and (SUBB.BENEFIT_NAME <> SUBT.BENEFIT_NAME
+      or (SUBB.BENEFIT_NAME is null and SUBT.BENEFIT_NAME is not null)
+      or (SUBB.BENEFIT_NAME is not null and SUBT.BENEFIT_NAME is null)
+      or SUBB.DESCRIPTION <> SUBT.DESCRIPTION
+      or (SUBB.DESCRIPTION is null and SUBT.DESCRIPTION is not null)
+      or (SUBB.DESCRIPTION is not null and SUBT.DESCRIPTION is null)
+  ));
+
+  insert into PV_GE_BENEFITS_TL (
+    BENEFIT_ID,
+    BENEFIT_NAME,
+    DESCRIPTION,
+    CREATED_BY,
+    CREATION_DATE,
+    LAST_UPDATED_BY,
+    LAST_UPDATE_DATE,
+    LAST_UPDATE_LOGIN,
+    LANGUAGE,
+    SOURCE_LANG
+  ) select /*+ ORDERED */
+    B.BENEFIT_ID,
+    B.BENEFIT_NAME,
+    B.DESCRIPTION,
+    B.CREATED_BY,
+    B.CREATION_DATE,
+    B.LAST_UPDATED_BY,
+    B.LAST_UPDATE_DATE,
+    B.LAST_UPDATE_LOGIN,
+    L.LANGUAGE_CODE,
+    B.SOURCE_LANG
+  from PV_GE_BENEFITS_TL B, FND_LANGUAGES L
+  where L.INSTALLED_FLAG in ('I', 'B')
+  and B.LANGUAGE = userenv('LANG')
+  and not exists
+    (select NULL
+    from PV_GE_BENEFITS_TL T
+    where T.BENEFIT_ID = B.BENEFIT_ID
+    and T.LANGUAGE = L.LANGUAGE_CODE);
+end ADD_LANGUAGE;
+
+--procedure TRANSLATE_ROW
+procedure TRANSLATE_ROW(
+       p_benefit_id	   in VARCHAR2
+     , p_benefit_name      in VARCHAR2
+     , p_description       in VARCHAR2
+     , p_owner             in VARCHAR2
+ ) is
+ begin
+    update PV_GE_BENEFITS_TL set
+       description = nvl(p_description, description),
+       benefit_name = nvl( p_benefit_name, benefit_name),
+       source_lang = userenv('LANG'),
+       last_update_date = sysdate,
+       last_updated_by = decode(p_owner, 'SEED', 1, 0),
+       last_update_login = 0
+    where  benefit_id = p_benefit_id
+    and    userenv('LANG') in (language, source_lang);
+
+end TRANSLATE_ROW;
+
+PROCEDURE LOAD_ROW
+( p_BENEFIT_ID			IN NUMBER,
+  p_BENEFIT_TYPE_CODE		in VARCHAR2,
+  p_BENEFIT_STATUS_CODE		in VARCHAR2,
+  p_BENEFIT_CODE		in VARCHAR2,
+  p_DELETE_FLAG			in VARCHAR2,
+  p_ADDITIONAL_INFO_1		in NUMBER,
+  p_ADDITIONAL_INFO_2		in VARCHAR2,
+  p_ATTRIBUTE_CATEGORY		in VARCHAR2,
+  p_ATTRIBUTE1			in VARCHAR2,
+  p_ATTRIBUTE2			in VARCHAR2,
+  p_ATTRIBUTE3			in VARCHAR2,
+  p_ATTRIBUTE4			in VARCHAR2,
+  p_ATTRIBUTE5			in VARCHAR2,
+  p_ATTRIBUTE6			in VARCHAR2,
+  p_ATTRIBUTE7			in VARCHAR2,
+  p_ATTRIBUTE8			in VARCHAR2,
+  p_ATTRIBUTE9			in VARCHAR2,
+  p_ATTRIBUTE10			in VARCHAR2,
+  p_ATTRIBUTE11			in VARCHAR2,
+  p_ATTRIBUTE12			in VARCHAR2,
+  p_ATTRIBUTE13			in VARCHAR2,
+  p_ATTRIBUTE14			in VARCHAR2,
+  p_ATTRIBUTE15			in VARCHAR2,
+  p_BENEFIT_NAME		in VARCHAR2,
+  p_DESCRIPTION			in VARCHAR2,
+  p_owner			in VARCHAR2 )
+IS
+     L_USER_ID           number := 0;
+     L_OBJ_VERNO         number;
+     L_DUMMY_CHAR        varchar2(1);
+     L_ROW_ID            varchar2(100);
+     L_BENEFIT_ID        number;
+
+     cursor  C_OBJ_VERNO is
+	select OBJECT_VERSION_NUMBER
+	from   PV_GE_BENEFITS_B
+	where  BENEFIT_ID = l_BENEFIT_ID;
+
+     cursor c_chk_benefit_exists is
+	select 'x'
+	from   PV_GE_BENEFITS_B
+	where  BENEFIT_ID = l_BENEFIT_ID;
+
+
+BEGIN
+
+
+         L_BENEFIT_ID := p_benefit_id;
+
+	 if p_owner = 'SEED' then
+	     l_user_id := 1;
+	 end if;
+
+	 open c_chk_benefit_exists;
+	 fetch c_chk_benefit_exists into l_dummy_char;
+
+	 if c_chk_benefit_exists%notfound then
+	    close c_chk_benefit_exists;
+	    l_obj_verno := 1;
+	    PV_GE_BENEFITS_PKG.INSERT_ROW (
+		  X_ROWID			=> L_ROW_ID
+		 , X_BENEFIT_ID			=> p_BENEFIT_ID
+		 , X_OBJECT_VERSION_NUMBER	=> L_OBJ_VERNO
+		 , X_BENEFIT_TYPE_CODE		=> p_BENEFIT_TYPE_CODE
+		 , X_BENEFIT_STATUS_CODE	=> p_BENEFIT_STATUS_CODE
+		 , X_BENEFIT_CODE		=> p_BENEFIT_CODE
+		 , X_DELETE_FLAG		=> p_DELETE_FLAG
+		 , X_ADDITIONAL_INFO_1		=> p_ADDITIONAL_INFO_1
+		 , X_ADDITIONAL_INFO_2		=> p_ADDITIONAL_INFO_2
+		 , X_ATTRIBUTE_CATEGORY		=> p_ATTRIBUTE_CATEGORY
+		 , X_ATTRIBUTE1			=> p_ATTRIBUTE1
+		 , X_ATTRIBUTE2			=> p_ATTRIBUTE2
+		 , X_ATTRIBUTE3			=> p_ATTRIBUTE3
+		 , X_ATTRIBUTE4			=> p_ATTRIBUTE4
+		 , X_ATTRIBUTE5			=> p_ATTRIBUTE5
+		 , X_ATTRIBUTE6			=> p_ATTRIBUTE6
+		 , X_ATTRIBUTE7			=> p_ATTRIBUTE7
+		 , X_ATTRIBUTE8			=> p_ATTRIBUTE8
+		 , X_ATTRIBUTE9			=> p_ATTRIBUTE9
+		 , X_ATTRIBUTE10		=> p_ATTRIBUTE10
+		 , X_ATTRIBUTE11		=> p_ATTRIBUTE11
+		 , X_ATTRIBUTE12		=> p_ATTRIBUTE12
+		 , X_ATTRIBUTE13		=> p_ATTRIBUTE13
+		 , X_ATTRIBUTE14		=> p_ATTRIBUTE14
+		 , X_ATTRIBUTE15		=> p_ATTRIBUTE15
+		 , X_BENEFIT_NAME		=> p_BENEFIT_NAME
+		 , X_DESCRIPTION		=> p_DESCRIPTION
+		 , X_CREATION_DATE		=> SYSDATE
+		 , X_CREATED_BY			=> l_user_id
+		 , X_LAST_UPDATE_DATE		=> SYSDATE
+		 , X_LAST_UPDATED_BY		=> l_user_id
+		 , X_LAST_UPDATE_LOGIN		=> 0
+		);
+
+	 else
+
+	   close c_chk_benefit_exists;
+	   open c_obj_verno;
+	   fetch c_obj_verno into l_obj_verno;
+	   close c_obj_verno;
+
+	    PV_GE_BENEFITS_PKG.UPDATE_SEED_ROW (
+		  X_BENEFIT_ID			=> p_BENEFIT_ID
+		 , X_OBJECT_VERSION_NUMBER	=> L_OBJ_VERNO
+		 , X_BENEFIT_TYPE_CODE		=> p_BENEFIT_TYPE_CODE
+		 , X_BENEFIT_STATUS_CODE	=> p_BENEFIT_STATUS_CODE
+		 , X_BENEFIT_CODE		=> p_BENEFIT_CODE
+		 , X_DELETE_FLAG		=> p_DELETE_FLAG
+		 , X_ADDITIONAL_INFO_1		=> p_ADDITIONAL_INFO_1
+		 , X_ADDITIONAL_INFO_2		=> p_ADDITIONAL_INFO_2
+		 , X_ATTRIBUTE_CATEGORY		=> p_ATTRIBUTE_CATEGORY
+		 , X_ATTRIBUTE1			=> p_ATTRIBUTE1
+		 , X_ATTRIBUTE2			=> p_ATTRIBUTE2
+		 , X_ATTRIBUTE3			=> p_ATTRIBUTE3
+		 , X_ATTRIBUTE4			=> p_ATTRIBUTE4
+		 , X_ATTRIBUTE5			=> p_ATTRIBUTE5
+		 , X_ATTRIBUTE6			=> p_ATTRIBUTE6
+		 , X_ATTRIBUTE7			=> p_ATTRIBUTE7
+		 , X_ATTRIBUTE8			=> p_ATTRIBUTE8
+		 , X_ATTRIBUTE9			=> p_ATTRIBUTE9
+		 , X_ATTRIBUTE10		=> p_ATTRIBUTE10
+		 , X_ATTRIBUTE11		=> p_ATTRIBUTE11
+		 , X_ATTRIBUTE12		=> p_ATTRIBUTE12
+		 , X_ATTRIBUTE13		=> p_ATTRIBUTE13
+		 , X_ATTRIBUTE14		=> p_ATTRIBUTE14
+		 , X_ATTRIBUTE15		=> p_ATTRIBUTE15
+		 , X_BENEFIT_NAME		=> p_BENEFIT_NAME
+		 , X_DESCRIPTION		=> p_DESCRIPTION
+		 , X_LAST_UPDATE_DATE		=> SYSDATE
+		 , X_LAST_UPDATED_BY		=> l_user_id
+		 , X_LAST_UPDATE_LOGIN		=> 0
+		);
+
+	end if;
+
+END;
+PROCEDURE load_seed_row
+( p_UPLOAD_MODE                 in VARCHAR2,
+  p_BENEFIT_ID			IN NUMBER,
+  p_BENEFIT_TYPE_CODE		in VARCHAR2,
+  p_BENEFIT_STATUS_CODE		in VARCHAR2,
+  p_BENEFIT_CODE		in VARCHAR2,
+  p_DELETE_FLAG			in VARCHAR2,
+  p_ADDITIONAL_INFO_1		in NUMBER,
+  p_ADDITIONAL_INFO_2		in VARCHAR2,
+  p_ATTRIBUTE_CATEGORY		in VARCHAR2,
+  p_ATTRIBUTE1			in VARCHAR2,
+  p_ATTRIBUTE2			in VARCHAR2,
+  p_ATTRIBUTE3			in VARCHAR2,
+  p_ATTRIBUTE4			in VARCHAR2,
+  p_ATTRIBUTE5			in VARCHAR2,
+  p_ATTRIBUTE6			in VARCHAR2,
+  p_ATTRIBUTE7			in VARCHAR2,
+  p_ATTRIBUTE8			in VARCHAR2,
+  p_ATTRIBUTE9			in VARCHAR2,
+  p_ATTRIBUTE10			in VARCHAR2,
+  p_ATTRIBUTE11			in VARCHAR2,
+  p_ATTRIBUTE12			in VARCHAR2,
+  p_ATTRIBUTE13			in VARCHAR2,
+  p_ATTRIBUTE14			in VARCHAR2,
+  p_ATTRIBUTE15			in VARCHAR2,
+  p_BENEFIT_NAME		in VARCHAR2,
+  p_DESCRIPTION			in VARCHAR2,
+  p_owner			in VARCHAR2 )
+
+IS
+BEGIN
+     IF (p_upload_mode = 'NLS') THEN
+
+	TRANSLATE_ROW(
+		  p_benefit_id	      => p_benefit_id
+		, p_benefit_name      => p_benefit_name
+		, p_description       => p_description
+		, p_owner             => p_owner);
+     ELSE
+
+         LOAD_ROW (
+		 p_benefit_id		 =>   p_benefit_id
+		,p_benefit_type_code	 =>   p_benefit_type_code
+		,p_benefit_status_code	 =>   p_benefit_status_code
+		,p_benefit_code		 =>   p_benefit_code
+		,p_delete_flag		 =>   p_delete_flag
+		,p_additional_info_1	 =>   p_additional_info_1
+		,p_additional_info_2	 =>   p_additional_info_2
+		,p_attribute_category	 =>   p_attribute_category
+		,p_attribute1		 =>   p_attribute1
+		,p_attribute2		 =>   p_attribute2
+		,p_attribute3		 =>   p_attribute3
+		,p_attribute4		 =>   p_attribute4
+		,p_attribute5		 =>   p_attribute5
+		,p_attribute6		 =>   p_attribute6
+		,p_attribute7		 =>   p_attribute7
+		,p_attribute8		 =>   p_attribute8
+		,p_attribute9		 =>   p_attribute9
+		,p_attribute10		 =>   p_attribute10
+		,p_attribute11		 =>   p_attribute11
+		,p_attribute12		 =>   p_attribute12
+		,p_attribute13		 =>   p_attribute13
+		,p_attribute14		 =>   p_attribute14
+		,p_attribute15		 =>   p_attribute15
+		,p_benefit_name		 =>   p_benefit_name
+		,p_description		 =>   p_description
+		,p_owner                 =>   p_owner);
+
+      END IF;
+
+end LOAD_SEED_ROW;
+
+end PV_GE_BENEFITS_PKG;
+
+/

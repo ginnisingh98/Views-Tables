@@ -1,0 +1,41 @@
+--------------------------------------------------------
+--  DDL for Package HR_NAV_CONTEXT_RULES_PKG
+--------------------------------------------------------
+
+  CREATE OR REPLACE EDITIONABLE PACKAGE "APPS"."HR_NAV_CONTEXT_RULES_PKG" AUTHID CURRENT_USER as
+/* $Header: hrwcrlct.pkh 115.2 2004/01/08 01:50:06 adudekul noship $ */
+procedure INSERT_ROW (
+  X_ROWID in out nocopy VARCHAR2,
+  X_NAV_CONTEXT_RULE_ID in NUMBER,
+  X_GLOBAL_USAGE_ID in NUMBER,
+  X_EVALUATION_TYPE_CODE in VARCHAR2,
+  X_VALUE in VARCHAR2
+);
+procedure LOCK_ROW (
+  X_NAV_CONTEXT_RULE_ID in NUMBER,
+  X_GLOBAL_USAGE_ID in NUMBER,
+  X_EVALUATION_TYPE_CODE in VARCHAR2,
+  X_VALUE in VARCHAR2
+);
+procedure UPDATE_ROW (
+  X_NAV_CONTEXT_RULE_ID in NUMBER,
+  X_GLOBAL_USAGE_ID in NUMBER,
+  X_EVALUATION_TYPE_CODE in VARCHAR2,
+  X_VALUE in VARCHAR2
+);
+procedure DELETE_ROW (
+  X_NAV_CONTEXT_RULE_ID in NUMBER
+);
+procedure LOAD_ROW (
+  X_FORM_NAME in VARCHAR2,
+  X_BLOCK_NAME in VARCHAR2,
+  X_GLOBAL_NAME in VARCHAR2,
+  X_IN_OR_OUT in VARCHAR2,
+  X_EVALUATION_TYPE_CODE in VARCHAR2,
+  X_VALUE in VARCHAR2
+);
+end HR_NAV_CONTEXT_RULES_PKG;
+
+ 
+
+/

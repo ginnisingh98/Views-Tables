@@ -1,0 +1,52 @@
+--------------------------------------------------------
+--  DDL for Package ICX_NONCAT_TEMPLATES_PKG
+--------------------------------------------------------
+
+  CREATE OR REPLACE EDITIONABLE PACKAGE "APPS"."ICX_NONCAT_TEMPLATES_PKG" AUTHID CURRENT_USER AS
+/* $Header: ICXNTMPS.pls 115.1 2004/03/31 18:46:45 vkartik noship $ */
+
+procedure INSERT_ROW (
+  X_ROWID             in out NOCOPY VARCHAR2,
+  X_TEMPLATE_ID       in NUMBER,
+  X_ORG_ID            in NUMBER,
+  X_TEMPLATE_NAME     in VARCHAR2,
+  X_ITEM_DESCRIPTION  in VARCHAR2,
+  X_CREATION_DATE     in DATE,
+  X_CREATED_BY        in NUMBER,
+  X_LAST_UPDATE_DATE  in DATE,
+  X_LAST_UPDATED_BY   in NUMBER,
+  X_LAST_UPDATE_LOGIN in NUMBER);
+
+procedure UPDATE_ROW (
+  X_TEMPLATE_ID       in NUMBER,
+  X_ORG_ID            in NUMBER,
+  X_TEMPLATE_NAME     in VARCHAR2,
+  X_ITEM_DESCRIPTION  in VARCHAR2,
+  X_LAST_UPDATE_DATE  in DATE,
+  X_LAST_UPDATED_BY   in NUMBER,
+  X_LAST_UPDATE_LOGIN in NUMBER);
+
+procedure TRANSLATE_ROW(
+  X_TEMPLATE_ID       in VARCHAR2,
+  X_OWNER             in VARCHAR2,
+  X_TEMPLATE_NAME     in VARCHAR2,
+  X_ITEM_DESCRIPTION  in VARCHAR2,
+  X_CUSTOM_MODE       in VARCHAR2,
+  X_LAST_UPDATE_DATE  in VARCHAR2);
+
+procedure LOAD_ROW(
+  X_TEMPLATE_ID       in VARCHAR2,
+  X_OWNER             in VARCHAR2,
+  X_ORG_ID            in VARCHAR2,
+  X_TEMPLATE_NAME     in VARCHAR2,
+  X_ITEM_DESCRIPTION  in VARCHAR2,
+  X_CUSTOM_MODE       in VARCHAR2,
+  X_LAST_UPDATE_DATE  in VARCHAR2);
+
+procedure ADD_LANGUAGE;
+
+end ICX_NONCAT_TEMPLATES_PKG;
+
+ 
+
+/

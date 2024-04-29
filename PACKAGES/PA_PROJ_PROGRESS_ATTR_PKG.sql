@@ -1,0 +1,57 @@
+--------------------------------------------------------
+--  DDL for Package PA_PROJ_PROGRESS_ATTR_PKG
+--------------------------------------------------------
+
+  CREATE OR REPLACE EDITIONABLE PACKAGE "APPS"."PA_PROJ_PROGRESS_ATTR_PKG" AUTHID CURRENT_USER as
+/* $Header: PAPPPKGS.pls 120.1 2005/08/19 16:43:31 mwasowic noship $*/
+
+procedure INSERT_ROW(
+  X_PROJ_PROGRESS_ATTR_ID           IN OUT NOCOPY NUMBER --File.Sql.39 bug 4440895
+ ,X_PROJECT_ID                      IN NUMBER
+ ,X_OBJECT_TYPE                     IN VARCHAR2
+ ,X_OBJECT_ID                       IN NUMBER
+ ,X_LAST_UPDATE_DATE                IN DATE
+ ,X_LAST_UPDATED_BY                 IN NUMBER
+ ,X_CREATION_DATE                   IN DATE
+ ,X_CREATED_BY                      IN NUMBER
+ ,X_LAST_UPDATE_LOGIN               IN NUMBER
+ ,X_PROGRESS_CYCLE_ID               IN NUMBER
+ ,X_WQ_ENABLE_FLAG                  IN VARCHAR2
+ ,X_REMAIN_EFFORT_ENABLE_FLAG       IN VARCHAR2
+ ,X_PERCENT_COMP_ENABLE_FLAG        IN VARCHAR2
+ ,X_NEXT_PROGRESS_UPDATE_DATE       IN DATE
+ ,X_TASK_WEIGHT_BASIS_CODE          IN VARCHAR2
+ ,X_ALLOW_COLLAB_PROG_ENTRY         IN VARCHAR2
+ ,X_ALLW_PHY_PRCNT_CMP_OVERRIDES         IN VARCHAR2
+ ,X_STRUCTURE_TYPE                  IN VARCHAR2
+);
+
+procedure UPDATE_ROW(
+  X_PROJ_PROGRESS_ATTR_ID           IN NUMBER
+ ,X_PROJECT_ID                      IN NUMBER
+ ,X_OBJECT_TYPE                     IN VARCHAR2
+ ,X_OBJECT_ID                       IN NUMBER
+ ,X_LAST_UPDATE_DATE                IN DATE
+ ,X_LAST_UPDATED_BY                 IN NUMBER
+ ,X_LAST_UPDATE_LOGIN               IN NUMBER
+ ,X_PROGRESS_CYCLE_ID               IN NUMBER
+ ,X_WQ_ENABLE_FLAG                  IN VARCHAR2
+ ,X_REMAIN_EFFORT_ENABLE_FLAG       IN VARCHAR2
+ ,X_PERCENT_COMP_ENABLE_FLAG        IN VARCHAR2
+ ,X_NEXT_PROGRESS_UPDATE_DATE       IN DATE
+ ,X_RECORD_VERSION_NUMBER           IN NUMBER
+ ,X_TASK_WEIGHT_BASIS_CODE          IN VARCHAR2
+ ,X_ALLOW_COLLAB_PROG_ENTRY         IN VARCHAR2
+ ,X_ALLW_PHY_PRCNT_CMP_OVERRIDES         IN VARCHAR2
+ ,X_STRUCTURE_TYPE                  IN VARCHAR2
+);
+
+Procedure DELETE_ROW(
+ p_row_id  VARCHAR2 );
+
+end PA_PROJ_PROGRESS_ATTR_PKG;
+
+
+ 
+
+/

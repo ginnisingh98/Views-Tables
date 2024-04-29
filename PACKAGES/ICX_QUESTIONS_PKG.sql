@@ -1,0 +1,49 @@
+--------------------------------------------------------
+--  DDL for Package ICX_QUESTIONS_PKG
+--------------------------------------------------------
+
+  CREATE OR REPLACE EDITIONABLE PACKAGE "APPS"."ICX_QUESTIONS_PKG" AUTHID CURRENT_USER as
+/* $Header: ICXQUESS.pls 115.2 99/10/18 10:49:51 porting s $ */
+
+procedure INSERT_ROW (
+  X_ROWID			in out VARCHAR2,
+  X_QUESTION_CODE 	in 	VARCHAR2,
+  X_APPLICATION_ID 		in	NUMBER,
+  X_TYPE			in	VARCHAR2,
+  X_QUESTION 			in 	VARCHAR2,
+  X_CREATION_DATE 		in 	DATE,
+  X_CREATED_BY 			in 	NUMBER,
+  X_LAST_UPDATE_DATE 		in 	DATE,
+  X_LAST_UPDATED_BY 		in 	NUMBER,
+  X_LAST_UPDATE_LOGIN 		in 	NUMBER
+);
+
+procedure UPDATE_ROW (
+  X_QUESTION_CODE		in VARCHAR2,
+  X_APPLICATION_ID 			in NUMBER,
+  X_TYPE				in VARCHAR2,
+  X_QUESTION				in VARCHAR2,
+  X_LAST_UPDATE_DATE 		in DATE,
+  X_LAST_UPDATED_BY 		in NUMBER,
+  X_LAST_UPDATE_LOGIN 		in NUMBER
+);
+
+procedure TRANSLATE_ROW (
+  X_QUESTION_CODE			in	VARCHAR2,
+  X_OWNER				in	VARCHAR2,
+  X_QUESTION			in	VARCHAR2);
+
+procedure LOAD_ROW (
+  X_QUESTION_CODE		in 	VARCHAR2,
+  X_OWNER			in	VARCHAR2,
+  X_APPLICATION_ID	in 	NUMBER,
+  X_TYPE			in	VARCHAR2,
+  X_QUESTION	in 	VARCHAR2);
+
+procedure ADD_LANGUAGE;
+
+END ICX_QUESTIONS_PKG;
+
+ 
+
+/

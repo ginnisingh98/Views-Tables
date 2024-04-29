@@ -1,0 +1,912 @@
+--------------------------------------------------------
+--  DDL for Package Body RLM_RLMNETCH_XMLP_PKG
+--------------------------------------------------------
+
+  CREATE OR REPLACE EDITIONABLE PACKAGE BODY "APPS"."RLM_RLMNETCH_XMLP_PKG" AS
+/* $Header: RLMNETCHB.pls 120.0 2008/01/25 11:58:38 krreddy noship $ */
+  FUNCTION C_CHANGE_CUMFORMULA(CF_NEW_CUM IN NUMBER
+                              ,CF_OLD_CUM IN NUMBER) RETURN NUMBER IS
+    CHANGE NUMBER;
+  BEGIN
+    CHANGE := CF_NEW_CUM - CF_OLD_CUM;
+    RETURN (CHANGE);
+  END C_CHANGE_CUMFORMULA;
+
+  FUNCTION C_NET_CHANGEFORMULA(C_ACTUAL_NEW_QTY IN NUMBER
+                              ,C_ACTUAL_OLD_QTY IN NUMBER) RETURN NUMBER IS
+    NETCHANGE NUMBER;
+  BEGIN
+    NETCHANGE := C_ACTUAL_NEW_QTY - C_ACTUAL_OLD_QTY;
+    RETURN (NETCHANGE);
+  END C_NET_CHANGEFORMULA;
+
+  FUNCTION G_ITEM_1GROUPFILTER RETURN BOOLEAN IS
+  BEGIN
+    RETURN (TRUE);
+  END G_ITEM_1GROUPFILTER;
+
+  FUNCTION G_CUSTOMER_ITEM_ID1GROUPFILTER RETURN BOOLEAN IS
+  BEGIN
+    CP_NEW_CUM := 0;
+    CP_OLD_CUM := 0;
+    RETURN (TRUE);
+  EXCEPTION
+    WHEN NO_DATA_FOUND THEN
+      CP_NEW_CUM := 0;
+      CP_OLD_CUM := 0;
+      RETURN (TRUE);
+  END G_CUSTOMER_ITEM_ID1GROUPFILTER;
+
+  FUNCTION G_ITEM_HEADGROUPFILTER RETURN BOOLEAN IS
+  BEGIN
+    CP_PREV_VALUE := 0;
+    RETURN (TRUE);
+  END G_ITEM_HEADGROUPFILTER;
+
+  FUNCTION G_HEADERGROUPFILTER RETURN BOOLEAN IS
+  BEGIN
+    RETURN (TRUE);
+  END G_HEADERGROUPFILTER;
+
+  FUNCTION BEFOREREPORT RETURN BOOLEAN IS
+    L_RLM_SCHEDULE_TYPE VARCHAR2(30);
+    L_YES_NO VARCHAR2(30);
+    L_ENABLED_FLAG VARCHAR2(30);
+    L_SHIP_TO VARCHAR2(30);
+    L_STATUS VARCHAR2(1);
+    L_CURRENT_ORG_ID NUMBER;
+    L_OU_NAME VARCHAR2(240);
+    CURSOR CUR_CUST_NAME(V_CUSTOMER_ID IN NUMBER) IS
+      SELECT
+        PARTY.PARTY_NAME
+      FROM
+        HZ_PARTIES PARTY,
+        HZ_CUST_ACCOUNTS CUST_ACCT
+      WHERE PARTY.PARTY_ID = CUST_ACCT.PARTY_ID
+        AND CUST_ACCT.CUST_ACCOUNT_ID = V_CUSTOMER_ID;
+    CURSOR CUR_SCHEDULE_TYPE(V_SCHEDULE_TYPE IN VARCHAR2) IS
+      SELECT
+        MEANING
+      FROM
+        FND_LOOKUP_VALUES_VL
+      WHERE LOOKUP_TYPE = L_RLM_SCHEDULE_TYPE
+        AND LOOKUP_CODE = V_SCHEDULE_TYPE
+        AND ENABLED_FLAG = L_ENABLED_FLAG;
+    CURSOR CUR_SCH_REF_NUM(V_SCH_REF_NUM IN NUMBER) IS
+      SELECT
+        SCHEDULE_REFERENCE_NUM
+      FROM
+        RLM_SCHEDULE_HEADERS_ALL
+      WHERE HEADER_ID = V_SCH_REF_NUM;
+    CURSOR CUR_SHIP_FROM(V_SHIP_FROM IN NUMBER) IS
+      SELECT
+        ORGANIZATION_CODE
+      FROM
+        ORG_ORGANIZATION_DEFINITIONS
+      WHERE ORGANIZATION_ID = V_SHIP_FROM;
+    CURSOR CUR_P_SHIP_TO(NU_SHIP_TO IN NUMBER) IS
+      SELECT
+        ACCT_SITE.ECE_TP_LOCATION_CODE
+      FROM
+        HZ_CUST_SITE_USES_ALL CUST_SITE,
+        HZ_CUST_ACCT_SITES ACCT_SITE
+      WHERE CUST_SITE.SITE_USE_CODE = L_SHIP_TO
+        AND ACCT_SITE.STATUS = L_STATUS
+        AND CUST_SITE.SITE_USE_ID = NU_SHIP_TO
+        AND ACCT_SITE.CUST_ACCT_SITE_ID = CUST_SITE.CUST_ACCT_SITE_ID
+        AND CUST_SITE.ORG_ID = ACCT_SITE.ORG_ID;
+    CURSOR CUR_CHECK_YES_NO(V_YES_NO IN VARCHAR2) IS
+      SELECT
+        MEANING
+      FROM
+        FND_LOOKUP_VALUES_VL
+      WHERE LOOKUP_TYPE = L_YES_NO
+        AND LOOKUP_CODE = V_YES_NO
+        AND ENABLED_FLAG = L_ENABLED_FLAG;
+  BEGIN
+    L_RLM_SCHEDULE_TYPE := 'RLM_SCHEDULE_TYPE';
+    L_ENABLED_FLAG := 'Y';
+    L_SHIP_TO := 'SHIP_TO';
+    L_STATUS := 'A';
+    L_YES_NO := 'YES_NO';
+    BEGIN
+      P_CONC_REQUEST_ID := FND_GLOBAL.CONC_REQUEST_ID;
+      /*SRW.USER_EXIT('FND SRWINIT')*/NULL;
+    EXCEPTION
+      WHEN /*SRW.USER_EXIT_FAILURE*/OTHERS THEN
+        /*SRW.MESSAGE(1
+                   ,'Failed FND SRWINIT.')*/NULL;
+        /*RAISE SRW.PROGRAM_ABORT*/RAISE_APPLICATION_ERROR(-20101,null);
+    END;
+    L_CURRENT_ORG_ID := MO_GLOBAL.GET_CURRENT_ORG_ID;
+    IF (L_CURRENT_ORG_ID IS NULL AND P_ORG_ID IS NOT NULL) THEN
+      MO_GLOBAL.SET_POLICY_CONTEXT(P_ACCESS_MODE => 'S'
+                                  ,P_ORG_ID => P_ORG_ID);
+      L_CURRENT_ORG_ID := P_ORG_ID;
+    END IF;
+    L_OU_NAME := FND_ACCESS_CONTROL_UTIL.GET_ORG_NAME(L_CURRENT_ORG_ID);
+    CP_DEFAULT_OU := L_OU_NAME;
+    CP_ORG_ID := L_CURRENT_ORG_ID;
+    IF (P_CUSTOMER_ID IS NOT NULL) THEN
+      OPEN CUR_CUST_NAME(P_CUSTOMER_ID);
+      FETCH CUR_CUST_NAME
+       INTO CP_P_CUSTOMER_NAME;
+      CLOSE CUR_CUST_NAME;
+    END IF;
+    IF (P_SCHEDULE_TYPE IS NOT NULL) THEN
+      OPEN CUR_SCHEDULE_TYPE(P_SCHEDULE_TYPE);
+      FETCH CUR_SCHEDULE_TYPE
+       INTO CP_P_SCHEDULE_TYPE;
+      CLOSE CUR_SCHEDULE_TYPE;
+    END IF;
+    IF (P_NEW_HEADER_ID IS NOT NULL) THEN
+      OPEN CUR_SCH_REF_NUM(P_NEW_HEADER_ID);
+      FETCH CUR_SCH_REF_NUM
+       INTO CP_P_NEW_SCH_REF_NUM;
+      CLOSE CUR_SCH_REF_NUM;
+      OPEN CUR_SCH_REF_NUM(P_OLD_HEADER_ID);
+      FETCH CUR_SCH_REF_NUM
+       INTO CP_P_OLD_SCH_REF_NUM;
+      CLOSE CUR_SCH_REF_NUM;
+    END IF;
+    IF (P_SHIP_TO IS NOT NULL) THEN
+      OPEN CUR_P_SHIP_TO(P_SHIP_TO);
+      FETCH CUR_P_SHIP_TO
+       INTO CP_P_SHIP_TO;
+      CLOSE CUR_P_SHIP_TO;
+    END IF;
+    IF (P_SHIP_FROM IS NOT NULL) THEN
+      OPEN CUR_SHIP_FROM(P_SHIP_FROM);
+      FETCH CUR_SHIP_FROM
+       INTO CP_P_SHIP_FROM;
+      CLOSE CUR_SHIP_FROM;
+    END IF;
+    IF (P_AUTH_QUANT_FLAG IS NOT NULL) THEN
+      OPEN CUR_CHECK_YES_NO(P_AUTH_QUANT_FLAG);
+      FETCH CUR_CHECK_YES_NO
+       INTO CP_P_AUTH_QUANT_FLAG;
+      CLOSE CUR_CHECK_YES_NO;
+    END IF;
+    IF (P_OTHER_DETAIL_FLAG IS NOT NULL) THEN
+      OPEN CUR_CHECK_YES_NO(P_AUTH_QUANT_FLAG);
+      FETCH CUR_CHECK_YES_NO
+       INTO CP_P_OTHER_DETAIL_FLAG;
+      CLOSE CUR_CHECK_YES_NO;
+    END IF;
+    IF (P_NOCHANGE_LINES_FLAG IS NOT NULL) THEN
+      OPEN CUR_CHECK_YES_NO(P_NOCHANGE_LINES_FLAG);
+      FETCH CUR_CHECK_YES_NO
+       INTO CP_P_NOCHANGE_LINES_FLAG;
+      CLOSE CUR_CHECK_YES_NO;
+    END IF;
+    RETURN (TRUE);
+  END BEFOREREPORT;
+
+  FUNCTION CF_PERCENTAGEFORMULA(C_SUM_OLD_QTY IN NUMBER
+                               ,CF_OLD_CUM IN NUMBER
+                               ,C_CHANGE_CUM IN NUMBER) RETURN NUMBER IS
+    PERCENTAGE NUMBER;
+  BEGIN
+    IF (C_SUM_OLD_QTY = 0 OR CF_OLD_CUM = 0) THEN
+      PERCENTAGE := 0;
+    ELSE
+      PERCENTAGE := C_CHANGE_CUM * 100 / CF_OLD_CUM;
+    END IF;
+    RETURN (PERCENTAGE);
+  END CF_PERCENTAGEFORMULA;
+
+  FUNCTION C_ACTUAL_NEW_QTYFORMULA(NEW_CODE IN VARCHAR2
+                                  ,ITEM_DETAIL_QUANTITY IN NUMBER
+                                  ,CUST_RECORD_YEAR IN VARCHAR2
+                                  ,INTRMD_SHIP_TO_ID IN NUMBER
+                                  ,CUSTOMER_ITEM_ID IN NUMBER
+                                  ,SHIP_FROM_ORG_ID IN NUMBER
+                                  ,BILL_TO_ADDRESS_ID IN NUMBER
+                                  ,SHIP_TO_ADDRESS_ID IN NUMBER
+                                  ,INVENTORY_ITEM_ID IN NUMBER
+                                  ,CUST_PO_NUMBER IN VARCHAR2
+                                  ,SHIP_TO_ORG_ID IN NUMBER) RETURN NUMBER IS
+    NEW_QTY NUMBER;
+    CUM_START_DATE DATE;
+  BEGIN
+    NEW_QTY := 0;
+    IF NEW_CODE = 'CUMULATIVE' THEN
+      IF NOT (CP_NEW_CUM = 0 AND ITEM_DETAIL_QUANTITY <> 0) THEN
+        NEW_QTY := ITEM_DETAIL_QUANTITY - CP_NEW_CUM;
+      ELSE
+        /*CUM_START_DATE := GET_CUM_START_DATE(X_HEADER_ID
+                                            ,SHIP_FROM_ORG_ID
+                                            ,SHIP_TO_ORG_ID
+                                            ,CUSTOMER_ITEM_ID
+                                            ,INVENTORY_ITEM_ID);*/
+	CUM_START_DATE := GET_CUM_START_DATE(P_NEW_HEADER_ID
+                                            ,SHIP_FROM_ORG_ID
+                                            ,SHIP_TO_ORG_ID
+                                            ,CUSTOMER_ITEM_ID
+                                            ,INVENTORY_ITEM_ID);
+
+	NEW_QTY := CUMKEYCALCULATION(CP_new_creation_date
+                                    ,CUM_START_DATE
+                                    ,CUSTOMER_ITEM_ID
+                                    ,SHIP_FROM_ORG_ID
+                                    ,INTRMD_SHIP_TO_ID
+                                    ,SHIP_TO_ADDRESS_ID
+                                    ,BILL_TO_ADDRESS_ID
+                                    ,CUST_PO_NUMBER
+                                    ,CUST_RECORD_YEAR
+                                    ,INVENTORY_ITEM_ID);
+        CP_NEW_SUP_CUM := NEW_QTY;
+        NEW_QTY := ITEM_DETAIL_QUANTITY - NEW_QTY;
+      END IF;
+      CP_NEW_CUM := ITEM_DETAIL_QUANTITY;
+      IF CP_NEW_ACT < 0 THEN
+        NEW_QTY := NEW_QTY + CP_NEW_ACT;
+      END IF;
+      IF NEW_QTY < 0 THEN
+        CP_NEW_ACT := NEW_QTY;
+      ELSE
+        CP_NEW_ACT := 0;
+      END IF;
+    ELSIF NEW_CODE = 'ACTUAL' THEN
+      NEW_QTY := ITEM_DETAIL_QUANTITY;
+    END IF;
+    RETURN (NEW_QTY);
+  END C_ACTUAL_NEW_QTYFORMULA;
+
+  FUNCTION C_ACTUAL_OLD_QTYFORMULA(OLD_CODE IN VARCHAR2
+                                  ,ITEM_DETAIL_QUANTITY1 IN NUMBER
+                                  ,CUST_RECORD_YEAR IN VARCHAR2
+                                  ,INTRMD_SHIP_TO_ID IN NUMBER
+                                  ,CUSTOMER_ITEM_ID IN NUMBER
+                                  ,SHIP_FROM_ORG_ID IN NUMBER
+                                  ,BILL_TO_ADDRESS_ID IN NUMBER
+                                  ,SHIP_TO_ADDRESS_ID IN NUMBER
+                                  ,INVENTORY_ITEM_ID IN NUMBER
+                                  ,CUST_PO_NUMBER IN VARCHAR2
+                                  ,SHIP_TO_ORG_ID IN NUMBER) RETURN NUMBER IS
+    OLD_QTY NUMBER;
+    CUM_START_DATE DATE;
+  BEGIN
+    OLD_QTY := 0;
+    IF OLD_CODE = 'CUMULATIVE' THEN
+      IF NOT (CP_OLD_CUM = 0 AND ITEM_DETAIL_QUANTITY1 <> 0) THEN
+        OLD_QTY := ITEM_DETAIL_QUANTITY1 - CP_OLD_CUM;
+      ELSE
+        /*CUM_START_DATE := GET_CUM_START_DATE(X_HEADER_ID
+                                            ,SHIP_FROM_ORG_ID
+                                            ,SHIP_TO_ORG_ID
+                                            ,CUSTOMER_ITEM_ID
+                                            ,INVENTORY_ITEM_ID);*/
+	CUM_START_DATE := GET_CUM_START_DATE(P_OLD_HEADER_ID
+                                            ,SHIP_FROM_ORG_ID
+                                            ,SHIP_TO_ORG_ID
+                                            ,CUSTOMER_ITEM_ID
+                                            ,INVENTORY_ITEM_ID);
+	OLD_QTY := CUMKEYCALCULATION(CP_new_creation_date
+                                    ,CUM_START_DATE
+                                    ,CUSTOMER_ITEM_ID
+                                    ,SHIP_FROM_ORG_ID
+                                    ,INTRMD_SHIP_TO_ID
+                                    ,SHIP_TO_ADDRESS_ID
+                                    ,BILL_TO_ADDRESS_ID
+                                    ,CUST_PO_NUMBER
+                                    ,CUST_RECORD_YEAR
+                                    ,INVENTORY_ITEM_ID);
+        CP_OLD_SUP_CUM := OLD_QTY;
+        OLD_QTY := ITEM_DETAIL_QUANTITY1 - OLD_QTY;
+      END IF;
+      CP_OLD_CUM := ITEM_DETAIL_QUANTITY1;
+      IF CP_OLD_ACT < 0 THEN
+        OLD_QTY := OLD_QTY + CP_OLD_ACT;
+      END IF;
+      IF OLD_QTY < 0 THEN
+        CP_OLD_ACT := OLD_QTY;
+      ELSE
+        CP_OLD_ACT := 0;
+      END IF;
+    ELSIF OLD_CODE = 'ACTUAL' THEN
+      OLD_QTY := ITEM_DETAIL_QUANTITY1;
+    END IF;
+    RETURN (OLD_QTY);
+  END C_ACTUAL_OLD_QTYFORMULA;
+
+  FUNCTION CF_1FORMULA(NEW_CODE IN VARCHAR2
+                      ,ITEM_DETAIL_QUANTITY IN NUMBER
+                      ,OLD_CODE IN VARCHAR2
+                      ,CUST_RECORD_YEAR IN VARCHAR2
+                      ,INTRMD_SHIP_TO_ID IN NUMBER
+                      ,CUSTOMER_ITEM_ID IN NUMBER
+                      ,SHIP_FROM_ORG_ID IN NUMBER
+                      ,BILL_TO_ADDRESS_ID IN NUMBER
+                      ,SHIP_TO_ADDRESS_ID IN NUMBER
+                      ,INVENTORY_ITEM_ID IN NUMBER
+                      ,CUST_PO_NUMBER IN VARCHAR2
+                      ,SHIP_TO_ORG_ID IN NUMBER) RETURN NUMBER IS
+    CUMQTY NUMBER;
+    CUM_START_DATE DATE;
+  BEGIN
+    IF NEW_CODE = 'CUMULATIVE' THEN
+      CUMQTY := ITEM_DETAIL_QUANTITY;
+    ELSIF NEW_CODE = 'ACTUAL' THEN
+      CUMQTY := ITEM_DETAIL_QUANTITY + CP_NEW_CUM;
+      CP_NEW_CUM := CUMQTY;
+    ELSIF OLD_CODE = 'ACTUAL' THEN
+      CUMQTY := CP_NEW_CUM;
+    ELSIF OLD_CODE = 'CUMULATIVE' THEN
+      IF CP_NEW_CUM = 0 AND NVL(ITEM_DETAIL_QUANTITY
+         ,0) = 0 THEN
+        IF CP_NEW_SUP_CUM = 0 THEN
+          /*CUM_START_DATE := GET_CUM_START_DATE(X_HEADER_ID
+                                              ,SHIP_FROM_ORG_ID
+                                              ,SHIP_TO_ORG_ID
+                                              ,CUSTOMER_ITEM_ID
+                                              ,INVENTORY_ITEM_ID);*/
+	CUM_START_DATE := GET_CUM_START_DATE(P_NEW_HEADER_ID
+                                              ,SHIP_FROM_ORG_ID
+                                              ,SHIP_TO_ORG_ID
+                                              ,CUSTOMER_ITEM_ID
+                                              ,INVENTORY_ITEM_ID);
+
+          CP_NEW_SUP_CUM := CUMKEYCALCULATION(CP_new_creation_date
+                                             ,CUM_START_DATE
+                                             ,CUSTOMER_ITEM_ID
+                                             ,SHIP_FROM_ORG_ID
+                                             ,INTRMD_SHIP_TO_ID
+                                             ,SHIP_TO_ADDRESS_ID
+                                             ,BILL_TO_ADDRESS_ID
+                                             ,CUST_PO_NUMBER
+                                             ,CUST_RECORD_YEAR
+                                             ,INVENTORY_ITEM_ID);
+        END IF;
+        CUMQTY := CP_NEW_SUP_CUM;
+      ELSE
+        CUMQTY := CP_NEW_CUM;
+      END IF;
+    ELSIF OLD_CODE = 'ACTUAL' THEN
+      CUMQTY := CP_NEW_CUM;
+    END IF;
+    RETURN (CUMQTY);
+  END CF_1FORMULA;
+
+  FUNCTION CF_OLD_CUMFORMULA(OLD_CODE IN VARCHAR2
+                            ,ITEM_DETAIL_QUANTITY1 IN NUMBER
+                            ,NEW_CODE IN VARCHAR2
+                            ,CUST_RECORD_YEAR IN VARCHAR2
+                            ,INTRMD_SHIP_TO_ID IN NUMBER
+                            ,CUSTOMER_ITEM_ID IN NUMBER
+                            ,SHIP_FROM_ORG_ID IN NUMBER
+                            ,BILL_TO_ADDRESS_ID IN NUMBER
+                            ,SHIP_TO_ADDRESS_ID IN NUMBER
+                            ,INVENTORY_ITEM_ID IN NUMBER
+                            ,CUST_PO_NUMBER IN VARCHAR2
+                            ,SHIP_TO_ORG_ID IN NUMBER) RETURN NUMBER IS
+    OLDCUM NUMBER;
+    TEMP NUMBER;
+    CUM_START_DATE DATE;
+  BEGIN
+    IF OLD_CODE = 'CUMULATIVE' THEN
+      OLDCUM := ITEM_DETAIL_QUANTITY1;
+    ELSIF OLD_CODE = 'ACTUAL' THEN
+      OLDCUM := ITEM_DETAIL_QUANTITY1 + CP_OLD_CUM;
+      CP_OLD_CUM := OLDCUM;
+    ELSIF NEW_CODE = 'ACTUAL' THEN
+      OLDCUM := CP_OLD_CUM;
+    ELSIF NEW_CODE = 'CUMULATIVE' THEN
+      IF CP_OLD_CUM = 0 AND NVL(ITEM_DETAIL_QUANTITY1
+         ,0) = 0 THEN
+        IF CP_OLD_SUP_CUM = 0 THEN
+/*          CUM_START_DATE := GET_CUM_START_DATE(X_HEADER_ID
+                                              ,SHIP_FROM_ORG_ID
+                                              ,SHIP_TO_ORG_ID
+                                              ,CUSTOMER_ITEM_ID
+                                              ,INVENTORY_ITEM_ID);*/
+	CUM_START_DATE := GET_CUM_START_DATE(P_OLD_HEADER_ID
+                                              ,SHIP_FROM_ORG_ID
+                                              ,SHIP_TO_ORG_ID
+                                              ,CUSTOMER_ITEM_ID
+                                              ,INVENTORY_ITEM_ID);
+          CP_OLD_SUP_CUM := CUMKEYCALCULATION(CP_new_creation_date
+                                             ,CUM_START_DATE
+                                             ,CUSTOMER_ITEM_ID
+                                             ,SHIP_FROM_ORG_ID
+                                             ,INTRMD_SHIP_TO_ID
+                                             ,SHIP_TO_ADDRESS_ID
+                                             ,BILL_TO_ADDRESS_ID
+                                             ,CUST_PO_NUMBER
+                                             ,CUST_RECORD_YEAR
+                                             ,INVENTORY_ITEM_ID);
+        END IF;
+        OLDCUM := CP_OLD_SUP_CUM;
+      ELSE
+        OLDCUM := CP_OLD_CUM;
+      END IF;
+    ELSIF NEW_CODE = 'ACTUAL' THEN
+      OLDCUM := CP_OLD_CUM;
+    END IF;
+    RETURN (OLDCUM);
+  END CF_OLD_CUMFORMULA;
+
+  FUNCTION INTRMD_SHIP_TO_EXTFORMULA(ITRMD_SHIP_TO_ID IN NUMBER) RETURN CHAR IS
+    V_INTRMD_SHIP_TO_EXT VARCHAR2(35);
+  BEGIN
+    SELECT
+      ACCT_SITE.ECE_TP_LOCATION_CODE
+    INTO V_INTRMD_SHIP_TO_EXT
+    FROM
+      HZ_CUST_ACCT_SITES ACCT_SITE
+    WHERE ACCT_SITE.CUST_ACCT_SITE_ID = ITRMD_SHIP_TO_ID;
+    RETURN (V_INTRMD_SHIP_TO_EXT);
+  EXCEPTION
+    WHEN OTHERS THEN
+      RETURN (NULL);
+  END INTRMD_SHIP_TO_EXTFORMULA;
+
+  FUNCTION CUSTOMER_ITEM_NUMBERFORMULA(CUSTOMER_ITEM_ID1 IN NUMBER) RETURN CHAR IS
+    V_CUST_ITEM_NUMBER VARCHAR2(50);
+  BEGIN
+    SELECT
+      CUSTOMER_ITEM_NUMBER
+    INTO V_CUST_ITEM_NUMBER
+    FROM
+      MTL_CUSTOMER_ITEMS
+    WHERE CUSTOMER_ITEM_ID = CUSTOMER_ITEM_ID1;
+    RETURN (V_CUST_ITEM_NUMBER);
+  EXCEPTION
+    WHEN OTHERS THEN
+      RETURN (NULL);
+  END CUSTOMER_ITEM_NUMBERFORMULA;
+
+  FUNCTION CUSTOMER_ITEM_DESCFORMULA(CUSTOMER_ITEM_ID1 IN NUMBER) RETURN CHAR IS
+    V_CUST_ITEM_DESC VARCHAR2(240);
+  BEGIN
+    SELECT
+      CUSTOMER_ITEM_DESC
+    INTO V_CUST_ITEM_DESC
+    FROM
+      MTL_CUSTOMER_ITEMS
+    WHERE CUSTOMER_ITEM_ID = CUSTOMER_ITEM_ID1;
+    RETURN (V_CUST_ITEM_DESC);
+  EXCEPTION
+    WHEN OTHERS THEN
+      RETURN (NULL);
+  END CUSTOMER_ITEM_DESCFORMULA;
+
+  FUNCTION ITEM_NUMBER1FORMULA(INVENTORY_ITEM_ID1 IN NUMBER
+                              ,SHIP_FROM_ORG_ID1 IN NUMBER) RETURN CHAR IS
+    V_ITEM_NUMBER VARCHAR2(40);
+  BEGIN
+    SELECT
+      ITEM_NUMBER
+    INTO V_ITEM_NUMBER
+    FROM
+      MTL_ITEM_FLEXFIELDS
+    WHERE INVENTORY_ITEM_ID = INVENTORY_ITEM_ID1
+      AND ORGANIZATION_ID = SHIP_FROM_ORG_ID1;
+    RETURN (V_ITEM_NUMBER);
+  EXCEPTION
+    WHEN OTHERS THEN
+      RETURN (NULL);
+  END ITEM_NUMBER1FORMULA;
+
+  FUNCTION SHIP_TO_NAME1FORMULA(SHIP_TO_ORG_ID1 IN NUMBER) RETURN CHAR IS
+    V_SHIP_TO_NAME VARCHAR2(40);
+  BEGIN
+    SELECT
+      CUST_SITE.LOCATION
+    INTO V_SHIP_TO_NAME
+    FROM
+      HZ_CUST_SITE_USES_ALL CUST_SITE,
+      HZ_CUST_ACCT_SITES ACCT_SITE
+    WHERE CUST_SITE.SITE_USE_CODE = 'SHIP_TO'
+      AND CUST_SITE.SITE_USE_ID = SHIP_TO_ORG_ID1
+      AND ACCT_SITE.STATUS = 'A'
+      AND ACCT_SITE.CUST_ACCT_SITE_ID = CUST_SITE.CUST_ACCT_SITE_ID
+      AND CUST_SITE.ORG_ID = ACCT_SITE.ORG_ID;
+    RETURN (V_SHIP_TO_NAME);
+  EXCEPTION
+    WHEN OTHERS THEN
+      RETURN (NULL);
+  END SHIP_TO_NAME1FORMULA;
+
+  FUNCTION ORG_NAME1FORMULA(SHIP_FROM_ORG_ID1 IN NUMBER) RETURN CHAR IS
+    V_ORG_NAME ORG_ORGANIZATION_DEFINITIONS.ORGANIZATION_NAME%TYPE;
+  BEGIN
+    SELECT
+      ORGANIZATION_NAME
+    INTO V_ORG_NAME
+    FROM
+      ORG_ORGANIZATION_DEFINITIONS
+    WHERE ORGANIZATION_ID = SHIP_FROM_ORG_ID1;
+    RETURN (V_ORG_NAME);
+  EXCEPTION
+    WHEN OTHERS THEN
+      RETURN (NULL);
+  END ORG_NAME1FORMULA;
+
+  FUNCTION SHIP_FROM_NAMEFORMULA(SHIP_FROM_ORG_ID1 IN NUMBER) RETURN CHAR IS
+    V_SHIP_FROM_NAME ORG_ORGANIZATION_DEFINITIONS.ORGANIZATION_NAME%TYPE;
+  BEGIN
+    SELECT
+      ORGANIZATION_NAME
+    INTO V_SHIP_FROM_NAME
+    FROM
+      ORG_ORGANIZATION_DEFINITIONS
+    WHERE ORGANIZATION_ID = SHIP_FROM_ORG_ID1;
+    RETURN (V_SHIP_FROM_NAME);
+  EXCEPTION
+    WHEN OTHERS THEN
+      RETURN (NULL);
+  END SHIP_FROM_NAMEFORMULA;
+
+  FUNCTION AFTERPFORM RETURN BOOLEAN IS
+    STATEMENT0 VARCHAR2(200);
+    STATEMENT1 VARCHAR2(200);
+    STATEMENT2 VARCHAR2(200);
+    STATEMENT3 VARCHAR2(200);
+    STATEMENT4 VARCHAR2(200);
+    STATEMENT5 VARCHAR2(200);
+    STATEMENT6 VARCHAR2(200);
+    STATEMENT7 VARCHAR2(200);
+  BEGIN
+    IF (P_SHIP_TO IS NOT NULL) THEN
+      STATEMENT0 := ' and a.ship_to_org_id (+) = :P_ship_to and b.ship_to_org_id = :P_ship_to';
+      STATEMENT1 := ' and a.ship_to_org_id = :P_ship_to and b.ship_to_org_id (+) = :P_ship_to';
+    ELSE
+      STATEMENT0 := NULL;
+      STATEMENT1 := NULL;
+    END IF;
+    IF (P_SHIP_FROM IS NOT NULL) THEN
+      STATEMENT6 := ' and a.ship_from_org_id (+) = :P_ship_from and b.ship_from_org_id = :P_ship_from';
+      STATEMENT7 := ' and a.ship_from_org_id = :P_ship_from and b.ship_from_org_id (+) = :P_ship_from';
+    ELSE
+      STATEMENT6 := NULL;
+      STATEMENT7 := NULL;
+    END IF;
+    IF (P_CUST_ITEM_START IS NOT NULL AND P_CUST_ITEM_END IS NOT NULL) THEN
+      STATEMENT2 := ' and nvl(a.customer_item_ext, b.customer_item_ext) between :P_cust_item_start' || ' and :P_cust_item_end';
+      STATEMENT3 := ' and nvl(b.customer_item_ext, a.customer_item_ext) between :P_cust_item_start' || ' and :P_cust_item_end';
+    ELSE
+      STATEMENT2 := NULL;
+      STATEMENT3 := NULL;
+    END IF;
+    IF (P_CUST_PRODSEQ_START IS NOT NULL AND P_CUST_PRODSEQ_END IS NOT NULL) THEN
+      STATEMENT4 := ' and nvl(to_number(a.cust_production_seq_num), to_number(b.cust_production_seq_num) ) between to_number(:P_cust_prodseq_start)' || ' and to_number(:P_cust_prodseq_end)';
+      STATEMENT5 := ' and nvl(to_number(a.cust_production_seq_num), to_number(b.cust_production_seq_num) ) between to_number(:P_cust_prodseq_start)' || ' and to_number(:P_cust_prodseq_end))';
+    ELSE
+      STATEMENT4 := NULL;
+      STATEMENT5 := NULL;
+    END IF;
+
+    P_WHERE1 := STATEMENT0 || STATEMENT6 || STATEMENT2;
+    P_WHERE2 := STATEMENT1 || STATEMENT7 || STATEMENT3;
+    P_WHERE3 := STATEMENT4;
+if (P_WHERE1 is null) then
+P_WHERE1 := ' ';
+end if;
+if (P_WHERE2 is null) then
+P_WHERE2 := ' ';
+end if;
+if (P_WHERE3 is null) then
+P_WHERE3 := ' ';
+end if;
+    RETURN (TRUE);
+  END AFTERPFORM;
+
+  FUNCTION DETAIL_TYPE_SFORMULA(ITEM_DETAIL_TYPE2 IN VARCHAR2) RETURN CHAR IS
+    V_DETAIL_TYPE VARCHAR2(80);
+  BEGIN
+    SELECT
+      MEANING
+    INTO V_DETAIL_TYPE
+    FROM
+      FND_LOOKUPS FND
+    WHERE FND.LOOKUP_CODE = ITEM_DETAIL_TYPE2
+      AND FND.LOOKUP_TYPE = 'RLM_DETAIL_TYPE_CODE';
+    RETURN (V_DETAIL_TYPE);
+  EXCEPTION
+    WHEN OTHERS THEN
+      RETURN (NULL);
+  END DETAIL_TYPE_SFORMULA;
+
+  FUNCTION DETAIL_SUBTYPE_SFORMULA(ITEM_DETAIL_SUBTYPE1 IN VARCHAR2) RETURN CHAR IS
+    V_DETAIL_SUBTYPE VARCHAR2(80);
+  BEGIN
+    SELECT
+      MEANING
+    INTO V_DETAIL_SUBTYPE
+    FROM
+      FND_LOOKUPS FND
+    WHERE FND.LOOKUP_CODE = ITEM_DETAIL_SUBTYPE1
+      AND FND.LOOKUP_TYPE = 'RLM_DETAIL_SUBTYPE_CODE';
+    RETURN (V_DETAIL_SUBTYPE);
+  EXCEPTION
+    WHEN OTHERS THEN
+      RETURN (NULL);
+  END DETAIL_SUBTYPE_SFORMULA;
+
+  FUNCTION CUMKEYCALCULATION(V_AS_OF_DATE_TIME IN DATE
+                            ,V_CUM_START_DATE IN DATE
+			    ,CUSTOMER_ITEM_ID IN NUMBER
+                                    ,SHIP_FROM_ORG_ID IN NUMBER
+                                    ,INTRMD_SHIP_TO_ID IN NUMBER
+                                    ,SHIP_TO_ADDRESS_ID IN NUMBER
+                                    ,BILL_TO_ADDRESS_ID IN NUMBER
+                                    ,CUST_PO_NUMBER IN VARCHAR2
+                                    ,CUST_RECORD_YEAR IN VARCHAR2
+                                    ,INVENTORY_ITEM_ID IN NUMBER) RETURN NUMBER IS
+    P_CUM_KEY_ID RLM_CUST_ITEM_CUM_KEYS.CUM_KEY_ID%TYPE := NULL;
+    P_CUM_START_DATE RLM_CUST_ITEM_CUM_KEYS.CUM_START_DATE%TYPE;
+    P_SHIPPED_QUANTITY OE_ORDER_LINES.SHIPPED_QUANTITY%TYPE := NULL;
+    P_ACTUAL_SHIPMENT_DATE OE_ORDER_LINES.ACTUAL_SHIPMENT_DATE%TYPE := NULL;
+    P_CUM_KEY_CREATED_FLAG BOOLEAN := FALSE;
+    P_CUM_QTY RLM_CUST_ITEM_CUM_KEYS.CUM_QTY%TYPE := NULL;
+    P_AS_OF_DATE_CUM_QTY RLM_CUST_ITEM_CUM_KEYS.CUM_QTY%TYPE := NULL;
+    P_CUM_QTY_TO_BE_ACCUMULATED RLM_CUST_ITEM_CUM_KEYS.CUM_QTY_TO_BE_ACCUMULATED%TYPE := NULL;
+    P_CUM_QTY_AFTER_CUTOFF RLM_CUST_ITEM_CUM_KEYS.CUM_QTY_AFTER_CUTOFF%TYPE := NULL;
+    P_LAST_CUM_QTY_UPDATE_DATE RLM_CUST_ITEM_CUM_KEYS.LAST_CUM_QTY_UPDATE_DATE%TYPE := NULL;
+    P_CUST_UOM_CODE RLM_CUST_ITEM_CUM_KEYS.CUST_UOM_CODE%TYPE := NULL;
+    P_USE_SHIP_INCL_RULE_FLAG VARCHAR2(1) := 'N';
+    P_SHIPMENT_RULE_CODE RLM_CUST_SHIPTO_TERMS.CUM_SHIPMENT_RULE_CODE%TYPE := NULL;
+    P_YESTERDAY_TIME_CUTOFF RLM_CUST_ITEM_CUM_KEYS.LAST_UPDATE_DATE%TYPE := NULL;
+    P_LAST_UPDATE_DATE RLM_CUST_ITEM_CUM_KEYS.LAST_UPDATE_DATE%TYPE := NULL;
+    P_AS_OF_DATE_TIME OE_ORDER_LINES.ACTUAL_SHIPMENT_DATE%TYPE;
+    P_MESG_DATA VARCHAR2(32767) := NULL;
+    P_RECORD_RETURN_STATUS BOOLEAN := FALSE;
+    V_TMP_CUST_RECORD_YEAR VARCHAR2(240);
+    V_TMP_RETURN_MESSAGE VARCHAR2(4000);
+    V_TMP_RETURN_STATUS BOOLEAN;
+  BEGIN
+    P_AS_OF_DATE_TIME := V_AS_OF_DATE_TIME;
+    P_CUM_START_DATE := V_CUM_START_DATE;
+    RLM_CUM_SV.CALCULATECUMKEYCLIENT(X_CUSTOMER_ID => CP_CUSTOMER_ID
+                                    ,X_CUSTOMER_ITEM_ID => CUSTOMER_ITEM_ID
+                                    ,X_SHIP_FROM_ORG_ID => SHIP_FROM_ORG_ID
+                                    ,X_INTRMD_SHIP_TO_ADDRESS_ID => INTRMD_SHIP_TO_ID
+                                    ,X_SHIP_TO_ADDRESS_ID => SHIP_TO_ADDRESS_ID
+                                    ,X_BILL_TO_ADDRESS_ID => BILL_TO_ADDRESS_ID
+                                    ,X_PURCHASE_ORDER_NUMBER => CUST_PO_NUMBER
+                                    ,X_CUST_RECORD_YEAR => CUST_RECORD_YEAR
+                                    ,X_CREATE_CUM_KEY_FLAG => 'N'
+                                    ,X_MSG_DATA => P_MESG_DATA
+                                    ,X_RECORD_RETURN_STATUS => P_RECORD_RETURN_STATUS
+                                    ,X_CUM_KEY_ID => P_CUM_KEY_ID
+                                    ,X_CUM_START_DATE => P_CUM_START_DATE
+                                    ,X_SHIPPED_QUANTITY => P_SHIPPED_QUANTITY
+                                    ,X_ACTUAL_SHIPMENT_DATE => P_ACTUAL_SHIPMENT_DATE
+                                    ,X_CUM_KEY_CREATED_FLAG => P_CUM_KEY_CREATED_FLAG
+                                    ,X_CUM_QTY => P_CUM_QTY
+                                    ,X_AS_OF_DATE_CUM_QTY => P_AS_OF_DATE_CUM_QTY
+                                    ,X_CUM_QTY_TO_BE_ACCUMULATED => P_CUM_QTY_TO_BE_ACCUMULATED
+                                    ,X_CUM_QTY_AFTER_CUTOFF => P_CUM_QTY_AFTER_CUTOFF
+                                    ,X_LAST_CUM_QTY_UPDATE_DATE => P_LAST_CUM_QTY_UPDATE_DATE
+                                    ,X_CUST_UOM_CODE => P_CUST_UOM_CODE
+                                    ,X_USE_SHIP_INCL_RULE_FLAG => P_USE_SHIP_INCL_RULE_FLAG
+                                    ,X_SHIPMENT_RULE_CODE => P_SHIPMENT_RULE_CODE
+                                    ,X_YESTERDAY_TIME_CUTOFF => P_YESTERDAY_TIME_CUTOFF
+                                    ,X_LAST_UPDATE_DATE => P_LAST_UPDATE_DATE
+                                    ,X_AS_OF_DATE_TIME => P_AS_OF_DATE_TIME);
+    IF P_RECORD_RETURN_STATUS <> FALSE THEN
+      RLM_CUM_SV.CALCULATESUPPLIERCUMCLIENT(X_CUSTOMER_ID => CP_CUSTOMER_ID
+                                           ,X_CUSTOMER_ITEM_ID => CUSTOMER_ITEM_ID
+                                           ,X_INVENTORY_ITEM_ID => INVENTORY_ITEM_ID
+                                           ,X_SHIP_FROM_ORG_ID => SHIP_FROM_ORG_ID
+                                           ,X_INTRMD_SHIP_TO_ADDRESS_ID => INTRMD_SHIP_TO_ID
+                                           ,X_SHIP_TO_ADDRESS_ID => SHIP_TO_ADDRESS_ID
+                                           ,X_BILL_TO_ADDRESS_ID => BILL_TO_ADDRESS_ID
+                                           ,X_PURCHASE_ORDER_NUMBER => CUST_PO_NUMBER
+                                           ,X_CUST_RECORD_YEAR => CUST_RECORD_YEAR
+                                           ,X_CREATE_CUM_KEY_FLAG => 'N'
+                                           ,X_MSG_DATA => V_TMP_RETURN_MESSAGE
+                                           ,X_RECORD_RETURN_STATUS => V_TMP_RETURN_STATUS
+                                           ,X_CUM_KEY_ID => P_CUM_KEY_ID
+                                           ,X_CUM_START_DATE => P_CUM_START_DATE
+                                           ,X_SHIPPED_QUANTITY => P_SHIPPED_QUANTITY
+                                           ,X_ACTUAL_SHIPMENT_DATE => P_ACTUAL_SHIPMENT_DATE
+                                           ,X_CUM_KEY_CREATED_FLAG => P_CUM_KEY_CREATED_FLAG
+                                           ,X_CUM_QTY => P_CUM_QTY
+                                           ,X_AS_OF_DATE_CUM_QTY => P_AS_OF_DATE_CUM_QTY
+                                           ,X_CUM_QTY_TO_BE_ACCUMULATED => P_CUM_QTY_TO_BE_ACCUMULATED
+                                           ,X_CUM_QTY_AFTER_CUTOFF => P_CUM_QTY_AFTER_CUTOFF
+                                           ,X_LAST_CUM_QTY_UPDATE_DATE => P_LAST_CUM_QTY_UPDATE_DATE
+                                           ,X_CUST_UOM_CODE => P_CUST_UOM_CODE
+                                           ,X_USE_SHIP_INCL_RULE_FLAG => P_USE_SHIP_INCL_RULE_FLAG
+                                           ,X_SHIPMENT_RULE_CODE => P_SHIPMENT_RULE_CODE
+                                           ,X_YESTERDAY_TIME_CUTOFF => P_YESTERDAY_TIME_CUTOFF
+                                           ,X_LAST_UPDATE_DATE => P_LAST_UPDATE_DATE
+                                           ,X_AS_OF_DATE_TIME => P_AS_OF_DATE_TIME);
+      IF V_TMP_RETURN_STATUS <> FALSE THEN
+        RETURN NVL(P_AS_OF_DATE_CUM_QTY
+                  ,0);
+      ELSE
+        /*SRW.MESSAGE(123
+                   ,'Error : ' || V_TMP_RETURN_MESSAGE)*/NULL;
+        /*RAISE SRW.PROGRAM_ABORT*/RAISE_APPLICATION_ERROR(-20101,null);
+      END IF;
+    ELSE
+      /*SRW.MESSAGE(124
+                 ,'Error : ' || P_MESG_DATA)*/NULL;
+      /*RAISE SRW.PROGRAM_ABORT*/RAISE_APPLICATION_ERROR(-20101,null);
+    END IF;
+  END CUMKEYCALCULATION;
+
+  FUNCTION CF_PLACEHOLDERFORMULA(NEW_CREATION_DATE IN DATE
+                                ,OLD_CREATION_DATE IN DATE
+                                ,CUSTOMER_ID IN NUMBER) RETURN NUMBER IS
+  BEGIN
+    CP_NEW_CREATION_DATE := NEW_CREATION_DATE;
+    CP_OLD_CREATION_DATE := OLD_CREATION_DATE;
+    CP_CUSTOMER_ID := CUSTOMER_ID;
+    RETURN (0);
+  END CF_PLACEHOLDERFORMULA;
+
+  FUNCTION AFTERREPORT RETURN BOOLEAN IS
+  BEGIN
+    BEGIN
+      /*SRW.USER_EXIT('FND SRWEXIT')*/NULL;
+    EXCEPTION
+      WHEN /*SRW.USER_EXIT_FAILURE*/OTHERS THEN
+        /*SRW.MESSAGE(1
+                   ,'Failed in SRWEXIT')*/NULL;
+        RAISE;
+    END;
+    RETURN (TRUE);
+  END AFTERREPORT;
+
+  FUNCTION GET_CUM_START_DATE(X_HEADER_ID IN NUMBER,
+  SHIP_FROM_ORG_ID1 IN NUMBER,
+  SHIP_TO_ORG_ID1 IN NUMBER,
+  CUSTOMER_ITEM_ID1 IN NUMBER,
+  INVENTORY_ITEM_ID1 IN NUMBER) RETURN DATE IS
+    V_CUM_START_DATE DATE;
+    V_K_DNULL DATE;
+  BEGIN
+    V_K_DNULL := RLM_MANAGE_DEMAND_SV.GETVARK_DNULL;
+    SELECT
+      START_DATE_TIME
+    INTO V_CUM_START_DATE
+    FROM
+    RLM_SCHEDULE_LINES_ALL
+    WHERE ORG_ID = CP_ORG_ID
+      AND HEADER_ID = X_HEADER_ID
+      AND SHIP_FROM_ORG_ID = SHIP_FROM_ORG_ID1
+      AND SHIP_TO_ORG_ID = SHIP_TO_ORG_ID1
+      AND CUSTOMER_ITEM_ID = CUSTOMER_ITEM_ID1
+      AND INVENTORY_ITEM_ID = INVENTORY_ITEM_ID1
+      AND ITEM_DETAIL_TYPE = '4'
+      AND ITEM_DETAIL_SUBTYPE = 'CUM';
+    RETURN (V_CUM_START_DATE);
+  EXCEPTION
+    WHEN NO_DATA_FOUND THEN
+      RETURN (V_K_DNULL);
+    WHEN OTHERS THEN
+      RETURN (NULL);
+  END GET_CUM_START_DATE;
+
+  FUNCTION CP_PREV_VALUE_P RETURN NUMBER IS
+  BEGIN
+    RETURN CP_PREV_VALUE;
+  END CP_PREV_VALUE_P;
+
+  FUNCTION CP_NEW_START_P RETURN DATE IS
+  BEGIN
+    RETURN CP_NEW_START;
+  END CP_NEW_START_P;
+
+  FUNCTION CP_NEW_END_P RETURN DATE IS
+  BEGIN
+    RETURN CP_NEW_END;
+  END CP_NEW_END_P;
+
+  FUNCTION CP_OLD_START_P RETURN DATE IS
+  BEGIN
+    RETURN CP_OLD_START;
+  END CP_OLD_START_P;
+
+  FUNCTION CP_OLD_END_P RETURN DATE IS
+  BEGIN
+    RETURN CP_OLD_END;
+  END CP_OLD_END_P;
+
+  FUNCTION CP_NEW_CUM_P RETURN NUMBER IS
+  BEGIN
+    RETURN CP_NEW_CUM;
+  END CP_NEW_CUM_P;
+
+  FUNCTION CP_OLD_CUM_P RETURN NUMBER IS
+  BEGIN
+    RETURN CP_OLD_CUM;
+  END CP_OLD_CUM_P;
+
+  FUNCTION CP_NEW_CREATION_DATE_P RETURN DATE IS
+  BEGIN
+    RETURN CP_NEW_CREATION_DATE;
+  END CP_NEW_CREATION_DATE_P;
+
+  FUNCTION CP_OLD_CREATION_DATE_P RETURN DATE IS
+  BEGIN
+    RETURN CP_OLD_CREATION_DATE;
+  END CP_OLD_CREATION_DATE_P;
+
+  FUNCTION CP_CUSTOMER_ID_P RETURN NUMBER IS
+  BEGIN
+    RETURN CP_CUSTOMER_ID;
+  END CP_CUSTOMER_ID_P;
+
+  FUNCTION CP_OLD_ACT_P RETURN NUMBER IS
+  BEGIN
+    RETURN CP_OLD_ACT;
+  END CP_OLD_ACT_P;
+
+  FUNCTION CP_NEW_ACT_P RETURN NUMBER IS
+  BEGIN
+    RETURN CP_NEW_ACT;
+  END CP_NEW_ACT_P;
+
+  FUNCTION CP_NEW_SUP_CUM_P RETURN NUMBER IS
+  BEGIN
+    RETURN CP_NEW_SUP_CUM;
+  END CP_NEW_SUP_CUM_P;
+
+  FUNCTION CP_OLD_SUP_CUM_P RETURN NUMBER IS
+  BEGIN
+    RETURN CP_OLD_SUP_CUM;
+  END CP_OLD_SUP_CUM_P;
+
+  FUNCTION CP_P_SHIP_FROM_P RETURN VARCHAR2 IS
+  BEGIN
+    RETURN CP_P_SHIP_FROM;
+  END CP_P_SHIP_FROM_P;
+
+  FUNCTION CP_P_SHIP_TO_P RETURN VARCHAR2 IS
+  BEGIN
+    RETURN CP_P_SHIP_TO;
+  END CP_P_SHIP_TO_P;
+
+  FUNCTION CP_P_CUSTOMER_NAME_P RETURN VARCHAR2 IS
+  BEGIN
+    RETURN CP_P_CUSTOMER_NAME;
+  END CP_P_CUSTOMER_NAME_P;
+
+  FUNCTION CP_P_SCHEDULE_TYPE_P RETURN VARCHAR2 IS
+  BEGIN
+    RETURN CP_P_SCHEDULE_TYPE;
+  END CP_P_SCHEDULE_TYPE_P;
+
+  FUNCTION CP_P_NEW_SCH_REF_NUM_P RETURN VARCHAR2 IS
+  BEGIN
+    RETURN CP_P_NEW_SCH_REF_NUM;
+  END CP_P_NEW_SCH_REF_NUM_P;
+
+  FUNCTION CP_P_OLD_SCH_REF_NUM_P RETURN VARCHAR2 IS
+  BEGIN
+    RETURN CP_P_OLD_SCH_REF_NUM;
+  END CP_P_OLD_SCH_REF_NUM_P;
+
+  FUNCTION CP_P_AUTH_QUANT_FLAG_P RETURN VARCHAR2 IS
+  BEGIN
+    RETURN CP_P_AUTH_QUANT_FLAG;
+  END CP_P_AUTH_QUANT_FLAG_P;
+
+  FUNCTION CP_P_OTHER_DETAIL_FLAG_P RETURN VARCHAR2 IS
+  BEGIN
+    RETURN CP_P_OTHER_DETAIL_FLAG;
+  END CP_P_OTHER_DETAIL_FLAG_P;
+
+  FUNCTION CP_P_NOCHANGE_LINES_FLAG_P RETURN VARCHAR2 IS
+  BEGIN
+    RETURN CP_P_NOCHANGE_LINES_FLAG;
+  END CP_P_NOCHANGE_LINES_FLAG_P;
+
+  FUNCTION CP_DEFAULT_OU_P RETURN VARCHAR2 IS
+  BEGIN
+    RETURN CP_DEFAULT_OU;
+  END CP_DEFAULT_OU_P;
+
+  FUNCTION CP_ORG_ID_P RETURN NUMBER IS
+  BEGIN
+    RETURN CP_ORG_ID;
+  END CP_ORG_ID_P;
+
+END RLM_RLMNETCH_XMLP_PKG;
+
+/

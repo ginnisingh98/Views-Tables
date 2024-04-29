@@ -1,0 +1,181 @@
+--------------------------------------------------------
+--  DDL for Package Body PER_OFFER_PARAGRAPHS_PKG
+--------------------------------------------------------
+
+  CREATE OR REPLACE EDITIONABLE PACKAGE BODY "APPS"."PER_OFFER_PARAGRAPHS_PKG" as
+/* $Header: hrltrlct.pkb 115.1 1999/11/04 17:05:20 pkm ship $ */
+procedure OWNER_TO_WHO (
+  X_OWNER in VARCHAR2,
+  X_CREATION_DATE out DATE,
+  X_CREATED_BY out NUMBER,
+  X_LAST_UPDATE_DATE out DATE,
+  X_LAST_UPDATED_BY out NUMBER,
+  X_LAST_UPDATE_LOGIN out NUMBER
+) is
+begin
+  if X_OWNER = 'SEED' then
+    X_CREATED_BY := 1;
+    X_LAST_UPDATED_BY := 1;
+  else
+    X_CREATED_BY := 0;
+    X_LAST_UPDATED_BY := 0;
+  end if;
+  X_CREATION_DATE := sysdate;
+  X_LAST_UPDATE_DATE := sysdate;
+  X_LAST_UPDATE_LOGIN := 0;
+end OWNER_TO_WHO;
+--
+procedure INSERT_ROW (
+  X_PARAGRAPH_NO in VARCHAR2,
+  X_BODY_TEXT    in VARCHAR2,
+  X_CREATION_DATE in DATE,
+  X_CREATED_BY in VARCHAR2,
+  X_LAST_UPDATE_DATE in DATE,
+  X_LAST_UPDATED_BY in VARCHAR2,
+  X_LAST_UPDATE_LOGIN in NUMBER
+) is
+begin
+  insert into PER_PROPOSAL_OFFER_PARAGRAPHS (
+    PARAGRAPH_NO,
+    BODY_TEXT,
+    CREATION_DATE,
+    CREATED_BY,
+    LAST_UPDATE_DATE,
+    LAST_UPDATED_BY,
+    LAST_UPDATE_LOGIN
+  ) values (
+    X_PARAGRAPH_NO,
+    X_BODY_TEXT,
+    X_CREATION_DATE,
+    X_CREATED_BY,
+    X_LAST_UPDATE_DATE,
+    X_LAST_UPDATED_BY,
+    X_LAST_UPDATE_LOGIN
+  );
+end INSERT_ROW;
+--
+procedure LOCK_ROW (
+  X_PARAGRAPH_NO in VARCHAR2
+) is
+  cursor CSR_BODY_TEXT (
+    X_PARAGRAPH_NO in VARCHAR2
+  ) is
+    select PARAGRAPH_NO
+    from   PER_PROPOSAL_OFFER_PARAGRAPHS
+    where  PARAGRAPH_NO = X_PARAGRAPH_NO
+    for update of PARAGRAPH_NO nowait;
+  RECINFO CSR_BODY_TEXT%rowtype;
+begin
+  open CSR_BODY_TEXT(X_PARAGRAPH_NO);
+  fetch CSR_BODY_TEXT into RECINFO;
+  if (CSR_BODY_TEXT%notfound) then
+    close CSR_BODY_TEXT;
+    fnd_message.set_name('FND','FORM_RECORD_DELETED');
+    app_exception.raise_exception;
+  end if;
+  close CSR_BODY_TEXT;
+end LOCK_ROW;
+--
+procedure UPDATE_ROW (
+  X_PARAGRAPH_NO in VARCHAR2,
+  X_BODY_TEXT    in VARCHAR2,
+  X_LAST_UPDATE_DATE in DATE,
+  X_LAST_UPDATED_BY in VARCHAR2,
+  X_LAST_UPDATE_LOGIN in NUMBER
+) is
+begin
+  update PER_PROPOSAL_OFFER_PARAGRAPHS set
+    BODY_TEXT = X_BODY_TEXT,
+    LAST_UPDATE_DATE = X_LAST_UPDATE_DATE,
+    LAST_UPDATED_BY = X_LAST_UPDATED_BY,
+    LAST_UPDATE_LOGIN = X_LAST_UPDATE_LOGIN
+  where PARAGRAPH_NO = X_PARAGRAPH_NO;
+  if (sql%notfound) then
+    raise no_data_found;
+  end if;
+end UPDATE_ROW;
+--
+procedure DELETE_ROW (
+  X_PARAGRAPH_NO in VARCHAR2
+) is
+begin
+  delete from PER_PROPOSAL_OFFER_PARAGRAPHS
+  where PARAGRAPH_NO = X_PARAGRAPH_NO;
+  if (sql%notfound) then
+    raise no_data_found;
+  end if;
+end DELETE_ROW;
+--
+procedure LOAD_ROW (
+  X_PARAGRAPH_NO in VARCHAR2,
+  X_BODY_TEXT    in VARCHAR2,
+  X_OWNER in VARCHAR2
+) is
+  X_CREATION_DATE DATE;
+  X_CREATED_BY NUMBER;
+  X_LAST_UPDATE_DATE DATE;
+  X_LAST_UPDATED_BY NUMBER;
+  X_LAST_UPDATE_LOGIN NUMBER;
+begin
+  OWNER_TO_WHO (
+    X_OWNER,
+    X_CREATION_DATE,
+    X_CREATED_BY,
+    X_LAST_UPDATE_DATE,
+    X_LAST_UPDATED_BY,
+    X_LAST_UPDATE_LOGIN
+  );
+  begin
+    UPDATE_ROW (
+      X_PARAGRAPH_NO,
+      X_BODY_TEXT,
+      X_LAST_UPDATE_DATE,
+      X_LAST_UPDATED_BY,
+      X_LAST_UPDATE_LOGIN
+    );
+  exception
+    when no_data_found then
+      INSERT_ROW (
+        X_PARAGRAPH_NO,
+        X_BODY_TEXT,
+        X_CREATION_DATE,
+        X_CREATED_BY,
+        X_LAST_UPDATE_DATE,
+        X_LAST_UPDATED_BY,
+        X_LAST_UPDATE_LOGIN
+      );
+  end;
+end LOAD_ROW;
+--
+procedure TRANSLATE_ROW (
+  X_PARAGRAPH_NO in VARCHAR2,
+  X_BODY_TEXT    in VARCHAR2,
+  X_OWNER in VARCHAR2
+) is
+  X_CREATION_DATE DATE;
+  X_CREATED_BY NUMBER;
+  X_LAST_UPDATE_DATE DATE;
+  X_LAST_UPDATED_BY NUMBER;
+  X_LAST_UPDATE_LOGIN NUMBER;
+begin
+  OWNER_TO_WHO (
+    X_OWNER,
+    X_CREATION_DATE,
+    X_CREATED_BY,
+    X_LAST_UPDATE_DATE,
+    X_LAST_UPDATED_BY,
+    X_LAST_UPDATE_LOGIN
+  );
+  update PER_PROPOSAL_OFFER_PARAGRAPHS
+  set BODY_TEXT = X_BODY_TEXT,
+      LAST_UPDATE_DATE = X_LAST_UPDATE_DATE,
+      LAST_UPDATED_BY = X_LAST_UPDATED_BY,
+      LAST_UPDATE_LOGIN = X_LAST_UPDATE_LOGIN
+  where PARAGRAPH_NO = X_PARAGRAPH_NO
+  and userenv('LANG') =   (Select language_code
+  from FND_LANGUAGES where installed_flag = 'B');
+end TRANSLATE_ROW;
+--
+end PER_OFFER_PARAGRAPHS_PKG;
+
+/

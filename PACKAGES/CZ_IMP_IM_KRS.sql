@@ -1,0 +1,64 @@
+--------------------------------------------------------
+--  DDL for Package CZ_IMP_IM_KRS
+--------------------------------------------------------
+
+  CREATE OR REPLACE EDITIONABLE PACKAGE "APPS"."CZ_IMP_IM_KRS" AUTHID CURRENT_USER AS
+/*	$Header: cziimkrs.pls 115.15 2004/03/08 20:23:12 sselahi ship $		*/
+
+PROCEDURE KRS_ITEM_MASTER (	inRUN_ID 		IN 	PLS_INTEGER,
+					COMMIT_SIZE	IN	PLS_INTEGER,
+					MAX_ERR		IN 	PLS_INTEGER,
+					INSERTS		   OUT NOCOPY PLS_INTEGER,
+					UPDATES		   OUT NOCOPY PLS_INTEGER,
+					FAILED		IN OUT NOCOPY PLS_INTEGER,
+					DUPS		   OUT NOCOPY PLS_INTEGER,
+                                        inXFR_GROUP     IN     VARCHAR2
+					);
+
+PROCEDURE KRS_ITEM_PROPERTY_VALUE (	inRUN_ID 	IN 	PLS_INTEGER,
+					COMMIT_SIZE	IN	PLS_INTEGER,
+					MAX_ERR		IN 	PLS_INTEGER,
+					INSERTS		   OUT NOCOPY PLS_INTEGER,
+					UPDATES		   OUT NOCOPY PLS_INTEGER,
+					FAILED		IN OUT NOCOPY PLS_INTEGER,
+					DUPS		   OUT NOCOPY PLS_INTEGER,
+                                        inXFR_GROUP     IN     VARCHAR2
+					);
+
+
+PROCEDURE KRS_ITEM_TYPE (	inRUN_ID 		IN 	PLS_INTEGER,
+					COMMIT_SIZE	IN	PLS_INTEGER,
+					MAX_ERR		IN 	PLS_INTEGER,
+					INSERTS		   OUT NOCOPY PLS_INTEGER,
+					UPDATES		   OUT NOCOPY PLS_INTEGER,
+					FAILED		IN OUT NOCOPY PLS_INTEGER,
+					DUPS		   OUT NOCOPY PLS_INTEGER,
+                                       inXFR_GROUP      IN     VARCHAR2
+					);
+PROCEDURE KRS_ITEM_TYPE_PROPERTY (	inRUN_ID 	IN 	PLS_INTEGER,
+					COMMIT_SIZE	IN	PLS_INTEGER,
+					MAX_ERR		IN 	PLS_INTEGER,
+					INSERTS		   OUT NOCOPY PLS_INTEGER,
+					UPDATES		   OUT NOCOPY PLS_INTEGER,
+					FAILED		IN OUT NOCOPY PLS_INTEGER,
+					DUPS		   OUT NOCOPY PLS_INTEGER,
+                                        inXFR_GROUP     IN     VARCHAR2
+					);
+
+PROCEDURE KRS_PROPERTY (	inRUN_ID 		IN 	PLS_INTEGER,
+					COMMIT_SIZE	IN	PLS_INTEGER,
+					MAX_ERR		IN 	PLS_INTEGER,
+					INSERTS		   OUT NOCOPY PLS_INTEGER,
+					UPDATES		   OUT NOCOPY PLS_INTEGER,
+					FAILED		IN OUT NOCOPY PLS_INTEGER,
+					DUPS		   OUT NOCOPY PLS_INTEGER,
+                                        inXFR_GROUP     IN     VARCHAR2
+					);
+/* constants */
+cnDefSrcAppId                 CONSTANT NUMBER:=-1;
+cnDefSrcTypeCode              CONSTANT NUMBER:=-1;
+END CZ_IMP_IM_KRS;
+
+ 
+
+/

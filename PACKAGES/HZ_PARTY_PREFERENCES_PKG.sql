@@ -1,0 +1,80 @@
+--------------------------------------------------------
+--  DDL for Package HZ_PARTY_PREFERENCES_PKG
+--------------------------------------------------------
+
+  CREATE OR REPLACE EDITIONABLE PACKAGE "APPS"."HZ_PARTY_PREFERENCES_PKG" AUTHID CURRENT_USER as
+/*$Header: ARHPRFTS.pls 115.4 2003/02/04 06:47:35 ssmohan noship $ */
+
+
+PROCEDURE Insert_Row(
+  X_ROWID                 in out NOCOPY VARCHAR2,
+  X_PARTY_PREFERENCE_ID   in     NUMBER,
+  X_PARTY_ID              in     NUMBER,
+  X_MODULE                in     VARCHAR2,
+  X_CATEGORY              in     VARCHAR2,
+  X_PREFERENCE_CODE       in     VARCHAR2,
+  X_VALUE_VARCHAR2        in     VARCHAR2,
+  X_VALUE_NUMBER          in     NUMBER,
+  X_VALUE_DATE            in     DATE,
+  X_VALUE_NAME            in     VARCHAR2,
+  X_ADDITIONAL_VALUE1     in     VARCHAR2,
+  X_ADDITIONAL_VALUE2     in     VARCHAR2,
+  X_ADDITIONAL_VALUE3     in     VARCHAR2,
+  X_ADDITIONAL_VALUE4     in     VARCHAR2,
+  X_ADDITIONAL_VALUE5     in     VARCHAR2,
+  X_OBJECT_VERSION_NUMBER in     NUMBER,
+  X_CREATED_BY            in     NUMBER,
+  X_CREATION_DATE         in     DATE,
+  X_LAST_UPDATED_BY       in     NUMBER,
+  X_LAST_UPDATE_DATE      in     DATE,
+  X_LAST_UPDATE_LOGIN     in     NUMBER);
+
+
+PROCEDURE Lock_Row(
+  X_PARTY_PREFERENCE_ID   in NUMBER,
+  X_PARTY_ID              in NUMBER,
+  X_MODULE                in VARCHAR2,
+  X_CATEGORY              in VARCHAR2,
+  X_PREFERENCE_CODE       in VARCHAR2,
+  X_VALUE_VARCHAR2        in VARCHAR2,
+  X_VALUE_NUMBER          in NUMBER,
+  X_VALUE_DATE            in DATE,
+  X_VALUE_NAME            in VARCHAR2,
+  X_ADDITIONAL_VALUE1     in VARCHAR2,
+  X_ADDITIONAL_VALUE2     in VARCHAR2,
+  X_ADDITIONAL_VALUE3     in VARCHAR2,
+  X_ADDITIONAL_VALUE4     in VARCHAR2,
+  X_ADDITIONAL_VALUE5     in VARCHAR2,
+  X_OBJECT_VERSION_NUMBER in NUMBER);
+
+
+PROCEDURE Update_Row(
+  X_PARTY_PREFERENCE_ID   in NUMBER,
+  X_PARTY_ID              in NUMBER,
+  X_MODULE                in VARCHAR2,
+  X_CATEGORY              in VARCHAR2,
+  X_PREFERENCE_CODE       in VARCHAR2,
+  X_VALUE_VARCHAR2        in VARCHAR2,
+  X_VALUE_NUMBER          in NUMBER,
+  X_VALUE_DATE            in DATE,
+  X_VALUE_NAME            in VARCHAR2,
+  X_ADDITIONAL_VALUE1     in VARCHAR2,
+  X_ADDITIONAL_VALUE2     in VARCHAR2,
+  X_ADDITIONAL_VALUE3     in VARCHAR2,
+  X_ADDITIONAL_VALUE4     in VARCHAR2,
+  X_ADDITIONAL_VALUE5     in VARCHAR2,
+  X_OBJECT_VERSION_NUMBER in NUMBER,
+  X_LAST_UPDATED_BY       in NUMBER,
+  X_LAST_UPDATE_DATE      in DATE,
+  X_LAST_UPDATE_LOGIN     in NUMBER);
+
+
+PROCEDURE Delete_Row(
+  x_PARTY_PREFERENCE_ID   in NUMBER,
+  X_OBJECT_VERSION_NUMBER in NUMBER);
+
+END HZ_PARTY_PREFERENCES_PKG;
+
+ 
+
+/

@@ -1,0 +1,110 @@
+--------------------------------------------------------
+--  DDL for Package BEN_CPD_RKD
+--------------------------------------------------------
+
+  CREATE OR REPLACE EDITIONABLE PACKAGE "APPS"."BEN_CPD_RKD" AUTHID CURRENT_USER as
+/* $Header: becpdrhi.pkh 120.1.12010000.3 2010/03/12 06:10:29 sgnanama ship $ */
+--
+-- ----------------------------------------------------------------------------
+-- |----------------------------< after_delete >------------------------------|
+-- ----------------------------------------------------------------------------
+--
+procedure after_delete
+  (p_pl_id                          in number
+  ,p_lf_evt_ocrd_dt                 in date
+  ,p_oipl_id                        in number
+  ,p_effective_date_o               in date
+  ,p_name_o                         in varchar2
+  ,p_group_pl_id_o                  in number
+  ,p_group_oipl_id_o                in number
+  ,p_opt_hidden_flag_o              in varchar2
+  ,p_opt_id_o                       in number
+  ,p_pl_uom_o                       in varchar2
+  ,p_pl_ordr_num_o                  in number
+  ,p_oipl_ordr_num_o                in number
+  ,p_pl_xchg_rate_o                 in number
+  ,p_opt_count_o                    in number
+  ,p_uses_bdgt_flag_o               in varchar2
+  ,p_prsrv_bdgt_cd_o                in varchar2
+  ,p_upd_start_dt_o                 in date
+  ,p_upd_end_dt_o                   in date
+  ,p_approval_mode_o                in varchar2
+  ,p_enrt_perd_start_dt_o           in date
+  ,p_enrt_perd_end_dt_o             in date
+  ,p_yr_perd_start_dt_o             in date
+  ,p_yr_perd_end_dt_o               in date
+  ,p_wthn_yr_start_dt_o             in date
+  ,p_wthn_yr_end_dt_o               in date
+  ,p_enrt_perd_id_o                 in number
+  ,p_yr_perd_id_o                   in number
+  ,p_business_group_id_o            in number
+  ,p_perf_revw_strt_dt_o            in date
+  ,p_asg_updt_eff_date_o            in date
+  ,p_emp_interview_typ_cd_o         in varchar2
+  ,p_salary_change_reason_o         in varchar2
+  ,p_ws_abr_id_o                    in number
+  ,p_ws_nnmntry_uom_o               in varchar2
+  ,p_ws_rndg_cd_o                   in varchar2
+  ,p_ws_sub_acty_typ_cd_o           in varchar2
+  ,p_dist_bdgt_abr_id_o             in number
+  ,p_dist_bdgt_nnmntry_uom_o        in varchar2
+  ,p_dist_bdgt_rndg_cd_o            in varchar2
+  ,p_ws_bdgt_abr_id_o               in number
+  ,p_ws_bdgt_nnmntry_uom_o          in varchar2
+  ,p_ws_bdgt_rndg_cd_o              in varchar2
+  ,p_rsrv_abr_id_o                  in number
+  ,p_rsrv_nnmntry_uom_o             in varchar2
+  ,p_rsrv_rndg_cd_o                 in varchar2
+  ,p_elig_sal_abr_id_o              in number
+  ,p_elig_sal_nnmntry_uom_o         in varchar2
+  ,p_elig_sal_rndg_cd_o             in varchar2
+  ,p_misc1_abr_id_o                 in number
+  ,p_misc1_nnmntry_uom_o            in varchar2
+  ,p_misc1_rndg_cd_o                in varchar2
+  ,p_misc2_abr_id_o                 in number
+  ,p_misc2_nnmntry_uom_o            in varchar2
+  ,p_misc2_rndg_cd_o                in varchar2
+  ,p_misc3_abr_id_o                 in number
+  ,p_misc3_nnmntry_uom_o            in varchar2
+  ,p_misc3_rndg_cd_o                in varchar2
+  ,p_stat_sal_abr_id_o              in number
+  ,p_stat_sal_nnmntry_uom_o         in varchar2
+  ,p_stat_sal_rndg_cd_o             in varchar2
+  ,p_rec_abr_id_o                   in number
+  ,p_rec_nnmntry_uom_o              in varchar2
+  ,p_rec_rndg_cd_o                  in varchar2
+  ,p_tot_comp_abr_id_o              in number
+  ,p_tot_comp_nnmntry_uom_o         in varchar2
+  ,p_tot_comp_rndg_cd_o             in varchar2
+  ,p_oth_comp_abr_id_o              in number
+  ,p_oth_comp_nnmntry_uom_o         in varchar2
+  ,p_oth_comp_rndg_cd_o             in varchar2
+  ,p_actual_flag_o                  in varchar2
+  ,p_acty_ref_perd_cd_o             in varchar2
+  ,p_legislation_code_o             in varchar2
+  ,p_pl_annulization_factor_o       in number
+  ,p_pl_stat_cd_o                   in varchar2
+  ,p_uom_precision_o                in number
+  ,p_ws_element_type_id_o           in number
+  ,p_ws_input_value_id_o            in number
+  ,p_data_freeze_date_o             in date
+  ,p_ws_amt_edit_cd_o               in varchar2
+  ,p_ws_amt_edit_enf_cd_for_nul_o   in varchar2
+  ,p_ws_over_budget_edit_cd_o       in varchar2
+  ,p_ws_over_budget_tol_pct_o       in number
+  ,p_bdgt_over_budget_edit_cd_o     in varchar2
+  ,p_bdgt_over_budget_tol_pct_o     in number
+  ,p_auto_distr_flag_o              in varchar2
+  ,p_pqh_document_short_name_o      in varchar2
+  ,p_ovrid_rt_strt_dt_o             in date
+  ,p_do_not_process_flag_o          in varchar2
+  ,p_ovr_perf_revw_strt_dt_o        in date
+  ,p_post_zero_salary_increase_o    in varchar2
+  ,p_show_appraisals_n_days_o       in number
+  ,p_grade_range_validation_o       in  varchar2
+  ,p_object_version_number_o        in number
+  );
+--
+end ben_cpd_rkd;
+
+/

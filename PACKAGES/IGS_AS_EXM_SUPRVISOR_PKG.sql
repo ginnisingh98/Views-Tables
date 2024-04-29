@@ -1,0 +1,95 @@
+--------------------------------------------------------
+--  DDL for Package IGS_AS_EXM_SUPRVISOR_PKG
+--------------------------------------------------------
+
+  CREATE OR REPLACE EDITIONABLE PACKAGE "APPS"."IGS_AS_EXM_SUPRVISOR_PKG" AUTHID CURRENT_USER as
+/* $Header: IGSDI42S.pls 115.5 2002/11/28 23:21:12 nsidana ship $ */
+
+procedure INSERT_ROW (
+  X_ROWID in out NOCOPY VARCHAR2,
+  X_ORG_ID in NUMBER,
+  X_PERSON_ID in NUMBER,
+  X_EXAM_SUPERVISOR_TYPE in VARCHAR2,
+  X_PREVIOUS_SESSIONS in NUMBER,
+  X_RESPONSIBLE_ORG_UNIT_CD in VARCHAR2,
+  X_RESPONSIBLE_OU_START_DT in DATE,
+  X_COMMENTS in VARCHAR2,
+  X_MODE in VARCHAR2 default 'R'
+  );
+procedure LOCK_ROW (
+  X_ROWID in VARCHAR2,
+  X_PERSON_ID in NUMBER,
+  X_EXAM_SUPERVISOR_TYPE in VARCHAR2,
+  X_PREVIOUS_SESSIONS in NUMBER,
+  X_RESPONSIBLE_ORG_UNIT_CD in VARCHAR2,
+  X_RESPONSIBLE_OU_START_DT in DATE,
+  X_COMMENTS in VARCHAR2
+);
+procedure UPDATE_ROW (
+  X_ROWID in VARCHAR2,
+  X_PERSON_ID in NUMBER,
+  X_EXAM_SUPERVISOR_TYPE in VARCHAR2,
+  X_PREVIOUS_SESSIONS in NUMBER,
+  X_RESPONSIBLE_ORG_UNIT_CD in VARCHAR2,
+  X_RESPONSIBLE_OU_START_DT in DATE,
+  X_COMMENTS in VARCHAR2,
+  X_MODE in VARCHAR2 default 'R'
+  );
+procedure ADD_ROW (
+  X_ROWID in out NOCOPY VARCHAR2,
+  X_ORG_ID in NUMBER,
+  X_PERSON_ID in NUMBER,
+  X_EXAM_SUPERVISOR_TYPE in VARCHAR2,
+  X_PREVIOUS_SESSIONS in NUMBER,
+  X_RESPONSIBLE_ORG_UNIT_CD in VARCHAR2,
+  X_RESPONSIBLE_OU_START_DT in DATE,
+  X_COMMENTS in VARCHAR2,
+  X_MODE in VARCHAR2 default 'R'
+  );
+procedure DELETE_ROW (
+  X_ROWID in VARCHAR2
+);
+
+FUNCTION Get_PK_For_Validation (
+    x_person_id IN NUMBER
+    ) RETURN BOOLEAN;
+
+  PROCEDURE GET_FK_IGS_AS_EXM_SPRVSRTYP (
+    x_exam_supervisor_type IN VARCHAR2
+    );
+
+  PROCEDURE GET_FK_IGS_OR_UNIT (
+    x_org_unit_cd IN VARCHAR2,
+    x_start_dt IN VARCHAR2
+    );
+
+  PROCEDURE GET_FK_IGS_PE_PERSON (
+    x_person_id IN NUMBER
+    );
+
+ PROCEDURE Check_Constraints (
+ Column_Name	IN	VARCHAR2	DEFAULT NULL,
+ Column_Value 	IN	VARCHAR2	DEFAULT NULL
+ );
+
+  PROCEDURE Before_DML (
+    p_action IN VARCHAR2,
+    x_rowid IN  VARCHAR2 DEFAULT NULL,
+    x_org_id in NUMBER DEFAULT NULL,
+    x_person_id IN NUMBER DEFAULT NULL,
+    x_exam_supervisor_type IN VARCHAR2 DEFAULT NULL,
+    x_previous_sessions IN NUMBER DEFAULT NULL,
+    x_responsible_org_unit_cd IN VARCHAR2 DEFAULT NULL,
+    x_responsible_ou_start_dt IN DATE DEFAULT NULL,
+    x_comments IN VARCHAR2 DEFAULT NULL,
+    x_creation_date IN DATE DEFAULT NULL,
+    x_created_by IN NUMBER DEFAULT NULL,
+    x_last_update_date IN DATE DEFAULT NULL,
+    x_last_updated_by IN NUMBER DEFAULT NULL,
+    x_last_update_login IN NUMBER DEFAULT NULL
+  ) ;
+end IGS_AS_EXM_SUPRVISOR_PKG;
+
+ 
+
+/

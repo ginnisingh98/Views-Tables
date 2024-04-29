@@ -1,0 +1,104 @@
+--------------------------------------------------------
+--  DDL for Package GMF_SUBLEDGER_REPORT
+--------------------------------------------------------
+
+  CREATE OR REPLACE EDITIONABLE PACKAGE "APPS"."GMF_SUBLEDGER_REPORT" AUTHID CURRENT_USER AS
+/* $Header: gmfsubrs.pls 115.7 2004/07/23 16:53:12 dvadivel ship $ */
+
+PROCEDURE RUN(
+	errbuf               OUT NOCOPY  VARCHAR2,
+	retcode              OUT NOCOPY  VARCHAR2,
+	preference_no        IN          VARCHAR2,
+	pco_code             IN          VARCHAR2,
+	pcurrency_code       IN          VARCHAR2,
+	pfiscal_year         IN          VARCHAR2,
+	pperiod              IN          VARCHAR2,
+	pstart_date          IN          VARCHAR2,
+	pend_date            IN          VARCHAR2,
+	pfrom_voucher_no     IN          VARCHAR2,
+	pto_voucher_no       IN          VARCHAR2,
+	pfrom_source_code    IN          VARCHAR2,
+	pto_source_code      IN          VARCHAR2,
+	pfrom_sub_event_code IN          VARCHAR2,
+	pto_sub_event_code   IN          VARCHAR2,
+	report_on            IN          VARCHAR2,
+	rep_mode             IN          VARCHAR2,
+	plines_per_page      IN          VARCHAR2,
+	ppage_size           IN          NUMBER DEFAULT 132);  -- Bug 2804810
+
+PROCEDURE PRINT_TOTALS(
+        line_id                 IN      VARCHAR2,
+        doc_no                  IN      VARCHAR2,
+        sub_event_code          IN      VARCHAR2,
+        voucher_id              IN      NUMBER,
+	rep_mode		IN	VARCHAR2,
+	ppage_size		IN	NUMBER DEFAULT 132);  -- Bug 2804810
+
+PROCEDURE PRINT_LINE(
+	line_text		IN	VARCHAR2);
+
+PROCEDURE INITIALIZE_LABELS;
+
+-- variables for report labels.
+L_GMF_SUBLEDGER_REPORT	VARCHAR2(2000);
+L_GMF_SOURCE		VARCHAR2(2000);
+L_GMF_SUB_EVENT		VARCHAR2(2000);
+L_GMF_VOUCHER		VARCHAR2(2000);
+L_GMF_DOCUMENT		VARCHAR2(2000);
+L_GMF_DOC_NO		VARCHAR2(2000);
+L_GMF_DOC_TYPE		VARCHAR2(2000);
+L_GMF_DOC_DATE		VARCHAR2(2000);
+L_GMF_LINE		VARCHAR2(2000);
+L_GMF_ITEM		VARCHAR2(2000);
+L_GMF_TRANS_DATE	VARCHAR2(2000);
+L_GMF_WHSE		VARCHAR2(2000);
+L_GMF_QUANTITY		VARCHAR2(2000);
+L_GMF_UOM		VARCHAR2(2000);
+L_GMF_TTL		VARCHAR2(2000);
+L_GMF_BASE_CURR		VARCHAR2(2000);
+L_GMF_BILL_CURR		VARCHAR2(2000);
+L_GMF_DEBIT		VARCHAR2(2000);
+L_GMF_CREDIT		VARCHAR2(2000);
+L_GMF_JV_QTY		VARCHAR2(2000);
+L_GMF_REFERENCE_NO	VARCHAR2(2000);
+L_GMF_COMPANY		VARCHAR2(2000);
+L_GMF_CURRENCY		VARCHAR2(2000);
+L_GMF_FISCAL_YEAR	VARCHAR2(2000);
+L_GMF_PERIOD		VARCHAR2(2000);
+L_GMF_START_DATE	VARCHAR2(2000);
+L_GMF_END_DATE		VARCHAR2(2000);
+L_GMF_FROM		VARCHAR2(2000);
+L_GMF_TO		VARCHAR2(2000);
+L_GMF_AU_AND_ACCT	VARCHAR2(2000);
+L_GMF_TEST		VARCHAR2(2000);
+/* Bug 1924250 */
+L_GMF_VENDOR		VARCHAR2(2000);
+L_GMF_PO_NO		VARCHAR2(2000);
+L_GMF_XCHG_RATE		VARCHAR2(2000);
+L_GMF_RECEIPT		VARCHAR2(2000);
+L_GMF_RECEIPT_DATE	VARCHAR2(2000);
+L_GMF_FORMULA		VARCHAR2(2000);
+L_GMF_VERSION		VARCHAR2(2000);
+L_GMF_ACTUAL_START_DATE		VARCHAR2(2000);
+L_GMF_ACTUAL_CMPLT_DATE		VARCHAR2(2000);
+L_GMF_ROUTING		VARCHAR2(2000);
+L_GMF_CUSTOMER		VARCHAR2(2000);
+L_GMF_SO_NO		VARCHAR2(2000);
+L_GMF_SO_DATE		VARCHAR2(2000);
+L_GMF_WIP_WHSE		VARCHAR2(2000);
+/* End of code for Bug 1924250 */
+/* Bug 2048108 */
+L_GMF_UNIT_PRICE	VARCHAR2(2000);
+L_GMF_REAS_CODE		VARCHAR2(2000);
+L_GMF_PLAN_QTY		VARCHAR2(2000);
+L_GMF_ACTL_QTY		VARCHAR2(2000);
+L_GMF_ORIG_QTY		VARCHAR2(2000); -- Bug 3772552 - Fwd port of 3544905
+L_GMF_BATCH_STATUS	VARCHAR2(2000);
+L_GMF_PAGE_NO		VARCHAR2(2000);
+/* End of code for Bug 2048108 */
+
+END;
+
+ 
+
+/

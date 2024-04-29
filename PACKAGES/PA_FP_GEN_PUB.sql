@@ -1,0 +1,78 @@
+--------------------------------------------------------
+--  DDL for Package PA_FP_GEN_PUB
+--------------------------------------------------------
+
+  CREATE OR REPLACE EDITIONABLE PACKAGE "APPS"."PA_FP_GEN_PUB" AUTHID CURRENT_USER as
+/* $Header: PAFPGNPS.pls 120.0 2005/05/30 03:47:03 appldev noship $ */
+
+
+PROCEDURE UPDATE_RES_DEFAULTS
+       (P_PROJECT_ID                     IN            pa_projects_all.PROJECT_ID%TYPE,
+        P_BUDGET_VERSION_ID 	         IN            PA_BUDGET_VERSIONS.BUDGET_VERSION_ID%TYPE,
+        P_CALLED_MODE                    IN            VARCHAR2 DEFAULT 'SELF_SERVICE',
+        P_COMMIT_FLAG                    IN            VARCHAR2 DEFAULT 'N',
+        P_INIT_MSG_FLAG                  IN            VARCHAR2 DEFAULT 'N',
+        X_RETURN_STATUS                  OUT  NOCOPY   VARCHAR2,
+        X_MSG_COUNT                      OUT  NOCOPY   NUMBER,
+        X_MSG_DATA	                 OUT  NOCOPY   VARCHAR2);
+
+PROCEDURE INCLUDE_CHANGE_DOCUMENT_WRP
+          (P_FP_COLS_REC                    IN              PA_FP_GEN_AMOUNT_UTILS.FP_COLS,
+           X_RETURN_STATUS                  OUT   NOCOPY    VARCHAR2,
+           X_MSG_COUNT                      OUT   NOCOPY    NUMBER,
+           X_MSG_DATA	                    OUT   NOCOPY    VARCHAR2);
+
+PROCEDURE UNSPENT_AMOUNT
+          (P_BUDGET_VERSION_ID              IN            PA_BUDGET_VERSIONS.BUDGET_VERSION_ID%TYPE,
+           P_APP_COST_BDGT_VER_ID           IN            PA_BUDGET_VERSIONS.BUDGET_VERSION_ID%TYPE,
+           P_FP_COLS_REC                    IN            PA_FP_GEN_AMOUNT_UTILS.FP_COLS,
+           P_UNSPENT_AMT_PERIOD             IN            VARCHAR2,
+           X_RETURN_STATUS                  OUT   NOCOPY  VARCHAR2,
+           X_MSG_COUNT                      OUT   NOCOPY  NUMBER,
+           X_MSG_DATA                       OUT   NOCOPY  VARCHAR2);
+
+PROCEDURE UPD_WBS_ELEMENT_VERSION_ID
+          (P_BUDGET_VERSION_ID              IN            PA_BUDGET_VERSIONS.BUDGET_VERSION_ID%TYPE,
+           P_STRUCTURE_VERSION_ID           IN            NUMBER DEFAULT null,
+           X_RETURN_STATUS                  OUT   NOCOPY  VARCHAR2,
+           X_MSG_COUNT                      OUT   NOCOPY  NUMBER,
+           X_MSG_DATA                       OUT   NOCOPY  VARCHAR2);
+
+/* Added 10/15/2004 by dlai */
+PROCEDURE PRORATE_UNALIGNED_PERIOD_AMTS
+    (P_SRC_RES_ASG_ID_TAB	IN   PA_PLSQL_DATATYPES.IdTabTyp,
+     P_TARGET_RES_ASG_ID    	IN   PA_RESOURCE_ASSIGNMENTS.RESOURCE_ASSIGNMENT_ID%TYPE,
+     P_CURRENCY_CODE		IN   PA_BUDGET_LINES.TXN_CURRENCY_CODE%TYPE,
+     P_CURRENCY_CODE_FLAG	IN   VARCHAR2,
+     P_ACTUAL_THRU_DATE		IN   PA_PERIODS_ALL.END_DATE%TYPE,
+     X_QUANTITY	                OUT  NOCOPY PA_BUDGET_LINES.QUANTITY%TYPE,
+     X_TXN_RAW_COST		OUT  NOCOPY  PA_BUDGET_LINES.TXN_RAW_COST%TYPE,
+     X_TXN_BURDENED_COST	OUT  NOCOPY PA_BUDGET_LINES.TXN_BURDENED_COST%TYPE,
+     X_TXN_REVENUE		OUT  NOCOPY PA_BUDGET_LINES.TXN_REVENUE%TYPE,
+     X_PROJ_RAW_COST		OUT  NOCOPY PA_BUDGET_LINES.PROJECT_RAW_COST%TYPE,
+     X_PROJ_BURDENED_COST	OUT  NOCOPY PA_BUDGET_LINES.PROJECT_BURDENED_COST%TYPE,
+     X_PROJ_REVENUE		OUT  NOCOPY PA_BUDGET_LINES.PROJECT_REVENUE%TYPE,
+     X_RETURN_STATUS		OUT  NOCOPY  VARCHAR2,
+     X_MSG_COUNT		OUT  NOCOPY  NUMBER,
+     X_MSG_DATA			OUT  NOCOPY  VARCHAR2);
+
+/* Added 10/26/2004 by dkuo */
+PROCEDURE MAINTAIN_FIXED_DATE_SP
+   (P_BUDGET_VERSION_ID            IN            PA_BUDGET_VERSIONS.BUDGET_VERSION_ID%TYPE,
+    P_FP_COLS_REC                  IN            PA_FP_GEN_AMOUNT_UTILS.FP_COLS,
+    X_RETURN_STATUS                OUT  NOCOPY   VARCHAR2,
+    X_MSG_COUNT                    OUT  NOCOPY   NUMBER,
+    X_MSG_DATA                     OUT  NOCOPY   VARCHAR2);
+
+/* Added 1/6/2004 by dkuo */
+PROCEDURE COPY_SRC_ATTRS_TO_TARGET_FCST
+    (P_FP_COLS_REC                  IN            PA_FP_GEN_AMOUNT_UTILS.FP_COLS,
+     X_RETURN_STATUS                OUT  NOCOPY   VARCHAR2,
+     X_MSG_COUNT                    OUT  NOCOPY   NUMBER,
+     X_MSG_DATA                     OUT  NOCOPY   VARCHAR2);
+
+END PA_FP_GEN_PUB;
+
+ 
+
+/

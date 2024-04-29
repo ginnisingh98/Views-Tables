@@ -1,0 +1,137 @@
+--------------------------------------------------------
+--  DDL for Package CE_FORECASTS_TABLE_PKG
+--------------------------------------------------------
+
+  CREATE OR REPLACE EDITIONABLE PACKAGE "APPS"."CE_FORECASTS_TABLE_PKG" AUTHID CURRENT_USER AS
+/* $Header: ceforcas.pls 120.3 2003/05/12 23:14:33 sspoonen ship $ */
+  G_spec_revision 	VARCHAR2(1000) := '$Revision: 120.3 $';
+
+  FUNCTION spec_revision RETURN VARCHAR2;
+
+  FUNCTION body_revision RETURN VARCHAR2;
+
+  PROCEDURE Insert_Row(	X_Rowid			IN OUT NOCOPY	VARCHAR2,
+			X_forecast_id		IN OUT NOCOPY  NUMBER,
+			X_forecast_header_id		NUMBER,
+			X_name				VARCHAR2,
+                        X_description			VARCHAR2,
+			X_start_date			DATE,
+			X_period_set_name			VARCHAR2,
+			X_start_period			VARCHAR2,
+			X_forecast_currency		VARCHAR2,
+			X_currency_type			VARCHAR2,
+			X_source_currency		VARCHAR2,
+			X_exchange_rate_type		VARCHAR2,
+			X_exchange_date                 DATE,
+			X_exchange_rate			NUMBER,
+			X_error_status			VARCHAR2,
+			X_amount_threshold		NUMBER,
+			X_project_id			NUMBER,
+			X_drilldown_flag		VARCHAR2,
+			X_bank_balance_type		VARCHAR2,
+			X_float_type			VARCHAR2,
+			X_view_by			VARCHAR2,
+			X_include_sub_account		VARCHAR2,
+			X_factor			NUMBER,
+			X_request_id			NUMBER,
+			X_Created_By                    NUMBER,
+                       	X_Creation_Date                 DATE,
+                       	X_Last_Updated_By               NUMBER,
+                      	X_Last_Update_Date              DATE,
+                       	X_Last_Update_Login             NUMBER,
+			X_attribute_category            VARCHAR2,
+			X_attribute1                    VARCHAR2,
+			X_attribute2                    VARCHAR2,
+			X_attribute3                    VARCHAR2,
+			X_attribute4                    VARCHAR2,
+			X_attribute5                    VARCHAR2,
+			X_attribute6                    VARCHAR2,
+			X_attribute7                    VARCHAR2,
+			X_attribute8                    VARCHAR2,
+			X_attribute9                    VARCHAR2,
+			X_attribute10                   VARCHAR2,
+			X_attribute11                   VARCHAR2,
+			X_attribute12                   VARCHAR2,
+			X_attribute13                   VARCHAR2,
+			X_attribute14                   VARCHAR2,
+			X_attribute15                   VARCHAR2);
+
+
+  PROCEDURE Update_Row( X_Rowid				VARCHAR2,
+			X_forecast_id                   NUMBER,
+                        X_forecast_header_id            NUMBER,
+			X_name				VARCHAR2,
+			X_description			VARCHAR2,
+			X_start_date			DATE,
+			X_period_set_name		VARCHAR2,
+			X_start_period			VARCHAR2,
+			X_forecast_currency		VARCHAR2,
+			X_currency_type			VARCHAR2,
+			X_source_currency		VARCHAR2,
+			X_exchange_rate_type		VARCHAR2,
+			X_exchange_date                 DATE,
+                        X_exchange_rate                 NUMBER,
+			X_error_status			VARCHAR2,
+			X_amount_threshold		NUMBER,
+			X_project_id			NUMBER,
+                       	X_Last_Updated_By               NUMBER,
+                       	X_Last_Update_Date              DATE,
+                       	X_Last_Update_Login             NUMBER,
+			X_Attribute_category            VARCHAR2,
+			X_Attribute1                    VARCHAR2,
+			X_Attribute2                    VARCHAR2,
+			X_Attribute3                    VARCHAR2,
+			X_Attribute4                    VARCHAR2,
+			X_Attribute5                    VARCHAR2,
+			X_Attribute6                    VARCHAR2,
+			X_Attribute7                    VARCHAR2,
+			X_Attribute8                    VARCHAR2,
+			X_Attribute9                    VARCHAR2,
+			X_Attribute10                   VARCHAR2,
+			X_Attribute11                   VARCHAR2,
+			X_Attribute12                   VARCHAR2,
+			X_Attribute13                   VARCHAR2,
+			X_Attribute14                   VARCHAR2,
+			X_Attribute15                   VARCHAR2);
+
+  PROCEDURE Delete_row(X_rowid VARCHAR2);
+
+  PROCEDURE Lock_Row  ( X_RowId                        VARCHAR2,
+                        X_forecast_id                   NUMBER,
+                        X_forecast_header_id            NUMBER,
+                        X_name                          VARCHAR2,
+                        X_description                   VARCHAR2,
+                        X_start_date                    DATE,
+                        X_period_set_name		VARCHAR2,
+			X_start_period                  VARCHAR2,
+                        X_forecast_currency             VARCHAR2,
+                        X_currency_type                 VARCHAR2,
+                        X_source_currency               VARCHAR2,
+                        X_exchange_rate_type            VARCHAR2,
+                        X_exchange_date                 DATE,
+                        X_exchange_rate                 NUMBER,
+			X_error_status			VARCHAR2,
+			X_amount_threshold		NUMBER,
+			X_project_id			NUMBER,
+                        X_attribute_category            VARCHAR2,
+                        X_attribute1                    VARCHAR2,
+                        X_attribute2                    VARCHAR2,
+                        X_attribute3                    VARCHAR2,
+                        X_attribute4                    VARCHAR2,
+                        X_attribute5                    VARCHAR2,
+                        X_attribute6                    VARCHAR2,
+                        X_attribute7                    VARCHAR2,
+                        X_attribute8                    VARCHAR2,
+                        X_attribute9                    VARCHAR2,
+                        X_attribute10                   VARCHAR2,
+                        X_attribute11                   VARCHAR2,
+                        X_attribute12                   VARCHAR2,
+                        X_attribute13                   VARCHAR2,
+                        X_attribute14                   VARCHAR2,
+                        X_attribute15                   VARCHAR2);
+
+END CE_FORECASTS_TABLE_PKG;
+
+ 
+
+/

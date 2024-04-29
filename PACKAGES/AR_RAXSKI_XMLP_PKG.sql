@@ -1,0 +1,101 @@
+--------------------------------------------------------
+--  DDL for Package AR_RAXSKI_XMLP_PKG
+--------------------------------------------------------
+
+  CREATE OR REPLACE EDITIONABLE PACKAGE "APPS"."AR_RAXSKI_XMLP_PKG" AUTHID CURRENT_USER AS
+/* $Header: RAXSKIS.pls 120.0 2007/12/27 14:33:38 abraghun noship $ */
+	P_CONC_REQUEST_ID	number;
+	P_Set_of_Books_Id	number;
+	P_Start_Date	date;
+	P_End_Date	date;
+	P_Prior_Start_Date	date;
+	P_Prior_End_Date	date;
+	--lp_start_date	varchar2(200);
+	lp_start_date	varchar2(1200):=' ';
+	--lp_end_date	varchar2(200);
+	lp_end_date	varchar2(1200):=' ';
+	--lp_start_currency_code	varchar2(200);
+	lp_start_currency_code	varchar2(1200):=' ';
+	--lp_end_currency_code	varchar2(200);
+	lp_end_currency_code	varchar2(1200):= ' ';
+	P_Start_Currency_Code	varchar2(32767);
+	P_End_Currency_Code	varchar2(32767);
+	Current_Inv_Period	number;
+	Prior_Inv_Period	number;
+	P_Percent_Change	number;
+	Current_Inv_Sum	number;
+	Prior_Inv_Sum	number;
+	A_Percent_Change	number;
+	Inv_Sum_TF	number;
+	Current_Period	number;
+	Prior_Period	number;
+	C_Percent_Change	number;
+	Current_Sum	number;
+	Prior_Sum	number;
+	S_Percent_Change	number;
+	All_Sum_CTF	number;
+	RP_COMPANY_NAME	varchar2(350);
+	RP_REPORT_NAME	varchar2(380);
+	RP_DATA_FOUND	varchar2(300);
+	RP_SUB_TITLE	varchar2(380);
+	V_Addresses	number;
+	Prior_V_Addresses	number;
+	Address_Total_Number	number;
+	V_Customers	number;
+	Prior_V_Customers	number;
+	Cust_Total_Number	number;
+	V_Inactive_Count	number;
+	Customer_Change	varchar2(32767);
+	Address_Change	varchar2(32767);
+	Prior_V_Inactive_Count	number;
+	Inactive_Count_Total_Number	number;
+	Inactive_Count_Change	varchar2(32767);
+	function report_nameformula(Company_Name in varchar2) return varchar2  ;
+	function BeforeReport return boolean  ;
+	function AfterPForm return boolean  ;
+	function Sub_TitleFormula return VARCHAR2  ;
+	function Sel_CustomersFormula return Number  ;
+	--function sel_invoicesformula(inv_type in number, invoice_currency_code in varchar2, inv_sum in number) return number  ;
+	function sel_invoicesformula(inv_type in number, invoice_currency_code_t in varchar2, inv_sum in number) return number  ;
+	--function sel_trxformula(reason in varchar2, invoice_currency_code in varchar2, all_sum in number) return number  ;
+	function sel_trxformula(reason in varchar2, invoice_currency_code_t in varchar2, all_sum_t in number) return number  ;
+	function CF_NO_REASONFormula return VARCHAR2  ;
+	function sum_p_percent_change1formula(sum_prior_inv_period in number, sum_current_inv_period in number) return number  ;
+	function sum_c_percent_change1formula(sum_prior_period in number, sum_current_period in number) return number  ;
+	function sum_a_percent_change1formula(sum_prior_inv_sum in number, sum_current_inv_sum in number) return number  ;
+	function sum_s_percent_change1formula(sum_prior_sum in number, sum_current_sum in number) return number  ;
+	function AfterReport return boolean  ;
+	Function Current_Inv_Period_p return number;
+	Function Prior_Inv_Period_p return number;
+	Function P_Percent_Change_p return number;
+	Function Current_Inv_Sum_p return number;
+	Function Prior_Inv_Sum_p return number;
+	Function A_Percent_Change_p return number;
+	Function Inv_Sum_TF_p return number;
+	Function Current_Period_p return number;
+	Function Prior_Period_p return number;
+	Function C_Percent_Change_p return number;
+	Function Current_Sum_p return number;
+	Function Prior_Sum_p return number;
+	Function S_Percent_Change_p return number;
+	Function All_Sum_CTF_p return number;
+	Function RP_COMPANY_NAME_p return varchar2;
+	Function RP_REPORT_NAME_p return varchar2;
+	Function RP_DATA_FOUND_p return varchar2;
+	Function RP_SUB_TITLE_p return varchar2;
+	Function V_Addresses_p return number;
+	Function Prior_V_Addresses_p return number;
+	Function Address_Total_Number_p return number;
+	Function V_Customers_p return number;
+	Function Prior_V_Customers_p return number;
+	Function Cust_Total_Number_p return number;
+	Function V_Inactive_Count_p return number;
+	Function Customer_Change_p return varchar2;
+	Function Address_Change_p return varchar2;
+	Function Prior_V_Inactive_Count_p return number;
+	Function Inactive_Count_Total_Number_p return number;
+	Function Inactive_Count_Change_p return varchar2;
+END AR_RAXSKI_XMLP_PKG;
+
+
+/

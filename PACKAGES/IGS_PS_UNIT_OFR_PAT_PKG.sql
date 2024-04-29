@@ -1,0 +1,125 @@
+--------------------------------------------------------
+--  DDL for Package IGS_PS_UNIT_OFR_PAT_PKG
+--------------------------------------------------------
+
+  CREATE OR REPLACE EDITIONABLE PACKAGE "APPS"."IGS_PS_UNIT_OFR_PAT_PKG" AUTHID CURRENT_USER as
+/* $Header: IGSPI87S.pls 120.2 2005/06/29 06:28:56 appldev ship $ */
+
+procedure INSERT_ROW (
+  X_ROWID in out NOCOPY VARCHAR2,
+  X_UNIT_CD in VARCHAR2,
+  X_VERSION_NUMBER in NUMBER,
+  X_CI_SEQUENCE_NUMBER in NUMBER,
+  X_CAL_TYPE in VARCHAR2,
+  X_CI_START_DT in DATE,
+  X_CI_END_DT in DATE,
+  X_WAITLIST_ALLOWED in VARCHAR2,
+  X_MAX_STUDENTS_PER_WAITLIST  in NUMBER,
+  X_MODE in VARCHAR2 default 'R',
+  X_ORG_ID in NUMBER,
+  X_DELETE_FLAG IN VARCHAR2 DEFAULT NULL,
+  x_abort_flag  IN VARCHAR2 DEFAULT 'N'
+  );
+
+procedure LOCK_ROW (
+  X_ROWID in VARCHAR2,
+  X_UNIT_CD in VARCHAR2,
+  X_VERSION_NUMBER in NUMBER,
+  X_CI_SEQUENCE_NUMBER in NUMBER,
+  X_CAL_TYPE in VARCHAR2,
+  X_CI_START_DT in DATE,
+  X_CI_END_DT in DATE,
+  X_WAITLIST_ALLOWED in VARCHAR2,
+  X_MAX_STUDENTS_PER_WAITLIST  in NUMBER,
+  X_DELETE_FLAG IN VARCHAR2 DEFAULT NULL,
+  x_abort_flag  IN VARCHAR2 DEFAULT 'N'
+);
+
+procedure UPDATE_ROW (
+  X_ROWID in VARCHAR2,
+  X_UNIT_CD in VARCHAR2,
+  X_VERSION_NUMBER in NUMBER,
+  X_CI_SEQUENCE_NUMBER in NUMBER,
+  X_CAL_TYPE in VARCHAR2,
+  X_CI_START_DT in DATE,
+  X_CI_END_DT in DATE,
+  X_WAITLIST_ALLOWED in VARCHAR2,
+  X_MAX_STUDENTS_PER_WAITLIST  in NUMBER,
+  X_MODE in VARCHAR2 default 'R',
+  X_DELETE_FLAG IN VARCHAR2 DEFAULT NULL,
+  x_abort_flag  IN VARCHAR2  DEFAULT 'N'
+  );
+
+procedure ADD_ROW (
+  X_ROWID in out NOCOPY VARCHAR2,
+  X_UNIT_CD in VARCHAR2,
+  X_VERSION_NUMBER in NUMBER,
+  X_CI_SEQUENCE_NUMBER in NUMBER,
+  X_CAL_TYPE in VARCHAR2,
+  X_CI_START_DT in DATE,
+  X_CI_END_DT in DATE,
+  X_WAITLIST_ALLOWED in VARCHAR2,
+  X_MAX_STUDENTS_PER_WAITLIST  in NUMBER,
+  X_MODE in VARCHAR2 default 'R',
+  X_ORG_ID in NUMBER,
+  X_DELETE_FLAG IN VARCHAR2 DEFAULT NULL,
+  x_abort_flag  IN VARCHAR2 DEFAULT 'N'
+  );
+
+procedure DELETE_ROW (
+  X_ROWID in VARCHAR2
+);
+
+  FUNCTION Get_PK_For_Validation (
+    x_unit_cd IN VARCHAR2,
+    x_version_number IN NUMBER,
+    x_cal_type IN VARCHAR2,
+    x_ci_sequence_number IN NUMBER
+    )RETURN BOOLEAN;
+
+  PROCEDURE GET_UFK_IGS_CA_INST (
+    x_cal_type IN VARCHAR2,
+    x_sequence_number IN NUMBER,
+    x_start_dt IN DATE,
+    x_end_dt IN DATE
+    );
+
+  PROCEDURE GET_FK_IGS_PS_UNIT_OFR (
+    x_unit_cd IN VARCHAR2,
+    x_version_number IN NUMBER,
+    x_cal_type IN VARCHAR2
+    );
+
+PROCEDURE Check_Constraints(
+   Column_Name IN VARCHAR2 DEFAULT NULL,
+   Column_Value IN VARCHAR2 DEFAULT NULL
+   );
+
+
+  PROCEDURE Before_DML (
+    p_action IN VARCHAR2,
+    x_rowid IN VARCHAR2 DEFAULT NULL,
+    x_unit_cd IN VARCHAR2 DEFAULT NULL,
+    x_version_number IN NUMBER DEFAULT NULL,
+    x_cal_type IN VARCHAR2 DEFAULT NULL,
+    x_ci_sequence_number IN NUMBER DEFAULT NULL,
+    x_ci_start_dt IN DATE DEFAULT NULL,
+    x_ci_end_dt IN DATE DEFAULT NULL,
+    x_waitlist_allowed in VARCHAR2 DEFAULT NULL,
+    x_max_students_per_waitlist in NUMBER DEFAULT NULL,
+    x_creation_date IN DATE DEFAULT NULL,
+    x_created_by IN NUMBER DEFAULT NULL,
+    x_last_update_date IN DATE DEFAULT NULL,
+    x_last_updated_by IN NUMBER DEFAULT NULL,
+    x_last_update_login IN NUMBER DEFAULT NULL,
+    X_ORG_ID IN NUMBER DEFAULT NULL,
+    X_DELETE_FLAG IN VARCHAR2 DEFAULT NULL,
+    x_abort_flag  IN VARCHAR2 DEFAULT 'N'
+  );
+
+
+end IGS_PS_UNIT_OFR_PAT_PKG;
+
+ 
+
+/

@@ -1,0 +1,119 @@
+--------------------------------------------------------
+--  DDL for Package CSI_I_ASSETS_H_PKG
+--------------------------------------------------------
+
+  CREATE OR REPLACE EDITIONABLE PACKAGE "APPS"."CSI_I_ASSETS_H_PKG" AUTHID CURRENT_USER as
+/* $Header: csitashs.pls 120.1 2005/06/08 13:51:53 appldev  $ */
+
+
+PROCEDURE Insert_Row(
+          px_INSTANCE_ASSET_HISTORY_ID   IN OUT NOCOPY NUMBER,
+          p_INSTANCE_ASSET_ID    NUMBER,
+          p_TRANSACTION_ID    NUMBER,
+          p_OLD_INSTANCE_ID    NUMBER,
+          p_NEW_INSTANCE_ID    NUMBER,
+          p_OLD_FA_ASSET_ID    NUMBER,
+          p_NEW_FA_ASSET_ID    NUMBER,
+          p_OLD_ASSET_QUANTITY    NUMBER,
+          p_NEW_ASSET_QUANTITY    NUMBER,
+          p_OLD_FA_BOOK_TYPE_CODE    VARCHAR2,
+          p_NEW_FA_BOOK_TYPE_CODE    VARCHAR2,
+          p_OLD_FA_LOCATION_ID    NUMBER,
+          p_NEW_FA_LOCATION_ID    NUMBER,
+          p_OLD_UPDATE_STATUS    VARCHAR2,
+          p_NEW_UPDATE_STATUS    VARCHAR2,
+          p_OLD_FA_SYNC_FLAG    VARCHAR2,
+          p_NEW_FA_SYNC_FLAG    VARCHAR2,
+          p_OLD_FA_MASS_ADDITION_ID    NUMBER,
+          p_NEW_FA_MASS_ADDITION_ID    NUMBER,
+          p_OLD_CREATION_COMPLETE_FLAG    VARCHAR2,
+          p_NEW_CREATION_COMPLETE_FLAG    VARCHAR2,
+          p_FULL_DUMP_FLAG    VARCHAR2,
+          p_CREATED_BY    NUMBER,
+          p_CREATION_DATE    DATE,
+          p_LAST_UPDATED_BY    NUMBER,
+          p_LAST_UPDATE_DATE    DATE,
+          p_LAST_UPDATE_LOGIN    NUMBER,
+          p_OBJECT_VERSION_NUMBER    NUMBER,
+          p_OLD_ACTIVE_START_DATE    DATE,
+          p_NEW_ACTIVE_START_DATE    DATE,
+          p_OLD_ACTIVE_END_DATE    DATE,
+          p_NEW_ACTIVE_END_DATE    DATE);
+
+PROCEDURE Update_Row(
+          p_INSTANCE_ASSET_HISTORY_ID    NUMBER,
+          p_INSTANCE_ASSET_ID    NUMBER,
+          p_TRANSACTION_ID    NUMBER,
+          p_OLD_INSTANCE_ID    NUMBER,
+          p_NEW_INSTANCE_ID    NUMBER,
+          p_OLD_FA_ASSET_ID    NUMBER,
+          p_NEW_FA_ASSET_ID    NUMBER,
+          p_OLD_ASSET_QUANTITY    NUMBER,
+          p_NEW_ASSET_QUANTITY    NUMBER,
+          p_OLD_FA_BOOK_TYPE_CODE    VARCHAR2,
+          p_NEW_FA_BOOK_TYPE_CODE    VARCHAR2,
+          p_OLD_FA_LOCATION_ID    NUMBER,
+          p_NEW_FA_LOCATION_ID    NUMBER,
+          p_OLD_UPDATE_STATUS    VARCHAR2,
+          p_NEW_UPDATE_STATUS    VARCHAR2,
+          p_OLD_FA_SYNC_FLAG    VARCHAR2,
+          p_NEW_FA_SYNC_FLAG    VARCHAR2,
+          p_OLD_FA_MASS_ADDITION_ID    NUMBER,
+          p_NEW_FA_MASS_ADDITION_ID    NUMBER,
+          p_OLD_CREATION_COMPLETE_FLAG    VARCHAR2,
+          p_NEW_CREATION_COMPLETE_FLAG    VARCHAR2,
+          p_FULL_DUMP_FLAG    VARCHAR2,
+          p_CREATED_BY    NUMBER,
+          p_CREATION_DATE    DATE,
+          p_LAST_UPDATED_BY    NUMBER,
+          p_LAST_UPDATE_DATE    DATE,
+          p_LAST_UPDATE_LOGIN    NUMBER,
+          p_OBJECT_VERSION_NUMBER    NUMBER,
+          p_OLD_ACTIVE_START_DATE    DATE,
+          p_NEW_ACTIVE_START_DATE    DATE,
+          p_OLD_ACTIVE_END_DATE    DATE,
+          p_NEW_ACTIVE_END_DATE    DATE);
+
+PROCEDURE Lock_Row(
+          p_INSTANCE_ASSET_HISTORY_ID    NUMBER,
+          p_INSTANCE_ASSET_ID    NUMBER,
+          p_TRANSACTION_ID    NUMBER,
+          p_OLD_INSTANCE_ID    NUMBER,
+          p_NEW_INSTANCE_ID    NUMBER,
+          p_OLD_FA_ASSET_ID    NUMBER,
+          p_NEW_FA_ASSET_ID    NUMBER,
+          p_OLD_ASSET_QUANTITY    NUMBER,
+          p_NEW_ASSET_QUANTITY    NUMBER,
+          p_OLD_FA_BOOK_TYPE_CODE    VARCHAR2,
+          p_NEW_FA_BOOK_TYPE_CODE    VARCHAR2,
+          p_OLD_FA_LOCATION_ID    NUMBER,
+          p_NEW_FA_LOCATION_ID    NUMBER,
+          p_OLD_UPDATE_STATUS    VARCHAR2,
+          p_NEW_UPDATE_STATUS    VARCHAR2,
+          p_OLD_FA_SYNC_FLAG    VARCHAR2,
+          p_NEW_FA_SYNC_FLAG    VARCHAR2,
+          p_OLD_FA_MASS_ADDITION_ID    NUMBER,
+          p_NEW_FA_MASS_ADDITION_ID    NUMBER,
+          p_OLD_CREATION_COMPLETE_FLAG    VARCHAR2,
+          p_NEW_CREATION_COMPLETE_FLAG    VARCHAR2,
+          p_FULL_DUMP_FLAG    VARCHAR2,
+          p_CREATED_BY    NUMBER,
+          p_CREATION_DATE    DATE,
+          p_LAST_UPDATED_BY    NUMBER,
+          p_LAST_UPDATE_DATE    DATE,
+          p_LAST_UPDATE_LOGIN    NUMBER,
+          p_OBJECT_VERSION_NUMBER    NUMBER,
+          p_OLD_ACTIVE_START_DATE    DATE,
+          p_NEW_ACTIVE_START_DATE    DATE,
+          p_OLD_ACTIVE_END_DATE    DATE,
+          p_NEW_ACTIVE_END_DATE    DATE);
+
+PROCEDURE Delete_Row(
+    p_INSTANCE_ASSET_HISTORY_ID  NUMBER);
+
+End CSI_I_ASSETS_H_PKG;
+
+
+ 
+
+/

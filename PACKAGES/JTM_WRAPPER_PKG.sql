@@ -1,0 +1,21 @@
+--------------------------------------------------------
+--  DDL for Package JTM_WRAPPER_PKG
+--------------------------------------------------------
+
+  CREATE OR REPLACE EDITIONABLE PACKAGE "APPS"."JTM_WRAPPER_PKG" AUTHID CURRENT_USER AS
+/* $Header: jtmwrpps.pls 120.1 2005/08/24 02:21:33 saradhak noship $ */
+
+PROCEDURE POPULATE_ACCESS_RECORDS( P_USER_ID IN NUMBER );
+
+PROCEDURE DELETE_ACCESS_RECORDS( P_USER_ID IN NUMBER );
+
+PROCEDURE APPLY_CLIENT_CHANGES( P_USER_NAME IN VARCHAR2
+                              , P_TRAN_ID   IN NUMBER );
+
+FUNCTION CHECK_OLITE_SCHEMA RETURN VARCHAR2;
+
+END JTM_WRAPPER_PKG;
+
+ 
+
+/

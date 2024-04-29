@@ -1,0 +1,69 @@
+--------------------------------------------------------
+--  DDL for Package IBC_DIRECTORY_NODE_RELS_PKG
+--------------------------------------------------------
+
+  CREATE OR REPLACE EDITIONABLE PACKAGE "APPS"."IBC_DIRECTORY_NODE_RELS_PKG" AUTHID CURRENT_USER AS
+/* $Header: ibctdrls.pls 120.1 2005/07/12 01:52:06 appldev ship $*/
+
+-- Purpose: Table Handler for Ibc_Directory_Node_Rels table.
+
+-- MODIFICATION HISTORY
+-- Person            Date        Comments
+-- ---------         ------      ------------------------------------------
+-- Sri Rangarajan    01/06/2002      Created Package
+-- vicho	     11/05/2002     Remove G_MISS defaulting on UPDATE_ROW
+-- Sharma	     07/04/2005  Modified LOAD_ROW and created
+--				 LOAD_SEED_ROW for R12 LCT standards bug 4411674
+
+PROCEDURE INSERT_ROW (
+  x_ROWID  OUT NOCOPY VARCHAR2,
+  px_Directory_Node_Rel_ID IN OUT NOCOPY NUMBER,
+  p_CHILD_DIR_NODE_ID IN NUMBER,
+  p_PARENT_DIR_NODE_ID IN NUMBER,
+  p_OBJECT_VERSION_NUMBER IN NUMBER,
+  p_CREATION_DATE IN DATE 	  		DEFAULT NULL,
+  p_CREATED_BY IN NUMBER	  		DEFAULT NULL,
+  p_LAST_UPDATE_DATE IN DATE  		DEFAULT NULL,
+  p_LAST_UPDATED_BY IN NUMBER 		DEFAULT NULL,
+  p_LAST_UPDATE_LOGIN IN NUMBER		DEFAULT NULL
+);
+
+PROCEDURE LOCK_ROW (
+  p_Directory_Node_Rel_ID IN NUMBER,
+  p_OBJECT_VERSION_NUMBER IN NUMBER
+);
+PROCEDURE UPDATE_ROW (
+p_Directory_Node_Rel_ID	IN  NUMBER,
+p_CHILD_DIR_NODE_ID	IN  NUMBER  DEFAULT  NULL,
+p_LAST_UPDATED_BY	IN  NUMBER  DEFAULT  NULL,
+p_LAST_UPDATE_DATE	IN  DATE DEFAULT  NULL,
+p_LAST_UPDATE_LOGIN	IN  NUMBER DEFAULT  NULL,
+p_OBJECT_VERSION_NUMBER	IN  NUMBER DEFAULT  NULL,
+p_PARENT_DIR_NODE_ID    IN  NUMBER DEFAULT  NULL
+);
+PROCEDURE DELETE_ROW (
+p_Directory_Node_Rel_ID IN  NUMBER
+);
+
+PROCEDURE LOAD_ROW (
+  p_UPLOAD_MODE	  IN VARCHAR2,
+  p_DIRECTORY_NODE_REL_ID   IN  NUMBER,
+  p_CHILD_DIR_NODE_ID    IN  NUMBER,
+  p_PARENT_DIR_NODE_ID    IN  NUMBER,
+  p_OWNER 	IN VARCHAR2,
+  p_LAST_UPDATE_DATE IN VARCHAR2);
+
+PROCEDURE LOAD_SEED_ROW (
+  p_UPLOAD_MODE	  IN VARCHAR2,
+  p_DIRECTORY_NODE_REL_ID   IN  NUMBER,
+  p_CHILD_DIR_NODE_ID    IN  NUMBER,
+  p_PARENT_DIR_NODE_ID    IN  NUMBER,
+  p_OWNER 	IN VARCHAR2,
+  p_LAST_UPDATE_DATE IN VARCHAR2);
+
+END Ibc_Directory_Node_Rels_Pkg;
+
+
+ 
+
+/

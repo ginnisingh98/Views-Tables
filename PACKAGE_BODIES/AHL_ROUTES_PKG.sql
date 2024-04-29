@@ -1,0 +1,781 @@
+--------------------------------------------------------
+--  DDL for Package Body AHL_ROUTES_PKG
+--------------------------------------------------------
+
+  CREATE OR REPLACE EDITIONABLE PACKAGE BODY "APPS"."AHL_ROUTES_PKG" as
+/* $Header: AHLLROUB.pls 120.0.12010000.3 2008/11/23 14:24:35 bachandr ship $ */
+procedure INSERT_ROW (
+  X_ROWID in out NOCOPY VARCHAR2,
+  X_ROUTE_ID in NUMBER,
+  X_QA_INSPECTION_TYPE in VARCHAR2,
+  X_ENABLED_FLAG in VARCHAR2,
+  X_SUMMARY_FLAG in VARCHAR2,
+  X_START_DATE_ACTIVE in DATE,
+  X_END_DATE_ACTIVE in DATE,
+  X_SEGMENT15 in VARCHAR2,
+  X_OPERATOR_PARTY_ID in NUMBER,
+  X_TIME_SPAN in NUMBER,
+  X_SERVICE_ITEM_ID in NUMBER,
+  X_SERVICE_ITEM_ORG_ID in NUMBER,
+  X_TASK_TEMPLATE_GROUP_ID in NUMBER,
+  X_ACCOUNTING_CLASS_CODE in VARCHAR2,
+  X_ACCOUNTING_CLASS_ORG_ID in NUMBER,
+  X_SUB_ZONE_CODE in VARCHAR2,
+  X_SEGMENT1 in VARCHAR2,
+  X_SEGMENT2 in VARCHAR2,
+  X_SEGMENT3 in VARCHAR2,
+  X_SEGMENT4 in VARCHAR2,
+  X_SEGMENT5 in VARCHAR2,
+  X_SEGMENT6 in VARCHAR2,
+  X_SEGMENT7 in VARCHAR2,
+  X_SEGMENT8 in VARCHAR2,
+  X_SEGMENT9 in VARCHAR2,
+  X_SEGMENT10 in VARCHAR2,
+  X_SEGMENT11 in VARCHAR2,
+  X_SEGMENT12 in VARCHAR2,
+  X_SEGMENT13 in VARCHAR2,
+  X_SEGMENT14 in VARCHAR2,
+  X_OBJECT_VERSION_NUMBER in NUMBER,
+  X_ROUTE_NO in VARCHAR2,
+  X_APPLICATION_USG_CODE  IN  VARCHAR2,
+  X_REVISION_NUMBER in NUMBER,
+  X_REVISION_STATUS_CODE in VARCHAR2,
+  X_UNIT_RECEIPT_UPDATE_FLAG in VARCHAR2,
+  X_PRODUCT_TYPE_CODE in VARCHAR2,
+  --bachandr Enigma Phase I changes -- start
+  X_MODEL_CODE in VARCHAR2,
+  X_ENIGMA_PUBLISH_DATE in DATE,
+  X_ENIGMA_DOC_ID in VARCHAR2,
+  X_ENIGMA_ROUTE_ID in VARCHAR2,
+  X_FILE_ID in NUMBER,
+  --bachandr Enigma Phase I changes -- end
+  X_ZONE_CODE in VARCHAR2,
+  X_ROUTE_TYPE_CODE in VARCHAR2,
+  X_PROCESS_CODE in VARCHAR2,
+  X_ATTRIBUTE_CATEGORY in VARCHAR2,
+  X_ATTRIBUTE1 in VARCHAR2,
+  X_ATTRIBUTE2 in VARCHAR2,
+  X_ATTRIBUTE3 in VARCHAR2,
+  X_ATTRIBUTE4 in VARCHAR2,
+  X_ATTRIBUTE5 in VARCHAR2,
+  X_ATTRIBUTE6 in VARCHAR2,
+  X_ATTRIBUTE7 in VARCHAR2,
+  X_ATTRIBUTE8 in VARCHAR2,
+  X_ATTRIBUTE9 in VARCHAR2,
+  X_ATTRIBUTE10 in VARCHAR2,
+  X_ATTRIBUTE11 in VARCHAR2,
+  X_ATTRIBUTE12 in VARCHAR2,
+  X_ATTRIBUTE13 in VARCHAR2,
+  X_ATTRIBUTE14 in VARCHAR2,
+  X_ATTRIBUTE15 in VARCHAR2,
+  X_TITLE in VARCHAR2,
+  X_REMARKS in VARCHAR2,
+  X_REVISION_NOTES in VARCHAR2,
+  X_CREATION_DATE in DATE,
+  X_CREATED_BY in NUMBER,
+  X_LAST_UPDATE_DATE in DATE,
+  X_LAST_UPDATED_BY in NUMBER,
+  X_LAST_UPDATE_LOGIN in NUMBER
+) is
+  cursor C is select ROWID from AHL_ROUTES_B
+    where ROUTE_ID = X_ROUTE_ID
+    ;
+begin
+  insert into AHL_ROUTES_B (
+    QA_INSPECTION_TYPE,
+    ENABLED_FLAG,
+    SUMMARY_FLAG,
+    START_DATE_ACTIVE,
+    END_DATE_ACTIVE,
+    SEGMENT15,
+    OPERATOR_PARTY_ID,
+    TIME_SPAN,
+    SERVICE_ITEM_ID,
+    SERVICE_ITEM_ORG_ID,
+    TASK_TEMPLATE_GROUP_ID,
+    ACCOUNTING_CLASS_CODE,
+    ACCOUNTING_CLASS_ORG_ID,
+    SUB_ZONE_CODE,
+    SEGMENT1,
+    SEGMENT2,
+    SEGMENT3,
+    SEGMENT4,
+    SEGMENT5,
+    SEGMENT6,
+    SEGMENT7,
+    SEGMENT8,
+    SEGMENT9,
+    SEGMENT10,
+    SEGMENT11,
+    SEGMENT12,
+    SEGMENT13,
+    SEGMENT14,
+    ROUTE_ID,
+    OBJECT_VERSION_NUMBER,
+    ROUTE_NO,
+    APPLICATION_USG_CODE,
+    REVISION_NUMBER,
+    REVISION_STATUS_CODE,
+    UNIT_RECEIPT_UPDATE_FLAG,
+    PRODUCT_TYPE_CODE,
+    --bachandr Enigma Phase I changes -- start
+    MODEL_CODE,
+    ENIGMA_PUBLISH_DATE,
+    ENIGMA_DOC_ID,
+    ENIGMA_ROUTE_ID,
+    FILE_ID,
+    --bachandr Enigma Phase I changes -- end
+    ZONE_CODE,
+    ROUTE_TYPE_CODE,
+    PROCESS_CODE,
+    ATTRIBUTE_CATEGORY,
+    ATTRIBUTE1,
+    ATTRIBUTE2,
+    ATTRIBUTE3,
+    ATTRIBUTE4,
+    ATTRIBUTE5,
+    ATTRIBUTE6,
+    ATTRIBUTE7,
+    ATTRIBUTE8,
+    ATTRIBUTE9,
+    ATTRIBUTE10,
+    ATTRIBUTE11,
+    ATTRIBUTE12,
+    ATTRIBUTE13,
+    ATTRIBUTE14,
+    ATTRIBUTE15,
+    CREATION_DATE,
+    CREATED_BY,
+    LAST_UPDATE_DATE,
+    LAST_UPDATED_BY,
+    LAST_UPDATE_LOGIN
+  ) values (
+    X_QA_INSPECTION_TYPE,
+    X_ENABLED_FLAG,
+    X_SUMMARY_FLAG,
+    X_START_DATE_ACTIVE,
+    X_END_DATE_ACTIVE,
+    X_SEGMENT15,
+    X_OPERATOR_PARTY_ID,
+    X_TIME_SPAN,
+    X_SERVICE_ITEM_ID,
+    X_SERVICE_ITEM_ORG_ID,
+    X_TASK_TEMPLATE_GROUP_ID,
+    X_ACCOUNTING_CLASS_CODE,
+    X_ACCOUNTING_CLASS_ORG_ID,
+    X_SUB_ZONE_CODE,
+    X_SEGMENT1,
+    X_SEGMENT2,
+    X_SEGMENT3,
+    X_SEGMENT4,
+    X_SEGMENT5,
+    X_SEGMENT6,
+    X_SEGMENT7,
+    X_SEGMENT8,
+    X_SEGMENT9,
+    X_SEGMENT10,
+    X_SEGMENT11,
+    X_SEGMENT12,
+    X_SEGMENT13,
+    X_SEGMENT14,
+    X_ROUTE_ID,
+    X_OBJECT_VERSION_NUMBER,
+    X_ROUTE_NO,
+    X_APPLICATION_USG_CODE,
+    X_REVISION_NUMBER,
+    X_REVISION_STATUS_CODE,
+    X_UNIT_RECEIPT_UPDATE_FLAG,
+    X_PRODUCT_TYPE_CODE,
+    --bachandr Enigma Phase I changes -- start
+    X_MODEL_CODE,
+    X_ENIGMA_PUBLISH_DATE,
+    X_ENIGMA_DOC_ID,
+    X_ENIGMA_ROUTE_ID,
+    X_FILE_ID,
+    --bachandr Enigma Phase I changes -- end
+    X_ZONE_CODE,
+    X_ROUTE_TYPE_CODE,
+    X_PROCESS_CODE,
+    X_ATTRIBUTE_CATEGORY,
+    X_ATTRIBUTE1,
+    X_ATTRIBUTE2,
+    X_ATTRIBUTE3,
+    X_ATTRIBUTE4,
+    X_ATTRIBUTE5,
+    X_ATTRIBUTE6,
+    X_ATTRIBUTE7,
+    X_ATTRIBUTE8,
+    X_ATTRIBUTE9,
+    X_ATTRIBUTE10,
+    X_ATTRIBUTE11,
+    X_ATTRIBUTE12,
+    X_ATTRIBUTE13,
+    X_ATTRIBUTE14,
+    X_ATTRIBUTE15,
+    X_CREATION_DATE,
+    X_CREATED_BY,
+    X_LAST_UPDATE_DATE,
+    X_LAST_UPDATED_BY,
+    X_LAST_UPDATE_LOGIN
+  );
+
+  insert into AHL_ROUTES_TL (
+    REMARKS,
+    REVISION_NOTES,
+    ROUTE_ID,
+    LAST_UPDATE_DATE,
+    LAST_UPDATED_BY,
+    CREATION_DATE,
+    CREATED_BY,
+    LAST_UPDATE_LOGIN,
+    TITLE,
+    LANGUAGE,
+    SOURCE_LANG
+  ) select
+    X_REMARKS,
+    X_REVISION_NOTES,
+    X_ROUTE_ID,
+    X_LAST_UPDATE_DATE,
+    X_LAST_UPDATED_BY,
+    X_CREATION_DATE,
+    X_CREATED_BY,
+    X_LAST_UPDATE_LOGIN,
+    X_TITLE,
+    L.LANGUAGE_CODE,
+    userenv('LANG')
+  from FND_LANGUAGES L
+  where L.INSTALLED_FLAG in ('I', 'B')
+  and not exists
+    (select NULL
+    from AHL_ROUTES_TL T
+    where T.ROUTE_ID = X_ROUTE_ID
+    and T.LANGUAGE = L.LANGUAGE_CODE);
+
+  open c;
+  fetch c into X_ROWID;
+  if (c%notfound) then
+    close c;
+    raise no_data_found;
+  end if;
+  close c;
+
+end INSERT_ROW;
+
+procedure LOCK_ROW (
+  X_ROUTE_ID in NUMBER,
+  X_QA_INSPECTION_TYPE in VARCHAR2,
+  X_ENABLED_FLAG in VARCHAR2,
+  X_SUMMARY_FLAG in VARCHAR2,
+  X_START_DATE_ACTIVE in DATE,
+  X_END_DATE_ACTIVE in DATE,
+  X_SEGMENT15 in VARCHAR2,
+  X_OPERATOR_PARTY_ID in NUMBER,
+  X_TIME_SPAN in NUMBER,
+  X_SERVICE_ITEM_ID in NUMBER,
+  X_SERVICE_ITEM_ORG_ID in NUMBER,
+  X_TASK_TEMPLATE_GROUP_ID in NUMBER,
+  X_ACCOUNTING_CLASS_CODE in VARCHAR2,
+  X_ACCOUNTING_CLASS_ORG_ID in NUMBER,
+  X_SUB_ZONE_CODE in VARCHAR2,
+  X_SEGMENT1 in VARCHAR2,
+  X_SEGMENT2 in VARCHAR2,
+  X_SEGMENT3 in VARCHAR2,
+  X_SEGMENT4 in VARCHAR2,
+  X_SEGMENT5 in VARCHAR2,
+  X_SEGMENT6 in VARCHAR2,
+  X_SEGMENT7 in VARCHAR2,
+  X_SEGMENT8 in VARCHAR2,
+  X_SEGMENT9 in VARCHAR2,
+  X_SEGMENT10 in VARCHAR2,
+  X_SEGMENT11 in VARCHAR2,
+  X_SEGMENT12 in VARCHAR2,
+  X_SEGMENT13 in VARCHAR2,
+  X_SEGMENT14 in VARCHAR2,
+  X_OBJECT_VERSION_NUMBER in NUMBER,
+  X_ROUTE_NO in VARCHAR2,
+  X_APPLICATION_USG_CODE    IN VARCHAR2,
+  X_REVISION_NUMBER in NUMBER,
+  X_REVISION_STATUS_CODE in VARCHAR2,
+  X_UNIT_RECEIPT_UPDATE_FLAG in VARCHAR2,
+  X_PRODUCT_TYPE_CODE in VARCHAR2,
+  --bachandr Enigma Phase I changes -- start
+  X_MODEL_CODE in VARCHAR2,
+  --bachandr Enigma Phase I changes -- end
+  X_ZONE_CODE in VARCHAR2,
+  X_ROUTE_TYPE_CODE in VARCHAR2,
+  X_PROCESS_CODE in VARCHAR2,
+  X_ATTRIBUTE_CATEGORY in VARCHAR2,
+  X_ATTRIBUTE1 in VARCHAR2,
+  X_ATTRIBUTE2 in VARCHAR2,
+  X_ATTRIBUTE3 in VARCHAR2,
+  X_ATTRIBUTE4 in VARCHAR2,
+  X_ATTRIBUTE5 in VARCHAR2,
+  X_ATTRIBUTE6 in VARCHAR2,
+  X_ATTRIBUTE7 in VARCHAR2,
+  X_ATTRIBUTE8 in VARCHAR2,
+  X_ATTRIBUTE9 in VARCHAR2,
+  X_ATTRIBUTE10 in VARCHAR2,
+  X_ATTRIBUTE11 in VARCHAR2,
+  X_ATTRIBUTE12 in VARCHAR2,
+  X_ATTRIBUTE13 in VARCHAR2,
+  X_ATTRIBUTE14 in VARCHAR2,
+  X_ATTRIBUTE15 in VARCHAR2,
+  X_TITLE in VARCHAR2,
+  X_REMARKS in VARCHAR2,
+  X_REVISION_NOTES in VARCHAR2
+) is
+  cursor c is select
+      QA_INSPECTION_TYPE,
+      ENABLED_FLAG,
+      SUMMARY_FLAG,
+      START_DATE_ACTIVE,
+      END_DATE_ACTIVE,
+      SEGMENT15,
+      OPERATOR_PARTY_ID,
+      TIME_SPAN,
+      SERVICE_ITEM_ID,
+      SERVICE_ITEM_ORG_ID,
+      TASK_TEMPLATE_GROUP_ID,
+      ACCOUNTING_CLASS_CODE,
+      ACCOUNTING_CLASS_ORG_ID,
+      SUB_ZONE_CODE,
+      SEGMENT1,
+      SEGMENT2,
+      SEGMENT3,
+      SEGMENT4,
+      SEGMENT5,
+      SEGMENT6,
+      SEGMENT7,
+      SEGMENT8,
+      SEGMENT9,
+      SEGMENT10,
+      SEGMENT11,
+      SEGMENT12,
+      SEGMENT13,
+      SEGMENT14,
+      OBJECT_VERSION_NUMBER,
+      ROUTE_NO,
+      APPLICATION_USG_CODE,
+      REVISION_NUMBER,
+      REVISION_STATUS_CODE,
+      UNIT_RECEIPT_UPDATE_FLAG,
+      PRODUCT_TYPE_CODE,
+      --bachandr Enigma Phase I changes -- start
+      MODEL_CODE,
+      --bachandr Enigma Phase I changes -- end
+      ZONE_CODE,
+      ROUTE_TYPE_CODE,
+      PROCESS_CODE,
+      ATTRIBUTE_CATEGORY,
+      ATTRIBUTE1,
+      ATTRIBUTE2,
+      ATTRIBUTE3,
+      ATTRIBUTE4,
+      ATTRIBUTE5,
+      ATTRIBUTE6,
+      ATTRIBUTE7,
+      ATTRIBUTE8,
+      ATTRIBUTE9,
+      ATTRIBUTE10,
+      ATTRIBUTE11,
+      ATTRIBUTE12,
+      ATTRIBUTE13,
+      ATTRIBUTE14,
+      ATTRIBUTE15
+    from AHL_ROUTES_B
+    where ROUTE_ID = X_ROUTE_ID
+    for update of ROUTE_ID nowait;
+  recinfo c%rowtype;
+
+  cursor c1 is select
+      TITLE,
+      REMARKS,
+      REVISION_NOTES,
+      decode(LANGUAGE, userenv('LANG'), 'Y', 'N') BASELANG
+    from AHL_ROUTES_TL
+    where ROUTE_ID = X_ROUTE_ID
+    and userenv('LANG') in (LANGUAGE, SOURCE_LANG)
+    for update of ROUTE_ID nowait;
+begin
+  open c;
+  fetch c into recinfo;
+  if (c%notfound) then
+    close c;
+    fnd_message.set_name('FND', 'FORM_RECORD_DELETED');
+    app_exception.raise_exception;
+  end if;
+  close c;
+  if (    ((recinfo.QA_INSPECTION_TYPE = X_QA_INSPECTION_TYPE)
+           OR ((recinfo.QA_INSPECTION_TYPE is null) AND (X_QA_INSPECTION_TYPE is null)))
+      AND (recinfo.ENABLED_FLAG = X_ENABLED_FLAG)
+      AND (recinfo.SUMMARY_FLAG = X_SUMMARY_FLAG)
+      AND ((recinfo.START_DATE_ACTIVE = X_START_DATE_ACTIVE)
+           OR ((recinfo.START_DATE_ACTIVE is null) AND (X_START_DATE_ACTIVE is null)))
+      AND ((recinfo.END_DATE_ACTIVE = X_END_DATE_ACTIVE)
+           OR ((recinfo.END_DATE_ACTIVE is null) AND (X_END_DATE_ACTIVE is null)))
+      AND ((recinfo.SEGMENT15 = X_SEGMENT15)
+           OR ((recinfo.SEGMENT15 is null) AND (X_SEGMENT15 is null)))
+      AND ((recinfo.OPERATOR_PARTY_ID = X_OPERATOR_PARTY_ID)
+           OR ((recinfo.OPERATOR_PARTY_ID is null) AND (X_OPERATOR_PARTY_ID is null)))
+      AND ((recinfo.TIME_SPAN = X_TIME_SPAN)
+           OR ((recinfo.TIME_SPAN is null) AND (X_TIME_SPAN is null)))
+      AND ((recinfo.SERVICE_ITEM_ID = X_SERVICE_ITEM_ID)
+           OR ((recinfo.SERVICE_ITEM_ID is null) AND (X_SERVICE_ITEM_ID is null)))
+      AND ((recinfo.SERVICE_ITEM_ORG_ID = X_SERVICE_ITEM_ORG_ID)
+           OR ((recinfo.SERVICE_ITEM_ORG_ID is null) AND (X_SERVICE_ITEM_ORG_ID is null)))
+      AND ((recinfo.TASK_TEMPLATE_GROUP_ID = X_TASK_TEMPLATE_GROUP_ID)
+           OR ((recinfo.TASK_TEMPLATE_GROUP_ID is null) AND (X_TASK_TEMPLATE_GROUP_ID is null)))
+      AND ((recinfo.ACCOUNTING_CLASS_CODE = X_ACCOUNTING_CLASS_CODE)
+           OR ((recinfo.ACCOUNTING_CLASS_CODE is null) AND (X_ACCOUNTING_CLASS_CODE is null)))
+      AND ((recinfo.ACCOUNTING_CLASS_ORG_ID = X_ACCOUNTING_CLASS_ORG_ID)
+           OR ((recinfo.ACCOUNTING_CLASS_ORG_ID is null) AND (X_ACCOUNTING_CLASS_ORG_ID is null)))
+      AND ((recinfo.SUB_ZONE_CODE = X_SUB_ZONE_CODE)
+           OR ((recinfo.SUB_ZONE_CODE is null) AND (X_SUB_ZONE_CODE is null)))
+      AND ((recinfo.SEGMENT1 = X_SEGMENT1)
+           OR ((recinfo.SEGMENT1 is null) AND (X_SEGMENT1 is null)))
+      AND ((recinfo.SEGMENT2 = X_SEGMENT2)
+           OR ((recinfo.SEGMENT2 is null) AND (X_SEGMENT2 is null)))
+      AND ((recinfo.SEGMENT3 = X_SEGMENT3)
+           OR ((recinfo.SEGMENT3 is null) AND (X_SEGMENT3 is null)))
+      AND ((recinfo.SEGMENT4 = X_SEGMENT4)
+           OR ((recinfo.SEGMENT4 is null) AND (X_SEGMENT4 is null)))
+      AND ((recinfo.SEGMENT5 = X_SEGMENT5)
+           OR ((recinfo.SEGMENT5 is null) AND (X_SEGMENT5 is null)))
+      AND ((recinfo.SEGMENT6 = X_SEGMENT6)
+           OR ((recinfo.SEGMENT6 is null) AND (X_SEGMENT6 is null)))
+      AND ((recinfo.SEGMENT7 = X_SEGMENT7)
+           OR ((recinfo.SEGMENT7 is null) AND (X_SEGMENT7 is null)))
+      AND ((recinfo.SEGMENT8 = X_SEGMENT8)
+           OR ((recinfo.SEGMENT8 is null) AND (X_SEGMENT8 is null)))
+      AND ((recinfo.SEGMENT9 = X_SEGMENT9)
+           OR ((recinfo.SEGMENT9 is null) AND (X_SEGMENT9 is null)))
+      AND ((recinfo.SEGMENT10 = X_SEGMENT10)
+           OR ((recinfo.SEGMENT10 is null) AND (X_SEGMENT10 is null)))
+      AND ((recinfo.SEGMENT11 = X_SEGMENT11)
+           OR ((recinfo.SEGMENT11 is null) AND (X_SEGMENT11 is null)))
+      AND ((recinfo.SEGMENT12 = X_SEGMENT12)
+           OR ((recinfo.SEGMENT12 is null) AND (X_SEGMENT12 is null)))
+      AND ((recinfo.SEGMENT13 = X_SEGMENT13)
+           OR ((recinfo.SEGMENT13 is null) AND (X_SEGMENT13 is null)))
+      AND ((recinfo.SEGMENT14 = X_SEGMENT14)
+           OR ((recinfo.SEGMENT14 is null) AND (X_SEGMENT14 is null)))
+      AND (recinfo.OBJECT_VERSION_NUMBER = X_OBJECT_VERSION_NUMBER)
+      AND (recinfo.ROUTE_NO = X_ROUTE_NO)
+      AND (recinfo.APPLICATION_USG_CODE = X_APPLICATION_USG_CODE)
+      AND (recinfo.REVISION_NUMBER = X_REVISION_NUMBER)
+      AND (recinfo.REVISION_STATUS_CODE = X_REVISION_STATUS_CODE)
+      AND (recinfo.UNIT_RECEIPT_UPDATE_FLAG = X_UNIT_RECEIPT_UPDATE_FLAG)
+      AND ((recinfo.PRODUCT_TYPE_CODE = X_PRODUCT_TYPE_CODE)
+           OR ((recinfo.PRODUCT_TYPE_CODE is null) AND (X_PRODUCT_TYPE_CODE is null)))
+      --bachandr Enigma Phase I changes -- start
+      AND ((recinfo.MODEL_CODE = X_MODEL_CODE)
+           OR ((recinfo.MODEL_CODE is null) AND (X_MODEL_CODE is null)))
+      --bachandr Enigma Phase I changes -- end
+      AND ((recinfo.ZONE_CODE = X_ZONE_CODE)
+           OR ((recinfo.ZONE_CODE is null) AND (X_ZONE_CODE is null)))
+      AND ((recinfo.ROUTE_TYPE_CODE = X_ROUTE_TYPE_CODE)
+           OR ((recinfo.ROUTE_TYPE_CODE is null) AND (X_ROUTE_TYPE_CODE is null)))
+      AND ((recinfo.PROCESS_CODE = X_PROCESS_CODE)
+           OR ((recinfo.PROCESS_CODE is null) AND (X_PROCESS_CODE is null)))
+      AND ((recinfo.ATTRIBUTE_CATEGORY = X_ATTRIBUTE_CATEGORY)
+           OR ((recinfo.ATTRIBUTE_CATEGORY is null) AND (X_ATTRIBUTE_CATEGORY is null)))
+      AND ((recinfo.ATTRIBUTE1 = X_ATTRIBUTE1)
+           OR ((recinfo.ATTRIBUTE1 is null) AND (X_ATTRIBUTE1 is null)))
+      AND ((recinfo.ATTRIBUTE2 = X_ATTRIBUTE2)
+           OR ((recinfo.ATTRIBUTE2 is null) AND (X_ATTRIBUTE2 is null)))
+      AND ((recinfo.ATTRIBUTE3 = X_ATTRIBUTE3)
+           OR ((recinfo.ATTRIBUTE3 is null) AND (X_ATTRIBUTE3 is null)))
+      AND ((recinfo.ATTRIBUTE4 = X_ATTRIBUTE4)
+           OR ((recinfo.ATTRIBUTE4 is null) AND (X_ATTRIBUTE4 is null)))
+      AND ((recinfo.ATTRIBUTE5 = X_ATTRIBUTE5)
+           OR ((recinfo.ATTRIBUTE5 is null) AND (X_ATTRIBUTE5 is null)))
+      AND ((recinfo.ATTRIBUTE6 = X_ATTRIBUTE6)
+           OR ((recinfo.ATTRIBUTE6 is null) AND (X_ATTRIBUTE6 is null)))
+      AND ((recinfo.ATTRIBUTE7 = X_ATTRIBUTE7)
+           OR ((recinfo.ATTRIBUTE7 is null) AND (X_ATTRIBUTE7 is null)))
+      AND ((recinfo.ATTRIBUTE8 = X_ATTRIBUTE8)
+           OR ((recinfo.ATTRIBUTE8 is null) AND (X_ATTRIBUTE8 is null)))
+      AND ((recinfo.ATTRIBUTE9 = X_ATTRIBUTE9)
+           OR ((recinfo.ATTRIBUTE9 is null) AND (X_ATTRIBUTE9 is null)))
+      AND ((recinfo.ATTRIBUTE10 = X_ATTRIBUTE10)
+           OR ((recinfo.ATTRIBUTE10 is null) AND (X_ATTRIBUTE10 is null)))
+      AND ((recinfo.ATTRIBUTE11 = X_ATTRIBUTE11)
+           OR ((recinfo.ATTRIBUTE11 is null) AND (X_ATTRIBUTE11 is null)))
+      AND ((recinfo.ATTRIBUTE12 = X_ATTRIBUTE12)
+           OR ((recinfo.ATTRIBUTE12 is null) AND (X_ATTRIBUTE12 is null)))
+      AND ((recinfo.ATTRIBUTE13 = X_ATTRIBUTE13)
+           OR ((recinfo.ATTRIBUTE13 is null) AND (X_ATTRIBUTE13 is null)))
+      AND ((recinfo.ATTRIBUTE14 = X_ATTRIBUTE14)
+           OR ((recinfo.ATTRIBUTE14 is null) AND (X_ATTRIBUTE14 is null)))
+      AND ((recinfo.ATTRIBUTE15 = X_ATTRIBUTE15)
+           OR ((recinfo.ATTRIBUTE15 is null) AND (X_ATTRIBUTE15 is null)))
+  ) then
+    null;
+  else
+    fnd_message.set_name('FND', 'FORM_RECORD_CHANGED');
+    app_exception.raise_exception;
+  end if;
+
+  for tlinfo in c1 loop
+    if (tlinfo.BASELANG = 'Y') then
+      if (    (tlinfo.TITLE = X_TITLE)
+          AND ((tlinfo.REMARKS = X_REMARKS)
+               OR ((tlinfo.REMARKS is null) AND (X_REMARKS is null)))
+          AND ((tlinfo.REVISION_NOTES = X_REVISION_NOTES)
+               OR ((tlinfo.REVISION_NOTES is null) AND (X_REVISION_NOTES is null)))
+      ) then
+        null;
+      else
+        fnd_message.set_name('FND', 'FORM_RECORD_CHANGED');
+        app_exception.raise_exception;
+      end if;
+    end if;
+  end loop;
+  return;
+end LOCK_ROW;
+
+procedure UPDATE_ROW (
+  X_ROUTE_ID in NUMBER,
+  X_QA_INSPECTION_TYPE in VARCHAR2,
+  X_ENABLED_FLAG in VARCHAR2,
+  X_SUMMARY_FLAG in VARCHAR2,
+  X_START_DATE_ACTIVE in DATE,
+  X_END_DATE_ACTIVE in DATE,
+  X_SEGMENT15 in VARCHAR2,
+  X_OPERATOR_PARTY_ID in NUMBER,
+  X_TIME_SPAN in NUMBER,
+  X_SERVICE_ITEM_ID in NUMBER,
+  X_SERVICE_ITEM_ORG_ID in NUMBER,
+  X_TASK_TEMPLATE_GROUP_ID in NUMBER,
+  X_ACCOUNTING_CLASS_CODE in VARCHAR2,
+  X_ACCOUNTING_CLASS_ORG_ID in NUMBER,
+  X_SUB_ZONE_CODE in VARCHAR2,
+  X_SEGMENT1 in VARCHAR2,
+  X_SEGMENT2 in VARCHAR2,
+  X_SEGMENT3 in VARCHAR2,
+  X_SEGMENT4 in VARCHAR2,
+  X_SEGMENT5 in VARCHAR2,
+  X_SEGMENT6 in VARCHAR2,
+  X_SEGMENT7 in VARCHAR2,
+  X_SEGMENT8 in VARCHAR2,
+  X_SEGMENT9 in VARCHAR2,
+  X_SEGMENT10 in VARCHAR2,
+  X_SEGMENT11 in VARCHAR2,
+  X_SEGMENT12 in VARCHAR2,
+  X_SEGMENT13 in VARCHAR2,
+  X_SEGMENT14 in VARCHAR2,
+  X_OBJECT_VERSION_NUMBER in NUMBER,
+  X_ROUTE_NO in VARCHAR2,
+  X_REVISION_NUMBER in NUMBER,
+  X_REVISION_STATUS_CODE in VARCHAR2,
+  X_UNIT_RECEIPT_UPDATE_FLAG in VARCHAR2,
+  X_PRODUCT_TYPE_CODE in VARCHAR2,
+  --bachandr Enigma Phase I changes -- start
+  X_MODEL_CODE in VARCHAR2,
+  X_FILE_ID in NUMBER,
+  --bachandr Enigma Phase I changes -- end
+  X_ZONE_CODE in VARCHAR2,
+  X_ROUTE_TYPE_CODE in VARCHAR2,
+  X_PROCESS_CODE in VARCHAR2,
+  X_ATTRIBUTE_CATEGORY in VARCHAR2,
+  X_ATTRIBUTE1 in VARCHAR2,
+  X_ATTRIBUTE2 in VARCHAR2,
+  X_ATTRIBUTE3 in VARCHAR2,
+  X_ATTRIBUTE4 in VARCHAR2,
+  X_ATTRIBUTE5 in VARCHAR2,
+  X_ATTRIBUTE6 in VARCHAR2,
+  X_ATTRIBUTE7 in VARCHAR2,
+  X_ATTRIBUTE8 in VARCHAR2,
+  X_ATTRIBUTE9 in VARCHAR2,
+  X_ATTRIBUTE10 in VARCHAR2,
+  X_ATTRIBUTE11 in VARCHAR2,
+  X_ATTRIBUTE12 in VARCHAR2,
+  X_ATTRIBUTE13 in VARCHAR2,
+  X_ATTRIBUTE14 in VARCHAR2,
+  X_ATTRIBUTE15 in VARCHAR2,
+  X_TITLE in VARCHAR2,
+  X_REMARKS in VARCHAR2,
+  X_REVISION_NOTES in VARCHAR2,
+  X_LAST_UPDATE_DATE in DATE,
+  X_LAST_UPDATED_BY in NUMBER,
+  X_LAST_UPDATE_LOGIN in NUMBER
+) is
+begin
+  update AHL_ROUTES_B set
+    QA_INSPECTION_TYPE = X_QA_INSPECTION_TYPE,
+    ENABLED_FLAG = X_ENABLED_FLAG,
+    SUMMARY_FLAG = X_SUMMARY_FLAG,
+    START_DATE_ACTIVE = X_START_DATE_ACTIVE,
+    END_DATE_ACTIVE = X_END_DATE_ACTIVE,
+    SEGMENT15 = X_SEGMENT15,
+    OPERATOR_PARTY_ID = X_OPERATOR_PARTY_ID,
+    TIME_SPAN = X_TIME_SPAN,
+    SERVICE_ITEM_ID = X_SERVICE_ITEM_ID,
+    SERVICE_ITEM_ORG_ID = X_SERVICE_ITEM_ORG_ID,
+    TASK_TEMPLATE_GROUP_ID = X_TASK_TEMPLATE_GROUP_ID,
+    ACCOUNTING_CLASS_CODE = X_ACCOUNTING_CLASS_CODE,
+    ACCOUNTING_CLASS_ORG_ID = X_ACCOUNTING_CLASS_ORG_ID,
+    SUB_ZONE_CODE = X_SUB_ZONE_CODE,
+    SEGMENT1 = X_SEGMENT1,
+    SEGMENT2 = X_SEGMENT2,
+    SEGMENT3 = X_SEGMENT3,
+    SEGMENT4 = X_SEGMENT4,
+    SEGMENT5 = X_SEGMENT5,
+    SEGMENT6 = X_SEGMENT6,
+    SEGMENT7 = X_SEGMENT7,
+    SEGMENT8 = X_SEGMENT8,
+    SEGMENT9 = X_SEGMENT9,
+    SEGMENT10 = X_SEGMENT10,
+    SEGMENT11 = X_SEGMENT11,
+    SEGMENT12 = X_SEGMENT12,
+    SEGMENT13 = X_SEGMENT13,
+    SEGMENT14 = X_SEGMENT14,
+    OBJECT_VERSION_NUMBER = X_OBJECT_VERSION_NUMBER,
+    ROUTE_NO = X_ROUTE_NO,
+    REVISION_NUMBER = X_REVISION_NUMBER,
+    REVISION_STATUS_CODE = X_REVISION_STATUS_CODE,
+    UNIT_RECEIPT_UPDATE_FLAG = X_UNIT_RECEIPT_UPDATE_FLAG,
+    PRODUCT_TYPE_CODE = X_PRODUCT_TYPE_CODE,
+    --bachandr Enigma Phase I changes -- start
+    MODEL_CODE = X_MODEL_CODE ,
+    FILE_ID = X_FILE_ID ,
+    --bachandr Enigma Phase I changes -- end
+    ZONE_CODE = X_ZONE_CODE,
+    ROUTE_TYPE_CODE = X_ROUTE_TYPE_CODE,
+    PROCESS_CODE = X_PROCESS_CODE,
+    ATTRIBUTE_CATEGORY = X_ATTRIBUTE_CATEGORY,
+    ATTRIBUTE1 = X_ATTRIBUTE1,
+    ATTRIBUTE2 = X_ATTRIBUTE2,
+    ATTRIBUTE3 = X_ATTRIBUTE3,
+    ATTRIBUTE4 = X_ATTRIBUTE4,
+    ATTRIBUTE5 = X_ATTRIBUTE5,
+    ATTRIBUTE6 = X_ATTRIBUTE6,
+    ATTRIBUTE7 = X_ATTRIBUTE7,
+    ATTRIBUTE8 = X_ATTRIBUTE8,
+    ATTRIBUTE9 = X_ATTRIBUTE9,
+    ATTRIBUTE10 = X_ATTRIBUTE10,
+    ATTRIBUTE11 = X_ATTRIBUTE11,
+    ATTRIBUTE12 = X_ATTRIBUTE12,
+    ATTRIBUTE13 = X_ATTRIBUTE13,
+    ATTRIBUTE14 = X_ATTRIBUTE14,
+    ATTRIBUTE15 = X_ATTRIBUTE15,
+    LAST_UPDATE_DATE = X_LAST_UPDATE_DATE,
+    LAST_UPDATED_BY = X_LAST_UPDATED_BY,
+    LAST_UPDATE_LOGIN = X_LAST_UPDATE_LOGIN
+  where ROUTE_ID = X_ROUTE_ID;
+
+  if (sql%notfound) then
+    raise no_data_found;
+  end if;
+
+  update AHL_ROUTES_TL set
+    TITLE = X_TITLE,
+    REMARKS = X_REMARKS,
+    REVISION_NOTES = X_REVISION_NOTES,
+    LAST_UPDATE_DATE = X_LAST_UPDATE_DATE,
+    LAST_UPDATED_BY = X_LAST_UPDATED_BY,
+    LAST_UPDATE_LOGIN = X_LAST_UPDATE_LOGIN,
+    SOURCE_LANG = userenv('LANG')
+  where ROUTE_ID = X_ROUTE_ID
+  and userenv('LANG') in (LANGUAGE, SOURCE_LANG);
+
+  if (sql%notfound) then
+    raise no_data_found;
+  end if;
+end UPDATE_ROW;
+
+procedure DELETE_ROW (
+  X_ROUTE_ID in NUMBER
+) is
+begin
+  delete from AHL_ROUTES_TL
+  where ROUTE_ID = X_ROUTE_ID;
+
+  if (sql%notfound) then
+    raise no_data_found;
+  end if;
+
+  delete from AHL_ROUTES_B
+  where ROUTE_ID = X_ROUTE_ID;
+
+  if (sql%notfound) then
+    raise no_data_found;
+  end if;
+end DELETE_ROW;
+
+procedure ADD_LANGUAGE
+is
+begin
+  delete from AHL_ROUTES_TL T
+  where not exists
+    (select NULL
+    from AHL_ROUTES_B B
+    where B.ROUTE_ID = T.ROUTE_ID
+    );
+
+  update AHL_ROUTES_TL T set (
+      TITLE,
+      REMARKS,
+      REVISION_NOTES
+    ) = (select
+      B.TITLE,
+      B.REMARKS,
+      B.REVISION_NOTES
+    from AHL_ROUTES_TL B
+    where B.ROUTE_ID = T.ROUTE_ID
+    and B.LANGUAGE = T.SOURCE_LANG)
+  where (
+      T.ROUTE_ID,
+      T.LANGUAGE
+  ) in (select
+      SUBT.ROUTE_ID,
+      SUBT.LANGUAGE
+    from AHL_ROUTES_TL SUBB, AHL_ROUTES_TL SUBT
+    where SUBB.ROUTE_ID = SUBT.ROUTE_ID
+    and SUBB.LANGUAGE = SUBT.SOURCE_LANG
+    and (SUBB.TITLE <> SUBT.TITLE
+      or SUBB.REMARKS <> SUBT.REMARKS
+      or (SUBB.REMARKS is null and SUBT.REMARKS is not null)
+      or (SUBB.REMARKS is not null and SUBT.REMARKS is null)
+      or SUBB.REVISION_NOTES <> SUBT.REVISION_NOTES
+      or (SUBB.REVISION_NOTES is null and SUBT.REVISION_NOTES is not null)
+      or (SUBB.REVISION_NOTES is not null and SUBT.REVISION_NOTES is null)
+  ));
+
+  insert into AHL_ROUTES_TL (
+    REMARKS,
+    REVISION_NOTES,
+    ROUTE_ID,
+    LAST_UPDATE_DATE,
+    LAST_UPDATED_BY,
+    CREATION_DATE,
+    CREATED_BY,
+    LAST_UPDATE_LOGIN,
+    TITLE,
+    LANGUAGE,
+    SOURCE_LANG
+  ) select
+    B.REMARKS,
+    B.REVISION_NOTES,
+    B.ROUTE_ID,
+    B.LAST_UPDATE_DATE,
+    B.LAST_UPDATED_BY,
+    B.CREATION_DATE,
+    B.CREATED_BY,
+    B.LAST_UPDATE_LOGIN,
+    B.TITLE,
+    L.LANGUAGE_CODE,
+    B.SOURCE_LANG
+  from AHL_ROUTES_TL B, FND_LANGUAGES L
+  where L.INSTALLED_FLAG in ('I', 'B')
+  and B.LANGUAGE = userenv('LANG')
+  and not exists
+    (select NULL
+    from AHL_ROUTES_TL T
+    where T.ROUTE_ID = B.ROUTE_ID
+    and T.LANGUAGE = L.LANGUAGE_CODE);
+end ADD_LANGUAGE;
+
+end AHL_ROUTES_PKG;
+
+/

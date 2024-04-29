@@ -1,0 +1,82 @@
+--------------------------------------------------------
+--  DDL for Package Body IGI_EXP_POSITION_ACTION_PKG
+--------------------------------------------------------
+
+  CREATE OR REPLACE EDITIONABLE PACKAGE BODY "APPS"."IGI_EXP_POSITION_ACTION_PKG" AS
+--$Header: igiexpob.pls 115.5 2003/08/09 11:46:33 rgopalan ship $
+ PROCEDURE INSERT_ROW(
+        X_ROWID IN OUT NOCOPY VARCHAR2,
+        X_WKF_ID        NUMBER,
+        X_FLOW_ID       NUMBER,
+        X_STEP_NO       NUMBER,
+        X_POSITION_ID   NUMBER,
+        X_POSITION_STRUCTURE_ID NUMBER,
+        X_CREATE_DOC    VARCHAR2,
+        X_APPROVE       VARCHAR2,
+        X_REJECT        VARCHAR2,
+        X_HOLD          VARCHAR2,
+        X_PEC           VARCHAR2,
+        X_REQUISITION   VARCHAR2,
+        X_CREATION_DATE DATE,
+        X_CREATED_BY    NUMBER,
+        X_LAST_UPDATE_LOGIN NUMBER,
+        X_LAST_UPDATE_DATE DATE,
+        X_LAST_UPDATED_BY NUMBER ) IS
+ BEGIN
+NULL;
+END  INSERT_ROW;
+
+  PROCEDURE LOCK_ROW(
+        X_ROWID IN OUT NOCOPY VARCHAR2,
+        X_WKF_ID        NUMBER,
+        X_FLOW_ID       NUMBER,
+        X_STEP_NO       NUMBER,
+        X_POSITION_ID   NUMBER,
+        X_POSITION_STRUCTURE_ID NUMBER,
+        X_CREATE_DOC    VARCHAR2,
+        X_APPROVE       VARCHAR2,
+        X_REJECT        VARCHAR2,
+        X_HOLD          VARCHAR2,
+        X_PEC           VARCHAR2,
+        X_REQUISITION   VARCHAR2,
+        X_CREATION_DATE DATE,
+        X_CREATED_BY    NUMBER,
+        X_LAST_UPDATE_LOGIN NUMBER,
+        X_LAST_UPDATE_DATE DATE,
+        X_LAST_UPDATED_BY NUMBER ) IS
+  BEGIN
+NULL;
+END  LOCK_ROW;
+
+
+  PROCEDURE UPDATE_ROW(
+        X_ROWID IN OUT NOCOPY VARCHAR2,
+        X_WKF_ID        NUMBER,
+        X_FLOW_ID       NUMBER,
+        X_STEP_NO       NUMBER,
+        X_POSITION_ID   NUMBER,
+        X_POSITION_STRUCTURE_ID NUMBER,
+        X_CREATE_DOC    VARCHAR2,
+        X_APPROVE       VARCHAR2,
+        X_REJECT        VARCHAR2,
+        X_HOLD          VARCHAR2,
+        X_PEC           VARCHAR2,
+        X_REQUISITION   VARCHAR2,
+        X_CREATION_DATE DATE,
+        X_CREATED_BY    NUMBER,
+        X_LAST_UPDATE_LOGIN NUMBER,
+        X_LAST_UPDATE_DATE DATE,
+        X_LAST_UPDATED_BY NUMBER ) IS
+ BEGIN
+NULL;
+ END UPDATE_ROW;
+
+  PROCEDURE DELETE_ROW(X_ROWID VARCHAR2)
+  IS
+ BEGIN
+   NULL;
+ END DELETE_ROW;
+
+END  IGI_EXP_POSITION_ACTION_PKG;
+
+/

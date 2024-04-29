@@ -1,0 +1,16 @@
+--------------------------------------------------------
+--  DDL for Package GMS_FP_DISTRIBUTIONS_PKG
+--------------------------------------------------------
+
+  CREATE OR REPLACE EDITIONABLE PACKAGE "APPS"."GMS_FP_DISTRIBUTIONS_PKG" AUTHID CURRENT_USER AS
+  -- $Header: gmsfdtbs.pls 115.2 2002/07/04 09:23:54 gnema ship $
+
+	procedure INSERT_ROW ( P_rec GMS_FP_DISTRIBUTIONS%ROWTYPE);
+	PROCEDURE UPDATE_ROW ( P_rec GMS_FP_DISTRIBUTIONS%ROWTYPE);
+	PROCEDURE DELETE_ROW ( P_rec GMS_FP_DISTRIBUTIONS%ROWTYPE);
+	PROCEDURE LOCK_ROW ( P_rec GMS_FP_DISTRIBUTIONS%ROWTYPE);
+END GMS_FP_DISTRIBUTIONS_PKG ; -- Package spec
+
+ 
+
+/

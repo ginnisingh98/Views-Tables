@@ -1,0 +1,238 @@
+--------------------------------------------------------
+--  DDL for Package Body PA_PACCINTG_XMLP_PKG
+--------------------------------------------------------
+
+  CREATE OR REPLACE EDITIONABLE PACKAGE BODY "APPS"."PA_PACCINTG_XMLP_PKG" AS
+/* $Header: PACCINTGB.pls 120.0 2008/01/02 10:53:57 krreddy noship $ */
+  FUNCTION BEFOREREPORT RETURN BOOLEAN IS
+    L_PURGEABLE VARCHAR2(20);
+    L_MSG_COUNT NUMBER := 0;
+    L_MSG_DATA VARCHAR2(2000) := NULL;
+    L_RETURN_STATUS VARCHAR2(1);
+    NUMBER_OF_MESSAGES NUMBER;
+    MESSAGE_BUF VARCHAR2(2000);
+    INIT_FAILURE EXCEPTION;
+  BEGIN
+    /*SRW.MESSAGE('100'
+               ,'BEFORE CALLING INIT USEREXIT')*/NULL;
+    P_CONC_REQUEST_ID := FND_GLOBAL.CONC_REQUEST_ID;
+    /*SRW.USER_EXIT('FND SRWINIT')*/NULL;
+    CP_RET_STS := 'S';
+    IF P_CONC_REQUEST_ID IS NULL THEN
+      /*RAISE SRW.PROGRAM_ABORT*/RAISE_APPLICATION_ERROR(-20101,null);
+      /*SRW.MESSAGE('100'
+                 ,'P_CONC_ID IS NULL')*/NULL;
+    END IF;
+    IF P_MODE IS NULL THEN
+      P_MODE := 'G';
+    END IF;
+    IF P_AUTO_RELEASE IS NULL THEN
+      P_AUTO_RELEASE := 'N';
+    END IF;
+    IF P_STORE_SRC_DET IS NULL THEN
+      P_STORE_SRC_DET := 'N';
+    END IF;
+    /*SRW.MESSAGE('100'
+               ,'BEFORE GETTTING THE DEBUG MODE PROFILE VALUE')*/NULL;
+    P_DEBUG_MODE := FND_PROFILE.VALUE('PA_DEBUG_MODE');
+    /*SRW.MESSAGE('100'
+               ,'BEFORE SETTING ALTER SEESION')*/NULL;
+    IF P_DEBUG_MODE = 'Y' THEN
+      EXECUTE IMMEDIATE
+        'ALTER SESSION SET SQL_TRACE TRUE';
+    END IF;
+    /*SRW.MESSAGE('100'
+               ,'BEFORE GETTTING THE COMP NAME')*/NULL;
+    IF (GET_COMPANY_NAME <> TRUE) THEN
+      RAISE INIT_FAILURE;
+    END IF;
+    /*SRW.MESSAGE('100'
+               ,'BEFORE CALLING THE who cals')*/NULL;
+    PA_ALLOC_RUN.INIT_WHO_COLS;
+    IF P_FROM_PROJECT_ID IS NOT NULL THEN
+      SELECT
+        SEGMENT1
+      INTO P_FROM_PROJ_NUM
+      FROM
+        PA_PROJECTS_ALL
+      WHERE PROJECT_ID = P_FROM_PROJECT_ID;
+    END IF;
+    IF P_TO_PROJECT_ID IS NOT NULL THEN
+      SELECT
+        SEGMENT1
+      INTO P_TO_PROJ_NUM
+      FROM
+        PA_PROJECTS_ALL
+      WHERE PROJECT_ID = P_TO_PROJECT_ID;
+    END IF;
+    IF P_EXP_ITEM_DATE IS NULL THEN
+      SELECT
+        END_DATE
+      INTO P_EXP_ITEM_DATE
+      FROM
+        PA_IMPLEMENTATIONS PIMP,
+        GL_PERIOD_STATUSES GLS
+      WHERE PIMP.SET_OF_BOOKS_ID = GLS.SET_OF_BOOKS_ID
+        AND GLS.APPLICATION_ID = 101
+        AND GLS.PERIOD_NAME = P_RUN_PERIOD;
+    END IF;
+    P_EXP_ITEM_DATE_1:=to_char(P_EXP_ITEM_DATE,'DD-MON-YY');
+    /*SRW.MESSAGE('100'
+               ,'BEFORE CALLING THE GET CAP')*/NULL;
+    /*SRW.MESSAGE('100'
+               ,'BEFORE CALLING THE GET CAP P1' || P_FROM_PROJ_NUM)*/NULL;
+    /*SRW.MESSAGE('100'
+               ,'BEFORE CALLING THE GET CAP P2' || P_TO_PROJ_NUM)*/NULL;
+    /*SRW.MESSAGE('100'
+               ,'BEFORE CALLING THE GET CAP P3' || P_RUN_PERIOD)*/NULL;
+    /*SRW.MESSAGE('100'
+               ,'BEFORE CALLING THE GET CAP P4' || P_EXP_ITEM_DATE)*/NULL;
+    /*SRW.MESSAGE('100'
+               ,'BEFORE CALLING THE GET CAP P5' || P_STORE_SRC_DET)*/NULL;
+    /*SRW.MESSAGE('100'
+               ,'BEFORE CALLING THE GET CAP P6' || P_AUTO_RELEASE)*/NULL;
+    PA_CAP_INT_PVT.GENERATE_CAP_INTEREST(P_FROM_PROJECT_NUM => P_FROM_PROJ_NUM
+                                        ,P_TO_PROJECT_NUM => P_TO_PROJ_NUM
+                                        ,P_GL_PERIOD => P_RUN_PERIOD
+                                        ,P_EXP_ITEM_DATE => P_EXP_ITEM_DATE
+                                        ,P_SOURCE_DETAILS => P_STORE_SRC_DET
+                                        ,P_AUTORELEASE => P_AUTO_RELEASE
+                                        ,P_MODE => P_MODE
+                                        ,X_RUN_ID => P_RUN_ID
+                                        ,X_RETURN_STATUS => L_RETURN_STATUS
+                                        ,X_ERROR_MSG_COUNT => L_MSG_COUNT
+                                        ,X_ERROR_MSG_CODE => L_MSG_DATA);
+    /*SRW.MESSAGE('100'
+               ,'AFTER CALLING THE GET CAP THE ERR BUF IS ' || L_MSG_DATA)*/NULL;
+    /*SRW.MESSAGE('100'
+               ,'AFTER CALLING THE GET CAP THE ERR BUF IS ' || L_RETURN_STATUS)*/NULL;
+    IF (L_RETURN_STATUS <> 'S') THEN
+      /*RAISE SRW.PROGRAM_ABORT*/RAISE_APPLICATION_ERROR(-20101,null);
+    END IF;
+    RETURN (TRUE);
+  EXCEPTION
+    WHEN INIT_FAILURE THEN
+      /*SRW.MESSAGE('102'
+                 ,'Unable to get the Title')*/NULL;
+      RETURN (TRUE);
+    WHEN OTHERS THEN
+      /*SRW.MESSAGE('101'
+                 ,'before prinintg unexp err')*/NULL;
+      L_MSG_DATA := SQLERRM;
+      /*SRW.MESSAGE('101'
+                 ,'Unexpected Error' || SUBSTR(L_MSG_DATA
+                       ,1
+                       ,100))*/NULL;
+      /*SRW.MESSAGE('101'
+                 ,'About to call process failed run')*/NULL;
+      PROCESS_FAILED_RUN;
+      RETURN (TRUE);
+  END BEFOREREPORT;
+
+  FUNCTION GET_COMPANY_NAME RETURN BOOLEAN IS
+    L_NAME GL_SETS_OF_BOOKS.NAME%TYPE;
+  BEGIN
+    SELECT
+      GL.NAME
+    INTO L_NAME
+    FROM
+      GL_SETS_OF_BOOKS GL,
+      PA_IMPLEMENTATIONS PI
+    WHERE GL.SET_OF_BOOKS_ID = PI.SET_OF_BOOKS_ID;
+    C_COMPANY_NAME := L_NAME;
+    RETURN (TRUE);
+  EXCEPTION
+    WHEN OTHERS THEN
+      RETURN (FALSE);
+  END GET_COMPANY_NAME;
+
+  PROCEDURE PROCESS_FAILED_RUN IS
+    NUMBER_OF_MESSAGES NUMBER;
+    MESSAGE_BUF VARCHAR2(2000);
+    L_PURGEABLE_FLAG PA_TRANSACTION_SOURCES.PURGEABLE_FLAG%TYPE;
+    L_RUN_STATUS_CODE PA_ALLOC_RUNS_ALL.RUN_STATUS%TYPE;
+  BEGIN
+    /*SRW.MESSAGE(1
+               ,'In process failerd run')*/NULL;
+    CP_RET_STS := 'E';
+    NUMBER_OF_MESSAGES := PA_DEBUG.NO_OF_DEBUG_MESSAGES;
+    /*SRW.MESSAGE(1
+               ,'Debug Messages:')*/NULL;
+    FOR i IN 1 .. NUMBER_OF_MESSAGES LOOP
+      PA_DEBUG.GET_MESSAGE(I
+                          ,MESSAGE_BUF);
+      /*SRW.MESSAGE(1
+                 ,MESSAGE_BUF)*/NULL;
+    END LOOP;
+    /*SRW.MESSAGE(1
+               ,'Leaving process failerd run')*/NULL;
+  EXCEPTION
+    WHEN OTHERS THEN
+      NULL;
+  END PROCESS_FAILED_RUN;
+
+  FUNCTION AFTERREPORT RETURN BOOLEAN IS
+    L_PURGEABLE_FLAG PA_TRANSACTION_SOURCES.PURGEABLE_FLAG%TYPE;
+  BEGIN
+    BEGIN
+      /*SRW.MESSAGE('2'
+                 ,'In after report trigger with p_mode ' || P_MODE)*/NULL;
+      SELECT
+        PURGEABLE_FLAG
+      INTO L_PURGEABLE_FLAG
+      FROM
+        PA_TRANSACTION_SOURCES
+      WHERE TRANSACTION_SOURCE = 'Capitalized Interest';
+      IF ((P_MODE = 'R') OR (P_MODE = 'G' AND P_AUTO_RELEASE = 'Y')) THEN
+        IF (L_PURGEABLE_FLAG = 'Y') THEN
+          DELETE FROM PA_TRANSACTION_INTERFACE
+           WHERE TRANSACTION_SOURCE = 'Capitalized Interest'
+             AND BATCH_NAME = TO_CHAR(P_RUN_ID);
+        END IF;
+        DELETE FROM PA_TRANSACTION_XFACE_CONTROL
+         WHERE TRANSACTION_SOURCE = 'Capitalized Interest'
+           AND BATCH_NAME = TO_CHAR(P_RUN_ID);
+      END IF;
+    EXCEPTION
+      WHEN OTHERS THEN
+        NULL;
+    END;
+    IF CP_RET_STS = 'E' THEN
+      IF ((P_MODE = 'R') OR (P_MODE = 'G' AND P_AUTO_RELEASE = 'Y')) THEN
+        UPDATE
+          PA_ALLOC_RUNS_ALL
+        SET
+          RELEASE_REQUEST_ID = NULL
+        WHERE RUN_ID = P_RUN_ID;
+      END IF;
+      /*SRW.MESSAGE('2'
+                 ,'In after report trigger |about to raise')*/NULL;
+      COMMIT;
+      /*RAISE SRW.PROGRAM_ABORT*/RAISE_APPLICATION_ERROR(-20101,null);
+    END IF;
+    /*SRW.USER_EXIT('FND SRWEXIT')*/NULL;
+    COMMIT;
+    /*SRW.MESSAGE('2'
+               ,'Leaving after rep trigger')*/NULL;
+    RETURN TRUE;
+  END AFTERREPORT;
+
+  FUNCTION CF_FORMAT_MASKFORMULA RETURN VARCHAR2 IS
+  BEGIN
+    RETURN (PA_MULTI_CURRENCY.GET_ACCT_CURRENCY_CODE);
+  END CF_FORMAT_MASKFORMULA;
+
+  FUNCTION C_COMPANY_NAME_P RETURN VARCHAR2 IS
+  BEGIN
+    RETURN C_COMPANY_NAME;
+  END C_COMPANY_NAME_P;
+
+  FUNCTION CP_RET_STS_P RETURN VARCHAR2 IS
+  BEGIN
+    RETURN CP_RET_STS;
+  END CP_RET_STS_P;
+
+END PA_PACCINTG_XMLP_PKG;
+
+
+/

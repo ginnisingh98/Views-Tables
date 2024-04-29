@@ -1,0 +1,625 @@
+--------------------------------------------------------
+--  DDL for Package Body IGF_AW_AWD_HIST_PKG
+--------------------------------------------------------
+
+  CREATE OR REPLACE EDITIONABLE PACKAGE BODY "APPS"."IGF_AW_AWD_HIST_PKG" AS
+/* $Header: IGFWI69B.pls 120.0 2005/06/02 15:52:47 appldev noship $ */
+
+  l_rowid VARCHAR2(25);
+  old_references igf_aw_awd_hist%ROWTYPE;
+  new_references igf_aw_awd_hist%ROWTYPE;
+
+  PROCEDURE set_column_values (
+    p_action                            IN     VARCHAR2,
+    x_rowid                             IN     VARCHAR2,
+    x_awdh_id                           IN     NUMBER,
+    x_award_id                          IN     NUMBER,
+    x_tran_date                         IN     DATE,
+    x_operation_txt                     IN     VARCHAR2,
+    x_offered_amt_num                   IN     NUMBER,
+    x_off_adj_num                       IN     NUMBER,
+    x_accepted_amt_num                  IN     NUMBER,
+    x_acc_adj_num                       IN     NUMBER,
+    x_paid_amt_num                      IN     NUMBER,
+    x_paid_adj_num                      IN     NUMBER,
+    x_creation_date                     IN     DATE,
+    x_created_by                        IN     NUMBER,
+    x_last_update_date                  IN     DATE,
+    x_last_updated_by                   IN     NUMBER,
+    x_last_update_login                 IN     NUMBER
+  ) AS
+  /*
+  ||  Created By : cdcruz
+  ||  Created On : 16-NOV-2004
+  ||  Purpose : Initialises the Old and New references for the columns of the table.
+  ||  Known limitations, enhancements or remarks :
+  ||  Change History :
+  ||  Who             When            What
+  ||  (reverse chronological order - newest change first)
+  */
+
+    CURSOR cur_old_ref_values IS
+      SELECT   *
+      FROM     igf_aw_awd_hist
+      WHERE    rowid = x_rowid;
+
+  BEGIN
+
+    l_rowid := x_rowid;
+
+    -- Code for setting the Old and New Reference Values.
+    -- Populate Old Values.
+    OPEN cur_old_ref_values;
+    FETCH cur_old_ref_values INTO old_references;
+    IF ((cur_old_ref_values%NOTFOUND) AND (p_action NOT IN ('INSERT', 'VALIDATE_INSERT'))) THEN
+      CLOSE cur_old_ref_values;
+      fnd_message.set_name ('FND', 'FORM_RECORD_DELETED');
+      igs_ge_msg_stack.add;
+      app_exception.raise_exception;
+      RETURN;
+    END IF;
+    CLOSE cur_old_ref_values;
+
+    -- Populate New Values.
+    new_references.awdh_id                           := x_awdh_id;
+    new_references.award_id                          := x_award_id;
+    new_references.tran_date                         := x_tran_date;
+    new_references.operation_txt                     := x_operation_txt;
+    new_references.offered_amt_num                   := x_offered_amt_num;
+    new_references.off_adj_num                       := x_off_adj_num;
+    new_references.accepted_amt_num                  := x_accepted_amt_num;
+    new_references.acc_adj_num                       := x_acc_adj_num;
+    new_references.paid_amt_num                      := x_paid_amt_num;
+    new_references.paid_adj_num                      := x_paid_adj_num;
+
+    IF (p_action = 'UPDATE') THEN
+      new_references.creation_date                   := old_references.creation_date;
+      new_references.created_by                      := old_references.created_by;
+    ELSE
+      new_references.creation_date                   := x_creation_date;
+      new_references.created_by                      := x_created_by;
+    END IF;
+
+    new_references.last_update_date                  := x_last_update_date;
+    new_references.last_updated_by                   := x_last_updated_by;
+    new_references.last_update_login                 := x_last_update_login;
+
+  END set_column_values;
+
+
+  FUNCTION get_pk_for_validation (
+    x_awdh_id                           IN     NUMBER
+  ) RETURN BOOLEAN AS
+  /*
+  ||  Created By : cdcruz
+  ||  Created On : 16-NOV-2004
+  ||  Purpose : Validates the Primary Key of the table.
+  ||  Known limitations, enhancements or remarks :
+  ||  Change History :
+  ||  Who             When            What
+  ||  (reverse chronological order - newest change first)
+  */
+    CURSOR cur_rowid IS
+      SELECT   rowid
+      FROM     igf_aw_awd_hist
+      WHERE    awdh_id = x_awdh_id
+      FOR UPDATE NOWAIT;
+
+    lv_rowid cur_rowid%RowType;
+
+  BEGIN
+
+    OPEN cur_rowid;
+    FETCH cur_rowid INTO lv_rowid;
+    IF (cur_rowid%FOUND) THEN
+      CLOSE cur_rowid;
+      RETURN(TRUE);
+    ELSE
+      CLOSE cur_rowid;
+      RETURN(FALSE);
+    END IF;
+
+  END get_pk_for_validation;
+
+
+  PROCEDURE before_dml (
+    p_action                            IN     VARCHAR2,
+    x_rowid                             IN     VARCHAR2,
+    x_awdh_id                           IN     NUMBER,
+    x_award_id                          IN     NUMBER,
+    x_tran_date                         IN     DATE,
+    x_operation_txt                     IN     VARCHAR2,
+    x_offered_amt_num                   IN     NUMBER,
+    x_off_adj_num                       IN     NUMBER,
+    x_accepted_amt_num                  IN     NUMBER,
+    x_acc_adj_num                       IN     NUMBER,
+    x_paid_amt_num                      IN     NUMBER,
+    x_paid_adj_num                      IN     NUMBER,
+    x_creation_date                     IN     DATE,
+    x_created_by                        IN     NUMBER,
+    x_last_update_date                  IN     DATE,
+    x_last_updated_by                   IN     NUMBER,
+    x_last_update_login                 IN     NUMBER
+  ) AS
+  /*
+  ||  Created By : cdcruz
+  ||  Created On : 16-NOV-2004
+  ||  Purpose : Initialises the columns, Checks Constraints, Calls the
+  ||            Trigger Handlers for the table, before any DML operation.
+  ||  Known limitations, enhancements or remarks :
+  ||  Change History :
+  ||  Who             When            What
+  ||  (reverse chronological order - newest change first)
+  */
+  BEGIN
+
+    set_column_values (
+      p_action,
+      x_rowid,
+      x_awdh_id,
+      x_award_id,
+      x_tran_date,
+      x_operation_txt,
+      x_offered_amt_num,
+      x_off_adj_num,
+      x_accepted_amt_num,
+      x_acc_adj_num,
+      x_paid_amt_num,
+      x_paid_adj_num,
+      x_creation_date,
+      x_created_by,
+      x_last_update_date,
+      x_last_updated_by,
+      x_last_update_login
+    );
+
+    IF (p_action = 'INSERT') THEN
+      -- Call all the procedures related to Before Insert.
+      IF ( get_pk_for_validation(
+             new_references.awdh_id
+           )
+         ) THEN
+        fnd_message.set_name('IGS','IGS_GE_RECORD_ALREADY_EXISTS');
+        igs_ge_msg_stack.add;
+        app_exception.raise_exception;
+      END IF;
+    ELSIF (p_action = 'VALIDATE_INSERT') THEN
+      -- Call all the procedures related to Before Insert.
+      IF ( get_pk_for_validation (
+             new_references.awdh_id
+           )
+         ) THEN
+        fnd_message.set_name('IGS','IGS_GE_RECORD_ALREADY_EXISTS');
+        igs_ge_msg_stack.add;
+        app_exception.raise_exception;
+      END IF;
+    END IF;
+
+  END before_dml;
+
+
+  PROCEDURE insert_row (
+    x_rowid                             IN OUT NOCOPY VARCHAR2,
+    x_awdh_id                           IN OUT NOCOPY NUMBER,
+    x_award_id                          IN     NUMBER,
+    x_tran_date                         IN     DATE,
+    x_operation_txt                     IN     VARCHAR2,
+    x_offered_amt_num                   IN     NUMBER,
+    x_off_adj_num                       IN     NUMBER,
+    x_accepted_amt_num                  IN     NUMBER,
+    x_acc_adj_num                       IN     NUMBER,
+    x_paid_amt_num                      IN     NUMBER,
+    x_paid_adj_num                      IN     NUMBER,
+    x_mode                              IN     VARCHAR2
+  ) AS
+  /*
+  ||  Created By : cdcruz
+  ||  Created On : 16-NOV-2004
+  ||  Purpose : Handles the INSERT DML logic for the table.
+  ||  Known limitations, enhancements or remarks :
+  ||  Change History :
+  ||  Who             When            What
+  ||  (reverse chronological order - newest change first)
+  */
+
+    x_last_update_date           DATE;
+    x_last_updated_by            NUMBER;
+    x_last_update_login          NUMBER;
+    x_request_id                 NUMBER;
+    x_program_id                 NUMBER;
+    x_program_application_id     NUMBER;
+    x_program_update_date        DATE;
+
+  BEGIN
+
+    x_last_update_date := SYSDATE;
+    IF (x_mode = 'I') THEN
+      x_last_updated_by := 1;
+      x_last_update_login := 0;
+    ELSIF (x_mode = 'R') THEN
+      x_last_updated_by := fnd_global.user_id;
+      IF (x_last_updated_by IS NULL) THEN
+        x_last_updated_by := -1;
+      END IF;
+      x_last_update_login := fnd_global.login_id;
+      IF (x_last_update_login IS NULL) THEN
+        x_last_update_login := -1;
+      END IF;
+      x_request_id             := fnd_global.conc_request_id;
+      x_program_id             := fnd_global.conc_program_id;
+      x_program_application_id := fnd_global.prog_appl_id;
+
+      IF (x_request_id = -1) THEN
+        x_request_id             := NULL;
+        x_program_id             := NULL;
+        x_program_application_id := NULL;
+        x_program_update_date    := NULL;
+      ELSE
+        x_program_update_date    := SYSDATE;
+      END IF;
+    ELSE
+      fnd_message.set_name ('FND', 'SYSTEM-INVALID ARGS');
+      fnd_message.set_token ('ROUTINE', 'IGF_AW_AWD_HIST_PKG.INSERT_ROW');
+      igs_ge_msg_stack.add;
+      app_exception.raise_exception;
+    END IF;
+
+    x_awdh_id := NULL;
+
+    before_dml(
+      p_action                            => 'INSERT',
+      x_rowid                             => x_rowid,
+      x_awdh_id                           => x_awdh_id,
+      x_award_id                          => x_award_id,
+      x_tran_date                         => x_tran_date,
+      x_operation_txt                     => x_operation_txt,
+      x_offered_amt_num                   => x_offered_amt_num,
+      x_off_adj_num                       => x_off_adj_num,
+      x_accepted_amt_num                  => x_accepted_amt_num,
+      x_acc_adj_num                       => x_acc_adj_num,
+      x_paid_amt_num                      => x_paid_amt_num,
+      x_paid_adj_num                      => x_paid_adj_num,
+      x_creation_date                     => x_last_update_date,
+      x_created_by                        => x_last_updated_by,
+      x_last_update_date                  => x_last_update_date,
+      x_last_updated_by                   => x_last_updated_by,
+      x_last_update_login                 => x_last_update_login
+    );
+
+    INSERT INTO igf_aw_awd_hist (
+      awdh_id,
+      award_id,
+      tran_date,
+      operation_txt,
+      offered_amt_num,
+      off_adj_num,
+      accepted_amt_num,
+      acc_adj_num,
+      paid_amt_num,
+      paid_adj_num,
+      creation_date,
+      created_by,
+      last_update_date,
+      last_updated_by,
+      last_update_login,
+      request_id,
+      program_id,
+      program_application_id,
+      program_update_date
+    ) VALUES (
+      igf_aw_awd_hist_s.NEXTVAL,
+      new_references.award_id,
+      new_references.tran_date,
+      new_references.operation_txt,
+      new_references.offered_amt_num,
+      new_references.off_adj_num,
+      new_references.accepted_amt_num,
+      new_references.acc_adj_num,
+      new_references.paid_amt_num,
+      new_references.paid_adj_num,
+      x_last_update_date,
+      x_last_updated_by,
+      x_last_update_date,
+      x_last_updated_by,
+      x_last_update_login ,
+      x_request_id,
+      x_program_id,
+      x_program_application_id,
+      x_program_update_date
+    ) RETURNING ROWID, awdh_id INTO x_rowid, x_awdh_id;
+
+  END insert_row;
+
+
+  PROCEDURE lock_row (
+    x_rowid                             IN     VARCHAR2,
+    x_awdh_id                           IN     NUMBER,
+    x_award_id                          IN     NUMBER,
+    x_tran_date                         IN     DATE,
+    x_operation_txt                     IN     VARCHAR2,
+    x_offered_amt_num                   IN     NUMBER,
+    x_off_adj_num                       IN     NUMBER,
+    x_accepted_amt_num                  IN     NUMBER,
+    x_acc_adj_num                       IN     NUMBER,
+    x_paid_amt_num                      IN     NUMBER,
+    x_paid_adj_num                      IN     NUMBER
+  ) AS
+  /*
+  ||  Created By : cdcruz
+  ||  Created On : 16-NOV-2004
+  ||  Purpose : Handles the LOCK mechanism for the table.
+  ||  Known limitations, enhancements or remarks :
+  ||  Change History :
+  ||  Who             When            What
+  ||  (reverse chronological order - newest change first)
+  */
+    CURSOR c1 IS
+      SELECT
+        award_id,
+        tran_date,
+        operation_txt,
+        offered_amt_num,
+        off_adj_num,
+        accepted_amt_num,
+        acc_adj_num,
+        paid_amt_num,
+        paid_adj_num
+      FROM  igf_aw_awd_hist
+      WHERE rowid = x_rowid
+      FOR UPDATE NOWAIT;
+
+    tlinfo c1%ROWTYPE;
+
+  BEGIN
+
+    OPEN c1;
+    FETCH c1 INTO tlinfo;
+    IF (c1%notfound) THEN
+      fnd_message.set_name('FND', 'FORM_RECORD_DELETED');
+      igs_ge_msg_stack.add;
+      CLOSE c1;
+      app_exception.raise_exception;
+      RETURN;
+    END IF;
+    CLOSE c1;
+
+    IF (
+        ((tlinfo.award_id = x_award_id) OR ((tlinfo.award_id IS NULL) AND (X_award_id IS NULL)))
+        AND ((tlinfo.tran_date = x_tran_date) OR ((tlinfo.tran_date IS NULL) AND (X_tran_date IS NULL)))
+        AND ((tlinfo.operation_txt = x_operation_txt) OR ((tlinfo.operation_txt IS NULL) AND (X_operation_txt IS NULL)))
+        AND ((tlinfo.offered_amt_num = x_offered_amt_num) OR ((tlinfo.offered_amt_num IS NULL) AND (X_offered_amt_num IS NULL)))
+        AND ((tlinfo.off_adj_num = x_off_adj_num) OR ((tlinfo.off_adj_num IS NULL) AND (X_off_adj_num IS NULL)))
+        AND ((tlinfo.accepted_amt_num = x_accepted_amt_num) OR ((tlinfo.accepted_amt_num IS NULL) AND (X_accepted_amt_num IS NULL)))
+        AND ((tlinfo.acc_adj_num = x_acc_adj_num) OR ((tlinfo.acc_adj_num IS NULL) AND (X_acc_adj_num IS NULL)))
+        AND ((tlinfo.paid_amt_num = x_paid_amt_num) OR ((tlinfo.paid_amt_num IS NULL) AND (X_paid_amt_num IS NULL)))
+        AND ((tlinfo.paid_adj_num = x_paid_adj_num) OR ((tlinfo.paid_adj_num IS NULL) AND (X_paid_adj_num IS NULL)))
+       ) THEN
+      NULL;
+    ELSE
+      fnd_message.set_name('FND', 'FORM_RECORD_CHANGED');
+      igs_ge_msg_stack.add;
+      app_exception.raise_exception;
+    END IF;
+
+    RETURN;
+
+  END lock_row;
+
+
+  PROCEDURE update_row (
+    x_rowid                             IN     VARCHAR2,
+    x_awdh_id                           IN     NUMBER,
+    x_award_id                          IN     NUMBER,
+    x_tran_date                         IN     DATE,
+    x_operation_txt                     IN     VARCHAR2,
+    x_offered_amt_num                   IN     NUMBER,
+    x_off_adj_num                       IN     NUMBER,
+    x_accepted_amt_num                  IN     NUMBER,
+    x_acc_adj_num                       IN     NUMBER,
+    x_paid_amt_num                      IN     NUMBER,
+    x_paid_adj_num                      IN     NUMBER,
+    x_mode                              IN     VARCHAR2
+  ) AS
+  /*
+  ||  Created By : cdcruz
+  ||  Created On : 16-NOV-2004
+  ||  Purpose : Handles the UPDATE DML logic for the table.
+  ||  Known limitations, enhancements or remarks :
+  ||  Change History :
+  ||  Who             When            What
+  ||  (reverse chronological order - newest change first)
+  */
+    x_last_update_date           DATE ;
+    x_last_updated_by            NUMBER;
+    x_last_update_login          NUMBER;
+    x_request_id                 NUMBER;
+    x_program_id                 NUMBER;
+    x_program_application_id     NUMBER;
+    x_program_update_date        DATE;
+
+  BEGIN
+
+    x_last_update_date := SYSDATE;
+    IF (X_MODE = 'I') THEN
+      x_last_updated_by := 1;
+      x_last_update_login := 0;
+    ELSIF (x_mode = 'R') THEN
+      x_last_updated_by := fnd_global.user_id;
+      IF x_last_updated_by IS NULL THEN
+        x_last_updated_by := -1;
+      END IF;
+      x_last_update_login := fnd_global.login_id;
+      IF (x_last_update_login IS NULL) THEN
+        x_last_update_login := -1;
+      END IF;
+    ELSE
+      fnd_message.set_name( 'FND', 'SYSTEM-INVALID ARGS');
+      fnd_message.set_token ('ROUTINE', 'IGF_AW_AWD_HIST_PKG.UPDATE_ROW');
+      igs_ge_msg_stack.add;
+      app_exception.raise_exception;
+    END IF;
+
+    before_dml(
+      p_action                            => 'UPDATE',
+      x_rowid                             => x_rowid,
+      x_awdh_id                           => x_awdh_id,
+      x_award_id                          => x_award_id,
+      x_tran_date                         => x_tran_date,
+      x_operation_txt                     => x_operation_txt,
+      x_offered_amt_num                   => x_offered_amt_num,
+      x_off_adj_num                       => x_off_adj_num,
+      x_accepted_amt_num                  => x_accepted_amt_num,
+      x_acc_adj_num                       => x_acc_adj_num,
+      x_paid_amt_num                      => x_paid_amt_num,
+      x_paid_adj_num                      => x_paid_adj_num,
+      x_creation_date                     => x_last_update_date,
+      x_created_by                        => x_last_updated_by,
+      x_last_update_date                  => x_last_update_date,
+      x_last_updated_by                   => x_last_updated_by,
+      x_last_update_login                 => x_last_update_login
+    );
+
+    IF (x_mode = 'R') THEN
+      x_request_id := fnd_global.conc_request_id;
+      x_program_id := fnd_global.conc_program_id;
+      x_program_application_id := fnd_global.prog_appl_id;
+      IF (x_request_id =  -1) THEN
+        x_request_id := old_references.request_id;
+        x_program_id := old_references.program_id;
+        x_program_application_id := old_references.program_application_id;
+        x_program_update_date := old_references.program_update_date;
+      ELSE
+        x_program_update_date := SYSDATE;
+      END IF;
+    END IF;
+
+    UPDATE igf_aw_awd_hist
+      SET
+        award_id                          = new_references.award_id,
+        tran_date                         = new_references.tran_date,
+        operation_txt                     = new_references.operation_txt,
+        offered_amt_num                   = new_references.offered_amt_num,
+        off_adj_num                       = new_references.off_adj_num,
+        accepted_amt_num                  = new_references.accepted_amt_num,
+        acc_adj_num                       = new_references.acc_adj_num,
+        paid_amt_num                      = new_references.paid_amt_num,
+        paid_adj_num                      = new_references.paid_adj_num,
+        last_update_date                  = x_last_update_date,
+        last_updated_by                   = x_last_updated_by,
+        last_update_login                 = x_last_update_login ,
+        request_id                        = x_request_id,
+        program_id                        = x_program_id,
+        program_application_id            = x_program_application_id,
+        program_update_date               = x_program_update_date
+      WHERE rowid = x_rowid;
+
+    IF (SQL%NOTFOUND) THEN
+      RAISE NO_DATA_FOUND;
+    END IF;
+
+  END update_row;
+
+
+  PROCEDURE add_row (
+    x_rowid                             IN OUT NOCOPY VARCHAR2,
+    x_awdh_id                           IN OUT NOCOPY NUMBER,
+    x_award_id                          IN     NUMBER,
+    x_tran_date                         IN     DATE,
+    x_operation_txt                     IN     VARCHAR2,
+    x_offered_amt_num                   IN     NUMBER,
+    x_off_adj_num                       IN     NUMBER,
+    x_accepted_amt_num                  IN     NUMBER,
+    x_acc_adj_num                       IN     NUMBER,
+    x_paid_amt_num                      IN     NUMBER,
+    x_paid_adj_num                      IN     NUMBER,
+    x_mode                              IN     VARCHAR2
+  ) AS
+  /*
+  ||  Created By : cdcruz
+  ||  Created On : 16-NOV-2004
+  ||  Purpose : Adds a row if there is no existing row, otherwise updates existing row in the table.
+  ||  Known limitations, enhancements or remarks :
+  ||  Change History :
+  ||  Who             When            What
+  ||  (reverse chronological order - newest change first)
+  */
+    CURSOR c1 IS
+      SELECT   rowid
+      FROM     igf_aw_awd_hist
+      WHERE    awdh_id                           = x_awdh_id;
+
+  BEGIN
+
+    OPEN c1;
+    FETCH c1 INTO x_rowid;
+    IF (c1%NOTFOUND) THEN
+      CLOSE c1;
+
+      insert_row (
+        x_rowid,
+        x_awdh_id,
+        x_award_id,
+        x_tran_date,
+        x_operation_txt,
+        x_offered_amt_num,
+        x_off_adj_num,
+        x_accepted_amt_num,
+        x_acc_adj_num,
+        x_paid_amt_num,
+        x_paid_adj_num,
+        x_mode
+      );
+      RETURN;
+    END IF;
+    CLOSE c1;
+
+    update_row (
+      x_rowid,
+      x_awdh_id,
+      x_award_id,
+      x_tran_date,
+      x_operation_txt,
+      x_offered_amt_num,
+      x_off_adj_num,
+      x_accepted_amt_num,
+      x_acc_adj_num,
+      x_paid_amt_num,
+      x_paid_adj_num,
+      x_mode
+    );
+
+  END add_row;
+
+
+  PROCEDURE delete_row (
+    x_rowid IN VARCHAR2
+  ) AS
+  /*
+  ||  Created By : cdcruz
+  ||  Created On : 16-NOV-2004
+  ||  Purpose : Handles the DELETE DML logic for the table.
+  ||  Known limitations, enhancements or remarks :
+  ||  Change History :
+  ||  Who             When            What
+  ||  (reverse chronological order - newest change first)
+  */
+  BEGIN
+
+    before_dml (
+      p_action => 'DELETE',
+      x_rowid => x_rowid
+    );
+
+    DELETE FROM igf_aw_awd_hist
+    WHERE rowid = x_rowid;
+
+    IF (SQL%NOTFOUND) THEN
+      RAISE NO_DATA_FOUND;
+    END IF;
+
+  END delete_row;
+
+
+END igf_aw_awd_hist_pkg;
+
+/

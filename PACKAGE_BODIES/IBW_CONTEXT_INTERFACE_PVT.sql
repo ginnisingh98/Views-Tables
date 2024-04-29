@@ -1,0 +1,84 @@
+--------------------------------------------------------
+--  DDL for Package Body IBW_CONTEXT_INTERFACE_PVT
+--------------------------------------------------------
+
+  CREATE OR REPLACE EDITIONABLE PACKAGE BODY "APPS"."IBW_CONTEXT_INTERFACE_PVT" as
+/* $Header: ibwctxb.pls 120.1 2005/10/28 01:37 vekancha noship $*/
+
+  -- HISTORY
+  --   10/27/05           VEKANCHA         Created this file.
+  -- **************************************************************************
+
+procedure ADD_LANGUAGE
+is
+begin
+  delete from IBW_CONTEXT_INTERFACE_TL T
+  where not exists
+    (select NULL
+    from IBW_CONTEXT_INTERFACE_B B
+    where B.CONTEXT_INTERFACE_ID = T.CONTEXT_INTERFACE_ID
+    );
+
+  update IBW_CONTEXT_INTERFACE_TL T set (
+      CONTEXT_INSTANCE_NAME
+    ) = (select
+      B.CONTEXT_INSTANCE_NAME
+    from IBW_CONTEXT_INTERFACE_TL B
+    where B.CONTEXT_INTERFACE_ID = T.CONTEXT_INTERFACE_ID
+    and B.LANGUAGE = T.SOURCE_LANG)
+  where (
+      T.CONTEXT_INTERFACE_ID,
+      T.LANGUAGE
+  ) in (select
+      SUBT.CONTEXT_INTERFACE_ID,
+      SUBT.LANGUAGE
+    from IBW_CONTEXT_INTERFACE_TL SUBB, IBW_CONTEXT_INTERFACE_TL SUBT
+    where SUBB.CONTEXT_INTERFACE_ID = SUBT.CONTEXT_INTERFACE_ID
+    and SUBB.LANGUAGE = SUBT.SOURCE_LANG
+    and (SUBB.CONTEXT_INSTANCE_NAME <> SUBT.CONTEXT_INSTANCE_NAME
+  ));
+
+  insert into IBW_CONTEXT_INTERFACE_TL (
+    LAST_UPDATE_DATE,
+    LAST_UPDATE_LOGIN,
+    PROGRAM_ID,
+    PROGRAM_LOGIN_ID,
+    PROGRAM_APPLICATION_ID,
+    REQUEST_ID,
+    LAST_UPDATED_BY,
+    CONTEXT_INSTANCE_NAME,
+    OBJECT_VERSION_NUMBER,
+    CREATED_BY,
+    CREATION_DATE,
+    CONTEXT_INTERFACE_ID,
+    LANGUAGE,
+    SOURCE_LANG
+  ) select /*+ ORDERED */
+    B.LAST_UPDATE_DATE,
+    B.LAST_UPDATE_LOGIN,
+    B.PROGRAM_ID,
+    B.PROGRAM_LOGIN_ID,
+    B.PROGRAM_APPLICATION_ID,
+    B.REQUEST_ID,
+    B.LAST_UPDATED_BY,
+    B.CONTEXT_INSTANCE_NAME,
+    B.OBJECT_VERSION_NUMBER,
+    B.CREATED_BY,
+    B.CREATION_DATE,
+    B.CONTEXT_INTERFACE_ID,
+    L.LANGUAGE_CODE,
+    B.SOURCE_LANG
+  from IBW_CONTEXT_INTERFACE_TL B, FND_LANGUAGES L
+  where L.INSTALLED_FLAG in ('I', 'B')
+  and B.LANGUAGE = userenv('LANG')
+  and not exists
+    (select NULL
+    from IBW_CONTEXT_INTERFACE_TL T
+    where T.CONTEXT_INTERFACE_ID = B.CONTEXT_INTERFACE_ID
+    and T.LANGUAGE = L.LANGUAGE_CODE);
+end ADD_LANGUAGE;
+
+end IBW_CONTEXT_INTERFACE_PVT;
+
+
+/

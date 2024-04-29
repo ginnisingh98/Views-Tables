@@ -1,0 +1,365 @@
+--------------------------------------------------------
+--  DDL for Package Body QP_PRICE_BOOK_HEADERS_PKG
+--------------------------------------------------------
+
+  CREATE OR REPLACE EDITIONABLE PACKAGE BODY "APPS"."QP_PRICE_BOOK_HEADERS_PKG" as
+/* $Header: QPXUPBHB.pls 120.0 2005/10/27 04:07:52 nirmkuma noship $ */
+procedure INSERT_ROW (
+  X_ROWID in out NOCOPY VARCHAR2,
+  X_PRICE_BOOK_HEADER_ID in NUMBER,
+  X_PRICE_BOOK_TYPE_CODE in VARCHAR2,
+  X_CURRENCY_CODE in VARCHAR2,
+  X_EFFECTIVE_DATE in DATE,
+  X_CUSTOMER_ID in VARCHAR2,
+  X_PUB_STATUS_CODE in VARCHAR2,
+  X_ITEM_CATEGORY in NUMBER,
+  X_PRICE_BASED_ON in VARCHAR2,
+  X_PL_AGR_BSA_ID in NUMBER,
+  X_PRICING_PERSPECTIVE_CODE in VARCHAR2,
+  X_ITEM_QUANTITY in NUMBER,
+  X_REQUEST_ID in NUMBER,
+  X_REQUEST_TYPE_CODE in VARCHAR2,
+  X_PB_INPUT_HEADER_ID in NUMBER,
+  X_PRICE_BOOK_NAME in VARCHAR2,
+  X_PL_AGR_BSA_NAME in VARCHAR2,
+  X_LANGUAGE in VARCHAR2,
+  X_CREATION_DATE in DATE,
+  X_CREATED_BY in NUMBER,
+  X_LAST_UPDATE_DATE in DATE,
+  X_LAST_UPDATED_BY in NUMBER,
+  X_LAST_UPDATE_LOGIN in NUMBER
+) is
+  cursor C is select ROWID from QP_PRICE_BOOK_HEADERS_ALL_B
+    where PRICE_BOOK_HEADER_ID = X_PRICE_BOOK_HEADER_ID
+    ;
+begin
+  insert into QP_PRICE_BOOK_HEADERS_ALL_B (
+    PRICE_BOOK_TYPE_CODE,
+    CURRENCY_CODE,
+    EFFECTIVE_DATE,
+    CUSTOMER_ID,
+    PUB_STATUS_CODE,
+    ITEM_CATEGORY,
+    PRICE_BASED_ON,
+    PL_AGR_BSA_ID,
+    PRICING_PERSPECTIVE_CODE,
+    ITEM_QUANTITY,
+    REQUEST_ID,
+    REQUEST_TYPE_CODE,
+    PB_INPUT_HEADER_ID,
+    PRICE_BOOK_HEADER_ID ,
+    CREATION_DATE,
+    CREATED_BY,
+    LAST_UPDATE_DATE,
+    LAST_UPDATED_BY,
+    LAST_UPDATE_LOGIN
+  ) values (
+    X_PRICE_BOOK_TYPE_CODE,
+    X_CURRENCY_CODE,
+    X_EFFECTIVE_DATE,
+    X_CUSTOMER_ID,
+    X_PUB_STATUS_CODE,
+    X_ITEM_CATEGORY,
+    X_PRICE_BASED_ON,
+    X_PL_AGR_BSA_ID,
+    X_PRICING_PERSPECTIVE_CODE,
+    X_ITEM_QUANTITY,
+    X_REQUEST_ID,
+    X_REQUEST_TYPE_CODE,
+    X_PB_INPUT_HEADER_ID,
+    X_PRICE_BOOK_HEADER_ID ,
+    X_CREATION_DATE,
+    X_CREATED_BY,
+    X_LAST_UPDATE_DATE,
+    X_LAST_UPDATED_BY,
+    X_LAST_UPDATE_LOGIN
+  );
+
+  insert into QP_PRICE_BOOK_HEADERS_TL (
+    PRICE_BOOK_HEADER_ID,
+    PRICE_BOOK_NAME,
+    PL_AGR_BSA_NAME,
+    CREATION_DATE,
+    CREATED_BY,
+    LAST_UPDATE_DATE,
+    LAST_UPDATED_BY,
+    LAST_UPDATE_LOGIN,
+    LANGUAGE,
+    SOURCE_LANG
+  ) select
+    X_PRICE_BOOK_HEADER_ID,
+    X_PRICE_BOOK_NAME,
+    X_PL_AGR_BSA_NAME,
+    X_CREATION_DATE,
+    X_CREATED_BY,
+    X_LAST_UPDATE_DATE,
+    X_LAST_UPDATED_BY,
+    X_LAST_UPDATE_LOGIN,
+    L.LANGUAGE_CODE,
+    userenv('LANG')
+  from FND_LANGUAGES L
+  where L.INSTALLED_FLAG in ('I', 'B')
+  and not exists
+    (select NULL
+    from QP_PRICE_BOOK_HEADERS_TL T
+    where T.PRICE_BOOK_HEADER_ID = X_PRICE_BOOK_HEADER_ID
+    and T.LANGUAGE = L.LANGUAGE_CODE);
+
+  open c;
+  fetch c into X_ROWID;
+  if (c%notfound) then
+    close c;
+    raise no_data_found;
+  end if;
+  close c;
+
+end INSERT_ROW;
+
+procedure LOCK_ROW (
+  X_PRICE_BOOK_HEADER_ID in NUMBER,
+  X_PRICE_BOOK_TYPE_CODE in VARCHAR2,
+  X_CURRENCY_CODE in VARCHAR2,
+  X_EFFECTIVE_DATE in DATE,
+  X_CUSTOMER_ID in VARCHAR2,
+  X_PUB_STATUS_CODE in VARCHAR2,
+  X_ITEM_CATEGORY in NUMBER,
+  X_PRICE_BASED_ON in VARCHAR2,
+  X_PL_AGR_BSA_ID in NUMBER,
+  X_PRICING_PERSPECTIVE_CODE in VARCHAR2,
+  X_ITEM_QUANTITY in NUMBER,
+  X_REQUEST_ID in NUMBER,
+  X_REQUEST_TYPE_CODE in VARCHAR2,
+  X_PB_INPUT_HEADER_ID in NUMBER,
+  X_PRICE_BOOK_NAME in VARCHAR2,
+   X_PL_AGR_BSA_NAME in VARCHAR2,
+  X_LANGUAGE in VARCHAR2
+) is
+  cursor c is select
+      PRICE_BOOK_TYPE_CODE,
+      CURRENCY_CODE,
+      EFFECTIVE_DATE,
+      CUSTOMER_ID,
+      PUB_STATUS_CODE,
+      ITEM_CATEGORY,
+      PRICE_BASED_ON,
+      PL_AGR_BSA_ID,
+      PRICING_PERSPECTIVE_CODE,
+      ITEM_QUANTITY,
+      REQUEST_ID,
+      REQUEST_TYPE_CODE,
+      PB_INPUT_HEADER_ID
+    from QP_PRICE_BOOK_HEADERS_ALL_B
+    where PRICE_BOOK_HEADER_ID = X_PRICE_BOOK_HEADER_ID
+    for update of PRICE_BOOK_HEADER_ID nowait;
+  recinfo c%rowtype;
+
+  cursor c1 is select
+       PRICE_BOOK_NAME,
+      PL_AGR_BSA_NAME,
+    --  PRICE_BOOK_HEADER_ID,
+      LANGUAGE,
+      decode(LANGUAGE, userenv('LANG'), 'Y', 'N') BASELANG
+    from QP_PRICE_BOOK_HEADERS_TL
+    where PRICE_BOOK_HEADER_ID = X_PRICE_BOOK_HEADER_ID
+    and userenv('LANG') in (LANGUAGE, SOURCE_LANG)
+    for update of PRICE_BOOK_HEADER_ID nowait;
+begin
+  open c;
+  fetch c into recinfo;
+  if (c%notfound) then
+    close c;
+    fnd_message.set_name('FND', 'FORM_RECORD_DELETED');
+    app_exception.raise_exception;
+  end if;
+  close c;
+  if (    (recinfo.PRICE_BOOK_TYPE_CODE = X_PRICE_BOOK_TYPE_CODE)
+      AND (recinfo.CURRENCY_CODE = X_CURRENCY_CODE)
+      AND ((recinfo.EFFECTIVE_DATE = X_EFFECTIVE_DATE)
+           OR ((recinfo.EFFECTIVE_DATE is null) AND (X_EFFECTIVE_DATE is null)))
+      AND (recinfo.CUSTOMER_ID = X_CUSTOMER_ID)
+      AND ((recinfo.PUB_STATUS_CODE = X_PUB_STATUS_CODE)
+           OR ((recinfo.PUB_STATUS_CODE is null) AND (X_PUB_STATUS_CODE is null)))
+      AND ((recinfo.ITEM_CATEGORY = X_ITEM_CATEGORY)
+           OR ((recinfo.ITEM_CATEGORY is null) AND (X_ITEM_CATEGORY is null)))
+      AND ((recinfo.PRICE_BASED_ON = X_PRICE_BASED_ON)
+           OR ((recinfo.PRICE_BASED_ON is null) AND (X_PRICE_BASED_ON is null)))
+      AND ((recinfo.PL_AGR_BSA_ID = X_PL_AGR_BSA_ID)
+           OR ((recinfo.PL_AGR_BSA_ID is null) AND (X_PL_AGR_BSA_ID is null)))
+      AND (recinfo.PRICING_PERSPECTIVE_CODE = X_PRICING_PERSPECTIVE_CODE)
+      AND ((recinfo.ITEM_QUANTITY = X_ITEM_QUANTITY)
+           OR ((recinfo.ITEM_QUANTITY is null) AND (X_ITEM_QUANTITY is null)))
+      AND ((recinfo.REQUEST_ID = X_REQUEST_ID)
+           OR ((recinfo.REQUEST_ID is null) AND (X_REQUEST_ID is null)))
+      AND (recinfo.REQUEST_TYPE_CODE = X_REQUEST_TYPE_CODE)
+      AND (recinfo.PB_INPUT_HEADER_ID = X_PB_INPUT_HEADER_ID)
+  ) then
+    null;
+  else
+    fnd_message.set_name('FND', 'FORM_RECORD_CHANGED');
+    app_exception.raise_exception;
+  end if;
+
+  for tlinfo in c1 loop
+    if (tlinfo.BASELANG = 'Y') then
+         if (tlinfo.PRICE_BOOK_NAME = X_PRICE_BOOK_NAME) then
+        null;
+      else
+        fnd_message.set_name('FND', 'FORM_RECORD_CHANGED');
+        app_exception.raise_exception;
+      end if;
+    end if;
+  end loop;
+  return;
+end LOCK_ROW;
+
+procedure UPDATE_ROW (
+  X_PRICE_BOOK_HEADER_ID in NUMBER,
+  X_PRICE_BOOK_TYPE_CODE in VARCHAR2,
+  X_CURRENCY_CODE in VARCHAR2,
+  X_EFFECTIVE_DATE in DATE,
+  X_CUSTOMER_ID in VARCHAR2,
+  X_PUB_STATUS_CODE in VARCHAR2,
+  X_ITEM_CATEGORY in NUMBER,
+  X_PRICE_BASED_ON in VARCHAR2,
+  X_PL_AGR_BSA_ID in NUMBER,
+  X_PRICING_PERSPECTIVE_CODE in VARCHAR2,
+  X_ITEM_QUANTITY in NUMBER,
+  X_REQUEST_ID in NUMBER,
+  X_REQUEST_TYPE_CODE in VARCHAR2,
+  X_PB_INPUT_HEADER_ID in NUMBER,
+  X_PRICE_BOOK_NAME in VARCHAR2,
+   X_PL_AGR_BSA_NAME in VARCHAR2,
+  X_LANGUAGE in VARCHAR2,
+  X_LAST_UPDATE_DATE in DATE,
+  X_LAST_UPDATED_BY in NUMBER,
+  X_LAST_UPDATE_LOGIN in NUMBER
+) is
+begin
+  update QP_PRICE_BOOK_HEADERS_ALL_B set
+    PRICE_BOOK_TYPE_CODE = X_PRICE_BOOK_TYPE_CODE,
+    CURRENCY_CODE = X_CURRENCY_CODE,
+    EFFECTIVE_DATE = X_EFFECTIVE_DATE,
+    CUSTOMER_ID = X_CUSTOMER_ID,
+    PUB_STATUS_CODE = X_PUB_STATUS_CODE,
+    ITEM_CATEGORY = X_ITEM_CATEGORY,
+    PRICE_BASED_ON = X_PRICE_BASED_ON,
+    PL_AGR_BSA_ID = X_PL_AGR_BSA_ID,
+    PRICING_PERSPECTIVE_CODE = X_PRICING_PERSPECTIVE_CODE,
+    ITEM_QUANTITY = X_ITEM_QUANTITY,
+    REQUEST_ID = X_REQUEST_ID,
+    REQUEST_TYPE_CODE = X_REQUEST_TYPE_CODE,
+    PB_INPUT_HEADER_ID = X_PB_INPUT_HEADER_ID,
+    LAST_UPDATE_DATE = X_LAST_UPDATE_DATE,
+    LAST_UPDATED_BY = X_LAST_UPDATED_BY,
+    LAST_UPDATE_LOGIN = X_LAST_UPDATE_LOGIN
+  where PRICE_BOOK_HEADER_ID = X_PRICE_BOOK_HEADER_ID;
+
+  if (sql%notfound) then
+    raise no_data_found;
+  end if;
+
+  update QP_PRICE_BOOK_HEADERS_TL set
+    PRICE_BOOK_NAME = X_PRICE_BOOK_NAME,
+    PL_AGR_BSA_NAME = X_PL_AGR_BSA_NAME,
+    PRICE_BOOK_HEADER_ID = X_PRICE_BOOK_HEADER_ID,
+    LANGUAGE = X_LANGUAGE,
+    LAST_UPDATE_DATE = X_LAST_UPDATE_DATE,
+    LAST_UPDATED_BY = X_LAST_UPDATED_BY,
+    LAST_UPDATE_LOGIN = X_LAST_UPDATE_LOGIN,
+    SOURCE_LANG = userenv('LANG')
+  where PRICE_BOOK_HEADER_ID = X_PRICE_BOOK_HEADER_ID
+  and userenv('LANG') in (LANGUAGE, SOURCE_LANG);
+
+  if (sql%notfound) then
+    raise no_data_found;
+  end if;
+end UPDATE_ROW;
+
+procedure DELETE_ROW (
+  X_PRICE_BOOK_HEADER_ID in NUMBER
+) is
+begin
+  delete from QP_PRICE_BOOK_HEADERS_TL
+  where PRICE_BOOK_HEADER_ID = X_PRICE_BOOK_HEADER_ID;
+
+  if (sql%notfound) then
+    raise no_data_found;
+  end if;
+
+  delete from QP_PRICE_BOOK_HEADERS_ALL_B
+  where PRICE_BOOK_HEADER_ID = X_PRICE_BOOK_HEADER_ID;
+
+  if (sql%notfound) then
+    raise no_data_found;
+  end if;
+end DELETE_ROW;
+
+procedure ADD_LANGUAGE
+is
+begin
+  delete from QP_PRICE_BOOK_HEADERS_TL T
+  where not exists
+    (select NULL
+    from QP_PRICE_BOOK_HEADERS_ALL_B B
+    where B.PRICE_BOOK_HEADER_ID = T.PRICE_BOOK_HEADER_ID
+    );
+
+  update QP_PRICE_BOOK_HEADERS_TL T set (
+       PRICE_BOOK_NAME,
+       PL_AGR_BSA_NAME
+    ) = (select
+          B.PRICE_BOOK_NAME,
+          B.PL_AGR_BSA_NAME
+    from QP_PRICE_BOOK_HEADERS_TL B
+    where B.PRICE_BOOK_HEADER_ID = T.PRICE_BOOK_HEADER_ID
+    and B.LANGUAGE = T.SOURCE_LANG)
+  where (
+      T.PRICE_BOOK_HEADER_ID,
+      T.LANGUAGE
+  ) in (select
+      SUBT.PRICE_BOOK_HEADER_ID,
+      SUBT.LANGUAGE
+    from QP_PRICE_BOOK_HEADERS_TL SUBB, QP_PRICE_BOOK_HEADERS_TL SUBT
+    where SUBB.PRICE_BOOK_HEADER_ID = SUBT.PRICE_BOOK_HEADER_ID
+    and SUBB.LANGUAGE = SUBT.SOURCE_LANG
+    and (SUBB.PRICE_BOOK_NAME <> SUBT.PRICE_BOOK_NAME
+      or SUBB.PL_AGR_BSA_NAME <> SUBT.PL_AGR_BSA_NAME
+      or (SUBB.PL_AGR_BSA_NAME is null and SUBT.PL_AGR_BSA_NAME is not null)
+      or (SUBB.PL_AGR_BSA_NAME is not null and SUBT.PL_AGR_BSA_NAME is null)
+  ));
+
+  insert into QP_PRICE_BOOK_HEADERS_TL (
+    PRICE_BOOK_HEADER_ID,
+    PRICE_BOOK_NAME,
+    PL_AGR_BSA_NAME,
+    CREATION_DATE,
+    CREATED_BY,
+    LAST_UPDATE_DATE,
+    LAST_UPDATED_BY,
+    LAST_UPDATE_LOGIN,
+    LANGUAGE,
+    SOURCE_LANG
+  ) select /*+ ORDERED */
+    B.PRICE_BOOK_HEADER_ID,
+    B.PRICE_BOOK_NAME,
+    B.PL_AGR_BSA_NAME,
+    B.CREATION_DATE,
+    B.CREATED_BY,
+    B.LAST_UPDATE_DATE,
+    B.LAST_UPDATED_BY,
+    B.LAST_UPDATE_LOGIN,
+    L.LANGUAGE_CODE,
+    B.SOURCE_LANG
+  from QP_PRICE_BOOK_HEADERS_TL B, FND_LANGUAGES L
+  where L.INSTALLED_FLAG in ('I', 'B')
+  and B.LANGUAGE = userenv('LANG')
+  and not exists
+    (select NULL
+    from QP_PRICE_BOOK_HEADERS_TL T
+    where T.PRICE_BOOK_HEADER_ID = B.PRICE_BOOK_HEADER_ID
+    and T.LANGUAGE = L.LANGUAGE_CODE);
+end ADD_LANGUAGE;
+
+end QP_PRICE_BOOK_HEADERS_PKG;
+
+/

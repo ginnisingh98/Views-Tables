@@ -1,0 +1,173 @@
+--------------------------------------------------------
+--  DDL for Package Body CSP_FAILURE_RATES_PKG
+--------------------------------------------------------
+
+  CREATE OR REPLACE EDITIONABLE PACKAGE BODY "APPS"."CSP_FAILURE_RATES_PKG" as
+/* $Header: csptfrab.pls 115.3 2002/11/26 07:19:57 hhaugeru noship $ */
+-- Start of Comments
+-- Package name     : CSP_FAILURE_RATES_PKG
+-- Purpose          :
+-- History          :
+-- NOTE             :
+-- End of Comments
+
+
+G_PKG_NAME CONSTANT VARCHAR2(30):= 'CSP_FAILURE_RATES_PKG';
+G_FILE_NAME CONSTANT VARCHAR2(12) := 'csptfrab.pls';
+
+PROCEDURE Insert_Row(
+          px_FAILURE_RATE_ID   IN OUT NOCOPY NUMBER
+         ,p_PRODUCT_ID    NUMBER
+         ,p_INVENTORY_ITEM_ID    NUMBER
+         ,p_CALCULATED_FAILURE_RATE    NUMBER
+         ,p_MANUAL_FAILURE_RATE    NUMBER
+         ,p_LAST_UPDATE_DATE    DATE
+         ,p_LAST_UPDATED_BY    NUMBER
+         ,p_CREATION_DATE    DATE
+         ,p_CREATED_BY    NUMBER
+         ,p_LAST_UPDATE_LOGIN    NUMBER
+         ,p_PLANNING_PARAMETERS_ID    NUMBER)
+ IS
+   CURSOR C2 IS SELECT CSP_FAILURE_RATES_S1.nextval FROM sys.dual;
+BEGIN
+   If (px_FAILURE_RATE_ID IS NULL) OR (px_FAILURE_RATE_ID = FND_API.G_MISS_NUM) then
+       OPEN C2;
+       FETCH C2 INTO px_FAILURE_RATE_ID;
+       CLOSE C2;
+   End If;
+   INSERT INTO CSP_FAILURE_RATES(
+           FAILURE_RATE_ID
+          ,PRODUCT_ID
+          ,INVENTORY_ITEM_ID
+          ,CALCULATED_FAILURE_RATE
+          ,MANUAL_FAILURE_RATE
+          ,LAST_UPDATE_DATE
+          ,LAST_UPDATED_BY
+          ,CREATION_DATE
+          ,CREATED_BY
+          ,LAST_UPDATE_LOGIN
+          ,PLANNING_PARAMETERS_ID
+          ) VALUES (
+           px_FAILURE_RATE_ID
+          ,decode( p_PRODUCT_ID, FND_API.G_MISS_NUM, NULL, p_PRODUCT_ID)
+          ,decode( p_INVENTORY_ITEM_ID, FND_API.G_MISS_NUM, NULL, p_INVENTORY_ITEM_ID)
+          ,decode( p_CALCULATED_FAILURE_RATE, FND_API.G_MISS_NUM, NULL, p_CALCULATED_FAILURE_RATE)
+          ,decode( p_MANUAL_FAILURE_RATE, FND_API.G_MISS_NUM, NULL, p_MANUAL_FAILURE_RATE)
+          ,decode( p_LAST_UPDATE_DATE, FND_API.G_MISS_DATE, TO_DATE(NULL), p_LAST_UPDATE_DATE)
+          ,decode( p_LAST_UPDATED_BY, FND_API.G_MISS_NUM, NULL, p_LAST_UPDATED_BY)
+          ,decode( p_CREATION_DATE, FND_API.G_MISS_DATE, TO_DATE(NULL), p_CREATION_DATE)
+          ,decode( p_CREATED_BY, FND_API.G_MISS_NUM, NULL, p_CREATED_BY)
+          ,decode( p_LAST_UPDATE_LOGIN, FND_API.G_MISS_NUM, NULL, p_LAST_UPDATE_LOGIN)
+          ,decode( p_PLANNING_PARAMETERS_ID, FND_API.G_MISS_NUM, NULL, p_PLANNING_PARAMETERS_ID));
+End Insert_Row;
+PROCEDURE Update_Row(
+          p_FAILURE_RATE_ID    NUMBER
+         ,p_PRODUCT_ID    NUMBER
+         ,p_INVENTORY_ITEM_ID    NUMBER
+         ,p_CALCULATED_FAILURE_RATE    NUMBER
+         ,p_MANUAL_FAILURE_RATE    NUMBER
+         ,p_LAST_UPDATE_DATE    DATE
+         ,p_LAST_UPDATED_BY    NUMBER
+         ,p_CREATION_DATE    DATE
+         ,p_CREATED_BY    NUMBER
+         ,p_LAST_UPDATE_LOGIN    NUMBER
+         ,p_PLANNING_PARAMETERS_ID    NUMBER)
+IS
+BEGIN
+    Update CSP_FAILURE_RATES
+    SET
+        PRODUCT_ID = decode( p_PRODUCT_ID, FND_API.G_MISS_NUM, PRODUCT_ID, p_PRODUCT_ID)
+       ,INVENTORY_ITEM_ID = decode( p_INVENTORY_ITEM_ID, FND_API.G_MISS_NUM, INVENTORY_ITEM_ID, p_INVENTORY_ITEM_ID)
+       ,CALCULATED_FAILURE_RATE = decode( p_CALCULATED_FAILURE_RATE, FND_API.G_MISS_NUM, CALCULATED_FAILURE_RATE, p_CALCULATED_FAILURE_RATE)
+       ,MANUAL_FAILURE_RATE = decode( p_MANUAL_FAILURE_RATE, FND_API.G_MISS_NUM, MANUAL_FAILURE_RATE, p_MANUAL_FAILURE_RATE)
+       ,LAST_UPDATE_DATE = decode( p_LAST_UPDATE_DATE, FND_API.G_MISS_DATE, LAST_UPDATE_DATE, p_LAST_UPDATE_DATE)
+       ,LAST_UPDATED_BY = decode( p_LAST_UPDATED_BY, FND_API.G_MISS_NUM, LAST_UPDATED_BY, p_LAST_UPDATED_BY)
+       ,CREATION_DATE = decode( p_CREATION_DATE, FND_API.G_MISS_DATE, CREATION_DATE, p_CREATION_DATE)
+       ,CREATED_BY = decode( p_CREATED_BY, FND_API.G_MISS_NUM, CREATED_BY, p_CREATED_BY)
+       ,LAST_UPDATE_LOGIN = decode( p_LAST_UPDATE_LOGIN, FND_API.G_MISS_NUM, LAST_UPDATE_LOGIN, p_LAST_UPDATE_LOGIN)
+       ,PLANNING_PARAMETERS_ID = decode( p_PLANNING_PARAMETERS_ID, FND_API.G_MISS_NUM, PLANNING_PARAMETERS_ID, p_PLANNING_PARAMETERS_ID)
+    where FAILURE_RATE_ID = p_FAILURE_RATE_ID;
+    If (SQL%NOTFOUND) then
+        RAISE NO_DATA_FOUND;
+    End If;
+END Update_Row;
+PROCEDURE Delete_Row(
+    p_FAILURE_RATE_ID  NUMBER)
+IS
+BEGIN
+    DELETE FROM CSP_FAILURE_RATES
+    WHERE FAILURE_RATE_ID = p_FAILURE_RATE_ID;
+    If (SQL%NOTFOUND) then
+        RAISE NO_DATA_FOUND;
+    End If;
+END Delete_Row;
+PROCEDURE Lock_Row(
+          p_FAILURE_RATE_ID    NUMBER
+         ,p_PRODUCT_ID    NUMBER
+         ,p_INVENTORY_ITEM_ID    NUMBER
+         ,p_CALCULATED_FAILURE_RATE    NUMBER
+         ,p_MANUAL_FAILURE_RATE    NUMBER
+         ,p_LAST_UPDATE_DATE    DATE
+         ,p_LAST_UPDATED_BY    NUMBER
+         ,p_CREATION_DATE    DATE
+         ,p_CREATED_BY    NUMBER
+         ,p_LAST_UPDATE_LOGIN    NUMBER
+         ,p_PLANNING_PARAMETERS_ID    NUMBER)
+ IS
+   CURSOR C IS
+       SELECT *
+       FROM CSP_FAILURE_RATES
+       WHERE FAILURE_RATE_ID =  p_FAILURE_RATE_ID
+       FOR UPDATE of FAILURE_RATE_ID NOWAIT;
+   Recinfo C%ROWTYPE;
+BEGIN
+    OPEN C;
+    FETCH C INTO Recinfo;
+    If (C%NOTFOUND) then
+        CLOSE C;
+        FND_MESSAGE.SET_NAME('FND', 'FORM_RECORD_DELETED');
+        APP_EXCEPTION.RAISE_EXCEPTION;
+    End If;
+    CLOSE C;
+    if (
+           (      Recinfo.FAILURE_RATE_ID = p_FAILURE_RATE_ID)
+       AND (    ( Recinfo.PRODUCT_ID = p_PRODUCT_ID)
+            OR (    ( Recinfo.PRODUCT_ID IS NULL )
+                AND (  p_PRODUCT_ID IS NULL )))
+       AND (    ( Recinfo.INVENTORY_ITEM_ID = p_INVENTORY_ITEM_ID)
+            OR (    ( Recinfo.INVENTORY_ITEM_ID IS NULL )
+                AND (  p_INVENTORY_ITEM_ID IS NULL )))
+       AND (    ( Recinfo.CALCULATED_FAILURE_RATE = p_CALCULATED_FAILURE_RATE)
+            OR (    ( Recinfo.CALCULATED_FAILURE_RATE IS NULL )
+                AND (  p_CALCULATED_FAILURE_RATE IS NULL )))
+       AND (    ( Recinfo.MANUAL_FAILURE_RATE = p_MANUAL_FAILURE_RATE)
+            OR (    ( Recinfo.MANUAL_FAILURE_RATE IS NULL )
+                AND (  p_MANUAL_FAILURE_RATE IS NULL )))
+       AND (    ( Recinfo.LAST_UPDATE_DATE = p_LAST_UPDATE_DATE)
+            OR (    ( Recinfo.LAST_UPDATE_DATE IS NULL )
+                AND (  p_LAST_UPDATE_DATE IS NULL )))
+       AND (    ( Recinfo.LAST_UPDATED_BY = p_LAST_UPDATED_BY)
+            OR (    ( Recinfo.LAST_UPDATED_BY IS NULL )
+                AND (  p_LAST_UPDATED_BY IS NULL )))
+       AND (    ( Recinfo.CREATION_DATE = p_CREATION_DATE)
+            OR (    ( Recinfo.CREATION_DATE IS NULL )
+                AND (  p_CREATION_DATE IS NULL )))
+       AND (    ( Recinfo.CREATED_BY = p_CREATED_BY)
+            OR (    ( Recinfo.CREATED_BY IS NULL )
+                AND (  p_CREATED_BY IS NULL )))
+       AND (    ( Recinfo.LAST_UPDATE_LOGIN = p_LAST_UPDATE_LOGIN)
+            OR (    ( Recinfo.LAST_UPDATE_LOGIN IS NULL )
+                AND (  p_LAST_UPDATE_LOGIN IS NULL )))
+       AND (    ( Recinfo.PLANNING_PARAMETERS_ID = p_PLANNING_PARAMETERS_ID)
+            OR (    ( Recinfo.PLANNING_PARAMETERS_ID IS NULL )
+                AND (  p_PLANNING_PARAMETERS_ID IS NULL )))
+        ) then
+        return;
+    else
+        FND_MESSAGE.SET_NAME('FND', 'FORM_RECORD_CHANGED');
+        APP_EXCEPTION.RAISE_EXCEPTION;
+    End If;
+END Lock_Row;
+End CSP_FAILURE_RATES_PKG;
+
+/

@@ -1,0 +1,184 @@
+--------------------------------------------------------
+--  DDL for Package OKE_CHR_PVT
+--------------------------------------------------------
+
+  CREATE OR REPLACE EDITIONABLE PACKAGE "APPS"."OKE_CHR_PVT" AUTHID CURRENT_USER AS
+/*$Header: OKEVCHRS.pls 120.0 2005/05/25 17:44:19 appldev noship $ */
+
+-- GLOBAL DATA STRUCTURES
+
+TYPE chr_rec_type IS RECORD(
+  k_header_id		NUMBER := OKE_API.G_MISS_NUM,
+  program_id 		NUMBER := OKE_API.G_MISS_NUM,
+  project_id		NUMBER := OKE_API.G_MISS_NUM,
+  boa_id		NUMBER := OKE_API.G_MISS_NUM,
+  k_type_code		OKE_K_HEADERS.K_TYPE_CODE%TYPE   := OKE_API.G_MISS_CHAR,
+  priority_code		OKE_K_HEADERS.PRIORITY_CODE%TYPE := OKE_API.G_MISS_CHAR,
+  prime_k_alias 	OKE_K_HEADERS.PRIME_K_ALIAS%TYPE := OKE_API.G_MISS_CHAR,
+  prime_k_number 	OKE_K_HEADERS.PRIME_K_NUMBER%TYPE := OKE_API.G_MISS_CHAR,
+  authorize_date 	OKE_K_HEADERS.AUTHORIZE_DATE%TYPE := OKE_API.G_MISS_DATE,
+  authorizing_reason 	OKE_K_HEADERS.AUTHORIZING_REASON%TYPE := OKE_API.G_MISS_CHAR,
+  award_cancel_date 	OKE_K_HEADERS.AWARD_CANCEL_DATE%TYPE := OKE_API.G_MISS_DATE,
+  award_date		OKE_K_HEADERS.AWARD_DATE%TYPE := OKE_API.G_MISS_DATE,
+  date_definitized 	OKE_K_HEADERS.DATE_DEFINITIZED%TYPE := OKE_API.G_MISS_DATE,
+  date_issued 		OKE_K_HEADERS.DATE_ISSUED%TYPE := OKE_API.G_MISS_DATE,
+  date_negotiated 	OKE_K_HEADERS.DATE_NEGOTIATED%TYPE := OKE_API.G_MISS_DATE,
+  date_received 	OKE_K_HEADERS.DATE_RECEIVED%TYPE := OKE_API.G_MISS_DATE,
+  date_sign_by_contractor OKE_K_HEADERS.DATE_SIGN_BY_CONTRACTOR%TYPE := OKE_API.G_MISS_DATE,
+  date_sign_by_customer OKE_K_HEADERS.DATE_SIGN_BY_CUSTOMER%TYPE := OKE_API.G_MISS_DATE,
+  faa_approve_date 	OKE_K_HEADERS.FAA_APPROVE_DATE%TYPE := OKE_API.G_MISS_DATE,
+  faa_reject_date 	OKE_K_HEADERS.FAA_REJECT_DATE%TYPE := OKE_API.G_MISS_DATE,
+  booked_flag		OKE_K_HEADERS.BOOKED_FLAG%TYPE := OKE_API.G_MISS_CHAR,
+  open_flag		OKE_K_HEADERS.OPEN_FLAG%TYPE := OKE_API.G_MISS_CHAR,
+  cfe_flag		OKE_K_HEADERS.CFE_FLAG%TYPE := OKE_API.G_MISS_CHAR,
+  vat_code		OKE_K_HEADERS.VAT_CODE%TYPE := OKE_API.G_MISS_CHAR,
+  country_of_origin_code OKE_K_HEADERS.COUNTRY_OF_ORIGIN_CODE%TYPE := OKE_API.G_MISS_CHAR,
+  export_flag		OKE_K_HEADERS.EXPORT_FLAG%TYPE := OKE_API.G_MISS_CHAR,
+  human_subject_flag 	OKE_K_HEADERS.HUMAN_SUBJECT_FLAG%TYPE := OKE_API.G_MISS_CHAR,
+  cqa_flag		OKE_K_HEADERS.CQA_FLAG%TYPE := OKE_API.G_MISS_CHAR,
+  interim_rpt_req_flag 	OKE_K_HEADERS.INTERIM_RPT_REQ_FLAG%TYPE := OKE_API.G_MISS_CHAR,
+  no_competition_authorize OKE_K_HEADERS.NO_COMPETITION_AUTHORIZE%TYPE := OKE_API.G_MISS_CHAR,
+  penalty_clause_flag 	OKE_K_HEADERS.PENALTY_CLAUSE_FLAG%TYPE := OKE_API.G_MISS_CHAR,
+  product_line_code 	OKE_K_HEADERS.PRODUCT_LINE_CODE%TYPE := OKE_API.G_MISS_CHAR,
+  reporting_flag 	OKE_K_HEADERS.REPORTING_FLAG%TYPE := OKE_API.G_MISS_CHAR,
+  sb_plan_req_flag 	OKE_K_HEADERS.SB_PLAN_REQ_FLAG%TYPE := OKE_API.G_MISS_CHAR,
+  sb_report_flag 	OKE_K_HEADERS.SB_REPORT_FLAG%TYPE := OKE_API.G_MISS_CHAR,
+  nte_amount 		OKE_K_HEADERS.NTE_AMOUNT%TYPE := OKE_API.G_MISS_NUM,
+  nte_warning_flag 	OKE_K_HEADERS.NTE_WARNING_FLAG%TYPE := OKE_API.G_MISS_CHAR,
+  bill_without_def_flag OKE_K_HEADERS.BILL_WITHOUT_DEF_FLAG%TYPE := OKE_API.G_MISS_CHAR,
+  cas_flag		OKE_K_HEADERS.CAS_FLAG%TYPE := OKE_API.G_MISS_CHAR,
+  classified_flag 	OKE_K_HEADERS.CLASSIFIED_FLAG%TYPE := OKE_API.G_MISS_CHAR,
+  client_approve_req_flag OKE_K_HEADERS.CLIENT_APPROVE_REQ_FLAG%TYPE := OKE_API.G_MISS_CHAR,
+  cost_of_money 	OKE_K_HEADERS.COST_OF_MONEY%TYPE := OKE_API.G_MISS_CHAR,
+  dcaa_audit_req_flag 	OKE_K_HEADERS.DCAA_AUDIT_REQ_FLAG%TYPE := OKE_API.G_MISS_CHAR,
+  cost_share_flag 	OKE_K_HEADERS.COST_SHARE_FLAG%TYPE := OKE_API.G_MISS_CHAR,
+  oh_rates_final_flag 	OKE_K_HEADERS.OH_RATES_FINAL_FLAG%TYPE := OKE_API.G_MISS_CHAR,
+  progress_payment_flag OKE_K_HEADERS.PROGRESS_PAYMENT_FLAG%TYPE := OKE_API.G_MISS_CHAR,
+  progress_payment_liq_rate OKE_K_HEADERS.PROGRESS_PAYMENT_LIQ_RATE%TYPE := OKE_API.G_MISS_NUM,
+  progress_payment_rate OKE_K_HEADERS.PROGRESS_PAYMENT_RATE%TYPE := OKE_API.G_MISS_NUM,
+  alternate_liquidation_rate OKE_K_HEADERS.ALTERNATE_LIQUIDATION_RATE%TYPE := OKE_API.G_MISS_NUM,
+  prop_delivery_location 	OKE_K_HEADERS.PROP_DELIVERY_LOCATION%TYPE := OKE_API.G_MISS_CHAR,
+  prop_due_date_time 	OKE_K_HEADERS.PROP_DUE_DATE_TIME%TYPE := OKE_API.G_MISS_DATE,
+  prop_due_time		OKE_K_HEADERS.PROP_DUE_TIME%TYPE := OKE_API.G_MISS_CHAR,
+  prop_expire_date 	OKE_K_HEADERS.PROP_EXPIRE_DATE%TYPE := OKE_API.G_MISS_DATE,
+  copies_required       OKE_K_HEADERS.COPIES_REQUIRED%TYPE := OKE_API.G_MISS_NUM,
+  sic_code 		OKE_K_HEADERS.SIC_CODE%TYPE := OKE_API.G_MISS_CHAR,
+  tech_data_wh_rate 	OKE_K_HEADERS.TECH_DATA_WH_RATE%TYPE := OKE_API.G_MISS_NUM,
+  cost_of_sale_rate     OKE_K_HEADERS.COST_OF_SALE_RATE%TYPE := OKE_API.G_MISS_NUM,
+  financial_ctrl_verified_flag OKE_K_HEADERS.FINANCIAL_CTRL_VERIFIED_FLAG%TYPE := OKE_API.G_MISS_CHAR,
+  definitized_flag		OKE_K_HEADERS.DEFINITIZED_FLAG%TYPE := OKE_API.G_MISS_CHAR,
+  created_by		NUMBER := OKE_API.G_MISS_NUM,
+  creation_date		DATE   := OKE_API.G_MISS_DATE,
+  last_updated_by	NUMBER := OKE_API.G_MISS_NUM,
+  last_update_login	NUMBER := OKE_API.G_MISS_NUM,
+  last_update_date	DATE   := OKE_API.G_MISS_DATE,
+  line_value_total	NUMBER := OKE_API.G_MISS_NUM,
+  undef_line_value_total NUMBER := OKE_API.G_MISS_NUM,
+--  end_date		DATE  := OKE_API.G_MISS_DATE,
+  owning_organization_id NUMBER := OKE_API.G_MISS_NUM,
+  default_task_id	NUMBER := OKE_API.G_MISS_NUM);
+
+
+g_miss_chr_rec	chr_rec_type;
+
+TYPE chr_tbl_type IS TABLE OF chr_rec_type
+  INDEX BY BINARY_INTEGER;
+
+-- GLOBAL MESSAGE CONSTANTS
+
+G_FND_APP 	CONSTANT VARCHAR2(200) := OKE_API.G_FND_APP;
+G_FORM_UNABLE_TO_RESERVE_REC  CONSTANT VARCHAR2(200) := OKE_API.G_FORM_UNABLE_TO_RESERVE_REC;
+G_FORM_RECORD_DELETED	CONSTANT VARCHAR2(200) := OKE_API.G_FORM_RECORD_DELETED;
+G_FORM_RECORD_CHANGED	CONSTANT VARCHAR2(200) := OKE_API.G_FORM_RECORD_CHANGED;
+G_RECORD_LOGICALLY_DELETED	CONSTANT VARCHAR2(200) := OKE_API.G_RECORD_LOGICALLY_DELETED;
+G_REQUIRED_VALUE	CONSTANT VARCHAR2(200) := OKE_API.G_REQUIRED_VALUE;
+G_INVALID_VALUE		CONSTANT VARCHAR2(200) := OKE_API.G_INVALID_VALUE;
+G_COL_NAME_TOKEN	CONSTANT VARCHAR2(200) := OKE_API.G_COL_NAME_TOKEN;
+G_PARENT_TABLE_TOKEN	CONSTANT VARCHAR2(200) := OKE_API.G_PARENT_TABLE_TOKEN;
+G_CHILD_TABLE_TOKEN	CONSTANT VARCHAR2(200) := OKE_API.G_CHILD_TABLE_TOKEN;
+
+-- GLOBAL VARIABLES
+
+G_PKG_NAME	CONSTANT VARCHAR2(200) := 'OKE_CHR_PVT';
+G_APP_NAME	CONSTANT VARCHAR2(3) := OKE_API.G_APP_NAME;
+
+-- PROCEDURES AND FUNCTIONS
+
+PROCEDURE change_version;
+PROCEDURE api_copy;
+PROCEDURE insert_row(
+  p_api_version 	IN NUMBER,
+  p_init_msg_list		IN VARCHAR2 DEFAULT OKE_API.G_FALSE,
+  x_return_status	OUT NOCOPY VARCHAR2,
+  x_msg_count		OUT NOCOPY NUMBER,
+  x_msg_data		OUT NOCOPY VARCHAR2,
+  p_chr_rec   		IN chr_rec_type,
+  x_chr_rec		OUT NOCOPY chr_rec_type);
+
+PROCEDURE insert_row(
+  p_api_version 	IN NUMBER,
+  p_init_msg_list	IN VARCHAR2 DEFAULT OKE_API.G_FALSE,
+  x_return_status	OUT NOCOPY VARCHAR2,
+  x_msg_count		OUT NOCOPY NUMBER,
+  x_msg_data		OUT NOCOPY VARCHAR2,
+  p_chr_tbl		IN chr_tbl_type,
+  x_chr_tbl		OUT NOCOPY chr_tbl_type);
+
+
+
+PROCEDURE update_row(
+  p_api_version 	IN NUMBER,
+  p_init_msg_list	        IN VARCHAR2 DEFAULT OKE_API.G_FALSE,
+  x_return_status	OUT NOCOPY VARCHAR2,
+  x_msg_count		OUT NOCOPY NUMBER,
+  x_msg_data		OUT NOCOPY VARCHAR2,
+  p_chr_rec   		IN chr_rec_type,
+  x_chr_rec		OUT NOCOPY chr_rec_type);
+
+PROCEDURE update_row(
+  p_api_version 	IN NUMBER,
+  p_init_msg_list		IN VARCHAR2 DEFAULT OKE_API.G_FALSE,
+  x_return_status	OUT NOCOPY VARCHAR2,
+  x_msg_count		OUT NOCOPY NUMBER,
+  x_msg_data		OUT NOCOPY VARCHAR2,
+  p_chr_tbl		IN chr_tbl_type,
+  x_chr_tbl		OUT NOCOPY chr_tbl_type);
+
+PROCEDURE delete_row(
+  p_api_version 	IN NUMBER,
+  p_init_msg_list		IN VARCHAR2 DEFAULT OKE_API.G_FALSE,
+  x_return_status	OUT NOCOPY VARCHAR2,
+  x_msg_count		OUT NOCOPY NUMBER,
+  x_msg_data		OUT NOCOPY VARCHAR2,
+  p_chr_rec   		IN chr_rec_type);
+
+PROCEDURE delete_row(
+  p_api_version 	IN NUMBER,
+  p_init_msg_list		IN VARCHAR2 DEFAULT OKE_API.G_FALSE,
+  x_return_status	OUT NOCOPY VARCHAR2,
+  x_msg_count		OUT NOCOPY NUMBER,
+  x_msg_data		OUT NOCOPY VARCHAR2,
+  p_chr_tbl		IN chr_tbl_type);
+
+PROCEDURE validate_row(
+  p_api_version 	IN NUMBER,
+  p_init_msg_list		IN VARCHAR2 DEFAULT OKE_API.G_FALSE,
+  x_return_status	OUT NOCOPY VARCHAR2,
+  x_msg_count		OUT NOCOPY NUMBER,
+  x_msg_data		OUT NOCOPY VARCHAR2,
+  p_chr_rec   		IN chr_rec_type);
+
+PROCEDURE validate_row(
+  p_api_version 	IN NUMBER,
+  p_init_msg_list		IN VARCHAR2 DEFAULT OKE_API.G_FALSE,
+  x_return_status	OUT NOCOPY VARCHAR2,
+  x_msg_count		OUT NOCOPY NUMBER,
+  x_msg_data		OUT NOCOPY VARCHAR2,
+  p_chr_tbl		IN chr_tbl_type);
+
+END OKE_CHR_PVT;
+
+
+ 
+
+/

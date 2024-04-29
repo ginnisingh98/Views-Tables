@@ -1,0 +1,350 @@
+--------------------------------------------------------
+--  DDL for Package PAY_QPI_API
+--------------------------------------------------------
+
+  CREATE OR REPLACE EDITIONABLE PACKAGE "APPS"."PAY_QPI_API" AUTHID CURRENT_USER as
+/* $Header: pyqpirhi.pkh 120.1 2005/10/04 06:49:42 swinton noship $ */
+--
+-- ----------------------------------------------------------------------------
+-- |---------------------------------< lck >----------------------------------|
+-- ----------------------------------------------------------------------------
+-- {Start Of Comments}
+--
+-- Description:
+--   The Lck process has two main functions to perform. Firstly, the row to be
+--   deleted must be locked. The locking of the row will only be
+--   successful if the row is not currently locked by another user.
+--   Secondly, during the locking of the row, the row is selected into
+--   the g_old_rec data structure which enables the current row values from the
+--   server to be available to the api.
+--
+-- Pre Conditions:
+--   None.
+--
+-- In Arguments:
+--   The arguments to the Lck process are the primary key(s) which uniquely
+--   identify the row.
+--
+-- Post Success:
+--   On successful completion of the Lck process the row to be updated or
+--   deleted will be locked and selected into the global data structure
+--   g_old_rec.
+--
+-- Post Failure:
+--   The Lck process can fail for two reasons:
+--   1) When attempting to lock the row the row could already be locked by
+--      another user. This will raise the error HR_7165_OBJECT_LOCKED.
+--   2) The row which is required to be locked doesn't exist in the HR Schema.
+--      This error is trapped and reported using the message name
+--      'HR_7220_INVALID_PRIMARY_KEY'.
+--
+-- Access Status:
+--   Public.
+--
+-- {End Of Comments}
+--
+procedure lck
+  (p_element_entry_id      in number
+  ,p_assignment_action_id  in number
+  );
+--
+-- ----------------------------------------------------------------------------
+-- |---------------------------------< ins >----------------------------------|
+-- ----------------------------------------------------------------------------
+-- {Start Of Comments}
+--
+-- Description:
+--   This procedure is the record interface for the insert business process
+--   for the specified entity. The role of this process is to insert a fully
+--   validated row, into the HR schema.
+--   1) If the p_validate argument has been set to true then a savepoint is
+--      issued.
+--   2) The controlling validation process insert_validate is then executed
+--      which will execute all private and public validation business rule
+--      processes.
+--   3) The insert_dml process will physical perform the insert dml into the
+--      specified entity.
+--   4) If the p_validate argument has been set to true an exception is raised
+--      which is handled and processed by performing a rollback to the
+--      savepoint which was issued at the beginning of the Ins process
+--
+-- Pre Conditions:
+--   The main arguments to the business process have to be in the record
+--   format.
+--
+-- In Arguments:
+--   p_validate
+--     Determines if the business process is to be validated. Setting this
+--     boolean value to true will invoke the process to be validated. The
+--     default is false. The validation is controlled by a savepoint and
+--     rollback mechanism. The savepoint is issued at the beginning of the
+--     business process and is rollbacked at the end of the business process
+--     when all the processing has been completed. The rollback is controlled
+--     by raising and handling the exception hr_api.validate_enabled. We use
+--     the exception because, by raising the exception with the business
+--     process, we can exit successfully without having any of the 'OUT'
+--     arguments being set.
+--
+-- Post Success:
+--   A fully validated row will be inserted into the specified entity
+--   without being committed. If the p_validate argument has been set to true
+--   then all the work will be rolled back.
+--
+-- Post Failure:
+--   If an error has occurred, an error message will be supplied with the work
+--   rolled back.
+--   An insert will be disallowed if any of the following conditions are
+--   found:
+--     1) An Assignment Process with an id of p_rec.assignment_action_id does
+--        not exist.
+--     2) The Assignment Process does exist but it is not for a 'QuickPay Run'
+--        Payroll Process.
+--     3) The Assignment Process has a status of complete.
+--     4) The Payroll Process current_task is not null.
+--     5) No Element Entry exists with an id of p_rec.element_entry_id.
+--     6) The entry is not for the assignment defined on the QuickPay Run
+--        definition.
+--     7) The element type cannot be processed in run.
+--     8) The element entry does not exist as of the QuickPay date earned.
+--     9) The entry type is a balance adjustment, replacement adjustment
+--        or additive adjustment.
+--    10) The element type is non-recurring and it has already been processed.
+--    11) The element type is recurring, the entry type is 'Additional entry'
+--        or 'Override' and it has already processed.
+--    12) A QuickPay Inclusion for this Assignment Process and Element Entry
+--        already exists.
+--
+-- Access Status:
+--   Public.
+--
+-- {End Of Comments}
+--
+procedure ins
+  (p_rec       in out nocopy pay_quickpay_inclusions%ROWTYPE
+  ,p_validate  in boolean default false
+  );
+--
+-- ----------------------------------------------------------------------------
+-- |---------------------------------< ins >----------------------------------|
+-- ----------------------------------------------------------------------------
+-- {Start Of Comments}
+--
+-- Description:
+--   This procedure is the attribute interface for the insert business
+--   process for QuickPay Inclusions and is the outermost layer. The role
+--   of this process is to insert a fully validated row into the HR schema.
+--   The processing of this procedure is as follows:
+--   1) The attributes are converted into a local record structure by
+--      calling an internal convert_args function.
+--   2) After the conversion has taken place, the corresponding record ins
+--      interface business process is executed.
+--   3) OUT arguments are then set to their corresponding record arguments.
+--
+-- Pre Conditions:
+--
+-- In Arguments:
+--   p_validate
+--     Determines if the business process is to be validated. Setting this
+--     Boolean value to true will invoke the process to be validated.
+--     The default is false.
+--
+-- Post Success:
+--   A fully validated row will be inserted for QuickPay Inclusions
+--   without being committed (or rollbacked depending on the p_validate
+--   status).
+--
+-- Post Failure:
+--   If an error has occurred, an error message will be supplied with the work
+--   rolled back. For full details of the error conditions refer to the
+--   'ins' record interface.
+--
+-- Developer Implementation Notes:
+--   None.
+--
+-- Access Status:
+--   Public.
+--
+-- {End Of Comments}
+--
+procedure ins
+  (p_element_entry_id      in number
+  ,p_assignment_action_id  in number
+  ,p_validate              in boolean   default false
+  );
+--
+-- ----------------------------------------------------------------------------
+-- |-------------------------< bulk_default_ins >-----------------------------|
+-- ----------------------------------------------------------------------------
+-- {Start Of Comments}
+--
+-- Description:
+--   Inserts all default QuickPay Inclusions rows for one QuickPay Run
+--   assignment process. This is faster than using the single row insert
+--   procedures (ins record and attribute) as the assignment process and
+--   element entry validation is only executed once.
+--   Used when an assignment process has just been inserted for a QuickPay Run
+--   payroll process.
+--
+-- Pre Conditions:
+--   The QuickPay Run Payroll Process and Assignment Process details have
+--   already been inserted into the HR schema. No QuickPay Inclusions exist
+--   for the Assignment Process.
+--
+-- In Arguments:
+--   p_assignment_action_id is the id of an inserted assignment process.
+--   p_validate is set to true or false. This argument works in the same way
+--   as the p_validate for the ins procedures.
+--
+-- Post Success:
+--   Inserts a row into pay_quickpay_inclusions for every element entry
+--   which match all of these conditions:
+--     1) The entry is for the assignment defined on the QuickPay Run
+--        definition.
+--     2) The element type can be processed in run.
+--     3) The entry exists as of the QuickPay date earned.
+--     4) The entry type is not a balance adjustment, replacement adjustment
+--        or additive adjustment.
+--     5) Non-recurring entries are only included if they have not already
+--        been processed.
+--     6) Recurring entries which have an entry type of 'Additional entry'
+--        or 'Override', are only included they have have not already been
+--        processed.
+--
+-- Post Failure:
+--   An error is raised and the insert is aborted if any of the following
+--   conditions are found:
+--     1) An Assignment Process with the id p_assignment_action_id does not
+--        exist.
+--     2) The corresponding Payroll Process for this Assignment Process is not
+--        for a QuickPay Run.
+--     3) The Assignment Process has an action_status of 'C' for Complete.
+--
+-- Access Status:
+--   Public.
+--
+-- {End Of Comments}
+--
+procedure bulk_default_ins
+  (p_assignment_action_id in pay_assignment_actions.assignment_action_id%TYPE
+  ,p_validate             in boolean default false
+  );
+--
+-- ----------------------------------------------------------------------------
+-- |---------------------------------< del >----------------------------------|
+-- ----------------------------------------------------------------------------
+-- {Start Of Comments}
+--
+-- Description:
+--   This procedure is the record interface for the delete business process
+--   for QuickPay Inclusions. The role of this process is to delete the
+--   row from the HR schema. This process is the main backbone of the del
+--   business process. The processing of this procedure is as follows:
+--   1) If the p_validate argument has been set to true then a savepoint is
+--      issued.
+--   2) The controlling validation process delete_validate is then executed
+--      which will execute all private and public validation business rule
+--      processes.
+--   3) The pre_delete business process is then executed which enables any
+--      logic to be processed before the delete dml process is executed.
+--   4) The delete_dml process will physical perform the delete dml for the
+--      specified row.
+--   5) The post_delete business process is then executed which enables any
+--      logic to be processed after the delete dml process.
+--   6) If the p_validate argument has been set to true an exception is raised
+--      which is handled and processed by performing a rollback to the
+--      savepoint which was issued at the beginning of the del process.
+--
+-- Pre Conditions:
+--   The main arguments to the business process have to be in the record
+--   format.
+--
+-- In Arguments:
+--   p_validate
+--     Determines if the business process is to be validated. Setting this
+--     boolean value to true will invoke the process to be validated. The
+--     default is false. The validation is controlled by a savepoint and
+--     rollback mechanism. The savepoint is issued at the beginning of the
+--     business process and is rollbacked at the end of the business process
+--     when all the processing has been completed. The rollback is controlled
+--     by raising and handling the exception hr_api.validate_enabled. We use
+--     the exception because, by raising the exception with the business
+--     process, we can exit successfully without having any of the 'OUT'
+--     arguments being set.
+--
+-- Post Success:
+--   The specified row will be fully validated and deleted without being
+--   committed. If the p_validate argument has been set to true then all the
+--   work will be rolled back.
+--
+-- Post Failure:
+--   If an error has occurred, an error message will be supplied with the work
+--   rolled back.
+--   A delete will be disallowed if any of the following conditions are
+--   found:
+--     1) The corresponding Assignment Process has an action_status of
+--        Complete.
+--     2) The corresponding Payroll Process has a current_task which is
+--        not null.
+--
+-- Developer Implementation Notes:
+--   None.
+--
+-- Access Status:
+--   Public.
+--
+-- {End Of Comments}
+--
+procedure del
+  (p_rec        in pay_quickpay_inclusions%ROWTYPE
+  ,p_validate   in boolean default false
+  );
+--
+-- ----------------------------------------------------------------------------
+-- |---------------------------------< del >----------------------------------|
+-- ----------------------------------------------------------------------------
+-- {Start Of Comments}
+--
+-- Description:
+--   This procedure is the attribute interface for the delete business
+--   process for QuickPay Inclusions and is the outermost layer. The role
+--   of this process is to validate and delete the specified row from the
+--   HR schema. The processing of this procedure is as follows:
+--   1) The attributes are converted into a local record structure by
+--      explicitly coding the attribute arguments into the
+--      pay_quickpay_inclusion%ROWTYPE datatype.
+--   2) After the conversion has taken place, the corresponding record del
+--      interface business process is executed.
+--
+-- Pre Conditions:
+--
+-- In Arguments:
+--   p_validate
+--     Determines if the business process is to be validated. Setting this
+--     Boolean value to true will invoke the process to be validated.
+--     The default is false.
+--
+-- Post Success:
+--   The specified row will be fully validated and deleted for the specified
+--   entity without being committed (or rollbacked depending on the
+--   p_validate status).
+--
+-- Post Failure:
+--   If an error has occurred, an error message will be supplied with the work
+--   rolled back.
+--
+-- Access Status:
+--   Public.
+--
+-- {End Of Comments}
+--
+procedure del
+  (p_element_entry_id      in number
+  ,p_assignment_action_id  in number
+  ,p_validate              in boolean default false
+  );
+--
+end pay_qpi_api;
+
+ 
+
+/

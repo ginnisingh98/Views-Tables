@@ -1,0 +1,165 @@
+--------------------------------------------------------
+--  DDL for Package PER_PJO_RKU
+--------------------------------------------------------
+
+  CREATE OR REPLACE EDITIONABLE PACKAGE "APPS"."PER_PJO_RKU" AUTHID CURRENT_USER as
+/* $Header: pepjorhi.pkh 120.0.12010000.2 2008/08/06 09:28:32 ubhat ship $ */
+--
+-- ----------------------------------------------------------------------------
+-- |----------------------------< after_update >------------------------------|
+-- ----------------------------------------------------------------------------
+--
+procedure after_update
+  (p_effective_date               in date
+  ,p_previous_job_id              in number
+  ,p_previous_employer_id         in number
+  ,p_start_date                   in date
+  ,p_end_date                     in date
+  ,p_period_years                 in number
+  ,p_period_days                  in number
+  ,p_job_name                     in varchar2
+  ,p_employment_category          in varchar2
+  ,p_description                  in varchar2
+  ,p_pjo_attribute_category       in varchar2
+  ,p_pjo_attribute1               in varchar2
+  ,p_pjo_attribute2               in varchar2
+  ,p_pjo_attribute3               in varchar2
+  ,p_pjo_attribute4               in varchar2
+  ,p_pjo_attribute5               in varchar2
+  ,p_pjo_attribute6               in varchar2
+  ,p_pjo_attribute7               in varchar2
+  ,p_pjo_attribute8               in varchar2
+  ,p_pjo_attribute9               in varchar2
+  ,p_pjo_attribute10              in varchar2
+  ,p_pjo_attribute11              in varchar2
+  ,p_pjo_attribute12              in varchar2
+  ,p_pjo_attribute13              in varchar2
+  ,p_pjo_attribute14              in varchar2
+  ,p_pjo_attribute15              in varchar2
+  ,p_pjo_attribute16              in varchar2
+  ,p_pjo_attribute17              in varchar2
+  ,p_pjo_attribute18              in varchar2
+  ,p_pjo_attribute19              in varchar2
+  ,p_pjo_attribute20              in varchar2
+  ,p_pjo_attribute21              in varchar2
+  ,p_pjo_attribute22              in varchar2
+  ,p_pjo_attribute23              in varchar2
+  ,p_pjo_attribute24              in varchar2
+  ,p_pjo_attribute25              in varchar2
+  ,p_pjo_attribute26              in varchar2
+  ,p_pjo_attribute27              in varchar2
+  ,p_pjo_attribute28              in varchar2
+  ,p_pjo_attribute29              in varchar2
+  ,p_pjo_attribute30              in varchar2
+  ,p_pjo_information_category     in varchar2
+  ,p_pjo_information1             in varchar2
+  ,p_pjo_information2             in varchar2
+  ,p_pjo_information3             in varchar2
+  ,p_pjo_information4             in varchar2
+  ,p_pjo_information5             in varchar2
+  ,p_pjo_information6             in varchar2
+  ,p_pjo_information7             in varchar2
+  ,p_pjo_information8             in varchar2
+  ,p_pjo_information9             in varchar2
+  ,p_pjo_information10            in varchar2
+  ,p_pjo_information11            in varchar2
+  ,p_pjo_information12            in varchar2
+  ,p_pjo_information13            in varchar2
+  ,p_pjo_information14            in varchar2
+  ,p_pjo_information15            in varchar2
+  ,p_pjo_information16            in varchar2
+  ,p_pjo_information17            in varchar2
+  ,p_pjo_information18            in varchar2
+  ,p_pjo_information19            in varchar2
+  ,p_pjo_information20            in varchar2
+  ,p_pjo_information21            in varchar2
+  ,p_pjo_information22            in varchar2
+  ,p_pjo_information23            in varchar2
+  ,p_pjo_information24            in varchar2
+  ,p_pjo_information25            in varchar2
+  ,p_pjo_information26            in varchar2
+  ,p_pjo_information27            in varchar2
+  ,p_pjo_information28            in varchar2
+  ,p_pjo_information29            in varchar2
+  ,p_pjo_information30            in varchar2
+  ,p_object_version_number        in number
+  ,p_all_assignments              in varchar2
+  ,p_period_months                in number
+  ,p_previous_employer_id_o       in number
+  ,p_start_date_o                 in date
+  ,p_end_date_o                   in date
+  ,p_period_years_o               in number
+  ,p_period_days_o                in number
+  ,p_job_name_o                   in varchar2
+  ,p_employment_category_o        in varchar2
+  ,p_description_o                in varchar2
+  ,p_pjo_attribute_category_o     in varchar2
+  ,p_pjo_attribute1_o             in varchar2
+  ,p_pjo_attribute2_o             in varchar2
+  ,p_pjo_attribute3_o             in varchar2
+  ,p_pjo_attribute4_o             in varchar2
+  ,p_pjo_attribute5_o             in varchar2
+  ,p_pjo_attribute6_o             in varchar2
+  ,p_pjo_attribute7_o             in varchar2
+  ,p_pjo_attribute8_o             in varchar2
+  ,p_pjo_attribute9_o             in varchar2
+  ,p_pjo_attribute10_o            in varchar2
+  ,p_pjo_attribute11_o            in varchar2
+  ,p_pjo_attribute12_o            in varchar2
+  ,p_pjo_attribute13_o            in varchar2
+  ,p_pjo_attribute14_o            in varchar2
+  ,p_pjo_attribute15_o            in varchar2
+  ,p_pjo_attribute16_o            in varchar2
+  ,p_pjo_attribute17_o            in varchar2
+  ,p_pjo_attribute18_o            in varchar2
+  ,p_pjo_attribute19_o            in varchar2
+  ,p_pjo_attribute20_o            in varchar2
+  ,p_pjo_attribute21_o            in varchar2
+  ,p_pjo_attribute22_o            in varchar2
+  ,p_pjo_attribute23_o            in varchar2
+  ,p_pjo_attribute24_o            in varchar2
+  ,p_pjo_attribute25_o            in varchar2
+  ,p_pjo_attribute26_o            in varchar2
+  ,p_pjo_attribute27_o            in varchar2
+  ,p_pjo_attribute28_o            in varchar2
+  ,p_pjo_attribute29_o            in varchar2
+  ,p_pjo_attribute30_o            in varchar2
+  ,p_pjo_information_category_o   in varchar2
+  ,p_pjo_information1_o           in varchar2
+  ,p_pjo_information2_o           in varchar2
+  ,p_pjo_information3_o           in varchar2
+  ,p_pjo_information4_o           in varchar2
+  ,p_pjo_information5_o           in varchar2
+  ,p_pjo_information6_o           in varchar2
+  ,p_pjo_information7_o           in varchar2
+  ,p_pjo_information8_o           in varchar2
+  ,p_pjo_information9_o           in varchar2
+  ,p_pjo_information10_o          in varchar2
+  ,p_pjo_information11_o          in varchar2
+  ,p_pjo_information12_o          in varchar2
+  ,p_pjo_information13_o          in varchar2
+  ,p_pjo_information14_o          in varchar2
+  ,p_pjo_information15_o          in varchar2
+  ,p_pjo_information16_o          in varchar2
+  ,p_pjo_information17_o          in varchar2
+  ,p_pjo_information18_o          in varchar2
+  ,p_pjo_information19_o          in varchar2
+  ,p_pjo_information20_o          in varchar2
+  ,p_pjo_information21_o          in varchar2
+  ,p_pjo_information22_o          in varchar2
+  ,p_pjo_information23_o          in varchar2
+  ,p_pjo_information24_o          in varchar2
+  ,p_pjo_information25_o          in varchar2
+  ,p_pjo_information26_o          in varchar2
+  ,p_pjo_information27_o          in varchar2
+  ,p_pjo_information28_o          in varchar2
+  ,p_pjo_information29_o          in varchar2
+  ,p_pjo_information30_o          in varchar2
+  ,p_object_version_number_o      in number
+  ,p_all_assignments_o            in varchar2
+  ,p_period_months_o              in number
+  );
+--
+end per_pjo_rku;
+
+/

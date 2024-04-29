@@ -1,0 +1,115 @@
+--------------------------------------------------------
+--  DDL for Package IGS_OR_UNIT_HIST_PKG
+--------------------------------------------------------
+
+  CREATE OR REPLACE EDITIONABLE PACKAGE "APPS"."IGS_OR_UNIT_HIST_PKG" AUTHID CURRENT_USER AS
+ /* $Header: IGSOI12S.pls 115.5 2002/11/29 01:40:11 nsidana ship $ */
+procedure INSERT_ROW (
+  X_ROWID in out NOCOPY VARCHAR2,
+  X_ORG_UNIT_CD in VARCHAR2,
+  X_OU_START_DT in DATE,
+  X_HIST_START_DT in DATE,
+  X_HIST_END_DT in DATE,
+  X_HIST_WHO in NUMBER,
+  X_OU_END_DT in DATE,
+  X_DESCRIPTION in VARCHAR2,
+  X_ORG_STATUS in VARCHAR2,
+  X_ORG_TYPE in VARCHAR2,
+  X_MEMBER_TYPE in VARCHAR2,
+  X_INSTITUTION_CD in VARCHAR2,
+  X_NAME in VARCHAR2,
+  X_MODE in VARCHAR2 default 'R' ,
+  X_ORG_ID in NUMBER
+  );
+procedure LOCK_ROW (
+  X_ROWID in VARCHAR2,
+  X_ORG_UNIT_CD in VARCHAR2,
+  X_OU_START_DT in DATE,
+  X_HIST_START_DT in DATE,
+  X_HIST_END_DT in DATE,
+  X_HIST_WHO in NUMBER,
+  X_OU_END_DT in DATE,
+  X_DESCRIPTION in VARCHAR2,
+  X_ORG_STATUS in VARCHAR2,
+  X_ORG_TYPE in VARCHAR2,
+  X_MEMBER_TYPE in VARCHAR2,
+  X_INSTITUTION_CD in VARCHAR2,
+  X_NAME in VARCHAR2
+
+);
+procedure UPDATE_ROW (
+  X_ROWID in VARCHAR2,
+  X_ORG_UNIT_CD in VARCHAR2,
+  X_OU_START_DT in DATE,
+  X_HIST_START_DT in DATE,
+  X_HIST_END_DT in DATE,
+  X_HIST_WHO in NUMBER,
+  X_OU_END_DT in DATE,
+  X_DESCRIPTION in VARCHAR2,
+  X_ORG_STATUS in VARCHAR2,
+  X_ORG_TYPE in VARCHAR2,
+  X_MEMBER_TYPE in VARCHAR2,
+  X_INSTITUTION_CD in VARCHAR2,
+  X_NAME in VARCHAR2,
+  X_MODE in VARCHAR2 default 'R'
+  );
+procedure ADD_ROW (
+  X_ROWID in out NOCOPY VARCHAR2,
+  X_ORG_UNIT_CD in VARCHAR2,
+  X_OU_START_DT in DATE,
+  X_HIST_START_DT in DATE,
+  X_HIST_END_DT in DATE,
+  X_HIST_WHO in NUMBER,
+  X_OU_END_DT in DATE,
+  X_DESCRIPTION in VARCHAR2,
+  X_ORG_STATUS in VARCHAR2,
+  X_ORG_TYPE in VARCHAR2,
+  X_MEMBER_TYPE in VARCHAR2,
+  X_INSTITUTION_CD in VARCHAR2,
+  X_NAME in VARCHAR2,
+  X_MODE in VARCHAR2 default 'R',
+  X_ORG_ID in NUMBER
+  );
+procedure DELETE_ROW (
+  X_ROWID in VARCHAR2
+  );
+
+  FUNCTION Get_PK_For_Validation (
+    x_org_unit_cd IN VARCHAR2,
+    x_ou_start_dt IN DATE,
+    x_hist_start_dt IN DATE
+    )RETURN BOOLEAN;
+
+procedure Check_Constraints (
+  Column_Name in VARCHAR2 DEFAULT NULL ,
+  Column_Value in VARCHAR2 DEFAULT NULL
+  ) ;
+
+  PROCEDURE Before_DML (
+    p_action IN VARCHAR2,
+    x_rowid IN VARCHAR2 DEFAULT NULL,
+    x_org_unit_cd IN VARCHAR2 DEFAULT NULL,
+    x_ou_start_dt IN DATE DEFAULT NULL,
+    x_hist_start_dt IN DATE DEFAULT NULL,
+    x_hist_end_dt IN DATE DEFAULT NULL,
+    x_hist_who IN VARCHAR2 DEFAULT NULL,
+    x_ou_end_dt IN DATE DEFAULT NULL,
+    x_description IN VARCHAR2 DEFAULT NULL,
+    x_org_status IN VARCHAR2 DEFAULT NULL,
+    x_org_type IN VARCHAR2 DEFAULT NULL,
+    x_member_type IN VARCHAR2 DEFAULT NULL,
+    x_institution_cd IN VARCHAR2 DEFAULT NULL,
+    x_name IN VARCHAR2 DEFAULT NULL,
+    x_creation_date IN DATE DEFAULT NULL,
+    x_created_by IN NUMBER DEFAULT NULL,
+    x_last_update_date IN DATE DEFAULT NULL,
+    x_last_updated_by IN NUMBER DEFAULT NULL,
+    x_last_update_login IN NUMBER DEFAULT NULL,
+    X_ORG_ID in NUMBER DEFAULT NULL
+  ) ;
+
+end IGS_OR_UNIT_HIST_PKG;
+
+ 
+
+/

@@ -1,0 +1,67 @@
+--------------------------------------------------------
+--  DDL for Package HR_PERSON_EXTRA_INFO_BE1
+--------------------------------------------------------
+
+  CREATE OR REPLACE EDITIONABLE PACKAGE "APPS"."HR_PERSON_EXTRA_INFO_BE1" AUTHID CURRENT_USER as 
+--Code generated on 29/08/2013 10:00:55
+/* $Header: hrapiwfe.pkb 120.4.12010000.2 2008/09/29 12:54:07 srgnanas ship $*/
+procedure create_person_extra_info_a (
+p_person_extra_info_id         number,
+p_person_id                    number,
+p_information_type             varchar2,
+p_pei_attribute_category       varchar2,
+p_pei_attribute1               varchar2,
+p_pei_attribute2               varchar2,
+p_pei_attribute3               varchar2,
+p_pei_attribute4               varchar2,
+p_pei_attribute5               varchar2,
+p_pei_attribute6               varchar2,
+p_pei_attribute7               varchar2,
+p_pei_attribute8               varchar2,
+p_pei_attribute9               varchar2,
+p_pei_attribute10              varchar2,
+p_pei_attribute11              varchar2,
+p_pei_attribute12              varchar2,
+p_pei_attribute13              varchar2,
+p_pei_attribute14              varchar2,
+p_pei_attribute15              varchar2,
+p_pei_attribute16              varchar2,
+p_pei_attribute17              varchar2,
+p_pei_attribute18              varchar2,
+p_pei_attribute19              varchar2,
+p_pei_attribute20              varchar2,
+p_pei_information_category     varchar2,
+p_pei_information1             varchar2,
+p_pei_information2             varchar2,
+p_pei_information3             varchar2,
+p_pei_information4             varchar2,
+p_pei_information5             varchar2,
+p_pei_information6             varchar2,
+p_pei_information7             varchar2,
+p_pei_information8             varchar2,
+p_pei_information9             varchar2,
+p_pei_information10            varchar2,
+p_pei_information11            varchar2,
+p_pei_information12            varchar2,
+p_pei_information13            varchar2,
+p_pei_information14            varchar2,
+p_pei_information15            varchar2,
+p_pei_information16            varchar2,
+p_pei_information17            varchar2,
+p_pei_information18            varchar2,
+p_pei_information19            varchar2,
+p_pei_information20            varchar2,
+p_pei_information21            varchar2,
+p_pei_information22            varchar2,
+p_pei_information23            varchar2,
+p_pei_information24            varchar2,
+p_pei_information25            varchar2,
+p_pei_information26            varchar2,
+p_pei_information27            varchar2,
+p_pei_information28            varchar2,
+p_pei_information29            varchar2,
+p_pei_information30            varchar2,
+p_object_version_number        number);
+end hr_person_extra_info_be1;
+
+/

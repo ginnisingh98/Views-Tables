@@ -1,0 +1,942 @@
+--------------------------------------------------------
+--  DDL for Package Body GMD_QC_TESTS_PVT
+--------------------------------------------------------
+
+  CREATE OR REPLACE EDITIONABLE PACKAGE BODY "APPS"."GMD_QC_TESTS_PVT" AS
+/* $Header: GMDVTSTB.pls 115.8 2004/05/05 09:47:18 rboddu noship $ */
+PROCEDURE insert_row (
+  X_ROWID in out NOCOPY ROWID,
+  X_TEST_ID in out NOCOPY NUMBER,
+  X_TEST_OPRN_LINE_ID in NUMBER,
+  X_TEST_PROVIDER_CODE in VARCHAR2,
+  X_DELETE_MARK in NUMBER,
+  X_TEXT_CODE in NUMBER,
+  X_ATTRIBUTE_CATEGORY in VARCHAR2,
+  X_ATTRIBUTE1 in VARCHAR2,
+  X_ATTRIBUTE2 in VARCHAR2,
+  X_ATTRIBUTE3 in VARCHAR2,
+  X_ATTRIBUTE4 in VARCHAR2,
+  X_ATTRIBUTE5 in VARCHAR2,
+  X_ATTRIBUTE6 in VARCHAR2,
+  X_ATTRIBUTE7 in VARCHAR2,
+  X_ATTRIBUTE8 in VARCHAR2,
+  X_ATTRIBUTE9 in VARCHAR2,
+  X_ATTRIBUTE10 in VARCHAR2,
+  X_ATTRIBUTE11 in VARCHAR2,
+  X_ATTRIBUTE12 in VARCHAR2,
+  X_ATTRIBUTE13 in VARCHAR2,
+  X_ATTRIBUTE14 in VARCHAR2,
+  X_ATTRIBUTE15 in VARCHAR2,
+  X_ATTRIBUTE16 in VARCHAR2,
+  X_ATTRIBUTE17 in VARCHAR2,
+  X_ATTRIBUTE18 in VARCHAR2,
+  X_ATTRIBUTE19 in VARCHAR2,
+  X_ATTRIBUTE20 in VARCHAR2,
+  X_ATTRIBUTE21 in VARCHAR2,
+  X_ATTRIBUTE22 in VARCHAR2,
+  X_ATTRIBUTE23 in VARCHAR2,
+  X_ATTRIBUTE24 in VARCHAR2,
+  X_ATTRIBUTE25 in VARCHAR2,
+  X_ATTRIBUTE26 in VARCHAR2,
+  X_ATTRIBUTE27 in VARCHAR2,
+  X_ATTRIBUTE28 in VARCHAR2,
+  X_ATTRIBUTE29 in VARCHAR2,
+  X_ATTRIBUTE30 in VARCHAR2,
+  X_TEST_CODE in VARCHAR2,
+  X_TEST_METHOD_ID in NUMBER,
+  X_TEST_CLASS in VARCHAR2,
+  X_TEST_TYPE in VARCHAR2,
+  X_TEST_UNIT in VARCHAR2,
+  X_MIN_VALUE_NUM in NUMBER,
+  X_MAX_VALUE_NUM in NUMBER,
+  X_EXP_ERROR_TYPE in VARCHAR2,
+  X_BELOW_SPEC_MIN in NUMBER,
+  X_ABOVE_SPEC_MIN in NUMBER,
+  X_BELOW_SPEC_MAX in NUMBER,
+  X_ABOVE_SPEC_MAX in NUMBER,
+  X_BELOW_MIN_ACTION_CODE in VARCHAR2,
+  X_ABOVE_MIN_ACTION_CODE in VARCHAR2,
+  X_BELOW_MAX_ACTION_CODE in VARCHAR2,
+  X_ABOVE_MAX_ACTION_CODE in VARCHAR2,
+  X_EXPRESSION in VARCHAR2,
+  X_DISPLAY_PRECISION in NUMBER,
+  X_REPORT_PRECISION in NUMBER,
+  X_PRIORITY in VARCHAR2,
+  X_TEST_OPRN_ID in NUMBER,
+  X_TEST_DESC in VARCHAR2,
+  X_CREATION_DATE in DATE,
+  X_CREATED_BY in NUMBER,
+  X_LAST_UPDATE_DATE in DATE,
+  X_LAST_UPDATED_BY in NUMBER,
+  X_LAST_UPDATE_LOGIN in NUMBER,
+  X_TEST_GROUP_ORDER IN NUMBER
+) is
+  CURSOR C IS SELECT ROWID FROM gmd_qc_tests_b
+    WHERE TEST_ID = X_TEST_ID
+    ;
+
+BEGIN
+
+  IF X_TEST_ID IS NULL THEN
+     SELECT GMD_QC_TEST_ID_S.NEXTVAL INTO X_TEST_ID FROM DUAL;
+  END IF;
+
+  insert into GMD_QC_TESTS_B (
+    TEST_OPRN_LINE_ID,
+    TEST_PROVIDER_CODE,
+    DELETE_MARK,
+    TEXT_CODE,
+    ATTRIBUTE_CATEGORY,
+    ATTRIBUTE1,
+    ATTRIBUTE2,
+    ATTRIBUTE3,
+    ATTRIBUTE4,
+    ATTRIBUTE5,
+    ATTRIBUTE6,
+    ATTRIBUTE7,
+    ATTRIBUTE8,
+    ATTRIBUTE9,
+    ATTRIBUTE10,
+    ATTRIBUTE11,
+    ATTRIBUTE12,
+    ATTRIBUTE13,
+    ATTRIBUTE14,
+    ATTRIBUTE15,
+    ATTRIBUTE16,
+    ATTRIBUTE17,
+    ATTRIBUTE18,
+    ATTRIBUTE19,
+    ATTRIBUTE20,
+    ATTRIBUTE21,
+    ATTRIBUTE22,
+    ATTRIBUTE23,
+    ATTRIBUTE24,
+    ATTRIBUTE25,
+    ATTRIBUTE26,
+    ATTRIBUTE27,
+    ATTRIBUTE28,
+    ATTRIBUTE29,
+    ATTRIBUTE30,
+    TEST_ID,
+    TEST_CODE,
+    TEST_METHOD_ID,
+    TEST_CLASS,
+    TEST_TYPE,
+    TEST_UNIT,
+    MIN_VALUE_NUM,
+    MAX_VALUE_NUM,
+    EXP_ERROR_TYPE,
+    BELOW_SPEC_MIN,
+    ABOVE_SPEC_MIN,
+    BELOW_SPEC_MAX,
+    ABOVE_SPEC_MAX,
+    BELOW_MIN_ACTION_CODE,
+    ABOVE_MIN_ACTION_CODE,
+    BELOW_MAX_ACTION_CODE,
+    ABOVE_MAX_ACTION_CODE,
+    EXPRESSION,
+    DISPLAY_PRECISION,
+    REPORT_PRECISION,
+    PRIORITY,
+    TEST_OPRN_ID,
+    CREATION_DATE,
+    CREATED_BY,
+    LAST_UPDATE_DATE,
+    LAST_UPDATED_BY,
+    LAST_UPDATE_LOGIN,
+    TEST_GROUP_ORDER
+  ) values (
+    X_TEST_OPRN_LINE_ID,
+    X_TEST_PROVIDER_CODE,
+    X_DELETE_MARK,
+    X_TEXT_CODE,
+    X_ATTRIBUTE_CATEGORY,
+    X_ATTRIBUTE1,
+    X_ATTRIBUTE2,
+    X_ATTRIBUTE3,
+    X_ATTRIBUTE4,
+    X_ATTRIBUTE5,
+    X_ATTRIBUTE6,
+    X_ATTRIBUTE7,
+    X_ATTRIBUTE8,
+    X_ATTRIBUTE9,
+    X_ATTRIBUTE10,
+    X_ATTRIBUTE11,
+    X_ATTRIBUTE12,
+    X_ATTRIBUTE13,
+    X_ATTRIBUTE14,
+    X_ATTRIBUTE15,
+    X_ATTRIBUTE16,
+    X_ATTRIBUTE17,
+    X_ATTRIBUTE18,
+    X_ATTRIBUTE19,
+    X_ATTRIBUTE20,
+    X_ATTRIBUTE21,
+    X_ATTRIBUTE22,
+    X_ATTRIBUTE23,
+    X_ATTRIBUTE24,
+    X_ATTRIBUTE25,
+    X_ATTRIBUTE26,
+    X_ATTRIBUTE27,
+    X_ATTRIBUTE28,
+    X_ATTRIBUTE29,
+    X_ATTRIBUTE30,
+    X_TEST_ID,
+    X_TEST_CODE,
+    X_TEST_METHOD_ID,
+    X_TEST_CLASS,
+    X_TEST_TYPE,
+    X_TEST_UNIT,
+    X_MIN_VALUE_NUM,
+    X_MAX_VALUE_NUM,
+    X_EXP_ERROR_TYPE,
+    X_BELOW_SPEC_MIN,
+    X_ABOVE_SPEC_MIN,
+    X_BELOW_SPEC_MAX,
+    X_ABOVE_SPEC_MAX,
+    X_BELOW_MIN_ACTION_CODE,
+    X_ABOVE_MIN_ACTION_CODE,
+    X_BELOW_MAX_ACTION_CODE,
+    X_ABOVE_MAX_ACTION_CODE,
+    X_EXPRESSION,
+    X_DISPLAY_PRECISION,
+    X_REPORT_PRECISION,
+    X_PRIORITY,
+    X_TEST_OPRN_ID,
+    NVL(X_CREATION_DATE,SYSDATE),
+    NVL(X_CREATED_BY,FND_GLOBAL.USER_ID),
+    NVL(X_LAST_UPDATE_DATE,SYSDATE),
+    NVL(X_LAST_UPDATED_BY,FND_GLOBAL.USER_ID),
+    NVL(X_LAST_UPDATE_LOGIN,FND_GLOBAL.LOGIN_ID),
+    X_TEST_GROUP_ORDER
+  );
+
+  insert into GMD_QC_TESTS_TL (
+    TEST_ID,
+    TEST_DESC,
+    CREATION_DATE,
+    CREATED_BY,
+    LAST_UPDATED_BY,
+    LAST_UPDATE_DATE,
+    LAST_UPDATE_LOGIN,
+    LANGUAGE,
+    SOURCE_LANG
+  ) select
+    X_TEST_ID,
+    X_TEST_DESC,
+    NVL(X_CREATION_DATE,SYSDATE),
+    NVL(X_CREATED_BY,FND_GLOBAL.USER_ID),
+    NVL(X_LAST_UPDATED_BY,FND_GLOBAL.USER_ID),
+    NVL(X_LAST_UPDATE_DATE,SYSDATE),
+    NVL(X_LAST_UPDATE_LOGIN,FND_GLOBAL.LOGIN_ID),
+    L.LANGUAGE_CODE,
+    userenv('LANG')
+  from FND_LANGUAGES L
+  where L.INSTALLED_FLAG in ('I', 'B')
+  and not exists
+    (select NULL
+    from GMD_QC_TESTS_TL T
+    where T.TEST_ID = X_TEST_ID
+    and T.LANGUAGE = L.LANGUAGE_CODE);
+
+  open c;
+  fetch c into X_ROWID;
+  if (c%notfound) then
+    close c;
+    raise no_data_found;
+  end if;
+  close c;
+
+end INSERT_ROW;
+
+FUNCTION INSERT_ROW(p_qc_tests_rec IN OUT NOCOPY GMD_QC_TESTS%ROWTYPE)
+RETURN BOOLEAN IS
+l_rowid ROWID ;
+BEGIN
+
+	  GMD_QC_TESTS_PVT.INSERT_ROW(
+    X_ROWID => l_rowid,
+    X_TEST_ID => p_qc_tests_rec.TEST_ID,
+    X_TEST_OPRN_LINE_ID => p_qc_tests_rec.TEST_OPRN_LINE_ID,
+    X_TEST_PROVIDER_CODE => p_qc_tests_rec.TEST_PROVIDER_CODE,
+    X_DELETE_MARK => p_qc_tests_rec.DELETE_MARK,
+    X_TEXT_CODE => p_qc_tests_rec.TEXT_CODE,
+    X_ATTRIBUTE_CATEGORY => p_qc_tests_rec.ATTRIBUTE_CATEGORY,
+    X_ATTRIBUTE1 => p_qc_tests_rec.ATTRIBUTE1,
+    X_ATTRIBUTE2 => p_qc_tests_rec.ATTRIBUTE2,
+    X_ATTRIBUTE3 => p_qc_tests_rec.ATTRIBUTE3,
+    X_ATTRIBUTE4 => p_qc_tests_rec.ATTRIBUTE4,
+    X_ATTRIBUTE5 => p_qc_tests_rec.ATTRIBUTE5,
+    X_ATTRIBUTE6 => p_qc_tests_rec.ATTRIBUTE6,
+    X_ATTRIBUTE7 => p_qc_tests_rec.ATTRIBUTE7,
+    X_ATTRIBUTE8 => p_qc_tests_rec.ATTRIBUTE8,
+    X_ATTRIBUTE9 => p_qc_tests_rec.ATTRIBUTE9,
+    X_ATTRIBUTE10 => p_qc_tests_rec.ATTRIBUTE10,
+    X_ATTRIBUTE11 => p_qc_tests_rec.ATTRIBUTE11,
+    X_ATTRIBUTE12 => p_qc_tests_rec.ATTRIBUTE12,
+    X_ATTRIBUTE13 => p_qc_tests_rec.ATTRIBUTE13,
+    X_ATTRIBUTE14 => p_qc_tests_rec.ATTRIBUTE14,
+    X_ATTRIBUTE15 => p_qc_tests_rec.ATTRIBUTE15,
+    X_ATTRIBUTE16 => p_qc_tests_rec.ATTRIBUTE16,
+    X_ATTRIBUTE17 => p_qc_tests_rec.ATTRIBUTE17,
+    X_ATTRIBUTE18 => p_qc_tests_rec.ATTRIBUTE18,
+    X_ATTRIBUTE19 => p_qc_tests_rec.ATTRIBUTE19,
+    X_ATTRIBUTE20 => p_qc_tests_rec.ATTRIBUTE20,
+    X_ATTRIBUTE21 => p_qc_tests_rec.ATTRIBUTE21,
+    X_ATTRIBUTE22 => p_qc_tests_rec.ATTRIBUTE22,
+    X_ATTRIBUTE23 => p_qc_tests_rec.ATTRIBUTE23,
+    X_ATTRIBUTE24 => p_qc_tests_rec.ATTRIBUTE24,
+    X_ATTRIBUTE25 => p_qc_tests_rec.ATTRIBUTE25,
+    X_ATTRIBUTE26 => p_qc_tests_rec.ATTRIBUTE26,
+    X_ATTRIBUTE27 => p_qc_tests_rec.ATTRIBUTE27,
+    X_ATTRIBUTE28 => p_qc_tests_rec.ATTRIBUTE28,
+    X_ATTRIBUTE29 => p_qc_tests_rec.ATTRIBUTE29,
+    X_ATTRIBUTE30 => p_qc_tests_rec.ATTRIBUTE30,
+    X_TEST_CODE => p_qc_tests_rec.TEST_CODE,
+    X_TEST_METHOD_ID => p_qc_tests_rec.TEST_METHOD_ID,
+    X_TEST_CLASS => p_qc_tests_rec.TEST_CLASS,
+    X_TEST_TYPE => p_qc_tests_rec.TEST_TYPE,
+    X_TEST_UNIT => p_qc_tests_rec.TEST_UNIT,
+    X_MIN_VALUE_NUM => p_qc_tests_rec.MIN_VALUE_NUM,
+    X_MAX_VALUE_NUM => p_qc_tests_rec.MAX_VALUE_NUM,
+    X_EXP_ERROR_TYPE => p_qc_tests_rec.EXP_ERROR_TYPE,
+    X_BELOW_SPEC_MIN => p_qc_tests_rec.BELOW_SPEC_MIN,
+    X_ABOVE_SPEC_MIN => p_qc_tests_rec.ABOVE_SPEC_MIN,
+    X_BELOW_SPEC_MAX => p_qc_tests_rec.BELOW_SPEC_MAX,
+    X_ABOVE_SPEC_MAX => p_qc_tests_rec.ABOVE_SPEC_MAX,
+    X_BELOW_MIN_ACTION_CODE => p_qc_tests_rec.BELOW_MIN_ACTION_CODE,
+    X_ABOVE_MIN_ACTION_CODE => p_qc_tests_rec.ABOVE_MIN_ACTION_CODE,
+    X_BELOW_MAX_ACTION_CODE => p_qc_tests_rec.BELOW_MAX_ACTION_CODE,
+    X_ABOVE_MAX_ACTION_CODE => p_qc_tests_rec.ABOVE_MAX_ACTION_CODE,
+    X_EXPRESSION => p_qc_tests_rec.EXPRESSION,
+    X_DISPLAY_PRECISION => p_qc_tests_rec.DISPLAY_PRECISION,
+    X_REPORT_PRECISION => p_qc_tests_rec.REPORT_PRECISION,
+    X_PRIORITY => p_qc_tests_rec.PRIORITY,
+    X_TEST_OPRN_ID => p_qc_tests_rec.TEST_OPRN_ID,
+    X_TEST_DESC => p_qc_tests_rec.TEST_DESC,
+    X_CREATION_DATE => p_qc_tests_rec.CREATION_DATE,
+    X_CREATED_BY => p_qc_tests_rec.CREATED_BY,
+    X_LAST_UPDATE_DATE => p_qc_tests_rec.LAST_UPDATE_DATE,
+    X_LAST_UPDATED_BY => p_qc_tests_rec.LAST_UPDATED_BY,
+    X_LAST_UPDATE_LOGIN => p_qc_tests_rec.LAST_UPDATE_LOGIN,
+    X_TEST_GROUP_ORDER => p_qc_tests_rec.TEST_GROUP_ORDER);
+
+    return TRUE;
+
+EXCEPTION WHEN OTHERS THEN
+    gmd_api_pub.log_message('GMD_API_ERROR','PACKAGE','GMD_QC_TESTS_PVT.INSERT_ROW','ERROR',
+    SUBSTR(SQLERRM,1,100),'POSITION','010');
+RETURN FALSE;
+
+END INSERT_ROW;
+
+procedure LOCK_ROW (
+  X_TEST_ID in NUMBER,
+  X_TEST_OPRN_LINE_ID in NUMBER,
+  X_TEST_PROVIDER_CODE in VARCHAR2,
+  X_DELETE_MARK in NUMBER,
+  X_TEXT_CODE in NUMBER,
+  X_ATTRIBUTE_CATEGORY in VARCHAR2,
+  X_ATTRIBUTE1 in VARCHAR2,
+  X_ATTRIBUTE2 in VARCHAR2,
+  X_ATTRIBUTE3 in VARCHAR2,
+  X_ATTRIBUTE4 in VARCHAR2,
+  X_ATTRIBUTE5 in VARCHAR2,
+  X_ATTRIBUTE6 in VARCHAR2,
+  X_ATTRIBUTE7 in VARCHAR2,
+  X_ATTRIBUTE8 in VARCHAR2,
+  X_ATTRIBUTE9 in VARCHAR2,
+  X_ATTRIBUTE10 in VARCHAR2,
+  X_ATTRIBUTE11 in VARCHAR2,
+  X_ATTRIBUTE12 in VARCHAR2,
+  X_ATTRIBUTE13 in VARCHAR2,
+  X_ATTRIBUTE14 in VARCHAR2,
+  X_ATTRIBUTE15 in VARCHAR2,
+  X_ATTRIBUTE16 in VARCHAR2,
+  X_ATTRIBUTE17 in VARCHAR2,
+  X_ATTRIBUTE18 in VARCHAR2,
+  X_ATTRIBUTE19 in VARCHAR2,
+  X_ATTRIBUTE20 in VARCHAR2,
+  X_ATTRIBUTE21 in VARCHAR2,
+  X_ATTRIBUTE22 in VARCHAR2,
+  X_ATTRIBUTE23 in VARCHAR2,
+  X_ATTRIBUTE24 in VARCHAR2,
+  X_ATTRIBUTE25 in VARCHAR2,
+  X_ATTRIBUTE26 in VARCHAR2,
+  X_ATTRIBUTE27 in VARCHAR2,
+  X_ATTRIBUTE28 in VARCHAR2,
+  X_ATTRIBUTE29 in VARCHAR2,
+  X_ATTRIBUTE30 in VARCHAR2,
+  X_TEST_CODE in VARCHAR2,
+  X_TEST_METHOD_ID in NUMBER,
+  X_TEST_CLASS in VARCHAR2,
+  X_TEST_TYPE in VARCHAR2,
+  X_TEST_UNIT in VARCHAR2,
+  X_MIN_VALUE_NUM in NUMBER,
+  X_MAX_VALUE_NUM in NUMBER,
+  X_EXP_ERROR_TYPE in VARCHAR2,
+  X_BELOW_SPEC_MIN in NUMBER,
+  X_ABOVE_SPEC_MIN in NUMBER,
+  X_BELOW_SPEC_MAX in NUMBER,
+  X_ABOVE_SPEC_MAX in NUMBER,
+  X_BELOW_MIN_ACTION_CODE in VARCHAR2,
+  X_ABOVE_MIN_ACTION_CODE in VARCHAR2,
+  X_BELOW_MAX_ACTION_CODE in VARCHAR2,
+  X_ABOVE_MAX_ACTION_CODE in VARCHAR2,
+  X_EXPRESSION in VARCHAR2,
+  X_DISPLAY_PRECISION in NUMBER,
+  X_REPORT_PRECISION in NUMBER,
+  X_PRIORITY in VARCHAR2,
+  X_TEST_OPRN_ID in NUMBER,
+  X_TEST_DESC in VARCHAR2,
+  X_TEST_GROUP_ORDER IN NUMBER
+) is
+  cursor c is select
+      TEST_OPRN_LINE_ID,
+      TEST_PROVIDER_CODE,
+      DELETE_MARK,
+      TEXT_CODE,
+      ATTRIBUTE_CATEGORY,
+      ATTRIBUTE1,
+      ATTRIBUTE2,
+      ATTRIBUTE3,
+      ATTRIBUTE4,
+      ATTRIBUTE5,
+      ATTRIBUTE6,
+      ATTRIBUTE7,
+      ATTRIBUTE8,
+      ATTRIBUTE9,
+      ATTRIBUTE10,
+      ATTRIBUTE11,
+      ATTRIBUTE12,
+      ATTRIBUTE13,
+      ATTRIBUTE14,
+      ATTRIBUTE15,
+      ATTRIBUTE16,
+      ATTRIBUTE17,
+      ATTRIBUTE18,
+      ATTRIBUTE19,
+      ATTRIBUTE20,
+      ATTRIBUTE21,
+      ATTRIBUTE22,
+      ATTRIBUTE23,
+      ATTRIBUTE24,
+      ATTRIBUTE25,
+      ATTRIBUTE26,
+      ATTRIBUTE27,
+      ATTRIBUTE28,
+      ATTRIBUTE29,
+      ATTRIBUTE30,
+      TEST_CODE,
+      TEST_METHOD_ID,
+      TEST_CLASS,
+      TEST_TYPE,
+      TEST_UNIT,
+      MIN_VALUE_NUM,
+      MAX_VALUE_NUM,
+      EXP_ERROR_TYPE,
+      BELOW_SPEC_MIN,
+      ABOVE_SPEC_MIN,
+      BELOW_SPEC_MAX,
+      ABOVE_SPEC_MAX,
+      BELOW_MIN_ACTION_CODE,
+      ABOVE_MIN_ACTION_CODE,
+      BELOW_MAX_ACTION_CODE,
+      ABOVE_MAX_ACTION_CODE,
+      EXPRESSION,
+      DISPLAY_PRECISION,
+      REPORT_PRECISION,
+      PRIORITY,
+      TEST_OPRN_ID,
+      TEST_GROUP_ORDER
+    from GMD_QC_TESTS_B
+    where TEST_ID = X_TEST_ID
+    for update of TEST_ID nowait;
+  recinfo c%rowtype;
+
+  cursor c1 is select
+      TEST_DESC,
+      decode(LANGUAGE, userenv('LANG'), 'Y', 'N') BASELANG
+    from GMD_QC_TESTS_TL
+    where TEST_ID = X_TEST_ID
+    and userenv('LANG') in (LANGUAGE, SOURCE_LANG)
+    for update of TEST_ID nowait;
+BEGIN
+  open c;
+  fetch c into recinfo;
+  if (c%notfound) then
+    close c;
+    fnd_message.set_name('FND', 'FORM_RECORD_DELETED');
+    app_exception.raise_exception;
+  end if;
+  close c;
+  if (    ((recinfo.TEST_OPRN_LINE_ID = X_TEST_OPRN_LINE_ID)
+           OR ((recinfo.TEST_OPRN_LINE_ID is null) AND (X_TEST_OPRN_LINE_ID is null)))
+      AND ((recinfo.TEST_PROVIDER_CODE = X_TEST_PROVIDER_CODE)
+           OR ((recinfo.TEST_PROVIDER_CODE is null) AND (X_TEST_PROVIDER_CODE is null)))
+      AND (recinfo.DELETE_MARK = X_DELETE_MARK)
+      AND ((recinfo.TEXT_CODE = X_TEXT_CODE)
+           OR ((recinfo.TEXT_CODE is null) AND (X_TEXT_CODE is null)))
+      AND ((recinfo.ATTRIBUTE_CATEGORY = X_ATTRIBUTE_CATEGORY)
+           OR ((recinfo.ATTRIBUTE_CATEGORY is null) AND (X_ATTRIBUTE_CATEGORY is null)))
+      AND ((recinfo.ATTRIBUTE1 = X_ATTRIBUTE1)
+           OR ((recinfo.ATTRIBUTE1 is null) AND (X_ATTRIBUTE1 is null)))
+      AND ((recinfo.ATTRIBUTE2 = X_ATTRIBUTE2)
+           OR ((recinfo.ATTRIBUTE2 is null) AND (X_ATTRIBUTE2 is null)))
+      AND ((recinfo.ATTRIBUTE3 = X_ATTRIBUTE3)
+           OR ((recinfo.ATTRIBUTE3 is null) AND (X_ATTRIBUTE3 is null)))
+      AND ((recinfo.ATTRIBUTE4 = X_ATTRIBUTE4)
+           OR ((recinfo.ATTRIBUTE4 is null) AND (X_ATTRIBUTE4 is null)))
+      AND ((recinfo.ATTRIBUTE5 = X_ATTRIBUTE5)
+           OR ((recinfo.ATTRIBUTE5 is null) AND (X_ATTRIBUTE5 is null)))
+      AND ((recinfo.ATTRIBUTE6 = X_ATTRIBUTE6)
+           OR ((recinfo.ATTRIBUTE6 is null) AND (X_ATTRIBUTE6 is null)))
+      AND ((recinfo.ATTRIBUTE7 = X_ATTRIBUTE7)
+           OR ((recinfo.ATTRIBUTE7 is null) AND (X_ATTRIBUTE7 is null)))
+      AND ((recinfo.ATTRIBUTE8 = X_ATTRIBUTE8)
+           OR ((recinfo.ATTRIBUTE8 is null) AND (X_ATTRIBUTE8 is null)))
+      AND ((recinfo.ATTRIBUTE9 = X_ATTRIBUTE9)
+           OR ((recinfo.ATTRIBUTE9 is null) AND (X_ATTRIBUTE9 is null)))
+      AND ((recinfo.ATTRIBUTE10 = X_ATTRIBUTE10)
+           OR ((recinfo.ATTRIBUTE10 is null) AND (X_ATTRIBUTE10 is null)))
+      AND ((recinfo.ATTRIBUTE11 = X_ATTRIBUTE11)
+           OR ((recinfo.ATTRIBUTE11 is null) AND (X_ATTRIBUTE11 is null)))
+      AND ((recinfo.ATTRIBUTE12 = X_ATTRIBUTE12)
+           OR ((recinfo.ATTRIBUTE12 is null) AND (X_ATTRIBUTE12 is null)))
+      AND ((recinfo.ATTRIBUTE13 = X_ATTRIBUTE13)
+           OR ((recinfo.ATTRIBUTE13 is null) AND (X_ATTRIBUTE13 is null)))
+      AND ((recinfo.ATTRIBUTE14 = X_ATTRIBUTE14)
+           OR ((recinfo.ATTRIBUTE14 is null) AND (X_ATTRIBUTE14 is null)))
+      AND ((recinfo.ATTRIBUTE15 = X_ATTRIBUTE15)
+           OR ((recinfo.ATTRIBUTE15 is null) AND (X_ATTRIBUTE15 is null)))
+      AND ((recinfo.ATTRIBUTE16 = X_ATTRIBUTE16)
+           OR ((recinfo.ATTRIBUTE16 is null) AND (X_ATTRIBUTE16 is null)))
+      AND ((recinfo.ATTRIBUTE17 = X_ATTRIBUTE17)
+           OR ((recinfo.ATTRIBUTE17 is null) AND (X_ATTRIBUTE17 is null)))
+      AND ((recinfo.ATTRIBUTE18 = X_ATTRIBUTE18)
+           OR ((recinfo.ATTRIBUTE18 is null) AND (X_ATTRIBUTE18 is null)))
+      AND ((recinfo.ATTRIBUTE19 = X_ATTRIBUTE19)
+           OR ((recinfo.ATTRIBUTE19 is null) AND (X_ATTRIBUTE19 is null)))
+      AND ((recinfo.ATTRIBUTE20 = X_ATTRIBUTE20)
+           OR ((recinfo.ATTRIBUTE20 is null) AND (X_ATTRIBUTE20 is null)))
+      AND ((recinfo.ATTRIBUTE21 = X_ATTRIBUTE21)
+           OR ((recinfo.ATTRIBUTE21 is null) AND (X_ATTRIBUTE21 is null)))
+      AND ((recinfo.ATTRIBUTE22 = X_ATTRIBUTE22)
+           OR ((recinfo.ATTRIBUTE22 is null) AND (X_ATTRIBUTE22 is null)))
+      AND ((recinfo.ATTRIBUTE23 = X_ATTRIBUTE23)
+           OR ((recinfo.ATTRIBUTE23 is null) AND (X_ATTRIBUTE23 is null)))
+      AND ((recinfo.ATTRIBUTE24 = X_ATTRIBUTE24)
+           OR ((recinfo.ATTRIBUTE24 is null) AND (X_ATTRIBUTE24 is null)))
+      AND ((recinfo.ATTRIBUTE25 = X_ATTRIBUTE25)
+           OR ((recinfo.ATTRIBUTE25 is null) AND (X_ATTRIBUTE25 is null)))
+      AND ((recinfo.ATTRIBUTE26 = X_ATTRIBUTE26)
+           OR ((recinfo.ATTRIBUTE26 is null) AND (X_ATTRIBUTE26 is null)))
+      AND ((recinfo.ATTRIBUTE27 = X_ATTRIBUTE27)
+           OR ((recinfo.ATTRIBUTE27 is null) AND (X_ATTRIBUTE27 is null)))
+      AND ((recinfo.ATTRIBUTE28 = X_ATTRIBUTE28)
+           OR ((recinfo.ATTRIBUTE28 is null) AND (X_ATTRIBUTE28 is null)))
+      AND ((recinfo.ATTRIBUTE29 = X_ATTRIBUTE29)
+           OR ((recinfo.ATTRIBUTE29 is null) AND (X_ATTRIBUTE29 is null)))
+      AND ((recinfo.ATTRIBUTE30 = X_ATTRIBUTE30)
+           OR ((recinfo.ATTRIBUTE30 is null) AND (X_ATTRIBUTE30 is null)))
+      AND (recinfo.TEST_CODE = X_TEST_CODE)
+      AND (recinfo.TEST_METHOD_ID = X_TEST_METHOD_ID)
+      AND ((recinfo.TEST_CLASS = X_TEST_CLASS)
+           OR ((recinfo.TEST_CLASS is null) AND (X_TEST_CLASS is null)))
+      AND (recinfo.TEST_TYPE = X_TEST_TYPE)
+      AND ((recinfo.TEST_UNIT = X_TEST_UNIT)
+           OR ((recinfo.TEST_UNIT is null) AND (X_TEST_UNIT is null)))
+      AND ((recinfo.MIN_VALUE_NUM = X_MIN_VALUE_NUM)
+           OR ((recinfo.MIN_VALUE_NUM is null) AND (X_MIN_VALUE_NUM is null)))
+      AND ((recinfo.MAX_VALUE_NUM = X_MAX_VALUE_NUM)
+           OR ((recinfo.MAX_VALUE_NUM is null) AND (X_MAX_VALUE_NUM is null)))
+      AND ((recinfo.EXP_ERROR_TYPE = X_EXP_ERROR_TYPE)
+           OR ((recinfo.EXP_ERROR_TYPE is null) AND (X_EXP_ERROR_TYPE is null)))
+      AND ((recinfo.BELOW_SPEC_MIN = X_BELOW_SPEC_MIN)
+           OR ((recinfo.BELOW_SPEC_MIN is null) AND (X_BELOW_SPEC_MIN is null)))
+      AND ((recinfo.ABOVE_SPEC_MIN = X_ABOVE_SPEC_MIN)
+           OR ((recinfo.ABOVE_SPEC_MIN is null) AND (X_ABOVE_SPEC_MIN is null)))
+      AND ((recinfo.BELOW_SPEC_MAX = X_BELOW_SPEC_MAX)
+           OR ((recinfo.BELOW_SPEC_MAX is null) AND (X_BELOW_SPEC_MAX is null)))
+      AND ((recinfo.ABOVE_SPEC_MAX = X_ABOVE_SPEC_MAX)
+           OR ((recinfo.ABOVE_SPEC_MAX is null) AND (X_ABOVE_SPEC_MAX is null)))
+      AND ((recinfo.BELOW_MIN_ACTION_CODE = X_BELOW_MIN_ACTION_CODE)
+           OR ((recinfo.BELOW_MIN_ACTION_CODE is null) AND (X_BELOW_MIN_ACTION_CODE is null)))
+      AND ((recinfo.ABOVE_MIN_ACTION_CODE = X_ABOVE_MIN_ACTION_CODE)
+           OR ((recinfo.ABOVE_MIN_ACTION_CODE is null) AND (X_ABOVE_MIN_ACTION_CODE is null)))
+      AND ((recinfo.BELOW_MAX_ACTION_CODE = X_BELOW_MAX_ACTION_CODE)
+           OR ((recinfo.BELOW_MAX_ACTION_CODE is null) AND (X_BELOW_MAX_ACTION_CODE is null)))
+      AND ((recinfo.ABOVE_MAX_ACTION_CODE = X_ABOVE_MAX_ACTION_CODE)
+           OR ((recinfo.ABOVE_MAX_ACTION_CODE is null) AND (X_ABOVE_MAX_ACTION_CODE is null)))
+      AND ((recinfo.EXPRESSION = X_EXPRESSION)
+           OR ((recinfo.EXPRESSION is null) AND (X_EXPRESSION is null)))
+      AND ((recinfo.DISPLAY_PRECISION = X_DISPLAY_PRECISION)
+           OR ((recinfo.DISPLAY_PRECISION is null) AND (X_DISPLAY_PRECISION is null)))
+      AND ((recinfo.REPORT_PRECISION = X_REPORT_PRECISION)
+           OR ((recinfo.REPORT_PRECISION is null) AND (X_REPORT_PRECISION is null)))
+      AND ((recinfo.PRIORITY = X_PRIORITY)
+           OR ((recinfo.PRIORITY is null) AND (X_PRIORITY is null)))
+      AND ((recinfo.TEST_OPRN_ID = X_TEST_OPRN_ID)
+           OR ((recinfo.TEST_OPRN_ID is null) AND (X_TEST_OPRN_ID is null)))
+      AND ((recinfo.TEST_GROUP_ORDER = X_TEST_GROUP_ORDER)
+           OR ((recinfo.TEST_GROUP_ORDER is null) AND (X_TEST_GROUP_ORDER is null)))
+  ) then
+    null;
+  else
+    fnd_message.set_name('FND', 'FORM_RECORD_CHANGED');
+    app_exception.raise_exception;
+  end if;
+
+  for tlinfo in c1 loop
+    if (tlinfo.BASELANG = 'Y') then
+      if (    (tlinfo.TEST_DESC = X_TEST_DESC)
+      ) then
+        null;
+      else
+        fnd_message.set_name('FND', 'FORM_RECORD_CHANGED');
+        app_exception.raise_exception;
+      end if;
+    end if;
+  end loop;
+  return;
+end LOCK_ROW;
+
+procedure UPDATE_ROW (
+  X_TEST_ID in NUMBER,
+  X_TEST_OPRN_LINE_ID in NUMBER,
+  X_TEST_PROVIDER_CODE in VARCHAR2,
+  X_DELETE_MARK in NUMBER,
+  X_TEXT_CODE in NUMBER,
+  X_ATTRIBUTE_CATEGORY in VARCHAR2,
+  X_ATTRIBUTE1 in VARCHAR2,
+  X_ATTRIBUTE2 in VARCHAR2,
+  X_ATTRIBUTE3 in VARCHAR2,
+  X_ATTRIBUTE4 in VARCHAR2,
+  X_ATTRIBUTE5 in VARCHAR2,
+  X_ATTRIBUTE6 in VARCHAR2,
+  X_ATTRIBUTE7 in VARCHAR2,
+  X_ATTRIBUTE8 in VARCHAR2,
+  X_ATTRIBUTE9 in VARCHAR2,
+  X_ATTRIBUTE10 in VARCHAR2,
+  X_ATTRIBUTE11 in VARCHAR2,
+  X_ATTRIBUTE12 in VARCHAR2,
+  X_ATTRIBUTE13 in VARCHAR2,
+  X_ATTRIBUTE14 in VARCHAR2,
+  X_ATTRIBUTE15 in VARCHAR2,
+  X_ATTRIBUTE16 in VARCHAR2,
+  X_ATTRIBUTE17 in VARCHAR2,
+  X_ATTRIBUTE18 in VARCHAR2,
+  X_ATTRIBUTE19 in VARCHAR2,
+  X_ATTRIBUTE20 in VARCHAR2,
+  X_ATTRIBUTE21 in VARCHAR2,
+  X_ATTRIBUTE22 in VARCHAR2,
+  X_ATTRIBUTE23 in VARCHAR2,
+  X_ATTRIBUTE24 in VARCHAR2,
+  X_ATTRIBUTE25 in VARCHAR2,
+  X_ATTRIBUTE26 in VARCHAR2,
+  X_ATTRIBUTE27 in VARCHAR2,
+  X_ATTRIBUTE28 in VARCHAR2,
+  X_ATTRIBUTE29 in VARCHAR2,
+  X_ATTRIBUTE30 in VARCHAR2,
+  X_TEST_CODE in VARCHAR2,
+  X_TEST_METHOD_ID in NUMBER,
+  X_TEST_CLASS in VARCHAR2,
+  X_TEST_TYPE in VARCHAR2,
+  X_TEST_UNIT in VARCHAR2,
+  X_MIN_VALUE_NUM in NUMBER,
+  X_MAX_VALUE_NUM in NUMBER,
+  X_EXP_ERROR_TYPE in VARCHAR2,
+  X_BELOW_SPEC_MIN in NUMBER,
+  X_ABOVE_SPEC_MIN in NUMBER,
+  X_BELOW_SPEC_MAX in NUMBER,
+  X_ABOVE_SPEC_MAX in NUMBER,
+  X_BELOW_MIN_ACTION_CODE in VARCHAR2,
+  X_ABOVE_MIN_ACTION_CODE in VARCHAR2,
+  X_BELOW_MAX_ACTION_CODE in VARCHAR2,
+  X_ABOVE_MAX_ACTION_CODE in VARCHAR2,
+  X_EXPRESSION in VARCHAR2,
+  X_DISPLAY_PRECISION in NUMBER,
+  X_REPORT_PRECISION in NUMBER,
+  X_PRIORITY in VARCHAR2,
+  X_TEST_OPRN_ID in NUMBER,
+  X_TEST_DESC in VARCHAR2,
+  X_LAST_UPDATE_DATE in DATE,
+  X_LAST_UPDATED_BY in NUMBER,
+  X_LAST_UPDATE_LOGIN in NUMBER,
+  X_TEST_GROUP_ORDER IN NUMBER
+) is
+begin
+  update GMD_QC_TESTS_B set
+    TEST_OPRN_LINE_ID = X_TEST_OPRN_LINE_ID,
+    TEST_PROVIDER_CODE = X_TEST_PROVIDER_CODE,
+    DELETE_MARK = X_DELETE_MARK,
+    TEXT_CODE = X_TEXT_CODE,
+    ATTRIBUTE_CATEGORY = X_ATTRIBUTE_CATEGORY,
+    ATTRIBUTE1 = X_ATTRIBUTE1,
+    ATTRIBUTE2 = X_ATTRIBUTE2,
+    ATTRIBUTE3 = X_ATTRIBUTE3,
+    ATTRIBUTE4 = X_ATTRIBUTE4,
+    ATTRIBUTE5 = X_ATTRIBUTE5,
+    ATTRIBUTE6 = X_ATTRIBUTE6,
+    ATTRIBUTE7 = X_ATTRIBUTE7,
+    ATTRIBUTE8 = X_ATTRIBUTE8,
+    ATTRIBUTE9 = X_ATTRIBUTE9,
+    ATTRIBUTE10 = X_ATTRIBUTE10,
+    ATTRIBUTE11 = X_ATTRIBUTE11,
+    ATTRIBUTE12 = X_ATTRIBUTE12,
+    ATTRIBUTE13 = X_ATTRIBUTE13,
+    ATTRIBUTE14 = X_ATTRIBUTE14,
+    ATTRIBUTE15 = X_ATTRIBUTE15,
+    ATTRIBUTE16 = X_ATTRIBUTE16,
+    ATTRIBUTE17 = X_ATTRIBUTE17,
+    ATTRIBUTE18 = X_ATTRIBUTE18,
+    ATTRIBUTE19 = X_ATTRIBUTE19,
+    ATTRIBUTE20 = X_ATTRIBUTE20,
+    ATTRIBUTE21 = X_ATTRIBUTE21,
+    ATTRIBUTE22 = X_ATTRIBUTE22,
+    ATTRIBUTE23 = X_ATTRIBUTE23,
+    ATTRIBUTE24 = X_ATTRIBUTE24,
+    ATTRIBUTE25 = X_ATTRIBUTE25,
+    ATTRIBUTE26 = X_ATTRIBUTE26,
+    ATTRIBUTE27 = X_ATTRIBUTE27,
+    ATTRIBUTE28 = X_ATTRIBUTE28,
+    ATTRIBUTE29 = X_ATTRIBUTE29,
+    ATTRIBUTE30 = X_ATTRIBUTE30,
+    TEST_CODE = X_TEST_CODE,
+    TEST_METHOD_ID = X_TEST_METHOD_ID,
+    TEST_CLASS = X_TEST_CLASS,
+    TEST_TYPE = X_TEST_TYPE,
+    TEST_UNIT = X_TEST_UNIT,
+    MIN_VALUE_NUM = X_MIN_VALUE_NUM,
+    MAX_VALUE_NUM = X_MAX_VALUE_NUM,
+    EXP_ERROR_TYPE = X_EXP_ERROR_TYPE,
+    BELOW_SPEC_MIN = X_BELOW_SPEC_MIN,
+    ABOVE_SPEC_MIN = X_ABOVE_SPEC_MIN,
+    BELOW_SPEC_MAX = X_BELOW_SPEC_MAX,
+    ABOVE_SPEC_MAX = X_ABOVE_SPEC_MAX,
+    BELOW_MIN_ACTION_CODE = X_BELOW_MIN_ACTION_CODE,
+    ABOVE_MIN_ACTION_CODE = X_ABOVE_MIN_ACTION_CODE,
+    BELOW_MAX_ACTION_CODE = X_BELOW_MAX_ACTION_CODE,
+    ABOVE_MAX_ACTION_CODE = X_ABOVE_MAX_ACTION_CODE,
+    EXPRESSION = X_EXPRESSION,
+    DISPLAY_PRECISION = X_DISPLAY_PRECISION,
+    REPORT_PRECISION = X_REPORT_PRECISION,
+    PRIORITY = X_PRIORITY,
+    TEST_OPRN_ID = X_TEST_OPRN_ID,
+    LAST_UPDATE_DATE =  NVL(X_LAST_UPDATE_DATE,SYSDATE),
+    LAST_UPDATED_BY =   NVL(X_LAST_UPDATED_BY,FND_GLOBAL.USER_ID),
+    LAST_UPDATE_LOGIN = NVL(X_LAST_UPDATE_LOGIN,FND_GLOBAL.LOGIN_ID),
+    TEST_GROUP_ORDER = X_TEST_GROUP_ORDER
+  where TEST_ID = X_TEST_ID;
+
+  if (sql%notfound) then
+    raise no_data_found;
+  end if;
+
+  update GMD_QC_TESTS_TL set
+    TEST_DESC = X_TEST_DESC,
+    LAST_UPDATE_DATE =  NVL(X_LAST_UPDATE_DATE,SYSDATE),
+    LAST_UPDATED_BY =   NVL(X_LAST_UPDATED_BY,FND_GLOBAL.USER_ID),
+    LAST_UPDATE_LOGIN = NVL(X_LAST_UPDATE_LOGIN,FND_GLOBAL.LOGIN_ID),
+    SOURCE_LANG = userenv('LANG')
+  where TEST_ID = X_TEST_ID
+  and userenv('LANG') in (LANGUAGE, SOURCE_LANG);
+
+  if (sql%notfound) then
+    raise no_data_found;
+  end if;
+end UPDATE_ROW;
+
+procedure ADD_LANGUAGE
+is
+begin
+  delete from GMD_QC_TESTS_TL T
+  where not exists
+    (select NULL
+    from GMD_QC_TESTS_B B
+    where B.TEST_ID = T.TEST_ID
+    );
+
+  update GMD_QC_TESTS_TL T set (
+      TEST_DESC
+    ) = (select
+      B.TEST_DESC
+    from GMD_QC_TESTS_TL B
+    where B.TEST_ID = T.TEST_ID
+    and B.LANGUAGE = T.SOURCE_LANG)
+  where (
+      T.TEST_ID,
+      T.LANGUAGE
+  ) in (select
+      SUBT.TEST_ID,
+      SUBT.LANGUAGE
+    from GMD_QC_TESTS_TL SUBB, GMD_QC_TESTS_TL SUBT
+    where SUBB.TEST_ID = SUBT.TEST_ID
+    and SUBB.LANGUAGE = SUBT.SOURCE_LANG
+    and (SUBB.TEST_DESC <> SUBT.TEST_DESC
+  ));
+
+  insert into GMD_QC_TESTS_TL (
+    TEST_ID,
+    TEST_DESC,
+    CREATION_DATE,
+    CREATED_BY,
+    LAST_UPDATED_BY,
+    LAST_UPDATE_DATE,
+    LAST_UPDATE_LOGIN,
+    LANGUAGE,
+    SOURCE_LANG
+  ) select
+    B.TEST_ID,
+    B.TEST_DESC,
+    B.CREATION_DATE,
+    B.CREATED_BY,
+    B.LAST_UPDATED_BY,
+    B.LAST_UPDATE_DATE,
+    B.LAST_UPDATE_LOGIN,
+    L.LANGUAGE_CODE,
+    B.SOURCE_LANG
+  from GMD_QC_TESTS_TL B, FND_LANGUAGES L
+  where L.INSTALLED_FLAG in ('I', 'B')
+  and B.LANGUAGE = userenv('LANG')
+  and not exists
+    (select NULL
+    from GMD_QC_TESTS_TL T
+    where T.TEST_ID = B.TEST_ID
+    and T.LANGUAGE = L.LANGUAGE_CODE);
+end ADD_LANGUAGE;
+
+
+FUNCTION fetch_row (
+  p_gmd_qc_tests IN  gmd_qc_tests%ROWTYPE ,
+  x_gmd_qc_tests OUT NOCOPY gmd_qc_tests%ROWTYPE
+)
+RETURN BOOLEAN
+IS
+BEGIN
+
+
+  IF (p_gmd_qc_tests.test_id IS NOT NULL) THEN
+    SELECT *
+    INTO   x_gmd_qc_tests
+    FROM   gmd_qc_tests
+    WHERE  test_id = p_gmd_qc_tests.test_id ;
+    RETURN TRUE;
+  ELSIF (p_gmd_qc_tests.test_code IS NOT NULL) THEN
+    SELECT *
+    INTO   x_gmd_qc_tests
+    FROM   gmd_qc_tests
+    WHERE  test_code = p_gmd_qc_tests.test_code ;
+    RETURN TRUE;
+  ELSE
+    gmd_api_pub.log_message('GMD_NO_KEYS','TABLE_NAME', 'GMD_QC_TESTS');
+    RETURN FALSE;
+  END IF;
+
+
+    RETURN FALSE;
+
+EXCEPTION
+ WHEN NO_DATA_FOUND
+   THEN
+     gmd_api_pub.log_message('GMD_NO_DATA_FOUND','TABLE_NAME', 'GMD_QC_TESTS');
+     RETURN FALSE;
+ WHEN OTHERS
+   THEN
+     gmd_api_pub.log_message('GMD_API_ERROR','PACKAGE','GMD_QC_TESTS_PVT.FETCH_ROW','ERROR',SUBSTR(SQLERRM,1,100),'POSITION','010');
+     RETURN FALSE;
+END fetch_row;
+
+FUNCTION lock_row (
+  p_test_id   IN  NUMBER  ,
+  p_test_code IN  VARCHAR2
+)
+RETURN BOOLEAN
+IS
+
+  dummy       NUMBER;
+BEGIN
+
+  IF (p_test_id IS NOT NULL) THEN
+    SELECT test_id
+    INTO   dummy
+    FROM   gmd_qc_tests_b
+    WHERE  test_id = p_test_id
+    FOR UPDATE OF test_id NOWAIT  ;
+  ELSIF (p_test_code IS NOT NULL) THEN
+    SELECT test_id
+    INTO   dummy
+    FROM   gmd_qc_tests_b
+    WHERE  test_code = p_test_code
+    FOR UPDATE OF test_id NOWAIT ;
+  ELSE
+    gmd_api_pub.log_message('GMD_NO_KEYS','TABLE_NAME', 'GMD_QC_TESTS');
+    RETURN FALSE;
+  END IF;
+
+  RETURN TRUE;
+
+EXCEPTION
+ WHEN NO_DATA_FOUND
+   THEN
+     gmd_api_pub.log_message('GMD_NO_DATA_FOUND','TABLE_NAME', 'GMD_QC_TESTS');
+     RETURN FALSE;
+ WHEN OTHERS
+   THEN
+     gmd_api_pub.log_message('GMD_API_ERROR','PACKAGE','GMD_QC_TESTS_PVT.LOCK_ROW','ERROR',SUBSTR(SQLERRM,1,100),'POSITION','010');
+     RETURN FALSE;
+END lock_row;
+
+FUNCTION mark_for_delete (
+  p_test_id   		IN  NUMBER   ,
+  p_test_code 		IN  VARCHAR2 ,
+  p_last_update_date 	IN  DATE     ,
+  p_last_updated_by 	IN  NUMBER  ,
+  p_last_update_login 	IN  NUMBER
+)
+RETURN BOOLEAN
+IS
+
+BEGIN
+
+  IF (p_test_id IS NOT NULL) THEN
+    UPDATE gmd_qc_tests_b
+    SET  delete_mark       = 1,
+         last_update_date  = NVL(p_last_update_date,SYSDATE),
+         last_updated_by   = NVL(p_last_updated_by,FND_GLOBAL.USER_ID),
+         last_update_login = NVL(p_last_update_login,FND_GLOBAL.LOGIN_ID)
+    WHERE  test_id = p_test_id ;
+    IF SQL%NOTFOUND THEN
+    	RAISE NO_DATA_FOUND ;
+    END IF;
+  ELSIF (p_test_code IS NOT NULL) THEN
+    UPDATE gmd_qc_tests_b
+    SET  delete_mark       = 1,
+         last_update_date  = NVL(p_last_update_date,SYSDATE),
+         last_updated_by   = NVL(p_last_updated_by,FND_GLOBAL.USER_ID),
+         last_update_login = NVL(p_last_update_login,FND_GLOBAL.LOGIN_ID)
+    WHERE  test_code = p_test_code ;
+    IF SQL%NOTFOUND THEN
+    	RAISE NO_DATA_FOUND ;
+    END IF;
+  ELSE
+    gmd_api_pub.log_message('GMD_NO_KEYS','TABLE_NAME', 'GMD_QC_TESTS');
+    RETURN FALSE;
+  END IF;
+
+  RETURN TRUE;
+
+EXCEPTION
+ WHEN NO_DATA_FOUND
+   THEN
+     gmd_api_pub.log_message('GMD_NO_DATA_FOUND','TABLE_NAME', 'GMD_QC_TESTS');
+     RETURN FALSE;
+ WHEN OTHERS
+   THEN
+     gmd_api_pub.log_message('GMD_API_ERROR','PACKAGE','GMD_QC_TESTS_PVT.MARK_FOR_DELETE','ERROR',SUBSTR(SQLERRM,1,100),'POSITION','010');
+     RETURN FALSE;
+END mark_for_delete;
+
+END gmd_qc_tests_pvt;
+
+/

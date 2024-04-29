@@ -1,0 +1,121 @@
+--------------------------------------------------------
+--  DDL for Package Body CSI_CSICPREP_XMLP_PKG
+--------------------------------------------------------
+
+  CREATE OR REPLACE EDITIONABLE PACKAGE BODY "APPS"."CSI_CSICPREP_XMLP_PKG" AS
+/* $Header: CSICPREPB.pls 120.1 2008/04/24 07:03:41 dwkrishn noship $ */
+  FUNCTION BEFOREREPORT RETURN BOOLEAN IS
+  BEGIN
+    BEGIN
+      /*SRW.REFERENCE(P_ORGANIZATION_ID)*/NULL;
+      P_ORGANIZATION_ID := FND_PROFILE.VALUE('SO_ORGANIZATION_ID');
+    END;
+    BEGIN
+      P_CONC_REQUEST_ID := FND_GLOBAL.CONC_REQUEST_ID;
+      /*SRW.USER_EXIT('FND SRWINIT')*/NULL;
+    EXCEPTION
+      WHEN /*SRW.USER_EXIT_FAILURE*/OTHERS THEN
+        /*SRW.MESSAGE(1
+                   ,'srw_init failed')*/NULL;
+    END;
+    BEGIN
+      /*SRW.REFERENCE(P_ITEM_STRUCT_NUM)*/NULL;
+    EXCEPTION
+      WHEN /*SRW.USER_EXIT_FAILURE*/OTHERS THEN
+        /*SRW.MESSAGE(1
+                   ,'Before Report: ItemFlex')*/NULL;
+    END;
+    CS_REPORTS_PACKAGE.CS_GET_COMPANY_NAME(RP_COMPANY_NAME
+                                          ,P_SOB_ID);
+    CS_REPORTS_PACKAGE.CS_GET_REPORT_NAME(RP_REPORT_NAME
+                                         ,P_CONC_REQUEST_ID
+                                         ,'Customer Products Summary Report');
+    BEGIN
+      /*SRW.REFERENCE(P_ITEM_STRUCT_NUM)*/NULL;
+      /*SRW.REFERENCE(P_ITEM_LO)*/NULL;
+      /*SRW.REFERENCE(P_ITEM_HIGH)*/NULL;
+      IF (P_ITEM_LO IS NOT NULL) AND (P_ITEM_HIGH IS NOT NULL) THEN
+        /*SRW.REFERENCE(P_ITEM_STRUCT_NUM)*/NULL;
+        /*SRW.REFERENCE(P_ITEM_LO)*/NULL;
+        /*SRW.REFERENCE(P_ITEM_HIGH)*/NULL;
+        P_ITEM_WHERE := ' AND ' || P_ITEM_WHERE;
+      ELSIF (P_ITEM_LO IS NOT NULL) AND (P_ITEM_HIGH IS NULL) THEN
+        /*SRW.REFERENCE(P_ITEM_STRUCT_NUM)*/NULL;
+        /*SRW.REFERENCE(P_ITEM_LO)*/NULL;
+        P_ITEM_WHERE := ' AND ' || P_ITEM_WHERE;
+      ELSIF (P_ITEM_LO IS NULL) AND (P_ITEM_HIGH IS NOT NULL) THEN
+        /*SRW.REFERENCE(P_ITEM_STRUCT_NUM)*/NULL;
+        /*SRW.REFERENCE(P_ITEM_HIGH)*/NULL;
+        P_ITEM_WHERE := ' AND ' || P_ITEM_WHERE;
+      ELSE
+        NULL;
+      END IF;
+    EXCEPTION
+      WHEN /*SRW.USER_EXIT_FAILURE*/OTHERS THEN
+        /*SRW.MESSAGE(1
+                   ,'Failed in before report trigger:MSTK:WHERE')*/NULL;
+    END;
+    BEGIN
+      /*SRW.REFERENCE(P_ITEM_STRUCT_NUM)*/NULL;
+    EXCEPTION
+      WHEN /*SRW.USER_EXIT_FAILURE*/OTHERS THEN
+        /*SRW.MESSAGE(1
+                   ,'Failed in FLEXSQL : Order by ')*/NULL;
+    END;
+    RETURN (TRUE);
+  END BEFOREREPORT;
+  FUNCTION AFTERREPORT RETURN BOOLEAN IS
+  BEGIN
+    BEGIN
+      BEGIN
+        /*SRW.USER_EXIT('FND SRWEXIT')*/NULL;
+      END;
+    END;
+    RETURN (TRUE);
+  END AFTERREPORT;
+  FUNCTION P_SOB_IDVALIDTRIGGER RETURN BOOLEAN IS
+  BEGIN
+    RETURN (TRUE);
+  END P_SOB_IDVALIDTRIGGER;
+  FUNCTION AFTERPFORM RETURN BOOLEAN IS
+  BEGIN
+    IF ((P_CUSTOMER_NUMBER_LOW IS NULL) AND (P_CUSTOMER_NUMBER_HIGH IS NULL) AND (P_ITEM_LO IS NULL) AND (P_ITEM_HIGH IS NULL) AND (P_INSTALL_LOCATION IS NULL) AND (P_CP_STATUS IS NULL)) THEN
+      /*SRW.MESSAGE(100
+                 ,'Aborting the generation of the report as no Parameters are specified.')*/NULL;
+      /*RAISE SRW.PROGRAM_ABORT*/RAISE_APPLICATION_ERROR(-20101,'Aborting the generation of the report as no Parameters are specified.');
+      RETURN (FALSE);
+    END IF;
+    BEGIN
+      /*SRW.REFERENCE(P_CUSTOMER_NUMBER_LOW)*/NULL;
+      /*SRW.REFERENCE(P_CUSTOMER_NUMBER_HIGH)*/NULL;
+      IF (P_CUSTOMER_NUMBER_LOW IS NOT NULL) AND (P_CUSTOMER_NUMBER_HIGH IS NOT NULL) THEN
+        LP_CUSTOMER_RANGE := 'AND hca.account_number BETWEEN  :p_customer_number_low  AND :p_customer_number_high';
+      ELSIF (P_CUSTOMER_NUMBER_LOW IS NOT NULL) THEN
+        LP_CUSTOMER_RANGE := 'AND hca.account_number >= :p_customer_number_low ';
+      ELSIF (P_CUSTOMER_NUMBER_HIGH IS NOT NULL) THEN
+        LP_CUSTOMER_RANGE := 'AND hca.account_number <= :p_customer_number_high ';
+      END IF;
+      /*SRW.REFERENCE(P_INSTALL_LOCATION)*/NULL;
+      IF (P_INSTALL_LOCATION IS NOT NULL) THEN
+        LP_INSTALL_LOCATION := 'AND hl.city =
+                                                                 :p_install_location';
+      END IF;
+      /*SRW.REFERENCE(P_CP_STATUS)*/NULL;
+      IF (P_CP_STATUS IS NOT NULL) THEN
+        LP_CP_STATUS := 'AND ccps.name = :p_cp_status';
+      END IF;
+    END;
+    RETURN (TRUE);
+  END AFTERPFORM;
+  FUNCTION RP_REPORT_NAME_P RETURN VARCHAR2 IS
+  BEGIN
+    RETURN RP_REPORT_NAME;
+  END RP_REPORT_NAME_P;
+  FUNCTION RP_COMPANY_NAME_P RETURN VARCHAR2 IS
+  BEGIN
+    RETURN RP_COMPANY_NAME;
+  END RP_COMPANY_NAME_P;
+END CSI_CSICPREP_XMLP_PKG;
+
+
+/

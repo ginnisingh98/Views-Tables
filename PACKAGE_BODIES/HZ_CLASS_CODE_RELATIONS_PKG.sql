@@ -1,0 +1,237 @@
+--------------------------------------------------------
+--  DDL for Package Body HZ_CLASS_CODE_RELATIONS_PKG
+--------------------------------------------------------
+
+  CREATE OR REPLACE EDITIONABLE PACKAGE BODY "APPS"."HZ_CLASS_CODE_RELATIONS_PKG" AS
+/*$Header: ARHCCRTB.pls 115.4 2002/11/21 19:38:06 sponnamb ship $ */
+
+PROCEDURE Insert_Row (
+    X_CLASS_CATEGORY                        IN     VARCHAR2,
+    X_CLASS_CODE                            IN     VARCHAR2,
+    X_SUB_CLASS_CODE                        IN     VARCHAR2,
+    X_START_DATE_ACTIVE                     IN     DATE,
+    X_END_DATE_ACTIVE                       IN     DATE,
+    X_OBJECT_VERSION_NUMBER                 IN     NUMBER,
+    X_CREATED_BY_MODULE                     IN     VARCHAR2,
+    X_APPLICATION_ID                        IN     NUMBER
+) IS
+
+BEGIN
+
+    INSERT INTO HZ_CLASS_CODE_RELATIONS (
+        CLASS_CATEGORY,
+        CLASS_CODE,
+        SUB_CLASS_CODE,
+        START_DATE_ACTIVE,
+        END_DATE_ACTIVE,
+        CREATED_BY,
+        CREATION_DATE,
+        LAST_UPDATE_LOGIN,
+        LAST_UPDATE_DATE,
+        LAST_UPDATED_BY,
+        OBJECT_VERSION_NUMBER,
+        CREATED_BY_MODULE,
+        APPLICATION_ID
+    )
+    VALUES (
+        DECODE( X_CLASS_CATEGORY, FND_API.G_MISS_CHAR, NULL, X_CLASS_CATEGORY ),
+        DECODE( X_CLASS_CODE, FND_API.G_MISS_CHAR, NULL, X_CLASS_CODE ),
+        DECODE( X_SUB_CLASS_CODE, FND_API.G_MISS_CHAR, NULL, X_SUB_CLASS_CODE ),
+        DECODE( X_START_DATE_ACTIVE, FND_API.G_MISS_DATE, TO_DATE( NULL ), X_START_DATE_ACTIVE ),
+        DECODE( X_END_DATE_ACTIVE, FND_API.G_MISS_DATE, TO_DATE( NULL ), X_END_DATE_ACTIVE ),
+        HZ_UTILITY_V2PUB.CREATED_BY,
+        HZ_UTILITY_V2PUB.CREATION_DATE,
+        HZ_UTILITY_V2PUB.LAST_UPDATE_LOGIN,
+        HZ_UTILITY_V2PUB.LAST_UPDATE_DATE,
+        HZ_UTILITY_V2PUB.LAST_UPDATED_BY,
+        DECODE( X_OBJECT_VERSION_NUMBER, FND_API.G_MISS_NUM, NULL, X_OBJECT_VERSION_NUMBER ),
+        DECODE( X_CREATED_BY_MODULE, FND_API.G_MISS_CHAR, NULL, X_CREATED_BY_MODULE ),
+        DECODE( X_APPLICATION_ID, FND_API.G_MISS_NUM, NULL, X_APPLICATION_ID )
+    );
+
+END Insert_Row;
+
+PROCEDURE Update_Row (
+    X_CLASS_CATEGORY                        IN     VARCHAR2,
+    X_CLASS_CODE                            IN     VARCHAR2,
+    X_SUB_CLASS_CODE                        IN     VARCHAR2,
+    X_START_DATE_ACTIVE                     IN     DATE,
+    X_END_DATE_ACTIVE                       IN     DATE,
+    X_OBJECT_VERSION_NUMBER                 IN     NUMBER,
+    X_CREATED_BY_MODULE                     IN     VARCHAR2,
+    X_APPLICATION_ID                        IN     NUMBER
+) IS
+
+BEGIN
+
+    UPDATE HZ_CLASS_CODE_RELATIONS SET
+        END_DATE_ACTIVE = DECODE( X_END_DATE_ACTIVE, NULL, END_DATE_ACTIVE, FND_API.G_MISS_DATE, NULL, X_END_DATE_ACTIVE ),
+        LAST_UPDATE_LOGIN = HZ_UTILITY_V2PUB.LAST_UPDATE_LOGIN,
+        LAST_UPDATE_DATE = HZ_UTILITY_V2PUB.LAST_UPDATE_DATE,
+        LAST_UPDATED_BY = HZ_UTILITY_V2PUB.LAST_UPDATED_BY,
+        OBJECT_VERSION_NUMBER = DECODE( X_OBJECT_VERSION_NUMBER, NULL, OBJECT_VERSION_NUMBER, FND_API.G_MISS_NUM, NULL, X_OBJECT_VERSION_NUMBER ),
+        CREATED_BY_MODULE = DECODE( X_CREATED_BY_MODULE, NULL, CREATED_BY_MODULE, FND_API.G_MISS_CHAR, NULL, X_CREATED_BY_MODULE ),
+        APPLICATION_ID = DECODE( X_APPLICATION_ID, NULL, APPLICATION_ID, FND_API.G_MISS_NUM, NULL, X_APPLICATION_ID )
+    WHERE CLASS_CATEGORY = X_CLASS_CATEGORY
+    AND   CLASS_CODE = X_CLASS_CODE
+    AND   SUB_CLASS_CODE = X_SUB_CLASS_CODE
+    AND   START_DATE_ACTIVE = X_START_DATE_ACTIVE;
+
+    IF ( SQL%NOTFOUND ) THEN
+        RAISE NO_DATA_FOUND;
+    END IF;
+
+END Update_Row;
+
+PROCEDURE Lock_Row (
+    X_Rowid                                 IN OUT NOCOPY VARCHAR2,
+    X_CLASS_CATEGORY                        IN     VARCHAR2,
+    X_CLASS_CODE                            IN     VARCHAR2,
+    X_SUB_CLASS_CODE                        IN     VARCHAR2,
+    X_START_DATE_ACTIVE                     IN     DATE,
+    X_END_DATE_ACTIVE                       IN     DATE,
+    X_CREATED_BY                            IN     NUMBER,
+    X_CREATION_DATE                         IN     DATE,
+    X_LAST_UPDATE_LOGIN                     IN     NUMBER,
+    X_LAST_UPDATE_DATE                      IN     DATE,
+    X_LAST_UPDATED_BY                       IN     NUMBER,
+    X_OBJECT_VERSION_NUMBER                 IN     NUMBER,
+    X_CREATED_BY_MODULE                     IN     VARCHAR2,
+    X_APPLICATION_ID                        IN     NUMBER
+) IS
+
+    CURSOR C IS
+        SELECT * FROM HZ_CLASS_CODE_RELATIONS
+        WHERE  ROWID = x_Rowid
+        FOR UPDATE NOWAIT;
+    Recinfo C%ROWTYPE;
+
+BEGIN
+
+    OPEN C;
+    FETCH C INTO Recinfo;
+    IF ( C%NOTFOUND ) THEN
+        CLOSE C;
+        FND_MESSAGE.SET_NAME('FND', 'FORM_RECORD_DELETED');
+        APP_EXCEPTION.RAISE_EXCEPTION;
+    END IF;
+    CLOSE C;
+
+    IF (
+        ( ( Recinfo.CLASS_CATEGORY = X_CLASS_CATEGORY )
+        OR ( ( Recinfo.CLASS_CATEGORY IS NULL )
+            AND (  X_CLASS_CATEGORY IS NULL ) ) )
+    AND ( ( Recinfo.CLASS_CODE = X_CLASS_CODE )
+        OR ( ( Recinfo.CLASS_CODE IS NULL )
+            AND (  X_CLASS_CODE IS NULL ) ) )
+    AND ( ( Recinfo.SUB_CLASS_CODE = X_SUB_CLASS_CODE )
+        OR ( ( Recinfo.SUB_CLASS_CODE IS NULL )
+            AND (  X_SUB_CLASS_CODE IS NULL ) ) )
+    AND ( ( Recinfo.START_DATE_ACTIVE = X_START_DATE_ACTIVE )
+        OR ( ( Recinfo.START_DATE_ACTIVE IS NULL )
+            AND (  X_START_DATE_ACTIVE IS NULL ) ) )
+    AND ( ( Recinfo.END_DATE_ACTIVE = X_END_DATE_ACTIVE )
+        OR ( ( Recinfo.END_DATE_ACTIVE IS NULL )
+            AND (  X_END_DATE_ACTIVE IS NULL ) ) )
+    AND ( ( Recinfo.CREATED_BY = X_CREATED_BY )
+        OR ( ( Recinfo.CREATED_BY IS NULL )
+            AND (  X_CREATED_BY IS NULL ) ) )
+    AND ( ( Recinfo.CREATION_DATE = X_CREATION_DATE )
+        OR ( ( Recinfo.CREATION_DATE IS NULL )
+            AND (  X_CREATION_DATE IS NULL ) ) )
+    AND ( ( Recinfo.LAST_UPDATE_LOGIN = X_LAST_UPDATE_LOGIN )
+        OR ( ( Recinfo.LAST_UPDATE_LOGIN IS NULL )
+            AND (  X_LAST_UPDATE_LOGIN IS NULL ) ) )
+    AND ( ( Recinfo.LAST_UPDATE_DATE = X_LAST_UPDATE_DATE )
+        OR ( ( Recinfo.LAST_UPDATE_DATE IS NULL )
+            AND (  X_LAST_UPDATE_DATE IS NULL ) ) )
+    AND ( ( Recinfo.LAST_UPDATED_BY = X_LAST_UPDATED_BY )
+        OR ( ( Recinfo.LAST_UPDATED_BY IS NULL )
+            AND (  X_LAST_UPDATED_BY IS NULL ) ) )
+    AND ( ( Recinfo.OBJECT_VERSION_NUMBER = X_OBJECT_VERSION_NUMBER )
+        OR ( ( Recinfo.OBJECT_VERSION_NUMBER IS NULL )
+            AND (  X_OBJECT_VERSION_NUMBER IS NULL ) ) )
+    AND ( ( Recinfo.CREATED_BY_MODULE = X_CREATED_BY_MODULE )
+        OR ( ( Recinfo.CREATED_BY_MODULE IS NULL )
+            AND (  X_CREATED_BY_MODULE IS NULL ) ) )
+    AND ( ( Recinfo.APPLICATION_ID = X_APPLICATION_ID )
+        OR ( ( Recinfo.APPLICATION_ID IS NULL )
+            AND (  X_APPLICATION_ID IS NULL ) ) )
+    ) THEN
+        RETURN;
+    ELSE
+        FND_MESSAGE.SET_NAME('FND', 'FORM_RECORD_DELETED');
+        APP_EXCEPTION.RAISE_EXCEPTION;
+    END IF;
+
+END Lock_Row;
+
+PROCEDURE Select_Row (
+    X_CLASS_CATEGORY                        IN OUT NOCOPY VARCHAR2,
+    X_CLASS_CODE                            IN OUT NOCOPY VARCHAR2,
+    X_SUB_CLASS_CODE                        IN OUT NOCOPY VARCHAR2,
+    X_START_DATE_ACTIVE                     IN OUT NOCOPY DATE,
+    X_END_DATE_ACTIVE                       OUT NOCOPY    DATE,
+    X_CREATED_BY_MODULE                     OUT NOCOPY    VARCHAR2,
+    X_APPLICATION_ID                        OUT NOCOPY    NUMBER
+) IS
+
+BEGIN
+
+    SELECT
+        NVL( CLASS_CATEGORY, FND_API.G_MISS_CHAR ),
+        NVL( CLASS_CODE, FND_API.G_MISS_CHAR ),
+        NVL( SUB_CLASS_CODE, FND_API.G_MISS_CHAR ),
+        NVL( START_DATE_ACTIVE, FND_API.G_MISS_DATE ),
+        NVL( END_DATE_ACTIVE, FND_API.G_MISS_DATE ),
+        NVL( CREATED_BY_MODULE, FND_API.G_MISS_CHAR ),
+        NVL( APPLICATION_ID, FND_API.G_MISS_NUM )
+    INTO
+        X_CLASS_CATEGORY,
+        X_CLASS_CODE,
+        X_SUB_CLASS_CODE,
+        X_START_DATE_ACTIVE,
+        X_END_DATE_ACTIVE,
+        X_CREATED_BY_MODULE,
+        X_APPLICATION_ID
+    FROM  HZ_CLASS_CODE_RELATIONS
+    WHERE CLASS_CATEGORY = X_CLASS_CATEGORY
+    AND   CLASS_CODE = X_CLASS_CODE
+    AND   SUB_CLASS_CODE = X_SUB_CLASS_CODE
+    AND   START_DATE_ACTIVE = X_START_DATE_ACTIVE;
+
+EXCEPTION
+    WHEN NO_DATA_FOUND THEN
+        FND_MESSAGE.SET_NAME( 'AR', 'HZ_API_NO_RECORD' );
+        FND_MESSAGE.SET_TOKEN( 'RECORD', 'class_code_relation_rec');
+        FND_MESSAGE.SET_TOKEN( 'VALUE', X_CLASS_CATEGORY );
+        FND_MSG_PUB.ADD;
+        RAISE FND_API.G_EXC_ERROR;
+
+END Select_Row;
+
+PROCEDURE Delete_Row (
+    X_CLASS_CATEGORY                        IN     VARCHAR2,
+    X_CLASS_CODE                            IN     VARCHAR2,
+    X_SUB_CLASS_CODE                        IN     VARCHAR2,
+    X_START_DATE_ACTIVE                     IN     DATE
+
+) IS
+
+BEGIN
+
+    DELETE FROM HZ_CLASS_CODE_RELATIONS
+    WHERE CLASS_CATEGORY = X_CLASS_CATEGORY
+    AND   CLASS_CODE = X_CLASS_CODE
+    AND   SUB_CLASS_CODE = X_SUB_CLASS_CODE
+    AND   START_DATE_ACTIVE = X_START_DATE_ACTIVE;
+
+    IF ( SQL%NOTFOUND ) THEN
+        RAISE NO_DATA_FOUND;
+    END IF;
+
+END Delete_Row;
+
+END HZ_CLASS_CODE_RELATIONS_PKG;
+
+/

@@ -1,0 +1,57 @@
+--------------------------------------------------------
+--  DDL for Package Body IGI_EXPWARNINGS
+--------------------------------------------------------
+
+  CREATE OR REPLACE EDITIONABLE PACKAGE BODY "APPS"."IGI_EXPWARNINGS" as
+-- $Header: igiexplb.pls 115.9 2003/08/09 11:46:17 rgopalan ship $
+PROCEDURE CHECK_DOC_TYPE(itemtype IN VARCHAR2,
+				itemkey  IN VARCHAR2,
+				actid	 IN NUMBER,
+				funcmode IN VARCHAR2,
+				result 	 OUT NOCOPY VARCHAR2 ) IS
+
+BEGIN
+NULL;
+END CHECK_DOC_TYPE;
+
+
+PROCEDURE START_WORKFLOW(p_new_line 		wf_messages_tl.body%TYPE,
+			               p_item_key 		VARCHAR2,
+			               p_preparer_id 	fnd_user.employee_id%type,
+			               p_document_type	VARCHAR2) IS
+BEGIN
+NULL;
+END START_WORKFLOW;
+
+
+PROCEDURE AP_DOC_OUTSIDE_DU_WARNING(p_wait_days 	IN NUMBER) IS
+BEGIN
+NULL;
+END AP_DOC_OUTSIDE_DU_WARNING;
+
+
+PROCEDURE AR_DOC_OUTSIDE_DU_WARNING(p_wait_days 	IN NUMBER) IS
+BEGIN
+NULL;
+END AR_DOC_OUTSIDE_DU_WARNING;
+
+
+PROCEDURE INTEREST_PAYMENT_ACO_WARNING IS
+BEGIN
+NULL;
+END INTEREST_PAYMENT_ACO_WARNING;
+
+
+PROCEDURE INTEREST_PAYMENT_AUT_WARNING IS
+BEGIN
+NULL;
+END INTEREST_PAYMENT_AUT_WARNING;
+
+PROCEDURE INITIATE_WARNING_CHECKS (p_wait_days NUMBER ) IS
+BEGIN
+NULL;
+END INITIATE_WARNING_CHECKS ;
+
+END igi_expwarnings;
+
+/

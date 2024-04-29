@@ -1,0 +1,548 @@
+--------------------------------------------------------
+--  DDL for Package Body IMC_THREE_SIXTY_QUERY_PKG
+--------------------------------------------------------
+
+  CREATE OR REPLACE EDITIONABLE PACKAGE BODY "APPS"."IMC_THREE_SIXTY_QUERY_PKG" as
+/* $Header: ARHTSDVB.pls 120.3 2005/08/30 00:41:22 rnalluri noship $ */
+
+procedure INSERT_ROW (
+  X_QUERY_ID in out NOCOPY NUMBER,
+  X_APPLICATION_ID in NUMBER,
+  X_QUERY_TYPE_FLAG in VARCHAR2,
+  X_PRODUCT_QUERY1 in VARCHAR2,
+  X_PRODUCT_QUERY2 in VARCHAR2,
+  X_PRODUCT_QUERY3 in VARCHAR2,
+  X_PRODUCT_QUERY4 in VARCHAR2,
+  X_PRODUCT_QUERY5 in VARCHAR2,
+  X_SEQUENCE_NO in NUMBER,
+  X_SECURITY_FUNCTION in VARCHAR2,
+  X_DISPLAY_FLAG in VARCHAR2,
+  X_FILTER_COUNT     in NUMBER,
+  X_DISPLAY_COLUMN_COUNT in NUMBER,
+  X_PRODUCT_URL in VARCHAR2,
+  X_BE_CODE     in VARCHAR2,
+  X_CATEGORY_CODE in VARCHAR2,
+  X_OPERATING_UNIT_FLAG in VARCHAR2,
+  X_TRANSACTION_NAME in VARCHAR2,
+  X_HEADER_TEXT in VARCHAR2,
+  X_CREATION_DATE in DATE,
+  X_CREATED_BY in NUMBER,
+  X_LAST_UPDATE_DATE in DATE,
+  X_LAST_UPDATED_BY in NUMBER,
+  X_LAST_UPDATE_LOGIN in NUMBER,
+  X_OBJECT_VERSION_NUMBER in NUMBER
+) IS
+   CURSOR C2 IS SELECT  IMC_THREE_SIXTY_QUERY_S.nextval FROM sys.dual;
+
+      begin
+
+    IF ( X_QUERY_ID IS NULL) OR (X_QUERY_ID = FND_API.G_MISS_NUM) THEN
+        OPEN C2;
+        FETCH C2 INTO X_QUERY_ID;
+
+        if (c2%notfound) then
+           close c2;
+           raise no_data_found;
+        end if;
+
+        CLOSE C2;
+    END IF;
+ begin
+insert into IMC_THREE_SIXTY_QUERY_B (
+    QUERY_ID,
+    APPLICATION_ID,
+    QUERY_TYPE_FLAG,
+    PRODUCT_QUERY1,
+    PRODUCT_QUERY2,
+    PRODUCT_QUERY3,
+    PRODUCT_QUERY4,
+    PRODUCT_QUERY5,
+    SEQUENCE_NO,
+    SECURITY_FUNCTION,
+    DISPLAY_FLAG,
+    FILTER_COUNT,
+    DISPLAY_COLUMN_COUNT,
+    PRODUCT_URL,
+    BE_CODE,
+    CATEGORY_CODE,
+    OPERATING_UNIT_FLAG,
+    CREATION_DATE,
+    CREATED_BY,
+    LAST_UPDATE_DATE,
+    LAST_UPDATED_BY,
+    LAST_UPDATE_LOGIN,
+    OBJECT_VERSION_NUMBER
+  ) values (
+    X_QUERY_ID,
+    X_APPLICATION_ID,
+    X_QUERY_TYPE_FLAG,
+    X_PRODUCT_QUERY1,
+    X_PRODUCT_QUERY2,
+    X_PRODUCT_QUERY3,
+    X_PRODUCT_QUERY4,
+    X_PRODUCT_QUERY5,
+    X_SEQUENCE_NO,
+    X_SECURITY_FUNCTION,
+    X_DISPLAY_FLAG,
+    X_FILTER_COUNT,
+    X_DISPLAY_COLUMN_COUNT,
+    X_PRODUCT_URL,
+    X_BE_CODE,
+    X_CATEGORY_CODE,
+    X_OPERATING_UNIT_FLAG,
+    X_CREATION_DATE,
+    X_CREATED_BY,
+    X_LAST_UPDATE_DATE,
+    X_LAST_UPDATED_BY,
+    X_LAST_UPDATE_LOGIN,
+    1
+  );
+
+
+  insert into IMC_THREE_SIXTY_QUERY_TL (
+    QUERY_ID,
+    TRANSACTION_NAME,
+    HEADER_TEXT,
+    LAST_UPDATE_DATE,
+    CREATION_DATE,
+    CREATED_BY,
+    LAST_UPDATED_BY,
+    LAST_UPDATE_LOGIN,
+    LANGUAGE,
+    SOURCE_LANG,
+    OBJECT_VERSION_NUMBER
+  ) select
+    X_QUERY_ID,
+    X_TRANSACTION_NAME,
+    X_HEADER_TEXT,
+    X_LAST_UPDATE_DATE,
+    X_CREATION_DATE,
+    X_CREATED_BY,
+    X_LAST_UPDATED_BY,
+    X_LAST_UPDATE_LOGIN,
+    L.LANGUAGE_CODE,
+    userenv('LANG'),
+    1
+  from FND_LANGUAGES L
+  where L.INSTALLED_FLAG in ('I', 'B')
+  and not exists
+    (select NULL
+    from IMC_THREE_SIXTY_QUERY_TL T
+    where T.QUERY_ID = X_QUERY_ID
+    and T.LANGUAGE = L.LANGUAGE_CODE);
+
+    end;
+end INSERT_ROW;
+
+procedure LOCK_ROW (
+  X_QUERY_ID in NUMBER,
+  X_APPLICATION_ID in NUMBER,
+  X_QUERY_TYPE_FLAG in VARCHAR2,
+  X_PRODUCT_QUERY1 in VARCHAR2,
+  X_PRODUCT_QUERY2 in VARCHAR2,
+  X_PRODUCT_QUERY3 in VARCHAR2,
+  X_PRODUCT_QUERY4 in VARCHAR2,
+  X_PRODUCT_QUERY5 in VARCHAR2,
+  X_SEQUENCE_NO in NUMBER,
+  X_SECURITY_FUNCTION in VARCHAR2,
+  X_DISPLAY_FLAG in VARCHAR2,
+  X_FILTER_COUNT     in NUMBER,
+  X_DISPLAY_COLUMN_COUNT in NUMBER,
+  X_PRODUCT_URL in VARCHAR2,
+  X_BE_CODE     in VARCHAR2,
+  X_CATEGORY_CODE in VARCHAR2,
+  X_OPERATING_UNIT_FLAG in VARCHAR2,
+  X_TRANSACTION_NAME in VARCHAR2,
+  X_HEADER_TEXT in VARCHAR2,
+  X_CREATION_DATE in DATE,
+  X_CREATED_BY in NUMBER,
+  X_LAST_UPDATE_DATE in DATE,
+  X_LAST_UPDATED_BY in NUMBER,
+  X_LAST_UPDATE_LOGIN in NUMBER,
+  X_OBJECT_VERSION_NUMBER in NUMBER
+) is
+  cursor c is select
+      APPLICATION_ID,
+      QUERY_TYPE_FLAG,
+      PRODUCT_QUERY1,
+      PRODUCT_QUERY2,
+      PRODUCT_QUERY3,
+      PRODUCT_QUERY4,
+      PRODUCT_QUERY5,
+      SEQUENCE_NO,
+      SECURITY_FUNCTION,
+      DISPLAY_FLAG,
+      FILTER_COUNT,
+      DISPLAY_COLUMN_COUNT,
+      PRODUCT_URL,
+      BE_CODE,
+      CATEGORY_CODE,
+      OPERATING_UNIT_FLAG,
+      OBJECT_VERSION_NUMBER
+    from IMC_THREE_SIXTY_QUERY_B
+    where QUERY_ID = X_QUERY_ID
+    for update of QUERY_ID nowait;
+  recinfo c%rowtype;
+
+  cursor c1 is select
+      TRANSACTION_NAME,
+      HEADER_TEXT,
+      decode(LANGUAGE, userenv('LANG'), 'Y', 'N') BASELANG
+    from IMC_THREE_SIXTY_QUERY_TL
+    where QUERY_ID = X_QUERY_ID
+    and userenv('LANG') in (LANGUAGE, SOURCE_LANG)
+    for update of QUERY_ID nowait;
+begin
+  open c;
+  fetch c into recinfo;
+  if (c%notfound) then
+    close c;
+    fnd_message.set_name('FND', 'FORM_RECORD_DELETED');
+    app_exception.raise_exception;
+  end if;
+  close c;
+  if (    (recinfo.APPLICATION_ID = X_APPLICATION_ID)
+      AND (recinfo.QUERY_TYPE_FLAG = X_QUERY_TYPE_FLAG)
+      AND (recinfo.FILTER_COUNT = X_FILTER_COUNT)
+      AND (recinfo.DISPLAY_COLUMN_COUNT = X_DISPLAY_COLUMN_COUNT)
+      AND (recinfo.PRODUCT_QUERY1 = X_PRODUCT_QUERY1)
+      AND (recinfo.SEQUENCE_NO = X_SEQUENCE_NO)
+      AND (recinfo.DISPLAY_FLAG = X_DISPLAY_FLAG)
+      AND ( (recinfo.PRODUCT_URL = X_PRODUCT_URL) OR
+           ((recinfo.PRODUCT_URL is null) AND (X_PRODUCT_URL is null)))
+      AND ( (recinfo.BE_CODE = X_BE_CODE) OR
+           ((recinfo.BE_CODE is null) AND (X_BE_CODE is null   )))
+		        AND ( (recinfo.OPERATING_UNIT_FLAG = X_OPERATING_UNIT_FLAG) OR
+           ((recinfo.OPERATING_UNIT_FLAG is null) AND (X_OPERATING_UNIT_FLAG is null)))
+      AND ((recinfo.SECURITY_FUNCTION = X_SECURITY_FUNCTION)
+     OR ((recinfo.SECURITY_FUNCTION is null) AND (X_SECURITY_FUNCTION is null)))
+      AND ((recinfo.OBJECT_VERSION_NUMBER = X_OBJECT_VERSION_NUMBER)
+      OR ((recinfo.OBJECT_VERSION_NUMBER is null) AND
+          (X_OBJECT_VERSION_NUMBER is null)))
+  ) then
+    null;
+  else
+    fnd_message.set_name('FND', 'FORM_RECORD_CHANGED');
+    app_exception.raise_exception;
+  end if;
+
+  for tlinfo in c1 loop
+    if (tlinfo.BASELANG = 'Y') then
+      if (    (tlinfo.TRANSACTION_NAME = X_TRANSACTION_NAME)
+          AND ((tlinfo.HEADER_TEXT = X_HEADER_TEXT)
+               OR ((tlinfo.HEADER_TEXT is null) AND (X_HEADER_TEXT is null)))
+      ) then
+        null;
+      else
+        fnd_message.set_name('FND', 'FORM_RECORD_CHANGED');
+        app_exception.raise_exception;
+      end if;
+    end if;
+  end loop;
+  return;
+end LOCK_ROW;
+
+procedure UPDATE_ROW (
+  X_QUERY_ID in NUMBER,
+  X_APPLICATION_ID in NUMBER,
+  X_QUERY_TYPE_FLAG in VARCHAR2,
+  X_PRODUCT_QUERY1 in VARCHAR2,
+  X_PRODUCT_QUERY2 in VARCHAR2,
+  X_PRODUCT_QUERY3 in VARCHAR2,
+  X_PRODUCT_QUERY4 in VARCHAR2,
+  X_PRODUCT_QUERY5 in VARCHAR2,
+  X_SEQUENCE_NO in NUMBER,
+  X_SECURITY_FUNCTION in VARCHAR2,
+  X_DISPLAY_FLAG in VARCHAR2,
+  X_FILTER_COUNT     in NUMBER,
+  X_DISPLAY_COLUMN_COUNT in NUMBER,
+  X_PRODUCT_URL in VARCHAR2,
+  X_BE_CODE in VARCHAR2,
+  X_CATEGORY_CODE in VARCHAR2,
+ X_OPERATING_UNIT_FLAG in VARCHAR2,
+  X_TRANSACTION_NAME in VARCHAR2,
+  X_HEADER_TEXT in VARCHAR2,
+  X_LAST_UPDATE_DATE in DATE,
+  X_LAST_UPDATED_BY in NUMBER,
+  X_LAST_UPDATE_LOGIN in NUMBER,
+  X_OBJECT_VERSION_NUMBER in NUMBER
+) is
+
+begin
+  update IMC_THREE_SIXTY_QUERY_B set
+    APPLICATION_ID = X_APPLICATION_ID,
+    QUERY_TYPE_FLAG = X_QUERY_TYPE_FLAG,
+    PRODUCT_QUERY1 = X_PRODUCT_QUERY1,
+    PRODUCT_QUERY2 = X_PRODUCT_QUERY2,
+    PRODUCT_QUERY3 = X_PRODUCT_QUERY3,
+    PRODUCT_QUERY4 = X_PRODUCT_QUERY4,
+    PRODUCT_QUERY5 = X_PRODUCT_QUERY5,
+    SEQUENCE_NO = X_SEQUENCE_NO,
+    SECURITY_FUNCTION = X_SECURITY_FUNCTION,
+    DISPLAY_FLAG = X_DISPLAY_FLAG,
+    FILTER_COUNT     = X_FILTER_COUNT,
+    DISPLAY_COLUMN_COUNT = X_DISPLAY_COLUMN_COUNT,
+    PRODUCT_URL = X_PRODUCT_URL,
+    BE_CODE = X_BE_CODE,
+    CATEGORY_CODE = X_CATEGORY_CODE,
+    OPERATING_UNIT_FLAG = X_OPERATING_UNIT_FLAG,
+    OBJECT_VERSION_NUMBER = X_OBJECT_VERSION_NUMBER,
+    LAST_UPDATE_DATE = X_LAST_UPDATE_DATE,
+    LAST_UPDATED_BY = X_LAST_UPDATED_BY,
+    LAST_UPDATE_LOGIN = X_LAST_UPDATE_LOGIN
+  where QUERY_ID = X_QUERY_ID;
+
+  if (sql%notfound) then
+    raise no_data_found;
+  end if;
+
+   update IMC_THREE_SIXTY_QUERY_TL set
+    TRANSACTION_NAME = X_TRANSACTION_NAME,
+    HEADER_TEXT = X_HEADER_TEXT,
+    LAST_UPDATE_DATE = X_LAST_UPDATE_DATE,
+    LAST_UPDATED_BY = X_LAST_UPDATED_BY,
+    LAST_UPDATE_LOGIN = X_LAST_UPDATE_LOGIN,
+    SOURCE_LANG = userenv('LANG')
+  where QUERY_ID = X_QUERY_ID
+  and userenv('LANG') in (LANGUAGE, SOURCE_LANG);
+
+  if (sql%notfound) then
+    raise no_data_found;
+  end if;
+
+end UPDATE_ROW;
+
+procedure DELETE_ROW (
+  X_QUERY_ID in NUMBER
+) is
+begin
+  delete from IMC_THREE_SIXTY_QUERY_TL
+  where QUERY_ID = X_QUERY_ID;
+
+  if (sql%notfound) then
+    raise no_data_found;
+  end if;
+
+  delete from IMC_THREE_SIXTY_QUERY_B
+  where QUERY_ID = X_QUERY_ID;
+
+  if (sql%notfound) then
+    raise no_data_found;
+  end if;
+end DELETE_ROW;
+
+procedure ADD_LANGUAGE
+is
+begin
+  delete from IMC_THREE_SIXTY_QUERY_TL T
+  where not exists
+    (select NULL
+    from IMC_THREE_SIXTY_QUERY_B B
+    where B.QUERY_ID = T.QUERY_ID
+    );
+
+  update IMC_THREE_SIXTY_QUERY_TL T set (
+      TRANSACTION_NAME,
+      HEADER_TEXT
+    ) = (select
+      B.TRANSACTION_NAME,
+      B.HEADER_TEXT
+    from IMC_THREE_SIXTY_QUERY_TL B
+    where B.QUERY_ID = T.QUERY_ID
+    and B.LANGUAGE = T.SOURCE_LANG)
+  where (
+      T.QUERY_ID,
+      T.LANGUAGE
+  ) in (select
+      SUBT.QUERY_ID,
+      SUBT.LANGUAGE
+    from IMC_THREE_SIXTY_QUERY_TL SUBB, IMC_THREE_SIXTY_QUERY_TL SUBT
+    where SUBB.QUERY_ID = SUBT.QUERY_ID
+    and SUBB.LANGUAGE = SUBT.SOURCE_LANG
+    and (SUBB.TRANSACTION_NAME <> SUBT.TRANSACTION_NAME
+      or SUBB.HEADER_TEXT <> SUBT.HEADER_TEXT
+      or (SUBB.HEADER_TEXT is null and SUBT.HEADER_TEXT is not null)
+      or (SUBB.HEADER_TEXT is not null and SUBT.HEADER_TEXT is null)
+  ));
+
+   insert into IMC_THREE_SIXTY_QUERY_TL (
+    QUERY_ID,
+    TRANSACTION_NAME,
+    HEADER_TEXT,
+    LAST_UPDATE_DATE,
+    CREATION_DATE,
+    CREATED_BY,
+    LAST_UPDATED_BY,
+    LAST_UPDATE_LOGIN,
+    OBJECT_VERSION_NUMBER,
+    LANGUAGE,
+    SOURCE_LANG
+  ) select
+    B.QUERY_ID,
+    B.TRANSACTION_NAME,
+    B.HEADER_TEXT,
+    B.LAST_UPDATE_DATE,
+    B.CREATION_DATE,
+    B.CREATED_BY,
+    B.LAST_UPDATED_BY,
+    B.LAST_UPDATE_LOGIN,
+    B.OBJECT_VERSION_NUMBER,
+    L.LANGUAGE_CODE,
+    B.SOURCE_LANG
+  from IMC_THREE_SIXTY_QUERY_TL B, FND_LANGUAGES L
+  where L.INSTALLED_FLAG in ('I', 'B')
+  and B.LANGUAGE = userenv('LANG')
+  and not exists
+    (select NULL
+    from IMC_THREE_SIXTY_QUERY_TL T
+    where T.QUERY_ID = B.QUERY_ID
+    and T.LANGUAGE = L.LANGUAGE_CODE);
+end ADD_LANGUAGE;
+
+procedure TRANSLATE_ROW (
+  X_QUERY_ID in NUMBER,
+  X_TRANSACTION_NAME in VARCHAR2,
+  X_HEADER_TEXT in VARCHAR2,
+  X_OWNER in VARCHAR2) IS
+
+BEGIN
+    -- only update rows that have not been altered by user
+    update IMC_THREE_SIXTY_QUERY_TL set
+    TRANSACTION_NAME= X_TRANSACTION_NAME,
+    HEADER_TEXT = X_HEADER_TEXT,
+    source_lang = userenv('LANG'),
+    last_update_date = sysdate,
+    last_updated_by = decode(X_OWNER, 'SEED', 1, 0),
+    last_update_login = 0
+    where QUERY_ID= X_QUERY_ID
+    and   userenv('LANG') in (language, source_lang);
+
+END;
+
+ procedure LOAD_ROW(
+  X_QUERY_ID in out NOCOPY NUMBER,
+  X_APPLICATION_ID in NUMBER,
+  X_QUERY_TYPE_FLAG in VARCHAR2,
+  X_PRODUCT_QUERY1 in VARCHAR2,
+  X_PRODUCT_QUERY2 in VARCHAR2,
+  X_PRODUCT_QUERY3 in VARCHAR2,
+  X_PRODUCT_QUERY4 in VARCHAR2,
+  X_PRODUCT_QUERY5 in VARCHAR2,
+  X_SEQUENCE_NO in NUMBER,
+  X_SECURITY_FUNCTION in VARCHAR2,
+  X_DISPLAY_FLAG in VARCHAR2,
+  X_FILTER_COUNT     in NUMBER,
+  X_DISPLAY_COLUMN_COUNT in NUMBER,
+  X_PRODUCT_URL in VARCHAR2,
+  X_BE_CODE  in VARCHAR2,
+  X_CATEGORY_CODE in VARCHAR2,
+  X_OPERATING_UNIT_FLAG in VARCHAR2,
+  X_TRANSACTION_NAME in VARCHAR2,
+  X_HEADER_TEXT in VARCHAR2,
+  X_LAST_UPDATE_DATE in DATE,
+  X_LAST_UPDATED_BY in NUMBER,
+  X_LAST_UPDATE_LOGIN in NUMBER,
+  X_OBJECT_VERSION_NUMBER in NUMBER,
+  X_OWNER in VARCHAR2) IS
+
+begin
+  declare
+     user_id		number := 0;
+     row_id     	varchar2(64);
+     L_QUERY_ID  NUMBER := X_QUERY_ID;
+     L_OBJECT_VERSION_NUMBER number;
+     cnt number;
+
+  begin
+
+     if (X_OWNER = 'SEED') then
+        user_id := 1;
+     end if;
+
+  BEGIN
+   IF X_BE_CODE IS NOT NULL then
+    select count(*) into cnt from fnd_lookup_values where
+	lookup_type='IMC_TXN_BUSINESS_ENTITY'
+	 and lookup_code = X_BE_CODE;
+    end if;
+     --dbms_output.put_line('count for lookup in load_row '||to_char(cnt));
+
+      IF cnt = 0 then
+      --dbms_output.put_line('count for lookup in load_row if '||to_char(cnt));
+      fnd_message.set_name('IMC', 'IMC_INVALID_BUSINESS_ENTITY');
+      fnd_msg_pub.add;
+      goto raise_error;
+      end if;
+
+      EXCEPTION WHEN NO_DATA_FOUND THEN
+      --dbms_output.put_line('count for lookup in load_row exception '||to_char(cnt));
+      fnd_message.set_name('IMC', 'IMC_INVALID_BUSINESS_ENTITY');
+      fnd_msg_pub.add;
+      goto raise_error;
+      END;
+
+     L_OBJECT_VERSION_NUMBER := NVL(X_OBJECT_VERSION_NUMBER, 1) + 1;
+
+     IMC_THREE_SIXTY_QUERY_PKG.UPDATE_ROW (
+     X_QUERY_ID => X_QUERY_ID,
+     X_APPLICATION_ID => X_APPLICATION_ID,
+     X_QUERY_TYPE_FLAG => X_QUERY_TYPE_FLAG,
+     X_PRODUCT_QUERY1 => X_PRODUCT_QUERY1,
+     X_PRODUCT_QUERY2 => X_PRODUCT_QUERY2,
+     X_PRODUCT_QUERY3 => X_PRODUCT_QUERY3,
+     X_PRODUCT_QUERY4 => X_PRODUCT_QUERY4,
+     X_PRODUCT_QUERY5 => X_PRODUCT_QUERY5,
+     X_SEQUENCE_NO => X_SEQUENCE_NO,
+     X_SECURITY_FUNCTION => X_SECURITY_FUNCTION,
+     X_DISPLAY_FLAG => X_DISPLAY_FLAG,
+     X_FILTER_COUNT     => X_FILTER_COUNT,
+     X_DISPLAY_COLUMN_COUNT => X_DISPLAY_COLUMN_COUNT,
+     X_PRODUCT_URL => X_PRODUCT_URL,
+     X_BE_CODE => X_BE_CODE,
+     X_CATEGORY_CODE => X_CATEGORY_CODE,
+     X_OPERATING_UNIT_FLAG => X_OPERATING_UNIT_FLAG,
+     X_TRANSACTION_NAME => X_TRANSACTION_NAME,
+     X_HEADER_TEXT => X_HEADER_TEXT,
+     X_LAST_UPDATE_DATE =>  sysdate,
+     X_LAST_UPDATED_BY => user_id,
+     X_LAST_UPDATE_LOGIN => 0,
+     X_OBJECT_VERSION_NUMBER => L_OBJECT_VERSION_NUMBER );
+
+    exception
+       when NO_DATA_FOUND then
+
+     IMC_THREE_SIXTY_QUERY_PKG.INSERT_ROW (
+     X_QUERY_ID => L_QUERY_ID,
+     X_APPLICATION_ID => X_APPLICATION_ID,
+     X_QUERY_TYPE_FLAG => X_QUERY_TYPE_FLAG,
+     X_PRODUCT_QUERY1 => X_PRODUCT_QUERY1,
+     X_PRODUCT_QUERY2 => X_PRODUCT_QUERY2,
+     X_PRODUCT_QUERY3 => X_PRODUCT_QUERY3,
+     X_PRODUCT_QUERY4 => X_PRODUCT_QUERY4,
+     X_PRODUCT_QUERY5 => X_PRODUCT_QUERY5,
+     X_SEQUENCE_NO => X_SEQUENCE_NO,
+     X_SECURITY_FUNCTION => X_SECURITY_FUNCTION,
+     X_DISPLAY_FLAG => X_DISPLAY_FLAG,
+     X_FILTER_COUNT     => X_FILTER_COUNT,
+     X_DISPLAY_COLUMN_COUNT => X_DISPLAY_COLUMN_COUNT,
+     X_PRODUCT_URL => X_PRODUCT_URL,
+     X_BE_CODE => X_BE_CODE,
+     X_CATEGORY_CODE => X_CATEGORY_CODE,
+     X_OPERATING_UNIT_FLAG => X_OPERATING_UNIT_FLAG,
+     X_TRANSACTION_NAME => X_TRANSACTION_NAME,
+     X_HEADER_TEXT => X_HEADER_TEXT,
+     X_CREATION_DATE => sysdate,
+     X_CREATED_BY => user_id,
+     X_LAST_UPDATE_DATE => sysdate,
+     X_LAST_UPDATED_BY => user_id,
+     X_LAST_UPDATE_LOGIN => 0,
+     X_OBJECT_VERSION_NUMBER =>1);
+end;
+
+ <<raise_error>>
+ null;
+end LOAD_ROW;
+
+end IMC_THREE_SIXTY_QUERY_PKG;
+
+/

@@ -1,0 +1,55 @@
+--------------------------------------------------------
+--  DDL for Package BEN_STARTUP_ACTN_TYP_PKG
+--------------------------------------------------------
+
+  CREATE OR REPLACE EDITIONABLE PACKAGE "APPS"."BEN_STARTUP_ACTN_TYP_PKG" AUTHID CURRENT_USER as
+/* $Header: besat01t.pkh 115.2 2002/12/16 12:35:27 vsethi noship $ */
+procedure OWNER_TO_WHO (
+  P_OWNER in VARCHAR2,
+  P_CREATION_DATE out nocopy DATE,
+  P_CREATED_BY out nocopy NUMBER,
+  P_LAST_UPDATE_DATE out nocopy DATE,
+  P_LAST_UPDATED_BY out nocopy NUMBER,
+  P_LAST_UPDATE_LOGIN out nocopy NUMBER
+);
+procedure INSERT_ROW (
+  P_ROWID in out nocopy VARCHAR2,
+  P_TYPE_CD in VARCHAR2,
+  P_DESCRIPTION in VARCHAR2,
+  P_NAME in VARCHAR2,
+  P_CREATION_DATE in DATE,
+  P_CREATED_BY in NUMBER,
+  P_LAST_UPDATE_DATE in DATE,
+  P_LAST_UPDATED_BY in NUMBER,
+  P_LAST_UPDATE_LOGIN in NUMBER);
+procedure LOCK_ROW (
+  P_TYPE_CD in VARCHAR2,
+  P_DESCRIPTION in VARCHAR2,
+  P_NAME in VARCHAR2
+);
+procedure UPDATE_ROW (
+  P_TYPE_CD in VARCHAR2,
+  P_DESCRIPTION in VARCHAR2,
+  P_NAME in VARCHAR2,
+  P_LAST_UPDATE_DATE in DATE,
+  P_LAST_UPDATED_BY in NUMBER,
+  P_LAST_UPDATE_LOGIN in NUMBER
+);
+procedure DELETE_ROW ( P_TYPE_CD in VARCHAR2
+);
+PROCEDURE LOAD_ROW (
+  P_TYPE_CD in VARCHAR2,
+  P_DESCRIPTION in VARCHAR2,
+  P_NAME in VARCHAR2,
+  P_OWNER in VARCHAR2);
+procedure translate_row(
+  P_TYPE_CD in VARCHAR2,
+  P_DESCRIPTION in VARCHAR2,
+  P_NAME in VARCHAR2,
+  p_OWNER IN VARCHAR2);
+procedure ADD_LANGUAGE;
+end BEN_STARTUP_ACTN_TYP_PKG;
+
+ 
+
+/

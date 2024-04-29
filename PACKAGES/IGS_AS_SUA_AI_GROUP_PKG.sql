@@ -1,0 +1,141 @@
+--------------------------------------------------------
+--  DDL for Package IGS_AS_SUA_AI_GROUP_PKG
+--------------------------------------------------------
+
+  CREATE OR REPLACE EDITIONABLE PACKAGE "APPS"."IGS_AS_SUA_AI_GROUP_PKG" AUTHID CURRENT_USER AS
+/* $Header: IGSDI83S.pls 120.0 2005/07/05 12:05:06 appldev noship $ */
+
+  PROCEDURE insert_row (
+    x_rowid                             IN OUT NOCOPY VARCHAR2,
+    x_sua_ass_item_group_id             IN OUT NOCOPY NUMBER,
+    x_person_id                         IN     NUMBER,
+    x_course_cd                         IN     VARCHAR2,
+    x_uoo_id                            IN     NUMBER,
+    x_group_name                        IN     VARCHAR2,
+    x_midterm_formula_code              IN     VARCHAR2,
+    x_midterm_formula_qty               IN     NUMBER,
+    x_midterm_weight_qty                IN     NUMBER,
+    x_final_formula_code                IN     VARCHAR2,
+    x_final_formula_qty                 IN     NUMBER,
+    x_final_weight_qty                  IN     NUMBER,
+    x_unit_ass_item_group_id            IN     NUMBER,
+    x_us_ass_item_group_id              IN     NUMBER,
+    x_logical_delete_date               IN     DATE,
+    x_mode                              IN     VARCHAR2    DEFAULT 'R'
+  );
+
+  PROCEDURE lock_row (
+    x_rowid                             IN     VARCHAR2,
+    x_sua_ass_item_group_id             IN     NUMBER,
+    x_person_id                         IN     NUMBER,
+    x_course_cd                         IN     VARCHAR2,
+    x_uoo_id                            IN     NUMBER,
+    x_group_name                        IN     VARCHAR2,
+    x_midterm_formula_code              IN     VARCHAR2,
+    x_midterm_formula_qty               IN     NUMBER,
+    x_midterm_weight_qty                IN     NUMBER,
+    x_final_formula_code                IN     VARCHAR2,
+    x_final_formula_qty                 IN     NUMBER,
+    x_final_weight_qty                  IN     NUMBER,
+    x_unit_ass_item_group_id            IN     NUMBER,
+    x_us_ass_item_group_id              IN     NUMBER,
+    x_logical_delete_date               IN     DATE
+  );
+
+  PROCEDURE update_row (
+    x_rowid                             IN     VARCHAR2,
+    x_sua_ass_item_group_id             IN     NUMBER,
+    x_person_id                         IN     NUMBER,
+    x_course_cd                         IN     VARCHAR2,
+    x_uoo_id                            IN     NUMBER,
+    x_group_name                        IN     VARCHAR2,
+    x_midterm_formula_code              IN     VARCHAR2,
+    x_midterm_formula_qty               IN     NUMBER,
+    x_midterm_weight_qty                IN     NUMBER,
+    x_final_formula_code                IN     VARCHAR2,
+    x_final_formula_qty                 IN     NUMBER,
+    x_final_weight_qty                  IN     NUMBER,
+    x_unit_ass_item_group_id            IN     NUMBER,
+    x_us_ass_item_group_id              IN     NUMBER,
+    x_logical_delete_date               IN     DATE,
+    x_mode                              IN     VARCHAR2    DEFAULT 'R'
+  );
+
+  PROCEDURE add_row (
+    x_rowid                             IN OUT NOCOPY VARCHAR2,
+    x_sua_ass_item_group_id             IN OUT NOCOPY NUMBER,
+    x_person_id                         IN     NUMBER,
+    x_course_cd                         IN     VARCHAR2,
+    x_uoo_id                            IN     NUMBER,
+    x_group_name                        IN     VARCHAR2,
+    x_midterm_formula_code              IN     VARCHAR2,
+    x_midterm_formula_qty               IN     NUMBER,
+    x_midterm_weight_qty                IN     NUMBER,
+    x_final_formula_code                IN     VARCHAR2,
+    x_final_formula_qty                 IN     NUMBER,
+    x_final_weight_qty                  IN     NUMBER,
+    x_unit_ass_item_group_id            IN     NUMBER,
+    x_us_ass_item_group_id              IN     NUMBER,
+    x_logical_delete_date               IN     DATE,
+    x_mode                              IN     VARCHAR2    DEFAULT 'R'
+  );
+
+  PROCEDURE delete_row (
+    x_rowid                             IN     VARCHAR2,
+    x_mode				IN     VARCHAR2 DEFAULT 'R'
+  );
+
+  FUNCTION get_pk_for_validation (
+    x_sua_ass_item_group_id             IN     NUMBER
+  ) RETURN BOOLEAN;
+
+  FUNCTION get_uk_for_validation (
+    x_person_id                         IN     NUMBER,
+    x_course_cd                         IN     VARCHAR2,
+    x_uoo_id                            IN     NUMBER,
+    x_group_name                        IN     VARCHAR2
+  ) RETURN BOOLEAN;
+
+  PROCEDURE get_fk_igs_en_su_attempt (
+    x_person_id                         IN     NUMBER,
+    x_course_cd                         IN     VARCHAR2,
+    x_uoo_id                            IN     NUMBER
+  );
+
+  PROCEDURE get_fk_igs_as_unit_ai_grp (
+    x_unit_ass_item_group_id            IN     NUMBER
+  );
+
+  PROCEDURE get_fk_igs_as_us_ai_group (
+    x_us_ass_item_group_id              IN     NUMBER
+  );
+
+  PROCEDURE before_dml (
+    p_action                            IN     VARCHAR2,
+    x_rowid                             IN     VARCHAR2    DEFAULT NULL,
+    x_sua_ass_item_group_id             IN     NUMBER      DEFAULT NULL,
+    x_person_id                         IN     NUMBER      DEFAULT NULL,
+    x_course_cd                         IN     VARCHAR2    DEFAULT NULL,
+    x_uoo_id                            IN     NUMBER      DEFAULT NULL,
+    x_group_name                        IN     VARCHAR2    DEFAULT NULL,
+    x_midterm_formula_code              IN     VARCHAR2    DEFAULT NULL,
+    x_midterm_formula_qty               IN     NUMBER      DEFAULT NULL,
+    x_midterm_weight_qty                IN     NUMBER      DEFAULT NULL,
+    x_final_formula_code                IN     VARCHAR2    DEFAULT NULL,
+    x_final_formula_qty                 IN     NUMBER      DEFAULT NULL,
+    x_final_weight_qty                  IN     NUMBER      DEFAULT NULL,
+    x_unit_ass_item_group_id            IN     NUMBER      DEFAULT NULL,
+    x_us_ass_item_group_id              IN     NUMBER      DEFAULT NULL,
+    x_logical_delete_date               IN     DATE        DEFAULT NULL,
+    x_creation_date                     IN     DATE        DEFAULT NULL,
+    x_created_by                        IN     NUMBER      DEFAULT NULL,
+    x_last_update_date                  IN     DATE        DEFAULT NULL,
+    x_last_updated_by                   IN     NUMBER      DEFAULT NULL,
+    x_last_update_login                 IN     NUMBER      DEFAULT NULL
+  );
+
+END igs_as_sua_ai_group_pkg;
+
+ 
+
+/

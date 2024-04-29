@@ -1,0 +1,236 @@
+--------------------------------------------------------
+--  DDL for Package Body ONT_AGREEMENT_DEF_UTIL
+--------------------------------------------------------
+
+  CREATE OR REPLACE EDITIONABLE PACKAGE BODY "APPS"."ONT_AGREEMENT_DEF_UTIL" AS
+/* $Header: OEXDFWKB.pls 115.0 29-AUG-13 23:23:31 appldev ship $ */
+ 
+--  
+--  Copyright (c) 1996 Oracle Corporation, Redwood Shores, CA, USA
+--  All rights reserved.
+--  
+--  FILENAME
+--  
+--      ONT_AGREEMENT_Def_Util
+--  
+--  DESCRIPTION
+--  
+--      Body of package ONT_AGREEMENT_Def_Util
+--  
+--  NOTES
+--  
+--  HISTORY
+--  
+--  29-AUG-13 Created
+--  
+ 
+--  Global constant holding the package name
+G_PKG_NAME                    CONSTANT VARCHAR2(30) := 'ONT_AGREEMENT_Def_Util';
+ 
+ 
+  g_database_object_name varchar2(30) :='OE_AGREEMENTS_V';
+ 
+ 
+FUNCTION Get_Attr_Val_Varchar2
+(   p_attr_code                     IN  VARCHAR2
+,   p_record                        IN  OE_AGREEMENTS_V%ROWTYPE 
+) RETURN VARCHAR2
+IS
+BEGIN
+ 
+IF p_attr_code =('ACCOUNTING_RULE_ID') THEN
+  IF NVL(p_record.ACCOUNTING_RULE_ID, FND_API.G_MISS_NUM) <> FND_API.G_MISS_NUM THEN
+  RETURN p_record.ACCOUNTING_RULE_ID;
+  ELSE
+  RETURN NULL; 
+  END IF;
+ELSIF p_attr_code =('AGREEMENT_ID') THEN
+  IF NVL(p_record.AGREEMENT_ID, FND_API.G_MISS_NUM) <> FND_API.G_MISS_NUM THEN
+  RETURN p_record.AGREEMENT_ID;
+  ELSE
+  RETURN NULL; 
+  END IF;
+ELSIF p_attr_code =('AGREEMENT_TYPE_CODE') THEN
+  IF NVL(p_record.AGREEMENT_TYPE_CODE, FND_API.G_MISS_CHAR) <> FND_API.G_MISS_CHAR THEN
+  RETURN p_record.AGREEMENT_TYPE_CODE;
+  ELSE
+  RETURN NULL; 
+  END IF;
+ELSIF p_attr_code =('CUST_PO_NUMBER') THEN
+  IF NVL(p_record.CUST_PO_NUMBER, FND_API.G_MISS_CHAR) <> FND_API.G_MISS_CHAR THEN
+  RETURN p_record.CUST_PO_NUMBER;
+  ELSE
+  RETURN NULL; 
+  END IF;
+ELSIF p_attr_code =('INVOICE_TO_CONTACT_ID') THEN
+  IF NVL(p_record.INVOICE_TO_CONTACT_ID, FND_API.G_MISS_NUM) <> FND_API.G_MISS_NUM THEN
+  RETURN p_record.INVOICE_TO_CONTACT_ID;
+  ELSE
+  RETURN NULL; 
+  END IF;
+ELSIF p_attr_code =('INVOICE_TO_ORG_ID') THEN
+  IF NVL(p_record.INVOICE_TO_ORG_ID, FND_API.G_MISS_NUM) <> FND_API.G_MISS_NUM THEN
+  RETURN p_record.INVOICE_TO_ORG_ID;
+  ELSE
+  RETURN NULL; 
+  END IF;
+ELSIF p_attr_code =('INVOICING_RULE_ID') THEN
+  IF NVL(p_record.INVOICING_RULE_ID, FND_API.G_MISS_NUM) <> FND_API.G_MISS_NUM THEN
+  RETURN p_record.INVOICING_RULE_ID;
+  ELSE
+  RETURN NULL; 
+  END IF;
+ELSIF p_attr_code =('PAYMENT_TERM_ID') THEN
+  IF NVL(p_record.PAYMENT_TERM_ID, FND_API.G_MISS_NUM) <> FND_API.G_MISS_NUM THEN
+  RETURN p_record.PAYMENT_TERM_ID;
+  ELSE
+  RETURN NULL; 
+  END IF;
+ELSIF p_attr_code =('PRICE_LIST_ID') THEN
+  IF NVL(p_record.PRICE_LIST_ID, FND_API.G_MISS_NUM) <> FND_API.G_MISS_NUM THEN
+  RETURN p_record.PRICE_LIST_ID;
+  ELSE
+  RETURN NULL; 
+  END IF;
+ELSIF p_attr_code =('SALESREP_ID') THEN
+  IF NVL(p_record.SALESREP_ID, FND_API.G_MISS_NUM) <> FND_API.G_MISS_NUM THEN
+  RETURN p_record.SALESREP_ID;
+  ELSE
+  RETURN NULL; 
+  END IF;
+ELSIF p_attr_code =('SOLD_TO_ORG_ID') THEN
+  IF NVL(p_record.SOLD_TO_ORG_ID, FND_API.G_MISS_NUM) <> FND_API.G_MISS_NUM THEN
+  RETURN p_record.SOLD_TO_ORG_ID;
+  ELSE
+  RETURN NULL; 
+  END IF;
+ELSE
+RETURN NULL; 
+END IF;
+END  Get_Attr_Val_Varchar2;
+ 
+ 
+FUNCTION Get_Attr_Val_Date
+(   p_attr_code                     IN  VARCHAR2
+,   p_record                        IN  OE_AGREEMENTS_V%ROWTYPE 
+) RETURN DATE
+IS
+BEGIN
+ 
+IF p_attr_code =('ACCOUNTING_RULE_ID') THEN
+    IF NVL(p_record.ACCOUNTING_RULE_ID, FND_API.G_MISS_NUM) <> FND_API.G_MISS_NUM THEN
+    RETURN to_date(p_record.ACCOUNTING_RULE_ID,'RRRR/MM/DD HH24:MI:SS');
+    ELSE
+    RETURN NULL; 
+    END IF;
+ELSIF p_attr_code =('AGREEMENT_ID') THEN
+    IF NVL(p_record.AGREEMENT_ID, FND_API.G_MISS_NUM) <> FND_API.G_MISS_NUM THEN
+    RETURN to_date(p_record.AGREEMENT_ID,'RRRR/MM/DD HH24:MI:SS');
+    ELSE
+    RETURN NULL; 
+    END IF;
+ELSIF p_attr_code =('AGREEMENT_TYPE_CODE') THEN
+    IF NVL(p_record.AGREEMENT_TYPE_CODE, FND_API.G_MISS_CHAR) <> FND_API.G_MISS_CHAR THEN
+    RETURN to_date(p_record.AGREEMENT_TYPE_CODE,'RRRR/MM/DD HH24:MI:SS');
+    ELSE
+    RETURN NULL; 
+    END IF;
+ELSIF p_attr_code =('CUST_PO_NUMBER') THEN
+    IF NVL(p_record.CUST_PO_NUMBER, FND_API.G_MISS_CHAR) <> FND_API.G_MISS_CHAR THEN
+    RETURN to_date(p_record.CUST_PO_NUMBER,'RRRR/MM/DD HH24:MI:SS');
+    ELSE
+    RETURN NULL; 
+    END IF;
+ELSIF p_attr_code =('INVOICE_TO_CONTACT_ID') THEN
+    IF NVL(p_record.INVOICE_TO_CONTACT_ID, FND_API.G_MISS_NUM) <> FND_API.G_MISS_NUM THEN
+    RETURN to_date(p_record.INVOICE_TO_CONTACT_ID,'RRRR/MM/DD HH24:MI:SS');
+    ELSE
+    RETURN NULL; 
+    END IF;
+ELSIF p_attr_code =('INVOICE_TO_ORG_ID') THEN
+    IF NVL(p_record.INVOICE_TO_ORG_ID, FND_API.G_MISS_NUM) <> FND_API.G_MISS_NUM THEN
+    RETURN to_date(p_record.INVOICE_TO_ORG_ID,'RRRR/MM/DD HH24:MI:SS');
+    ELSE
+    RETURN NULL; 
+    END IF;
+ELSIF p_attr_code =('INVOICING_RULE_ID') THEN
+    IF NVL(p_record.INVOICING_RULE_ID, FND_API.G_MISS_NUM) <> FND_API.G_MISS_NUM THEN
+    RETURN to_date(p_record.INVOICING_RULE_ID,'RRRR/MM/DD HH24:MI:SS');
+    ELSE
+    RETURN NULL; 
+    END IF;
+ELSIF p_attr_code =('PAYMENT_TERM_ID') THEN
+    IF NVL(p_record.PAYMENT_TERM_ID, FND_API.G_MISS_NUM) <> FND_API.G_MISS_NUM THEN
+    RETURN to_date(p_record.PAYMENT_TERM_ID,'RRRR/MM/DD HH24:MI:SS');
+    ELSE
+    RETURN NULL; 
+    END IF;
+ELSIF p_attr_code =('PRICE_LIST_ID') THEN
+    IF NVL(p_record.PRICE_LIST_ID, FND_API.G_MISS_NUM) <> FND_API.G_MISS_NUM THEN
+    RETURN to_date(p_record.PRICE_LIST_ID,'RRRR/MM/DD HH24:MI:SS');
+    ELSE
+    RETURN NULL; 
+    END IF;
+ELSIF p_attr_code =('SALESREP_ID') THEN
+    IF NVL(p_record.SALESREP_ID, FND_API.G_MISS_NUM) <> FND_API.G_MISS_NUM THEN
+    RETURN to_date(p_record.SALESREP_ID,'RRRR/MM/DD HH24:MI:SS');
+    ELSE
+    RETURN NULL; 
+    END IF;
+ELSIF p_attr_code =('SOLD_TO_ORG_ID') THEN
+    IF NVL(p_record.SOLD_TO_ORG_ID, FND_API.G_MISS_NUM) <> FND_API.G_MISS_NUM THEN
+    RETURN to_date(p_record.SOLD_TO_ORG_ID,'RRRR/MM/DD HH24:MI:SS');
+    ELSE
+    RETURN NULL; 
+    END IF;
+ELSE
+RETURN NULL; 
+END IF;
+ 
+END  Get_Attr_Val_Date;
+ 
+ 
+  PROCEDURE Clear_AGREEMENT_Cache
+  IS  
+  BEGIN  
+  g_cached_record.AGREEMENT_ID := null;
+   END Clear_AGREEMENT_Cache;
+ 
+ 
+FUNCTION Sync_AGREEMENT_Cache
+(   p_AGREEMENT_ID                  IN  NUMBER
+ 
+ 
+) RETURN NUMBER
+IS
+CURSOR cache IS 
+  SELECT * FROM   OE_AGREEMENTS_V
+  WHERE AGREEMENT_ID  = p_AGREEMENT_ID
+  ;
+BEGIN
+ 
+IF (NVL(p_AGREEMENT_ID,FND_API.G_MISS_NUM)  = FND_API.G_MISS_NUM) 
+THEN
+  RETURN 0 ;
+ELSIF (NVL(g_cached_record.AGREEMENT_ID,FND_API.G_MISS_NUM)  <>  p_AGREEMENT_ID) 
+THEN
+  Clear_AGREEMENT_Cache;
+  Open cache;
+  FETCH cache into g_cached_record;
+  IF cache%NOTFOUND THEN
+    RETURN 0;
+  END IF;
+  Close cache;
+  RETURN 1 ;
+END IF;
+ 
+  RETURN 1 ;
+EXCEPTION
+  WHEN OTHERS THEN 
+  RETURN 0 ;
+END Sync_AGREEMENT_Cache;
+ 
+ 
+END ONT_AGREEMENT_Def_Util;
+
+/

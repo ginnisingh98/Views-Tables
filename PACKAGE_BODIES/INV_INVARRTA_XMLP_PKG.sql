@@ -1,0 +1,77 @@
+--------------------------------------------------------
+--  DDL for Package Body INV_INVARRTA_XMLP_PKG
+--------------------------------------------------------
+
+  CREATE OR REPLACE EDITIONABLE PACKAGE BODY "APPS"."INV_INVARRTA_XMLP_PKG" AS
+/* $Header: INVARRTAB.pls 120.2 2008/01/08 06:39:16 dwkrishn noship $ */
+  FUNCTION C_FORMATTEDCURRENCYCODEFORMULA(CURRENCY_CODE IN VARCHAR2) RETURN VARCHAR2 IS
+  BEGIN
+    DECLARE
+      TEMP_C VARCHAR2(20);
+    BEGIN
+      TEMP_C := '(' || CURRENCY_CODE || ')';
+      RETURN (TEMP_C);
+    END;
+    RETURN NULL;
+  END C_FORMATTEDCURRENCYCODEFORMULA;
+
+  FUNCTION BEFOREREPORT RETURN BOOLEAN IS
+ C_DATE_FORMAT varchar2(20);
+  BEGIN
+    BEGIN
+      P_CONC_REQUEST_ID := FND_GLOBAL.CONC_REQUEST_ID;
+      C_DATE_FORMAT := 'DD-MON-YYYY';
+       LP_FROMDATE:=to_char(P_FROMDATE, C_DATE_FORMAT);
+        LP_TODATE:= TO_CHAR(P_TODATE,C_DATE_FORMAT);
+      /*SRW.USER_EXIT('FND SRWINIT')*/NULL;
+    EXCEPTION
+      WHEN /*SRW.USER_EXIT_FAILURE*/OTHERS THEN
+        /*SRW.MESSAGE(1
+                   ,'Before Report: Init')*/NULL;
+    END;
+    DECLARE
+      P_ORG_ID_CHAR VARCHAR2(100) := TO_CHAR(P_ORG_ID);
+    BEGIN
+      /*SRW.USER_EXIT('FND PUTPROFILE NAME="' || 'MFG_ORGANIZATION_ID' || '" FIELD="' || P_ORG_ID_CHAR || '"')*/NULL;
+    EXCEPTION
+      WHEN /*SRW.USER_EXIT_FAILURE*/OTHERS THEN
+        /*SRW.MESSAGE(020
+                   ,'Failed in before report trigger, setting org profile ')*/NULL;
+        RAISE;
+    END;
+    BEGIN
+      NULL;
+    EXCEPTION
+      WHEN /*SRW.USER_EXIT_FAILURE*/OTHERS THEN
+        /*SRW.MESSAGE(1
+                   ,'Before Report: LocatorFlex')*/NULL;
+    END;
+    BEGIN
+      NULL;
+    EXCEPTION
+      WHEN /*SRW.USER_EXIT_FAILURE*/OTHERS THEN
+        /*SRW.MESSAGE(1
+                   ,'Before Report: ItemFlex')*/NULL;
+    END;
+    RETURN (TRUE);
+  END BEFOREREPORT;
+
+  FUNCTION AFTERREPORT RETURN BOOLEAN IS
+  BEGIN
+    BEGIN
+      /*SRW.USER_EXIT('FND SRWEXIT')*/NULL;
+      RETURN (TRUE);
+    END;
+    RETURN (TRUE);
+  END AFTERREPORT;
+
+  FUNCTION AFTERPFORM RETURN BOOLEAN IS
+  BEGIN
+    RETURN (TRUE);
+  END AFTERPFORM;
+
+END INV_INVARRTA_XMLP_PKG;
+
+
+
+/

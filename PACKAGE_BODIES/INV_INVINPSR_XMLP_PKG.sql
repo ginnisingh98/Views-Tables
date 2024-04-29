@@ -1,0 +1,259 @@
+--------------------------------------------------------
+--  DDL for Package Body INV_INVINPSR_XMLP_PKG
+--------------------------------------------------------
+
+  CREATE OR REPLACE EDITIONABLE PACKAGE BODY "APPS"."INV_INVINPSR_XMLP_PKG" AS
+/* $Header: INVINPSRB.pls 120.1 2007/12/25 10:17:06 dwkrishn noship $ */
+  FUNCTION INS_PKSLIP_REC(OLD_PACKSLIP_NUMBER IN NUMBER
+                         ,LINE_NO IN NUMBER
+                         ,C_PACKSLIP_NUM IN NUMBER
+                         ,SHIP_HEADER_ID IN NUMBER) RETURN VARCHAR2 IS
+  BEGIN
+    /*SRW.REFERENCE(OLD_PACKSLIP_NUMBER)*/NULL;
+    IF OLD_PACKSLIP_NUMBER = 0 THEN
+      IF LINE_NO = 1 THEN
+        /*INSERT INTO MTL_INV_PACKSLIPS
+          (PACKSLIP_NUMBER
+          ,PACKSLIP_DATE
+          ,SHIPMENT_HEADER_ID)
+        VALUES   (C_PACKSLIP_NUM
+          ,SYSDATE
+          ,SHIP_HEADER_ID);*/null;
+      END IF;
+    END IF;
+    RETURN ('YES');
+  END INS_PKSLIP_REC;
+
+  FUNCTION PSLIP_NUMBER(OLD_PACKSLIP_NUMBER IN NUMBER
+                       ,LINE_NO IN NUMBER) RETURN NUMBER IS
+  BEGIN
+    DECLARE
+      PACKSLIP_NUM NUMBER;
+    BEGIN
+      IF (OLD_PACKSLIP_NUMBER = 0 AND LINE_NO = 1) THEN
+        SELECT
+          MTL_INV_PACKSLIPS_S.NEXTVAL
+        INTO PACKSLIP_NUM
+        FROM
+          SYS.DUAL;
+      ELSE
+        PACKSLIP_NUM := OLD_PACKSLIP_NUMBER;
+      END IF;
+      RETURN (PACKSLIP_NUM);
+    END;
+  END PSLIP_NUMBER;
+
+  FUNCTION AFTERREPORT RETURN BOOLEAN IS
+  BEGIN
+    /*SRW.USER_EXIT('FND SRWEXIT')*/NULL;
+    RETURN (TRUE);
+  END AFTERREPORT;
+
+  FUNCTION BEFOREREPORT RETURN BOOLEAN IS
+  BEGIN
+    DECLARE
+      SHIP_NUM NUMBER;
+    BEGIN
+      P_CONC_REQUEST_ID := FND_GLOBAL.CONC_REQUEST_ID;
+      /*SRW.USER_EXIT('FND SRWINIT')*/NULL;
+      SHIP_NUM := -1;
+      FND_MESSAGE.SET_NAME('INV'
+                          ,'INV_NO_DATA_EXISTS');
+      C_MESSAGE_NO_DATA := SUBSTR(FND_MESSAGE.GET
+                                 ,1
+                                 ,50);
+      C_MESSAGE_NO_DATA := '*** ' || C_MESSAGE_NO_DATA || ' ***';
+    EXCEPTION
+      WHEN /*SRW.USER_EXIT_FAILURE*/OTHERS THEN
+        BEGIN
+          /*SRW.MESSAGE(100
+                     ,'Foundation is not initialised')*/NULL;
+          /*RAISE SRW.PROGRAM_ABORT*/RAISE_APPLICATION_ERROR(-20101,null);
+        END;
+    END;
+    RETURN (TRUE);
+  END BEFOREREPORT;
+
+  FUNCTION C_SHIPNUM_WHERE RETURN VARCHAR2 IS
+  BEGIN
+    IF P_SHIPNO_LO IS NOT NULL AND P_SHIPNO_HIGH IS NOT NULL THEN
+      RETURN ('and h.shipment_num between ''' || P_SHIPNO_LO || '''
+                     and ''' || P_SHIPNO_HIGH || ''' ');
+    ELSE
+      IF P_SHIPNO_LO IS NULL AND P_SHIPNO_HIGH IS NOT NULL THEN
+        RETURN ('and  h.shipment_num = ''' || P_SHIPNO_HIGH || ''' ');
+      ELSE
+        IF P_SHIPNO_LO IS NOT NULL AND P_SHIPNO_HIGH IS NULL THEN
+          RETURN ('and h.shipment_num = ''' || P_SHIPNO_LO || ''' ');
+        ELSE
+          RETURN (' ');
+        END IF;
+      END IF;
+    END IF;
+    RETURN ' ';
+  END C_SHIPNUM_WHERE;
+
+  FUNCTION C_PACKSLIP_WHERE RETURN VARCHAR2 IS
+  BEGIN
+    IF P_PACKSLIP_LO IS NOT NULL AND P_PACKSLIP_HIGH IS NOT NULL THEN
+      RETURN ('and mip.packslip_number between to_char(''' || P_PACKSLIP_LO || ''')
+                     and to_char(''' || P_PACKSLIP_HIGH || ''') ');
+    ELSE
+      IF P_PACKSLIP_LO IS NULL AND P_PACKSLIP_HIGH IS NOT NULL THEN
+        RETURN ('and mip.packslip_number = to_char(''' || P_PACKSLIP_HIGH || ''') ');
+      ELSE
+        IF P_PACKSLIP_LO IS NOT NULL AND P_PACKSLIP_HIGH IS NULL THEN
+          RETURN ('and mip.packslip_number = to_char(''' || P_PACKSLIP_LO || ''') ');
+        ELSE
+          RETURN ('and nvl(mip.packslip_number,0) = 0');
+          RETURN (' ');
+        END IF;
+      END IF;
+    END IF;
+    RETURN NULL;
+  END C_PACKSLIP_WHERE;
+
+  FUNCTION C_SHIP_VIA_WHERE RETURN VARCHAR2 IS
+  BEGIN
+    IF P_SHIP_VIA_LO IS NOT NULL AND P_SHIP_VIA_HIGH IS NOT NULL THEN
+      RETURN ('and orgf.freight_code between ''' || P_SHIP_VIA_LO || '''
+                     and ''' || P_SHIP_VIA_HIGH || ''' ');
+    ELSE
+      IF P_SHIP_VIA_LO IS NULL AND P_SHIP_VIA_HIGH IS NOT NULL THEN
+        RETURN ('and orgf.freight_code = ''' || P_SHIP_VIA_HIGH || ''' ');
+      ELSE
+        IF P_SHIP_VIA_LO IS NOT NULL AND P_SHIP_VIA_HIGH IS NULL THEN
+          RETURN ('and orgf.freight_code = ''' || P_SHIP_VIA_LO || ''' ');
+        ELSE
+          RETURN (' ');
+        END IF;
+      END IF;
+    END IF;
+    RETURN NULL;
+  END C_SHIP_VIA_WHERE;
+
+  FUNCTION C_REC_ORG_WHERE RETURN VARCHAR2 IS
+  BEGIN
+    IF P_RECEIVING_ORG_LO IS NOT NULL AND P_RECEIVING_ORG_HIGH IS NOT NULL THEN
+      RETURN ('and l.to_organization_id between ''' || TO_CHAR(P_RECEIVING_ORG_LO) || ''' and
+                     ''' || TO_CHAR(P_RECEIVING_ORG_HIGH) || ''' ');
+    ELSE
+      IF P_RECEIVING_ORG_LO IS NULL AND P_RECEIVING_ORG_HIGH IS NOT NULL THEN
+        RETURN ('and l.to_organization_id = ''' || TO_CHAR(P_RECEIVING_ORG_HIGH) || ''' ');
+      ELSE
+        IF P_RECEIVING_ORG_LO IS NOT NULL AND P_RECEIVING_ORG_HIGH IS NULL THEN
+          RETURN ('and l.to_organization_id  = ''' || TO_CHAR(P_RECEIVING_ORG_LO) || ''' ');
+        ELSE
+          RETURN (' ');
+        END IF;
+      END IF;
+    END IF;
+    RETURN ' ';
+  END C_REC_ORG_WHERE;
+
+  FUNCTION C_TRANS_TYPE_WHERE RETURN VARCHAR2 IS
+  BEGIN
+    IF P_TRANS_TYPE_ID_LO IS NOT NULL AND P_TRANS_TYPE_ID_HIGH IS NOT NULL THEN
+      RETURN ('and mtt.transaction_type_id between ' || P_TRANS_TYPE_ID_LO || '
+                  and ' || P_TRANS_TYPE_ID_HIGH);
+    ELSE
+      IF P_TRANS_TYPE_ID_LO IS NULL AND P_TRANS_TYPE_ID_HIGH IS NOT NULL THEN
+        RETURN ('and mtt.transaction_type_id = ' || P_TRANS_TYPE_ID_HIGH);
+      ELSE
+        IF P_TRANS_TYPE_ID_LO IS NOT NULL AND P_TRANS_TYPE_ID_HIGH IS NULL THEN
+          RETURN ('and mtt.transaction_type_id = ' || P_TRANS_TYPE_ID_LO);
+        ELSE
+          RETURN (' ');
+        END IF;
+      END IF;
+    END IF;
+    RETURN ' ';
+  END C_TRANS_TYPE_WHERE;
+
+  FUNCTION BEFOREPFORM RETURN BOOLEAN IS
+    CURSOR C_SOB IS
+      SELECT
+        SET_OF_BOOKS_ID
+      FROM
+        AP_SYSTEM_PARAMETERS;
+  BEGIN
+    P_CONC_REQUEST_ID := FND_GLOBAL.CONC_REQUEST_ID;
+    /*SRW.USER_EXIT('FND SRWINIT')*/NULL;
+    IF (P_SET_OF_BOOKS_ID IS NULL) THEN
+      OPEN C_SOB;
+      FETCH C_SOB
+       INTO P_SET_OF_BOOKS_ID;
+      CLOSE C_SOB;
+    END IF;
+    RETURN (TRUE);
+  EXCEPTION
+    WHEN /*SRW.USER_EXIT_FAILURE*/OTHERS THEN
+      BEGIN
+        /*SRW.MESSAGE(100
+                   ,'Foundation is not initialised')*/NULL;
+        /*RAISE SRW.PROGRAM_ABORT*/RAISE_APPLICATION_ERROR(-20101,null);
+      END;
+      RETURN NULL;
+  END BEFOREPFORM;
+
+  FUNCTION C_SHIPPED_DATEFORMULA(SHIPPED_DATE IN DATE) RETURN CHAR IS
+  BEGIN
+    RETURN FND_DATE.DATE_TO_CHARDATE(SHIPPED_DATE);
+  END C_SHIPPED_DATEFORMULA;
+
+  FUNCTION CF_BLANKFORMULA RETURN CHAR IS
+  BEGIN
+    RETURN ('  ');
+  END CF_BLANKFORMULA;
+
+  FUNCTION CF_TAX_REGISTRATION_NUMBERFORM RETURN VARCHAR2 IS
+    L_DEF_TAX_REG_NO VARCHAR2(50);
+  BEGIN
+    BEGIN
+      SELECT
+        ZR.REGISTRATION_NUMBER
+      INTO L_DEF_TAX_REG_NO
+      FROM
+        ZX_PARTY_TAX_PROFILE ZPTP,
+        ZX_REGISTRATIONS ZR,
+        XLE_ASSOCIATIONS_V XAV
+      WHERE ZPTP.PARTY_TAX_PROFILE_ID = ZR.PARTY_TAX_PROFILE_ID
+        AND ZR.DEFAULT_REGISTRATION_FLAG = 'Y'
+        AND ZPTP.PARTY_ID = XAV.LEGAL_PARTY_ID
+        AND ZPTP.PARTY_TYPE_CODE = 'LEGAL_ESTABLISHMENT'
+        AND XAV.ENTITY_ID = P_ISSUING_ORG
+        AND XAV.ENTITY_TYPE = 'INVENTORY_ORGANIZATION';
+      RETURN L_DEF_TAX_REG_NO;
+    EXCEPTION
+      WHEN NO_DATA_FOUND THEN
+        SELECT
+          ZR.REGISTRATION_NUMBER
+        INTO L_DEF_TAX_REG_NO
+        FROM
+          XLE_ETB_PROFILES XEP,
+          ZX_PARTY_TAX_PROFILE ZPTP,
+          ZX_REGISTRATIONS ZR,
+          ORG_ORGANIZATION_DEFINITIONS OOD
+        WHERE ZPTP.PARTY_TAX_PROFILE_ID = ZR.PARTY_TAX_PROFILE_ID
+          AND ZR.DEFAULT_REGISTRATION_FLAG = 'Y'
+          AND ZPTP.PARTY_ID = XEP.PARTY_ID
+          AND ZPTP.PARTY_TYPE_CODE = 'LEGAL_ESTABLISHMENT'
+          AND XEP.LEGAL_ENTITY_ID = OOD.LEGAL_ENTITY
+          AND XEP.MAIN_ESTABLISHMENT_FLAG = 'Y'
+          AND OOD.ORGANIZATION_ID = P_ISSUING_ORG;
+        RETURN L_DEF_TAX_REG_NO;
+    END;
+  EXCEPTION
+    WHEN NO_DATA_FOUND THEN
+      RETURN (NULL);
+  END CF_TAX_REGISTRATION_NUMBERFORM;
+
+  FUNCTION C_MESSAGE_NO_DATA_P RETURN VARCHAR2 IS
+  BEGIN
+    RETURN C_MESSAGE_NO_DATA;
+  END C_MESSAGE_NO_DATA_P;
+
+END INV_INVINPSR_XMLP_PKG;
+
+
+/

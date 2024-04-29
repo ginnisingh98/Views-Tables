@@ -1,0 +1,126 @@
+--------------------------------------------------------
+--  DDL for Package IGS_CA_DA_INST_OFST_PKG
+--------------------------------------------------------
+
+  CREATE OR REPLACE EDITIONABLE PACKAGE "APPS"."IGS_CA_DA_INST_OFST_PKG" AUTHID CURRENT_USER AS
+/* $Header: IGSCI06S.pls 120.0 2005/06/01 14:28:30 appldev noship $ */
+procedure INSERT_ROW (
+  X_ROWID in out NOCOPY VARCHAR2,
+  X_DT_ALIAS in VARCHAR2,
+  X_DAI_SEQUENCE_NUMBER in NUMBER,
+  X_CAL_TYPE in VARCHAR2,
+  X_CI_SEQUENCE_NUMBER in NUMBER,
+  X_OFFSET_DT_ALIAS in VARCHAR2,
+  X_OFFSET_DAI_SEQUENCE_NUMBER in NUMBER,
+  X_OFFSET_CAL_TYPE in VARCHAR2,
+  X_OFFSET_CI_SEQUENCE_NUMBER in NUMBER,
+  X_DAY_OFFSET in NUMBER,
+  X_WEEK_OFFSET in NUMBER,
+  X_MONTH_OFFSET in NUMBER,
+  X_YEAR_OFFSET in NUMBER,
+  X_OFST_OVERRIDE in VARCHAR2,
+  X_MODE in VARCHAR2 default 'R'
+  );
+procedure LOCK_ROW (
+  X_ROWID in VARCHAR2,
+  X_DT_ALIAS in VARCHAR2,
+  X_DAI_SEQUENCE_NUMBER in NUMBER,
+  X_CAL_TYPE in VARCHAR2,
+  X_CI_SEQUENCE_NUMBER in NUMBER,
+  X_OFFSET_DT_ALIAS in VARCHAR2,
+  X_OFFSET_DAI_SEQUENCE_NUMBER in NUMBER,
+  X_OFFSET_CAL_TYPE in VARCHAR2,
+  X_OFFSET_CI_SEQUENCE_NUMBER in NUMBER,
+  X_DAY_OFFSET in NUMBER,
+  X_WEEK_OFFSET in NUMBER,
+  X_MONTH_OFFSET in NUMBER,
+  X_YEAR_OFFSET in NUMBER,
+  X_OFST_OVERRIDE in VARCHAR2
+);
+procedure UPDATE_ROW (
+  X_ROWID in VARCHAR2,
+  X_DT_ALIAS in VARCHAR2,
+  X_DAI_SEQUENCE_NUMBER in NUMBER,
+  X_CAL_TYPE in VARCHAR2,
+  X_CI_SEQUENCE_NUMBER in NUMBER,
+  X_OFFSET_DT_ALIAS in VARCHAR2,
+  X_OFFSET_DAI_SEQUENCE_NUMBER in NUMBER,
+  X_OFFSET_CAL_TYPE in VARCHAR2,
+  X_OFFSET_CI_SEQUENCE_NUMBER in NUMBER,
+  X_DAY_OFFSET in NUMBER,
+  X_WEEK_OFFSET in NUMBER,
+  X_MONTH_OFFSET in NUMBER,
+  X_YEAR_OFFSET in NUMBER,
+  X_OFST_OVERRIDE in VARCHAR2,
+  X_MODE in VARCHAR2 default 'R'
+  );
+procedure ADD_ROW (
+  X_ROWID in out NOCOPY VARCHAR2,
+  X_DT_ALIAS in VARCHAR2,
+  X_DAI_SEQUENCE_NUMBER in NUMBER,
+  X_CAL_TYPE in VARCHAR2,
+  X_CI_SEQUENCE_NUMBER in NUMBER,
+  X_OFFSET_DT_ALIAS in VARCHAR2,
+  X_OFFSET_DAI_SEQUENCE_NUMBER in NUMBER,
+  X_OFFSET_CAL_TYPE in VARCHAR2,
+  X_OFFSET_CI_SEQUENCE_NUMBER in NUMBER,
+  X_DAY_OFFSET in NUMBER,
+  X_WEEK_OFFSET in NUMBER,
+  X_MONTH_OFFSET in NUMBER,
+  X_YEAR_OFFSET in NUMBER,
+  X_OFST_OVERRIDE in VARCHAR2,
+  X_MODE in VARCHAR2 default 'R'
+  );
+procedure DELETE_ROW (
+  X_ROWID in VARCHAR2
+);
+  FUNCTION Get_PK_For_Validation (
+    x_dt_alias IN VARCHAR2,
+    x_dai_sequence_number IN NUMBER,
+    x_cal_type IN VARCHAR2,
+    x_ci_sequence_number IN NUMBER,
+    x_offset_dt_alias IN VARCHAR2,
+    x_offset_dai_sequence_number IN NUMBER,
+    x_offset_cal_type IN VARCHAR2,
+    x_offset_ci_sequence_number IN NUMBER
+    )RETURN BOOLEAN;
+
+  PROCEDURE Check_Constraints (
+	Column_Name	      IN	VARCHAR2	DEFAULT NULL,
+	Column_Value 	IN	VARCHAR2	DEFAULT NULL
+	);
+
+  PROCEDURE Before_DML (
+    p_action IN VARCHAR2,
+    x_rowid IN VARCHAR2 DEFAULT NULL,
+    x_offset_ci_sequence_number IN NUMBER DEFAULT NULL,
+    x_day_offset IN NUMBER DEFAULT NULL,
+    x_week_offset IN NUMBER DEFAULT NULL,
+    x_month_offset IN NUMBER DEFAULT NULL,
+    x_year_offset IN NUMBER DEFAULT NULL,
+    x_ofst_override IN VARCHAR2 DEFAULT NULL,
+    x_dt_alias IN VARCHAR2 DEFAULT NULL,
+    x_dai_sequence_number IN NUMBER DEFAULT NULL,
+    x_cal_type IN VARCHAR2 DEFAULT NULL,
+    x_ci_sequence_number IN NUMBER DEFAULT NULL,
+    x_offset_dt_alias IN VARCHAR2 DEFAULT NULL,
+    x_offset_dai_sequence_number IN NUMBER DEFAULT NULL,
+    x_offset_cal_type IN VARCHAR2 DEFAULT NULL,
+    x_creation_date IN DATE DEFAULT NULL,
+    x_created_by IN NUMBER DEFAULT NULL,
+    x_last_update_date IN DATE DEFAULT NULL,
+    x_last_updated_by IN NUMBER DEFAULT NULL,
+    x_last_update_login IN NUMBER DEFAULT NULL
+  ) ;
+
+  PROCEDURE GET_FK_IGS_CA_DA_INST (
+    x_dt_alias IN VARCHAR2,
+    x_sequence_number IN NUMBER,
+    x_cal_type IN VARCHAR2,
+    x_ci_sequence_number IN NUMBER
+    );
+end IGS_CA_DA_INST_OFST_PKG;
+
+ 
+
+/

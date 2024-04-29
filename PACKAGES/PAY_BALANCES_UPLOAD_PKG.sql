@@ -1,0 +1,136 @@
+--------------------------------------------------------
+--  DDL for Package PAY_BALANCES_UPLOAD_PKG
+--------------------------------------------------------
+
+  CREATE OR REPLACE EDITIONABLE PACKAGE "APPS"."PAY_BALANCES_UPLOAD_PKG" AUTHID CURRENT_USER AS
+/* $Header: pybaluld.pkh 115.4 2003/05/28 18:32:35 rthirlby noship $ */
+
+--This procedure is used for loading data into PAY_BALANCE_CATEGORIES_F table.
+--This procedure is called for pybalcat.lct configuration file
+PROCEDURE PAY_BAL_CATF_LOAD_ROW
+	(p_CATEGORY_NAME 		IN VARCHAR2
+	,p_EFFECTIVE_START_DATE 	IN VARCHAR2
+	,p_EFFECTIVE_END_DATE 		IN VARCHAR2
+	,p_LEGISLATION_CODE 		IN VARCHAR2
+	,p_BUSINESS_GROUP_NAME		IN VARCHAR2
+	,p_SAVE_RUN_BALANCE_ENABLED 	IN VARCHAR2
+        ,p_USER_CATEGORY_NAME           IN VARCHAR2
+	,p_PBC_INFORMATION_CATEGORY   	IN VARCHAR2
+	,p_PBC_INFORMATION1		IN VARCHAR2
+	,p_PBC_INFORMATION2		IN VARCHAR2
+	,p_PBC_INFORMATION3		IN VARCHAR2
+	,p_PBC_INFORMATION4		IN VARCHAR2
+	,p_PBC_INFORMATION5		IN VARCHAR2
+	,p_PBC_INFORMATION6		IN VARCHAR2
+	,p_PBC_INFORMATION7		IN VARCHAR2
+	,p_PBC_INFORMATION8		IN VARCHAR2
+	,p_PBC_INFORMATION9		IN VARCHAR2
+	,p_PBC_INFORMATION10		IN VARCHAR2
+	,p_PBC_INFORMATION11		IN VARCHAR2
+	,p_PBC_INFORMATION12		IN VARCHAR2
+	,p_PBC_INFORMATION13		IN VARCHAR2
+	,p_PBC_INFORMATION14		IN VARCHAR2
+	,p_PBC_INFORMATION15		IN VARCHAR2
+	,p_PBC_INFORMATION16		IN VARCHAR2
+	,p_PBC_INFORMATION17		IN VARCHAR2
+	,p_PBC_INFORMATION18		IN VARCHAR2
+	,p_PBC_INFORMATION19		IN VARCHAR2
+	,p_PBC_INFORMATION20		IN VARCHAR2
+	,p_PBC_INFORMATION21		IN VARCHAR2
+	,p_PBC_INFORMATION22		IN VARCHAR2
+	,p_PBC_INFORMATION23		IN VARCHAR2
+	,p_PBC_INFORMATION24		IN VARCHAR2
+	,p_PBC_INFORMATION25		IN VARCHAR2
+	,p_PBC_INFORMATION26		IN VARCHAR2
+	,p_PBC_INFORMATION27		IN VARCHAR2
+	,p_PBC_INFORMATION28		IN VARCHAR2
+	,p_PBC_INFORMATION29		IN VARCHAR2
+	,p_PBC_INFORMATION30		IN VARCHAR2
+	,p_OVN				IN VARCHAR2
+	,p_OWNER                   	IN VARCHAR2
+	);
+
+--This procedure is used for loading data into PAY_BALANCE_TYPES table.
+--This procedure is called for pybalcat.lct configuration file
+PROCEDURE PAY_BAL_TYPES_LOAD_ROW
+	(p_CATEGORY_NAME		IN VARCHAR2
+	,p_EFFECTIVE_START_DATE		IN VARCHAR2
+	,p_EFFECTIVE_END_DATE		IN VARCHAR2
+	,p_LEGISLATION_CODE		IN VARCHAR2
+	,p_BALANCE_NAME			IN VARCHAR2
+	,p_BUSINESS_GROUP_NAME		IN VARCHAR2
+	,p_OWNER                   	IN VARCHAR2
+	);
+
+--This procedure is used for loading data into PAY_BAL_ATTRIBUTE_DEFINITIONS table.
+--This procedure is called for pybalade.lct configuration file
+PROCEDURE PAY_BAL_ADE_LOAD_ROW
+	 (p_ATTRIBUTE_NAME		IN VARCHAR2
+	 ,p_LEGISLATION_CODE		IN VARCHAR2
+	 ,p_BUSINESS_GROUP_NAME 	IN VARCHAR2
+	 ,p_ALTERABLE			IN VARCHAR2
+         ,p_user_attribute_name         IN VARCHAR2
+	 ,p_OWNER			IN VARCHAR2
+	 );
+
+--This procedure is used for loading data into PAY_BALANCE_ATTRIBUTES table.
+--This procedure is called for pybalatt.lct configuration file
+PROCEDURE PAY_BAL_ATT_LOAD_ROW
+	 (p_ATTRIBUTE_NAME		IN VARCHAR2
+	 ,p_ATTR_DEFN_LEG_CODE		IN VARCHAR2
+	 ,p_LEGISLATION_CODE		IN VARCHAR2
+	 ,p_BALANCE_NAME		IN VARCHAR2
+	 ,p_BAL_LEG_CODE		IN VARCHAR2
+	 ,p_DIMENSION_NAME		IN VARCHAR2
+	 ,p_DIM_LEG_CODE		IN VARCHAR2
+	 ,p_BUSINESS_GROUP_NAME		IN VARCHAR2
+	 ,p_ATTR_DEFN_BUS_GROUP_NAME    IN VARCHAR2
+	 ,p_BAL_BUS_GROUP_NAME		IN VARCHAR2
+	 ,p_DIM_BUS_GROUP_NAME		IN VARCHAR2
+	 ,p_OWNER			IN VARCHAR2
+	 );
+
+--This procedure is used for loading data into PAY_BAL_ATTRIBUTE_DEFAULTS table.
+--This procedure is called for pybaladf.lct configuration file
+PROCEDURE PAY_BAL_ADF_LOAD_ROW
+	 (p_CATEGORY_NAME		IN VARCHAR2
+	 ,p_EFFECTIVE_START_DATE	IN VARCHAR2
+	 ,p_EFFECTIVE_END_DATE		IN VARCHAR2
+	 ,p_CAT_LEG_CODE		IN VARCHAR2
+	 ,p_LEGISLATION_CODE		IN VARCHAR2
+	 ,p_DIMENSION_NAME		IN VARCHAR2
+	 ,p_DIM_LEG_CODE		IN VARCHAR2
+	 ,p_ATTRIBUTE_NAME		IN VARCHAR2
+	 ,p_ATTR_LEG_CODE		IN VARCHAR2
+	 ,p_BUSINESS_GROUP_NAME		IN VARCHAR2
+	 ,p_CAT_BUS_GROUP_NAME		IN VARCHAR2
+	 ,p_DIM_BUS_GROUP_NAME		IN VARCHAR2
+	 ,p_ATTR_BUS_GROUP_NAME		IN VARCHAR2
+	 ,p_OWNER			IN VARCHAR2
+	 );
+--
+-- This procedure provides NLS support for pay_balance_categories_f
+--
+procedure translate_row_cat
+(p_category_name      in varchar2
+,p_user_category_name in varchar2
+,p_legislation_code   in varchar2
+,p_bg_name            in varchar2
+,p_owner              in varchar2
+);
+--
+-- This procedure provides NLS support for pay_bal_attribute_definitions
+--
+procedure translate_row_attrib
+(p_attribute_name      in varchar2
+,p_user_attribute_name in varchar2
+,p_legislation_code    in varchar2
+,p_bg_name             in varchar2
+,p_owner               in varchar2
+);
+--
+END PAY_BALANCES_UPLOAD_PKG;
+
+ 
+
+/

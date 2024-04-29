@@ -1,0 +1,672 @@
+--------------------------------------------------------
+--  DDL for Package WSM_WIP_LOT_TXN_PVT_W
+--------------------------------------------------------
+
+  CREATE OR REPLACE EDITIONABLE PACKAGE "APPS"."WSM_WIP_LOT_TXN_PVT_W" AUTHID CURRENT_USER as
+  /* $Header: WSMVWLTS.pls 120.0 2005/07/26 23:52 nlal noship $ */
+  procedure rosetta_table_copy_in_p5(t out nocopy wsm_wip_lot_txn_pvt.wsm_job_secondary_qty_tbl_type, a0 JTF_NUMBER_TABLE
+    , a1 JTF_VARCHAR2_TABLE_300
+    , a2 JTF_NUMBER_TABLE
+    , a3 JTF_VARCHAR2_TABLE_100
+    , a4 JTF_NUMBER_TABLE
+    , a5 JTF_NUMBER_TABLE
+    );
+  procedure rosetta_table_copy_out_p5(t wsm_wip_lot_txn_pvt.wsm_job_secondary_qty_tbl_type, a0 out nocopy JTF_NUMBER_TABLE
+    , a1 out nocopy JTF_VARCHAR2_TABLE_300
+    , a2 out nocopy JTF_NUMBER_TABLE
+    , a3 out nocopy JTF_VARCHAR2_TABLE_100
+    , a4 out nocopy JTF_NUMBER_TABLE
+    , a5 out nocopy JTF_NUMBER_TABLE
+    );
+
+  procedure rosetta_table_copy_in_p6(t out nocopy wsm_wip_lot_txn_pvt.wltx_starting_jobs_tbl_type, a0 JTF_NUMBER_TABLE
+    , a1 JTF_VARCHAR2_TABLE_300
+    , a2 JTF_NUMBER_TABLE
+    , a3 JTF_NUMBER_TABLE
+    , a4 JTF_VARCHAR2_TABLE_300
+    , a5 JTF_VARCHAR2_TABLE_100
+    , a6 JTF_NUMBER_TABLE
+    , a7 JTF_VARCHAR2_TABLE_100
+    , a8 JTF_VARCHAR2_TABLE_100
+    , a9 JTF_VARCHAR2_TABLE_100
+    , a10 JTF_NUMBER_TABLE
+    , a11 JTF_VARCHAR2_TABLE_100
+    , a12 JTF_NUMBER_TABLE
+    , a13 JTF_NUMBER_TABLE
+    , a14 JTF_NUMBER_TABLE
+    , a15 JTF_VARCHAR2_TABLE_100
+    , a16 JTF_VARCHAR2_TABLE_300
+    , a17 JTF_NUMBER_TABLE
+    , a18 JTF_NUMBER_TABLE
+    , a19 JTF_NUMBER_TABLE
+    , a20 JTF_VARCHAR2_TABLE_100
+    , a21 JTF_NUMBER_TABLE
+    , a22 JTF_NUMBER_TABLE
+    , a23 JTF_NUMBER_TABLE
+    , a24 JTF_NUMBER_TABLE
+    , a25 JTF_NUMBER_TABLE
+    , a26 JTF_NUMBER_TABLE
+    , a27 JTF_VARCHAR2_TABLE_100
+    , a28 JTF_DATE_TABLE
+    , a29 JTF_VARCHAR2_TABLE_100
+    , a30 JTF_VARCHAR2_TABLE_100
+    , a31 JTF_NUMBER_TABLE
+    , a32 JTF_VARCHAR2_TABLE_100
+    , a33 JTF_DATE_TABLE
+    , a34 JTF_VARCHAR2_TABLE_100
+    , a35 JTF_NUMBER_TABLE
+    , a36 JTF_VARCHAR2_TABLE_200
+    , a37 JTF_DATE_TABLE
+    , a38 JTF_DATE_TABLE
+    , a39 JTF_DATE_TABLE
+    , a40 JTF_NUMBER_TABLE
+    , a41 JTF_NUMBER_TABLE
+    , a42 JTF_NUMBER_TABLE
+    , a43 JTF_VARCHAR2_TABLE_100
+    , a44 JTF_VARCHAR2_TABLE_200
+    , a45 JTF_VARCHAR2_TABLE_200
+    , a46 JTF_VARCHAR2_TABLE_200
+    , a47 JTF_VARCHAR2_TABLE_200
+    , a48 JTF_VARCHAR2_TABLE_200
+    , a49 JTF_VARCHAR2_TABLE_200
+    , a50 JTF_VARCHAR2_TABLE_200
+    , a51 JTF_VARCHAR2_TABLE_200
+    , a52 JTF_VARCHAR2_TABLE_200
+    , a53 JTF_VARCHAR2_TABLE_200
+    , a54 JTF_VARCHAR2_TABLE_200
+    , a55 JTF_VARCHAR2_TABLE_200
+    , a56 JTF_VARCHAR2_TABLE_200
+    , a57 JTF_VARCHAR2_TABLE_200
+    , a58 JTF_VARCHAR2_TABLE_200
+    );
+  procedure rosetta_table_copy_out_p6(t wsm_wip_lot_txn_pvt.wltx_starting_jobs_tbl_type, a0 out nocopy JTF_NUMBER_TABLE
+    , a1 out nocopy JTF_VARCHAR2_TABLE_300
+    , a2 out nocopy JTF_NUMBER_TABLE
+    , a3 out nocopy JTF_NUMBER_TABLE
+    , a4 out nocopy JTF_VARCHAR2_TABLE_300
+    , a5 out nocopy JTF_VARCHAR2_TABLE_100
+    , a6 out nocopy JTF_NUMBER_TABLE
+    , a7 out nocopy JTF_VARCHAR2_TABLE_100
+    , a8 out nocopy JTF_VARCHAR2_TABLE_100
+    , a9 out nocopy JTF_VARCHAR2_TABLE_100
+    , a10 out nocopy JTF_NUMBER_TABLE
+    , a11 out nocopy JTF_VARCHAR2_TABLE_100
+    , a12 out nocopy JTF_NUMBER_TABLE
+    , a13 out nocopy JTF_NUMBER_TABLE
+    , a14 out nocopy JTF_NUMBER_TABLE
+    , a15 out nocopy JTF_VARCHAR2_TABLE_100
+    , a16 out nocopy JTF_VARCHAR2_TABLE_300
+    , a17 out nocopy JTF_NUMBER_TABLE
+    , a18 out nocopy JTF_NUMBER_TABLE
+    , a19 out nocopy JTF_NUMBER_TABLE
+    , a20 out nocopy JTF_VARCHAR2_TABLE_100
+    , a21 out nocopy JTF_NUMBER_TABLE
+    , a22 out nocopy JTF_NUMBER_TABLE
+    , a23 out nocopy JTF_NUMBER_TABLE
+    , a24 out nocopy JTF_NUMBER_TABLE
+    , a25 out nocopy JTF_NUMBER_TABLE
+    , a26 out nocopy JTF_NUMBER_TABLE
+    , a27 out nocopy JTF_VARCHAR2_TABLE_100
+    , a28 out nocopy JTF_DATE_TABLE
+    , a29 out nocopy JTF_VARCHAR2_TABLE_100
+    , a30 out nocopy JTF_VARCHAR2_TABLE_100
+    , a31 out nocopy JTF_NUMBER_TABLE
+    , a32 out nocopy JTF_VARCHAR2_TABLE_100
+    , a33 out nocopy JTF_DATE_TABLE
+    , a34 out nocopy JTF_VARCHAR2_TABLE_100
+    , a35 out nocopy JTF_NUMBER_TABLE
+    , a36 out nocopy JTF_VARCHAR2_TABLE_200
+    , a37 out nocopy JTF_DATE_TABLE
+    , a38 out nocopy JTF_DATE_TABLE
+    , a39 out nocopy JTF_DATE_TABLE
+    , a40 out nocopy JTF_NUMBER_TABLE
+    , a41 out nocopy JTF_NUMBER_TABLE
+    , a42 out nocopy JTF_NUMBER_TABLE
+    , a43 out nocopy JTF_VARCHAR2_TABLE_100
+    , a44 out nocopy JTF_VARCHAR2_TABLE_200
+    , a45 out nocopy JTF_VARCHAR2_TABLE_200
+    , a46 out nocopy JTF_VARCHAR2_TABLE_200
+    , a47 out nocopy JTF_VARCHAR2_TABLE_200
+    , a48 out nocopy JTF_VARCHAR2_TABLE_200
+    , a49 out nocopy JTF_VARCHAR2_TABLE_200
+    , a50 out nocopy JTF_VARCHAR2_TABLE_200
+    , a51 out nocopy JTF_VARCHAR2_TABLE_200
+    , a52 out nocopy JTF_VARCHAR2_TABLE_200
+    , a53 out nocopy JTF_VARCHAR2_TABLE_200
+    , a54 out nocopy JTF_VARCHAR2_TABLE_200
+    , a55 out nocopy JTF_VARCHAR2_TABLE_200
+    , a56 out nocopy JTF_VARCHAR2_TABLE_200
+    , a57 out nocopy JTF_VARCHAR2_TABLE_200
+    , a58 out nocopy JTF_VARCHAR2_TABLE_200
+    );
+
+  procedure rosetta_table_copy_in_p7(t out nocopy wsm_wip_lot_txn_pvt.wltx_resulting_jobs_tbl_type, a0 JTF_VARCHAR2_TABLE_300
+    , a1 JTF_NUMBER_TABLE
+    , a2 JTF_VARCHAR2_TABLE_300
+    , a3 JTF_NUMBER_TABLE
+    , a4 JTF_NUMBER_TABLE
+    , a5 JTF_NUMBER_TABLE
+    , a6 JTF_NUMBER_TABLE
+    , a7 JTF_VARCHAR2_TABLE_100
+    , a8 JTF_VARCHAR2_TABLE_100
+    , a9 JTF_NUMBER_TABLE
+    , a10 JTF_VARCHAR2_TABLE_100
+    , a11 JTF_VARCHAR2_TABLE_100
+    , a12 JTF_NUMBER_TABLE
+    , a13 JTF_VARCHAR2_TABLE_100
+    , a14 JTF_NUMBER_TABLE
+    , a15 JTF_NUMBER_TABLE
+    , a16 JTF_NUMBER_TABLE
+    , a17 JTF_VARCHAR2_TABLE_100
+    , a18 JTF_VARCHAR2_TABLE_100
+    , a19 JTF_DATE_TABLE
+    , a20 JTF_DATE_TABLE
+    , a21 JTF_VARCHAR2_TABLE_100
+    , a22 JTF_VARCHAR2_TABLE_100
+    , a23 JTF_NUMBER_TABLE
+    , a24 JTF_NUMBER_TABLE
+    , a25 JTF_NUMBER_TABLE
+    , a26 JTF_NUMBER_TABLE
+    , a27 JTF_VARCHAR2_TABLE_100
+    , a28 JTF_NUMBER_TABLE
+    , a29 JTF_NUMBER_TABLE
+    , a30 JTF_NUMBER_TABLE
+    , a31 JTF_VARCHAR2_TABLE_100
+    , a32 JTF_VARCHAR2_TABLE_300
+    , a33 JTF_NUMBER_TABLE
+    , a34 JTF_NUMBER_TABLE
+    , a35 JTF_VARCHAR2_TABLE_100
+    , a36 JTF_NUMBER_TABLE
+    , a37 JTF_VARCHAR2_TABLE_200
+    , a38 JTF_DATE_TABLE
+    , a39 JTF_DATE_TABLE
+    , a40 JTF_NUMBER_TABLE
+    , a41 JTF_NUMBER_TABLE
+    , a42 JTF_NUMBER_TABLE
+    , a43 JTF_VARCHAR2_TABLE_100
+    , a44 JTF_VARCHAR2_TABLE_200
+    , a45 JTF_VARCHAR2_TABLE_200
+    , a46 JTF_VARCHAR2_TABLE_200
+    , a47 JTF_VARCHAR2_TABLE_200
+    , a48 JTF_VARCHAR2_TABLE_200
+    , a49 JTF_VARCHAR2_TABLE_200
+    , a50 JTF_VARCHAR2_TABLE_200
+    , a51 JTF_VARCHAR2_TABLE_200
+    , a52 JTF_VARCHAR2_TABLE_200
+    , a53 JTF_VARCHAR2_TABLE_200
+    , a54 JTF_VARCHAR2_TABLE_200
+    , a55 JTF_VARCHAR2_TABLE_200
+    , a56 JTF_VARCHAR2_TABLE_200
+    , a57 JTF_VARCHAR2_TABLE_200
+    , a58 JTF_VARCHAR2_TABLE_200
+    );
+  procedure rosetta_table_copy_out_p7(t wsm_wip_lot_txn_pvt.wltx_resulting_jobs_tbl_type, a0 out nocopy JTF_VARCHAR2_TABLE_300
+    , a1 out nocopy JTF_NUMBER_TABLE
+    , a2 out nocopy JTF_VARCHAR2_TABLE_300
+    , a3 out nocopy JTF_NUMBER_TABLE
+    , a4 out nocopy JTF_NUMBER_TABLE
+    , a5 out nocopy JTF_NUMBER_TABLE
+    , a6 out nocopy JTF_NUMBER_TABLE
+    , a7 out nocopy JTF_VARCHAR2_TABLE_100
+    , a8 out nocopy JTF_VARCHAR2_TABLE_100
+    , a9 out nocopy JTF_NUMBER_TABLE
+    , a10 out nocopy JTF_VARCHAR2_TABLE_100
+    , a11 out nocopy JTF_VARCHAR2_TABLE_100
+    , a12 out nocopy JTF_NUMBER_TABLE
+    , a13 out nocopy JTF_VARCHAR2_TABLE_100
+    , a14 out nocopy JTF_NUMBER_TABLE
+    , a15 out nocopy JTF_NUMBER_TABLE
+    , a16 out nocopy JTF_NUMBER_TABLE
+    , a17 out nocopy JTF_VARCHAR2_TABLE_100
+    , a18 out nocopy JTF_VARCHAR2_TABLE_100
+    , a19 out nocopy JTF_DATE_TABLE
+    , a20 out nocopy JTF_DATE_TABLE
+    , a21 out nocopy JTF_VARCHAR2_TABLE_100
+    , a22 out nocopy JTF_VARCHAR2_TABLE_100
+    , a23 out nocopy JTF_NUMBER_TABLE
+    , a24 out nocopy JTF_NUMBER_TABLE
+    , a25 out nocopy JTF_NUMBER_TABLE
+    , a26 out nocopy JTF_NUMBER_TABLE
+    , a27 out nocopy JTF_VARCHAR2_TABLE_100
+    , a28 out nocopy JTF_NUMBER_TABLE
+    , a29 out nocopy JTF_NUMBER_TABLE
+    , a30 out nocopy JTF_NUMBER_TABLE
+    , a31 out nocopy JTF_VARCHAR2_TABLE_100
+    , a32 out nocopy JTF_VARCHAR2_TABLE_300
+    , a33 out nocopy JTF_NUMBER_TABLE
+    , a34 out nocopy JTF_NUMBER_TABLE
+    , a35 out nocopy JTF_VARCHAR2_TABLE_100
+    , a36 out nocopy JTF_NUMBER_TABLE
+    , a37 out nocopy JTF_VARCHAR2_TABLE_200
+    , a38 out nocopy JTF_DATE_TABLE
+    , a39 out nocopy JTF_DATE_TABLE
+    , a40 out nocopy JTF_NUMBER_TABLE
+    , a41 out nocopy JTF_NUMBER_TABLE
+    , a42 out nocopy JTF_NUMBER_TABLE
+    , a43 out nocopy JTF_VARCHAR2_TABLE_100
+    , a44 out nocopy JTF_VARCHAR2_TABLE_200
+    , a45 out nocopy JTF_VARCHAR2_TABLE_200
+    , a46 out nocopy JTF_VARCHAR2_TABLE_200
+    , a47 out nocopy JTF_VARCHAR2_TABLE_200
+    , a48 out nocopy JTF_VARCHAR2_TABLE_200
+    , a49 out nocopy JTF_VARCHAR2_TABLE_200
+    , a50 out nocopy JTF_VARCHAR2_TABLE_200
+    , a51 out nocopy JTF_VARCHAR2_TABLE_200
+    , a52 out nocopy JTF_VARCHAR2_TABLE_200
+    , a53 out nocopy JTF_VARCHAR2_TABLE_200
+    , a54 out nocopy JTF_VARCHAR2_TABLE_200
+    , a55 out nocopy JTF_VARCHAR2_TABLE_200
+    , a56 out nocopy JTF_VARCHAR2_TABLE_200
+    , a57 out nocopy JTF_VARCHAR2_TABLE_200
+    , a58 out nocopy JTF_VARCHAR2_TABLE_200
+    );
+
+  procedure rosetta_table_copy_in_p8(t out nocopy wsm_serial_support_grp.wsm_serial_num_tbl, a0 JTF_VARCHAR2_TABLE_100
+    , a1 JTF_NUMBER_TABLE
+    , a2 JTF_NUMBER_TABLE
+    , a3 JTF_NUMBER_TABLE
+    , a4 JTF_NUMBER_TABLE
+    , a5 JTF_NUMBER_TABLE
+    , a6 JTF_VARCHAR2_TABLE_300
+    , a7 JTF_VARCHAR2_TABLE_300
+    , a8 JTF_NUMBER_TABLE
+    , a9 JTF_NUMBER_TABLE
+    , a10 JTF_VARCHAR2_TABLE_100
+    , a11 JTF_VARCHAR2_TABLE_100
+    , a12 JTF_DATE_TABLE
+    , a13 JTF_VARCHAR2_TABLE_200
+    , a14 JTF_VARCHAR2_TABLE_200
+    , a15 JTF_VARCHAR2_TABLE_200
+    , a16 JTF_VARCHAR2_TABLE_200
+    , a17 JTF_VARCHAR2_TABLE_200
+    , a18 JTF_VARCHAR2_TABLE_200
+    , a19 JTF_VARCHAR2_TABLE_200
+    , a20 JTF_VARCHAR2_TABLE_200
+    , a21 JTF_VARCHAR2_TABLE_200
+    , a22 JTF_VARCHAR2_TABLE_200
+    , a23 JTF_VARCHAR2_TABLE_200
+    , a24 JTF_VARCHAR2_TABLE_200
+    , a25 JTF_VARCHAR2_TABLE_200
+    , a26 JTF_VARCHAR2_TABLE_200
+    , a27 JTF_VARCHAR2_TABLE_200
+    , a28 JTF_VARCHAR2_TABLE_200
+    , a29 JTF_VARCHAR2_TABLE_200
+    , a30 JTF_VARCHAR2_TABLE_200
+    , a31 JTF_VARCHAR2_TABLE_200
+    , a32 JTF_VARCHAR2_TABLE_200
+    , a33 JTF_DATE_TABLE
+    , a34 JTF_DATE_TABLE
+    , a35 JTF_DATE_TABLE
+    , a36 JTF_DATE_TABLE
+    , a37 JTF_DATE_TABLE
+    , a38 JTF_DATE_TABLE
+    , a39 JTF_DATE_TABLE
+    , a40 JTF_DATE_TABLE
+    , a41 JTF_DATE_TABLE
+    , a42 JTF_DATE_TABLE
+    , a43 JTF_NUMBER_TABLE
+    , a44 JTF_NUMBER_TABLE
+    , a45 JTF_NUMBER_TABLE
+    , a46 JTF_NUMBER_TABLE
+    , a47 JTF_NUMBER_TABLE
+    , a48 JTF_NUMBER_TABLE
+    , a49 JTF_NUMBER_TABLE
+    , a50 JTF_NUMBER_TABLE
+    , a51 JTF_NUMBER_TABLE
+    , a52 JTF_NUMBER_TABLE
+    , a53 JTF_NUMBER_TABLE
+    , a54 JTF_NUMBER_TABLE
+    , a55 JTF_NUMBER_TABLE
+    , a56 JTF_NUMBER_TABLE
+    , a57 JTF_NUMBER_TABLE
+    , a58 JTF_NUMBER_TABLE
+    , a59 JTF_NUMBER_TABLE
+    , a60 JTF_NUMBER_TABLE
+    , a61 JTF_NUMBER_TABLE
+    , a62 JTF_NUMBER_TABLE
+    , a63 JTF_NUMBER_TABLE
+    , a64 JTF_NUMBER_TABLE
+    , a65 JTF_VARCHAR2_TABLE_100
+    , a66 JTF_VARCHAR2_TABLE_200
+    , a67 JTF_VARCHAR2_TABLE_200
+    , a68 JTF_VARCHAR2_TABLE_200
+    , a69 JTF_VARCHAR2_TABLE_200
+    , a70 JTF_VARCHAR2_TABLE_200
+    , a71 JTF_VARCHAR2_TABLE_200
+    , a72 JTF_VARCHAR2_TABLE_200
+    , a73 JTF_VARCHAR2_TABLE_200
+    , a74 JTF_VARCHAR2_TABLE_200
+    , a75 JTF_VARCHAR2_TABLE_200
+    , a76 JTF_VARCHAR2_TABLE_200
+    , a77 JTF_VARCHAR2_TABLE_200
+    , a78 JTF_VARCHAR2_TABLE_200
+    , a79 JTF_VARCHAR2_TABLE_200
+    , a80 JTF_VARCHAR2_TABLE_200
+    );
+  procedure rosetta_table_copy_out_p8(t wsm_serial_support_grp.wsm_serial_num_tbl, a0 out nocopy JTF_VARCHAR2_TABLE_100
+    , a1 out nocopy JTF_NUMBER_TABLE
+    , a2 out nocopy JTF_NUMBER_TABLE
+    , a3 out nocopy JTF_NUMBER_TABLE
+    , a4 out nocopy JTF_NUMBER_TABLE
+    , a5 out nocopy JTF_NUMBER_TABLE
+    , a6 out nocopy JTF_VARCHAR2_TABLE_300
+    , a7 out nocopy JTF_VARCHAR2_TABLE_300
+    , a8 out nocopy JTF_NUMBER_TABLE
+    , a9 out nocopy JTF_NUMBER_TABLE
+    , a10 out nocopy JTF_VARCHAR2_TABLE_100
+    , a11 out nocopy JTF_VARCHAR2_TABLE_100
+    , a12 out nocopy JTF_DATE_TABLE
+    , a13 out nocopy JTF_VARCHAR2_TABLE_200
+    , a14 out nocopy JTF_VARCHAR2_TABLE_200
+    , a15 out nocopy JTF_VARCHAR2_TABLE_200
+    , a16 out nocopy JTF_VARCHAR2_TABLE_200
+    , a17 out nocopy JTF_VARCHAR2_TABLE_200
+    , a18 out nocopy JTF_VARCHAR2_TABLE_200
+    , a19 out nocopy JTF_VARCHAR2_TABLE_200
+    , a20 out nocopy JTF_VARCHAR2_TABLE_200
+    , a21 out nocopy JTF_VARCHAR2_TABLE_200
+    , a22 out nocopy JTF_VARCHAR2_TABLE_200
+    , a23 out nocopy JTF_VARCHAR2_TABLE_200
+    , a24 out nocopy JTF_VARCHAR2_TABLE_200
+    , a25 out nocopy JTF_VARCHAR2_TABLE_200
+    , a26 out nocopy JTF_VARCHAR2_TABLE_200
+    , a27 out nocopy JTF_VARCHAR2_TABLE_200
+    , a28 out nocopy JTF_VARCHAR2_TABLE_200
+    , a29 out nocopy JTF_VARCHAR2_TABLE_200
+    , a30 out nocopy JTF_VARCHAR2_TABLE_200
+    , a31 out nocopy JTF_VARCHAR2_TABLE_200
+    , a32 out nocopy JTF_VARCHAR2_TABLE_200
+    , a33 out nocopy JTF_DATE_TABLE
+    , a34 out nocopy JTF_DATE_TABLE
+    , a35 out nocopy JTF_DATE_TABLE
+    , a36 out nocopy JTF_DATE_TABLE
+    , a37 out nocopy JTF_DATE_TABLE
+    , a38 out nocopy JTF_DATE_TABLE
+    , a39 out nocopy JTF_DATE_TABLE
+    , a40 out nocopy JTF_DATE_TABLE
+    , a41 out nocopy JTF_DATE_TABLE
+    , a42 out nocopy JTF_DATE_TABLE
+    , a43 out nocopy JTF_NUMBER_TABLE
+    , a44 out nocopy JTF_NUMBER_TABLE
+    , a45 out nocopy JTF_NUMBER_TABLE
+    , a46 out nocopy JTF_NUMBER_TABLE
+    , a47 out nocopy JTF_NUMBER_TABLE
+    , a48 out nocopy JTF_NUMBER_TABLE
+    , a49 out nocopy JTF_NUMBER_TABLE
+    , a50 out nocopy JTF_NUMBER_TABLE
+    , a51 out nocopy JTF_NUMBER_TABLE
+    , a52 out nocopy JTF_NUMBER_TABLE
+    , a53 out nocopy JTF_NUMBER_TABLE
+    , a54 out nocopy JTF_NUMBER_TABLE
+    , a55 out nocopy JTF_NUMBER_TABLE
+    , a56 out nocopy JTF_NUMBER_TABLE
+    , a57 out nocopy JTF_NUMBER_TABLE
+    , a58 out nocopy JTF_NUMBER_TABLE
+    , a59 out nocopy JTF_NUMBER_TABLE
+    , a60 out nocopy JTF_NUMBER_TABLE
+    , a61 out nocopy JTF_NUMBER_TABLE
+    , a62 out nocopy JTF_NUMBER_TABLE
+    , a63 out nocopy JTF_NUMBER_TABLE
+    , a64 out nocopy JTF_NUMBER_TABLE
+    , a65 out nocopy JTF_VARCHAR2_TABLE_100
+    , a66 out nocopy JTF_VARCHAR2_TABLE_200
+    , a67 out nocopy JTF_VARCHAR2_TABLE_200
+    , a68 out nocopy JTF_VARCHAR2_TABLE_200
+    , a69 out nocopy JTF_VARCHAR2_TABLE_200
+    , a70 out nocopy JTF_VARCHAR2_TABLE_200
+    , a71 out nocopy JTF_VARCHAR2_TABLE_200
+    , a72 out nocopy JTF_VARCHAR2_TABLE_200
+    , a73 out nocopy JTF_VARCHAR2_TABLE_200
+    , a74 out nocopy JTF_VARCHAR2_TABLE_200
+    , a75 out nocopy JTF_VARCHAR2_TABLE_200
+    , a76 out nocopy JTF_VARCHAR2_TABLE_200
+    , a77 out nocopy JTF_VARCHAR2_TABLE_200
+    , a78 out nocopy JTF_VARCHAR2_TABLE_200
+    , a79 out nocopy JTF_VARCHAR2_TABLE_200
+    , a80 out nocopy JTF_VARCHAR2_TABLE_200
+    );
+
+  procedure invoke_txn_api(p_api_version  NUMBER
+    , p_commit  VARCHAR2
+    , p_validation_level  NUMBER
+    , p_init_msg_list  VARCHAR2
+    , p_calling_mode  NUMBER
+    , p5_a0  NUMBER
+    , p5_a1  DATE
+    , p5_a2  VARCHAR2
+    , p5_a3  NUMBER
+    , p5_a4  NUMBER
+    , p5_a5  NUMBER
+    , p5_a6  VARCHAR2
+    , p5_a7  NUMBER
+    , p5_a8  VARCHAR2
+    , p5_a9  VARCHAR2
+    , p5_a10  VARCHAR2
+    , p5_a11  VARCHAR2
+    , p5_a12  VARCHAR2
+    , p5_a13  VARCHAR2
+    , p5_a14  VARCHAR2
+    , p5_a15  VARCHAR2
+    , p5_a16  VARCHAR2
+    , p5_a17  VARCHAR2
+    , p5_a18  VARCHAR2
+    , p5_a19  VARCHAR2
+    , p5_a20  VARCHAR2
+    , p5_a21  VARCHAR2
+    , p5_a22  VARCHAR2
+    , p5_a23  VARCHAR2
+    , p5_a24  VARCHAR2
+    , p6_a0 JTF_NUMBER_TABLE
+    , p6_a1 JTF_VARCHAR2_TABLE_300
+    , p6_a2 JTF_NUMBER_TABLE
+    , p6_a3 JTF_NUMBER_TABLE
+    , p6_a4 JTF_VARCHAR2_TABLE_300
+    , p6_a5 JTF_VARCHAR2_TABLE_100
+    , p6_a6 JTF_NUMBER_TABLE
+    , p6_a7 JTF_VARCHAR2_TABLE_100
+    , p6_a8 JTF_VARCHAR2_TABLE_100
+    , p6_a9 JTF_VARCHAR2_TABLE_100
+    , p6_a10 JTF_NUMBER_TABLE
+    , p6_a11 JTF_VARCHAR2_TABLE_100
+    , p6_a12 JTF_NUMBER_TABLE
+    , p6_a13 JTF_NUMBER_TABLE
+    , p6_a14 JTF_NUMBER_TABLE
+    , p6_a15 JTF_VARCHAR2_TABLE_100
+    , p6_a16 JTF_VARCHAR2_TABLE_300
+    , p6_a17 JTF_NUMBER_TABLE
+    , p6_a18 JTF_NUMBER_TABLE
+    , p6_a19 JTF_NUMBER_TABLE
+    , p6_a20 JTF_VARCHAR2_TABLE_100
+    , p6_a21 JTF_NUMBER_TABLE
+    , p6_a22 JTF_NUMBER_TABLE
+    , p6_a23 JTF_NUMBER_TABLE
+    , p6_a24 JTF_NUMBER_TABLE
+    , p6_a25 JTF_NUMBER_TABLE
+    , p6_a26 JTF_NUMBER_TABLE
+    , p6_a27 JTF_VARCHAR2_TABLE_100
+    , p6_a28 JTF_DATE_TABLE
+    , p6_a29 JTF_VARCHAR2_TABLE_100
+    , p6_a30 JTF_VARCHAR2_TABLE_100
+    , p6_a31 JTF_NUMBER_TABLE
+    , p6_a32 JTF_VARCHAR2_TABLE_100
+    , p6_a33 JTF_DATE_TABLE
+    , p6_a34 JTF_VARCHAR2_TABLE_100
+    , p6_a35 JTF_NUMBER_TABLE
+    , p6_a36 JTF_VARCHAR2_TABLE_200
+    , p6_a37 JTF_DATE_TABLE
+    , p6_a38 JTF_DATE_TABLE
+    , p6_a39 JTF_DATE_TABLE
+    , p6_a40 JTF_NUMBER_TABLE
+    , p6_a41 JTF_NUMBER_TABLE
+    , p6_a42 JTF_NUMBER_TABLE
+    , p6_a43 JTF_VARCHAR2_TABLE_100
+    , p6_a44 JTF_VARCHAR2_TABLE_200
+    , p6_a45 JTF_VARCHAR2_TABLE_200
+    , p6_a46 JTF_VARCHAR2_TABLE_200
+    , p6_a47 JTF_VARCHAR2_TABLE_200
+    , p6_a48 JTF_VARCHAR2_TABLE_200
+    , p6_a49 JTF_VARCHAR2_TABLE_200
+    , p6_a50 JTF_VARCHAR2_TABLE_200
+    , p6_a51 JTF_VARCHAR2_TABLE_200
+    , p6_a52 JTF_VARCHAR2_TABLE_200
+    , p6_a53 JTF_VARCHAR2_TABLE_200
+    , p6_a54 JTF_VARCHAR2_TABLE_200
+    , p6_a55 JTF_VARCHAR2_TABLE_200
+    , p6_a56 JTF_VARCHAR2_TABLE_200
+    , p6_a57 JTF_VARCHAR2_TABLE_200
+    , p6_a58 JTF_VARCHAR2_TABLE_200
+    , p7_a0 JTF_VARCHAR2_TABLE_300
+    , p7_a1 JTF_NUMBER_TABLE
+    , p7_a2 JTF_VARCHAR2_TABLE_300
+    , p7_a3 JTF_NUMBER_TABLE
+    , p7_a4 JTF_NUMBER_TABLE
+    , p7_a5 JTF_NUMBER_TABLE
+    , p7_a6 JTF_NUMBER_TABLE
+    , p7_a7 JTF_VARCHAR2_TABLE_100
+    , p7_a8 JTF_VARCHAR2_TABLE_100
+    , p7_a9 JTF_NUMBER_TABLE
+    , p7_a10 JTF_VARCHAR2_TABLE_100
+    , p7_a11 JTF_VARCHAR2_TABLE_100
+    , p7_a12 JTF_NUMBER_TABLE
+    , p7_a13 JTF_VARCHAR2_TABLE_100
+    , p7_a14 JTF_NUMBER_TABLE
+    , p7_a15 JTF_NUMBER_TABLE
+    , p7_a16 JTF_NUMBER_TABLE
+    , p7_a17 JTF_VARCHAR2_TABLE_100
+    , p7_a18 JTF_VARCHAR2_TABLE_100
+    , p7_a19 JTF_DATE_TABLE
+    , p7_a20 JTF_DATE_TABLE
+    , p7_a21 JTF_VARCHAR2_TABLE_100
+    , p7_a22 JTF_VARCHAR2_TABLE_100
+    , p7_a23 JTF_NUMBER_TABLE
+    , p7_a24 JTF_NUMBER_TABLE
+    , p7_a25 JTF_NUMBER_TABLE
+    , p7_a26 JTF_NUMBER_TABLE
+    , p7_a27 JTF_VARCHAR2_TABLE_100
+    , p7_a28 JTF_NUMBER_TABLE
+    , p7_a29 JTF_NUMBER_TABLE
+    , p7_a30 JTF_NUMBER_TABLE
+    , p7_a31 JTF_VARCHAR2_TABLE_100
+    , p7_a32 JTF_VARCHAR2_TABLE_300
+    , p7_a33 JTF_NUMBER_TABLE
+    , p7_a34 JTF_NUMBER_TABLE
+    , p7_a35 JTF_VARCHAR2_TABLE_100
+    , p7_a36 JTF_NUMBER_TABLE
+    , p7_a37 JTF_VARCHAR2_TABLE_200
+    , p7_a38 JTF_DATE_TABLE
+    , p7_a39 JTF_DATE_TABLE
+    , p7_a40 JTF_NUMBER_TABLE
+    , p7_a41 JTF_NUMBER_TABLE
+    , p7_a42 JTF_NUMBER_TABLE
+    , p7_a43 JTF_VARCHAR2_TABLE_100
+    , p7_a44 JTF_VARCHAR2_TABLE_200
+    , p7_a45 JTF_VARCHAR2_TABLE_200
+    , p7_a46 JTF_VARCHAR2_TABLE_200
+    , p7_a47 JTF_VARCHAR2_TABLE_200
+    , p7_a48 JTF_VARCHAR2_TABLE_200
+    , p7_a49 JTF_VARCHAR2_TABLE_200
+    , p7_a50 JTF_VARCHAR2_TABLE_200
+    , p7_a51 JTF_VARCHAR2_TABLE_200
+    , p7_a52 JTF_VARCHAR2_TABLE_200
+    , p7_a53 JTF_VARCHAR2_TABLE_200
+    , p7_a54 JTF_VARCHAR2_TABLE_200
+    , p7_a55 JTF_VARCHAR2_TABLE_200
+    , p7_a56 JTF_VARCHAR2_TABLE_200
+    , p7_a57 JTF_VARCHAR2_TABLE_200
+    , p7_a58 JTF_VARCHAR2_TABLE_200
+    , p8_a0 JTF_VARCHAR2_TABLE_100
+    , p8_a1 JTF_NUMBER_TABLE
+    , p8_a2 JTF_NUMBER_TABLE
+    , p8_a3 JTF_NUMBER_TABLE
+    , p8_a4 JTF_NUMBER_TABLE
+    , p8_a5 JTF_NUMBER_TABLE
+    , p8_a6 JTF_VARCHAR2_TABLE_300
+    , p8_a7 JTF_VARCHAR2_TABLE_300
+    , p8_a8 JTF_NUMBER_TABLE
+    , p8_a9 JTF_NUMBER_TABLE
+    , p8_a10 JTF_VARCHAR2_TABLE_100
+    , p8_a11 JTF_VARCHAR2_TABLE_100
+    , p8_a12 JTF_DATE_TABLE
+    , p8_a13 JTF_VARCHAR2_TABLE_200
+    , p8_a14 JTF_VARCHAR2_TABLE_200
+    , p8_a15 JTF_VARCHAR2_TABLE_200
+    , p8_a16 JTF_VARCHAR2_TABLE_200
+    , p8_a17 JTF_VARCHAR2_TABLE_200
+    , p8_a18 JTF_VARCHAR2_TABLE_200
+    , p8_a19 JTF_VARCHAR2_TABLE_200
+    , p8_a20 JTF_VARCHAR2_TABLE_200
+    , p8_a21 JTF_VARCHAR2_TABLE_200
+    , p8_a22 JTF_VARCHAR2_TABLE_200
+    , p8_a23 JTF_VARCHAR2_TABLE_200
+    , p8_a24 JTF_VARCHAR2_TABLE_200
+    , p8_a25 JTF_VARCHAR2_TABLE_200
+    , p8_a26 JTF_VARCHAR2_TABLE_200
+    , p8_a27 JTF_VARCHAR2_TABLE_200
+    , p8_a28 JTF_VARCHAR2_TABLE_200
+    , p8_a29 JTF_VARCHAR2_TABLE_200
+    , p8_a30 JTF_VARCHAR2_TABLE_200
+    , p8_a31 JTF_VARCHAR2_TABLE_200
+    , p8_a32 JTF_VARCHAR2_TABLE_200
+    , p8_a33 JTF_DATE_TABLE
+    , p8_a34 JTF_DATE_TABLE
+    , p8_a35 JTF_DATE_TABLE
+    , p8_a36 JTF_DATE_TABLE
+    , p8_a37 JTF_DATE_TABLE
+    , p8_a38 JTF_DATE_TABLE
+    , p8_a39 JTF_DATE_TABLE
+    , p8_a40 JTF_DATE_TABLE
+    , p8_a41 JTF_DATE_TABLE
+    , p8_a42 JTF_DATE_TABLE
+    , p8_a43 JTF_NUMBER_TABLE
+    , p8_a44 JTF_NUMBER_TABLE
+    , p8_a45 JTF_NUMBER_TABLE
+    , p8_a46 JTF_NUMBER_TABLE
+    , p8_a47 JTF_NUMBER_TABLE
+    , p8_a48 JTF_NUMBER_TABLE
+    , p8_a49 JTF_NUMBER_TABLE
+    , p8_a50 JTF_NUMBER_TABLE
+    , p8_a51 JTF_NUMBER_TABLE
+    , p8_a52 JTF_NUMBER_TABLE
+    , p8_a53 JTF_NUMBER_TABLE
+    , p8_a54 JTF_NUMBER_TABLE
+    , p8_a55 JTF_NUMBER_TABLE
+    , p8_a56 JTF_NUMBER_TABLE
+    , p8_a57 JTF_NUMBER_TABLE
+    , p8_a58 JTF_NUMBER_TABLE
+    , p8_a59 JTF_NUMBER_TABLE
+    , p8_a60 JTF_NUMBER_TABLE
+    , p8_a61 JTF_NUMBER_TABLE
+    , p8_a62 JTF_NUMBER_TABLE
+    , p8_a63 JTF_NUMBER_TABLE
+    , p8_a64 JTF_NUMBER_TABLE
+    , p8_a65 JTF_VARCHAR2_TABLE_100
+    , p8_a66 JTF_VARCHAR2_TABLE_200
+    , p8_a67 JTF_VARCHAR2_TABLE_200
+    , p8_a68 JTF_VARCHAR2_TABLE_200
+    , p8_a69 JTF_VARCHAR2_TABLE_200
+    , p8_a70 JTF_VARCHAR2_TABLE_200
+    , p8_a71 JTF_VARCHAR2_TABLE_200
+    , p8_a72 JTF_VARCHAR2_TABLE_200
+    , p8_a73 JTF_VARCHAR2_TABLE_200
+    , p8_a74 JTF_VARCHAR2_TABLE_200
+    , p8_a75 JTF_VARCHAR2_TABLE_200
+    , p8_a76 JTF_VARCHAR2_TABLE_200
+    , p8_a77 JTF_VARCHAR2_TABLE_200
+    , p8_a78 JTF_VARCHAR2_TABLE_200
+    , p8_a79 JTF_VARCHAR2_TABLE_200
+    , p8_a80 JTF_VARCHAR2_TABLE_200
+    , p9_a0 JTF_NUMBER_TABLE
+    , p9_a1 JTF_VARCHAR2_TABLE_300
+    , p9_a2 JTF_NUMBER_TABLE
+    , p9_a3 JTF_VARCHAR2_TABLE_100
+    , p9_a4 JTF_NUMBER_TABLE
+    , p9_a5 JTF_NUMBER_TABLE
+    , x_return_status out nocopy  VARCHAR2
+    , x_msg_count out nocopy  NUMBER
+    , x_error_msg out nocopy  VARCHAR2
+  );
+end wsm_wip_lot_txn_pvt_w;
+
+ 
+
+/

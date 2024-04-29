@@ -1,0 +1,1106 @@
+--------------------------------------------------------
+--  DDL for Package Body HR_ITP_UPD
+--------------------------------------------------------
+
+  CREATE OR REPLACE EDITIONABLE PACKAGE BODY "APPS"."HR_ITP_UPD" as
+/* $Header: hritprhi.pkb 115.11 2003/12/03 07:01:45 adhunter noship $ */
+--
+-- ----------------------------------------------------------------------------
+-- |                     Private Global Definitions                           |
+-- ----------------------------------------------------------------------------
+--
+g_package  varchar2(33) := '  hr_itp_upd.';  -- Global package name
+--
+-- ----------------------------------------------------------------------------
+-- |------------------------------< update_dml >------------------------------|
+-- ----------------------------------------------------------------------------
+-- {Start Of Comments}
+--
+-- Description:
+--   This procedure controls the actual dml update logic. The processing of
+--   this procedure is:
+--   1) Increment the object_version_number by 1 if the object_version_number
+--      is defined as an attribute for this entity.
+--   2) To set and unset the g_api_dml status as required (as we are about to
+--      perform dml).
+--   3) To update the specified row in the schema using the primary key in
+--      the predicates.
+--   4) To trap any constraint violations that may have occurred.
+--   5) To raise any other errors.
+--
+-- Prerequisites:
+--   This is an internal private procedure which must be called from the upd
+--   procedure.
+--
+-- In Parameters:
+--   A Pl/Sql record structre.
+--
+-- Post Success:
+--   The specified row will be updated in the schema.
+--
+-- Post Failure:
+--   On the update dml failure it is important to note that we always reset the
+--   g_api_dml status to false.
+--   If a check, unique or parent integrity constraint violation is raised the
+--   constraint_error procedure will be called.
+--   If any other error is reported, the error will be raised after the
+--   g_api_dml status is reset.
+--
+-- Developer Implementation Notes:
+--   The update 'set' attribute list should be modified if any of your
+--   attributes are not updateable.
+--
+-- Access Status:
+--   Internal Row Handler Use Only.
+--
+-- {End Of Comments}
+-- ----------------------------------------------------------------------------
+Procedure update_dml
+  (p_rec in out nocopy hr_itp_shd.g_rec_type
+  ) is
+--
+  l_proc  varchar2(72) := g_package||'update_dml';
+--
+Begin
+  hr_utility.set_location('Entering:'||l_proc, 5);
+  --
+  p_rec.object_version_number := p_rec.object_version_number + 1;
+  --
+  --
+  -- Update the hr_item_properties_b Row
+  --
+  update hr_item_properties_b
+    set
+     item_property_id                = p_rec.item_property_id
+    ,object_version_number           = p_rec.object_version_number
+    ,form_item_id                    = p_rec.form_item_id
+    ,template_item_id                = p_rec.template_item_id
+    ,template_item_context_id        = p_rec.template_item_context_id
+    ,alignment                       = p_rec.alignment
+    ,bevel                           = p_rec.bevel
+    ,case_restriction                = p_rec.case_restriction
+    ,enabled                         = p_rec.enabled
+    ,format_mask                     = p_rec.format_mask
+    ,height                          = p_rec.height
+    ,information_formula_id          = p_rec.information_formula_id
+    ,information_parameter_item_id1  = p_rec.information_parameter_item_id1
+    ,information_parameter_item_id2  = p_rec.information_parameter_item_id2
+    ,information_parameter_item_id3  = p_rec.information_parameter_item_id3
+    ,information_parameter_item_id4  = p_rec.information_parameter_item_id4
+    ,information_parameter_item_id5  = p_rec.information_parameter_item_id5
+    ,insert_allowed                  = p_rec.insert_allowed
+    ,prompt_alignment_offset         = p_rec.prompt_alignment_offset
+    ,prompt_display_style            = p_rec.prompt_display_style
+    ,prompt_edge                     = p_rec.prompt_edge
+    ,prompt_edge_alignment           = p_rec.prompt_edge_alignment
+    ,prompt_edge_offset              = p_rec.prompt_edge_offset
+    ,prompt_text_alignment           = p_rec.prompt_text_alignment
+    ,query_allowed                   = p_rec.query_allowed
+    ,required                        = p_rec.required
+    ,update_allowed                  = p_rec.update_allowed
+    ,validation_formula_id           = p_rec.validation_formula_id
+    ,validation_parameter_item_id1   = p_rec.validation_parameter_item_id1
+    ,validation_parameter_item_id2   = p_rec.validation_parameter_item_id2
+    ,validation_parameter_item_id3   = p_rec.validation_parameter_item_id3
+    ,validation_parameter_item_id4   = p_rec.validation_parameter_item_id4
+    ,validation_parameter_item_id5   = p_rec.validation_parameter_item_id5
+    ,visible                         = p_rec.visible
+    ,width                           = p_rec.width
+    ,x_position                      = p_rec.x_position
+    ,y_position                      = p_rec.y_position
+    ,information_category            = p_rec.information_category
+    ,information1                    = p_rec.information1
+    ,information2                    = p_rec.information2
+    ,information3                    = p_rec.information3
+    ,information4                    = p_rec.information4
+    ,information5                    = p_rec.information5
+    ,information6                    = p_rec.information6
+    ,information7                    = p_rec.information7
+    ,information8                    = p_rec.information8
+    ,information9                    = p_rec.information9
+    ,information10                   = p_rec.information10
+    ,information11                   = p_rec.information11
+    ,information12                   = p_rec.information12
+    ,information13                   = p_rec.information13
+    ,information14                   = p_rec.information14
+    ,information15                   = p_rec.information15
+    ,information16                   = p_rec.information16
+    ,information17                   = p_rec.information17
+    ,information18                   = p_rec.information18
+    ,information19                   = p_rec.information19
+    ,information20                   = p_rec.information20
+    ,information21                   = p_rec.information21
+    ,information22                   = p_rec.information22
+    ,information23                   = p_rec.information23
+    ,information24                   = p_rec.information24
+    ,information25                   = p_rec.information25
+    ,information26                   = p_rec.information26
+    ,information27                   = p_rec.information27
+    ,information28                   = p_rec.information28
+    ,information29                   = p_rec.information29
+    ,information30                   = p_rec.information30
+    ,next_navigation_item_id         = p_rec.next_navigation_item_id
+    ,previous_navigation_item_id     = p_rec.previous_navigation_item_id
+    where item_property_id = p_rec.item_property_id;
+  --
+  --
+  --
+  hr_utility.set_location(' Leaving:'||l_proc, 10);
+--
+Exception
+  When hr_api.check_integrity_violated Then
+    -- A check constraint has been violated
+    --
+    hr_itp_shd.constraint_error
+      (p_constraint_name => hr_api.strip_constraint_name(SQLERRM));
+  When hr_api.parent_integrity_violated Then
+    -- Parent integrity has been violated
+    --
+    hr_itp_shd.constraint_error
+      (p_constraint_name => hr_api.strip_constraint_name(SQLERRM));
+  When hr_api.unique_integrity_violated Then
+    -- Unique integrity has been violated
+    --
+    hr_itp_shd.constraint_error
+      (p_constraint_name => hr_api.strip_constraint_name(SQLERRM));
+  When Others Then
+    --
+    Raise;
+End update_dml;
+--
+-- ----------------------------------------------------------------------------
+-- |------------------------------< pre_update >------------------------------|
+-- ----------------------------------------------------------------------------
+-- {Start Of Comments}
+--
+-- Description:
+--   This private procedure contains any processing which is required before
+--   the update dml.
+--
+-- Prerequisites:
+--   This is an internal procedure which is called from the upd procedure.
+--
+-- In Parameters:
+--   A Pl/Sql record structure.
+--
+-- Post Success:
+--   Processing continues.
+--
+-- Post Failure:
+--   If an error has occurred, an error message and exception wil be raised
+--   but not handled.
+--
+-- Developer Implementation Notes:
+--   Any pre-processing required before the update dml is issued should be
+--   coded within this procedure. It is important to note that any 3rd party
+--   maintenance should be reviewed before placing in this procedure.
+--
+-- Access Status:
+--   Internal Row Handler Use Only.
+--
+-- {End Of Comments}
+-- ----------------------------------------------------------------------------
+Procedure pre_update
+  (p_rec in hr_itp_shd.g_rec_type
+  ) is
+--
+  l_proc  varchar2(72) := g_package||'pre_update';
+--
+Begin
+  hr_utility.set_location('Entering:'||l_proc, 5);
+  --
+  hr_utility.set_location(' Leaving:'||l_proc, 10);
+End pre_update;
+--
+-- ----------------------------------------------------------------------------
+-- |-----------------------------< post_update >------------------------------|
+-- ----------------------------------------------------------------------------
+-- {Start Of Comments}
+--
+-- Description:
+--   This private procedure contains any processing which is required after the
+--   update dml.
+--
+-- Prerequisites:
+--   This is an internal procedure which is called from the upd procedure.
+--
+-- In Parameters:
+--   A Pl/Sql record structure.
+--
+-- Post Success:
+--   Processing continues.
+--
+-- Post Failure:
+--   If an error has occurred, an error message and exception will be raised
+--   but not handled.
+--
+-- Developer Implementation Notes:
+--   Any post-processing required after the update dml is issued should be
+--   coded within this procedure. It is important to note that any 3rd party
+--   maintenance should be reviewed before placing in this procedure.
+--
+-- Access Status:
+--   Internal Row Handler Use Only.
+--
+-- {End Of Comments}
+-- ----------------------------------------------------------------------------
+Procedure post_update
+  (p_effective_date               in date
+  ,p_rec                          in hr_itp_shd.g_rec_type
+  ) is
+--
+  l_proc  varchar2(72) := g_package||'post_update';
+--
+Begin
+  hr_utility.set_location('Entering:'||l_proc, 5);
+  begin
+    --
+    hr_itp_rku.after_update
+      (p_effective_date              => p_effective_date
+      ,p_object_version_number
+      => p_rec.object_version_number
+      ,p_item_property_id
+      => p_rec.item_property_id
+      ,p_form_item_id
+      => p_rec.form_item_id
+      ,p_template_item_id
+      => p_rec.template_item_id
+      ,p_template_item_context_id
+      => p_rec.template_item_context_id
+      ,p_alignment
+      => p_rec.alignment
+      ,p_bevel
+      => p_rec.bevel
+      ,p_case_restriction
+      => p_rec.case_restriction
+      ,p_enabled
+      => p_rec.enabled
+      ,p_format_mask
+      => p_rec.format_mask
+      ,p_height
+      => p_rec.height
+      ,p_information_formula_id
+      => p_rec.information_formula_id
+      ,p_information_param_item_id1
+      => p_rec.information_parameter_item_id1
+      ,p_information_param_item_id2
+      => p_rec.information_parameter_item_id2
+      ,p_information_param_item_id3
+      => p_rec.information_parameter_item_id3
+      ,p_information_param_item_id4
+      => p_rec.information_parameter_item_id4
+      ,p_information_param_item_id5
+      => p_rec.information_parameter_item_id5
+      ,p_insert_allowed
+      => p_rec.insert_allowed
+      ,p_prompt_alignment_offset
+      => p_rec.prompt_alignment_offset
+      ,p_prompt_display_style
+      => p_rec.prompt_display_style
+      ,p_prompt_edge
+      => p_rec.prompt_edge
+      ,p_prompt_edge_alignment
+      => p_rec.prompt_edge_alignment
+      ,p_prompt_edge_offset
+      => p_rec.prompt_edge_offset
+      ,p_prompt_text_alignment
+      => p_rec.prompt_text_alignment
+      ,p_query_allowed
+      => p_rec.query_allowed
+      ,p_required
+      => p_rec.required
+      ,p_update_allowed
+      => p_rec.update_allowed
+      ,p_validation_formula_id
+      => p_rec.validation_formula_id
+      ,p_validation_param_item_id1
+      => p_rec.validation_parameter_item_id1
+      ,p_validation_param_item_id2
+      => p_rec.validation_parameter_item_id2
+      ,p_validation_param_item_id3
+      => p_rec.validation_parameter_item_id3
+      ,p_validation_param_item_id4
+      => p_rec.validation_parameter_item_id4
+      ,p_validation_param_item_id5
+      => p_rec.validation_parameter_item_id5
+      ,p_visible
+      => p_rec.visible
+      ,p_width
+      => p_rec.width
+      ,p_x_position
+      => p_rec.x_position
+      ,p_y_position
+      => p_rec.y_position
+      ,p_information_category
+      => p_rec.information_category
+      ,p_information1
+      => p_rec.information1
+      ,p_information2
+      => p_rec.information2
+      ,p_information3
+      => p_rec.information3
+      ,p_information4
+      => p_rec.information4
+      ,p_information5
+      => p_rec.information5
+      ,p_information6
+      => p_rec.information6
+      ,p_information7
+      => p_rec.information7
+      ,p_information8
+      => p_rec.information8
+      ,p_information9
+      => p_rec.information9
+      ,p_information10
+      => p_rec.information10
+      ,p_information11
+      => p_rec.information11
+      ,p_information12
+      => p_rec.information12
+      ,p_information13
+      => p_rec.information13
+      ,p_information14
+      => p_rec.information14
+      ,p_information15
+      => p_rec.information15
+      ,p_information16
+      => p_rec.information16
+      ,p_information17
+      => p_rec.information17
+      ,p_information18
+      => p_rec.information18
+      ,p_information19
+      => p_rec.information19
+      ,p_information20
+      => p_rec.information20
+      ,p_information21
+      => p_rec.information21
+      ,p_information22
+      => p_rec.information22
+      ,p_information23
+      => p_rec.information23
+      ,p_information24
+      => p_rec.information24
+      ,p_information25
+      => p_rec.information25
+      ,p_information26
+      => p_rec.information26
+      ,p_information27
+      => p_rec.information27
+      ,p_information28
+      => p_rec.information28
+      ,p_information29
+      => p_rec.information29
+      ,p_information30
+      => p_rec.information30
+      ,p_next_navigation_item_id
+      => p_rec.next_navigation_item_id
+      ,p_previous_navigation_item_id
+      => p_rec.previous_navigation_item_id
+      ,p_form_item_id_o
+      => hr_itp_shd.g_old_rec.form_item_id
+      ,p_template_item_id_o
+      => hr_itp_shd.g_old_rec.template_item_id
+      ,p_template_item_context_id_o
+      => hr_itp_shd.g_old_rec.template_item_context_id
+      ,p_alignment_o
+      => hr_itp_shd.g_old_rec.alignment
+      ,p_bevel_o
+      => hr_itp_shd.g_old_rec.bevel
+      ,p_case_restriction_o
+      => hr_itp_shd.g_old_rec.case_restriction
+      ,p_enabled_o
+      => hr_itp_shd.g_old_rec.enabled
+      ,p_format_mask_o
+      => hr_itp_shd.g_old_rec.format_mask
+      ,p_object_version_number_o
+      => hr_itp_shd.g_old_rec.object_version_number
+      ,p_height_o
+      => hr_itp_shd.g_old_rec.height
+      ,p_information_formula_id_o
+      => hr_itp_shd.g_old_rec.information_formula_id
+      ,p_information_param_item_id1_o
+      => hr_itp_shd.g_old_rec.information_parameter_item_id1
+      ,p_information_param_item_id2_o
+      => hr_itp_shd.g_old_rec.information_parameter_item_id2
+      ,p_information_param_item_id3_o
+      => hr_itp_shd.g_old_rec.information_parameter_item_id3
+      ,p_information_param_item_id4_o
+      => hr_itp_shd.g_old_rec.information_parameter_item_id4
+      ,p_information_param_item_id5_o
+      => hr_itp_shd.g_old_rec.information_parameter_item_id5
+      ,p_insert_allowed_o
+      => hr_itp_shd.g_old_rec.insert_allowed
+      ,p_prompt_alignment_offset_o
+      => hr_itp_shd.g_old_rec.prompt_alignment_offset
+      ,p_prompt_display_style_o
+      => hr_itp_shd.g_old_rec.prompt_display_style
+      ,p_prompt_edge_o
+      => hr_itp_shd.g_old_rec.prompt_edge
+      ,p_prompt_edge_alignment_o
+      => hr_itp_shd.g_old_rec.prompt_edge_alignment
+      ,p_prompt_edge_offset_o
+      => hr_itp_shd.g_old_rec.prompt_edge_offset
+      ,p_prompt_text_alignment_o
+      => hr_itp_shd.g_old_rec.prompt_text_alignment
+      ,p_query_allowed_o
+      => hr_itp_shd.g_old_rec.query_allowed
+      ,p_required_o
+      => hr_itp_shd.g_old_rec.required
+      ,p_update_allowed_o
+      => hr_itp_shd.g_old_rec.update_allowed
+      ,p_validation_formula_id_o
+      => hr_itp_shd.g_old_rec.validation_formula_id
+      ,p_validation_param_item_id1_o
+      => hr_itp_shd.g_old_rec.validation_parameter_item_id1
+      ,p_validation_param_item_id2_o
+      => hr_itp_shd.g_old_rec.validation_parameter_item_id2
+      ,p_validation_param_item_id3_o
+      => hr_itp_shd.g_old_rec.validation_parameter_item_id3
+      ,p_validation_param_item_id4_o
+      => hr_itp_shd.g_old_rec.validation_parameter_item_id4
+      ,p_validation_param_item_id5_o
+      => hr_itp_shd.g_old_rec.validation_parameter_item_id5
+      ,p_visible_o
+      => hr_itp_shd.g_old_rec.visible
+      ,p_width_o
+      => hr_itp_shd.g_old_rec.width
+      ,p_x_position_o
+      => hr_itp_shd.g_old_rec.x_position
+      ,p_y_position_o
+      => hr_itp_shd.g_old_rec.y_position
+      ,p_information_category_o
+      => hr_itp_shd.g_old_rec.information_category
+      ,p_information1_o
+      => hr_itp_shd.g_old_rec.information1
+      ,p_information2_o
+      => hr_itp_shd.g_old_rec.information2
+      ,p_information3_o
+      => hr_itp_shd.g_old_rec.information3
+      ,p_information4_o
+      => hr_itp_shd.g_old_rec.information4
+      ,p_information5_o
+      => hr_itp_shd.g_old_rec.information5
+      ,p_information6_o
+      => hr_itp_shd.g_old_rec.information6
+      ,p_information7_o
+      => hr_itp_shd.g_old_rec.information7
+      ,p_information8_o
+      => hr_itp_shd.g_old_rec.information8
+      ,p_information9_o
+      => hr_itp_shd.g_old_rec.information9
+      ,p_information10_o
+      => hr_itp_shd.g_old_rec.information10
+      ,p_information11_o
+      => hr_itp_shd.g_old_rec.information11
+      ,p_information12_o
+      => hr_itp_shd.g_old_rec.information12
+      ,p_information13_o
+      => hr_itp_shd.g_old_rec.information13
+      ,p_information14_o
+      => hr_itp_shd.g_old_rec.information14
+      ,p_information15_o
+      => hr_itp_shd.g_old_rec.information15
+      ,p_information16_o
+      => hr_itp_shd.g_old_rec.information16
+      ,p_information17_o
+      => hr_itp_shd.g_old_rec.information17
+      ,p_information18_o
+      => hr_itp_shd.g_old_rec.information18
+      ,p_information19_o
+      => hr_itp_shd.g_old_rec.information19
+      ,p_information20_o
+      => hr_itp_shd.g_old_rec.information20
+      ,p_information21_o
+      => hr_itp_shd.g_old_rec.information21
+      ,p_information22_o
+      => hr_itp_shd.g_old_rec.information22
+      ,p_information23_o
+      => hr_itp_shd.g_old_rec.information23
+      ,p_information24_o
+      => hr_itp_shd.g_old_rec.information24
+      ,p_information25_o
+      => hr_itp_shd.g_old_rec.information25
+      ,p_information26_o
+      => hr_itp_shd.g_old_rec.information26
+      ,p_information27_o
+      => hr_itp_shd.g_old_rec.information27
+      ,p_information28_o
+      => hr_itp_shd.g_old_rec.information28
+      ,p_information29_o
+      => hr_itp_shd.g_old_rec.information29
+      ,p_information30_o
+      => hr_itp_shd.g_old_rec.information30
+      ,p_next_navigation_item_id_o
+      => hr_itp_shd.g_old_rec.next_navigation_item_id
+      ,p_prev_navigation_item_id_o
+      => hr_itp_shd.g_old_rec.previous_navigation_item_id
+      );
+    --
+  exception
+    --
+    when hr_api.cannot_find_prog_unit then
+      --
+      hr_api.cannot_find_prog_unit_error
+        (p_module_name => 'HR_ITEM_PROPERTIES_B'
+        ,p_hook_type   => 'AU');
+      --
+  end;
+  --
+  hr_utility.set_location(' Leaving:'||l_proc, 10);
+End post_update;
+--
+-- ----------------------------------------------------------------------------
+-- |-----------------------------< convert_defs >-----------------------------|
+-- ----------------------------------------------------------------------------
+-- {Start Of Comments}
+--
+-- Description:
+--   The Convert_Defs procedure has one very important function:
+--   It must return the record structure for the row with all system defaulted
+--   values converted into its corresponding parameter value for update. When
+--   we attempt to update a row through the Upd process , certain
+--   parameters can be defaulted which enables flexibility in the calling of
+--   the upd process (e.g. only attributes which need to be updated need to be
+--   specified). For the upd process to determine which attributes
+--   have NOT been specified we need to check if the parameter has a reserved
+--   system default value. Therefore, for all parameters which have a
+--   corresponding reserved system default mechanism specified we need to
+--   check if a system default is being used. If a system default is being
+--   used then we convert the defaulted value into its corresponding attribute
+--   value held in the g_old_rec data structure.
+--
+-- Prerequisites:
+--   This private function can only be called from the upd process.
+--
+-- In Parameters:
+--   A Pl/Sql record structure.
+--
+-- Post Success:
+--   The record structure will be returned with all system defaulted parameter
+--   values converted into its current row attribute value.
+--
+-- Post Failure:
+--   No direct error handling is required within this function. Any possible
+--   errors within this procedure will be a PL/SQL value error due to
+--   conversion of datatypes or data lengths.
+--
+-- Developer Implementation Notes:
+--   None.
+--
+-- Access Status:
+--   Internal Row Handler Use Only.
+--
+-- {End Of Comments}
+-- ----------------------------------------------------------------------------
+Procedure convert_defs
+  (p_rec in out nocopy hr_itp_shd.g_rec_type
+  ) is
+--
+Begin
+  --
+  -- We must now examine each argument value in the
+  -- p_rec plsql record structure
+  -- to see if a system default is being used. If a system default
+  -- is being used then we must set to the 'current' argument value.
+  --
+  If (p_rec.form_item_id = hr_api.g_number) then
+    p_rec.form_item_id :=
+    hr_itp_shd.g_old_rec.form_item_id;
+  End If;
+  If (p_rec.template_item_id = hr_api.g_number) then
+    p_rec.template_item_id :=
+    hr_itp_shd.g_old_rec.template_item_id;
+  End If;
+  If (p_rec.template_item_context_id = hr_api.g_number) then
+    p_rec.template_item_context_id :=
+    hr_itp_shd.g_old_rec.template_item_context_id;
+  End If;
+  If (p_rec.alignment = hr_api.g_number) then
+    p_rec.alignment :=
+    hr_itp_shd.g_old_rec.alignment;
+  End If;
+  If (p_rec.bevel = hr_api.g_number) then
+    p_rec.bevel :=
+    hr_itp_shd.g_old_rec.bevel;
+  End If;
+  If (p_rec.case_restriction = hr_api.g_number) then
+    p_rec.case_restriction :=
+    hr_itp_shd.g_old_rec.case_restriction;
+  End If;
+  If (p_rec.enabled = hr_api.g_number) then
+    p_rec.enabled :=
+    hr_itp_shd.g_old_rec.enabled;
+  End If;
+  If (p_rec.format_mask = hr_api.g_varchar2) then
+    p_rec.format_mask :=
+    hr_itp_shd.g_old_rec.format_mask;
+  End If;
+  If (p_rec.height = hr_api.g_number) then
+    p_rec.height :=
+    hr_itp_shd.g_old_rec.height;
+  End If;
+  If (p_rec.information_formula_id = hr_api.g_number) then
+    p_rec.information_formula_id :=
+    hr_itp_shd.g_old_rec.information_formula_id;
+  End If;
+  If (p_rec.information_parameter_item_id1 = hr_api.g_number) then
+    p_rec.information_parameter_item_id1 :=
+    hr_itp_shd.g_old_rec.information_parameter_item_id1;
+  End If;
+  If (p_rec.information_parameter_item_id2 = hr_api.g_number) then
+    p_rec.information_parameter_item_id2 :=
+    hr_itp_shd.g_old_rec.information_parameter_item_id2;
+  End If;
+  If (p_rec.information_parameter_item_id3 = hr_api.g_number) then
+    p_rec.information_parameter_item_id3 :=
+    hr_itp_shd.g_old_rec.information_parameter_item_id3;
+  End If;
+  If (p_rec.information_parameter_item_id4 = hr_api.g_number) then
+    p_rec.information_parameter_item_id4 :=
+    hr_itp_shd.g_old_rec.information_parameter_item_id4;
+  End If;
+  If (p_rec.information_parameter_item_id5 = hr_api.g_number) then
+    p_rec.information_parameter_item_id5 :=
+    hr_itp_shd.g_old_rec.information_parameter_item_id5;
+  End If;
+  If (p_rec.insert_allowed = hr_api.g_number) then
+    p_rec.insert_allowed :=
+    hr_itp_shd.g_old_rec.insert_allowed;
+  End If;
+  If (p_rec.prompt_alignment_offset = hr_api.g_number) then
+    p_rec.prompt_alignment_offset :=
+    hr_itp_shd.g_old_rec.prompt_alignment_offset;
+  End If;
+  If (p_rec.prompt_display_style = hr_api.g_number) then
+    p_rec.prompt_display_style :=
+    hr_itp_shd.g_old_rec.prompt_display_style;
+  End If;
+  If (p_rec.prompt_edge = hr_api.g_number) then
+    p_rec.prompt_edge :=
+    hr_itp_shd.g_old_rec.prompt_edge;
+  End If;
+  If (p_rec.prompt_edge_alignment = hr_api.g_number) then
+    p_rec.prompt_edge_alignment :=
+    hr_itp_shd.g_old_rec.prompt_edge_alignment;
+  End If;
+  If (p_rec.prompt_edge_offset = hr_api.g_number) then
+    p_rec.prompt_edge_offset :=
+    hr_itp_shd.g_old_rec.prompt_edge_offset;
+  End If;
+  If (p_rec.prompt_text_alignment = hr_api.g_number) then
+    p_rec.prompt_text_alignment :=
+    hr_itp_shd.g_old_rec.prompt_text_alignment;
+  End If;
+  If (p_rec.query_allowed = hr_api.g_number) then
+    p_rec.query_allowed :=
+    hr_itp_shd.g_old_rec.query_allowed;
+  End If;
+  If (p_rec.required = hr_api.g_number) then
+    p_rec.required :=
+    hr_itp_shd.g_old_rec.required;
+  End If;
+  If (p_rec.update_allowed = hr_api.g_number) then
+    p_rec.update_allowed :=
+    hr_itp_shd.g_old_rec.update_allowed;
+  End If;
+  If (p_rec.validation_formula_id = hr_api.g_number) then
+    p_rec.validation_formula_id :=
+    hr_itp_shd.g_old_rec.validation_formula_id;
+  End If;
+  If (p_rec.validation_parameter_item_id1 = hr_api.g_number) then
+    p_rec.validation_parameter_item_id1 :=
+    hr_itp_shd.g_old_rec.validation_parameter_item_id1;
+  End If;
+  If (p_rec.validation_parameter_item_id2 = hr_api.g_number) then
+    p_rec.validation_parameter_item_id2 :=
+    hr_itp_shd.g_old_rec.validation_parameter_item_id2;
+  End If;
+  If (p_rec.validation_parameter_item_id3 = hr_api.g_number) then
+    p_rec.validation_parameter_item_id3 :=
+    hr_itp_shd.g_old_rec.validation_parameter_item_id3;
+  End If;
+  If (p_rec.validation_parameter_item_id4 = hr_api.g_number) then
+    p_rec.validation_parameter_item_id4 :=
+    hr_itp_shd.g_old_rec.validation_parameter_item_id4;
+  End If;
+  If (p_rec.validation_parameter_item_id5 = hr_api.g_number) then
+    p_rec.validation_parameter_item_id5 :=
+    hr_itp_shd.g_old_rec.validation_parameter_item_id5;
+  End If;
+  If (p_rec.visible = hr_api.g_number) then
+    p_rec.visible :=
+    hr_itp_shd.g_old_rec.visible;
+  End If;
+  If (p_rec.width = hr_api.g_number) then
+    p_rec.width :=
+    hr_itp_shd.g_old_rec.width;
+  End If;
+  If (p_rec.x_position = hr_api.g_number) then
+    p_rec.x_position :=
+    hr_itp_shd.g_old_rec.x_position;
+  End If;
+  If (p_rec.y_position = hr_api.g_number) then
+    p_rec.y_position :=
+    hr_itp_shd.g_old_rec.y_position;
+  End If;
+  If (p_rec.information_category = hr_api.g_varchar2) then
+    p_rec.information_category :=
+    hr_itp_shd.g_old_rec.information_category;
+  End If;
+  If (p_rec.information1 = hr_api.g_varchar2) then
+    p_rec.information1 :=
+    hr_itp_shd.g_old_rec.information1;
+  End If;
+  If (p_rec.information2 = hr_api.g_varchar2) then
+    p_rec.information2 :=
+    hr_itp_shd.g_old_rec.information2;
+  End If;
+  If (p_rec.information3 = hr_api.g_varchar2) then
+    p_rec.information3 :=
+    hr_itp_shd.g_old_rec.information3;
+  End If;
+  If (p_rec.information4 = hr_api.g_varchar2) then
+    p_rec.information4 :=
+    hr_itp_shd.g_old_rec.information4;
+  End If;
+  If (p_rec.information5 = hr_api.g_varchar2) then
+    p_rec.information5 :=
+    hr_itp_shd.g_old_rec.information5;
+  End If;
+  If (p_rec.information6 = hr_api.g_varchar2) then
+    p_rec.information6 :=
+    hr_itp_shd.g_old_rec.information6;
+  End If;
+  If (p_rec.information7 = hr_api.g_varchar2) then
+    p_rec.information7 :=
+    hr_itp_shd.g_old_rec.information7;
+  End If;
+  If (p_rec.information8 = hr_api.g_varchar2) then
+    p_rec.information8 :=
+    hr_itp_shd.g_old_rec.information8;
+  End If;
+  If (p_rec.information9 = hr_api.g_varchar2) then
+    p_rec.information9 :=
+    hr_itp_shd.g_old_rec.information9;
+  End If;
+  If (p_rec.information10 = hr_api.g_varchar2) then
+    p_rec.information10 :=
+    hr_itp_shd.g_old_rec.information10;
+  End If;
+  If (p_rec.information11 = hr_api.g_varchar2) then
+    p_rec.information11 :=
+    hr_itp_shd.g_old_rec.information11;
+  End If;
+  If (p_rec.information12 = hr_api.g_varchar2) then
+    p_rec.information12 :=
+    hr_itp_shd.g_old_rec.information12;
+  End If;
+  If (p_rec.information13 = hr_api.g_varchar2) then
+    p_rec.information13 :=
+    hr_itp_shd.g_old_rec.information13;
+  End If;
+  If (p_rec.information14 = hr_api.g_varchar2) then
+    p_rec.information14 :=
+    hr_itp_shd.g_old_rec.information14;
+  End If;
+  If (p_rec.information15 = hr_api.g_varchar2) then
+    p_rec.information15 :=
+    hr_itp_shd.g_old_rec.information15;
+  End If;
+  If (p_rec.information16 = hr_api.g_varchar2) then
+    p_rec.information16 :=
+    hr_itp_shd.g_old_rec.information16;
+  End If;
+  If (p_rec.information17 = hr_api.g_varchar2) then
+    p_rec.information17 :=
+    hr_itp_shd.g_old_rec.information17;
+  End If;
+  If (p_rec.information18 = hr_api.g_varchar2) then
+    p_rec.information18 :=
+    hr_itp_shd.g_old_rec.information18;
+  End If;
+  If (p_rec.information19 = hr_api.g_varchar2) then
+    p_rec.information19 :=
+    hr_itp_shd.g_old_rec.information19;
+  End If;
+  If (p_rec.information20 = hr_api.g_varchar2) then
+    p_rec.information20 :=
+    hr_itp_shd.g_old_rec.information20;
+  End If;
+  If (p_rec.information21 = hr_api.g_varchar2) then
+    p_rec.information21 :=
+    hr_itp_shd.g_old_rec.information21;
+  End If;
+  If (p_rec.information22 = hr_api.g_varchar2) then
+    p_rec.information22 :=
+    hr_itp_shd.g_old_rec.information22;
+  End If;
+  If (p_rec.information23 = hr_api.g_varchar2) then
+    p_rec.information23 :=
+    hr_itp_shd.g_old_rec.information23;
+  End If;
+  If (p_rec.information24 = hr_api.g_varchar2) then
+    p_rec.information24 :=
+    hr_itp_shd.g_old_rec.information24;
+  End If;
+  If (p_rec.information25 = hr_api.g_varchar2) then
+    p_rec.information25 :=
+    hr_itp_shd.g_old_rec.information25;
+  End If;
+  If (p_rec.information26 = hr_api.g_varchar2) then
+    p_rec.information26 :=
+    hr_itp_shd.g_old_rec.information26;
+  End If;
+  If (p_rec.information27 = hr_api.g_varchar2) then
+    p_rec.information27 :=
+    hr_itp_shd.g_old_rec.information27;
+  End If;
+  If (p_rec.information28 = hr_api.g_varchar2) then
+    p_rec.information28 :=
+    hr_itp_shd.g_old_rec.information28;
+  End If;
+  If (p_rec.information29 = hr_api.g_varchar2) then
+    p_rec.information29 :=
+    hr_itp_shd.g_old_rec.information29;
+  End If;
+  If (p_rec.information30 = hr_api.g_varchar2) then
+    p_rec.information30 :=
+    hr_itp_shd.g_old_rec.information30;
+  End If;
+  If (p_rec.next_navigation_item_id = hr_api.g_number) then
+    p_rec.next_navigation_item_id :=
+    hr_itp_shd.g_old_rec.next_navigation_item_id;
+  End If;
+  If (p_rec.previous_navigation_item_id = hr_api.g_number) then
+    p_rec.previous_navigation_item_id :=
+    hr_itp_shd.g_old_rec.previous_navigation_item_id;
+  End If;
+  --
+End convert_defs;
+--
+-- ----------------------------------------------------------------------------
+-- |---------------------------------< upd >----------------------------------|
+-- ----------------------------------------------------------------------------
+Procedure upd
+  (p_effective_date               in date
+  ,p_rec                          in out nocopy hr_itp_shd.g_rec_type
+  ) is
+--
+  l_proc  varchar2(72) := g_package||'upd';
+--
+Begin
+  hr_utility.set_location('Entering:'||l_proc, 5);
+  --
+  -- We must lock the row which we need to update.
+  --
+  hr_itp_shd.lck
+    (p_rec.item_property_id
+    ,p_rec.object_version_number
+    );
+  --
+  -- 1. During an update system defaults are used to determine if
+  --    arguments have been defaulted or not. We must therefore
+  --    derive the full record structure values to be updated.
+  --
+  -- 2. Call the supporting update validate operations.
+  --
+  convert_defs(p_rec);
+  hr_itp_bus.update_validate
+     (p_effective_date
+     ,p_rec
+     );
+  --
+  -- Call the supporting pre-update operation
+  --
+  hr_itp_upd.pre_update(p_rec);
+  --
+  -- Update the row.
+  --
+  hr_itp_upd.update_dml(p_rec);
+  --
+  -- Call the supporting post-update operation
+  --
+  hr_itp_upd.post_update
+     (p_effective_date
+     ,p_rec
+     );
+
+End upd;
+--
+-- ----------------------------------------------------------------------------
+-- |---------------------------------< upd >----------------------------------|
+-- ----------------------------------------------------------------------------
+Procedure upd
+  (p_effective_date               in     date
+  ,p_item_property_id             in     number
+  ,p_object_version_number        in out nocopy number
+  ,p_form_item_id                 in     number    default hr_api.g_number
+  ,p_template_item_id             in     number    default hr_api.g_number
+  ,p_template_item_context_id     in     number    default hr_api.g_number
+  ,p_alignment                    in     number    default hr_api.g_number
+  ,p_bevel                        in     number    default hr_api.g_number
+  ,p_case_restriction             in     number    default hr_api.g_number
+  ,p_enabled                      in     number    default hr_api.g_number
+  ,p_format_mask                  in     varchar2  default hr_api.g_varchar2
+  ,p_height                       in     number    default hr_api.g_number
+  ,p_information_formula_id       in     number    default hr_api.g_number
+  ,p_information_param_item_id1   in     number    default hr_api.g_number
+  ,p_information_param_item_id2   in     number    default hr_api.g_number
+  ,p_information_param_item_id3   in     number    default hr_api.g_number
+  ,p_information_param_item_id4   in     number    default hr_api.g_number
+  ,p_information_param_item_id5   in     number    default hr_api.g_number
+  ,p_insert_allowed               in     number    default hr_api.g_number
+  ,p_prompt_alignment_offset      in     number    default hr_api.g_number
+  ,p_prompt_display_style         in     number    default hr_api.g_number
+  ,p_prompt_edge                  in     number    default hr_api.g_number
+  ,p_prompt_edge_alignment        in     number    default hr_api.g_number
+  ,p_prompt_edge_offset           in     number    default hr_api.g_number
+  ,p_prompt_text_alignment        in     number    default hr_api.g_number
+  ,p_query_allowed                in     number    default hr_api.g_number
+  ,p_required                     in     number    default hr_api.g_number
+  ,p_update_allowed               in     number    default hr_api.g_number
+  ,p_validation_formula_id        in     number    default hr_api.g_number
+  ,p_validation_param_item_id1    in     number    default hr_api.g_number
+  ,p_validation_param_item_id2    in     number    default hr_api.g_number
+  ,p_validation_param_item_id3    in     number    default hr_api.g_number
+  ,p_validation_param_item_id4    in     number    default hr_api.g_number
+  ,p_validation_param_item_id5    in     number    default hr_api.g_number
+  ,p_visible                      in     number    default hr_api.g_number
+  ,p_width                        in     number    default hr_api.g_number
+  ,p_x_position                   in     number    default hr_api.g_number
+  ,p_y_position                   in     number    default hr_api.g_number
+  ,p_information_category         in     varchar2  default hr_api.g_varchar2
+  ,p_information1                 in     varchar2  default hr_api.g_varchar2
+  ,p_information2                 in     varchar2  default hr_api.g_varchar2
+  ,p_information3                 in     varchar2  default hr_api.g_varchar2
+  ,p_information4                 in     varchar2  default hr_api.g_varchar2
+  ,p_information5                 in     varchar2  default hr_api.g_varchar2
+  ,p_information6                 in     varchar2  default hr_api.g_varchar2
+  ,p_information7                 in     varchar2  default hr_api.g_varchar2
+  ,p_information8                 in     varchar2  default hr_api.g_varchar2
+  ,p_information9                 in     varchar2  default hr_api.g_varchar2
+  ,p_information10                in     varchar2  default hr_api.g_varchar2
+  ,p_information11                in     varchar2  default hr_api.g_varchar2
+  ,p_information12                in     varchar2  default hr_api.g_varchar2
+  ,p_information13                in     varchar2  default hr_api.g_varchar2
+  ,p_information14                in     varchar2  default hr_api.g_varchar2
+  ,p_information15                in     varchar2  default hr_api.g_varchar2
+  ,p_information16                in     varchar2  default hr_api.g_varchar2
+  ,p_information17                in     varchar2  default hr_api.g_varchar2
+  ,p_information18                in     varchar2  default hr_api.g_varchar2
+  ,p_information19                in     varchar2  default hr_api.g_varchar2
+  ,p_information20                in     varchar2  default hr_api.g_varchar2
+  ,p_information21                in     varchar2  default hr_api.g_varchar2
+  ,p_information22                in     varchar2  default hr_api.g_varchar2
+  ,p_information23                in     varchar2  default hr_api.g_varchar2
+  ,p_information24                in     varchar2  default hr_api.g_varchar2
+  ,p_information25                in     varchar2  default hr_api.g_varchar2
+  ,p_information26                in     varchar2  default hr_api.g_varchar2
+  ,p_information27                in     varchar2  default hr_api.g_varchar2
+  ,p_information28                in     varchar2  default hr_api.g_varchar2
+  ,p_information29                in     varchar2  default hr_api.g_varchar2
+  ,p_information30                in     varchar2  default hr_api.g_varchar2
+  ,p_next_navigation_item_id      in     number    default hr_api.g_number
+  ,p_previous_navigation_item_id  in     number    default hr_api.g_number
+  ) is
+--
+  l_rec   hr_itp_shd.g_rec_type;
+  l_proc  varchar2(72) := g_package||'upd';
+--
+Begin
+  hr_utility.set_location('Entering:'||l_proc, 5);
+  --
+  -- Call conversion function to turn arguments into the
+  -- l_rec structure.
+  --
+  l_rec :=
+  hr_itp_shd.convert_args
+  (p_item_property_id
+  ,p_object_version_number
+  ,p_form_item_id
+  ,p_template_item_id
+  ,p_template_item_context_id
+  ,p_alignment
+  ,p_bevel
+  ,p_case_restriction
+  ,p_enabled
+  ,p_format_mask
+  ,p_height
+  ,p_information_formula_id
+  ,p_information_param_item_id1
+  ,p_information_param_item_id2
+  ,p_information_param_item_id3
+  ,p_information_param_item_id4
+  ,p_information_param_item_id5
+  ,p_insert_allowed
+  ,p_prompt_alignment_offset
+  ,p_prompt_display_style
+  ,p_prompt_edge
+  ,p_prompt_edge_alignment
+  ,p_prompt_edge_offset
+  ,p_prompt_text_alignment
+  ,p_query_allowed
+  ,p_required
+  ,p_update_allowed
+  ,p_validation_formula_id
+  ,p_validation_param_item_id1
+  ,p_validation_param_item_id2
+  ,p_validation_param_item_id3
+  ,p_validation_param_item_id4
+  ,p_validation_param_item_id5
+  ,p_visible
+  ,p_width
+  ,p_x_position
+  ,p_y_position
+  ,p_information_category
+  ,p_information1
+  ,p_information2
+  ,p_information3
+  ,p_information4
+  ,p_information5
+  ,p_information6
+  ,p_information7
+  ,p_information8
+  ,p_information9
+  ,p_information10
+  ,p_information11
+  ,p_information12
+  ,p_information13
+  ,p_information14
+  ,p_information15
+  ,p_information16
+  ,p_information17
+  ,p_information18
+  ,p_information19
+  ,p_information20
+  ,p_information21
+  ,p_information22
+  ,p_information23
+  ,p_information24
+  ,p_information25
+  ,p_information26
+  ,p_information27
+  ,p_information28
+  ,p_information29
+  ,p_information30
+  ,p_next_navigation_item_id
+  ,p_previous_navigation_item_id
+  );
+  --
+  -- Having converted the arguments into the
+  -- plsql record structure we call the corresponding record
+  -- business process.
+  --
+  hr_itp_upd.upd
+     (p_effective_date
+     ,l_rec
+     );
+  --
+  p_object_version_number := l_rec.object_version_number;
+  hr_utility.set_location(' Leaving:'||l_proc, 10);
+End upd;
+--
+end hr_itp_upd;
+
+/

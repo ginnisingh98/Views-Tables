@@ -1,0 +1,164 @@
+--------------------------------------------------------
+--  DDL for Package PN_VAR_TEMPLATE_PKG
+--------------------------------------------------------
+
+  CREATE OR REPLACE EDITIONABLE PACKAGE "APPS"."PN_VAR_TEMPLATE_PKG" AUTHID CURRENT_USER as
+/* $Header: PNVRTEMS.pls 120.4 2006/09/14 04:09:27 pikhar noship $*/
+
+procedure INSERT_ROW (
+  X_ROWID                  in out NOCOPY VARCHAR2,
+  X_AGREEMENT_TEMPLATE_ID  in out NOCOPY NUMBER,
+  X_AGREEMENT_TEMPLATE     in VARCHAR2,
+  X_PURPOSE_CODE           in VARCHAR2,
+  X_TYPE_CODE              in VARCHAR2,
+  X_CUMULATIVE_VOL         in VARCHAR2,
+  X_INVOICE_ON             in VARCHAR2,
+  X_NEGATIVE_RENT          in VARCHAR2,
+  X_TERM_TEMPLATE_ID       in NUMBER,
+  X_ABATEMENT_AMOUNT       in NUMBER,
+  X_PRORATION_RULE         in VARCHAR2,
+  X_PERIOD_FREQ_CODE       in VARCHAR2,
+  X_USE_GL_CALENDAR        in VARCHAR2,
+  X_YEAR_START_DATE        in DATE,
+  X_GL_PERIOD_SET_NAME     in VARCHAR2,
+  X_PERIOD_TYPE            in VARCHAR2,
+  X_REPTG_FREQ_CODE        in VARCHAR2,
+  X_REPTG_DAY_OF_MONTH     in NUMBER,
+  X_REPTG_DAYS_AFTER       in NUMBER,
+  X_INVG_FREQ_CODE         in VARCHAR2,
+  X_INVG_SPREAD_CODE       in VARCHAR2,
+  X_INVG_DAY_OF_MONTH      in NUMBER,
+  X_INVG_DAYS_AFTER        in NUMBER,
+  X_COMMENTS               in VARCHAR2,
+  X_ORG_ID                 in NUMBER default NULL,
+  X_CREATION_DATE          in DATE,
+  X_CREATED_BY             in NUMBER,
+  X_LAST_UPDATE_DATE       in DATE,
+  X_LAST_UPDATED_BY        in NUMBER,
+  X_LAST_UPDATE_LOGIN      in NUMBER,
+  X_VRG_REPTG_FREQ_CODE    in VARCHAR2,
+  X_ATTRIBUTE_CATEGORY     in VARCHAR2,
+  X_ATTRIBUTE1             in VARCHAR2,
+  X_ATTRIBUTE2             in VARCHAR2,
+  X_ATTRIBUTE3             in VARCHAR2,
+  X_ATTRIBUTE4             in VARCHAR2,
+  X_ATTRIBUTE5             in VARCHAR2,
+  X_ATTRIBUTE6             in VARCHAR2,
+  X_ATTRIBUTE7             in VARCHAR2,
+  X_ATTRIBUTE8             in VARCHAR2,
+  X_ATTRIBUTE9             in VARCHAR2,
+  X_ATTRIBUTE10            in VARCHAR2,
+  X_ATTRIBUTE11            in VARCHAR2,
+  X_ATTRIBUTE12            in VARCHAR2,
+  X_ATTRIBUTE13            in VARCHAR2,
+  X_ATTRIBUTE14            in VARCHAR2,
+  X_ATTRIBUTE15            in VARCHAR2);
+
+procedure LOCK_ROW (
+  X_AGREEMENT_TEMPLATE_ID  in NUMBER,
+  X_AGREEMENT_TEMPLATE     in VARCHAR2,
+  X_PURPOSE_CODE           in VARCHAR2,
+  X_TYPE_CODE              in VARCHAR2,
+  X_CUMULATIVE_VOL         in VARCHAR2,
+  X_INVOICE_ON             in VARCHAR2,
+  X_NEGATIVE_RENT          in VARCHAR2,
+  X_TERM_TEMPLATE_ID       in NUMBER,
+  X_ABATEMENT_AMOUNT       in NUMBER,
+  X_PRORATION_RULE         in VARCHAR2,
+  X_PERIOD_FREQ_CODE       in VARCHAR2,
+  X_USE_GL_CALENDAR        in VARCHAR2,
+  X_YEAR_START_DATE        in DATE,
+  X_GL_PERIOD_SET_NAME     in VARCHAR2,
+  X_PERIOD_TYPE            in VARCHAR2,
+  X_REPTG_FREQ_CODE        in VARCHAR2,
+  X_REPTG_DAY_OF_MONTH     in NUMBER,
+  X_REPTG_DAYS_AFTER       in NUMBER,
+  X_INVG_FREQ_CODE         in VARCHAR2,
+  X_INVG_SPREAD_CODE       in VARCHAR2,
+  X_INVG_DAY_OF_MONTH      in NUMBER,
+  X_INVG_DAYS_AFTER        in NUMBER,
+  X_COMMENTS               in VARCHAR2,
+  X_VRG_REPTG_FREQ_CODE    in VARCHAR2,
+  X_ATTRIBUTE_CATEGORY     in VARCHAR2,
+  X_ATTRIBUTE1             in VARCHAR2,
+  X_ATTRIBUTE2             in VARCHAR2,
+  X_ATTRIBUTE3             in VARCHAR2,
+  X_ATTRIBUTE4             in VARCHAR2,
+  X_ATTRIBUTE5             in VARCHAR2,
+  X_ATTRIBUTE6             in VARCHAR2,
+  X_ATTRIBUTE7             in VARCHAR2,
+  X_ATTRIBUTE8             in VARCHAR2,
+  X_ATTRIBUTE9             in VARCHAR2,
+  X_ATTRIBUTE10            in VARCHAR2,
+  X_ATTRIBUTE11            in VARCHAR2,
+  X_ATTRIBUTE12            in VARCHAR2,
+  X_ATTRIBUTE13            in VARCHAR2,
+  X_ATTRIBUTE14            in VARCHAR2,
+  X_ATTRIBUTE15            in VARCHAR2
+);
+
+
+procedure UPDATE_ROW (
+  X_AGREEMENT_TEMPLATE_ID  in NUMBER,
+  X_AGREEMENT_TEMPLATE     in VARCHAR2,
+  X_PURPOSE_CODE           in VARCHAR2,
+  X_TYPE_CODE              in VARCHAR2,
+  X_CUMULATIVE_VOL         in VARCHAR2,
+  X_INVOICE_ON             in VARCHAR2,
+  X_NEGATIVE_RENT          in VARCHAR2,
+  X_TERM_TEMPLATE_ID       in NUMBER,
+  X_ABATEMENT_AMOUNT       in NUMBER,
+  X_PRORATION_RULE         in VARCHAR2,
+  X_PERIOD_FREQ_CODE       in VARCHAR2,
+  X_USE_GL_CALENDAR        in VARCHAR2,
+  X_YEAR_START_DATE        in DATE,
+  X_GL_PERIOD_SET_NAME     in VARCHAR2,
+  X_PERIOD_TYPE            in VARCHAR2,
+  X_REPTG_FREQ_CODE        in VARCHAR2,
+  X_REPTG_DAY_OF_MONTH     in NUMBER,
+  X_REPTG_DAYS_AFTER       in NUMBER,
+  X_INVG_FREQ_CODE         in VARCHAR2,
+  X_INVG_SPREAD_CODE       in VARCHAR2,
+  X_INVG_DAY_OF_MONTH      in NUMBER,
+  X_INVG_DAYS_AFTER        in NUMBER,
+  X_COMMENTS               in VARCHAR2,
+  X_LAST_UPDATE_DATE       in DATE,
+  X_LAST_UPDATED_BY        in NUMBER,
+  X_LAST_UPDATE_LOGIN      in NUMBER,
+  X_VRG_REPTG_FREQ_CODE    in VARCHAR2,
+  X_ATTRIBUTE_CATEGORY     in VARCHAR2,
+  X_ATTRIBUTE1             in VARCHAR2,
+  X_ATTRIBUTE2             in VARCHAR2,
+  X_ATTRIBUTE3             in VARCHAR2,
+  X_ATTRIBUTE4             in VARCHAR2,
+  X_ATTRIBUTE5             in VARCHAR2,
+  X_ATTRIBUTE6             in VARCHAR2,
+  X_ATTRIBUTE7             in VARCHAR2,
+  X_ATTRIBUTE8             in VARCHAR2,
+  X_ATTRIBUTE9             in VARCHAR2,
+  X_ATTRIBUTE10            in VARCHAR2,
+  X_ATTRIBUTE11            in VARCHAR2,
+  X_ATTRIBUTE12            in VARCHAR2,
+  X_ATTRIBUTE13            in VARCHAR2,
+  X_ATTRIBUTE14            in VARCHAR2,
+  X_ATTRIBUTE15            in VARCHAR2
+);
+
+
+
+
+procedure DELETE_ROW (
+  X_AGREEMENT_TEMPLATE_ID  in NUMBER
+);
+
+   PROCEDURE check_unq_vr_template (
+      x_return_status IN OUT NOCOPY   VARCHAR2
+     ,x_template_id   IN NUMBER
+     ,x_name          IN VARCHAR2
+     ,x_org_id        IN NUMBER default NULL
+   );
+
+
+END PN_VAR_TEMPLATE_PKG;
+
+/

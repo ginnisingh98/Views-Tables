@@ -1,0 +1,424 @@
+--------------------------------------------------------
+--  DDL for Package Body HZ_RELATIONSHIP_TYPES_PKG
+--------------------------------------------------------
+
+  CREATE OR REPLACE EDITIONABLE PACKAGE BODY "APPS"."HZ_RELATIONSHIP_TYPES_PKG" AS
+/*$Header: ARHRLTTB.pls 120.7 2006/01/02 10:14:48 nkanbapu noship $ */
+
+PROCEDURE Insert_Row (
+    X_RELATIONSHIP_TYPE_ID                  IN OUT NOCOPY NUMBER,
+    X_RELATIONSHIP_TYPE                     IN     VARCHAR2,
+    X_FORWARD_REL_CODE                      IN     VARCHAR2,
+    X_BACKWARD_REL_CODE                     IN     VARCHAR2,
+    X_DIRECTION_CODE                        IN     VARCHAR2,
+    X_HIERARCHICAL_FLAG                     IN     VARCHAR2,
+    X_CREATE_PARTY_FLAG                     IN     VARCHAR2,
+    X_ALLOW_RELATE_TO_SELF_FLAG             IN     VARCHAR2,
+    X_SUBJECT_TYPE                          IN     VARCHAR2,
+    X_OBJECT_TYPE                           IN     VARCHAR2,
+    X_STATUS                                IN     VARCHAR2,
+    X_ALLOW_CIRCULAR_RELATIONSHIPS          IN     VARCHAR2,
+    X_MULTIPLE_PARENT_ALLOWED               IN     VARCHAR2,
+    X_INCL_UNRELATED_ENTITIES               IN     VARCHAR2,
+    X_ROLE                                  IN     VARCHAR2,
+    X_OBJECT_VERSION_NUMBER                 IN     NUMBER,
+    X_CREATED_BY_MODULE                     IN     VARCHAR2,
+    X_APPLICATION_ID                        IN     NUMBER
+) IS
+
+    l_success                               VARCHAR2(1) := 'N';
+    l_do_not_allow_convert                  VARCHAR2(1);
+    /* Bug Fix:4176951
+    l_dummy                                 VARCHAR2(1); */
+
+BEGIN
+
+    WHILE l_success = 'N' LOOP
+    BEGIN
+        INSERT INTO HZ_RELATIONSHIP_TYPES (
+            RELATIONSHIP_TYPE_ID,
+            RELATIONSHIP_TYPE,
+            FORWARD_REL_CODE,
+            BACKWARD_REL_CODE,
+            DIRECTION_CODE,
+            HIERARCHICAL_FLAG,
+            CREATE_PARTY_FLAG,
+            ALLOW_RELATE_TO_SELF_FLAG,
+            SUBJECT_TYPE,
+            OBJECT_TYPE,
+            STATUS,
+            CREATED_BY,
+            CREATION_DATE,
+            LAST_UPDATED_BY,
+            LAST_UPDATE_DATE,
+            LAST_UPDATE_LOGIN,
+            ALLOW_CIRCULAR_RELATIONSHIPS,
+            MULTIPLE_PARENT_ALLOWED,
+            INCL_UNRELATED_ENTITIES,
+            ROLE,
+            OBJECT_VERSION_NUMBER,
+            CREATED_BY_MODULE,
+            APPLICATION_ID
+                    )
+        VALUES (
+            DECODE( X_RELATIONSHIP_TYPE_ID, FND_API.G_MISS_NUM, HZ_RELATIONSHIP_TYPES_S.NEXTVAL, NULL, HZ_RELATIONSHIP_TYPES_S.NEXTVAL, X_RELATIONSHIP_TYPE_ID ),
+            DECODE( X_RELATIONSHIP_TYPE, FND_API.G_MISS_CHAR, NULL, X_RELATIONSHIP_TYPE ),
+            DECODE( X_FORWARD_REL_CODE, FND_API.G_MISS_CHAR, NULL, X_FORWARD_REL_CODE ),
+            DECODE( X_BACKWARD_REL_CODE, FND_API.G_MISS_CHAR, NULL, X_BACKWARD_REL_CODE ),
+            DECODE( X_DIRECTION_CODE, FND_API.G_MISS_CHAR, NULL, X_DIRECTION_CODE ),
+            DECODE( X_HIERARCHICAL_FLAG, FND_API.G_MISS_CHAR, 'N', NULL, 'N', X_HIERARCHICAL_FLAG ),
+            DECODE( X_CREATE_PARTY_FLAG, FND_API.G_MISS_CHAR, 'N', NULL, 'N', X_CREATE_PARTY_FLAG ),
+            DECODE( X_ALLOW_RELATE_TO_SELF_FLAG, FND_API.G_MISS_CHAR, 'N', NULL, 'N', X_ALLOW_RELATE_TO_SELF_FLAG ),
+            DECODE( X_SUBJECT_TYPE, FND_API.G_MISS_CHAR, NULL, X_SUBJECT_TYPE ),
+            DECODE( X_OBJECT_TYPE, FND_API.G_MISS_CHAR, NULL, X_OBJECT_TYPE ),
+            DECODE( X_STATUS, FND_API.G_MISS_CHAR, 'A', NULL, 'A', X_STATUS ),
+            HZ_UTILITY_V2PUB.CREATED_BY,
+            HZ_UTILITY_V2PUB.CREATION_DATE,
+            HZ_UTILITY_V2PUB.LAST_UPDATED_BY,
+            HZ_UTILITY_V2PUB.LAST_UPDATE_DATE,
+            HZ_UTILITY_V2PUB.LAST_UPDATE_LOGIN,
+            DECODE( X_ALLOW_CIRCULAR_RELATIONSHIPS, FND_API.G_MISS_CHAR, 'Y', NULL, 'Y', X_ALLOW_CIRCULAR_RELATIONSHIPS ),
+            DECODE( X_MULTIPLE_PARENT_ALLOWED, FND_API.G_MISS_CHAR, 'N', NULL, 'N', X_MULTIPLE_PARENT_ALLOWED ),
+            DECODE( X_INCL_UNRELATED_ENTITIES, FND_API.G_MISS_CHAR, 'N', NULL, 'N', X_INCL_UNRELATED_ENTITIES ),
+            DECODE( X_ROLE,FND_API.G_MISS_CHAR,'USER_ROLE_'||TO_CHAR(HZ_RELATIONSHIP_TYPES_S.CURRVAL),NULL,'USER_ROLE_'||TO_CHAR(HZ_RELATIONSHIP_TYPES_S.CURRVAL),X_ROLE),
+            DECODE( X_OBJECT_VERSION_NUMBER, FND_API.G_MISS_NUM, NULL, X_OBJECT_VERSION_NUMBER ),
+            DECODE( X_CREATED_BY_MODULE, FND_API.G_MISS_CHAR, NULL, X_CREATED_BY_MODULE ),
+            DECODE( X_APPLICATION_ID, FND_API.G_MISS_NUM, NULL, X_APPLICATION_ID )
+        ) RETURNING
+            RELATIONSHIP_TYPE_ID
+        INTO
+            X_RELATIONSHIP_TYPE_ID;
+
+        -- Bug 3615905: added DO_NOT_ALLOW_CONVERT
+        --
+        l_do_not_allow_convert := 'N';
+
+        IF X_HIERARCHICAL_FLAG = 'Y' THEN
+          l_do_not_allow_convert := 'Y';
+        ELSE
+            BEGIN
+              /* Bug Fix:4176951 */
+              SELECT 'Y' INTO l_do_not_allow_convert
+              FROM   dual
+              WHERE  EXISTS (
+                SELECT 'Y'
+                FROM   hz_relationship_types
+                WHERE  relationship_type = X_RELATIONSHIP_TYPE
+                AND    ( direction_code = 'N' OR
+                         do_not_allow_convert = 'Y'));
+
+            EXCEPTION
+              WHEN NO_DATA_FOUND THEN
+                l_do_not_allow_convert := 'N';
+
+          END;
+
+        END IF;
+
+        UPDATE hz_relationship_types
+        SET    do_not_allow_convert = l_do_not_allow_convert
+        WHERE  relationship_type = X_RELATIONSHIP_TYPE;
+
+        l_success := 'Y';
+
+    EXCEPTION
+        WHEN DUP_VAL_ON_INDEX THEN
+            IF INSTRB( SQLERRM, 'HZ_RELATIONSHIP_TYPES_U1' ) <> 0 OR
+               INSTRB( SQLERRM, 'HZ_RELATIONSHIP_TYPES_PK' ) <> 0
+            THEN
+            DECLARE
+                l_count             NUMBER;
+                l_dummy             VARCHAR2(1);
+            BEGIN
+                l_count := 1;
+                WHILE l_count > 0 LOOP
+                    SELECT HZ_RELATIONSHIP_TYPES_S.NEXTVAL
+                    INTO X_RELATIONSHIP_TYPE_ID FROM dual;
+                    BEGIN
+                        SELECT 'Y' INTO l_dummy
+                        FROM HZ_RELATIONSHIP_TYPES
+                        WHERE RELATIONSHIP_TYPE_ID = X_RELATIONSHIP_TYPE_ID;
+                        l_count := 1;
+                    EXCEPTION
+                        WHEN NO_DATA_FOUND THEN
+                            l_count := 0;
+                    END;
+                END LOOP;
+            END;
+            ELSE
+                RAISE;
+            END IF;
+
+    END;
+    END LOOP;
+
+END Insert_Row;
+
+PROCEDURE Update_Row (
+    X_Rowid                                 IN OUT NOCOPY VARCHAR2,
+    X_RELATIONSHIP_TYPE_ID                  IN     NUMBER,
+    X_RELATIONSHIP_TYPE                     IN     VARCHAR2,
+    X_FORWARD_REL_CODE                      IN     VARCHAR2,
+    X_BACKWARD_REL_CODE                     IN     VARCHAR2,
+    X_DIRECTION_CODE                        IN     VARCHAR2,
+    X_HIERARCHICAL_FLAG                     IN     VARCHAR2,
+    X_CREATE_PARTY_FLAG                     IN     VARCHAR2,
+    X_ALLOW_RELATE_TO_SELF_FLAG             IN     VARCHAR2,
+    X_SUBJECT_TYPE                          IN     VARCHAR2,
+    X_OBJECT_TYPE                           IN     VARCHAR2,
+    X_STATUS                                IN     VARCHAR2,
+    X_ALLOW_CIRCULAR_RELATIONSHIPS          IN     VARCHAR2,
+    X_MULTIPLE_PARENT_ALLOWED               IN     VARCHAR2,
+    X_INCL_UNRELATED_ENTITIES               IN     VARCHAR2,
+    X_ROLE                                  IN     VARCHAR2,
+    X_OBJECT_VERSION_NUMBER                 IN     NUMBER,
+    X_CREATED_BY_MODULE                     IN     VARCHAR2,
+    X_APPLICATION_ID                        IN     NUMBER
+) IS
+
+BEGIN
+
+    UPDATE HZ_RELATIONSHIP_TYPES SET
+        RELATIONSHIP_TYPE_ID = DECODE( X_RELATIONSHIP_TYPE_ID, NULL, RELATIONSHIP_TYPE_ID, FND_API.G_MISS_NUM, NULL, X_RELATIONSHIP_TYPE_ID ),
+        RELATIONSHIP_TYPE = DECODE( X_RELATIONSHIP_TYPE, NULL, RELATIONSHIP_TYPE, FND_API.G_MISS_CHAR, NULL, X_RELATIONSHIP_TYPE ),
+        FORWARD_REL_CODE = DECODE( X_FORWARD_REL_CODE, NULL, FORWARD_REL_CODE, FND_API.G_MISS_CHAR, NULL, X_FORWARD_REL_CODE ),
+        BACKWARD_REL_CODE = DECODE( X_BACKWARD_REL_CODE, NULL, BACKWARD_REL_CODE, FND_API.G_MISS_CHAR, NULL, X_BACKWARD_REL_CODE ),
+        DIRECTION_CODE = DECODE( X_DIRECTION_CODE, NULL, DIRECTION_CODE, FND_API.G_MISS_CHAR, NULL, X_DIRECTION_CODE ),
+        HIERARCHICAL_FLAG = DECODE( X_HIERARCHICAL_FLAG, NULL, HIERARCHICAL_FLAG, FND_API.G_MISS_CHAR, 'N', X_HIERARCHICAL_FLAG ),
+        CREATE_PARTY_FLAG = DECODE( X_CREATE_PARTY_FLAG, NULL, CREATE_PARTY_FLAG, FND_API.G_MISS_CHAR, 'N', X_CREATE_PARTY_FLAG ),
+        ALLOW_RELATE_TO_SELF_FLAG = DECODE( X_ALLOW_RELATE_TO_SELF_FLAG, NULL, ALLOW_RELATE_TO_SELF_FLAG, FND_API.G_MISS_CHAR, 'N', X_ALLOW_RELATE_TO_SELF_FLAG ),
+        SUBJECT_TYPE = DECODE( X_SUBJECT_TYPE, NULL, SUBJECT_TYPE, FND_API.G_MISS_CHAR, NULL, X_SUBJECT_TYPE ),
+        OBJECT_TYPE = DECODE( X_OBJECT_TYPE, NULL, OBJECT_TYPE, FND_API.G_MISS_CHAR, NULL, X_OBJECT_TYPE ),
+        STATUS = DECODE( X_STATUS, NULL, STATUS, FND_API.G_MISS_CHAR, 'A', X_STATUS ),
+        CREATED_BY = CREATED_BY,
+        CREATION_DATE = CREATION_DATE,
+        LAST_UPDATED_BY = HZ_UTILITY_V2PUB.LAST_UPDATED_BY,
+        LAST_UPDATE_DATE = HZ_UTILITY_V2PUB.LAST_UPDATE_DATE,
+        LAST_UPDATE_LOGIN = HZ_UTILITY_V2PUB.LAST_UPDATE_LOGIN,
+        ALLOW_CIRCULAR_RELATIONSHIPS = DECODE( X_ALLOW_CIRCULAR_RELATIONSHIPS, NULL, ALLOW_CIRCULAR_RELATIONSHIPS, FND_API.G_MISS_CHAR, 'Y', X_ALLOW_CIRCULAR_RELATIONSHIPS ),
+        MULTIPLE_PARENT_ALLOWED = DECODE( X_MULTIPLE_PARENT_ALLOWED, NULL, MULTIPLE_PARENT_ALLOWED, FND_API.G_MISS_CHAR, NULL, X_MULTIPLE_PARENT_ALLOWED ),
+        INCL_UNRELATED_ENTITIES = DECODE( X_INCL_UNRELATED_ENTITIES, NULL, INCL_UNRELATED_ENTITIES, FND_API.G_MISS_CHAR, NULL, X_INCL_UNRELATED_ENTITIES ),
+        ROLE = DECODE( X_ROLE, NULL, ROLE, FND_API.G_MISS_CHAR, NULL, X_ROLE ),
+        OBJECT_VERSION_NUMBER = DECODE( X_OBJECT_VERSION_NUMBER, NULL, OBJECT_VERSION_NUMBER, FND_API.G_MISS_NUM, NULL, X_OBJECT_VERSION_NUMBER ),
+        CREATED_BY_MODULE = DECODE( X_CREATED_BY_MODULE, NULL, CREATED_BY_MODULE, FND_API.G_MISS_CHAR, NULL, X_CREATED_BY_MODULE ),
+        APPLICATION_ID = DECODE( X_APPLICATION_ID, NULL, APPLICATION_ID, FND_API.G_MISS_NUM, NULL, X_APPLICATION_ID )
+    WHERE ROWID = X_RowId;
+
+    IF ( SQL%NOTFOUND ) THEN
+        RAISE NO_DATA_FOUND;
+    END IF;
+
+END Update_Row;
+
+PROCEDURE Lock_Row (
+    X_Rowid                                 IN OUT NOCOPY VARCHAR2,
+    X_RELATIONSHIP_TYPE_ID                  IN     NUMBER,
+    X_RELATIONSHIP_TYPE                     IN     VARCHAR2,
+    X_FORWARD_REL_CODE                      IN     VARCHAR2,
+    X_BACKWARD_REL_CODE                     IN     VARCHAR2,
+    X_DIRECTION_CODE                        IN     VARCHAR2,
+    X_HIERARCHICAL_FLAG                     IN     VARCHAR2,
+    X_CREATE_PARTY_FLAG                     IN     VARCHAR2,
+    X_ALLOW_RELATE_TO_SELF_FLAG             IN     VARCHAR2,
+    X_SUBJECT_TYPE                          IN     VARCHAR2,
+    X_OBJECT_TYPE                           IN     VARCHAR2,
+    X_STATUS                                IN     VARCHAR2,
+    X_CREATED_BY                            IN     NUMBER,
+    X_CREATION_DATE                         IN     DATE,
+    X_LAST_UPDATED_BY                       IN     NUMBER,
+    X_LAST_UPDATE_DATE                      IN     DATE,
+    X_LAST_UPDATE_LOGIN                     IN     NUMBER,
+    X_ALLOW_CIRCULAR_RELATIONSHIPS          IN     VARCHAR2,
+    X_MULTIPLE_PARENT_ALLOWED               IN     VARCHAR2,
+    X_INCL_UNRELATED_ENTITIES               IN     VARCHAR2,
+    X_ROLE                                  IN     VARCHAR2,
+    X_OBJECT_VERSION_NUMBER                 IN     NUMBER,
+    X_CREATED_BY_MODULE                     IN     VARCHAR2,
+    X_APPLICATION_ID                        IN     NUMBER
+) IS
+
+    CURSOR C IS
+        SELECT * FROM HZ_RELATIONSHIP_TYPES
+        WHERE  ROWID = x_Rowid
+        FOR UPDATE NOWAIT;
+    Recinfo C%ROWTYPE;
+
+BEGIN
+
+    OPEN C;
+    FETCH C INTO Recinfo;
+    IF ( C%NOTFOUND ) THEN
+        CLOSE C;
+        FND_MESSAGE.SET_NAME('FND', 'FORM_RECORD_DELETED');
+        APP_EXCEPTION.RAISE_EXCEPTION;
+    END IF;
+    CLOSE C;
+
+    IF (
+        ( ( Recinfo.RELATIONSHIP_TYPE_ID = X_RELATIONSHIP_TYPE_ID )
+        OR ( ( Recinfo.RELATIONSHIP_TYPE_ID IS NULL )
+            AND (  X_RELATIONSHIP_TYPE_ID IS NULL ) ) )
+    AND ( ( Recinfo.RELATIONSHIP_TYPE = X_RELATIONSHIP_TYPE )
+        OR ( ( Recinfo.RELATIONSHIP_TYPE IS NULL )
+            AND (  X_RELATIONSHIP_TYPE IS NULL ) ) )
+    AND ( ( Recinfo.FORWARD_REL_CODE = X_FORWARD_REL_CODE )
+        OR ( ( Recinfo.FORWARD_REL_CODE IS NULL )
+            AND (  X_FORWARD_REL_CODE IS NULL ) ) )
+    AND ( ( Recinfo.BACKWARD_REL_CODE = X_BACKWARD_REL_CODE )
+        OR ( ( Recinfo.BACKWARD_REL_CODE IS NULL )
+            AND (  X_BACKWARD_REL_CODE IS NULL ) ) )
+    AND ( ( Recinfo.DIRECTION_CODE = X_DIRECTION_CODE )
+        OR ( ( Recinfo.DIRECTION_CODE IS NULL )
+            AND (  X_DIRECTION_CODE IS NULL ) ) )
+    AND ( ( Recinfo.HIERARCHICAL_FLAG = X_HIERARCHICAL_FLAG )
+        OR ( ( Recinfo.HIERARCHICAL_FLAG IS NULL )
+            AND (  X_HIERARCHICAL_FLAG IS NULL ) ) )
+    AND ( ( Recinfo.CREATE_PARTY_FLAG = X_CREATE_PARTY_FLAG )
+        OR ( ( Recinfo.CREATE_PARTY_FLAG IS NULL )
+            AND (  X_CREATE_PARTY_FLAG IS NULL ) ) )
+    AND ( ( Recinfo.ALLOW_RELATE_TO_SELF_FLAG = X_ALLOW_RELATE_TO_SELF_FLAG )
+        OR ( ( Recinfo.ALLOW_RELATE_TO_SELF_FLAG IS NULL )
+            AND (  X_ALLOW_RELATE_TO_SELF_FLAG IS NULL ) ) )
+    AND ( ( Recinfo.SUBJECT_TYPE = X_SUBJECT_TYPE )
+        OR ( ( Recinfo.SUBJECT_TYPE IS NULL )
+            AND (  X_SUBJECT_TYPE IS NULL ) ) )
+    AND ( ( Recinfo.OBJECT_TYPE = X_OBJECT_TYPE )
+        OR ( ( Recinfo.OBJECT_TYPE IS NULL )
+            AND (  X_OBJECT_TYPE IS NULL ) ) )
+    AND ( ( Recinfo.STATUS = X_STATUS )
+        OR ( ( Recinfo.STATUS IS NULL )
+            AND (  X_STATUS IS NULL ) ) )
+    AND ( ( Recinfo.CREATED_BY = X_CREATED_BY )
+        OR ( ( Recinfo.CREATED_BY IS NULL )
+            AND (  X_CREATED_BY IS NULL ) ) )
+    AND ( ( Recinfo.CREATION_DATE = X_CREATION_DATE )
+        OR ( ( Recinfo.CREATION_DATE IS NULL )
+            AND (  X_CREATION_DATE IS NULL ) ) )
+    AND ( ( Recinfo.LAST_UPDATED_BY = X_LAST_UPDATED_BY )
+        OR ( ( Recinfo.LAST_UPDATED_BY IS NULL )
+            AND (  X_LAST_UPDATED_BY IS NULL ) ) )
+    AND ( ( Recinfo.LAST_UPDATE_DATE = X_LAST_UPDATE_DATE )
+        OR ( ( Recinfo.LAST_UPDATE_DATE IS NULL )
+            AND (  X_LAST_UPDATE_DATE IS NULL ) ) )
+    AND ( ( Recinfo.LAST_UPDATE_LOGIN = X_LAST_UPDATE_LOGIN )
+        OR ( ( Recinfo.LAST_UPDATE_LOGIN IS NULL )
+            AND (  X_LAST_UPDATE_LOGIN IS NULL ) ) )
+    AND ( ( Recinfo.ALLOW_CIRCULAR_RELATIONSHIPS = X_ALLOW_CIRCULAR_RELATIONSHIPS )
+        OR ( ( Recinfo.ALLOW_CIRCULAR_RELATIONSHIPS IS NULL )
+            AND (  X_ALLOW_CIRCULAR_RELATIONSHIPS IS NULL ) ) )
+    AND ( ( Recinfo.MULTIPLE_PARENT_ALLOWED = X_MULTIPLE_PARENT_ALLOWED )
+        OR ( ( Recinfo.MULTIPLE_PARENT_ALLOWED IS NULL )
+            AND (  X_MULTIPLE_PARENT_ALLOWED IS NULL ) ) )
+    AND ( ( Recinfo.INCL_UNRELATED_ENTITIES = X_INCL_UNRELATED_ENTITIES )
+        OR ( ( Recinfo.INCL_UNRELATED_ENTITIES IS NULL )
+            AND (  X_INCL_UNRELATED_ENTITIES IS NULL ) ) )
+    AND ( ( Recinfo.OBJECT_VERSION_NUMBER = X_OBJECT_VERSION_NUMBER )
+        OR ( ( Recinfo.OBJECT_VERSION_NUMBER IS NULL )
+            AND (  X_OBJECT_VERSION_NUMBER IS NULL ) ) )
+    AND ( ( Recinfo.ROLE = X_ROLE )
+        OR ( ( Recinfo.ROLE IS NULL )
+            AND (  X_ROLE IS NULL ) ) )
+    AND ( ( Recinfo.CREATED_BY_MODULE = X_CREATED_BY_MODULE )
+        OR ( ( Recinfo.CREATED_BY_MODULE IS NULL )
+            AND (  X_CREATED_BY_MODULE IS NULL ) ) )
+    AND ( ( Recinfo.APPLICATION_ID = X_APPLICATION_ID )
+        OR ( ( Recinfo.APPLICATION_ID IS NULL )
+            AND (  X_APPLICATION_ID IS NULL ) ) )
+    ) THEN
+        RETURN;
+    ELSE
+        FND_MESSAGE.SET_NAME('FND', 'FORM_RECORD_DELETED');
+        APP_EXCEPTION.RAISE_EXCEPTION;
+    END IF;
+
+END Lock_Row;
+
+PROCEDURE Select_Row (
+    X_RELATIONSHIP_TYPE_ID                  IN OUT NOCOPY NUMBER,
+    X_RELATIONSHIP_TYPE                     OUT NOCOPY    VARCHAR2,
+    X_FORWARD_REL_CODE                      OUT NOCOPY    VARCHAR2,
+    X_BACKWARD_REL_CODE                     OUT NOCOPY    VARCHAR2,
+    X_DIRECTION_CODE                        OUT NOCOPY    VARCHAR2,
+    X_HIERARCHICAL_FLAG                     OUT NOCOPY    VARCHAR2,
+    X_CREATE_PARTY_FLAG                     OUT NOCOPY    VARCHAR2,
+    X_ALLOW_RELATE_TO_SELF_FLAG             OUT NOCOPY    VARCHAR2,
+    X_SUBJECT_TYPE                          OUT NOCOPY    VARCHAR2,
+    X_OBJECT_TYPE                           OUT NOCOPY    VARCHAR2,
+    X_STATUS                                OUT NOCOPY    VARCHAR2,
+    X_ALLOW_CIRCULAR_RELATIONSHIPS          OUT NOCOPY    VARCHAR2,
+    X_MULTIPLE_PARENT_ALLOWED               OUT NOCOPY    VARCHAR2,
+    X_INCL_UNRELATED_ENTITIES               OUT NOCOPY    VARCHAR2,
+    X_ROLE                                  OUT NOCOPY    VARCHAR2,
+    X_CREATED_BY_MODULE                     OUT NOCOPY    VARCHAR2,
+    X_APPLICATION_ID                        OUT NOCOPY    NUMBER
+) IS
+
+BEGIN
+
+    SELECT
+        NVL( RELATIONSHIP_TYPE_ID, FND_API.G_MISS_NUM ),
+        NVL( RELATIONSHIP_TYPE, FND_API.G_MISS_CHAR ),
+        NVL( FORWARD_REL_CODE, FND_API.G_MISS_CHAR ),
+        NVL( BACKWARD_REL_CODE, FND_API.G_MISS_CHAR ),
+        NVL( DIRECTION_CODE, FND_API.G_MISS_CHAR ),
+        NVL( HIERARCHICAL_FLAG, FND_API.G_MISS_CHAR ),
+        NVL( CREATE_PARTY_FLAG, FND_API.G_MISS_CHAR ),
+        NVL( ALLOW_RELATE_TO_SELF_FLAG, FND_API.G_MISS_CHAR ),
+        NVL( SUBJECT_TYPE, FND_API.G_MISS_CHAR ),
+        NVL( OBJECT_TYPE, FND_API.G_MISS_CHAR ),
+        NVL( STATUS, FND_API.G_MISS_CHAR ),
+        NVL( ALLOW_CIRCULAR_RELATIONSHIPS, FND_API.G_MISS_CHAR ),
+        NVL( MULTIPLE_PARENT_ALLOWED, FND_API.G_MISS_CHAR ),
+        NVL( INCL_UNRELATED_ENTITIES, FND_API.G_MISS_CHAR ),
+        NVL(ROLE,FND_API.G_MISS_CHAR),
+        NVL( CREATED_BY_MODULE, FND_API.G_MISS_CHAR ),
+        NVL( APPLICATION_ID, FND_API.G_MISS_NUM )
+    INTO
+        X_RELATIONSHIP_TYPE_ID,
+        X_RELATIONSHIP_TYPE,
+        X_FORWARD_REL_CODE,
+        X_BACKWARD_REL_CODE,
+        X_DIRECTION_CODE,
+        X_HIERARCHICAL_FLAG,
+        X_CREATE_PARTY_FLAG,
+        X_ALLOW_RELATE_TO_SELF_FLAG,
+        X_SUBJECT_TYPE,
+        X_OBJECT_TYPE,
+        X_STATUS,
+        X_ALLOW_CIRCULAR_RELATIONSHIPS,
+        X_MULTIPLE_PARENT_ALLOWED,
+        X_INCL_UNRELATED_ENTITIES,
+        X_ROLE,
+        X_CREATED_BY_MODULE,
+        X_APPLICATION_ID
+    FROM HZ_RELATIONSHIP_TYPES
+    WHERE RELATIONSHIP_TYPE_ID = X_RELATIONSHIP_TYPE_ID;
+
+EXCEPTION
+    WHEN NO_DATA_FOUND THEN
+        FND_MESSAGE.SET_NAME( 'AR', 'HZ_API_NO_RECORD' );
+        FND_MESSAGE.SET_TOKEN( 'RECORD', 'relationship type');
+        FND_MESSAGE.SET_TOKEN( 'VALUE', TO_CHAR( X_RELATIONSHIP_TYPE_ID ) );
+        FND_MSG_PUB.ADD;
+        RAISE FND_API.G_EXC_ERROR;
+
+END Select_Row;
+
+PROCEDURE Delete_Row (
+    X_RELATIONSHIP_TYPE_ID                  IN     NUMBER
+) IS
+
+BEGIN
+
+    DELETE FROM HZ_RELATIONSHIP_TYPES
+    WHERE RELATIONSHIP_TYPE_ID = X_RELATIONSHIP_TYPE_ID;
+
+    IF ( SQL%NOTFOUND ) THEN
+        RAISE NO_DATA_FOUND;
+    END IF;
+
+END Delete_Row;
+
+END HZ_RELATIONSHIP_TYPES_PKG;
+
+/

@@ -1,0 +1,19 @@
+--------------------------------------------------------
+--  DDL for Package Body CE_CEFTMPLT_XMLP_PKG
+--------------------------------------------------------
+
+  CREATE OR REPLACE EDITIONABLE PACKAGE BODY "APPS"."CE_CEFTMPLT_XMLP_PKG" AS
+/* $Header: CEFTMPLTB.pls 120.0 2007/12/28 07:50:31 abraghun noship $ */
+  FUNCTION BEFOREREPORT RETURN BOOLEAN IS
+  BEGIN
+    P_CONC_REQUEST_ID := FND_GLOBAL.CONC_REQUEST_ID;
+    RETURN (TRUE);
+  END BEFOREREPORT;
+  FUNCTION AFTERREPORT RETURN BOOLEAN IS
+  BEGIN
+    RETURN (TRUE);
+  END AFTERREPORT;
+END CE_CEFTMPLT_XMLP_PKG;
+
+
+/

@@ -1,0 +1,654 @@
+--------------------------------------------------------
+--  DDL for Package Body CSI_CTR_READING_INTERFACE_PKG
+--------------------------------------------------------
+
+  CREATE OR REPLACE EDITIONABLE PACKAGE BODY "APPS"."CSI_CTR_READING_INTERFACE_PKG" as
+/* $Header: csitcrib.pls 120.0 2005/06/09 21:38:04 epajaril noship $*/
+
+G_PKG_NAME CONSTANT VARCHAR2(30)  := 'CSI_CTR_READING_INTERFACE_PKG';
+G_FILE_NAME CONSTANT VARCHAR2(12) := 'csitcrib.pls';
+
+PROCEDURE insert_row(
+	 px_COUNTER_INTERFACE_ID               IN OUT NOCOPY NUMBER
+	,p_PARALLEL_WORKER_ID                  NUMBER
+	,p_BATCH_NAME                          VARCHAR2
+	,p_SOURCE_TRANSACTION_DATE             DATE
+	,p_PROCESS_STATUS                      VARCHAR2
+        ,p_ERROR_TEXT                          VARCHAR2
+	,px_COUNTER_VALUE_ID                   IN OUT NOCOPY NUMBER
+	,p_COUNTER_ID                          NUMBER
+	,p_VALUE_TIMESTAMP                     DATE
+	,p_COUNTER_READING                     NUMBER
+	,p_RESET_MODE                          VARCHAR2
+	,p_RESET_REASON                        VARCHAR2
+	,p_ADJUSTMENT_TYPE                     VARCHAR2
+	,p_ADJUSTMENT_READING                  NUMBER
+	,p_OBJECT_VERSION_NUMBER               NUMBER
+	,p_LAST_UPDATE_DATE                    DATE
+	,p_LAST_UPDATED_BY                     NUMBER
+	,p_CREATION_DATE                       DATE
+	,p_CREATED_BY                          NUMBER
+	,p_LAST_UPDATE_LOGIN                   NUMBER
+	,p_ATTRIBUTE1                          VARCHAR2
+	,p_ATTRIBUTE2                          VARCHAR2
+	,p_ATTRIBUTE3                          VARCHAR2
+	,p_ATTRIBUTE4                          VARCHAR2
+	,p_ATTRIBUTE5                          VARCHAR2
+	,p_ATTRIBUTE6                          VARCHAR2
+	,p_ATTRIBUTE7                          VARCHAR2
+	,p_ATTRIBUTE8                          VARCHAR2
+	,p_ATTRIBUTE9                          VARCHAR2
+	,p_ATTRIBUTE10                         VARCHAR2
+	,p_ATTRIBUTE11                         VARCHAR2
+	,p_ATTRIBUTE12                         VARCHAR2
+	,p_ATTRIBUTE13                         VARCHAR2
+	,p_ATTRIBUTE14                         VARCHAR2
+	,p_ATTRIBUTE15                         VARCHAR2
+        ,p_ATTRIBUTE16                         VARCHAR2
+        ,p_ATTRIBUTE17                         VARCHAR2
+        ,p_ATTRIBUTE18                         VARCHAR2
+        ,p_ATTRIBUTE19                         VARCHAR2
+        ,p_ATTRIBUTE20                         VARCHAR2
+        ,p_ATTRIBUTE21                         VARCHAR2
+        ,p_ATTRIBUTE22                         VARCHAR2
+        ,p_ATTRIBUTE23                         VARCHAR2
+        ,p_ATTRIBUTE24                         VARCHAR2
+        ,p_ATTRIBUTE25                         VARCHAR2
+        ,p_ATTRIBUTE26                         VARCHAR2
+        ,p_ATTRIBUTE27                         VARCHAR2
+        ,p_ATTRIBUTE28                         VARCHAR2
+        ,p_ATTRIBUTE29                         VARCHAR2
+        ,p_ATTRIBUTE30                         VARCHAR2
+	,p_ATTRIBUTE_CATEGORY                  VARCHAR2
+	,p_DISABLED_FLAG                       VARCHAR2
+	,p_COMMENTS                            VARCHAR2
+	,p_SOURCE_TRANSACTION_TYPE_ID          NUMBER
+	,p_SOURCE_TRANSACTION_ID               NUMBER
+	,p_SOURCE_CODE                         VARCHAR2
+	,p_SOURCE_LINE_ID                      NUMBER
+	,p_COUNTER_NAME                        VARCHAR2
+        ,p_AUTOMATIC_ROLLOVER_FLAG             VARCHAR2
+        ,p_INCLUDE_TARGET_RESETS               VARCHAR2
+        ,p_RESET_COUNTER_READING               NUMBER
+        ,p_NET_READING                         NUMBER
+        ,p_LIFE_TO_DATE_READING                NUMBER
+        ,p_SOURCE_COUNTER_VALUE_ID             NUMBER
+) IS
+
+   CURSOR C1 IS
+   SELECT CSI_CTR_READINGS_INTERFACE_S.nextval
+   FROM   dual;
+
+   CURSOR C2 IS
+   SELECT CSI_COUNTER_READINGS_S.nextval
+   FROM   dual;
+BEGIN
+   IF (px_COUNTER_INTERFACE_ID IS NULL) OR (px_COUNTER_INTERFACE_ID = FND_API.G_MISS_NUM) then
+      OPEN C1;
+      FETCH C1 INTO px_COUNTER_INTERFACE_ID;
+      CLOSE C1;
+   END IF;
+
+   IF (px_COUNTER_VALUE_ID IS NULL) OR (px_COUNTER_VALUE_ID = FND_API.G_MISS_NUM) then
+      OPEN c2;
+      FETCH c2 INTO px_COUNTER_VALUE_ID;
+      CLOSE c2;
+   END IF;
+
+   INSERT INTO CSI_CTR_READINGS_INTERFACE(
+	 COUNTER_INTERFACE_ID
+	,PARALLEL_WORKER_ID
+	,BATCH_NAME
+	,SOURCE_TRANSACTION_DATE
+	,PROCESS_STATUS
+        ,ERROR_TEXT
+	,COUNTER_VALUE_ID
+	,COUNTER_ID
+	,VALUE_TIMESTAMP
+	,COUNTER_READING
+	,RESET_MODE
+	,RESET_REASON
+	,ADJUSTMENT_TYPE
+	,ADJUSTMENT_READING
+	,OBJECT_VERSION_NUMBER
+	,LAST_UPDATE_DATE
+	,LAST_UPDATED_BY
+	,CREATION_DATE
+	,CREATED_BY
+	,LAST_UPDATE_LOGIN
+	,ATTRIBUTE1
+	,ATTRIBUTE2
+	,ATTRIBUTE3
+	,ATTRIBUTE4
+	,ATTRIBUTE5
+	,ATTRIBUTE6
+	,ATTRIBUTE7
+	,ATTRIBUTE8
+	,ATTRIBUTE9
+	,ATTRIBUTE10
+	,ATTRIBUTE11
+	,ATTRIBUTE12
+	,ATTRIBUTE13
+	,ATTRIBUTE14
+	,ATTRIBUTE15
+        ,ATTRIBUTE16
+        ,ATTRIBUTE17
+        ,ATTRIBUTE18
+        ,ATTRIBUTE19
+        ,ATTRIBUTE20
+        ,ATTRIBUTE21
+        ,ATTRIBUTE22
+        ,ATTRIBUTE23
+        ,ATTRIBUTE24
+        ,ATTRIBUTE25
+        ,ATTRIBUTE26
+        ,ATTRIBUTE27
+        ,ATTRIBUTE28
+        ,ATTRIBUTE29
+        ,ATTRIBUTE30
+	,ATTRIBUTE_CATEGORY
+	,DISABLED_FLAG
+	,COMMENTS
+	,SOURCE_TRANSACTION_TYPE_ID
+	,SOURCE_TRANSACTION_ID
+	,SOURCE_CODE
+	,SOURCE_LINE_ID
+	,COUNTER_NAME
+	,AUTOMATIC_ROLLOVER_FLAG
+	,INCLUDE_TARGET_RESETS
+	,RESET_COUNTER_READING
+        ,NET_READING
+        ,LIFE_TO_DATE_READING
+        ,SOURCE_COUNTER_VALUE_ID
+        )
+    VALUES
+        (px_COUNTER_INTERFACE_ID
+	,decode(p_PARALLEL_WORKER_ID, FND_API.G_MISS_NUM, NULL,p_PARALLEL_WORKER_ID)
+	,decode(p_BATCH_NAME, FND_API.G_MISS_CHAR, NULL,p_BATCH_NAME)
+	,decode(p_SOURCE_TRANSACTION_DATE, FND_API.G_MISS_DATE, TO_DATE(NULL),p_SOURCE_TRANSACTION_DATE)
+	,decode(p_PROCESS_STATUS, FND_API.G_MISS_CHAR, NULL,p_PROCESS_STATUS)
+        ,decode(p_ERROR_TEXT, FND_API.G_MISS_CHAR, NULL, p_ERROR_TEXT)
+	,px_COUNTER_VALUE_ID
+	,decode(p_COUNTER_ID, FND_API.G_MISS_NUM, NULL, p_COUNTER_ID)
+	,decode(p_VALUE_TIMESTAMP, FND_API.G_MISS_DATE, TO_DATE(NULL),p_VALUE_TIMESTAMP)
+	,decode(p_COUNTER_READING, FND_API.G_MISS_NUM, NULL,p_COUNTER_READING)
+	,decode(p_RESET_MODE, FND_API.G_MISS_CHAR, NULL,p_RESET_MODE)
+	,decode(p_RESET_REASON, FND_API.G_MISS_CHAR, NULL,p_RESET_REASON)
+	,decode(p_ADJUSTMENT_TYPE, FND_API.G_MISS_CHAR, NULL,p_ADJUSTMENT_TYPE)
+	,decode(p_ADJUSTMENT_READING, FND_API.G_MISS_NUM, NULL,p_ADJUSTMENT_READING)
+	,decode(p_OBJECT_VERSION_NUMBER, FND_API.G_MISS_NUM, NULL,p_OBJECT_VERSION_NUMBER)
+	,decode(p_LAST_UPDATE_DATE, FND_API.G_MISS_DATE, TO_DATE(NULL),p_LAST_UPDATE_DATE)
+	,decode(p_LAST_UPDATED_BY, FND_API.G_MISS_NUM, NULL,p_LAST_UPDATED_BY)
+	,decode(p_CREATION_DATE, FND_API.G_MISS_DATE, TO_DATE(NULL),p_CREATION_DATE)
+	,decode(p_CREATED_BY, FND_API.G_MISS_NUM, NULL,p_CREATED_BY)
+	,decode(p_LAST_UPDATE_LOGIN, FND_API.G_MISS_NUM, NULL,p_LAST_UPDATE_LOGIN)
+	,decode(p_ATTRIBUTE1, FND_API.G_MISS_CHAR, NULL,p_ATTRIBUTE1)
+	,decode(p_ATTRIBUTE2, FND_API.G_MISS_CHAR, NULL,p_ATTRIBUTE2)
+	,decode(p_ATTRIBUTE3, FND_API.G_MISS_CHAR, NULL,p_ATTRIBUTE3)
+	,decode(p_ATTRIBUTE4, FND_API.G_MISS_CHAR, NULL,p_ATTRIBUTE4)
+	,decode(p_ATTRIBUTE5, FND_API.G_MISS_CHAR, NULL,p_ATTRIBUTE5)
+	,decode(p_ATTRIBUTE6, FND_API.G_MISS_CHAR, NULL,p_ATTRIBUTE6)
+	,decode(p_ATTRIBUTE7, FND_API.G_MISS_CHAR, NULL,p_ATTRIBUTE7)
+	,decode(p_ATTRIBUTE8, FND_API.G_MISS_CHAR, NULL,p_ATTRIBUTE8)
+	,decode(p_ATTRIBUTE9, FND_API.G_MISS_CHAR, NULL,p_ATTRIBUTE9)
+	,decode(p_ATTRIBUTE10, FND_API.G_MISS_CHAR, NULL,p_ATTRIBUTE10)
+	,decode(p_ATTRIBUTE11, FND_API.G_MISS_CHAR, NULL,p_ATTRIBUTE11)
+	,decode(p_ATTRIBUTE12, FND_API.G_MISS_CHAR, NULL,p_ATTRIBUTE12)
+	,decode(p_ATTRIBUTE13, FND_API.G_MISS_CHAR, NULL,p_ATTRIBUTE13)
+	,decode(p_ATTRIBUTE14, FND_API.G_MISS_CHAR, NULL,p_ATTRIBUTE14)
+	,decode(p_ATTRIBUTE15, FND_API.G_MISS_CHAR, NULL,p_ATTRIBUTE15)
+        ,decode(p_ATTRIBUTE16, FND_API.G_MISS_CHAR, NULL,p_ATTRIBUTE16)
+        ,decode(p_ATTRIBUTE17, FND_API.G_MISS_CHAR, NULL,p_ATTRIBUTE17)
+        ,decode(p_ATTRIBUTE18, FND_API.G_MISS_CHAR, NULL,p_ATTRIBUTE18)
+        ,decode(p_ATTRIBUTE19, FND_API.G_MISS_CHAR, NULL,p_ATTRIBUTE19)
+        ,decode(p_ATTRIBUTE20, FND_API.G_MISS_CHAR, NULL,p_ATTRIBUTE20)
+        ,decode(p_ATTRIBUTE21, FND_API.G_MISS_CHAR, NULL,p_ATTRIBUTE21)
+        ,decode(p_ATTRIBUTE22, FND_API.G_MISS_CHAR, NULL,p_ATTRIBUTE22)
+        ,decode(p_ATTRIBUTE23, FND_API.G_MISS_CHAR, NULL,p_ATTRIBUTE23)
+        ,decode(p_ATTRIBUTE24, FND_API.G_MISS_CHAR, NULL,p_ATTRIBUTE24)
+        ,decode(p_ATTRIBUTE25, FND_API.G_MISS_CHAR, NULL,p_ATTRIBUTE25)
+        ,decode(p_ATTRIBUTE26, FND_API.G_MISS_CHAR, NULL,p_ATTRIBUTE26)
+        ,decode(p_ATTRIBUTE27, FND_API.G_MISS_CHAR, NULL,p_ATTRIBUTE27)
+        ,decode(p_ATTRIBUTE28, FND_API.G_MISS_CHAR, NULL,p_ATTRIBUTE28)
+        ,decode(p_ATTRIBUTE29, FND_API.G_MISS_CHAR, NULL,p_ATTRIBUTE29)
+        ,decode(p_ATTRIBUTE30, FND_API.G_MISS_CHAR, NULL,p_ATTRIBUTE30)
+	,decode(p_ATTRIBUTE_CATEGORY, FND_API.G_MISS_CHAR, NULL,p_ATTRIBUTE_CATEGORY)
+	,decode(p_DISABLED_FLAG, FND_API.G_MISS_CHAR, NULL,p_DISABLED_FLAG)
+	,decode(p_COMMENTS, FND_API.G_MISS_CHAR, NULL,p_COMMENTS)
+	,decode(p_SOURCE_TRANSACTION_TYPE_ID, FND_API.G_MISS_NUM, NULL,p_SOURCE_TRANSACTION_TYPE_ID)
+	,decode(p_SOURCE_TRANSACTION_ID, FND_API.G_MISS_NUM, NULL,p_SOURCE_TRANSACTION_ID)
+	,decode(p_SOURCE_CODE, FND_API.G_MISS_CHAR, NULL, p_SOURCE_CODE)
+	,decode(p_SOURCE_LINE_ID, FND_API.G_MISS_NUM, NULL,p_SOURCE_LINE_ID)
+	,decode(p_COUNTER_NAME, FND_API.G_MISS_CHAR, NULL, p_COUNTER_NAME)
+	,decode(p_AUTOMATIC_ROLLOVER_FLAG,FND_API.G_MISS_CHAR, NULL, p_AUTOMATIC_ROLLOVER_FLAG)
+	,decode(p_INCLUDE_TARGET_RESETS,FND_API.G_MISS_CHAR, NULL, p_INCLUDE_TARGET_RESETS)
+	,decode(p_RESET_COUNTER_READING, FND_API.G_MISS_NUM, NULL, p_RESET_COUNTER_READING)
+	,decode(p_NET_READING, FND_API.G_MISS_NUM, NULL, p_NET_READING)
+	,decode(p_LIFE_TO_DATE_READING, FND_API.G_MISS_NUM, NULL, p_LIFE_TO_DATE_READING)
+	,decode(p_SOURCE_COUNTER_VALUE_ID, FND_API.G_MISS_NUM, NULL, p_SOURCE_COUNTER_VALUE_ID));
+END insert_row;
+
+
+PROCEDURE Update_Row(
+	 p_COUNTER_INTERFACE_ID                NUMBER
+	,p_PARALLEL_WORKER_ID                  NUMBER
+	,p_BATCH_NAME                          VARCHAR2
+	,p_SOURCE_TRANSACTION_DATE             DATE
+	,p_PROCESS_STATUS                      VARCHAR2
+        ,p_ERROR_TEXT                          VARCHAR2
+	,p_COUNTER_VALUE_ID                    NUMBER
+	,p_COUNTER_ID                          NUMBER
+	,p_VALUE_TIMESTAMP                     DATE
+	,p_COUNTER_READING                     NUMBER
+	,p_RESET_MODE                          VARCHAR2
+	,p_RESET_REASON                        VARCHAR2
+	,p_ADJUSTMENT_TYPE                     VARCHAR2
+	,p_ADJUSTMENT_READING                  NUMBER
+	,p_OBJECT_VERSION_NUMBER               NUMBER
+	,p_LAST_UPDATE_DATE                    DATE
+	,p_LAST_UPDATED_BY                     NUMBER
+	,p_CREATION_DATE                       DATE
+	,p_CREATED_BY                          NUMBER
+	,p_LAST_UPDATE_LOGIN                   NUMBER
+	,p_ATTRIBUTE1                          VARCHAR2
+	,p_ATTRIBUTE2                          VARCHAR2
+	,p_ATTRIBUTE3                          VARCHAR2
+	,p_ATTRIBUTE4                          VARCHAR2
+	,p_ATTRIBUTE5                          VARCHAR2
+	,p_ATTRIBUTE6                          VARCHAR2
+	,p_ATTRIBUTE7                          VARCHAR2
+	,p_ATTRIBUTE8                          VARCHAR2
+	,p_ATTRIBUTE9                          VARCHAR2
+	,p_ATTRIBUTE10                         VARCHAR2
+	,p_ATTRIBUTE11                         VARCHAR2
+	,p_ATTRIBUTE12                         VARCHAR2
+	,p_ATTRIBUTE13                         VARCHAR2
+	,p_ATTRIBUTE14                         VARCHAR2
+	,p_ATTRIBUTE15                         VARCHAR2
+        ,p_ATTRIBUTE16                         VARCHAR2
+        ,p_ATTRIBUTE17                         VARCHAR2
+        ,p_ATTRIBUTE18                         VARCHAR2
+        ,p_ATTRIBUTE19                         VARCHAR2
+        ,p_ATTRIBUTE20                         VARCHAR2
+        ,p_ATTRIBUTE21                         VARCHAR2
+        ,p_ATTRIBUTE22                         VARCHAR2
+        ,p_ATTRIBUTE23                         VARCHAR2
+        ,p_ATTRIBUTE24                         VARCHAR2
+        ,p_ATTRIBUTE25                         VARCHAR2
+        ,p_ATTRIBUTE26                         VARCHAR2
+        ,p_ATTRIBUTE27                         VARCHAR2
+        ,p_ATTRIBUTE28                         VARCHAR2
+        ,p_ATTRIBUTE29                         VARCHAR2
+        ,p_ATTRIBUTE30                         VARCHAR2
+	,p_ATTRIBUTE_CATEGORY                  VARCHAR2
+	,p_DISABLED_FLAG                       VARCHAR2
+	,p_COMMENTS                            VARCHAR2
+	,p_SOURCE_TRANSACTION_TYPE_ID          NUMBER
+	,p_SOURCE_TRANSACTION_ID               NUMBER
+	,p_SOURCE_CODE                         VARCHAR2
+	,p_SOURCE_LINE_ID                      NUMBER
+	,p_COUNTER_NAME                        VARCHAR2
+        ,p_AUTOMATIC_ROLLOVER_FLAG             VARCHAR2
+        ,p_INCLUDE_TARGET_RESETS               VARCHAR2
+        ,p_RESET_COUNTER_READING               NUMBER
+        ,p_NET_READING                         NUMBER
+        ,p_LIFE_TO_DATE_READING                NUMBER
+        ,p_SOURCE_COUNTER_VALUE_ID             NUMBER) IS
+BEGIN
+   UPDATE CSI_CTR_READINGS_INTERFACE
+   SET     PARALLEL_WORKER_ID = decode(p_PARALLEL_WORKER_ID, NULL, PARALLEL_WORKER_ID, FND_API.G_MISS_NUM, NULL, p_PARALLEL_WORKER_ID)
+	   ,BATCH_NAME = decode(p_BATCH_NAME, NULL, BATCH_NAME,FND_API.G_MISS_CHAR, NULL, p_BATCH_NAME)
+  	   ,SOURCE_TRANSACTION_DATE = decode(p_SOURCE_TRANSACTION_DATE, NULL, SOURCE_TRANSACTION_DATE, FND_API.G_MISS_DATE, NULL, p_SOURCE_TRANSACTION_DATE)
+	   ,PROCESS_STATUS = decode(p_PROCESS_STATUS, NULL, PROCESS_STATUS, FND_API.G_MISS_CHAR, NULL, p_PROCESS_STATUS)
+           ,ERROR_TEXT = decode(p_ERROR_TEXT, NULL, ERROR_TEXT, FND_API.G_MISS_CHAR, NULL, p_ERROR_TEXT)
+	   ,COUNTER_VALUE_ID = decode(p_COUNTER_VALUE_ID, NULL, COUNTER_VALUE_ID, FND_API.G_MISS_NUM, NULL, p_COUNTER_VALUE_ID)
+	   ,COUNTER_ID = decode(p_COUNTER_ID, NULL, COUNTER_ID, FND_API.G_MISS_NUM, NULL, p_COUNTER_ID)
+	   ,VALUE_TIMESTAMP = decode(p_VALUE_TIMESTAMP, NULL, VALUE_TIMESTAMP, FND_API.G_MISS_DATE, NULL, p_VALUE_TIMESTAMP)
+	   ,COUNTER_READING = decode(p_COUNTER_READING, NULL, COUNTER_READING, FND_API.G_MISS_NUM, NULL, p_COUNTER_READING)
+	   ,RESET_MODE = decode(p_RESET_MODE, NULL, RESET_MODE, FND_API.G_MISS_CHAR, NULL, p_RESET_MODE)
+	   ,RESET_REASON = decode(p_RESET_REASON, NULL, RESET_REASON, FND_API.G_MISS_CHAR, NULL, p_RESET_REASON)
+
+	   ,ADJUSTMENT_TYPE = decode(p_ADJUSTMENT_TYPE, NULL, ADJUSTMENT_TYPE, FND_API.G_MISS_CHAR, NULL, p_ADJUSTMENT_TYPE)
+	   ,ADJUSTMENT_READING = decode(p_ADJUSTMENT_READING, NULL, ADJUSTMENT_READING, FND_API.G_MISS_NUM, NULL, p_ADJUSTMENT_READING)
+	   ,OBJECT_VERSION_NUMBER = decode(p_OBJECT_VERSION_NUMBER, FND_API.G_MISS_NUM, OBJECT_VERSION_NUMBER,p_OBJECT_VERSION_NUMBER)
+  	   ,LAST_UPDATE_DATE = decode(p_LAST_UPDATE_DATE, NULL, LAST_UPDATE_DATE, FND_API.G_MISS_DATE, NULL,p_LAST_UPDATE_DATE)
+	   ,LAST_UPDATED_BY = decode(p_LAST_UPDATED_BY, NULL,LAST_UPDATED_BY, FND_API.G_MISS_NUM, NULL,p_LAST_UPDATED_BY)
+   	   ,CREATION_DATE = decode(p_CREATION_DATE, NULL, CREATION_DATE, FND_API.G_MISS_DATE, NULL, p_CREATION_DATE)
+	   ,CREATED_BY = decode(p_CREATED_BY, NULL, CREATED_BY, FND_API.G_MISS_NUM, NULL, p_CREATED_BY)
+	   ,LAST_UPDATE_LOGIN = decode(p_LAST_UPDATE_LOGIN, NULL,LAST_UPDATE_LOGIN, FND_API.G_MISS_NUM, NULL, p_LAST_UPDATE_LOGIN)
+	   ,ATTRIBUTE1 = decode(p_ATTRIBUTE1, NULL, ATTRIBUTE1, FND_API.G_MISS_CHAR, NULL, p_ATTRIBUTE1)
+	   ,ATTRIBUTE2 = decode(p_ATTRIBUTE2, NULL, ATTRIBUTE2, FND_API.G_MISS_CHAR, NULL, p_ATTRIBUTE2)
+	   ,ATTRIBUTE3 = decode(p_ATTRIBUTE3, NULL, ATTRIBUTE3, FND_API.G_MISS_CHAR, NULL, p_ATTRIBUTE3)
+	   ,ATTRIBUTE4 = decode(p_ATTRIBUTE4, NULL, ATTRIBUTE4, FND_API.G_MISS_CHAR, NULL, p_ATTRIBUTE4)
+	   ,ATTRIBUTE5 = decode(p_ATTRIBUTE5, NULL, ATTRIBUTE5, FND_API.G_MISS_CHAR, NULL, p_ATTRIBUTE5)
+	   ,ATTRIBUTE6 = decode(p_ATTRIBUTE6, NULL, ATTRIBUTE6, FND_API.G_MISS_CHAR, NULL, p_ATTRIBUTE6)
+	   ,ATTRIBUTE7 = decode(p_ATTRIBUTE7, NULL, ATTRIBUTE7, FND_API.G_MISS_CHAR, NULL, p_ATTRIBUTE7)
+	   ,ATTRIBUTE8 = decode(p_ATTRIBUTE8, NULL, ATTRIBUTE8, FND_API.G_MISS_CHAR, NULL, p_ATTRIBUTE8)
+	   ,ATTRIBUTE9 = decode(p_ATTRIBUTE9, NULL, ATTRIBUTE9, FND_API.G_MISS_CHAR, NULL, p_ATTRIBUTE9)
+	   ,ATTRIBUTE10 = decode(p_ATTRIBUTE10, NULL, ATTRIBUTE10, FND_API.G_MISS_CHAR, NULL, p_ATTRIBUTE10)
+	   ,ATTRIBUTE11 = decode(p_ATTRIBUTE11, NULL, ATTRIBUTE11, FND_API.G_MISS_CHAR, NULL, p_ATTRIBUTE11)
+	   ,ATTRIBUTE12 = decode(p_ATTRIBUTE12, NULL, ATTRIBUTE12, FND_API.G_MISS_CHAR, NULL, p_ATTRIBUTE12)
+	   ,ATTRIBUTE13 = decode(p_ATTRIBUTE13, NULL, ATTRIBUTE13, FND_API.G_MISS_CHAR, NULL, p_ATTRIBUTE13)
+	   ,ATTRIBUTE14 = decode(p_ATTRIBUTE14, NULL, ATTRIBUTE14, FND_API.G_MISS_CHAR, NULL, p_ATTRIBUTE14)
+	   ,ATTRIBUTE15 = decode(p_ATTRIBUTE15, NULL, ATTRIBUTE15, FND_API.G_MISS_CHAR, NULL, p_ATTRIBUTE15)
+	   ,ATTRIBUTE16 = decode(p_ATTRIBUTE16, NULL, ATTRIBUTE16, FND_API.G_MISS_CHAR, NULL, p_ATTRIBUTE16)
+           ,ATTRIBUTE17 = decode(p_ATTRIBUTE17, NULL, ATTRIBUTE17, FND_API.G_MISS_CHAR, NULL, p_ATTRIBUTE17)
+           ,ATTRIBUTE18 = decode(p_ATTRIBUTE18, NULL, ATTRIBUTE18, FND_API.G_MISS_CHAR, NULL, p_ATTRIBUTE18)
+           ,ATTRIBUTE19 = decode(p_ATTRIBUTE19, NULL, ATTRIBUTE19, FND_API.G_MISS_CHAR, NULL, p_ATTRIBUTE19)
+           ,ATTRIBUTE20 = decode(p_ATTRIBUTE20, NULL, ATTRIBUTE20, FND_API.G_MISS_CHAR, NULL, p_ATTRIBUTE20)
+           ,ATTRIBUTE21 = decode(p_ATTRIBUTE21, NULL, ATTRIBUTE21, FND_API.G_MISS_CHAR, NULL, p_ATTRIBUTE21)
+           ,ATTRIBUTE22 = decode(p_ATTRIBUTE22, NULL, ATTRIBUTE22, FND_API.G_MISS_CHAR, NULL, p_ATTRIBUTE22)
+           ,ATTRIBUTE23 = decode(p_ATTRIBUTE23, NULL, ATTRIBUTE23, FND_API.G_MISS_CHAR, NULL, p_ATTRIBUTE23)
+           ,ATTRIBUTE24 = decode(p_ATTRIBUTE24, NULL, ATTRIBUTE24, FND_API.G_MISS_CHAR, NULL, p_ATTRIBUTE24)
+           ,ATTRIBUTE25 = decode(p_ATTRIBUTE25, NULL, ATTRIBUTE25, FND_API.G_MISS_CHAR, NULL, p_ATTRIBUTE25)
+           ,ATTRIBUTE26 = decode(p_ATTRIBUTE26, NULL, ATTRIBUTE26, FND_API.G_MISS_CHAR, NULL, p_ATTRIBUTE26)
+           ,ATTRIBUTE27 = decode(p_ATTRIBUTE27, NULL, ATTRIBUTE27, FND_API.G_MISS_CHAR, NULL, p_ATTRIBUTE27)
+           ,ATTRIBUTE28 = decode(p_ATTRIBUTE28, NULL, ATTRIBUTE28, FND_API.G_MISS_CHAR, NULL, p_ATTRIBUTE28)
+           ,ATTRIBUTE29 = decode(p_ATTRIBUTE29, NULL, ATTRIBUTE29, FND_API.G_MISS_CHAR, NULL, p_ATTRIBUTE29)
+           ,ATTRIBUTE30 = decode(p_ATTRIBUTE30, NULL, ATTRIBUTE30, FND_API.G_MISS_CHAR, NULL, p_ATTRIBUTE30)
+	   ,ATTRIBUTE_CATEGORY = decode(p_ATTRIBUTE_CATEGORY, NULL, ATTRIBUTE_CATEGORY, FND_API.G_MISS_CHAR, NULL, p_ATTRIBUTE_CATEGORY)
+	   ,DISABLED_FLAG = decode(p_DISABLED_FLAG, NULL, DISABLED_FLAG, FND_API.G_MISS_CHAR, NULL, p_DISABLED_FLAG)
+	   ,COMMENTS = decode(p_COMMENTS, NULL, COMMENTS, FND_API.G_MISS_CHAR, NULL, p_COMMENTS)
+	   ,SOURCE_TRANSACTION_TYPE_ID = decode(p_SOURCE_TRANSACTION_TYPE_ID, NULL, SOURCE_TRANSACTION_TYPE_ID, FND_API.G_MISS_NUM, NULL, p_SOURCE_TRANSACTION_TYPE_ID)
+	   ,SOURCE_TRANSACTION_ID   = decode(p_SOURCE_TRANSACTION_ID, NULL, SOURCE_TRANSACTION_ID, FND_API.G_MISS_NUM, NULL, p_SOURCE_TRANSACTION_ID)
+	   ,SOURCE_CODE = decode(p_SOURCE_CODE, NULL, SOURCE_CODE, FND_API.G_MISS_CHAR, NULL, p_SOURCE_CODE)
+	   ,SOURCE_LINE_ID = decode(p_SOURCE_LINE_ID, NULL, SOURCE_LINE_ID, FND_API.G_MISS_NUM, NULL, p_SOURCE_LINE_ID)
+	   ,COUNTER_NAME = decode(p_COUNTER_NAME, NULL, COUNTER_NAME, FND_API.G_MISS_CHAR, NULL, p_COUNTER_NAME)
+	   ,AUTOMATIC_ROLLOVER_FLAG = decode(p_AUTOMATIC_ROLLOVER_FLAG, NULL, AUTOMATIC_ROLLOVER_FLAG, FND_API.G_MISS_NUM, NULL, p_AUTOMATIC_ROLLOVER_FLAG)
+	   ,INCLUDE_TARGET_RESETS = decode(p_INCLUDE_TARGET_RESETS, NULL, INCLUDE_TARGET_RESETS, FND_API.G_MISS_NUM, NULL, p_INCLUDE_TARGET_RESETS)
+	   ,RESET_COUNTER_READING = decode(p_RESET_COUNTER_READING, NULL, RESET_COUNTER_READING, FND_API.G_MISS_NUM, NULL, p_RESET_COUNTER_READING)
+	   ,NET_READING = decode(p_NET_READING, NULL, NET_READING, FND_API.G_MISS_NUM, NULL, p_NET_READING)
+	   ,LIFE_TO_DATE_READING = decode(p_LIFE_TO_DATE_READING, NULL, LIFE_TO_DATE_READING, FND_API.G_MISS_NUM, NULL, p_LIFE_TO_DATE_READING)
+	   ,SOURCE_COUNTER_VALUE_ID = decode(p_SOURCE_COUNTER_VALUE_ID, NULL, SOURCE_COUNTER_VALUE_ID, FND_API.G_MISS_NUM, NULL, p_SOURCE_COUNTER_VALUE_ID)
+   WHERE  COUNTER_INTERFACE_ID = p_COUNTER_INTERFACE_ID;
+END update_row;
+
+
+PROCEDURE lock_row(
+	 p_COUNTER_INTERFACE_ID                NUMBER
+	,p_PARALLEL_WORKER_ID                  NUMBER
+	,p_BATCH_NAME                          VARCHAR2
+	,p_SOURCE_TRANSACTION_DATE             DATE
+	,p_PROCESS_STATUS                      VARCHAR2
+        ,p_ERROR_TEXT                          VARCHAR2
+	,p_COUNTER_VALUE_ID                    NUMBER
+	,p_COUNTER_ID                          NUMBER
+	,p_VALUE_TIMESTAMP                     DATE
+	,p_COUNTER_READING                     NUMBER
+	,p_RESET_MODE                          VARCHAR2
+	,p_RESET_REASON                        VARCHAR2
+	,p_ADJUSTMENT_TYPE                     VARCHAR2
+	,p_ADJUSTMENT_READING                  NUMBER
+	,p_OBJECT_VERSION_NUMBER               NUMBER
+	,p_LAST_UPDATE_DATE                    DATE
+	,p_LAST_UPDATED_BY                     NUMBER
+	,p_CREATION_DATE                       DATE
+	,p_CREATED_BY                          NUMBER
+	,p_LAST_UPDATE_LOGIN                   NUMBER
+	,p_ATTRIBUTE1                          VARCHAR2
+	,p_ATTRIBUTE2                          VARCHAR2
+	,p_ATTRIBUTE3                          VARCHAR2
+	,p_ATTRIBUTE4                          VARCHAR2
+	,p_ATTRIBUTE5                          VARCHAR2
+	,p_ATTRIBUTE6                          VARCHAR2
+	,p_ATTRIBUTE7                          VARCHAR2
+	,p_ATTRIBUTE8                          VARCHAR2
+	,p_ATTRIBUTE9                          VARCHAR2
+	,p_ATTRIBUTE10                         VARCHAR2
+	,p_ATTRIBUTE11                         VARCHAR2
+	,p_ATTRIBUTE12                         VARCHAR2
+	,p_ATTRIBUTE13                         VARCHAR2
+	,p_ATTRIBUTE14                         VARCHAR2
+	,p_ATTRIBUTE15                         VARCHAR2
+        ,p_ATTRIBUTE16                         VARCHAR2
+        ,p_ATTRIBUTE17                         VARCHAR2
+        ,p_ATTRIBUTE18                         VARCHAR2
+        ,p_ATTRIBUTE19                         VARCHAR2
+        ,p_ATTRIBUTE20                         VARCHAR2
+        ,p_ATTRIBUTE21                         VARCHAR2
+        ,p_ATTRIBUTE22                         VARCHAR2
+        ,p_ATTRIBUTE23                         VARCHAR2
+        ,p_ATTRIBUTE24                         VARCHAR2
+        ,p_ATTRIBUTE25                         VARCHAR2
+        ,p_ATTRIBUTE26                         VARCHAR2
+        ,p_ATTRIBUTE27                         VARCHAR2
+        ,p_ATTRIBUTE28                         VARCHAR2
+        ,p_ATTRIBUTE29                         VARCHAR2
+        ,p_ATTRIBUTE30                         VARCHAR2
+	,p_ATTRIBUTE_CATEGORY                  VARCHAR2
+	,p_DISABLED_FLAG                       VARCHAR2
+	,p_COMMENTS                            VARCHAR2
+	,p_SOURCE_TRANSACTION_TYPE_ID          NUMBER
+	,p_SOURCE_TRANSACTION_ID               NUMBER
+	,p_SOURCE_CODE                         VARCHAR2
+	,p_SOURCE_LINE_ID                      NUMBER
+	,p_COUNTER_NAME                        VARCHAR2
+        ,p_AUTOMATIC_ROLLOVER_FLAG             VARCHAR2
+        ,p_INCLUDE_TARGET_RESETS               VARCHAR2
+        ,p_RESET_COUNTER_READING               NUMBER
+        ,p_NET_READING                         NUMBER
+        ,p_LIFE_TO_DATE_READING                NUMBER
+        ,p_SOURCE_COUNTER_VALUE_ID             NUMBER) IS
+
+   CURSOR C1 IS
+   SELECT *
+   FROM   CSI_CTR_READINGS_INTERFACE
+   WHERE  COUNTER_INTERFACE_ID = p_COUNTER_INTERFACE_ID
+   FOR UPDATE of COUNTER_INTERFACE_ID NOWAIT;
+   Recinfo C1%ROWTYPE;
+BEGIN
+   OPEN C1;
+   FETCH C1 INTO Recinfo;
+   IF (C1%NOTFOUND) then
+      CLOSE C1;
+      FND_MESSAGE.SET_NAME('FND', 'FORM_RECORD_DELETED');
+      APP_EXCEPTION.RAISE_EXCEPTION;
+   END IF;
+   CLOSE C1;
+
+   IF (
+           (      Recinfo.COUNTER_INTERFACE_ID  = p_COUNTER_INTERFACE_ID )
+       AND (    ( Recinfo.PARALLEL_WORKER_ID = p_PARALLEL_WORKER_ID)
+            OR (    ( Recinfo.PARALLEL_WORKER_ID IS NULL )
+                AND (  p_PARALLEL_WORKER_ID IS NULL )))
+       AND (    ( Recinfo.BATCH_NAME = p_BATCH_NAME)
+            OR (    ( Recinfo.BATCH_NAME IS NULL )
+                AND (  p_BATCH_NAME IS NULL )))
+       AND (    ( Recinfo.ERROR_TEXT = p_ERROR_TEXT)
+            OR (    ( Recinfo.ERROR_TEXT IS NULL )
+                AND (  p_ERROR_TEXT IS NULL )))
+       AND (    ( Recinfo.SOURCE_TRANSACTION_DATE = p_SOURCE_TRANSACTION_DATE)
+            OR (    ( Recinfo.SOURCE_TRANSACTION_DATE IS NULL )
+                AND (  p_SOURCE_TRANSACTION_DATE IS NULL )))
+       AND (    ( Recinfo.PROCESS_STATUS  = p_PROCESS_STATUS)
+            OR (    ( Recinfo.PROCESS_STATUS IS NULL )
+                AND (  p_PROCESS_STATUS IS NULL )))
+       AND (    ( Recinfo.COUNTER_VALUE_ID = p_COUNTER_VALUE_ID)
+            OR (    ( Recinfo.COUNTER_VALUE_ID IS NULL )
+                AND (  p_COUNTER_VALUE_ID IS NULL )))
+       AND (    ( Recinfo.COUNTER_ID = p_COUNTER_ID)
+            OR (    ( Recinfo.COUNTER_ID IS NULL )
+                AND (  p_COUNTER_ID IS NULL )))
+       AND (    ( Recinfo.VALUE_TIMESTAMP = p_VALUE_TIMESTAMP)
+            OR (    ( Recinfo.VALUE_TIMESTAMP IS NULL )
+                AND (  p_VALUE_TIMESTAMP IS NULL )))
+       AND (    ( Recinfo.COUNTER_READING = p_COUNTER_READING)
+            OR (    ( Recinfo.COUNTER_READING IS NULL )
+                AND (  p_COUNTER_READING IS NULL )))
+       AND (    ( Recinfo.RESET_MODE = p_RESET_MODE)
+            OR (    ( Recinfo.RESET_MODE IS NULL )
+                AND (  p_RESET_MODE IS NULL )))
+       AND (    ( Recinfo.RESET_REASON = p_RESET_REASON)
+            OR (    ( Recinfo.RESET_REASON IS NULL )
+                AND (  p_RESET_REASON IS NULL )))
+       AND (    ( Recinfo.ADJUSTMENT_TYPE = p_ADJUSTMENT_TYPE)
+            OR (    ( Recinfo.ADJUSTMENT_TYPE IS NULL )
+                AND (  p_ADJUSTMENT_TYPE IS NULL )))
+       AND (    ( Recinfo.ADJUSTMENT_READING = p_ADJUSTMENT_READING)
+            OR (    ( Recinfo.ADJUSTMENT_READING IS NULL )
+                AND (  p_ADJUSTMENT_READING IS NULL )))
+       AND (    ( Recinfo.OBJECT_VERSION_NUMBER = p_OBJECT_VERSION_NUMBER)
+            OR (    ( Recinfo.OBJECT_VERSION_NUMBER IS NULL )
+                AND (  p_OBJECT_VERSION_NUMBER IS NULL )))
+       AND (    ( Recinfo.LAST_UPDATE_DATE = p_LAST_UPDATE_DATE)
+            OR (    ( Recinfo.LAST_UPDATE_DATE IS NULL )
+                AND (  p_LAST_UPDATE_DATE IS NULL )))
+       AND (    ( Recinfo.LAST_UPDATED_BY = p_LAST_UPDATED_BY)
+            OR (    ( Recinfo.LAST_UPDATED_BY IS NULL )
+                AND (  p_LAST_UPDATED_BY IS NULL )))
+       AND (    ( Recinfo.CREATION_DATE = p_CREATION_DATE)
+            OR (    ( Recinfo.CREATION_DATE IS NULL )
+                AND (  p_CREATION_DATE IS NULL )))
+       AND (    ( Recinfo.CREATED_BY = p_CREATED_BY)
+            OR (    ( Recinfo.CREATED_BY IS NULL )
+                AND (  p_CREATED_BY IS NULL )))
+       AND (    ( Recinfo.LAST_UPDATE_LOGIN = p_LAST_UPDATE_LOGIN)
+            OR (    ( Recinfo.LAST_UPDATE_LOGIN IS NULL )
+                AND (  p_LAST_UPDATE_LOGIN IS NULL )))
+       AND (    ( Recinfo.ATTRIBUTE1 = p_ATTRIBUTE1)
+            OR (    ( Recinfo.ATTRIBUTE1 IS NULL )
+                AND (  p_ATTRIBUTE1 IS NULL )))
+       AND (    ( Recinfo.ATTRIBUTE2 = p_ATTRIBUTE2)
+            OR (    ( Recinfo.ATTRIBUTE2 IS NULL )
+                AND (  p_ATTRIBUTE2 IS NULL )))
+       AND (    ( Recinfo.ATTRIBUTE3 = p_ATTRIBUTE3)
+            OR (    ( Recinfo.ATTRIBUTE3 IS NULL )
+                AND (  p_ATTRIBUTE3 IS NULL )))
+       AND (    ( Recinfo.ATTRIBUTE4 = p_ATTRIBUTE4)
+            OR (    ( Recinfo.ATTRIBUTE4 IS NULL )
+                AND (  p_ATTRIBUTE4 IS NULL )))
+       AND (    ( Recinfo.ATTRIBUTE5 = p_ATTRIBUTE5)
+            OR (    ( Recinfo.ATTRIBUTE5 IS NULL )
+                AND (  p_ATTRIBUTE5 IS NULL )))
+       AND (    ( Recinfo.ATTRIBUTE6 = p_ATTRIBUTE6)
+            OR (    ( Recinfo.ATTRIBUTE6 IS NULL )
+                AND (  p_ATTRIBUTE6 IS NULL )))
+       AND (    ( Recinfo.ATTRIBUTE7 = p_ATTRIBUTE7)
+            OR (    ( Recinfo.ATTRIBUTE7 IS NULL )
+                AND (  p_ATTRIBUTE7 IS NULL )))
+       AND (    ( Recinfo.ATTRIBUTE8 = p_ATTRIBUTE8)
+            OR (    ( Recinfo.ATTRIBUTE8 IS NULL )
+                AND (  p_ATTRIBUTE8 IS NULL )))
+       AND (    ( Recinfo.ATTRIBUTE9 = p_ATTRIBUTE9)
+            OR (    ( Recinfo.ATTRIBUTE9 IS NULL )
+                AND (  p_ATTRIBUTE9 IS NULL )))
+       AND (    ( Recinfo.ATTRIBUTE10 = p_ATTRIBUTE10)
+            OR (    ( Recinfo.ATTRIBUTE10 IS NULL )
+                AND (  p_ATTRIBUTE10 IS NULL )))
+       AND (    ( Recinfo.ATTRIBUTE11 = p_ATTRIBUTE11)
+            OR (    ( Recinfo.ATTRIBUTE11 IS NULL )
+                AND (  p_ATTRIBUTE11 IS NULL )))
+       AND (    ( Recinfo.ATTRIBUTE12 = p_ATTRIBUTE12)
+            OR (    ( Recinfo.ATTRIBUTE12 IS NULL )
+                AND (  p_ATTRIBUTE12 IS NULL )))
+       AND (    ( Recinfo.ATTRIBUTE13 = p_ATTRIBUTE13)
+            OR (    ( Recinfo.ATTRIBUTE13 IS NULL )
+                AND (  p_ATTRIBUTE13 IS NULL )))
+       AND (    ( Recinfo.ATTRIBUTE14 = p_ATTRIBUTE14)
+            OR (    ( Recinfo.ATTRIBUTE14 IS NULL )
+                AND (  p_ATTRIBUTE14 IS NULL )))
+       AND (    ( Recinfo.ATTRIBUTE15 = p_ATTRIBUTE15)
+            OR (    ( Recinfo.ATTRIBUTE15 IS NULL )
+                AND (  p_ATTRIBUTE15 IS NULL )))
+      AND (    ( Recinfo.ATTRIBUTE16 = p_ATTRIBUTE16)
+            OR (    ( Recinfo.ATTRIBUTE15 IS NULL )
+                AND (  p_ATTRIBUTE16 IS NULL )))
+      AND (    ( Recinfo.ATTRIBUTE16 = p_ATTRIBUTE15)
+            OR (    ( Recinfo.ATTRIBUTE15 IS NULL )
+                AND (  p_ATTRIBUTE17 IS NULL )))
+      AND (    ( Recinfo.ATTRIBUTE17 = p_ATTRIBUTE17)
+            OR (    ( Recinfo.ATTRIBUTE15 IS NULL )
+                AND (  p_ATTRIBUTE17 IS NULL )))
+      AND (    ( Recinfo.ATTRIBUTE18 = p_ATTRIBUTE18)
+            OR (    ( Recinfo.ATTRIBUTE18 IS NULL )
+                AND (  p_ATTRIBUTE18 IS NULL )))
+      AND (    ( Recinfo.ATTRIBUTE19 = p_ATTRIBUTE19)
+            OR (    ( Recinfo.ATTRIBUTE19 IS NULL )
+                AND (  p_ATTRIBUTE19 IS NULL )))
+      AND (    ( Recinfo.ATTRIBUTE20 = p_ATTRIBUTE20)
+            OR (    ( Recinfo.ATTRIBUTE20 IS NULL )
+                AND (  p_ATTRIBUTE20 IS NULL )))
+      AND (    ( Recinfo.ATTRIBUTE21 = p_ATTRIBUTE21)
+            OR (    ( Recinfo.ATTRIBUTE21 IS NULL )
+                AND (  p_ATTRIBUTE21 IS NULL )))
+      AND (    ( Recinfo.ATTRIBUTE22 = p_ATTRIBUTE22)
+            OR (    ( Recinfo.ATTRIBUTE22 IS NULL )
+                AND (  p_ATTRIBUTE22 IS NULL )))
+      AND (    ( Recinfo.ATTRIBUTE23 = p_ATTRIBUTE23)
+            OR (    ( Recinfo.ATTRIBUTE23 IS NULL )
+                AND (  p_ATTRIBUTE23 IS NULL )))
+      AND (    ( Recinfo.ATTRIBUTE24 = p_ATTRIBUTE24)
+            OR (    ( Recinfo.ATTRIBUTE24 IS NULL )
+                AND (  p_ATTRIBUTE24 IS NULL )))
+      AND (    ( Recinfo.ATTRIBUTE25 = p_ATTRIBUTE25)
+            OR (    ( Recinfo.ATTRIBUTE25 IS NULL )
+                AND (  p_ATTRIBUTE25 IS NULL )))
+      AND (    ( Recinfo.ATTRIBUTE26 = p_ATTRIBUTE26)
+            OR (    ( Recinfo.ATTRIBUTE26 IS NULL )
+                AND (  p_ATTRIBUTE26 IS NULL )))
+      AND (    ( Recinfo.ATTRIBUTE27 = p_ATTRIBUTE27)
+            OR (    ( Recinfo.ATTRIBUTE27 IS NULL )
+                AND (  p_ATTRIBUTE27 IS NULL )))
+      AND (    ( Recinfo.ATTRIBUTE28 = p_ATTRIBUTE28)
+            OR (    ( Recinfo.ATTRIBUTE28 IS NULL )
+                AND (  p_ATTRIBUTE28 IS NULL )))
+      AND (    ( Recinfo.ATTRIBUTE29 = p_ATTRIBUTE29)
+            OR (    ( Recinfo.ATTRIBUTE29 IS NULL )
+                AND (  p_ATTRIBUTE29 IS NULL )))
+      AND (    ( Recinfo.ATTRIBUTE30 = p_ATTRIBUTE30)
+            OR (    ( Recinfo.ATTRIBUTE30 IS NULL )
+                AND (  p_ATTRIBUTE30 IS NULL )))
+       AND (    ( Recinfo.ATTRIBUTE_CATEGORY = p_ATTRIBUTE_CATEGORY)
+            OR (    ( Recinfo.ATTRIBUTE_CATEGORY IS NULL )
+                AND (  p_ATTRIBUTE_CATEGORY IS NULL )))
+       AND (    ( Recinfo.DISABLED_FLAG = p_DISABLED_FLAG)
+            OR (    ( Recinfo.DISABLED_FLAG IS NULL )
+                AND (  p_DISABLED_FLAG IS NULL )))
+       AND (    ( Recinfo.COMMENTS = p_COMMENTS)
+            OR (    ( Recinfo.COMMENTS IS NULL )
+                AND (  p_COMMENTS IS NULL )))
+       AND (    ( Recinfo.SOURCE_TRANSACTION_TYPE_ID = p_SOURCE_TRANSACTION_TYPE_ID)
+            OR (    ( Recinfo.SOURCE_TRANSACTION_TYPE_ID IS NULL )
+                AND (  p_SOURCE_TRANSACTION_TYPE_ID IS NULL )))
+       AND (    ( Recinfo.SOURCE_TRANSACTION_ID = p_SOURCE_TRANSACTION_ID)
+            OR (    ( Recinfo.SOURCE_TRANSACTION_ID IS NULL )
+                AND (  p_SOURCE_TRANSACTION_ID IS NULL )))
+       AND (    ( Recinfo.SOURCE_CODE = p_SOURCE_CODE)
+            OR (    ( Recinfo.SOURCE_CODE IS NULL )
+                AND (  p_SOURCE_CODE IS NULL )))
+       AND (    ( Recinfo.SOURCE_LINE_ID = p_SOURCE_LINE_ID)
+            OR (    ( Recinfo.SOURCE_LINE_ID IS NULL )
+                AND (  p_SOURCE_LINE_ID IS NULL )))
+       AND (    ( Recinfo.COUNTER_NAME = p_COUNTER_NAME)
+            OR (    ( Recinfo.COUNTER_NAME IS NULL )
+                AND (  p_COUNTER_NAME IS NULL )))
+      AND (    ( Recinfo.NET_READING = p_NET_READING)
+            OR (    ( Recinfo.NET_READING IS NULL )
+                AND (  p_NET_READING IS NULL )))
+      AND (    ( Recinfo.LIFE_TO_DATE_READING = p_LIFE_TO_DATE_READING)
+            OR (    ( Recinfo.LIFE_TO_DATE_READING IS NULL )
+                AND (  p_LIFE_TO_DATE_READING IS NULL )))
+      AND (    ( Recinfo.SOURCE_COUNTER_VALUE_ID = p_SOURCE_COUNTER_VALUE_ID)
+            OR (    ( Recinfo.SOURCE_COUNTER_VALUE_ID IS NULL )
+                AND (  p_SOURCE_COUNTER_VALUE_ID IS NULL )))
+       ) then
+       return;
+   ELSE
+      FND_MESSAGE.SET_NAME('FND', 'FORM_RECORD_CHANGED');
+      APP_EXCEPTION.RAISE_EXCEPTION;
+   END IF;
+END lock_row;
+
+
+PROCEDURE delete_row(p_COUNTER_INTERFACE_ID NUMBER) IS
+BEGIN
+   DELETE FROM CSI_CTR_READINGS_INTERFACE
+   WHERE  COUNTER_INTERFACE_ID = p_COUNTER_INTERFACE_ID;
+   IF (SQL%NOTFOUND) then
+       RAISE NO_DATA_FOUND;
+   END IF;
+END delete_row;
+
+End CSI_CTR_READING_INTERFACE_PKG;
+
+/

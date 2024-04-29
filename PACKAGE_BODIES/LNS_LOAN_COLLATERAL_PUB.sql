@@ -1,0 +1,113 @@
+--------------------------------------------------------
+--  DDL for Package Body LNS_LOAN_COLLATERAL_PUB
+--------------------------------------------------------
+
+  CREATE OR REPLACE EDITIONABLE PACKAGE BODY "APPS"."LNS_LOAN_COLLATERAL_PUB" AS
+/* $Header: LNS_LNCOL_PUBP_B.pls 120.0 2005/05/31 18:32:56 appldev noship $ */
+
+G_PKG_NAME                          CONSTANT VARCHAR2(30) := 'LNS_LOAN_COLLATERALS_PUB';
+
+procedure Release_Collaterals(p_loan_id NUMBER) AS
+CURSOR fee_assignment_cur (p_loan_id NUMBER) IS
+  SELECT ASSET_ASSIGNMENT_ID,
+         END_DATE_ACTIVE,
+      	 LAST_UPDATED_BY,
+     	 LAST_UPDATE_LOGIN ,
+    	 LAST_UPDATE_DATE ,
+     	 OBJECT_VERSION_NUMBER
+  FROM  LNS_ASSET_ASSIGNMENTS
+  WHERE LOAN_ID = p_loan_id
+  FOR UPDATE ;
+
+  fee_assignment_rec    fee_assignment_cur%ROWTYPE ;
+
+BEGIN
+
+    IF ( FND_LOG.LEVEL_PROCEDURE >= FND_LOG.G_CURRENT_RUNTIME_LEVEL ) THEN
+    	FND_LOG.STRING(FND_LOG.LEVEL_PROCEDURE, G_PKG_NAME, 'Begin Release_Collaterals');
+    END IF;
+
+    FOR fee_assignment_rec IN fee_assignment_cur(p_loan_id)
+    LOOP
+
+       LNS_LOAN_HISTORY_PUB.log_record_pre(fee_assignment_rec.ASSET_ASSIGNMENT_ID,
+       					'ASSET_ASSIGNMENT_ID',
+       					'LNS_ASSET_ASSIGNMENTS');
+       UPDATE LNS_ASSET_ASSIGNMENTS
+       SET
+       END_DATE_ACTIVE = SYSDATE ,
+	   LAST_UPDATED_BY = LNS_UTILITY_PUB.LAST_UPDATED_BY,
+	   LAST_UPDATE_LOGIN = LNS_UTILITY_PUB.LAST_UPDATE_LOGIN,
+	   LAST_UPDATE_DATE = LNS_UTILITY_PUB.LAST_UPDATE_DATE,
+	   OBJECT_VERSION_NUMBER = fee_assignment_rec.OBJECT_VERSION_NUMBER + 1
+       WHERE current of fee_assignment_cur ;
+
+
+       LNS_LOAN_HISTORY_PUB.log_record_post(fee_assignment_rec.ASSET_ASSIGNMENT_ID,
+       					'ASSET_ASSIGNMENT_ID',
+       					'LNS_ASSET_ASSIGNMENTS',p_loan_id);
+
+    END LOOP ;
+
+    /*-- update collaterals
+	UPDATE LNS_ASSET_ASSIGNMENTS
+	SET END_DATE_ACTIVE = SYSDATE,
+	LAST_UPDATED_BY = LNS_UTILITY_PUB.LAST_UPDATED_BY,
+	LAST_UPDATE_LOGIN = LNS_UTILITY_PUB.LAST_UPDATE_LOGIN,
+	LAST_UPDATE_DATE = LNS_UTILITY_PUB.LAST_UPDATE_DATE,
+	OBJECT_VERSION_NUMBER = OBJECT_VERSION_NUMBER + 1
+	WHERE LOAN_ID = p_loan_id; */
+
+
+	/* No need to end date Assets - Bug # 4212254
+     --update acquired assets
+	UPDATE LNS_ASSETS
+	SET END_DATE_ACTIVE = SYSDATE,
+	LAST_UPDATED_BY = LNS_UTILITY_PUB.LAST_UPDATED_BY,
+	LAST_UPDATE_LOGIN = LNS_UTILITY_PUB.LAST_UPDATE_LOGIN,
+	LAST_UPDATE_DATE = LNS_UTILITY_PUB.LAST_UPDATE_DATE,
+	OBJECT_VERSION_NUMBER = OBJECT_VERSION_NUMBER + 1
+	WHERE ACQUIRED_ASSET_LOAN_ID = p_loan_id; */
+
+    IF ( FND_LOG.LEVEL_PROCEDURE >= FND_LOG.G_CURRENT_RUNTIME_LEVEL ) THEN
+    	FND_LOG.STRING(FND_LOG.LEVEL_PROCEDURE, G_PKG_NAME, 'After call to Release_Collaterals');
+    END IF;
+EXCEPTION
+when others then
+        FND_MESSAGE.SET_NAME('LNS', 'LNS_RELEASE_COLLATERAL_ERROR');
+        FND_MSG_PUB.ADD;
+        RAISE FND_API.G_EXC_ERROR;
+END RELEASE_COLLATERALS;
+
+
+
+
+FUNCTION IS_EXIST_ASSET_ASSIGNMENT (
+    p_asset_id			 NUMBER
+) RETURN VARCHAR2 IS
+
+  CURSOR C_Is_Exist_Assignment (X_Asset_Id NUMBER) IS
+  SELECT 'X'
+  FROM LNS_ASSET_ASSIGNMENTS
+  WHERE ASSET_ID = X_ASSET_ID
+  AND (END_DATE_ACTIVE IS NULL
+  OR TRUNC(END_DATE_ACTIVE) > TRUNC(SYSDATE));
+
+  l_dummy VARCHAR2(1);
+
+BEGIN
+
+  OPEN C_Is_Exist_Assignment (p_asset_id);
+  FETCH C_Is_Exist_Assignment INTO l_dummy;
+  IF C_Is_Exist_Assignment%FOUND THEN
+    CLOSE C_Is_Exist_Assignment;
+    RETURN 'Y';
+  END IF;
+  CLOSE C_Is_Exist_Assignment;
+  RETURN 'N';
+
+END IS_EXIST_ASSET_ASSIGNMENT;
+
+END LNS_LOAN_COLLATERAL_PUB;
+
+/

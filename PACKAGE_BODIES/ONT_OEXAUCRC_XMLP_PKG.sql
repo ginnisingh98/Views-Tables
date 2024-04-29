@@ -1,0 +1,131 @@
+--------------------------------------------------------
+--  DDL for Package Body ONT_OEXAUCRC_XMLP_PKG
+--------------------------------------------------------
+
+  CREATE OR REPLACE EDITIONABLE PACKAGE BODY "APPS"."ONT_OEXAUCRC_XMLP_PKG" AS
+/* $Header: OEXAUCRCB.pls 120.1 2007/12/25 07:07:30 npannamp noship $ */
+  FUNCTION BEFOREREPORT RETURN BOOLEAN IS
+  BEGIN
+    BEGIN
+      P_CONC_REQUEST_ID := FND_GLOBAL.CONC_REQUEST_ID;
+      /*SRW.USER_EXIT('FND SRWINIT')*/NULL;
+    EXCEPTION
+      WHEN /*SRW.USER_EXIT_FAILURE*/OTHERS THEN
+        /*SRW.MESSAGE(1
+                   ,'FAILED IN BEFORE REPORT TRIGGER')*/NULL;
+        /*RAISE SRW.PROGRAM_ABORT*/RAISE_APPLICATION_ERROR(-20101,null);
+        RETURN (FALSE);
+    END;
+    BEGIN
+      IF P_ORG_ID IS NOT NULL THEN
+        SELECT
+          NAME
+        INTO RP_OPERATING_UNIT
+        FROM
+          HR_OPERATING_UNITS
+        WHERE ORGANIZATION_ID = P_ORG_ID;
+      END IF;
+    EXCEPTION
+      WHEN NO_DATA_FOUND THEN
+        NULL;
+    END;
+    BEGIN
+      IF P_HEADER_ID IS NOT NULL THEN
+        SELECT
+          OTT.NAME,
+          OOH.ORDER_NUMBER
+        INTO RP_ORDER_TYPE,RP_ORDER_NUMBER
+        FROM
+          OE_ORDER_HEADERS_ALL OOH,
+          OE_TRANSACTION_TYPES OTT
+        WHERE OOH.HEADER_ID = P_HEADER_ID
+          AND OOH.ORDER_TYPE_ID = OTT.TRANSACTION_TYPE_ID;
+      END IF;
+    EXCEPTION
+      WHEN NO_DATA_FOUND THEN
+        NULL;
+    END;
+    BEGIN
+      IF P_ORDER_BY IS NOT NULL THEN
+        SELECT
+          MEANING
+        INTO RP_ORDER_BY
+        FROM
+          OE_LOOKUPS
+        WHERE LOOKUP_TYPE = 'CREDIT_CHECK_PROCESS_RULE'
+          AND LOOKUP_CODE = P_ORDER_BY;
+      END IF;
+    EXCEPTION
+      WHEN NO_DATA_FOUND THEN
+        NULL;
+    END;
+    BEGIN
+      OE_CREDIT_CHECK_RPT.CREDIT_CHECK_PROCESSOR(P_PROFILE_ORG_ID => P_ORG_ID
+                                                ,P_CUST_PROF_CLASS_NAME_FROM => P_CUST_PROF_CLASS_LOW
+                                                ,P_CUST_PROF_CLASS_NAME_TO => P_CUST_PROF_CLASS_HIGH
+                                                ,P_PARTY_NAME_FROM => P_PARTY_NAME_LOW
+                                                ,P_PARTY_NAME_TO => P_PARTY_NAME_HIGH
+                                                ,P_CUST_ACCT_NUMBER_FROM => P_CUST_ACCT_NUMBER_LOW
+                                                ,P_CUST_ACCT_NUMBER_TO => P_CUST_ACCT_NUMBER_HIGH
+                                                ,P_ORDER_DATE_FROM => P_ORDER_DATE_LOW
+                                                ,P_ORDER_DATE_TO => P_ORDER_DATE_HIGH
+                                                ,P_HEADER_ID => P_HEADER_ID
+                                                ,P_ORDER_BY => P_ORDER_BY);
+    EXCEPTION
+      WHEN OTHERS THEN
+        /*SRW.MESSAGE(1
+                   ,'Credit_Check_Processor Unexpected Failure. Failed in BEFORE REPORT TRIGGER')*/NULL;
+        RETURN (FALSE);
+    END;
+    LP_ORDER_DATE_LOW:=to_char(P_ORDER_DATE_LOW,'DD-MON-YY');
+    LP_ORDER_DATE_HIGH:=to_char(P_ORDER_DATE_HIGH,'DD-MON-YY');
+    RETURN (TRUE);
+  END BEFOREREPORT;
+
+  FUNCTION AFTERREPORT RETURN BOOLEAN IS
+  BEGIN
+    BEGIN
+      /*SRW.USER_EXIT('FND SRWEXIT')*/NULL;
+    EXCEPTION
+      WHEN /*SRW.USER_EXIT_FAILURE*/OTHERS THEN
+        /*SRW.MESSAGE(1
+                   ,'Failed in AFTER REPORT TRIGGER')*/NULL;
+        RETURN (FALSE);
+    END;
+    RETURN (TRUE);
+  END AFTERREPORT;
+
+  FUNCTION RP_REPORT_NAME_P RETURN VARCHAR2 IS
+  BEGIN
+    RETURN RP_REPORT_NAME;
+  END RP_REPORT_NAME_P;
+
+  FUNCTION RP_DATA_FOUND_P RETURN VARCHAR2 IS
+  BEGIN
+    RETURN RP_DATA_FOUND;
+  END RP_DATA_FOUND_P;
+
+  FUNCTION RP_ORDER_TYPE_P RETURN VARCHAR2 IS
+  BEGIN
+    RETURN RP_ORDER_TYPE;
+  END RP_ORDER_TYPE_P;
+
+  FUNCTION RP_ORDER_BY_P RETURN VARCHAR2 IS
+  BEGIN
+    RETURN RP_ORDER_BY;
+  END RP_ORDER_BY_P;
+
+  FUNCTION RP_OPERATING_UNIT_P RETURN VARCHAR2 IS
+  BEGIN
+    RETURN RP_OPERATING_UNIT;
+  END RP_OPERATING_UNIT_P;
+
+  FUNCTION RP_ORDER_NUMBER_P RETURN NUMBER IS
+  BEGIN
+    RETURN RP_ORDER_NUMBER;
+  END RP_ORDER_NUMBER_P;
+
+END ONT_OEXAUCRC_XMLP_PKG;
+
+
+/

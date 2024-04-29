@@ -1,0 +1,63 @@
+--------------------------------------------------------
+--  DDL for Package AS_SALES_LEAD_RANKS_PKG
+--------------------------------------------------------
+
+  CREATE OR REPLACE EDITIONABLE PACKAGE "APPS"."AS_SALES_LEAD_RANKS_PKG" AUTHID CURRENT_USER as
+/* #$Header: asxtrnks.pls 115.5 2002/11/19 22:24:42 chchandr ship $ */
+
+procedure INSERT_ROW (
+  X_RANK_ID in OUT NOCOPY NUMBER,
+  X_MIN_SCORE in NUMBER,
+  X_MAX_SCORE in NUMBER,
+  X_ENABLED_FLAG in VARCHAR2,
+  X_MEANING in VARCHAR2,
+  X_DESCRIPTION IN VARCHAR2,
+  X_CREATION_DATE in DATE,
+  X_CREATED_BY in NUMBER,
+  X_LAST_UPDATE_DATE in DATE,
+  X_LAST_UPDATED_BY in NUMBER,
+  X_LAST_UPDATE_LOGIN in NUMBER);
+procedure LOCK_ROW (
+  X_RANK_ID in NUMBER,
+  X_MIN_SCORE in NUMBER,
+  X_MAX_SCORE in NUMBER,
+  X_ENABLED_FLAG in VARCHAR2,
+  X_MEANING in VARCHAR2
+);
+procedure UPDATE_ROW (
+  X_RANK_ID in NUMBER,
+  X_MIN_SCORE in NUMBER,
+  X_MAX_SCORE in NUMBER,
+  X_ENABLED_FLAG in VARCHAR2,
+  X_MEANING in VARCHAR2,
+  X_DESCRIPTION in VARCHAR2,
+  X_LAST_UPDATE_DATE in DATE,
+  X_LAST_UPDATED_BY in NUMBER,
+  X_LAST_UPDATE_LOGIN in NUMBER
+);
+procedure DELETE_ROW (
+  X_RANK_ID in NUMBER
+);
+
+procedure TRANSLATE_ROW (
+                P_sales_lead_rank_id IN NUMBER DEFAULT FND_API.G_MISS_NUM,
+                P_meaning            IN VARCHAR2 DEFAULT FND_API.G_MISS_CHAR,
+                P_owner              IN VARCHAR2 DEFAULT FND_API.G_MISS_CHAR
+);
+
+  PROCEDURE Load_Row (
+        X_RANK_ID in OUT NOCOPY NUMBER,
+        X_MIN_SCORE in NUMBER,
+        X_MAX_SCORE in NUMBER,
+        X_ENABLED_FLAG in VARCHAR2,
+        X_MEANING in VARCHAR2,
+        X_DESCRIPTION IN VARCHAR2,
+	   X_OWNER IN VARCHAR2
+        );
+
+procedure ADD_LANGUAGE;
+end AS_SALES_LEAD_RANKS_PKG;
+
+ 
+
+/

@@ -1,0 +1,114 @@
+--------------------------------------------------------
+--  DDL for Package Body PO_POXRVRER_XMLP_PKG
+--------------------------------------------------------
+
+  CREATE OR REPLACE EDITIONABLE PACKAGE BODY "APPS"."PO_POXRVRER_XMLP_PKG" AS
+/* $Header: POXRVRERB.pls 120.2 2008/01/06 10:20:49 dwkrishn noship $ */
+  USER_EXIT_FAILURE EXCEPTION;
+
+  FUNCTION BEFOREREPORT RETURN BOOLEAN IS
+  BEGIN
+    DECLARE
+      L_SORT PO_LOOKUP_CODES.DISPLAYED_FIELD%TYPE;
+      L_ORG_DISPLAYED ORG_ORGANIZATION_DEFINITIONS.ORGANIZATION_NAME%TYPE;
+    BEGIN
+
+
+      QTY_PRECISION := PO_COMMON_xmlp_pkg.GET_PRECISION(P_QTY_PRECISION);
+
+      IF P_SORT IS NOT NULL THEN
+        SELECT
+          DISPLAYED_FIELD
+        INTO
+          L_SORT
+        FROM
+          PO_LOOKUP_CODES
+        WHERE LOOKUP_CODE = P_SORT
+          AND LOOKUP_TYPE = 'SRS ORDER BY';
+        P_SORT_DISP := L_SORT;
+      ELSE
+        P_SORT_DISP := '';
+      END IF;
+      IF P_ORG_ID IS NOT NULL THEN
+        SELECT
+          ORGANIZATION_NAME
+        INTO
+          L_ORG_DISPLAYED
+        FROM
+          ORG_ORGANIZATION_DEFINITIONS
+        WHERE ORGANIZATION_ID = P_ORG_ID;
+        P_ORG_DISPLAYED := L_ORG_DISPLAYED;
+      ELSE
+        P_ORG_DISPLAYED := '';
+      END IF;
+    END;
+    BEGIN
+      P_CONC_REQUEST_ID := FND_GLOBAL.CONC_REQUEST_ID;
+    EXCEPTION
+      WHEN USER_EXIT_FAILURE THEN
+        NULL;
+    END;
+    BEGIN
+      NULL;
+    EXCEPTION
+      WHEN USER_EXIT_FAILURE THEN
+        NULL;
+    END;
+    BEGIN
+      NULL;
+    EXCEPTION
+      WHEN USER_EXIT_FAILURE THEN
+        NULL;
+    END;
+    RETURN TRUE;
+    RETURN (TRUE);
+  END BEFOREREPORT;
+
+  FUNCTION AFTERREPORT RETURN BOOLEAN IS
+  BEGIN
+    RETURN (TRUE);
+  END AFTERREPORT;
+
+  PROCEDURE GET_PRECISION IS
+  BEGIN
+    IF P_QTY_PRECISION = 0 THEN
+      NULL;
+    ELSE
+      IF P_QTY_PRECISION = 1 THEN
+        NULL;
+      ELSE
+        IF P_QTY_PRECISION = 3 THEN
+          NULL;
+        ELSE
+          IF P_QTY_PRECISION = 4 THEN
+            NULL;
+          ELSE
+            IF P_QTY_PRECISION = 5 THEN
+              NULL;
+            ELSE
+              IF P_QTY_PRECISION = 6 THEN
+                NULL;
+              ELSE
+                NULL;
+              END IF;
+            END IF;
+          END IF;
+        END IF;
+      END IF;
+    END IF;
+  END GET_PRECISION;
+
+  FUNCTION ORDERBY_CLAUSEFORMULA RETURN VARCHAR2 IS
+  BEGIN
+    IF P_SORT = 'VENDOR' THEN
+      RETURN ('2');
+    ELSIF P_SORT = 'PO NUMBER' THEN
+      RETURN ('18, 19');
+    END IF;
+    RETURN '2';
+  END ORDERBY_CLAUSEFORMULA;
+
+END PO_POXRVRER_XMLP_PKG;
+
+
+/

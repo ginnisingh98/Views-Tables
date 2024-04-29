@@ -1,0 +1,143 @@
+--------------------------------------------------------
+--  DDL for Package Body PA_CI_ACTIONS_PKG
+--------------------------------------------------------
+
+  CREATE OR REPLACE EDITIONABLE PACKAGE BODY "APPS"."PA_CI_ACTIONS_PKG" as
+/* $Header: PACIACTB.pls 120.0 2005/06/03 13:47:53 appldev noship $ */
+procedure INSERT_ROW (
+    P_CI_ACTION_ID		out NOCOPY NUMBER,
+    P_CI_ID                     in NUMBER,
+    P_CI_ACTION_NUMBER		in NUMBER,
+    P_STATUS_CODE   		in VARCHAR2,
+    P_TYPE_CODE			in VARCHAR2,
+    P_ASSIGNED_TO		in NUMBER,
+    P_DATE_REQUIRED 		in DATE,
+    P_SIGN_OFF_REQUIRED_FLAG    in VARCHAR2,
+    P_DATE_CLOSED		in DATE,
+    P_SIGN_OFF_FLAG		in VARCHAR2,
+    P_SOURCE_CI_ACTION_ID	in NUMBER,
+    P_LAST_UPDATED_BY		in NUMBER,
+    P_CREATED_BY		in NUMBER,
+    P_CREATION_DATE		in DATE,
+    P_LAST_UPDATE_DATE		in DATE,
+    P_LAST_UPDATE_LOGIN		in NUMBER,
+    P_RECORD_VERSION_NUMBER     in NUMBER
+) IS
+      -- Enter the procedure variables here. As shown below
+    CURSOR  c1 IS
+     SELECT rowid
+     FROM   PA_CI_ACTIONS
+     WHERE  ci_action_id = p_ci_action_id;
+
+    l_row_id  ROWID;
+
+BEGIN
+
+   Insert into PA_CI_ACTIONS (
+    CI_ACTION_ID,
+    CI_ID,
+    CI_ACTION_NUMBER,
+    STATUS_CODE,
+    TYPE_CODE,
+    ASSIGNED_TO,
+    DATE_REQUIRED,
+    SIGN_OFF_REQUIRED_FLAG,
+    DATE_CLOSED,
+    SIGN_OFF_FLAG,
+    SOURCE_CI_ACTION_ID,
+    LAST_UPDATED_BY,
+    CREATED_BY,
+    CREATION_DATE,
+    LAST_UPDATE_DATE,
+    LAST_UPDATE_LOGIN,
+    RECORD_VERSION_NUMBER
+    ) VALUES
+  (  PA_CI_ACTIONS_S.NEXTVAL,
+    P_CI_ID,
+    P_CI_ACTION_NUMBER,
+    P_STATUS_CODE,
+    P_TYPE_CODE,
+    P_ASSIGNED_TO,
+    P_DATE_REQUIRED,
+    P_SIGN_OFF_REQUIRED_FLAG,
+    P_DATE_CLOSED,
+    P_SIGN_OFF_FLAG,
+    P_SOURCE_CI_ACTION_ID,
+    P_LAST_UPDATED_BY,
+    P_CREATED_BY,
+    P_CREATION_DATE,
+    P_LAST_UPDATE_DATE,
+    P_LAST_UPDATE_LOGIN,
+    P_RECORD_VERSION_NUMBER
+  ) returning ci_action_id INTO p_ci_action_id;
+
+
+  EXCEPTION
+    WHEN OTHERS THEN -- catch the exceptions here
+        RAISE;
+  END INSERT_ROW;
+
+procedure UPDATE_ROW (
+    P_CI_ACTION_ID		in NUMBER,
+    P_CI_ID                     in NUMBER,
+    P_STATUS_CODE   		in VARCHAR2,
+    P_TYPE_CODE			in VARCHAR2,
+    P_ASSIGNED_TO		in NUMBER,
+    P_DATE_REQUIRED 		in DATE,
+    P_SIGN_OFF_REQUIRED_FLAG    in VARCHAR2,
+    P_DATE_CLOSED		in DATE,
+    P_SIGN_OFF_FLAG		in VARCHAR2,
+    P_SOURCE_CI_ACTION_ID	in NUMBER,
+    P_LAST_UPDATED_BY		in NUMBER,
+    P_CREATED_BY		in NUMBER,
+    P_CREATION_DATE		in DATE,
+    P_LAST_UPDATE_DATE		in DATE,
+    P_LAST_UPDATE_LOGIN		in NUMBER,
+    P_RECORD_VERSION_NUMBER     in NUMBER
+) IS
+ BEGIN
+   UPDATE PA_CI_ACTIONS
+   SET
+    CI_ID           =   P_CI_ID,
+    STATUS_CODE     =   P_STATUS_CODE,
+    TYPE_CODE       =   P_TYPE_CODE,
+    ASSIGNED_TO     =   P_ASSIGNED_TO,
+    DATE_REQUIRED   =   P_DATE_REQUIRED,
+    SIGN_OFF_REQUIRED_FLAG  =   P_SIGN_OFF_REQUIRED_FLAG,
+    DATE_CLOSED     =   P_DATE_CLOSED,
+    SIGN_OFF_FLAG   =   P_SIGN_OFF_FLAG,
+    SOURCE_CI_ACTION_ID     =   P_SOURCE_CI_ACTION_ID,
+    LAST_UPDATED_BY =   P_LAST_UPDATED_BY,
+    CREATED_BY      =   P_CREATED_BY,
+    CREATION_DATE   =   P_CREATION_DATE,
+    LAST_UPDATE_DATE    =   P_LAST_UPDATE_DATE,
+    LAST_UPDATE_LOGIN   =   P_LAST_UPDATE_LOGIN,
+    RECORD_VERSION_NUMBER = P_RECORD_VERSION_NUMBER+1
+   WHERE CI_ACTION_ID  	    =  P_CI_ACTION_ID;
+ EXCEPTION
+    WHEN OTHERS THEN -- catch the exceptins here
+        RAISE;
+ END UPDATE_ROW;
+
+
+
+procedure DELETE_ROW (
+		      P_CI_ACTION_ID in NUMBER
+              )
+ IS
+ BEGIN
+   DELETE FROM PA_CI_ACTIONS
+   WHERE CI_ACTION_ID = P_CI_ACTION_ID;
+
+ EXCEPTION
+    WHEN OTHERS THEN
+        RAISE;
+ END DELETE_ROW;
+
+
+   -- Enter further code below as specified in the Package spec.
+END PA_CI_ACTIONS_PKG; -- Package Body PA_CI_ACTION_PKG
+
+
+
+/

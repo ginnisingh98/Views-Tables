@@ -1,0 +1,112 @@
+--------------------------------------------------------
+--  DDL for Package Body BPEL_UPDATEORDEREBS11I10TOCOMS
+--------------------------------------------------------
+
+  CREATE OR REPLACE EDITIONABLE PACKAGE BODY "APPS"."BPEL_UPDATEORDEREBS11I10TOCOMS" AS
+/* $Header: OEXCGNOB.pls 120.2 2007/12/19 13:33:16 sahvivek noship $ */
+
+
+	FUNCTION PL_TO_SQL2(aPlsqlItem OE_ACKNOWLEDGMENT_PUB.HEADER_ACK_REC_TYPE)
+ 	RETURN OE_ACKNOWLEDGMENT_PUB_HEADER_ IS
+	aSqlItem OE_ACKNOWLEDGMENT_PUB_HEADER_;
+	BEGIN
+    aSqlItem  :=  oe_outbound_int.PL_TO_SQL2(aPlsqlItem);
+		RETURN aSqlItem;
+	END PL_TO_SQL2;
+
+
+	FUNCTION SQL_TO_PL2(aSqlItem OE_ACKNOWLEDGMENT_PUB_HEADER_)
+	RETURN OE_ACKNOWLEDGMENT_PUB.HEADER_ACK_REC_TYPE IS
+	aPlsqlItem OE_ACKNOWLEDGMENT_PUB.HEADER_ACK_REC_TYPE;
+	BEGIN
+    aPlsqlItem  :=  oe_outbound_int.SQL_TO_PL2(aSqlItem);
+		RETURN aPlsqlItem;
+	END SQL_TO_PL2;
+
+	FUNCTION PL_TO_SQL0(aPlsqlItem OE_ACKNOWLEDGMENT_PUB.HEADER_ACK_TBL_TYPE)
+ 	RETURN OE_SYNC_ORDER_PVT_HEADER_ACK_ IS
+	aSqlItem OE_SYNC_ORDER_PVT_HEADER_ACK_;
+	BEGIN
+    aSqlItem  :=  oe_outbound_int.PL_TO_SQL0(aPlsqlItem);
+		RETURN aSqlItem;
+	END PL_TO_SQL0;
+
+	FUNCTION SQL_TO_PL0(aSqlItem OE_SYNC_ORDER_PVT_HEADER_ACK_)
+	RETURN OE_ACKNOWLEDGMENT_PUB.HEADER_ACK_TBL_TYPE IS
+	aPlsqlItem OE_ACKNOWLEDGMENT_PUB.HEADER_ACK_TBL_TYPE;
+	BEGIN
+    aPlsqlItem  :=  oe_outbound_int.SQL_TO_PL0(aSqlItem);
+		RETURN aPlsqlItem;
+	END SQL_TO_PL0;
+
+	FUNCTION PL_TO_SQL3(aPlsqlItem OE_ACKNOWLEDGMENT_PUB.LINE_ACK_REC_TYPE)
+ 	RETURN OE_ACKNOWLEDGMENT_PUB_LINE_AC IS
+	aSqlItem OE_ACKNOWLEDGMENT_PUB_LINE_AC;
+	BEGIN
+    aSqlItem  :=  oe_outbound_int.PL_TO_SQL3(aPlsqlItem);
+		RETURN aSqlItem;
+	END PL_TO_SQL3;
+
+	FUNCTION SQL_TO_PL3(aSqlItem OE_ACKNOWLEDGMENT_PUB_LINE_AC)
+	RETURN OE_ACKNOWLEDGMENT_PUB.LINE_ACK_REC_TYPE IS
+	aPlsqlItem OE_ACKNOWLEDGMENT_PUB.LINE_ACK_REC_TYPE;
+	BEGIN
+    aPlsqlItem := oe_outbound_int.SQL_TO_PL3(aSqlItem);
+		RETURN aPlsqlItem;
+	END SQL_TO_PL3;
+
+	FUNCTION PL_TO_SQL1(aPlsqlItem OE_ACKNOWLEDGMENT_PUB.LINE_ACK_TBL_TYPE)
+ 	RETURN OE_SYNC_ORDER_PVT_LINE_ACK_TB IS
+	aSqlItem OE_SYNC_ORDER_PVT_LINE_ACK_TB;
+	BEGIN
+    aSqlItem  :=  oe_outbound_int.PL_TO_SQL1(aPlsqlItem);
+		RETURN aSqlItem;
+	END PL_TO_SQL1;
+
+	FUNCTION SQL_TO_PL1(aSqlItem OE_SYNC_ORDER_PVT_LINE_ACK_TB)
+	RETURN OE_ACKNOWLEDGMENT_PUB.LINE_ACK_TBL_TYPE IS
+	aPlsqlItem OE_ACKNOWLEDGMENT_PUB.LINE_ACK_TBL_TYPE;
+	BEGIN
+    aPlsqlItem := oe_outbound_int.SQL_TO_PL1(aSqlItem);
+		RETURN aPlsqlItem;
+	END SQL_TO_PL1;
+
+   PROCEDURE OE_SYNC_ORDER_PVT$PROCESS_ORD (
+            P_HEADER_ID       NUMBER,
+            P_HDR_REQ_ID      NUMBER,
+            P_LINE_ID         NUMBER,
+            P_LIN_REQ_ID      NUMBER,
+            P_HOLD_SOURCE_ID  NUMBER,
+            P_ORDER_HOLD_ID   NUMBER,
+            P_CHANGE_TYPE     VARCHAR2,
+            P_HDR_ACK_TBL     OUT NOCOPY OE_SYNC_ORDER_PVT_HEADER_ACK_,
+            P_LINE_ACK_TBL    OUT NOCOPY OE_SYNC_ORDER_PVT_LINE_ACK_TB,
+            X_RETURN_STATUS   OUT NOCOPY VARCHAR2,
+            X_MSG_COUNT       OUT NOCOPY NUMBER,
+            X_MSG_DATA        OUT NOCOPY VARCHAR2)
+      IS
+   BEGIN
+      oe_debug_pub.add('Entering Procedure oe_outbound_int.sync_order...');
+
+      oe_outbound_int.Sync_Order
+      (
+            P_HEADER_ID,
+            P_HDR_REQ_ID,
+            P_LINE_ID,
+            P_LIN_REQ_ID,
+            P_HOLD_SOURCE_ID,
+            P_ORDER_HOLD_ID,
+            P_CHANGE_TYPE,
+            P_HDR_ACK_TBL,
+            P_LINE_ACK_TBL,
+            X_RETURN_STATUS,
+            X_MSG_COUNT,
+            X_MSG_DATA
+      );
+      oe_debug_pub.add('Entering Procedure oe_outbound_int.sync_order...');
+   END OE_SYNC_ORDER_PVT$PROCESS_ORD;
+
+END BPEL_UPDATEORDEREBS11I10TOCOMS;
+
+
+/

@@ -1,0 +1,127 @@
+--------------------------------------------------------
+--  DDL for Package AS_INTERESTS_PKG
+--------------------------------------------------------
+
+  CREATE OR REPLACE EDITIONABLE PACKAGE "APPS"."AS_INTERESTS_PKG" AUTHID CURRENT_USER as
+/* $Header: asxinins.pls 115.7 2003/11/03 15:00:02 gbatra ship $ */
+
+PROCEDURE Insert_Row(X_Rowid                         IN OUT NOCOPY VARCHAR2,
+                     X_Interest_Id                   IN OUT NOCOPY NUMBER,
+                     X_Last_Update_Date                     DATE,
+                     X_Last_Updated_By                      NUMBER,
+                     X_Creation_Date                        DATE,
+                     X_Created_By                           NUMBER,
+                     X_Last_Update_Login                    NUMBER,
+             X_Interest_Use_Code            VARCHAR2,
+                     X_Interest_Type_Id                     NUMBER,
+                     X_Contact_Id                           NUMBER,
+                     X_Customer_Id                          NUMBER,
+                     X_Address_Id                           NUMBER,
+                     X_Primary_Interest_Code_Id             NUMBER DEFAULT NULL,
+                     X_Secondary_Interest_Code_Id           NUMBER DEFAULT NULL,
+                     X_Status_Code                          VARCHAR2 DEFAULT NULL,
+                     X_Description                          VARCHAR2 DEFAULT NULL,
+                     X_Attribute_Category                   VARCHAR2 DEFAULT NULL,
+                     X_Attribute1                           VARCHAR2 DEFAULT NULL,
+                     X_Attribute2                           VARCHAR2 DEFAULT NULL,
+                     X_Attribute3                           VARCHAR2 DEFAULT NULL,
+                     X_Attribute4                           VARCHAR2 DEFAULT NULL,
+                     X_Attribute5                           VARCHAR2 DEFAULT NULL,
+                     X_Attribute6                           VARCHAR2 DEFAULT NULL,
+                     X_Attribute7                           VARCHAR2 DEFAULT NULL,
+                     X_Attribute8                           VARCHAR2 DEFAULT NULL,
+                     X_Attribute9                           VARCHAR2 DEFAULT NULL,
+                     X_Attribute10                          VARCHAR2 DEFAULT NULL,
+                     X_Attribute11                          VARCHAR2 DEFAULT NULL,
+                     X_Attribute12                          VARCHAR2 DEFAULT NULL,
+                     X_Attribute13                          VARCHAR2 DEFAULT NULL,
+                     X_Attribute14                          VARCHAR2 DEFAULT NULL,
+                     X_Attribute15                          VARCHAR2 DEFAULT NULL,
+             X_Lead_Id                  NUMBER DEFAULT NULL,
+             X_Request_Id                           NUMBER DEFAULT NULL,
+                     X_Program_Application_Id               NUMBER DEFAULT NULL,
+                     X_Program_Id                           NUMBER DEFAULT NULL,
+                     X_Program_Update_Date                  DATE DEFAULT NULL,
+                     X_Product_Category_Id                  NUMBER,
+                     X_Product_Cat_Set_Id                      NUMBER
+);
+
+PROCEDURE Lock_Row(X_Rowid                                  VARCHAR2,
+                   X_Interest_Id                            NUMBER,
+           X_Interest_Use_Code              VARCHAR2,
+           X_Interest_Type_Id               NUMBER,
+                   X_Contact_Id                             NUMBER,
+                   X_Customer_Id                            NUMBER,
+                   X_Address_Id                             NUMBER,
+                   X_Primary_Interest_Code_Id               NUMBER DEFAULT NULL,
+                   X_Secondary_Interest_Code_Id             NUMBER DEFAULT NULL,
+                   X_Status_Code                            VARCHAR2 DEFAULT NULL,
+                   X_Description                            VARCHAR2 DEFAULT NULL,
+                   X_Attribute_Category                     VARCHAR2 DEFAULT NULL,
+                   X_Attribute1                             VARCHAR2 DEFAULT NULL,
+                   X_Attribute2                             VARCHAR2 DEFAULT NULL,
+                   X_Attribute3                             VARCHAR2 DEFAULT NULL,
+                   X_Attribute4                             VARCHAR2 DEFAULT NULL,
+                   X_Attribute5                             VARCHAR2 DEFAULT NULL,
+                   X_Attribute6                             VARCHAR2 DEFAULT NULL,
+                   X_Attribute7                             VARCHAR2 DEFAULT NULL,
+                   X_Attribute8                             VARCHAR2 DEFAULT NULL,
+                   X_Attribute9                             VARCHAR2 DEFAULT NULL,
+                   X_Attribute10                            VARCHAR2 DEFAULT NULL,
+                   X_Attribute11                            VARCHAR2 DEFAULT NULL,
+                   X_Attribute12                            VARCHAR2 DEFAULT NULL,
+                   X_Attribute13                            VARCHAR2 DEFAULT NULL,
+                   X_Attribute14                            VARCHAR2 DEFAULT NULL,
+                   X_Attribute15                            VARCHAR2 DEFAULT NULL,
+           X_Lead_Id                    NUMBER DEFAULT NULL,
+                   X_Product_Category_Id                    NUMBER,
+                   X_Product_Cat_Set_Id                        NUMBER
+);
+
+
+PROCEDURE Update_Row(X_Rowid                               VARCHAR2,
+                     X_Interest_Id                         NUMBER,
+                     X_Last_Update_Date                    DATE,
+                     X_Last_Updated_By                     NUMBER,
+                     X_Last_Update_Login                   NUMBER,
+             X_Interest_Use_Code           VARCHAR2,
+             X_Interest_Type_Id            NUMBER,
+                     X_Contact_Id                          NUMBER,
+                     X_Customer_Id                         NUMBER,
+                     X_Address_Id                          NUMBER,
+                     X_Primary_Interest_Code_Id            NUMBER DEFAULT FND_API.G_MISS_NUM,
+                     X_Secondary_Interest_Code_Id          NUMBER DEFAULT FND_API.G_MISS_NUM,
+                     X_Status_Code                         VARCHAR2 DEFAULT FND_API.G_MISS_CHAR,
+                     X_Description                         VARCHAR2 DEFAULT FND_API.G_MISS_CHAR,
+                     X_Attribute_Category                  VARCHAR2 DEFAULT FND_API.G_MISS_CHAR,
+                     X_Attribute1                          VARCHAR2 DEFAULT FND_API.G_MISS_CHAR,
+                     X_Attribute2                          VARCHAR2 DEFAULT FND_API.G_MISS_CHAR,
+                     X_Attribute3                          VARCHAR2 DEFAULT FND_API.G_MISS_CHAR,
+                     X_Attribute4                          VARCHAR2 DEFAULT FND_API.G_MISS_CHAR,
+                     X_Attribute5                          VARCHAR2 DEFAULT FND_API.G_MISS_CHAR,
+                     X_Attribute6                          VARCHAR2 DEFAULT FND_API.G_MISS_CHAR,
+                     X_Attribute7                          VARCHAR2 DEFAULT FND_API.G_MISS_CHAR,
+                     X_Attribute8                          VARCHAR2 DEFAULT FND_API.G_MISS_CHAR,
+                     X_Attribute9                          VARCHAR2 DEFAULT FND_API.G_MISS_CHAR,
+                     X_Attribute10                         VARCHAR2 DEFAULT FND_API.G_MISS_CHAR,
+                     X_Attribute11                         VARCHAR2 DEFAULT FND_API.G_MISS_CHAR,
+                     X_Attribute12                         VARCHAR2 DEFAULT FND_API.G_MISS_CHAR,
+                     X_Attribute13                         VARCHAR2 DEFAULT FND_API.G_MISS_CHAR,
+                     X_Attribute14                         VARCHAR2 DEFAULT FND_API.G_MISS_CHAR,
+                     X_Attribute15                         VARCHAR2 DEFAULT FND_API.G_MISS_CHAR,
+             X_Lead_Id                 NUMBER DEFAULT FND_API.G_MISS_NUM,
+             X_Request_Id                          NUMBER DEFAULT NULL,
+                     X_Program_Application_Id              NUMBER DEFAULT NULL,
+                     X_Program_Id                          NUMBER DEFAULT NULL,
+                     X_Program_Update_Date                 DATE DEFAULT NULL,
+                     X_Product_Category_Id                 NUMBER,
+                     X_Product_Cat_Set_Id                     NUMBER
+);
+
+PROCEDURE Delete_Row(X_Rowid VARCHAR2);
+
+END AS_INTERESTS_PKG;
+
+ 
+
+/

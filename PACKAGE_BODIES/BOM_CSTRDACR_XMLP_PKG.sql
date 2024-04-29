@@ -1,0 +1,115 @@
+--------------------------------------------------------
+--  DDL for Package Body BOM_CSTRDACR_XMLP_PKG
+--------------------------------------------------------
+
+  CREATE OR REPLACE EDITIONABLE PACKAGE BODY "APPS"."BOM_CSTRDACR_XMLP_PKG" AS
+/* $Header: CSTRDACRB.pls 120.0 2007/12/24 09:53:53 dwkrishn noship $ */
+  FUNCTION BEFOREREPORT RETURN BOOLEAN IS
+  BEGIN
+    DECLARE
+      EAM_ORG_COUNT NUMBER;
+      L_CURRENCY VARCHAR2(15);
+    BEGIN
+      SELECT
+        count(*)
+      INTO EAM_ORG_COUNT
+      FROM
+        MTL_PARAMETERS
+      WHERE ORGANIZATION_ID = P_ORG_ID
+        AND EAM_ENABLED_FLAG = 'Y';
+      IF EAM_ORG_COUNT < 1 THEN
+        FND_MESSAGE.SET_NAME('BOM'
+                            ,'CST_EAM_ORG_REPORT_ONLY');
+        /*SRW.MESSAGE(24200
+                   ,FND_MESSAGE.GET)*/NULL;
+        RETURN FALSE;
+      END IF;
+      SELECT
+        OAP1.PERIOD_START_DATE,
+        OAP2.SCHEDULE_CLOSE_DATE
+      INTO P_PERIOD_DATE_FROM,P_PERIOD_DATE_TO
+      FROM
+        ORG_ACCT_PERIODS OAP1,
+        ORG_ACCT_PERIODS OAP2
+      WHERE OAP1.ORGANIZATION_ID = P_ORG_ID
+        AND OAP1.ACCT_PERIOD_ID = P_PERIOD_ID_FROM
+        AND OAP2.ORGANIZATION_ID = P_ORG_ID
+        AND OAP2.ACCT_PERIOD_ID = P_PERIOD_ID_TO;
+      SELECT
+        OOD.ORGANIZATION_NAME,
+        SOB.CURRENCY_CODE
+      INTO P_ORG_NAME,L_CURRENCY
+      FROM
+        CST_ORGANIZATION_DEFINITIONS OOD,
+        GL_SETS_OF_BOOKS SOB
+      WHERE OOD.ORGANIZATION_ID = P_ORG_ID
+        AND OOD.SET_OF_BOOKS_ID = SOB.SET_OF_BOOKS_ID;
+      P_EXCHANGE_RATE := FND_NUMBER.CANONICAL_TO_NUMBER(P_EXCHANGE_RATE_CHAR);
+      IF L_CURRENCY = P_CURRENCY_CODE THEN
+        P_CURRENCY_DSP := P_CURRENCY_CODE;
+      ELSE
+        P_CURRENCY_DSP := P_CURRENCY_CODE || ' @ ' || TO_CHAR(ROUND(1 / P_EXCHANGE_RATE
+                                       ,5)) || ' ' || L_CURRENCY;
+      END IF;
+      SELECT
+        NVL(MINIMUM_ACCOUNTABLE_UNIT
+           ,POWER(10
+                ,NVL(-PRECISION
+                   ,0)))
+      INTO P_ROUND_UNIT
+      FROM
+        FND_CURRENCIES
+      WHERE CURRENCY_CODE = P_CURRENCY_CODE;
+    END;
+    RETURN (TRUE);
+  END BEFOREREPORT;
+
+  FUNCTION AFTERPFORM RETURN BOOLEAN IS
+    L_ENABLE_TRACE VARCHAR(1);
+  BEGIN
+    BEGIN
+      P_CONC_REQUEST_ID := FND_GLOBAL.CONC_REQUEST_ID;
+      /*SRW.USER_EXIT('FND SRWINIT')*/NULL;
+    EXCEPTION
+      WHEN OTHERS THEN
+        /*SRW.MESSAGE(999
+                   ,'FND SRWINIT >X')*/NULL;
+        RAISE;
+    END;
+    IF P_PERIOD_ID_FROM = P_PERIOD_ID_TO THEN
+      P_PERIOD_WEPB_WHERE := 'and wepb.acct_period_id = :P_PERIOD_ID_FROM';
+      P_PERIOD_WPB_WHERE := 'and wpb.acct_period_id = :P_PERIOD_ID_FROM';
+    ELSE
+      P_PERIOD_WEPB_WHERE := 'and wepb.acct_period_id between :P_PERIOD_ID_FROM and :P_PERIOD_ID_TO';
+      P_PERIOD_WPB_WHERE := 'and wpb.acct_period_id between :P_PERIOD_ID_FROM and :P_PERIOD_ID_TO';
+    END IF;
+    IF P_DEPT_FROM IS NOT NULL THEN
+      IF P_DEPT_TO IS NOT NULL THEN
+        IF P_DEPT_FROM = P_DEPT_TO THEN
+          P_DEPT_WHERE := 'and bd.department_code = :P_DEPT_FROM';
+        ELSE
+          P_DEPT_WHERE := 'and bd.department_code between :P_DEPT_FROM and :P_DEPT_TO';
+        END IF;
+      ELSE
+        P_DEPT_WHERE := 'and bd.department_code >= :P_DEPT_FROM';
+      END IF;
+    ELSE
+      IF P_DEPT_TO IS NOT NULL THEN
+        P_DEPT_WHERE := 'and bd.department_code <= :P_DEPT_TO';
+      ELSE
+        P_DEPT_WHERE := ' ';
+      END IF;
+    END IF;
+    RETURN (TRUE);
+  END AFTERPFORM;
+
+  FUNCTION AFTERREPORT RETURN BOOLEAN IS
+  BEGIN
+    /*SRW.USER_EXIT('FND SRWEXIT')*/NULL;
+    RETURN (TRUE);
+  END AFTERREPORT;
+
+END BOM_CSTRDACR_XMLP_PKG;
+
+
+/

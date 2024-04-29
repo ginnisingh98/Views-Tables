@@ -1,0 +1,41 @@
+--------------------------------------------------------
+--  DDL for Package CCT_RESOURCE_ASSIGNMENT
+--------------------------------------------------------
+
+  CREATE OR REPLACE EDITIONABLE PACKAGE "APPS"."CCT_RESOURCE_ASSIGNMENT" AUTHID CURRENT_USER as
+/* $Header: cctrsass.pls 120.0 2005/06/02 09:47:10 appldev noship $ */
+
+
+PROCEDURE ASSIGN_RESPONSIBILITY
+          (
+	   X_USER_ID           NUMBER,
+	   X_RESPONSIBILITY_ID NUMBER,
+	   X_APPLICATION_ID    NUMBER
+	  );
+
+PROCEDURE ASSIGN_RESPONSIBILITY
+          (
+	   X_USER_ID            NUMBER,
+	   X_RESPONSIBILITY_KEY VARCHAR2
+	  );
+
+PROCEDURE REVOKE_RESPONSIBILITY
+          (
+	   X_USER_ID            NUMBER,
+	   X_RESPONSIBILITY_KEY VARCHAR2
+	  );
+
+PROCEDURE REVOKE_RESPONSIBILITY
+          (
+	   X_USER_ID           NUMBER,
+	   X_RESPONSIBILITY_ID NUMBER,
+	   X_APPLICATION_ID    NUMBER
+	  );
+
+
+
+END CCT_RESOURCE_ASSIGNMENT;
+
+ 
+
+/

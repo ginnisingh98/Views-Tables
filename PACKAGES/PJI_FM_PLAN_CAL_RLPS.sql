@@ -1,0 +1,95 @@
+--------------------------------------------------------
+--  DDL for Package PJI_FM_PLAN_CAL_RLPS
+--------------------------------------------------------
+
+  CREATE OR REPLACE EDITIONABLE PACKAGE "APPS"."PJI_FM_PLAN_CAL_RLPS" AUTHID CURRENT_USER AS
+/* $Header: PJIPP04S.pls 120.0 2005/05/29 12:51:52 appldev noship $ */
+
+--
+-- Actuals and commitments calendar rollups..
+--
+PROCEDURE CREATE_AC_PA_ROLLUP ;
+
+PROCEDURE CREATE_AC_GL_ROLLUP ;
+
+PROCEDURE CREATE_AC_ENT_ROLLUP ;
+
+PROCEDURE CREATE_AC_ALL_T_PRI_ROLLUP (
+  p_calendar_type IN VARCHAR2 := 'G' );
+
+--
+-- Plans calendar rollups for primary and secondary slices.
+--
+PROCEDURE CREATE_FP_PA_ROLLUP; -- Public
+
+PROCEDURE CREATE_FP_GL_ROLLUP; -- Public
+
+PROCEDURE CREATE_FP_NONTP_ROLLUP; -- Public
+
+PROCEDURE CREATE_FP_ENT_ROLLUP; -- Public
+
+PROCEDURE CREATE_FP_PA_PRI_ROLLUP;
+
+PROCEDURE CREATE_FP_GL_PRI_ROLLUP;
+
+PROCEDURE CREATE_FP_ALL_T_PRI_ROLLUP (
+  p_calendar_type IN VARCHAR2 := 'G' );
+
+
+PROCEDURE CREATE_FP_ALLT_PRI_AGGREGATE;
+
+PROCEDURE CREATE_FP_PA_SEC_ROLLUP;
+
+PROCEDURE CREATE_FP_GL_SEC_ROLLUP;
+
+PROCEDURE CREATE_FP_ALLT_SEC_AGGREGATE;
+
+PROCEDURE CREATE_FP_ENT_SEC_ROLLUP;
+
+
+--
+-- Prorate to ENT cal based on prorate format.
+--
+PROCEDURE PRORATE_TO_ENT_PG_PJP1_D;
+
+PROCEDURE PRORATE_TO_ENT_PG_FPRL_D;
+
+PROCEDURE PRORATE_TO_ENT_N_PJP1_D;
+
+PROCEDURE PRORATE_TO_ENT_PG_PJP1_SE( p_prorating_format IN VARCHAR2); --Bug 4005006
+
+PROCEDURE PRORATE_TO_ENT_PG_FPRL_SE;
+
+PROCEDURE PRORATE_TO_ENT_N_PJP1_SE( p_prorating_format IN VARCHAR2); --Bug 4005006
+
+
+--
+-- Prorate to PA/GL cal based on prorate format.
+--
+PROCEDURE PRORATE_TO_PAGL_PGE_PJP1_D
+( p_calendar_type IN VARCHAR2 := NULL );
+
+PROCEDURE PRORATE_TO_PAGL_PGE_FPRL_D
+( p_calendar_type IN VARCHAR2 := NULL );
+
+PROCEDURE PRORATE_TO_PAGL_N_PJP1_D
+( p_calendar_type IN VARCHAR2 := NULL );
+
+PROCEDURE PRORATE_TO_PAGL_PGE_PJP1_SE
+( p_calendar_type IN VARCHAR2 := NULL ,
+   p_prorating_format IN VARCHAR2);-- Bug 4005006
+
+PROCEDURE PRORATE_TO_PAGL_PGE_FPRL_SE
+( p_calendar_type IN VARCHAR2 := NULL );
+
+PROCEDURE PRORATE_TO_PAGL_N_PJP1_SE
+( p_calendar_type IN VARCHAR2 := NULL ,
+   p_prorating_format IN VARCHAR2);-- Bug 4005006
+
+
+
+END PJI_FM_PLAN_CAL_RLPS;
+
+ 
+
+/

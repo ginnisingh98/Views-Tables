@@ -1,0 +1,395 @@
+--------------------------------------------------------
+--  DDL for Package Body FA_LEASE_PUB
+--------------------------------------------------------
+
+  CREATE OR REPLACE EDITIONABLE PACKAGE BODY "APPS"."FA_LEASE_PUB" AS
+/* $Header: FAPLEAB.pls 120.3.12010000.2 2009/07/19 12:14:29 glchen ship $ */
+
+--*********************** GLOBAL CONSTANTS *******************************--
+G_PKG_NAME      CONSTANT   VARCHAR2(30) := 'FA_LEASE_PUB';
+G_API_NAME      CONSTANT   VARCHAR2(30) := 'LEASE API';
+G_API_VERSION   CONSTANT   NUMBER       := 1.0;
+
+g_log_level_rec fa_api_types.log_level_rec_type;
+
+--*********************** PUBLIC PROCEDURES *****************************--
+----------------------------------------
+-- CREATE LEASE PUBLIC API
+----------------------------------------
+PROCEDURE CREATE_LEASE  (
+   P_API_VERSION          IN      NUMBER,
+   P_INIT_MSG_LIST        IN      VARCHAR2 := FND_API.G_FALSE,
+   P_COMMIT               IN      VARCHAR2 := FND_API.G_FALSE,
+   P_VALIDATION_LEVEL     IN      NUMBER   := FND_API.G_VALID_LEVEL_FULL,
+   X_RETURN_STATUS           OUT  NOCOPY VARCHAR2,
+   X_MSG_COUNT               OUT  NOCOPY NUMBER,
+   X_MSG_DATA                OUT  NOCOPY VARCHAR2,
+   P_CALLING_FN           IN      VARCHAR2,
+   P_TRANS_REC            IN      FA_API_TYPES.TRANS_REC_TYPE,
+   PX_LEASE_DETAILS_REC   IN OUT  NOCOPY FA_API_TYPES.LEASE_DETAILS_REC_TYPE) IS
+
+   VALUE_ERROR_EXCEPTION  	EXCEPTION;
+   L_ROWID			VARCHAR2(100):=NULL;
+   L_LEASE_ID			NUMBER:=NULL;
+   L_PRESENT_VALUE 		NUMBER:=NULL;
+   L_ECONOMIC_TEST 		VARCHAR2(1):=NULL;
+   L_PRESENT_TEST 		VARCHAR2(1):=NULL;
+   L_FASB_LEASE_TYPE 		VARCHAR2(15):=NULL;
+   L_COST_CAPITALIZED		NUMBER:=NULL;
+   L_API_NAME			CONSTANT VARCHAR2(30) := 'CREATE_LEASE';
+   L_API_VERSION		CONSTANT NUMBER := 1.0;
+   L_LEASE_DETAILS_REC	      	FA_API_TYPES.LEASE_DETAILS_REC_TYPE;
+
+   CURSOR C_PRESENT_VALUE IS
+   SELECT PRESENT_VALUE
+   FROM FA_LEASE_SCHEDULES
+   WHERE PAYMENT_SCHEDULE_ID= L_LEASE_DETAILS_REC.PAYMENT_SCHEDULE_ID;
+
+   PRESENT_VALUE_NOT_FOUND EXCEPTION;
+
+BEGIN
+
+  SAVEPOINT CREATE_LEASE;
+
+   if (not g_log_level_rec.initialized) then
+      if (NOT fa_util_pub.get_log_level_rec (
+                x_log_level_rec =>  g_log_level_rec
+      )) then
+         raise VALUE_ERROR_EXCEPTION;
+      end if;
+   end if;
+
+	---------------------------------------------------
+	-- STANDARD CALL TO CHECK FOR CALL COMPATIBILITY.
+	---------------------------------------------------
+
+	IF NOT FND_API.COMPATIBLE_API_CALL(L_API_VERSION, P_API_VERSION,
+			               L_API_NAME, G_PKG_NAME)
+	THEN
+		RAISE	FND_API.G_EXC_UNEXPECTED_ERROR;
+	END IF;
+
+	--------------------------------------------------------------
+	-- INITIALIZE MESSAGE LIST IF P_INIT_MSG_LIST IS SET TO TRUE.
+	--------------------------------------------------------------
+
+	IF FND_API.TO_BOOLEAN(P_INIT_MSG_LIST) THEN
+		FA_SRVR_MSG.INIT_SERVER_MESSAGE;
+		FA_DEBUG_PKG.INITIALIZE;
+	END IF;
+
+	L_LEASE_DETAILS_REC:= PX_LEASE_DETAILS_REC;
+
+	------------------------------------------
+	-- VALIDATE VALUES WHICH ARE SUPPLIED
+	------------------------------------------
+
+	IF NOT FA_LEASE_PVT.VALIDATION_CREATE_LEASE(L_LEASE_DETAILS_REC, p_log_level_rec => g_log_level_rec) THEN
+	   RAISE VALUE_ERROR_EXCEPTION;
+	END IF;
+
+	------------------------
+	-- GET LEASE ID
+	------------------------
+
+	SELECT FA_LEASES_S.NEXTVAL
+	 INTO  L_LEASE_ID
+	 FROM DUAL;
+
+	 IF (g_log_level_rec.statement_level) THEN
+         FA_DEBUG_PKG.ADD('AFTER LEASE ID','LEASE_ID',
+             L_LEASE_ID, p_log_level_rec => g_log_level_rec);
+	 END IF;
+
+	--------------------------
+	-- GET PRESENT VALUE
+	--------------------------
+
+	OPEN C_PRESENT_VALUE;
+    	FETCH C_PRESENT_VALUE
+    	INTO L_PRESENT_VALUE;
+    	IF C_PRESENT_VALUE%NOTFOUND THEN
+        	 RAISE PRESENT_VALUE_NOT_FOUND;
+    	END IF;
+  	CLOSE C_PRESENT_VALUE;
+
+ 	IF (g_log_level_rec.statement_level) THEN
+    	FA_DEBUG_PKG.ADD('AFTER PRESENT VALUE','PRESENT_VALUE',L_PRESENT_VALUE, p_log_level_rec => g_log_level_rec);
+	END IF;
+
+	----------------------------------
+	-- DO ECONOMIC VALUE TEST
+	----------------------------------
+
+	IF (L_LEASE_DETAILS_REC.LEASE_TERM IS NOT NULL) AND
+      	(L_LEASE_DETAILS_REC.ASSET_LIFE IS NOT NULL) THEN
+      		IF (L_LEASE_DETAILS_REC.LEASE_TERM >= L_LEASE_DETAILS_REC.ASSET_LIFE * 0.75) THEN
+          		L_ECONOMIC_TEST := 'Y';
+      		ELSE
+           		L_ECONOMIC_TEST := 'N';
+      		END IF;
+  	ELSE
+      		L_ECONOMIC_TEST := 'N';
+  	END IF;
+
+	IF (g_log_level_rec.statement_level) THEN
+    		FA_DEBUG_PKG.ADD('AFTER ECONOMIC TEST','ECONOMIC TEST',L_ECONOMIC_TEST, p_log_level_rec => g_log_level_rec);
+ 	END IF;
+
+	--------------------------------
+	-- DO PRESENT VALUE TEST
+	---------------------------------
+
+	IF (L_LEASE_DETAILS_REC.FAIR_VALUE IS NOT NULL) AND
+    	(L_PRESENT_VALUE IS NOT NULL) THEN
+      		IF (L_PRESENT_VALUE >= L_LEASE_DETAILS_REC.FAIR_VALUE * 0.90) THEN
+        	  	L_PRESENT_TEST := 'Y';
+      		ELSE
+          		L_PRESENT_TEST := 'N';
+      		END IF;
+   	ELSE
+        	L_PRESENT_TEST := 'N';
+	END IF;
+
+	IF (g_log_level_rec.statement_level) THEN
+    		FA_DEBUG_PKG.ADD('AFTER PRESENT VALUE TEST','PRESENT VALUE TEST',L_PRESENT_TEST , p_log_level_rec => g_log_level_rec);
+	END IF;
+
+	----------------------------------------------------------------------
+	-- BASED ON ECONOMIC TEST, PRESENT VALUE TEST DETERMINE IF
+	--LEASE TYPE AND COST OF CAPITALIZATION FASB-13
+	----------------------------------------------------------------------
+
+ 	IF (L_LEASE_DETAILS_REC.TRANSFER_OWNERSHIP = 'Y') OR
+      		(L_LEASE_DETAILS_REC.BARGAIN_PURCHASE_OPTION = 'Y') OR
+        	(L_PRESENT_TEST = 'Y') OR
+         	(L_ECONOMIC_TEST = 'Y')
+     	THEN
+       		L_FASB_LEASE_TYPE := 'CAPITALIZED';
+       		L_LEASE_DETAILS_REC.LEASE_TYPE := 'C';
+       		IF (L_PRESENT_VALUE IS NOT NULL AND
+           		L_LEASE_DETAILS_REC.FAIR_VALUE IS NOT NULL) THEN
+          		IF (L_PRESENT_VALUE < L_LEASE_DETAILS_REC.FAIR_VALUE) THEN
+              			L_COST_CAPITALIZED := L_PRESENT_VALUE;
+          		ELSE
+              			L_COST_CAPITALIZED := L_LEASE_DETAILS_REC.FAIR_VALUE;
+          		END IF;
+       		END IF;
+   	ELSE
+       		L_FASB_LEASE_TYPE := 'OPERATING';
+       		L_LEASE_DETAILS_REC.LEASE_TYPE := 'O';
+       		L_COST_CAPITALIZED := 0;
+   	END IF;
+
+	----------------------------------------------------------------
+	-- EVERYTING LOOKS GOOD, LET'S INSERT THIS ROW
+	----------------------------------------------------------------
+
+	   FA_LEASES2_PKG.INSERT_ROW( X_ROWID=>L_ROWID,
+              X_LEASE_ID=>L_LEASE_ID,
+              X_LEASE_NUMBER=>L_LEASE_DETAILS_REC.LEASE_NUMBER,
+              X_LESSOR_ID=>L_LEASE_DETAILS_REC.LESSOR_ID,
+              X_DESCRIPTION=>L_LEASE_DETAILS_REC.DESCRIPTION,
+              X_LAST_UPDATE_DATE=>NVL(P_TRANS_REC.WHO_INFO.LAST_UPDATE_DATE,SYSDATE),
+              X_LAST_UPDATED_BY=>NVL(P_TRANS_REC.WHO_INFO.LAST_UPDATED_BY,-1),
+              X_CREATED_BY=>NVL(P_TRANS_REC.WHO_INFO.CREATED_BY,-1),
+              X_CREATION_DATE=>NVL(P_TRANS_REC.WHO_INFO.CREATION_DATE,SYSDATE),
+              X_LAST_UPDATE_LOGIN=>NVL(P_TRANS_REC.WHO_INFO.LAST_UPDATE_LOGIN,-1),
+              X_ATTRIBUTE1=>L_LEASE_DETAILS_REC.DESC_FLEX.ATTRIBUTE1,
+              X_ATTRIBUTE2=>L_LEASE_DETAILS_REC.DESC_FLEX.ATTRIBUTE2,
+              X_ATTRIBUTE3=>L_LEASE_DETAILS_REC.DESC_FLEX.ATTRIBUTE3,
+              X_ATTRIBUTE4=>L_LEASE_DETAILS_REC.DESC_FLEX.ATTRIBUTE4,
+              X_ATTRIBUTE5=>L_LEASE_DETAILS_REC.DESC_FLEX.ATTRIBUTE5,
+              X_ATTRIBUTE6=>L_LEASE_DETAILS_REC.DESC_FLEX.ATTRIBUTE6,
+              X_ATTRIBUTE7=>L_LEASE_DETAILS_REC.DESC_FLEX.ATTRIBUTE7,
+              X_ATTRIBUTE8=>L_LEASE_DETAILS_REC.DESC_FLEX.ATTRIBUTE8,
+              X_ATTRIBUTE9=>L_LEASE_DETAILS_REC.DESC_FLEX.ATTRIBUTE9,
+              X_ATTRIBUTE10=>L_LEASE_DETAILS_REC.DESC_FLEX.ATTRIBUTE10,
+              X_ATTRIBUTE11=>L_LEASE_DETAILS_REC.DESC_FLEX.ATTRIBUTE11,
+              X_ATTRIBUTE12=>L_LEASE_DETAILS_REC.DESC_FLEX.ATTRIBUTE12,
+              X_ATTRIBUTE13=>L_LEASE_DETAILS_REC.DESC_FLEX.ATTRIBUTE13,
+              X_ATTRIBUTE14=>L_LEASE_DETAILS_REC.DESC_FLEX.ATTRIBUTE14,
+              X_ATTRIBUTE15=>L_LEASE_DETAILS_REC.DESC_FLEX.ATTRIBUTE15,
+              X_ATTRIBUTE_CATEGORY_CODE=>L_LEASE_DETAILS_REC.DESC_FLEX.ATTRIBUTE_CATEGORY_CODE,
+              X_FASB_LEASE_TYPE=>UPPER(L_FASB_LEASE_TYPE),
+              X_COST_CAPITALIZED=>L_COST_CAPITALIZED ,
+              X_TRANSFER_OWNERSHIP=>L_LEASE_DETAILS_REC.TRANSFER_OWNERSHIP,
+              X_BARGAIN_PURCHASE_OPTION=>L_LEASE_DETAILS_REC.BARGAIN_PURCHASE_OPTION,
+              X_PAYMENT_SCHEDULE_ID=>L_LEASE_DETAILS_REC.PAYMENT_SCHEDULE_ID,
+              X_FAIR_VALUE=>L_LEASE_DETAILS_REC.FAIR_VALUE,
+              X_PRESENT_VALUE=>L_PRESENT_VALUE,
+              X_LEASE_TYPE=>L_LEASE_DETAILS_REC.LEASE_TYPE,
+              X_LEASE_TERM=>L_LEASE_DETAILS_REC.LEASE_TERM,
+              X_ASSET_LIFE=>L_LEASE_DETAILS_REC.ASSET_LIFE,
+              X_CURRENCY_CODE=>L_LEASE_DETAILS_REC.CURRENCY_CODE,
+              X_LESSOR_SITE_ID=>L_LEASE_DETAILS_REC.LESSOR_SITE_ID,
+              X_DIST_CODE_COMBINATION_ID=>L_LEASE_DETAILS_REC.DIST_CODE_COMBINATION_ID,
+              X_TERMS_ID=>L_LEASE_DETAILS_REC.TERMS_ID,
+              X_CALLING_FN=>P_CALLING_FN,
+              p_log_level_rec => g_log_level_rec
+	  ) ;
+
+	PX_LEASE_DETAILS_REC.LEASE_ID:=L_LEASE_ID;
+
+	----------------------------------------------------------
+	-- CHECK FOR COMMIT
+	----------------------------------------------------------
+	IF FND_API.TO_BOOLEAN( P_COMMIT ) THEN
+   		COMMIT WORK;
+	END IF;
+
+	X_RETURN_STATUS := FND_API.G_RET_STS_SUCCESS;
+
+EXCEPTION
+	WHEN PRESENT_VALUE_NOT_FOUND  THEN
+  		ROLLBACK TO CREATE_LEASE;
+	        X_RETURN_STATUS := FND_API.G_RET_STS_ERROR;
+	  	FND_MESSAGE.SET_NAME ('OFA','FA_PRESENT_VALUE_NOT_FOUND');
+		FND_MESSAGE.SET_TOKEN ('CALLING_FN','CREATE_LEASE');
+    	  	FND_MSG_PUB.ADD;
+      	WHEN VALUE_ERROR_EXCEPTION THEN
+        	ROLLBACK TO CREATE_LEASE;
+        	X_RETURN_STATUS := FND_API.G_RET_STS_ERROR;
+      	WHEN OTHERS THEN
+       		ROLLBACK TO CREATE_LEASE;
+		X_RETURN_STATUS := FND_API.G_RET_STS_UNEXP_ERROR;
+       	     	X_MSG_DATA:=SQLERRM;
+END CREATE_LEASE;
+
+--------------------------------------
+-- UPDATE LEASE API
+--------------------------------------
+PROCEDURE UPDATE_LEASE  (
+   P_API_VERSION              IN      NUMBER,
+   P_INIT_MSG_LIST            IN      VARCHAR2 := FND_API.G_FALSE,
+   P_COMMIT                   IN      VARCHAR2 := FND_API.G_FALSE,
+   P_VALIDATION_LEVEL         IN      NUMBER   := FND_API.G_VALID_LEVEL_FULL,
+   X_RETURN_STATUS               OUT  NOCOPY VARCHAR2,
+   X_MSG_COUNT                   OUT  NOCOPY NUMBER,
+   X_MSG_DATA                    OUT  NOCOPY VARCHAR2,
+   P_CALLING_FN               IN      VARCHAR2,
+   P_TRANS_REC		      IN      FA_API_TYPES.TRANS_REC_TYPE,
+   P_LEASE_DETAILS_REC_NEW    IN      FA_API_TYPES.LEASE_DETAILS_REC_TYPE) IS
+
+   VALUE_ERROR_EXCEPTION       EXCEPTION;
+   L_UPDATE_FLAG               VARCHAR2(1):= NULL;
+   L_OK_TO_UPDATE_LESSOR       VARCHAR2(1):= NULL;
+   L_ATLEAST_ONE_UPDATE        NUMBER := 0;
+   L_API_NAME                  CONSTANT VARCHAR2(30) := 'UPDATE_LEASE';
+   L_API_VERSION               CONSTANT NUMBER := 1.0;
+   L_LEASE_DETAILS_REC_NEW     FA_API_TYPES.LEASE_DETAILS_REC_TYPE;
+
+BEGIN
+
+	SAVEPOINT UPDATE_LEASE;
+
+  if (not g_log_level_rec.initialized) then
+      if (NOT fa_util_pub.get_log_level_rec (
+                x_log_level_rec =>  g_log_level_rec
+      )) then
+         raise VALUE_ERROR_EXCEPTION;
+      end if;
+   end if;
+
+	------------------------------------------------------
+	-- STANDARD CALL TO CHECK FOR CALL COMPATIBILITY.
+	------------------------------------------------------
+
+	IF NOT FND_API.COMPATIBLE_API_CALL(L_API_VERSION, P_API_VERSION,
+			               L_API_NAME, G_PKG_NAME)
+	THEN
+		RAISE	FND_API.G_EXC_UNEXPECTED_ERROR;
+	END IF;
+
+	----------------------------------------------------------------
+	-- INITIALIZE MESSAGE LIST IF P_INIT_MSG_LIST IS SET TO TRUE.
+	----------------------------------------------------------------
+
+	IF FND_API.TO_BOOLEAN(P_INIT_MSG_LIST) THEN
+		FA_SRVR_MSG.INIT_SERVER_MESSAGE;
+		FA_DEBUG_PKG.INITIALIZE;
+	END IF;
+
+	L_LEASE_DETAILS_REC_NEW:=P_LEASE_DETAILS_REC_NEW;
+
+	---------------------------------
+	-- VALIDATE SUPPLIED VALUES.
+	---------------------------------
+	IF NOT FA_LEASE_PVT.VALIDATION_UPDATE_LEASE(L_LEASE_DETAILS_REC_NEW,L_OK_TO_UPDATE_LESSOR, p_log_level_rec => g_log_level_rec) THEN
+	   RAISE VALUE_ERROR_EXCEPTION;
+	END IF;
+
+	----------------------------------------------------
+	-- CHECK FOR G_MISS_CHAR
+	----------------------------------------------------
+	IF L_LEASE_DETAILS_REC_NEW.DESCRIPTION = FND_API.G_MISS_CHAR THEN
+            	FND_MESSAGE.SET_NAME ('OFA','FA_LEASE_DESCRIPTION_NULL');
+		FND_MESSAGE.SET_TOKEN ('CALLING_FN','UPDATE_LEASE');
+	  	FND_MSG_PUB.ADD;
+	  	RAISE VALUE_ERROR_EXCEPTION;
+	END IF;
+
+	IF L_OK_TO_UPDATE_LESSOR = 'Y'
+		AND L_LEASE_DETAILS_REC_NEW.LESSOR_ID IS NOT NULL
+		AND L_LEASE_DETAILS_REC_NEW.LESSOR_SITE_ID IS NOT NULL THEN
+		NULL;
+	ELSE
+		L_LEASE_DETAILS_REC_NEW.LESSOR_ID:=NULL;
+		L_LEASE_DETAILS_REC_NEW.LESSOR_SITE_ID:=NULL;
+	END IF;
+
+	-----------------------------------------
+	-- CALL UPDATE STATEMENT
+	-----------------------------------------
+	 FA_LEASE_PVT.UPDATE_ROW
+		(X_ROWID	      =>NULL,
+            	X_LEASE_ID            =>L_LEASE_DETAILS_REC_NEW.LEASE_ID,
+ 		X_LESSOR_ID           =>L_LEASE_DETAILS_REC_NEW.LESSOR_ID  ,
+		X_LESSOR_SITE_ID      =>L_LEASE_DETAILS_REC_NEW.LESSOR_SITE_ID ,
+		X_DESCRIPTION         =>L_LEASE_DETAILS_REC_NEW.DESCRIPTION   ,
+		X_LAST_UPDATE_DATE    =>P_TRANS_REC.WHO_INFO.LAST_UPDATE_DATE ,
+		X_LAST_UPDATED_BY     =>P_TRANS_REC.WHO_INFO.LAST_UPDATED_BY  ,
+		X_ATTRIBUTE1          =>L_LEASE_DETAILS_REC_NEW.DESC_FLEX.ATTRIBUTE1 ,
+		X_ATTRIBUTE2          =>L_LEASE_DETAILS_REC_NEW.DESC_FLEX.ATTRIBUTE2 ,
+		X_ATTRIBUTE3          =>L_LEASE_DETAILS_REC_NEW.DESC_FLEX.ATTRIBUTE3 ,
+		X_ATTRIBUTE4          =>L_LEASE_DETAILS_REC_NEW.DESC_FLEX.ATTRIBUTE4 ,
+		X_ATTRIBUTE5          =>L_LEASE_DETAILS_REC_NEW.DESC_FLEX.ATTRIBUTE5 ,
+		X_ATTRIBUTE6          =>L_LEASE_DETAILS_REC_NEW.DESC_FLEX.ATTRIBUTE6 ,
+		X_ATTRIBUTE7          =>L_LEASE_DETAILS_REC_NEW.DESC_FLEX.ATTRIBUTE7 ,
+		X_ATTRIBUTE8          =>L_LEASE_DETAILS_REC_NEW.DESC_FLEX.ATTRIBUTE8 ,
+		X_ATTRIBUTE9          =>L_LEASE_DETAILS_REC_NEW.DESC_FLEX.ATTRIBUTE9 ,
+		X_ATTRIBUTE10         =>L_LEASE_DETAILS_REC_NEW.DESC_FLEX.ATTRIBUTE10 ,
+		X_ATTRIBUTE11         =>L_LEASE_DETAILS_REC_NEW.DESC_FLEX.ATTRIBUTE11 ,
+		X_ATTRIBUTE12         =>L_LEASE_DETAILS_REC_NEW.DESC_FLEX.ATTRIBUTE12 ,
+		X_ATTRIBUTE13         =>L_LEASE_DETAILS_REC_NEW.DESC_FLEX.ATTRIBUTE13 ,
+		X_ATTRIBUTE14         =>L_LEASE_DETAILS_REC_NEW.DESC_FLEX.ATTRIBUTE14 ,
+		X_ATTRIBUTE15         =>L_LEASE_DETAILS_REC_NEW.DESC_FLEX.ATTRIBUTE15 ,
+		X_ATTRIBUTE_CATEGORY_CODE=>L_LEASE_DETAILS_REC_NEW.DESC_FLEX.ATTRIBUTE_CATEGORY_CODE, p_log_level_rec => g_log_level_rec);
+
+ 	IF (g_log_level_rec.statement_level) THEN
+    		FA_DEBUG_PKG.ADD('AFTER UPDATE','LEASE_ID',L_LEASE_DETAILS_REC_NEW.LEASE_ID, p_log_level_rec => g_log_level_rec);
+ 	END IF;
+
+	-------------------------------------------------
+	-- COMMIT
+	-------------------------------------------------
+
+	IF FND_API.TO_BOOLEAN( P_COMMIT ) THEN
+   		COMMIT WORK;
+	END IF;
+
+	X_RETURN_STATUS := FND_API.G_RET_STS_SUCCESS;
+
+EXCEPTION
+	WHEN VALUE_ERROR_EXCEPTION THEN
+        	ROLLBACK TO UPDATE_LEASE;
+        	X_RETURN_STATUS := FND_API.G_RET_STS_ERROR;
+     	WHEN OTHERS THEN
+       		ROLLBACK TO UPDATE_LEASE;
+		X_RETURN_STATUS := FND_API.G_RET_STS_UNEXP_ERROR;
+       	     	X_MSG_DATA:=SQLERRM;
+END UPDATE_LEASE;
+
+END FA_LEASE_PUB;
+
+/

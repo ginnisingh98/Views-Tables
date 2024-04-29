@@ -1,0 +1,92 @@
+--------------------------------------------------------
+--  DDL for Package Body ENG_CHANGE_RULE_ATTRIBUTES_PKG
+--------------------------------------------------------
+
+  CREATE OR REPLACE EDITIONABLE PACKAGE BODY "APPS"."ENG_CHANGE_RULE_ATTRIBUTES_PKG" as
+/* $Header: ENGCRATB.pls 115.0 2004/01/27 11:46:51 srajapar noship $ */
+
+PROCEDURE ADD_LANGUAGE IS
+BEGIN
+  delete from 	ENG_CHANGE_RULE_ATTRIBUTES_TL T
+  where not exists
+    (select NULL
+    from ENG_CHANGE_RULE_ATTRIBUTES_B B
+    where B.ATTRIBUTE_OBJECT_NAME = T.ATTRIBUTE_OBJECT_NAME
+      and B.ATTRIBUTE_CODE = T.ATTRIBUTE_CODE
+    );
+
+  update ENG_CHANGE_RULE_ATTRIBUTES_TL T set (
+      ATTRIBUTE_NAME,
+      DISPLAY_COLUMN1_NAME,
+      DISPLAY_COLUMN2_NAME
+    ) = (select
+          B.ATTRIBUTE_NAME,
+          B.DISPLAY_COLUMN1_NAME,
+          B.DISPLAY_COLUMN2_NAME
+        from ENG_CHANGE_RULE_ATTRIBUTES_TL B
+        where B.ATTRIBUTE_OBJECT_NAME = T.ATTRIBUTE_OBJECT_NAME
+          and B.ATTRIBUTE_CODE = T.ATTRIBUTE_CODE
+          and B.LANGUAGE = T.SOURCE_LANG)
+        where (  T.ATTRIBUTE_OBJECT_NAME,
+                 T.ATTRIBUTE_CODE,
+                 T.LANGUAGE
+              ) in
+              (select SUBT.ATTRIBUTE_OBJECT_NAME,
+                      SUBT.ATTRIBUTE_CODE,
+                      SUBT.LANGUAGE
+               from ENG_CHANGE_RULE_ATTRIBUTES_TL SUBB, ENG_CHANGE_RULE_ATTRIBUTES_TL SUBT
+               where SUBB.ATTRIBUTE_OBJECT_NAME = SUBT.ATTRIBUTE_OBJECT_NAME
+                 and SUBB.ATTRIBUTE_CODE = SUBT.ATTRIBUTE_CODE
+                 and SUBB.LANGUAGE = SUBT.SOURCE_LANG
+                 and (SUBB.ATTRIBUTE_NAME <> SUBT.ATTRIBUTE_NAME
+                      or SUBB.DISPLAY_COLUMN1_NAME <> SUBT.DISPLAY_COLUMN1_NAME
+                      or SUBB.DISPLAY_COLUMN2_NAME <> SUBT.DISPLAY_COLUMN2_NAME
+                      or (SUBB.DISPLAY_COLUMN2_NAME is null
+                          and
+                          SUBT.DISPLAY_COLUMN2_NAME is not null)
+                      or (SUBB.DISPLAY_COLUMN2_NAME is not null
+                          and
+                          SUBT.DISPLAY_COLUMN2_NAME is null)
+              )
+        );
+
+  insert into ENG_CHANGE_RULE_ATTRIBUTES_TL (
+    ATTRIBUTE_OBJECT_NAME,
+    ATTRIBUTE_CODE,
+    ATTRIBUTE_NAME,
+    DISPLAY_COLUMN1_NAME,
+    DISPLAY_COLUMN2_NAME,
+    CREATION_DATE,
+    CREATED_BY,
+    LAST_UPDATE_DATE,
+    LAST_UPDATED_BY,
+    LAST_UPDATE_LOGIN,
+    LANGUAGE,
+    SOURCE_LANG
+  ) select
+    B.ATTRIBUTE_OBJECT_NAME,
+    B.ATTRIBUTE_CODE,
+    B.ATTRIBUTE_NAME,
+    B.DISPLAY_COLUMN1_NAME,
+    B.DISPLAY_COLUMN2_NAME,
+    B.CREATION_DATE,
+    B.CREATED_BY,
+    B.LAST_UPDATE_DATE,
+    B.LAST_UPDATED_BY,
+    B.LAST_UPDATE_LOGIN,
+    L.LANGUAGE_CODE,
+    B.SOURCE_LANG
+  from ENG_CHANGE_RULE_ATTRIBUTES_TL B, FND_LANGUAGES L
+  where L.INSTALLED_FLAG in ('I', 'B')
+  and B.LANGUAGE = userenv('LANG')
+  and not exists
+    (select NULL
+    from ENG_CHANGE_RULE_ATTRIBUTES_TL T
+    where T.ATTRIBUTE_OBJECT_NAME = B.ATTRIBUTE_OBJECT_NAME
+      and T.ATTRIBUTE_CODE = B.ATTRIBUTE_CODE
+      and T.LANGUAGE = L.LANGUAGE_CODE);
+end ADD_LANGUAGE;
+
+end ENG_CHANGE_RULE_ATTRIBUTES_PKG;
+
+/

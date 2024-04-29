@@ -1,0 +1,205 @@
+--------------------------------------------------------
+--  DDL for Package IGS_AD_PS_APLINSTUNT_PKG
+--------------------------------------------------------
+
+  CREATE OR REPLACE EDITIONABLE PACKAGE "APPS"."IGS_AD_PS_APLINSTUNT_PKG" AUTHID CURRENT_USER as
+/* $Header: IGSAI20S.pls 120.0 2005/06/01 13:22:53 appldev noship $ */
+procedure INSERT_ROW (
+  X_ROWID in out NOCOPY VARCHAR2,
+	X_ORG_ID in NUMBER,
+  X_PERSON_ID in NUMBER,
+  X_ADMISSION_APPL_NUMBER in NUMBER,
+  X_NOMINATED_COURSE_CD in VARCHAR2,
+  X_ACAI_SEQUENCE_NUMBER in NUMBER,
+  X_UNIT_CD in VARCHAR2,
+  X_UV_VERSION_NUMBER in NUMBER,
+  X_CAL_TYPE in VARCHAR2,
+  X_CI_SEQUENCE_NUMBER in NUMBER,
+  X_LOCATION_CD in VARCHAR2,
+  X_UNIT_CLASS in VARCHAR2,
+  X_UNIT_MODE in VARCHAR2,
+  X_ADM_UNIT_OUTCOME_STATUS in VARCHAR2,
+  X_ASS_TRACKING_ID in NUMBER,
+  X_RULE_WAIVED_DT in DATE,
+  X_RULE_WAIVED_PERSON_ID in NUMBER,
+  X_SUP_UNIT_CD in VARCHAR2,
+  X_SUP_UV_VERSION_NUMBER in NUMBER,
+  X_MODE in VARCHAR2 default 'R',
+  X_ADM_PS_APPL_INST_UNIT_ID in out NOCOPY NUMBER
+  );
+procedure LOCK_ROW (
+  X_ROWID in VARCHAR2,
+  X_PERSON_ID in NUMBER,
+  X_ADMISSION_APPL_NUMBER in NUMBER,
+  X_NOMINATED_COURSE_CD in VARCHAR2,
+  X_ACAI_SEQUENCE_NUMBER in NUMBER,
+  X_UNIT_CD in VARCHAR2,
+  X_UV_VERSION_NUMBER in NUMBER,
+  X_CAL_TYPE in VARCHAR2,
+  X_CI_SEQUENCE_NUMBER in NUMBER,
+  X_LOCATION_CD in VARCHAR2,
+  X_UNIT_CLASS in VARCHAR2,
+  X_UNIT_MODE in VARCHAR2,
+  X_ADM_UNIT_OUTCOME_STATUS in VARCHAR2,
+  X_ASS_TRACKING_ID in NUMBER,
+  X_RULE_WAIVED_DT in DATE,
+  X_RULE_WAIVED_PERSON_ID in NUMBER,
+  X_SUP_UNIT_CD in VARCHAR2,
+  X_SUP_UV_VERSION_NUMBER in NUMBER,
+  X_ADM_PS_APPL_INST_UNIT_ID in NUMBER DEFAULT NULL
+);
+procedure UPDATE_ROW (
+  X_ROWID in VARCHAR2,
+  X_PERSON_ID in NUMBER,
+  X_ADMISSION_APPL_NUMBER in NUMBER,
+  X_NOMINATED_COURSE_CD in VARCHAR2,
+  X_ACAI_SEQUENCE_NUMBER in NUMBER,
+  X_UNIT_CD in VARCHAR2,
+  X_UV_VERSION_NUMBER in NUMBER,
+  X_CAL_TYPE in VARCHAR2,
+  X_CI_SEQUENCE_NUMBER in NUMBER,
+  X_LOCATION_CD in VARCHAR2,
+  X_UNIT_CLASS in VARCHAR2,
+  X_UNIT_MODE in VARCHAR2,
+  X_ADM_UNIT_OUTCOME_STATUS in VARCHAR2,
+  X_ASS_TRACKING_ID in NUMBER,
+  X_RULE_WAIVED_DT in DATE,
+  X_RULE_WAIVED_PERSON_ID in NUMBER,
+  X_SUP_UNIT_CD in VARCHAR2,
+  X_SUP_UV_VERSION_NUMBER in NUMBER,
+  X_MODE in VARCHAR2 default 'R',
+  X_ADM_PS_APPL_INST_UNIT_ID in NUMBER DEFAULT NULL
+  );
+procedure ADD_ROW (
+  X_ROWID in out NOCOPY VARCHAR2,
+	X_ORG_ID in NUMBER,
+  X_PERSON_ID in NUMBER,
+  X_ADMISSION_APPL_NUMBER in NUMBER,
+  X_NOMINATED_COURSE_CD in VARCHAR2,
+  X_ACAI_SEQUENCE_NUMBER in NUMBER,
+  X_UNIT_CD in VARCHAR2,
+  X_UV_VERSION_NUMBER in NUMBER,
+  X_CAL_TYPE in VARCHAR2,
+  X_CI_SEQUENCE_NUMBER in NUMBER,
+  X_LOCATION_CD in VARCHAR2,
+  X_UNIT_CLASS in VARCHAR2,
+  X_UNIT_MODE in VARCHAR2,
+  X_ADM_UNIT_OUTCOME_STATUS in VARCHAR2,
+  X_ASS_TRACKING_ID in NUMBER,
+  X_RULE_WAIVED_DT in DATE,
+  X_RULE_WAIVED_PERSON_ID in NUMBER,
+  X_SUP_UNIT_CD in VARCHAR2,
+  X_SUP_UV_VERSION_NUMBER in NUMBER,
+  X_MODE in VARCHAR2 default 'R',
+  X_ADM_PS_APPL_INST_UNIT_ID in out NOCOPY NUMBER
+  );
+procedure DELETE_ROW (
+  X_ROWID in VARCHAR2,
+  x_mode IN VARCHAR2 DEFAULT 'R'
+);
+
+FUNCTION Get_PK_For_Validation (
+    x_adm_ps_appl_inst_unit_id IN NUMBER
+    )
+RETURN BOOLEAN;
+
+FUNCTION Get_UK_For_Validation (
+    x_person_id IN NUMBER,
+    x_admission_appl_number IN NUMBER,
+    x_nominated_course_cd IN VARCHAR2,
+    x_acai_sequence_number IN NUMBER,
+    x_unit_cd IN VARCHAR2,
+    x_uv_version_number IN NUMBER ,
+    x_cal_type IN VARCHAR2 ,
+    x_ci_sequence_number IN NUMBER ,
+    x_location_cd IN VARCHAR2 ,
+    x_unit_class IN VARCHAR2
+    )
+RETURN BOOLEAN;
+
+Procedure Check_constraints(
+  	Column_Name 	IN	VARCHAR2 DEFAULT NULL,
+	Column_Value 	IN	VARCHAR2 DEFAULT NULL
+	);
+
+  PROCEDURE Before_DML (
+    p_action IN VARCHAR2,
+    x_rowid IN VARCHAR2 DEFAULT NULL,
+		x_org_id IN NUMBER DEFAULT NULL,
+    x_person_id IN NUMBER DEFAULT NULL,
+    x_admission_appl_number IN NUMBER DEFAULT NULL,
+    x_nominated_course_cd IN VARCHAR2 DEFAULT NULL,
+    x_acai_sequence_number IN NUMBER DEFAULT NULL,
+    x_unit_cd IN VARCHAR2 DEFAULT NULL,
+    x_uv_version_number IN NUMBER DEFAULT NULL,
+    x_cal_type IN VARCHAR2 DEFAULT NULL,
+    x_ci_sequence_number IN NUMBER DEFAULT NULL,
+    x_location_cd IN VARCHAR2 DEFAULT NULL,
+    x_unit_class IN VARCHAR2 DEFAULT NULL,
+    x_unit_mode IN VARCHAR2 DEFAULT NULL,
+    x_adm_unit_outcome_status IN VARCHAR2 DEFAULT NULL,
+    x_ass_tracking_id IN NUMBER DEFAULT NULL,
+    x_rule_waived_dt IN DATE DEFAULT NULL,
+    x_rule_waived_person_id IN NUMBER DEFAULT NULL,
+    x_sup_unit_cd IN VARCHAR2 DEFAULT NULL,
+    x_sup_uv_version_number IN NUMBER DEFAULT NULL,
+    x_creation_date IN DATE DEFAULT NULL,
+    x_created_by IN NUMBER DEFAULT NULL,
+    x_last_update_date IN DATE DEFAULT NULL,
+    x_last_updated_by IN NUMBER DEFAULT NULL,
+    x_last_update_login IN NUMBER DEFAULT NULL,
+    x_adm_ps_appl_inst_unit_id in NUMBER DEFAULT NULL
+  );
+
+  PROCEDURE GET_FK_IGS_AD_PS_APPL_INST (
+    x_person_id IN NUMBER,
+    x_admission_appl_number IN NUMBER,
+    x_nominated_course_cd IN VARCHAR2,
+    x_sequence_number IN NUMBER
+    );
+
+  PROCEDURE GET_FK_IGS_AD_UNIT_OU_STAT (
+    x_adm_unit_outcome_status IN VARCHAR2
+    );
+
+  PROCEDURE GET_FK_IGS_AD_LOCATION (
+    x_location_cd IN VARCHAR2
+    );
+
+  PROCEDURE GET_FK_IGS_PE_PERSON (
+    x_person_id IN NUMBER
+    );
+
+  PROCEDURE GET_FK_IGS_PS_UNIT_VER (
+    x_unit_cd IN VARCHAR2,
+    x_version_number IN NUMBER
+    );
+
+  PROCEDURE GET_FK_IGS_TR_ITEM (
+    x_tracking_id IN VARCHAR2
+    );
+
+  PROCEDURE GET_FK_IGS_AS_UNIT_MODE (
+    x_unit_mode IN VARCHAR2
+    );
+
+  PROCEDURE GET_FK_IGS_PS_UNIT_OFR_OPT (
+    x_unit_cd IN VARCHAR2,
+    x_version_number IN NUMBER,
+    x_cal_type IN VARCHAR2,
+    x_ci_sequence_number IN NUMBER,
+    x_location_cd IN VARCHAR2,
+    x_unit_class IN VARCHAR2
+    );
+
+  PROCEDURE GET_FK_IGS_PS_UNIT_OFR_PAT (
+    x_unit_cd IN VARCHAR2,
+    x_version_number IN NUMBER,
+    x_cal_type IN VARCHAR2,
+    x_ci_sequence_number IN NUMBER
+    );
+end IGS_AD_PS_APLINSTUNT_PKG;
+
+ 
+
+/

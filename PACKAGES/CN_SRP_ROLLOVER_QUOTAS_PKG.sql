@@ -1,0 +1,111 @@
+--------------------------------------------------------
+--  DDL for Package CN_SRP_ROLLOVER_QUOTAS_PKG
+--------------------------------------------------------
+
+  CREATE OR REPLACE EDITIONABLE PACKAGE "APPS"."CN_SRP_ROLLOVER_QUOTAS_PKG" AUTHID CURRENT_USER as
+/* $Header: cnsrpkgs.pls 115.1 2002/12/04 02:15:18 fting noship $ */
+
+-- -------------------------------------------------------------------------+
+-- Procedure Name
+--   INSERT_ROW
+-- Purpose
+--
+-- History
+--
+-- -------------------------------------------------------------------------+
+PROCEDURE INSERT_ROW
+  (X_ROWID in out NOCOPY VARCHAR2,
+   X_SRP_ROLLOVER_QUOTA_ID IN OUT NOCOPY NUMBER,
+   X_SRP_QUOTA_ASSIGN_ID IN NUMBER,
+   X_ROLLOVER_QUOTA_ID IN NUMBER,
+   X_QUOTA_ID IN NUMBER,
+   X_SOURCE_QUOTA_ID IN NUMBER,
+   X_ROLLOVER IN NUMBER,
+   X_ATTRIBUTE_CATEGORY IN VARCHAR2	:= NULL,
+   X_ATTRIBUTE1 IN VARCHAR2	:= NULL,
+   X_ATTRIBUTE2 IN VARCHAR2	:= NULL,
+   X_ATTRIBUTE3 IN VARCHAR2	:= NULL,
+   X_ATTRIBUTE4 IN VARCHAR2	:= NULL,
+   X_ATTRIBUTE5 IN VARCHAR2	:= NULL,
+   X_ATTRIBUTE6 IN VARCHAR2	:= NULL,
+   X_ATTRIBUTE7 IN VARCHAR2	:= NULL,
+   X_ATTRIBUTE8 IN VARCHAR2	:= NULL,
+   X_ATTRIBUTE9 IN VARCHAR2	:= NULL,
+   X_ATTRIBUTE10 IN VARCHAR2	:= NULL,
+   X_ATTRIBUTE11 IN VARCHAR2	:= NULL,
+   X_ATTRIBUTE12 IN VARCHAR2	:= NULL,
+   X_ATTRIBUTE13 IN VARCHAR2	:= NULL,
+   X_ATTRIBUTE14 IN VARCHAR2	:= NULL,
+   X_ATTRIBUTE15 IN VARCHAR2	:= NULL,
+   X_CREATED_BY IN NUMBER,
+   X_CREATION_DATE IN DATE,
+   X_LAST_UPDATE_DATE IN DATE,
+   X_LAST_UPDATED_BY IN NUMBER,
+   X_LAST_UPDATE_LOGIN IN NUMBER
+   );
+
+
+-- -------------------------------------------------------------------------+
+-- Procedure Name
+--   UPDATE_ROW
+-- Purpose
+--
+-- History
+--
+-- -------------------------------------------------------------------------+
+PROCEDURE UPDATE_ROW
+  (X_SRP_ROLLOVER_QUOTA_ID IN NUMBER,
+   X_SRP_QUOTA_ASSIGN_ID IN NUMBER,
+   X_ROLLOVER_QUOTA_ID IN NUMBER,
+   X_QUOTA_ID IN NUMBER,
+   X_SOURCE_QUOTA_ID IN NUMBER,
+   X_ROLLOVER IN NUMBER,
+   X_ATTRIBUTE_CATEGORY IN VARCHAR2	:= NULL,
+   X_ATTRIBUTE1 IN VARCHAR2	:= NULL,
+   X_ATTRIBUTE2 IN VARCHAR2	:= NULL,
+   X_ATTRIBUTE3 IN VARCHAR2	:= NULL,
+   X_ATTRIBUTE4 IN VARCHAR2	:= NULL,
+   X_ATTRIBUTE5 IN VARCHAR2	:= NULL,
+   X_ATTRIBUTE6 IN VARCHAR2	:= NULL,
+   X_ATTRIBUTE7 IN VARCHAR2	:= NULL,
+   X_ATTRIBUTE8 IN VARCHAR2	:= NULL,
+   X_ATTRIBUTE9 IN VARCHAR2	:= NULL,
+   X_ATTRIBUTE10 IN VARCHAR2	:= NULL,
+   X_ATTRIBUTE11 IN VARCHAR2	:= NULL,
+   X_ATTRIBUTE12 IN VARCHAR2	:= NULL,
+   X_ATTRIBUTE13 IN VARCHAR2	:= NULL,
+   X_ATTRIBUTE14 IN VARCHAR2	:= NULL,
+   X_ATTRIBUTE15 IN VARCHAR2	:= NULL,
+   X_CREATED_BY IN NUMBER,
+   X_CREATION_DATE IN DATE,
+   X_LAST_UPDATE_DATE IN DATE,
+   X_LAST_UPDATED_BY IN NUMBER,
+   X_LAST_UPDATE_LOGIN IN NUMBER
+   );
+
+
+
+-- -------------------------------------------------------------------------+
+-- Procedure Name
+--   DELETE_ROW
+-- Purpose
+--
+-- History
+--
+-- -------------------------------------------------------------------------+
+PROCEDURE DELETE_ROW
+  (X_SRP_ROLLOVER_QUOTA_ID IN NUMBER
+
+   );
+
+
+
+
+
+
+
+END CN_SRP_ROLLOVER_QUOTAS_PKG;
+
+ 
+
+/

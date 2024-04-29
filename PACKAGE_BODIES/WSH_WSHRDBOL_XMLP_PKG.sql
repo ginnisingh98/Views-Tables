@@ -1,0 +1,574 @@
+--------------------------------------------------------
+--  DDL for Package Body WSH_WSHRDBOL_XMLP_PKG
+--------------------------------------------------------
+
+  CREATE OR REPLACE EDITIONABLE PACKAGE BODY "APPS"."WSH_WSHRDBOL_XMLP_PKG" AS
+/* $Header: WSHRDBOLB.pls 120.3.12010000.3 2009/12/03 10:39:11 mvudugul ship $ */
+  FUNCTION AFTERPFORM RETURN BOOLEAN IS
+  BEGIN
+    P_DELIVERY_DATE_HIGH_V:=P_DELIVERY_DATE_HIGH;
+    LP_WHERE_CLAUSE := 'where 1 = 1';
+    IF P_DELIVERY_LEG_ID IS NOT NULL THEN
+      LP_DELIVERY_LEG_ID := 'AND wbrv.delivery_leg_id = :P_DELIVERY_LEG_ID';
+    END IF;
+    IF P_DELIVERY_DATE_HIGH IS NOT NULL THEN
+      --P_DELIVERY_DATE_HIGH := P_DELIVERY_DATE_HIGH + (86399 / 86400);
+      P_DELIVERY_DATE_HIGH_V := P_DELIVERY_DATE_HIGH + (86399 / 86400);
+    END IF;
+    --IF P_DELIVERY_DATE_LOW IS NOT NULL OR P_DELIVERY_DATE_HIGH IS NOT NULL THEN
+    IF P_DELIVERY_DATE_LOW IS NOT NULL OR P_DELIVERY_DATE_HIGH_V IS NOT NULL THEN
+      IF P_DELIVERY_DATE_LOW IS NULL THEN
+        --LP_DATE_RANGE := 'AND wbrv.delivery_leg_id IN (select distinct delivery_leg_id from wsh_delivery_legs where pick_up_stop_id in (select stop_id from wsh_trip_stops where planned_departure_date <= :P_DELIVERY_DATE_HIGH))';
+        LP_DATE_RANGE := 'AND wbrv.delivery_leg_id IN (select distinct delivery_leg_id from wsh_delivery_legs where pick_up_stop_id in (select stop_id from wsh_trip_stops where planned_departure_date <= :P_DELIVERY_DATE_HIGH_V))';
+      --ELSIF P_DELIVERY_DATE_HIGH IS NULL THEN
+      ELSIF P_DELIVERY_DATE_HIGH_V IS NULL THEN
+        LP_DATE_RANGE := 'AND wbrv.delivery_leg_id IN (select distinct delivery_leg_id from wsh_delivery_legs where pick_up_stop_id in (select stop_id from wsh_trip_stops where planned_departure_date >= :P_DELIVERY_DATE_LOW))';
+      ELSE
+        --LP_DATE_RANGE := 'AND wbrv.delivery_leg_id in (select distinct delivery_leg_id from wsh_delivery_legs where pick_up_stop_id in
+	--(select stop_id from wsh_trip_stops where planned_departure_date between :P_DELIVERY_DATE_LOW and :P_DELIVERY_DATE_HIGH))';
+        LP_DATE_RANGE := 'AND wbrv.delivery_leg_id in (select distinct delivery_leg_id from wsh_delivery_legs where pick_up_stop_id in
+	(select stop_id from wsh_trip_stops where planned_departure_date between :P_DELIVERY_DATE_LOW and :P_DELIVERY_DATE_HIGH_V))';
+      END IF;
+    END IF;
+    IF P_FREIGHT_CODE IS NOT NULL THEN
+      LP_FREIGHT_CODE := 'AND wbrv.ship_method = :P_FREIGHT_CODE';
+    END IF;
+    IF P_DELIVERY_ID IS NOT NULL THEN
+      LP_DELIVERY_ID := 'AND (wbrv.delivery_id = :P_DELIVERY_ID or
+                                                 exists (select delivery_id from wsh_delivery_legs wdl1
+                                                        where wdl1.delivery_id = wbrv.delivery_id
+                                                          and delivery_leg_id in
+                                                            (select parent_delivery_leg_id from wsh_delivery_legs
+                                                                    where delivery_id = :P_DELIVERY_ID))
+                                                 or
+                                                exists ( select delivery_id from wsh_delivery_legs wdl2
+                                                        where wdl2.delivery_id = wbrv.delivery_id
+                                                          and parent_delivery_leg_id in
+                                                            (select delivery_leg_id from wsh_delivery_legs
+                                                              where delivery_id = :P_DELIVERY_ID))
+                                                       )';
+    END IF;
+    --Commented following in bug 7409923
+    /*
+    IF P_DELIVERY_ID IS NULL AND P_TRIP_ID IS NULL THEN
+      LP_DELIVERY_ID := 'AND (exists (select delivery_id from wsh_delivery_legs wdl1
+                                                        where wdl1.delivery_id = wbrv.delivery_id
+                                                          and delivery_leg_id in
+                                                            (select parent_delivery_leg_id from wsh_delivery_legs
+                                                                    where rownum=1))
+                                                 or
+                                                exists ( select delivery_id from wsh_delivery_legs wdl2
+                                                        where wdl2.delivery_id = wbrv.delivery_id
+                                                          and parent_delivery_leg_id is not null)
+                                                       )';
+    END IF;
+    */
+
+    IF P_ORGANIZATION_ID IS NOT NULL THEN
+      LP_ORGANIZATION_ID := 'AND wbrv.organization_id = :P_ORGANIZATION_ID';
+    END IF;
+    IF P_TRIP_ID IS NOT NULL THEN
+      LP_TRIP_ID := 'AND wbrv.delivery_leg_id in (select distinct delivery_leg_id from wsh_delivery_legs where pick_up_stop_id in (select stop_id from wsh_trip_stops where trip_id  = :P_TRIP_ID ))';
+    END IF;
+    RETURN (TRUE);
+  END AFTERPFORM;
+
+  FUNCTION CF_LPNFORMULA(MASTER_CONTAINER_LPN IN VARCHAR2) RETURN CHAR IS
+    L_LPN VARCHAR2(30);
+  BEGIN
+    /*SRW.REFERENCE(MASTER_CONTAINER_LPN)*/NULL;
+    RETURN ('LPN# ' || MASTER_CONTAINER_LPN);
+  END CF_LPNFORMULA;
+
+  FUNCTION CF_CONTAINER_ITEM_DESCRIPTIONF(DELIVERY_DETAIL_ID IN NUMBER
+                                         ,ORGANIZATION_ID IN NUMBER) RETURN CHAR IS
+    L_DESCRIPTION VARCHAR2(32767) := NULL;
+    L_CLASSIFICATION VARCHAR2(32767) := NULL;
+    L_HM VARCHAR2(1) := NULL;
+    L_NUM_PACKAGES NUMBER := NULL;
+    L_RETURN_STATUS VARCHAR2(1) := NULL;
+  BEGIN
+    /*SRW.REFERENCE(DELIVERY_DETAIL_ID)*/NULL;
+    WSH_BOLS_UTIL_PKG.GET_MASTER_CONTAINER_CONTENTS(DELIVERY_DETAIL_ID
+                                                   ,'REPORT'
+                                                   ,P_ITEM_DISPLAY
+                                                   ,ORGANIZATION_ID
+                                                   ,L_CLASSIFICATION
+                                                   ,L_DESCRIPTION
+                                                   ,L_HM
+                                                   ,L_NUM_PACKAGES
+                                                   ,L_RETURN_STATUS);
+    CP_CLASSIFICATION := L_CLASSIFICATION;
+    CP_HM := L_HM;
+    CP_NUM_PACKAGES := L_NUM_PACKAGES;
+    RETURN (L_DESCRIPTION);
+  END CF_CONTAINER_ITEM_DESCRIPTIONF;
+
+  FUNCTION CF_CONTAINER_GROSS_WTFORMULA(MASTER_CONTAINER_GROSS_WEIGHT IN NUMBER
+                                       ,MASTER_CONTAINER_WEIGHT_UOM IN VARCHAR2) RETURN CHAR IS
+  BEGIN
+    /*SRW.REFERENCE(MASTER_CONTAINER_GROSS_WEIGHT)*/NULL;
+    /*SRW.REFERENCE(MASTER_CONTAINER_WEIGHT_UOM)*/NULL;
+    RETURN ('G ' || TO_CHAR(MASTER_CONTAINER_GROSS_WEIGHT) || ' ' || MASTER_CONTAINER_WEIGHT_UOM);
+  END CF_CONTAINER_GROSS_WTFORMULA;
+
+  FUNCTION CF_1FORMULA(MASTER_CONTAINER_NET_WEIGHT IN NUMBER
+                      ,MASTER_CONTAINER_WEIGHT_UOM IN VARCHAR2) RETURN CHAR IS
+  BEGIN
+    /*SRW.REFERENCE(MASTER_CONTAINER_NET_WEIGHT)*/NULL;
+    /*SRW.REFERENCE(MASTER_CONTAINER_WEIGHT_UOM)*/NULL;
+    RETURN ('N ' || TO_CHAR(MASTER_CONTAINER_NET_WEIGHT) || ' ' || MASTER_CONTAINER_WEIGHT_UOM);
+  END CF_1FORMULA;
+
+  FUNCTION CF_CONTAINER_TARE_WTFORMULA(MASTER_CONTAINER_TARE_WEIGHT IN NUMBER
+                                      ,MASTER_CONTAINER_WEIGHT_UOM IN VARCHAR2) RETURN CHAR IS
+  BEGIN
+    /*SRW.REFERENCE(MASTER_CONTAINER_TARE_WEIGHT)*/NULL;
+    /*SRW.REFERENCE(MASTER_CONTAINER_WEIGHT_UOM)*/NULL;
+    RETURN ('T ' || TO_CHAR(MASTER_CONTAINER_TARE_WEIGHT) || ' ' || MASTER_CONTAINER_WEIGHT_UOM);
+  END CF_CONTAINER_TARE_WTFORMULA;
+
+  FUNCTION CF_CONTAINER_VOLUMEFORMULA(MASTER_CONTAINER_VOLUME IN NUMBER
+                                     ,MASTER_CONTAINER_VOLUME_UOM IN VARCHAR2) RETURN CHAR IS
+  BEGIN
+    /*SRW.REFERENCE(MASTER_CONTAINER_VOLUME)*/NULL;
+    /*SRW.REFERENCE(MASTER_CONTAINER_VOLUME_UOM)*/NULL;
+    RETURN (TO_CHAR(MASTER_CONTAINER_VOLUME) || ' ' || MASTER_CONTAINER_VOLUME_UOM);
+  END CF_CONTAINER_VOLUMEFORMULA;
+
+  FUNCTION CF_UNPACKED_ITEM_DESCFORMULA(UNPACKED_ITEM_DESCRIPTION IN VARCHAR2
+                                       ,UNPACKED_ITEM_SHIPPED_QUANTITY IN NUMBER
+                                       ,UNPACKED_ITEM_QUANTITY_UOM IN VARCHAR2
+                                       ,UNPACKED_ITEM_ORGANIZATION_ID IN NUMBER
+                                       ,UNPACKED_ITEM_INV_ITEM_ID IN NUMBER
+                                       ,UNPACKED_ITEM_QUANTITY_UOM2 IN VARCHAR2
+                                       ,UNPACKED_ITEM_SHIPPED_QTY2 IN NUMBER) RETURN CHAR IS
+    CURSOR INVENTORY_LABEL(ID IN NUMBER,ORG_ID IN NUMBER) IS
+      SELECT
+        DESCRIPTION
+      FROM
+        MTL_SYSTEM_ITEMS_VL
+      WHERE INVENTORY_ITEM_ID = ID
+        AND ORGANIZATION_ID = ORG_ID;
+    L_DESCRIPTION VARCHAR2(1900);
+    L_SECOND_DESC VARCHAR2(100);
+    MESG VARCHAR2(10);
+    L_ITEM_DESC VARCHAR2(250);
+  BEGIN
+    /*SRW.REFERENCE(UNPACKED_ITEM_DESCRIPTION)*/NULL;
+    /*SRW.REFERENCE(UNPACKED_ITEM_SHIPPED_QUANTITY)*/NULL;
+    /*SRW.REFERENCE(UNPACKED_ITEM_QUANTITY_UOM)*/NULL;
+    /*SRW.REFERENCE(UNPACKED_ITEM_ORGANIZATION_ID)*/NULL;
+    /*SRW.REFERENCE(UNPACKED_ITEM_INV_ITEM_ID)*/NULL;
+    L_ITEM_DESC := UNPACKED_ITEM_DESCRIPTION;
+    IF (UNPACKED_ITEM_INV_ITEM_ID IS NOT NULL) THEN
+      OPEN INVENTORY_LABEL(UNPACKED_ITEM_INV_ITEM_ID,UNPACKED_ITEM_ORGANIZATION_ID);
+      FETCH INVENTORY_LABEL
+       INTO L_ITEM_DESC;
+      IF (INVENTORY_LABEL%NOTFOUND) THEN
+        L_ITEM_DESC := UNPACKED_ITEM_DESCRIPTION;
+      END IF;
+      CLOSE INVENTORY_LABEL;
+    END IF;
+    IF P_ITEM_DISPLAY = 'D' THEN
+      L_DESCRIPTION := L_ITEM_DESC;
+    ELSIF P_ITEM_DISPLAY = 'F' THEN
+    /* commented by anvarshn for lsp . added code to replace GENERIC_FLEX_NAME with get_item_name
+      L_DESCRIPTION := WSH_UTIL_CORE.GENERIC_FLEX_NAME(UNPACKED_ITEM_INV_ITEM_ID
+                                                      ,UNPACKED_ITEM_ORGANIZATION_ID
+                                                      ,'INV'
+                                                      ,P_ITEM_FLEX_CODE
+                                                      ,101);
+    ELSE
+      L_DESCRIPTION := WSH_UTIL_CORE.GENERIC_FLEX_NAME(UNPACKED_ITEM_INV_ITEM_ID
+                                                      ,UNPACKED_ITEM_ORGANIZATION_ID
+                                                      ,'INV'
+                                                      ,P_ITEM_FLEX_CODE
+                                                      ,101) || ' ' || L_ITEM_DESC;
+   */
+      L_DESCRIPTION := WSH_UTIL_CORE.get_item_name(UNPACKED_ITEM_INV_ITEM_ID
+                                                      ,UNPACKED_ITEM_ORGANIZATION_ID
+                                                      ,'MSTK'
+                                                      ,101,'Y');
+    ELSE
+      L_DESCRIPTION := WSH_UTIL_CORE.get_item_name(UNPACKED_ITEM_INV_ITEM_ID
+                                                      ,UNPACKED_ITEM_ORGANIZATION_ID
+                                                      ,'MSTK'
+                                                      ,101, 'Y') || ' ' || L_ITEM_DESC;
+    END IF;
+    IF (NVL(UNPACKED_ITEM_QUANTITY_UOM2
+       ,'*') <> '*') THEN
+      L_SECOND_DESC := ' ( ' || NVL(UNPACKED_ITEM_SHIPPED_QTY2
+                          ,0) || ' ' || UNPACKED_ITEM_QUANTITY_UOM2 || ' )';
+    ELSE
+      L_SECOND_DESC := NULL;
+    END IF;
+    FND_MESSAGE.SET_NAME('WSH'
+                        ,'WSH_WEB_OF_LABEL');
+    MESG := FND_MESSAGE.GET;
+    RETURN (TO_CHAR(UNPACKED_ITEM_SHIPPED_QUANTITY) || ' ' || UNPACKED_ITEM_QUANTITY_UOM || L_SECOND_DESC || ' ' || MESG || ' ' || L_DESCRIPTION);
+  END CF_UNPACKED_ITEM_DESCFORMULA;
+
+  FUNCTION CF_UNPACKED_ITEM_WTFORMULA(UNPACKED_ITEM_NET_WEIGHT IN NUMBER
+                                     ,UNPACKED_ITEM_WEIGHT_UOM IN VARCHAR2) RETURN CHAR IS
+  BEGIN
+    /*SRW.REFERENCE(UNPACKED_ITEM_NET_WEIGHT)*/NULL;
+    /*SRW.REFERENCE(UNPACKED_ITEM_WEIGHT_UOM)*/NULL;
+    RETURN (TO_CHAR(UNPACKED_ITEM_NET_WEIGHT) || ' ' || UNPACKED_ITEM_WEIGHT_UOM);
+  END CF_UNPACKED_ITEM_WTFORMULA;
+
+  FUNCTION CF_UNPACKED_ITEM_VOLFORMULA(UNPACKED_ITEM_VOLUME IN NUMBER
+                                      ,UNPACKED_ITEM_VOLUME_UOM IN VARCHAR2) RETURN CHAR IS
+  BEGIN
+    /*SRW.REFERENCE(UNPACKED_ITEM_VOLUME)*/NULL;
+    /*SRW.REFERENCE(UNPACKED_ITEM_VOLUME_UOM)*/NULL;
+    RETURN (TO_CHAR(UNPACKED_ITEM_VOLUME) || ' ' || UNPACKED_ITEM_VOLUME_UOM);
+  END CF_UNPACKED_ITEM_VOLFORMULA;
+
+  FUNCTION CF_FC_COLLECT_CURRENCYFORMULA(FC_COLLECT_CURRENCY IN VARCHAR2) RETURN NUMBER IS
+  BEGIN
+    /*SRW.REFERENCE(FC_COLLECT_CURRENCY)*/NULL;
+    CP_TOTAL_COLLECT_CURRENCY := FC_COLLECT_CURRENCY;
+    RETURN (0);
+  END CF_FC_COLLECT_CURRENCYFORMULA;
+
+  FUNCTION CP_NUM_PACKAGESFORMULA RETURN NUMBER IS
+  BEGIN
+    NULL;
+  END CP_NUM_PACKAGESFORMULA;
+
+  FUNCTION CF_NUM_OF_LPN1FORMULA(DELIVERY_ID3 IN NUMBER) RETURN NUMBER IS
+    CURSOR LPN IS
+      SELECT
+        NUMBER_OF_LPN
+      FROM
+        WSH_NEW_DELIVERIES
+      WHERE DELIVERY_ID = DELIVERY_ID3;
+    L_NUM_LPN NUMBER;
+  BEGIN
+    OPEN LPN;
+    FETCH LPN
+     INTO L_NUM_LPN;
+    CLOSE LPN;
+    RETURN (L_NUM_LPN);
+  END CF_NUM_OF_LPN1FORMULA;
+
+  FUNCTION BEFOREREPORT RETURN BOOLEAN IS
+  BEGIN
+    BEGIN
+      P_CONC_REQUEST_ID := FND_GLOBAL.CONC_REQUEST_ID;
+      /*SRW.USER_EXIT('FND SRWINIT')*/NULL;
+    EXCEPTION
+      WHEN /*SRW.USER_EXIT_FAILURE*/OTHERS THEN
+        /*SRW.MESSAGE(1
+                   ,'Failed FND SRWINIT.')*/NULL;
+        /*RAISE SRW.PROGRAM_ABORT*/RAISE_APPLICATION_ERROR(-20101,null);
+    END;
+    RETURN (TRUE);
+  END BEFOREREPORT;
+
+  FUNCTION AFTERREPORT RETURN BOOLEAN IS
+  BEGIN
+    BEGIN
+      /*SRW.USER_EXIT('FND SRWEXIT')*/NULL;
+    EXCEPTION
+      WHEN /*SRW.USER_EXIT_FAILURE*/OTHERS THEN
+        /*SRW.MESSAGE(1
+                   ,'Failed in SRWEXIT')*/NULL;
+        RAISE;
+    END;
+    RETURN (TRUE);
+  END AFTERREPORT;
+
+  FUNCTION LP_WHERE_CLAUSEVALIDTRIGGER RETURN BOOLEAN IS
+  BEGIN
+    RETURN (TRUE);
+  END LP_WHERE_CLAUSEVALIDTRIGGER;
+
+  FUNCTION CF_DOCK_CODEFORMULA(DELIVERY_ID3 IN NUMBER) RETURN CHAR IS
+    L_DOCK_CODE WSH_DELIVERY_DETAILS.CUSTOMER_DOCK_CODE%TYPE;
+    L_PREV_DOCK_CODE WSH_DELIVERY_DETAILS.CUSTOMER_DOCK_CODE%TYPE;
+    L_COUNT NUMBER;
+    CURSOR C_DOCK IS
+      SELECT
+        DISTINCT
+        ( WDD.CUSTOMER_DOCK_CODE )
+      FROM
+        WSH_DELIVERY_DETAILS WDD,
+        WSH_DELIVERY_ASSIGNMENTS_V WDA
+      WHERE WDA.DELIVERY_ID = DELIVERY_ID3
+        AND WDA.DELIVERY_DETAIL_ID = WDD.DELIVERY_DETAIL_ID
+        AND NVL(WDD.CONTAINER_FLAG
+         ,'N') = 'N'
+        AND WDD.CUSTOMER_DOCK_CODE is not null
+      GROUP BY
+        WDD.CUSTOMER_DOCK_CODE;
+  BEGIN
+    L_COUNT := 0;
+    L_PREV_DOCK_CODE := NULL;
+    L_DOCK_CODE := NULL;
+    OPEN C_DOCK;
+    LOOP
+      FETCH C_DOCK
+       INTO L_DOCK_CODE;
+      EXIT WHEN C_DOCK%NOTFOUND;
+      L_COUNT := L_COUNT + 1;
+      IF (L_COUNT > 1) THEN
+        IF (L_DOCK_CODE <> L_PREV_DOCK_CODE) THEN
+          L_DOCK_CODE := NULL;
+          CLOSE C_DOCK;
+          EXIT;
+        END IF;
+      END IF;
+      L_PREV_DOCK_CODE := L_DOCK_CODE;
+    END LOOP;
+    CLOSE C_DOCK;
+    RETURN L_DOCK_CODE;
+  EXCEPTION
+    WHEN NO_DATA_FOUND THEN
+      L_DOCK_CODE := NULL;
+      RETURN (L_DOCK_CODE);
+    WHEN OTHERS THEN
+      L_DOCK_CODE := NULL;
+      RETURN (L_DOCK_CODE);
+  END CF_DOCK_CODEFORMULA;
+
+  FUNCTION CF_CARRIER_NAMEFORMULA(SHIP_METHOD IN VARCHAR2) RETURN CHAR IS
+    L_CARRIER_NAME VARCHAR2(30);
+    L_CARRIER_ID NUMBER;
+  BEGIN
+    SELECT
+      CARRIER_ID
+    INTO L_CARRIER_ID
+    FROM
+      WSH_CARRIER_SERVICES
+    WHERE SHIP_METHOD_CODE = SHIP_METHOD;
+    SELECT
+      PARTY_NAME
+    INTO L_CARRIER_NAME
+    FROM
+      HZ_PARTIES
+    WHERE PARTY_ID = L_CARRIER_ID;
+    RETURN (L_CARRIER_NAME);
+  EXCEPTION
+    WHEN OTHERS THEN
+      RETURN (NULL);
+  END CF_CARRIER_NAMEFORMULA;
+
+  FUNCTION CF_MBOL_NUMBERFORMULA(TRIP_ID1 IN NUMBER) RETURN CHAR IS
+    L_MBOL_NUMBER VARCHAR2(50);
+  BEGIN
+    SELECT
+      SEQUENCE_NUMBER
+    INTO L_MBOL_NUMBER
+    FROM
+      WSH_DOCUMENT_INSTANCES
+    WHERE ENTITY_ID = TRIP_ID1
+      AND ENTITY_NAME = 'WSH_TRIPS';
+    RETURN L_MBOL_NUMBER;
+  EXCEPTION
+    WHEN NO_DATA_FOUND THEN
+      RETURN NULL;
+  END CF_MBOL_NUMBERFORMULA;
+
+  FUNCTION CF_CUSTOMER_NAMEFORMULA(CUSTOMER_NAME IN VARCHAR2) RETURN CHAR IS
+    L_CUSTOMER_NAME HZ_PARTIES.PARTY_NAME%TYPE;
+    L_PERSON_TITLE HZ_PARTIES.PERSON_TITLE%TYPE;
+    L_PERSON_TITLE_UP HZ_PARTIES.PERSON_TITLE%TYPE;
+    L_LOOKUP_TYPE VARCHAR2(20);
+  BEGIN
+    /*SRW.REFERENCE(CUSTOMER_NAME)*/NULL;
+    SELECT
+      PARTY_NAME,
+      NVL(PERSON_PRE_NAME_ADJUNCT
+         ,PERSON_TITLE) TITLE
+    INTO L_CUSTOMER_NAME,L_PERSON_TITLE
+    FROM
+      HZ_PARTIES
+    WHERE PARTY_NAME = CUSTOMER_NAME;
+    IF L_PERSON_TITLE IS NOT NULL THEN
+      BEGIN
+        L_LOOKUP_TYPE := 'RESPONSIBILITY';
+        L_PERSON_TITLE_UP := UPPER(L_PERSON_TITLE);
+        SELECT
+          MEANING || ' ' || L_CUSTOMER_NAME
+        INTO L_CUSTOMER_NAME
+        FROM
+          AR_LOOKUPS
+        WHERE LOOKUP_CODE = L_PERSON_TITLE_UP
+          AND LOOKUP_TYPE = L_LOOKUP_TYPE;
+      EXCEPTION
+        WHEN OTHERS THEN
+          L_CUSTOMER_NAME := L_PERSON_TITLE || ' ' || L_CUSTOMER_NAME;
+      END;
+    END IF;
+    RETURN (L_CUSTOMER_NAME);
+  EXCEPTION
+    WHEN OTHERS THEN
+      RETURN (CUSTOMER_NAME);
+  END CF_CUSTOMER_NAMEFORMULA;
+
+  FUNCTION CF_COMMODITY_CLASSFORMULA(UNPACKED_ITEM_INV_ITEM_ID IN NUMBER
+                                    ,UNPACKED_ITEM_ORGANIZATION_ID IN NUMBER) RETURN CHAR IS
+    L_CLASS_LIST VARCHAR2(1000);
+    CURSOR C_CATEGORY(C_INV_ITEM_ID IN NUMBER,C_INV_ORG_ID IN NUMBER) IS
+      SELECT
+        CONCATENATED_SEGMENTS COMM_CLASS
+      FROM
+        MTL_CATEGORIES_KFV MC,
+        MTL_ITEM_CATEGORIES MIC,
+        MTL_CATEGORY_SETS_VL MCSTL
+      WHERE MIC.INVENTORY_ITEM_ID = C_INV_ITEM_ID
+        AND MIC.ORGANIZATION_ID = C_INV_ORG_ID
+        AND MIC.CATEGORY_SET_ID = MCSTL.CATEGORY_SET_ID
+        AND MC.CATEGORY_ID = MIC.CATEGORY_ID
+        AND MCSTL.CATEGORY_SET_NAME = 'WSH_COMMODITY_CODE'
+      ORDER BY
+        MC.CATEGORY_ID;
+  BEGIN
+    /*SRW.REFERENCE(UNPACKED_ITEM_INV_ITEM_ID)*/NULL;
+    /*SRW.REFERENCE(UNPACKED_ITEM_ORGANIZATION_ID)*/NULL;
+    FOR c_rec IN C_CATEGORY(UNPACKED_ITEM_INV_ITEM_ID,UNPACKED_ITEM_ORGANIZATION_ID) LOOP
+      IF (L_CLASS_LIST IS NULL) THEN
+        L_CLASS_LIST := C_REC.COMM_CLASS;
+      ELSE
+        L_CLASS_LIST := L_CLASS_LIST || ', ' || C_REC.COMM_CLASS;
+      END IF;
+    END LOOP;
+    RETURN (L_CLASS_LIST);
+  EXCEPTION
+    WHEN OTHERS THEN
+      RETURN (NULL);
+  END CF_COMMODITY_CLASSFORMULA;
+
+  FUNCTION CF_DETAIL_COMM_CLASSFORMULA(DELIVERY_DETAIL_ID IN NUMBER) RETURN CHAR IS
+    L_CLASS_LIST VARCHAR2(4000);
+    CURSOR C_CATEGORY(C_INV_ITEM_ID IN NUMBER,C_INV_ORG_ID IN NUMBER) IS
+      SELECT
+        MC.SEGMENT1 || '-' || MC.SEGMENT2 || '-' || MC.SEGMENT3 COMM_CLASS
+      FROM
+        MTL_CATEGORIES MC,
+        MTL_ITEM_CATEGORIES MIC,
+        MTL_CATEGORY_SETS_VL MCSTL
+      WHERE MIC.INVENTORY_ITEM_ID = C_INV_ITEM_ID
+        AND MIC.ORGANIZATION_ID = C_INV_ORG_ID
+        AND MIC.CATEGORY_SET_ID = MCSTL.CATEGORY_SET_ID
+        AND MC.CATEGORY_ID = MIC.CATEGORY_ID
+        AND MCSTL.CATEGORY_SET_NAME = 'WSH_COMMODITY_CODE'
+      ORDER BY
+        MC.CATEGORY_ID;
+    CURSOR C_DLV_DETAIL(C_DELIVERY_DETAIL_ID IN NUMBER) IS
+      SELECT
+        DISTINCT
+        INVENTORY_ITEM_ID,
+        ORGANIZATION_ID
+      FROM
+        WSH_DELIVERY_DETAILS WDD
+      WHERE WDD.DELIVERY_DETAIL_ID IN (
+        SELECT
+          WDA.DELIVERY_DETAIL_ID
+        FROM
+          WSH_DELIVERY_ASSIGNMENTS WDA
+        START WITH WDA.DELIVERY_DETAIL_ID = C_DELIVERY_DETAIL_ID
+        CONNECT BY prior WDA.DELIVERY_DETAIL_ID = WDA.PARENT_DELIVERY_DETAIL_ID )
+        AND WDD.CONTAINER_FLAG = 'N';
+  BEGIN
+    /*SRW.REFERENCE(DELIVERY_DETAIL_ID)*/NULL;
+    FOR c_1 IN C_DLV_DETAIL(DELIVERY_DETAIL_ID) LOOP
+      FOR c_cat IN C_CATEGORY(c_1.inventory_item_id,c_1.organization_id) LOOP
+        IF (L_CLASS_LIST IS NULL) THEN
+          L_CLASS_LIST := C_CAT.COMM_CLASS;
+        ELSE
+          L_CLASS_LIST := L_CLASS_LIST || ', ' || C_CAT.COMM_CLASS;
+        END IF;
+      END LOOP;
+    END LOOP;
+    IF (LENGTH(L_CLASS_LIST) > 2000) THEN
+      L_CLASS_LIST := SUBSTR(L_CLASS_LIST
+                            ,1
+                            ,2000);
+    END IF;
+    RETURN (L_CLASS_LIST);
+  EXCEPTION
+    WHEN OTHERS THEN
+      RETURN (NULL);
+  END CF_DETAIL_COMM_CLASSFORMULA;
+
+  FUNCTION CF_SRC_HDR_IDFORMULA RETURN NUMBER IS
+    CURSOR C_MATCH_DLV_DETAIL(C_INV_ITEM_ID IN NUMBER,C_INV_ORG_ID IN NUMBER,C_DELIVERY_ID IN NUMBER) IS
+      SELECT
+        WDD.DELIVERY_DETAIL_ID,
+        WDD.SOURCE_HEADER_ID,
+        WDD.SOURCE_LINE_ID,
+        WDD.TOP_MODEL_LINE_ID
+      FROM
+        WSH_DELIVERY_DETAILS WDD,
+        WSH_DELIVERY_ASSIGNMENTS WDA
+      WHERE WDA.DELIVERY_ID = C_DELIVERY_ID
+        AND WDA.DELIVERY_DETAIL_ID = WDD.DELIVERY_DETAIL_ID
+        AND WDD.INVENTORY_ITEM_ID = C_INV_ITEM_ID
+        AND WDD.ORGANIZATION_ID = C_INV_ORG_ID
+        AND WDD.TOP_MODEL_LINE_ID IS NOT NULL
+        AND ROWNUM = 1;
+    L_SRC_HEADER_ID NUMBER;
+    L_SRC_LINE_ID NUMBER;
+    L_TOP_MODEL_LINE_ID NUMBER;
+  BEGIN
+    RETURN (L_SRC_HEADER_ID);
+  EXCEPTION
+    WHEN OTHERS THEN
+      CP_TOP_MODEL_LINE_ID := NULL;
+      CP_SRC_LINE_ID := NULL;
+      RETURN (NULL);
+  END CF_SRC_HDR_IDFORMULA;
+
+  FUNCTION CP_CLASSIFICATION_P RETURN VARCHAR2 IS
+  BEGIN
+    RETURN CP_CLASSIFICATION;
+  END CP_CLASSIFICATION_P;
+
+  FUNCTION CP_NUM_PACKAGES_P RETURN NUMBER IS
+  BEGIN
+    RETURN CP_NUM_PACKAGES;
+  END CP_NUM_PACKAGES_P;
+
+  FUNCTION CP_TOP_MODEL_LINE_ID_P RETURN NUMBER IS
+  BEGIN
+    RETURN CP_TOP_MODEL_LINE_ID;
+  END CP_TOP_MODEL_LINE_ID_P;
+
+  FUNCTION CP_SRC_LINE_ID_P RETURN NUMBER IS
+  BEGIN
+    RETURN CP_SRC_LINE_ID;
+  END CP_SRC_LINE_ID_P;
+
+  FUNCTION CP_CONTAINER_CLASSIFICATION_P RETURN VARCHAR2 IS
+  BEGIN
+    RETURN CP_CONTAINER_CLASSIFICATION;
+  END CP_CONTAINER_CLASSIFICATION_P;
+
+  FUNCTION CP_HM_P RETURN VARCHAR2 IS
+  BEGIN
+    RETURN CP_HM;
+  END CP_HM_P;
+
+  FUNCTION CP_TOTAL_PREPAID_AMOUNT_P RETURN NUMBER IS
+  BEGIN
+    RETURN CP_TOTAL_PREPAID_AMOUNT;
+  END CP_TOTAL_PREPAID_AMOUNT_P;
+
+  FUNCTION CP_TOTAL_PREPAID_CURRENCY_P RETURN VARCHAR2 IS
+  BEGIN
+    RETURN CP_TOTAL_PREPAID_CURRENCY;
+  END CP_TOTAL_PREPAID_CURRENCY_P;
+
+  FUNCTION CP_TOTAL_COLLECT_CURRENCY_P RETURN VARCHAR2 IS
+  BEGIN
+    RETURN CP_TOTAL_COLLECT_CURRENCY;
+  END CP_TOTAL_COLLECT_CURRENCY_P;
+
+END WSH_WSHRDBOL_XMLP_PKG;
+
+
+
+/

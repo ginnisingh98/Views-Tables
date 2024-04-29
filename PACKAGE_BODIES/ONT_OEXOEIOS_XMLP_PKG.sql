@@ -1,0 +1,742 @@
+--------------------------------------------------------
+--  DDL for Package Body ONT_OEXOEIOS_XMLP_PKG
+--------------------------------------------------------
+
+  CREATE OR REPLACE EDITIONABLE PACKAGE BODY "APPS"."ONT_OEXOEIOS_XMLP_PKG" AS
+/* $Header: OEXOEIOSB.pls 120.1 2007/12/25 07:17:57 npannamp noship $ */
+  FUNCTION BEFOREREPORT RETURN BOOLEAN IS
+  BEGIN
+    BEGIN
+      BEGIN
+        P_CONC_REQUEST_ID := FND_GLOBAL.CONC_REQUEST_ID;
+        /*SRW.USER_EXIT('FND SRWINIT')*/NULL;
+      EXCEPTION
+        WHEN /*SRW.USER_EXIT_FAILURE*/OTHERS THEN
+          /*SRW.MESSAGE(1000
+                     ,'Failed in BEFORE REPORT trigger')*/NULL;
+          RETURN (FALSE);
+      END;
+      BEGIN
+        P_ORG_ID := MO_GLOBAL.GET_CURRENT_ORG_ID;
+      END;
+      DECLARE
+        L_COMPANY_NAME VARCHAR2(100);
+        L_FUNCTIONAL_CURRENCY VARCHAR2(15);
+      BEGIN
+        SELECT
+          SOB.NAME,
+          SOB.CURRENCY_CODE
+        INTO L_COMPANY_NAME,L_FUNCTIONAL_CURRENCY
+        FROM
+          GL_SETS_OF_BOOKS SOB,
+          FND_CURRENCIES CUR
+        WHERE SOB.SET_OF_BOOKS_ID = P_SOB_ID
+          AND SOB.CURRENCY_CODE = CUR.CURRENCY_CODE;
+        RP_COMPANY_NAME := L_COMPANY_NAME;
+        RP_FUNCTIONAL_CURRENCY := L_FUNCTIONAL_CURRENCY;
+      EXCEPTION
+        WHEN NO_DATA_FOUND THEN
+          NULL;
+      END;
+      DECLARE
+        L_REPORT_NAME VARCHAR2(240);
+      BEGIN
+        SELECT
+          CP.USER_CONCURRENT_PROGRAM_NAME
+        INTO L_REPORT_NAME
+        FROM
+          FND_CONCURRENT_PROGRAMS_VL CP,
+          FND_CONCURRENT_REQUESTS CR
+        WHERE CR.REQUEST_ID = P_CONC_REQUEST_ID
+          AND CP.APPLICATION_ID = CR.PROGRAM_APPLICATION_ID
+          AND CP.CONCURRENT_PROGRAM_ID = CR.CONCURRENT_PROGRAM_ID;
+        RP_REPORT_NAME := L_REPORT_NAME;
+IF (RP_REPORT_NAME = 'Order/Invoice Summary Report (XML)') THEN
+	RP_REPORT_NAME := 'Order/Invoice Summary Report';
+END IF;
+      EXCEPTION
+        WHEN NO_DATA_FOUND THEN
+          RP_REPORT_NAME := 'Order/Invoice Summary Report';
+      END;
+      DECLARE
+        L_ORDER_TYPE_LOW VARCHAR2(50);
+        L_ORDER_TYPE_HIGH VARCHAR2(50);
+        L_CUSTOMER_NAME_LOW VARCHAR2(50);
+        L_CUSTOMER_NAME_HIGH VARCHAR2(50);
+        L_SALESREP_LOW VARCHAR2(50);
+        L_SALESREP_HIGH VARCHAR2(50);
+        L_ORDER_NUMBER_LOW VARCHAR2(50);
+        L_ORDER_NUMBER_HIGH VARCHAR2(50);
+      BEGIN
+        IF (P_ORDER_TYPE_LOW IS NULL) AND (P_ORDER_TYPE_HIGH IS NULL) THEN
+          NULL;
+        ELSE
+          IF P_ORDER_TYPE_LOW IS NULL THEN
+            L_ORDER_TYPE_LOW := '   ';
+          ELSE
+            L_ORDER_TYPE_LOW := SUBSTR(L_ORDER_TYPE_LOW
+                                      ,1
+                                      ,18);
+          END IF;
+          IF P_ORDER_TYPE_HIGH IS NULL THEN
+            L_ORDER_TYPE_HIGH := '   ';
+          ELSE
+            L_ORDER_TYPE_HIGH := SUBSTR(L_ORDER_TYPE_HIGH
+                                       ,1
+                                       ,18);
+          END IF;
+          RP_ORDER_TYPE_RANGE := 'From ' || L_ORDER_TYPE_LOW || ' To ' || L_ORDER_TYPE_HIGH;
+        END IF;
+        IF (P_CUSTOMER_NAME_LOW IS NULL) AND (P_CUSTOMER_NAME_HIGH IS NULL) THEN
+          NULL;
+        ELSE
+          IF P_CUSTOMER_NAME_LOW IS NULL THEN
+            L_CUSTOMER_NAME_LOW := '   ';
+          ELSE
+            L_CUSTOMER_NAME_LOW := P_CUSTOMER_NAME_LOW;
+          END IF;
+          IF P_CUSTOMER_NAME_HIGH IS NULL THEN
+            L_CUSTOMER_NAME_HIGH := '   ';
+          ELSE
+            L_CUSTOMER_NAME_HIGH := P_CUSTOMER_NAME_HIGH;
+          END IF;
+          RP_CUSTOMER_NAME_RANGE := 'From ' || L_CUSTOMER_NAME_LOW || ' To ' || L_CUSTOMER_NAME_HIGH;
+        END IF;
+        IF (P_SALESREP_LOW IS NULL) AND (P_SALESREP_HIGH IS NULL) THEN
+          NULL;
+        ELSE
+          IF P_SALESREP_LOW IS NULL THEN
+            L_SALESREP_LOW := '   ';
+          ELSE
+            L_SALESREP_LOW := SUBSTR(P_SALESREP_LOW
+                                    ,1
+                                    ,18);
+          END IF;
+          IF P_SALESREP_HIGH IS NULL THEN
+            L_SALESREP_HIGH := '   ';
+          ELSE
+            L_SALESREP_HIGH := SUBSTR(P_SALESREP_HIGH
+                                     ,1
+                                     ,18);
+          END IF;
+          RP_SALESREP_RANGE := 'From ' || L_SALESREP_LOW || ' To ' || L_SALESREP_HIGH;
+        END IF;
+        IF (P_ORDER_NUM_LOW IS NULL) AND (P_ORDER_NUM_HIGH IS NULL) THEN
+          NULL;
+        ELSE
+          IF P_ORDER_NUM_LOW IS NULL THEN
+            L_ORDER_NUMBER_LOW := '   ';
+          ELSE
+            L_ORDER_NUMBER_LOW := SUBSTR(P_ORDER_NUM_LOW
+                                        ,1
+                                        ,18);
+          END IF;
+          IF P_ORDER_NUM_HIGH IS NULL THEN
+            L_ORDER_NUMBER_HIGH := '   ';
+          ELSE
+            L_ORDER_NUMBER_HIGH := SUBSTR((P_ORDER_NUM_HIGH)
+                                         ,1
+                                         ,18);
+          END IF;
+          RP_ORDER_NUMBER_RANGE := 'From ' || L_ORDER_NUMBER_LOW || ' To ' || L_ORDER_NUMBER_HIGH;
+        END IF;
+      END;
+      DECLARE
+        L_MEANING VARCHAR2(80);
+      BEGIN
+        SELECT
+          MEANING
+        INTO L_MEANING
+        FROM
+          FND_LOOKUPS
+        WHERE LOOKUP_TYPE = 'YES_NO'
+          AND LOOKUP_CODE = SUBSTR(UPPER(P_OPEN_ORDERS_ONLY)
+              ,1
+              ,1);
+        RP_OPEN_ORDERS_ONLY := L_MEANING;
+      EXCEPTION
+        WHEN NO_DATA_FOUND THEN
+          RP_OPEN_ORDERS_ONLY := 'Yes';
+      END;
+    END;
+    RETURN (TRUE);
+  END BEFOREREPORT;
+
+  FUNCTION AFTERREPORT RETURN BOOLEAN IS
+  BEGIN
+    BEGIN
+      /*SRW.USER_EXIT('FND SRWEXIT')*/NULL;
+    EXCEPTION
+      WHEN /*SRW.USER_EXIT_FAILURE*/OTHERS THEN
+        /*SRW.MESSAGE(1
+                   ,'Failed in AFTER REPORT TRIGGER')*/NULL;
+        RETURN (FALSE);
+    END;
+    RETURN (TRUE);
+  END AFTERREPORT;
+
+  FUNCTION AFTERPFORM RETURN BOOLEAN IS
+  BEGIN
+    BEGIN
+      IF (P_ORDER_TYPE_LOW IS NOT NULL) AND (P_ORDER_TYPE_HIGH IS NOT NULL) THEN
+        LP_ORDER_TYPE := 'and ( ot.transaction_type_id between :p_order_type_low and :p_order_type_high ) ';
+        SELECT
+          OEOT.NAME
+        INTO L_ORDER_TYPE_LOW
+        FROM
+          OE_TRANSACTION_TYPES_TL OEOT
+        WHERE OEOT.TRANSACTION_TYPE_ID = P_ORDER_TYPE_LOW
+          AND OEOT.LANGUAGE = USERENV('LANG');
+        SELECT
+          OEOT.NAME
+        INTO L_ORDER_TYPE_HIGH
+        FROM
+          OE_TRANSACTION_TYPES_TL OEOT
+        WHERE OEOT.TRANSACTION_TYPE_ID = P_ORDER_TYPE_HIGH
+          AND OEOT.LANGUAGE = USERENV('LANG');
+      ELSIF (P_ORDER_TYPE_LOW IS NOT NULL) THEN
+        LP_ORDER_TYPE := 'and ot.transaction_type_id >= :p_order_type_low ';
+        SELECT
+          OEOT.NAME
+        INTO L_ORDER_TYPE_LOW
+        FROM
+          OE_TRANSACTION_TYPES_TL OEOT
+        WHERE OEOT.TRANSACTION_TYPE_ID = P_ORDER_TYPE_LOW
+          AND OEOT.LANGUAGE = USERENV('LANG');
+      ELSIF (P_ORDER_TYPE_HIGH IS NOT NULL) THEN
+        LP_ORDER_TYPE := 'and ot.transaction_type_id <= :p_order_type_high ';
+        SELECT
+          OEOT.NAME
+        INTO L_ORDER_TYPE_HIGH
+        FROM
+          OE_TRANSACTION_TYPES_TL OEOT
+        WHERE OEOT.TRANSACTION_TYPE_ID = P_ORDER_TYPE_HIGH
+          AND OEOT.LANGUAGE = USERENV('LANG');
+      END IF;
+
+      IF (LP_ORDER_TYPE IS NULL) THEN
+	LP_ORDER_TYPE := ' ';
+	END IF;
+
+      IF (P_CUSTOMER_NAME_LOW IS NOT NULL) AND (P_CUSTOMER_NAME_HIGH IS NOT NULL) THEN
+        LP_CUSTOMER_NAME := 'and ( party.party_name between :p_customer_name_low and :p_customer_name_high ) ';
+      ELSIF (P_CUSTOMER_NAME_LOW IS NOT NULL) THEN
+        LP_CUSTOMER_NAME := 'and party.party_name >= :p_customer_name_low ';
+      ELSIF (P_CUSTOMER_NAME_HIGH IS NOT NULL) THEN
+        LP_CUSTOMER_NAME := 'and party.party_name <= :p_customer_name_high ';
+      END IF;
+      IF (LP_CUSTOMER_NAME IS NULL) THEN
+	LP_CUSTOMER_NAME := ' ';
+	END IF;
+
+      IF (P_ORDER_NUM_LOW IS NOT NULL) AND (P_ORDER_NUM_HIGH IS NOT NULL) THEN
+        LP_ORDER_NUM := 'and ( h.order_number between to_number(:p_order_num_low) and to_number(:p_order_num_high) ) ';
+      ELSIF (P_ORDER_NUM_LOW IS NOT NULL) THEN
+        LP_ORDER_NUM := 'and h.order_number >= to_number(:p_order_num_low) ';
+      ELSIF (P_ORDER_NUM_HIGH IS NOT NULL) THEN
+        LP_ORDER_NUM := 'and h.order_number <= to_number(:p_order_num_high) ';
+      END IF;
+
+      IF (LP_ORDER_NUM IS NULL) THEN
+	LP_ORDER_NUM := ' ';
+	END IF;
+
+      IF (P_SALESREP_LOW IS NOT NULL) AND (P_SALESREP_HIGH IS NOT NULL) THEN
+        LP_SALESREP := 'and  ((nvl(sr.name,''zzzzzz'') between :p_salesrep_low and :p_salesrep_high ) and l.salesrep_id = sr.salesrep_id(+)
+                                              and nvl(l.org_id,0) = nvl(sr.org_id(+),0)) ';
+      ELSIF (P_SALESREP_LOW IS NOT NULL) THEN
+        LP_SALESREP := 'and (nvl(sr.name,''zzzzzz'') >= :p_salesrep_low and l.salesrep_id = sr.salesrep_id(+) and nvl(l.org_id,0) = nvl(sr.org_id(+),0)) ';
+      ELSIF (P_SALESREP_HIGH IS NOT NULL) THEN
+        LP_SALESREP := 'and (nvl(sr.name,''zzzzzz'') <= :p_salesrep_high and l.salesrep_id = sr.salesrep_id(+) and nvl(l.org_id,0) = nvl(sr.org_id(+),0)) ';
+      ELSE
+        LP_SALESREP := 'and  (h.salesrep_id = sr.salesrep_id(+) and nvl(h.org_id,0) = nvl(sr.org_id(+),0)) ';
+      END IF;
+      IF (P_COUNTRY IS NOT NULL) THEN
+        LP_COUNTRY := 'and terr.territory_short_name  =  :p_country ';
+      END IF;
+   IF (LP_COUNTRY IS NULL) THEN
+	LP_COUNTRY := ' ';
+	END IF;
+
+      IF P_OPEN_ORDERS_ONLY = 'Y' THEN
+        LP_OPEN_ORDERS_ONLY := 'and nvl(h.open_flag,''N'') = ''Y'' ';
+      END IF;
+    END;
+    RETURN (TRUE);
+  END AFTERPFORM;
+
+  FUNCTION C_DATA_NOT_FOUNDFORMULA(CURRENCY1 IN VARCHAR2) RETURN NUMBER IS
+  BEGIN
+    RP_DATA_FOUND := CURRENCY1;
+    RETURN (0);
+  END C_DATA_NOT_FOUNDFORMULA;
+
+  FUNCTION RP_CURR_LABELFORMULA RETURN VARCHAR2 IS
+  BEGIN
+    IF SUBSTR(UPPER(P_ORDER_BY)
+          ,1
+          ,1) = 'O' THEN
+      RETURN ('  Currency');
+    ELSIF SUBSTR(UPPER(P_ORDER_BY)
+          ,1
+          ,1) = 'S' THEN
+      RETURN ('    Currency');
+    ELSE
+      RETURN ('Currency');
+    END IF;
+    RETURN NULL;
+  END RP_CURR_LABELFORMULA;
+
+  FUNCTION C_ORDER_COUNTFORMULA RETURN NUMBER IS
+  BEGIN
+    RETURN (1);
+  END C_ORDER_COUNTFORMULA;
+
+  FUNCTION C_LINE_COUNTFORMULA(HEADER_ID1 IN NUMBER) RETURN NUMBER IS
+  BEGIN
+    DECLARE
+      L_COUNT NUMBER(20);
+    BEGIN
+      /*SRW.REFERENCE(HEADER_ID1)*/NULL;
+      L_COUNT := 0;
+      SELECT
+        COUNT(1)
+      INTO L_COUNT
+      FROM
+        OE_ORDER_LINES L,
+        RA_CUSTOMER_TRX_ALL TRX,
+        RA_CUSTOMER_TRX_LINES_ALL TRXL
+      WHERE L.HEADER_ID = HEADER_ID1
+        AND TO_CHAR(L.LINE_ID) = TRXL.INTERFACE_LINE_ATTRIBUTE6
+        AND TRXL.INTERFACE_LINE_CONTEXT = P_INVOICE_LINE_CONTEXT
+        AND TRXL.CUSTOMER_TRX_ID = TRX.CUSTOMER_TRX_ID;
+      RETURN (L_COUNT);
+    END;
+    RETURN NULL;
+  END C_LINE_COUNTFORMULA;
+
+  FUNCTION C_COMPUTE_AMOUNTSFORMULA(TRX_ID IN NUMBER
+                                   ,CURRENCY1 IN VARCHAR2
+                                   ,INV_ORDER_AMT IN NUMBER
+                                   ,CONVERSION_TYPE_CODE IN VARCHAR2
+                                   ,ORDER_DATE IN DATE
+                                   ,C_PRECISION IN NUMBER
+                                   ,CONVERSION_RATE IN NUMBER) RETURN NUMBER IS
+  BEGIN
+    BEGIN
+      DECLARE
+        L_AMOUNT NUMBER(12,2);
+        L_CREDIT_AMOUNT NUMBER(12,2);
+        L_BALANCE_DUE NUMBER(12,2);
+        L_TERMS_SEQUANCE_NUMBER NUMBER(15);
+      BEGIN
+        /*SRW.REFERENCE(TRX_ID)*/NULL;
+        C_AMOUNT := 0;
+        C_CREDIT_AMOUNT := 0;
+        C_BALANCE_DUE := 0;
+        SELECT
+          MAX(TERMS_SEQUENCE_NUMBER)
+        INTO L_TERMS_SEQUANCE_NUMBER
+        FROM
+          AR_PAYMENT_SCHEDULES
+        WHERE CUSTOMER_TRX_ID = TRX_ID;
+        IF L_TERMS_SEQUANCE_NUMBER IS NULL THEN
+          SELECT
+            SUM(PS.AMOUNT_DUE_ORIGINAL),
+            SUM(PS.AMOUNT_DUE_ORIGINAL - PS.AMOUNT_DUE_REMAINING),
+            SUM(PS.AMOUNT_DUE_REMAINING)
+          INTO L_AMOUNT,L_CREDIT_AMOUNT,L_BALANCE_DUE
+          FROM
+            AR_PAYMENT_SCHEDULES PS
+          WHERE PS.CUSTOMER_TRX_ID = TRX_ID;
+        ELSE
+          SELECT
+            PS.AMOUNT_DUE_ORIGINAL,
+            ( PS.AMOUNT_DUE_ORIGINAL - PS.AMOUNT_DUE_REMAINING ),
+            PS.AMOUNT_DUE_REMAINING
+          INTO L_AMOUNT,L_CREDIT_AMOUNT,L_BALANCE_DUE
+          FROM
+            AR_PAYMENT_SCHEDULES PS
+          WHERE PS.CUSTOMER_TRX_ID = TRX_ID
+            AND PS.TERMS_SEQUENCE_NUMBER = L_TERMS_SEQUANCE_NUMBER;
+        END IF;
+        C_AMOUNT := L_AMOUNT;
+        C_CREDIT_AMOUNT := L_CREDIT_AMOUNT;
+        C_BALANCE_DUE := L_BALANCE_DUE;
+      END;
+      DECLARE
+        L_CONVERSION_RATE NUMBER(15,3);
+      BEGIN
+        /*SRW.REFERENCE(CURRENCY1)*/NULL;
+        /*SRW.REFERENCE(RP_FUNCTIONAL_CURRENCY)*/NULL;
+        /*SRW.REFERENCE(C_INV_ORDER_AMT)*/NULL;
+        /*SRW.REFERENCE(C_AMOUNT)*/NULL;
+        /*SRW.REFERENCE(C_CREDIT_AMOUNT)*/NULL;
+        /*SRW.REFERENCE(C_BALANCE_DUE)*/NULL;
+        /*SRW.REFERENCE(INV_ORDER_AMT)*/NULL;
+        /*SRW.REFERENCE(CONVERSION_TYPE_CODE)*/NULL;
+        /*SRW.REFERENCE(ORDER_DATE)*/NULL;
+        L_CONVERSION_RATE := 0;
+        IF P_USE_FUNCTIONAL_CURRENCY = 'N' THEN
+          C_INV_ORDER_AMT := ROUND(NVL(INV_ORDER_AMT
+                                      ,0)
+                                  ,C_PRECISION);
+          RETURN (0);
+        ELSIF P_USE_FUNCTIONAL_CURRENCY = 'Y' THEN
+          IF CURRENCY1 = RP_FUNCTIONAL_CURRENCY THEN
+            L_CONVERSION_RATE := 1;
+          ELSE
+            IF CONVERSION_RATE IS NULL THEN
+              L_CONVERSION_RATE := GET_RATE(P_SOB_ID
+                                           ,CURRENCY1
+                                           ,ORDER_DATE
+                                           ,CONVERSION_TYPE_CODE);
+            ELSE
+              L_CONVERSION_RATE := CONVERSION_RATE;
+            END IF;
+          END IF;
+          C_INV_ORDER_AMT := ROUND(NVL(L_CONVERSION_RATE
+                                      ,0) * NVL(INV_ORDER_AMT
+                                      ,0)
+                                  ,C_PRECISION);
+          C_AMOUNT := ROUND(NVL(L_CONVERSION_RATE
+                               ,0) * NVL(C_AMOUNT
+                               ,0)
+                           ,C_PRECISION);
+          C_CREDIT_AMOUNT := ROUND(NVL(L_CONVERSION_RATE
+                                      ,0) * NVL(C_CREDIT_AMOUNT
+                                      ,0)
+                                  ,C_PRECISION);
+          C_BALANCE_DUE := ROUND(NVL(L_CONVERSION_RATE
+                                    ,0) * NVL(C_BALANCE_DUE
+                                    ,0)
+                                ,C_PRECISION);
+          RETURN (0);
+        END IF;
+      EXCEPTION
+        WHEN NO_DATA_FOUND THEN
+          C_INV_ORDER_AMT := 0;
+          C_AMOUNT := 0;
+          C_CREDIT_AMOUNT := 0;
+          C_BALANCE_DUE := 0;
+          RETURN (0);
+        WHEN OTHERS THEN
+          C_INV_ORDER_AMT := 0;
+          C_AMOUNT := 0;
+          C_CREDIT_AMOUNT := 0;
+          C_BALANCE_DUE := 0;
+          RETURN (0);
+      END;
+    END;
+    RETURN NULL;
+  END C_COMPUTE_AMOUNTSFORMULA;
+
+  FUNCTION RP_USE_FUNCTIONAL_CURRENCYFORM RETURN VARCHAR2 IS
+  BEGIN
+    DECLARE
+      L_TEMP VARCHAR2(100);
+    BEGIN
+      SELECT
+        MEANING
+      INTO L_TEMP
+      FROM
+        FND_LOOKUPS
+      WHERE LOOKUP_CODE = P_USE_FUNCTIONAL_CURRENCY
+        AND LOOKUP_TYPE = 'YES_NO';
+      RETURN (L_TEMP);
+    EXCEPTION
+      WHEN NO_DATA_FOUND THEN
+        RETURN ('No');
+    END;
+    RETURN NULL;
+  END RP_USE_FUNCTIONAL_CURRENCYFORM;
+
+  FUNCTION C_ORDER_AMOUNTFORMULA(CURRENCY1 IN VARCHAR2
+                                ,ORDER_AMOUNT IN NUMBER
+                                ,CONVERSION_TYPE_CODE IN VARCHAR2
+                                ,ORDER_DATE IN DATE
+                                ,C_PRECISION IN NUMBER
+                                ,CONVERSION_RATE IN NUMBER) RETURN NUMBER IS
+  BEGIN
+    DECLARE
+      L_CONVERSION_RATE NUMBER(15,3);
+    BEGIN
+      /*SRW.REFERENCE(CURRENCY1)*/NULL;
+      /*SRW.REFERENCE(RP_FUNCTIONAL_CURRENCY)*/NULL;
+      /*SRW.REFERENCE(ORDER_AMOUNT)*/NULL;
+      /*SRW.REFERENCE(CONVERSION_TYPE_CODE)*/NULL;
+      /*SRW.REFERENCE(ORDER_DATE)*/NULL;
+      L_CONVERSION_RATE := 0;
+      IF P_USE_FUNCTIONAL_CURRENCY = 'N' THEN
+        RETURN (ROUND(NVL(ORDER_AMOUNT
+                        ,0)
+                    ,C_PRECISION));
+      ELSIF P_USE_FUNCTIONAL_CURRENCY = 'Y' THEN
+        IF CURRENCY1 = RP_FUNCTIONAL_CURRENCY THEN
+          L_CONVERSION_RATE := 1;
+        ELSE
+          IF CONVERSION_RATE IS NULL THEN
+            L_CONVERSION_RATE := GET_RATE(P_SOB_ID
+                                         ,CURRENCY1
+                                         ,ORDER_DATE
+                                         ,CONVERSION_TYPE_CODE);
+          ELSE
+            L_CONVERSION_RATE := CONVERSION_RATE;
+          END IF;
+        END IF;
+        RETURN (ROUND(NVL(L_CONVERSION_RATE
+                        ,0) * NVL(ORDER_AMOUNT
+                        ,0)
+                    ,C_PRECISION));
+      END IF;
+    EXCEPTION
+      WHEN NO_DATA_FOUND THEN
+        RETURN (0);
+      WHEN OTHERS THEN
+        RETURN (0);
+    END;
+    RETURN NULL;
+  END C_ORDER_AMOUNTFORMULA;
+
+  FUNCTION BEFOREPFORM RETURN BOOLEAN IS
+  BEGIN
+    RETURN (TRUE);
+  END BEFOREPFORM;
+
+  FUNCTION C_PRECISIONFORMULA(CURRENCY1 IN VARCHAR2) RETURN NUMBER IS
+  BEGIN
+    DECLARE
+      W_PRECISION NUMBER;
+    BEGIN
+      SELECT
+        PRECISION
+      INTO W_PRECISION
+      FROM
+        FND_CURRENCIES
+      WHERE CURRENCY_CODE = CURRENCY1;
+      RETURN (W_PRECISION);
+    EXCEPTION
+      WHEN NO_DATA_FOUND THEN
+        W_PRECISION := 2;
+        RETURN (W_PRECISION);
+    END;
+    RETURN NULL;
+  END C_PRECISIONFORMULA;
+
+  FUNCTION C_INV_ORDER_AMT_P RETURN NUMBER IS
+  BEGIN
+    RETURN C_INV_ORDER_AMT;
+  END C_INV_ORDER_AMT_P;
+
+  FUNCTION C_BALANCE_DUE_P RETURN NUMBER IS
+  BEGIN
+    RETURN C_BALANCE_DUE;
+  END C_BALANCE_DUE_P;
+
+  FUNCTION C_CREDIT_AMOUNT_P RETURN NUMBER IS
+  BEGIN
+    RETURN C_CREDIT_AMOUNT;
+  END C_CREDIT_AMOUNT_P;
+
+  FUNCTION C_AMOUNT_P RETURN NUMBER IS
+  BEGIN
+    RETURN C_AMOUNT;
+  END C_AMOUNT_P;
+
+  FUNCTION RP_REPORT_NAME_P RETURN VARCHAR2 IS
+  BEGIN
+    RETURN RP_REPORT_NAME;
+  END RP_REPORT_NAME_P;
+
+  FUNCTION RP_SUB_TITLE_P RETURN VARCHAR2 IS
+  BEGIN
+    RETURN RP_SUB_TITLE;
+  END RP_SUB_TITLE_P;
+
+  FUNCTION RP_COMPANY_NAME_P RETURN VARCHAR2 IS
+  BEGIN
+    RETURN RP_COMPANY_NAME;
+  END RP_COMPANY_NAME_P;
+
+  FUNCTION RP_FUNCTIONAL_CURRENCY_P RETURN VARCHAR2 IS
+  BEGIN
+    RETURN RP_FUNCTIONAL_CURRENCY;
+  END RP_FUNCTIONAL_CURRENCY_P;
+
+  FUNCTION RP_DATA_FOUND_P RETURN VARCHAR2 IS
+  BEGIN
+    RETURN RP_DATA_FOUND;
+  END RP_DATA_FOUND_P;
+
+  FUNCTION RP_ORDER_NUMBER_RANGE_P RETURN VARCHAR2 IS
+  BEGIN
+    RETURN RP_ORDER_NUMBER_RANGE;
+  END RP_ORDER_NUMBER_RANGE_P;
+
+  FUNCTION RP_SALESREP_RANGE_P RETURN VARCHAR2 IS
+  BEGIN
+    RETURN RP_SALESREP_RANGE;
+  END RP_SALESREP_RANGE_P;
+
+  FUNCTION RP_CUSTOMER_NAME_RANGE_P RETURN VARCHAR2 IS
+  BEGIN
+    RETURN RP_CUSTOMER_NAME_RANGE;
+  END RP_CUSTOMER_NAME_RANGE_P;
+
+  FUNCTION RP_ORDER_TYPE_RANGE_P RETURN VARCHAR2 IS
+  BEGIN
+    RETURN RP_ORDER_TYPE_RANGE;
+  END RP_ORDER_TYPE_RANGE_P;
+
+  FUNCTION RP_OPEN_ORDERS_ONLY_P RETURN VARCHAR2 IS
+  BEGIN
+    RETURN RP_OPEN_ORDERS_ONLY;
+  END RP_OPEN_ORDERS_ONLY_P;
+
+  FUNCTION IS_FIXED_RATE(X_FROM_CURRENCY IN VARCHAR2
+                        ,X_TO_CURRENCY IN VARCHAR2
+                        ,X_EFFECTIVE_DATE IN DATE) RETURN VARCHAR2 IS
+    X0 VARCHAR2(2000);
+  BEGIN
+   /* STPROC.INIT('begin :X0 := GL_CURRENCY_API.IS_FIXED_RATE(:X_FROM_CURRENCY, :X_TO_CURRENCY, :X_EFFECTIVE_DATE); end;');
+    STPROC.BIND_O(X0);
+    STPROC.BIND_I(X_FROM_CURRENCY);
+    STPROC.BIND_I(X_TO_CURRENCY);
+    STPROC.BIND_I(X_EFFECTIVE_DATE);
+    STPROC.EXECUTE;
+    STPROC.RETRIEVE(1
+                   ,X0);*/
+		   null;
+    RETURN X0;
+  END IS_FIXED_RATE;
+
+  PROCEDURE GET_RELATION(X_FROM_CURRENCY IN VARCHAR2
+                        ,X_TO_CURRENCY IN VARCHAR2
+                        ,X_EFFECTIVE_DATE IN DATE
+                        ,X_FIXED_RATE IN OUT NOCOPY BOOLEAN
+                        ,X_RELATIONSHIP IN OUT NOCOPY VARCHAR2) IS
+  BEGIN
+/*
+    STPROC.BIND_IO(X_FIXED_RATE);
+    STPROC.BIND_I(X_FROM_CURRENCY);
+    STPROC.BIND_I(X_TO_CURRENCY);
+    STPROC.BIND_I(X_EFFECTIVE_DATE);
+    STPROC.BIND_IO(X_RELATIONSHIP);
+    STPROC.EXECUTE;
+    STPROC.RETRIEVE(1
+                   ,X_FIXED_RATE);
+    STPROC.RETRIEVE(5
+                   ,X_RELATIONSHIP);*/
+		   null;
+  END GET_RELATION;
+
+  FUNCTION GET_EURO_CODE RETURN VARCHAR2 IS
+    X0 VARCHAR2(2000);
+  BEGIN
+/*    STPROC.INIT('begin :X0 := GL_CURRENCY_API.GET_EURO_CODE; end;');
+    STPROC.BIND_O(X0);
+    STPROC.EXECUTE;
+    STPROC.RETRIEVE(1
+                   ,X0);*/
+		   null;
+    RETURN X0;
+  END GET_EURO_CODE;
+
+  FUNCTION GET_RATE(X_FROM_CURRENCY IN VARCHAR2
+                   ,X_TO_CURRENCY IN VARCHAR2
+                   ,X_CONVERSION_DATE IN DATE
+                   ,X_CONVERSION_TYPE IN VARCHAR2) RETURN NUMBER IS
+    X0 NUMBER;
+  BEGIN
+  /*  STPROC.INIT('begin :X0 := GL_CURRENCY_API.GET_RATE(:X_FROM_CURRENCY, :X_TO_CURRENCY, :X_CONVERSION_DATE, :X_CONVERSION_TYPE); end;');
+    STPROC.BIND_O(X0);
+    STPROC.BIND_I(X_FROM_CURRENCY);
+    STPROC.BIND_I(X_TO_CURRENCY);
+    STPROC.BIND_I(X_CONVERSION_DATE);
+    STPROC.BIND_I(X_CONVERSION_TYPE);
+    STPROC.EXECUTE;
+    STPROC.RETRIEVE(1
+                   ,X0);*/
+    RETURN X0;
+  END GET_RATE;
+
+  FUNCTION GET_RATE(X_SET_OF_BOOKS_ID IN NUMBER
+                   ,X_FROM_CURRENCY IN VARCHAR2
+                   ,X_CONVERSION_DATE IN DATE
+                   ,X_CONVERSION_TYPE IN VARCHAR2) RETURN NUMBER IS
+    X0 NUMBER;
+  BEGIN
+   /* STPROC.INIT('begin :X0 := GL_CURRENCY_API.GET_RATE(:X_SET_OF_BOOKS_ID, :X_FROM_CURRENCY, :X_CONVERSION_DATE, :X_CONVERSION_TYPE); end;');
+    STPROC.BIND_O(X0);
+    STPROC.BIND_I(X_SET_OF_BOOKS_ID);
+    STPROC.BIND_I(X_FROM_CURRENCY);
+    STPROC.BIND_I(X_CONVERSION_DATE);
+    STPROC.BIND_I(X_CONVERSION_TYPE);
+    STPROC.EXECUTE;
+    STPROC.RETRIEVE(1
+                   ,X0);*/
+    RETURN X0;
+  END GET_RATE;
+
+  FUNCTION CONVERT_AMOUNT(X_FROM_CURRENCY IN VARCHAR2
+                         ,X_TO_CURRENCY IN VARCHAR2
+                         ,X_CONVERSION_DATE IN DATE
+                         ,X_CONVERSION_TYPE IN VARCHAR2
+                         ,X_AMOUNT IN NUMBER) RETURN NUMBER IS
+    X0 NUMBER;
+  BEGIN
+/*    STPROC.INIT('begin :X0 := GL_CURRENCY_API.CONVERT_AMOUNT(:X_FROM_CURRENCY, :X_TO_CURRENCY, :X_CONVERSION_DATE, :X_CONVERSION_TYPE, :X_AMOUNT); end;');
+    STPROC.BIND_O(X0);
+    STPROC.BIND_I(X_FROM_CURRENCY);
+    STPROC.BIND_I(X_TO_CURRENCY);
+    STPROC.BIND_I(X_CONVERSION_DATE);
+    STPROC.BIND_I(X_CONVERSION_TYPE);
+    STPROC.BIND_I(X_AMOUNT);
+    STPROC.EXECUTE;
+    STPROC.RETRIEVE(1
+                   ,X0);*/
+    RETURN X0;
+  END CONVERT_AMOUNT;
+
+  FUNCTION CONVERT_AMOUNT(X_SET_OF_BOOKS_ID IN NUMBER
+                         ,X_FROM_CURRENCY IN VARCHAR2
+                         ,X_CONVERSION_DATE IN DATE
+                         ,X_CONVERSION_TYPE IN VARCHAR2
+                         ,X_AMOUNT IN NUMBER) RETURN NUMBER IS
+    X0 NUMBER;
+  BEGIN
+  /*  STPROC.INIT('begin :X0 := GL_CURRENCY_API.CONVERT_AMOUNT(:X_SET_OF_BOOKS_ID, :X_FROM_CURRENCY, :X_CONVERSION_DATE, :X_CONVERSION_TYPE, :X_AMOUNT); end;');
+    STPROC.BIND_O(X0);
+    STPROC.BIND_I(X_SET_OF_BOOKS_ID);
+    STPROC.BIND_I(X_FROM_CURRENCY);
+    STPROC.BIND_I(X_CONVERSION_DATE);
+    STPROC.BIND_I(X_CONVERSION_TYPE);
+    STPROC.BIND_I(X_AMOUNT);
+    STPROC.EXECUTE;
+    STPROC.RETRIEVE(1
+                   ,X0);*/
+    RETURN X0;
+  END CONVERT_AMOUNT;
+
+  FUNCTION GET_DERIVE_TYPE(SOB_ID IN NUMBER
+                          ,PERIOD IN VARCHAR2
+                          ,CURR_CODE IN VARCHAR2) RETURN VARCHAR2 IS
+    X0 VARCHAR2(2000);
+  BEGIN
+  /*  STPROC.INIT('begin :X0 := GL_CURRENCY_API.GET_DERIVE_TYPE(:SOB_ID, :PERIOD, :CURR_CODE); end;');
+    STPROC.BIND_O(X0);
+    STPROC.BIND_I(SOB_ID);
+    STPROC.BIND_I(PERIOD);
+    STPROC.BIND_I(CURR_CODE);
+    STPROC.EXECUTE;
+    STPROC.RETRIEVE(1
+                   ,X0);*/
+		   null;
+    RETURN X0;
+  END GET_DERIVE_TYPE;
+
+END ONT_OEXOEIOS_XMLP_PKG;
+
+
+
+/

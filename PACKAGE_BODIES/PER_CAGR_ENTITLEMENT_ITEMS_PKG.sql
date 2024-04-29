@@ -1,0 +1,742 @@
+--------------------------------------------------------
+--  DDL for Package Body PER_CAGR_ENTITLEMENT_ITEMS_PKG
+--------------------------------------------------------
+
+  CREATE OR REPLACE EDITIONABLE PACKAGE BODY "APPS"."PER_CAGR_ENTITLEMENT_ITEMS_PKG" as
+/* $Header: pepcilct.pkb 120.2 2006/06/27 11:10:36 bshukla noship $ */
+
+
+procedure KEY_TO_IDS (
+  X_ITEM_NAME  in VARCHAR2,
+  X_BUSINESS_GROUP_NAME in VARCHAR2,
+  X_LEGISLATION_CODE in VARCHAR2,
+  X_ELEMENT_TYPE 			in VARCHAR2,
+  X_INPUT_VALUE 			in VARCHAR2,
+  X_CAGR_API 				in VARCHAR2,
+  X_CAGR_API_PARAM 			in VARCHAR2,
+  X_FLEX_VALUE_SET 			in VARCHAR2,
+  X_BENEFICIAL_VALUE_SET	 	in VARCHAR2,
+  X_CAGR_ENTITLEMENT_ITEM_ID 	 out nocopy NUMBER,
+  X_BUSINESS_GROUP_ID 		 out nocopy NUMBER,
+  X_ELEMENT_TYPE_ID 		 out nocopy NUMBER,
+  X_INPUT_VALUE_ID 		 out nocopy VARCHAR2,
+  X_CAGR_API_ID 		 out nocopy NUMBER,
+  X_CAGR_API_PARAM_ID 		 out nocopy NUMBER,
+  X_FLEX_VALUE_SET_ID 		 out nocopy NUMBER,
+  X_BENEFICIAL_RULE_VALUE_SET_ID out nocopy NUMBER
+) is
+  cursor CSR_BUSINESS_GROUP (
+    X_NAME in VARCHAR2
+  ) is
+    select pbg.business_group_id
+    from per_business_groups pbg
+    where pbg.name = X_NAME;
+
+  cursor CSR_ELEMENT_TYPE (
+    X_ELEMENT_TYPE in VARCHAR2
+  ) is
+    select ELMT.ELEMENT_TYPE_ID
+    from PAY_ELEMENT_TYPES_F_TL ELMT
+    where ELMT.ELEMENT_NAME = X_ELEMENT_TYPE;
+
+
+  cursor CSR_INPUT_VALUE 	 (
+    X_INPUT_VALUE 	 in VARCHAR2
+  ) is
+    select VALUE.INPUT_VALUE_ID
+    from PAY_INPUT_VALUES_F_TL VALUE
+    where VALUE.NAME = X_INPUT_VALUE;
+
+cursor CSR_CAGR_API 	 (
+    X_CAGR_API 	 in VARCHAR2
+  ) is
+    select API.CAGR_API_ID
+    from PER_CAGR_APIS API
+    where API.API_NAME = X_CAGR_API;
+
+
+cursor CSR_CAGR_API_PARAM	 (
+    X_CAGR_API_PARAM 	 in VARCHAR2
+  ) is
+    select PARAM.CAGR_API_PARAM_ID
+    from PER_CAGR_API_PARAMETERS PARAM
+    where PARAM.DISPLAY_NAME = X_CAGR_API_PARAM;
+
+
+cursor CSR_FLEX_VALUE_SET (
+    X_FLEX_VALUE_SET 	 in VARCHAR2
+  ) is
+    select VSET.FLEX_VALUE_SET_ID
+    from FND_FLEX_VALUE_SETS VSET
+    where VSET.FLEX_VALUE_SET_NAME = X_FLEX_VALUE_SET;
+
+
+  cursor CSR_CAGR_ENTITLEMENT_ITEM_NAME (
+    X_ITEM_NAME VARCHAR2,
+    X_BUSINESS_GROUP_ID in NUMBER,
+    X_LEGISLATION_CODE in VARCHAR2
+  ) is
+    select CEI.CAGR_ENTITLEMENT_ITEM_ID
+    from PER_CAGR_ENTITLEMENT_ITEMS CEI
+    where CEI.ITEM_NAME = X_ITEM_NAME
+    and (  CEI.BUSINESS_GROUP_ID = X_BUSINESS_GROUP_ID
+        or (   CEI.BUSINESS_GROUP_ID is null
+           and X_BUSINESS_GROUP_ID is null))
+    and (  CEI.LEGISLATION_CODE = X_LEGISLATION_CODE
+        or (   CEI.LEGISLATION_CODE is null
+           and X_LEGISLATION_CODE is null));
+  cursor CSR_SEQUENCE is
+    select PER_CAGR_ENTITLEMENT_ITEMS_S.nextval
+    from   dual;
+  L_BUSINESS_GROUP_ID NUMBER;
+begin
+
+
+
+
+  open CSR_BUSINESS_GROUP (
+    X_BUSINESS_GROUP_NAME
+  );
+  fetch CSR_BUSINESS_GROUP into L_BUSINESS_GROUP_ID;
+  close CSR_BUSINESS_GROUP;
+  X_BUSINESS_GROUP_ID := L_BUSINESS_GROUP_ID;
+
+  open CSR_ELEMENT_TYPE (
+    X_ELEMENT_TYPE
+  );
+  fetch CSR_ELEMENT_TYPE into X_ELEMENT_TYPE_ID;
+  close CSR_ELEMENT_TYPE;
+
+  open CSR_INPUT_VALUE (
+    X_INPUT_VALUE
+  );
+  fetch CSR_INPUT_VALUE into X_INPUT_VALUE_ID;
+  close CSR_INPUT_VALUE;
+
+  open CSR_CAGR_API (
+    X_CAGR_API
+  );
+  fetch CSR_CAGR_API into X_CAGR_API_ID;
+  close CSR_CAGR_API;
+
+open CSR_CAGR_API_PARAM (
+    X_CAGR_API_PARAM
+  );
+  fetch CSR_CAGR_API_PARAM into X_CAGR_API_PARAM_ID;
+  close CSR_CAGR_API_PARAM;
+
+open CSR_FLEX_VALUE_SET (
+    X_FLEX_VALUE_SET
+  );
+  fetch CSR_FLEX_VALUE_SET into X_FLEX_VALUE_SET_ID;
+  close CSR_FLEX_VALUE_SET;
+
+open CSR_FLEX_VALUE_SET (
+    X_BENEFICIAL_VALUE_SET
+  );
+  fetch CSR_FLEX_VALUE_SET into X_BENEFICIAL_RULE_VALUE_SET_ID;
+  close CSR_FLEX_VALUE_SET;
+
+  open CSR_CAGR_ENTITLEMENT_ITEM_NAME (
+    X_ITEM_NAME,
+    L_BUSINESS_GROUP_ID,
+    X_LEGISLATION_CODE
+  );
+  fetch CSR_CAGR_ENTITLEMENT_ITEM_NAME into X_CAGR_ENTITLEMENT_ITEM_ID;
+  if (CSR_CAGR_ENTITLEMENT_ITEM_NAME%notfound) then
+    open CSR_SEQUENCE;
+    fetch CSR_SEQUENCE into X_CAGR_ENTITLEMENT_ITEM_ID;
+    close CSR_SEQUENCE;
+  end if;
+  close CSR_CAGR_ENTITLEMENT_ITEM_NAME;
+end KEY_TO_IDS;
+
+procedure INSERT_ROW (
+  X_ROWID in out nocopy VARCHAR2,
+  X_CAGR_ENTITLEMENT_ITEM_ID in NUMBER,
+  X_BUSINESS_GROUP_ID in NUMBER,
+  X_ELEMENT_TYPE_ID in NUMBER,
+  X_INPUT_VALUE_ID in VARCHAR2,
+  X_COLUMN_TYPE in VARCHAR2,
+  X_COLUMN_SIZE in NUMBER,
+  X_LEGISLATION_CODE in VARCHAR2,
+  X_BENEFICIAL_RULE in VARCHAR2,
+  X_CAGR_API_ID in NUMBER,
+  X_CAGR_API_PARAM_ID in NUMBER,
+  X_CATEGORY_NAME in VARCHAR2,
+  X_UOM in VARCHAR2,
+  X_BENEFICIAL_FORMULA_ID in NUMBER,
+  X_FLEX_VALUE_SET_ID in NUMBER,
+  X_BENEFICIAL_RULE_VALUE_SET_ID in NUMBER,
+  X_OBJECT_VERSION_NUMBER in NUMBER,
+  X_ITEM_NAME in VARCHAR2,
+  X_MULTI_ENTRIES_ALLOWED_FLAG in VARCHAR2,
+  X_AUTO_CREATE_ENTRIES_FLAG in VARCHAR2,
+  X_CREATION_DATE in DATE,
+  X_CREATED_BY in NUMBER,
+  X_LAST_UPDATE_DATE in DATE,
+  X_LAST_UPDATED_BY in NUMBER,
+  X_LAST_UPDATE_LOGIN in NUMBER
+) is
+  cursor C is select ROWID from PER_CAGR_ENTITLEMENT_ITEMS
+    where CAGR_ENTITLEMENT_ITEM_ID = X_CAGR_ENTITLEMENT_ITEM_ID
+    ;
+begin
+  insert into PER_CAGR_ENTITLEMENT_ITEMS (
+    CAGR_ENTITLEMENT_ITEM_ID,
+    ITEM_NAME,
+    BUSINESS_GROUP_ID,
+    ELEMENT_TYPE_ID,
+    INPUT_VALUE_ID,
+    COLUMN_TYPE,
+    COLUMN_SIZE,
+    LEGISLATION_CODE,
+    BENEFICIAL_RULE,
+    CAGR_API_ID,
+    CAGR_API_PARAM_ID,
+    CATEGORY_NAME,
+    UOM,
+    BENEFICIAL_FORMULA_ID,
+    FLEX_VALUE_SET_ID,
+    BENEFICIAL_RULE_VALUE_SET_ID,
+    MULTIPLE_ENTRIES_ALLOWED_FLAG,
+    AUTO_CREATE_ENTRIES_FLAG,
+    OBJECT_VERSION_NUMBER,
+    CREATION_DATE,
+    CREATED_BY,
+    LAST_UPDATE_DATE,
+    LAST_UPDATED_BY,
+    LAST_UPDATE_LOGIN
+  ) values (
+    X_CAGR_ENTITLEMENT_ITEM_ID,
+    X_ITEM_NAME,
+    X_BUSINESS_GROUP_ID,
+    X_ELEMENT_TYPE_ID,
+    X_INPUT_VALUE_ID,
+    X_COLUMN_TYPE,
+    X_COLUMN_SIZE,
+    X_LEGISLATION_CODE,
+    X_BENEFICIAL_RULE,
+    X_CAGR_API_ID,
+    X_CAGR_API_PARAM_ID,
+    X_CATEGORY_NAME,
+    X_UOM,
+    X_BENEFICIAL_FORMULA_ID,
+    X_FLEX_VALUE_SET_ID,
+    X_BENEFICIAL_RULE_VALUE_SET_ID,
+    X_MULTI_ENTRIES_ALLOWED_FLAG,
+    X_AUTO_CREATE_ENTRIES_FLAG,
+    X_OBJECT_VERSION_NUMBER,
+    X_CREATION_DATE,
+    X_CREATED_BY,
+    X_LAST_UPDATE_DATE,
+    X_LAST_UPDATED_BY,
+    X_LAST_UPDATE_LOGIN
+  );
+
+  insert into PER_CAGR_ENTITLEMENT_ITEMS_TL (
+    CREATED_BY,
+    CREATION_DATE,
+    LAST_UPDATE_LOGIN,
+    LAST_UPDATE_DATE,
+    LAST_UPDATED_BY,
+    CAGR_ENTITLEMENT_ITEM_ID,
+    ITEM_NAME,
+    LANGUAGE,
+    SOURCE_LANG
+  ) select
+    X_CREATED_BY,
+    X_CREATION_DATE,
+    X_LAST_UPDATE_LOGIN,
+    X_LAST_UPDATE_DATE,
+    X_LAST_UPDATED_BY,
+    X_CAGR_ENTITLEMENT_ITEM_ID,
+    X_ITEM_NAME,
+    L.LANGUAGE_CODE,
+    userenv('LANG')
+  from FND_LANGUAGES L
+  where L.INSTALLED_FLAG in ('I', 'B')
+  and not exists
+    (select NULL
+    from PER_CAGR_ENTITLEMENT_ITEMS_TL T
+    where T.CAGR_ENTITLEMENT_ITEM_ID = X_CAGR_ENTITLEMENT_ITEM_ID
+    and T.LANGUAGE = L.LANGUAGE_CODE);
+
+  open c;
+  fetch c into X_ROWID;
+  if (c%notfound) then
+    close c;
+    raise no_data_found;
+  end if;
+  close c;
+
+end INSERT_ROW;
+
+procedure TRANSLATE_ROW (
+  X_ITEM_NAME1                 in VARCHAR2 default null,
+  X_ITEM_NAME                  in VARCHAR2,
+  X_BUSINESS_GROUP_NAME        in VARCHAR2,
+  X_LEGISLATION_CODE           in VARCHAR2,
+  X_OWNER                      in VARCHAR2,
+  X_LAST_UPDATE_DATE IN VARCHAR2 default sysdate,
+  X_CUSTOM_MODE IN VARCHAR2 default null
+   ) is
+X_CAGR_ENTITLEMENT_ITEM_ID NUMBER;
+X_BUSINESS_GROUP_ID NUMBER;
+
+ X_ELEMENT_TYPE          VARCHAR2(60);
+ X_INPUT_VALUE	        VARCHAR2 (60);
+ X_CAGR_API	        VARCHAR2 (60);
+ X_CAGR_API_PARAM	 VARCHAR2(60);
+ X_FLEX_VALUE_SET	 VARCHAR2(60);
+ X_BENEFICIAL_VALUE_SET	 VARCHAR2(60);
+
+ X_ELEMENT_TYPE_ID	number;
+ X_INPUT_VALUE_ID	varchar2(60);
+ X_CAGR_API_ID		number;
+ X_CAGR_API_PARAM_ID	number;
+ X_FLEX_VALUE_SET_ID	number;
+ X_BENEFICIAL_RULE_VALUE_SET_ID number;
+
+ f_luby    number;  -- entity owner in file
+ f_ludate  date;    -- entity update date in file
+ db_luby   number;  -- entity owner in db
+ db_ludate date;    -- entity update date in db
+
+begin
+
+  KEY_TO_IDS (
+    X_ITEM_NAME1,
+    X_BUSINESS_GROUP_NAME,
+    X_LEGISLATION_CODE,
+    X_ELEMENT_TYPE,
+    X_INPUT_VALUE,
+    X_CAGR_API,
+    X_CAGR_API_PARAM,
+    X_FLEX_VALUE_SET,
+    X_BENEFICIAL_VALUE_SET,
+    X_CAGR_ENTITLEMENT_ITEM_ID,
+    X_BUSINESS_GROUP_ID,
+    X_ELEMENT_TYPE_ID,
+    X_INPUT_VALUE_ID,
+    X_CAGR_API_ID,
+    X_CAGR_API_PARAM_ID,
+    X_FLEX_VALUE_SET_ID,
+    X_BENEFICIAL_RULE_VALUE_SET_ID
+  );
+
+  -- Translate owner to file_last_updated_by
+  f_luby := fnd_load_util.owner_id(x_owner);
+
+  -- Translate char last_update_date to date
+  f_ludate := nvl(to_date(x_last_update_date, 'YYYY/MM/DD'), sysdate);
+      select LAST_UPDATED_BY, LAST_UPDATE_DATE
+      into db_luby, db_ludate
+      from PER_CAGR_ENTITLEMENT_ITEMS_TL
+      where CAGR_ENTITLEMENT_ITEM_ID = TO_NUMBER(X_CAGR_ENTITLEMENT_ITEM_ID)
+      and LANGUAGE=userenv('LANG');
+if (fnd_load_util.upload_test(f_luby, f_ludate, db_luby,
+                                        db_ludate,X_CUSTOM_MODE)) then
+  update per_cagr_entitlement_items_tl set
+    item_name         = X_ITEM_NAME,
+    last_update_date  = f_ludate,
+    last_updated_by   = f_luby,
+    last_update_login = 0,
+    source_lang       = userenv('LANG')
+  where cagr_entitlement_item_id   = X_CAGR_ENTITLEMENT_ITEM_ID
+  and userenv('LANG') in (language, source_lang);
+ end if;
+end TRANSLATE_ROW;
+
+procedure LOAD_ROW (
+  X_ITEM_NAME 				in  VARCHAR2,
+  X_OWNER                       	in  VARCHAR2,
+  X_LEGISLATION_CODE 			in  VARCHAR2,
+  X_BUSINESS_GROUP_NAME 		in VARCHAR2,
+  X_ELEMENT_TYPE 			in VARCHAR2,
+  X_INPUT_VALUE 			in VARCHAR2,
+  X_COLUMN_TYPE 			in VARCHAR2,
+  X_COLUMN_SIZE 			in NUMBER,
+  X_BENEFICIAL_RULE 			in VARCHAR2,
+  X_CAGR_API 				in VARCHAR2,
+  X_CAGR_API_PARAM 			in VARCHAR2,
+  X_CATEGORY_NAME 			in VARCHAR2,
+  X_UOM 				in VARCHAR2,
+  X_BENEFICIAL_FORMULA_ID 		in NUMBER,
+  X_FLEX_VALUE_SET 			in VARCHAR2,
+  X_BENEFICIAL_VALUE_SET	 	in VARCHAR2,
+  X_MULTI_ENTRIES_ALLOWED_FLAG          in VARCHAR2,
+  X_AUTO_CREATE_ENTRIES_FLAG            in VARCHAR2,
+  X_OBJECT_VERSION_NUMBER 		in NUMBER,
+  X_LAST_UPDATE_DATE IN VARCHAR2 default sysdate,
+  X_CUSTOM_MODE IN VARCHAR2 default null)
+is
+
+  X_ROWID ROWID;
+  user_id 				number := 0;
+  X_CAGR_ENTITLEMENT_ITEM_ID 		NUMBER;
+  X_BUSINESS_GROUP_ID 			NUMBER;
+  X_FLEX_VALUE_SET_ID 			NUMBER;
+  X_BENEFICIAL_RULE_VALUE_SET_ID	NUMBER;
+  X_ELEMENT_TYPE_ID			NUMBER;
+  X_INPUT_VALUE_ID			VARCHAR2(60);
+  X_CAGR_API_ID				NUMBER;
+  X_CAGR_API_PARAM_ID			NUMBER;
+  f_luby    number;  -- entity owner in file
+  f_ludate  date;    -- entity update date in file
+  db_luby   number;  -- entity owner in db
+  db_ludate date;    -- entity update date in db
+
+begin
+
+ KEY_TO_IDS (
+    X_ITEM_NAME,
+    X_BUSINESS_GROUP_NAME,
+    X_LEGISLATION_CODE,
+    X_ELEMENT_TYPE,
+    X_INPUT_VALUE,
+    X_CAGR_API,
+    X_CAGR_API_PARAM,
+    X_FLEX_VALUE_SET,
+    X_BENEFICIAL_VALUE_SET,
+    X_CAGR_ENTITLEMENT_ITEM_ID,
+    X_BUSINESS_GROUP_ID,
+    X_ELEMENT_TYPE_ID,
+    X_INPUT_VALUE_ID,
+    X_CAGR_API_ID,
+    X_CAGR_API_PARAM_ID,
+    X_FLEX_VALUE_SET_ID,
+    X_BENEFICIAL_RULE_VALUE_SET_ID
+  );
+
+if (X_OWNER = 'SEED') then
+    user_id := 1;
+  else
+    user_id := 0;
+  end if;
+
+   f_luby := fnd_load_util.owner_id(X_OWNER);
+   -- Translate char last_update_date to date
+   f_ludate := nvl(to_date(X_LAST_UPDATE_DATE, 'YYYY/MM/DD'), sysdate);
+     select LAST_UPDATED_BY, LAST_UPDATE_DATE
+     into db_luby, db_ludate
+     from PER_CAGR_ENTITLEMENT_ITEMS
+     where CAGR_ENTITLEMENT_ITEM_ID = TO_NUMBER(X_CAGR_ENTITLEMENT_ITEM_ID);
+
+   -- Test for customization and version
+   if (fnd_load_util.upload_test(f_luby, f_ludate, db_luby,
+                                 db_ludate, X_CUSTOM_MODE)) then
+PER_CAGR_ENTITLEMENT_ITEMS_PKG.UPDATE_ROW (
+  X_CAGR_ENTITLEMENT_ITEM_ID 		=> X_CAGR_ENTITLEMENT_ITEM_ID,
+  X_BUSINESS_GROUP_ID 			=> X_BUSINESS_GROUP_ID,
+  X_ELEMENT_TYPE_ID 			=> X_ELEMENT_TYPE_ID,
+  X_INPUT_VALUE_ID  			=> X_INPUT_VALUE_ID,
+  X_COLUMN_TYPE 			=> X_COLUMN_TYPE,
+  X_COLUMN_SIZE 			=> X_COLUMN_SIZE,
+  X_LEGISLATION_CODE 			=> X_LEGISLATION_CODE,
+  X_BENEFICIAL_RULE 			=> X_BENEFICIAL_RULE,
+  X_CAGR_API_ID 			=> X_CAGR_API_ID,
+  X_CAGR_API_PARAM_ID 			=> X_CAGR_API_PARAM_ID,
+  X_CATEGORY_NAME  			=>  X_CATEGORY_NAME,
+  X_UOM   				=>  X_UOM,
+  X_BENEFICIAL_FORMULA_ID   		=>  X_BENEFICIAL_FORMULA_ID,
+  X_FLEX_VALUE_SET_ID  			=> X_FLEX_VALUE_SET_ID,
+  X_BENEFICIAL_RULE_VALUE_SET_ID  	=> X_BENEFICIAL_RULE_VALUE_SET_ID,
+  X_MULTI_ENTRIES_ALLOWED_FLAG          => X_MULTI_ENTRIES_ALLOWED_FLAG,
+  X_AUTO_CREATE_ENTRIES_FLAG            => X_AUTO_CREATE_ENTRIES_FLAG,
+  X_OBJECT_VERSION_NUMBER 		=> X_OBJECT_VERSION_NUMBER,
+  X_ITEM_NAME 				=> X_ITEM_NAME,
+  X_LAST_UPDATE_DATE 			=> db_ludate,
+  X_LAST_UPDATED_BY 			=> db_luby,
+  X_LAST_UPDATE_LOGIN 			=> 0);
+ end if;
+exception
+  when NO_DATA_FOUND then
+
+
+PER_CAGR_ENTITLEMENT_ITEMS_PKG.INSERT_ROW (
+  X_ROWID                    	 => X_ROWID,
+  X_CAGR_ENTITLEMENT_ITEM_ID 	 => X_CAGR_ENTITLEMENT_ITEM_ID,
+  X_BUSINESS_GROUP_ID        	 => X_BUSINESS_GROUP_ID,
+  X_ELEMENT_TYPE_ID          	 => X_ELEMENT_TYPE_ID,
+  X_INPUT_VALUE_ID           	 => X_INPUT_VALUE_ID,
+  X_COLUMN_TYPE 	     	 => X_COLUMN_TYPE,
+  X_COLUMN_SIZE 	     	 => X_COLUMN_SIZE,
+  X_LEGISLATION_CODE         	 => X_LEGISLATION_CODE,
+  X_BENEFICIAL_RULE          	 => X_BENEFICIAL_RULE,
+  X_CAGR_API_ID 	     	 => X_CAGR_API_ID,
+  X_CAGR_API_PARAM_ID 	     	 => X_CAGR_API_PARAM_ID,
+  X_CATEGORY_NAME  	     	 => X_CATEGORY_NAME,
+  X_UOM   		     	 => X_UOM,
+  X_BENEFICIAL_FORMULA_ID    	 => X_BENEFICIAL_FORMULA_ID,
+  X_FLEX_VALUE_SET_ID        	 => X_FLEX_VALUE_SET_ID,
+  X_BENEFICIAL_RULE_VALUE_SET_ID => X_BENEFICIAL_RULE_VALUE_SET_ID,
+  X_MULTI_ENTRIES_ALLOWED_FLAG   => X_MULTI_ENTRIES_ALLOWED_FLAG,
+  X_AUTO_CREATE_ENTRIES_FLAG     => X_AUTO_CREATE_ENTRIES_FLAG,
+  X_OBJECT_VERSION_NUMBER 	 => X_OBJECT_VERSION_NUMBER,
+  X_ITEM_NAME 			 => X_ITEM_NAME,
+  X_LAST_UPDATE_DATE 		 => db_ludate,
+  X_LAST_UPDATED_BY 		 => db_luby,
+  X_LAST_UPDATE_LOGIN 		 => 0,
+  X_CREATION_DATE 		 => SYSDATE,
+  X_CREATED_BY   		 => user_id);
+
+end LOAD_ROW;
+
+procedure LOCK_ROW (
+  X_CAGR_ENTITLEMENT_ITEM_ID in NUMBER,
+  X_BUSINESS_GROUP_ID in NUMBER,
+  X_ELEMENT_TYPE_ID in NUMBER,
+  X_INPUT_VALUE_ID in VARCHAR2,
+  X_COLUMN_TYPE in VARCHAR2,
+  X_COLUMN_SIZE in NUMBER,
+  X_LEGISLATION_CODE in VARCHAR2,
+  X_BENEFICIAL_RULE in VARCHAR2,
+  X_CAGR_API_ID in NUMBER,
+  X_CAGR_API_PARAM_ID in NUMBER,
+  X_CATEGORY_NAME in VARCHAR2,
+  X_UOM in VARCHAR2,
+  X_BENEFICIAL_FORMULA_ID in NUMBER,
+  X_FLEX_VALUE_SET_ID in NUMBER,
+  X_BENEFICIAL_RULE_VALUE_SET_ID in NUMBER,
+  X_OBJECT_VERSION_NUMBER in NUMBER,
+  X_MULTI_ENTRIES_ALLOWED_FLAG in VARCHAR2,
+  X_AUTO_CREATE_ENTRIES_FLAG in VARCHAR2,
+  X_ITEM_NAME in VARCHAR2
+) is
+  cursor c is select
+      BUSINESS_GROUP_ID,
+      ELEMENT_TYPE_ID,
+      INPUT_VALUE_ID,
+      COLUMN_TYPE,
+      COLUMN_SIZE,
+      LEGISLATION_CODE,
+      BENEFICIAL_RULE,
+      CAGR_API_ID,
+      CAGR_API_PARAM_ID,
+      CATEGORY_NAME,
+      UOM,
+      BENEFICIAL_FORMULA_ID,
+      FLEX_VALUE_SET_ID,
+      BENEFICIAL_RULE_VALUE_SET_ID,
+      MULTIPLE_ENTRIES_ALLOWED_FLAG,
+      AUTO_CREATE_ENTRIES_FLAG,
+      OBJECT_VERSION_NUMBER
+    from PER_CAGR_ENTITLEMENT_ITEMS
+    where CAGR_ENTITLEMENT_ITEM_ID = X_CAGR_ENTITLEMENT_ITEM_ID
+    for update of CAGR_ENTITLEMENT_ITEM_ID nowait;
+  recinfo c%rowtype;
+
+  cursor c1 is select
+      ITEM_NAME,
+      decode(LANGUAGE, userenv('LANG'), 'Y', 'N') BASELANG
+    from PER_CAGR_ENTITLEMENT_ITEMS_TL
+    where CAGR_ENTITLEMENT_ITEM_ID = X_CAGR_ENTITLEMENT_ITEM_ID
+    and userenv('LANG') in (LANGUAGE, SOURCE_LANG)
+    for update of CAGR_ENTITLEMENT_ITEM_ID nowait;
+begin
+  open c;
+  fetch c into recinfo;
+  if (c%notfound) then
+    close c;
+    fnd_message.set_name('FND', 'FORM_RECORD_DELETED');
+    app_exception.raise_exception;
+  end if;
+  close c;
+  if (    (recinfo.BUSINESS_GROUP_ID = X_BUSINESS_GROUP_ID)
+      AND ((recinfo.ELEMENT_TYPE_ID = X_ELEMENT_TYPE_ID)
+           OR ((recinfo.ELEMENT_TYPE_ID is null) AND (X_ELEMENT_TYPE_ID is null)))
+      AND ((recinfo.INPUT_VALUE_ID = X_INPUT_VALUE_ID)
+           OR ((recinfo.INPUT_VALUE_ID is null) AND (X_INPUT_VALUE_ID is null)))
+      AND (recinfo.COLUMN_TYPE = X_COLUMN_TYPE)
+      AND (recinfo.COLUMN_SIZE = X_COLUMN_SIZE)
+      AND (recinfo.LEGISLATION_CODE = X_LEGISLATION_CODE)
+      AND ((recinfo.BENEFICIAL_RULE = X_BENEFICIAL_RULE)
+           OR ((recinfo.BENEFICIAL_RULE is null) AND (X_BENEFICIAL_RULE is null)))
+      AND ((recinfo.CAGR_API_ID = X_CAGR_API_ID)
+           OR ((recinfo.CAGR_API_ID is null) AND (X_CAGR_API_ID is null)))
+      AND ((recinfo.CAGR_API_PARAM_ID = X_CAGR_API_PARAM_ID)
+           OR ((recinfo.CAGR_API_PARAM_ID is null) AND (X_CAGR_API_PARAM_ID is null)))
+      AND (recinfo.CATEGORY_NAME = X_CATEGORY_NAME)
+      AND ((recinfo.UOM = X_UOM)
+           OR ((recinfo.UOM is null) AND (X_UOM is null)))
+      AND ((recinfo.BENEFICIAL_FORMULA_ID = X_BENEFICIAL_FORMULA_ID)
+           OR ((recinfo.BENEFICIAL_FORMULA_ID is null) AND (X_BENEFICIAL_FORMULA_ID is null)))
+      AND ((recinfo.FLEX_VALUE_SET_ID = X_FLEX_VALUE_SET_ID)
+           OR ((recinfo.FLEX_VALUE_SET_ID is null) AND (X_FLEX_VALUE_SET_ID is null)))
+      AND ((recinfo.BENEFICIAL_RULE_VALUE_SET_ID = X_BENEFICIAL_RULE_VALUE_SET_ID)
+           OR ((recinfo.BENEFICIAL_RULE_VALUE_SET_ID is null) AND (X_BENEFICIAL_RULE_VALUE_SET_ID is null)))
+      AND ((recinfo.MULTIPLE_ENTRIES_ALLOWED_FLAG = X_MULTI_ENTRIES_ALLOWED_FLAG)
+           OR ((recinfo.MULTIPLE_ENTRIES_ALLOWED_FLAG is null) AND (X_MULTI_ENTRIES_ALLOWED_FLAG is null)))
+      AND ((recinfo.AUTO_CREATE_ENTRIES_FLAG = X_AUTO_CREATE_ENTRIES_FLAG)
+           OR ((recinfo.AUTO_CREATE_ENTRIES_FLAG is null) AND (X_AUTO_CREATE_ENTRIES_FLAG is null)))
+      AND (recinfo.OBJECT_VERSION_NUMBER = X_OBJECT_VERSION_NUMBER)
+  ) then
+    null;
+  else
+    fnd_message.set_name('FND', 'FORM_RECORD_CHANGED');
+    app_exception.raise_exception;
+  end if;
+
+  for tlinfo in c1 loop
+    if (tlinfo.BASELANG = 'Y') then
+      if (    (tlinfo.ITEM_NAME = X_ITEM_NAME)
+      ) then
+        null;
+      else
+        fnd_message.set_name('FND', 'FORM_RECORD_CHANGED');
+        app_exception.raise_exception;
+      end if;
+    end if;
+  end loop;
+  return;
+end LOCK_ROW;
+
+procedure UPDATE_ROW (
+  X_CAGR_ENTITLEMENT_ITEM_ID in NUMBER,
+  X_BUSINESS_GROUP_ID in NUMBER,
+  X_ELEMENT_TYPE_ID in NUMBER,
+  X_INPUT_VALUE_ID in VARCHAR2,
+  X_COLUMN_TYPE in VARCHAR2,
+  X_COLUMN_SIZE in NUMBER,
+  X_LEGISLATION_CODE in VARCHAR2,
+  X_BENEFICIAL_RULE in VARCHAR2,
+  X_CAGR_API_ID in NUMBER,
+  X_CAGR_API_PARAM_ID in NUMBER,
+  X_CATEGORY_NAME in VARCHAR2,
+  X_UOM in VARCHAR2,
+  X_BENEFICIAL_FORMULA_ID in NUMBER,
+  X_FLEX_VALUE_SET_ID in NUMBER,
+  X_BENEFICIAL_RULE_VALUE_SET_ID in NUMBER,
+  X_OBJECT_VERSION_NUMBER in NUMBER,
+  X_MULTI_ENTRIES_ALLOWED_FLAG in VARCHAR2,
+  X_AUTO_CREATE_ENTRIES_FLAG in VARCHAR2,
+  X_ITEM_NAME in VARCHAR2,
+  X_LAST_UPDATE_DATE in DATE,
+  X_LAST_UPDATED_BY in NUMBER,
+  X_LAST_UPDATE_LOGIN in NUMBER
+) is
+begin
+  update PER_CAGR_ENTITLEMENT_ITEMS set
+    BUSINESS_GROUP_ID = X_BUSINESS_GROUP_ID,
+    ELEMENT_TYPE_ID = X_ELEMENT_TYPE_ID,
+    INPUT_VALUE_ID = X_INPUT_VALUE_ID,
+    COLUMN_TYPE = X_COLUMN_TYPE,
+    COLUMN_SIZE = X_COLUMN_SIZE,
+    LEGISLATION_CODE = X_LEGISLATION_CODE,
+    BENEFICIAL_RULE = X_BENEFICIAL_RULE,
+    CAGR_API_ID = X_CAGR_API_ID,
+    CAGR_API_PARAM_ID = X_CAGR_API_PARAM_ID,
+    CATEGORY_NAME = X_CATEGORY_NAME,
+    UOM = X_UOM,
+    BENEFICIAL_FORMULA_ID = X_BENEFICIAL_FORMULA_ID,
+    FLEX_VALUE_SET_ID = X_FLEX_VALUE_SET_ID,
+    BENEFICIAL_RULE_VALUE_SET_ID = X_BENEFICIAL_RULE_VALUE_SET_ID,
+    MULTIPLE_ENTRIES_ALLOWED_FLAG = X_MULTI_ENTRIES_ALLOWED_FLAG,
+    AUTO_CREATE_ENTRIES_FLAG = X_AUTO_CREATE_ENTRIES_FLAG,
+    OBJECT_VERSION_NUMBER = X_OBJECT_VERSION_NUMBER,
+    LAST_UPDATE_DATE = X_LAST_UPDATE_DATE,
+    LAST_UPDATED_BY = X_LAST_UPDATED_BY,
+    LAST_UPDATE_LOGIN = X_LAST_UPDATE_LOGIN
+  where CAGR_ENTITLEMENT_ITEM_ID = X_CAGR_ENTITLEMENT_ITEM_ID;
+
+  if (sql%notfound) then
+    raise no_data_found;
+  end if;
+
+  update PER_CAGR_ENTITLEMENT_ITEMS_TL set
+    ITEM_NAME = X_ITEM_NAME,
+    LAST_UPDATE_DATE = X_LAST_UPDATE_DATE,
+    LAST_UPDATED_BY = X_LAST_UPDATED_BY,
+    LAST_UPDATE_LOGIN = X_LAST_UPDATE_LOGIN,
+    SOURCE_LANG = userenv('LANG')
+  where CAGR_ENTITLEMENT_ITEM_ID = X_CAGR_ENTITLEMENT_ITEM_ID
+  and userenv('LANG') in (LANGUAGE, SOURCE_LANG);
+
+  if (sql%notfound) then
+    raise no_data_found;
+  end if;
+end UPDATE_ROW;
+
+procedure DELETE_ROW (
+  X_CAGR_ENTITLEMENT_ITEM_ID in NUMBER
+) is
+begin
+  delete from PER_CAGR_ENTITLEMENT_ITEMS_TL
+  where CAGR_ENTITLEMENT_ITEM_ID = X_CAGR_ENTITLEMENT_ITEM_ID;
+
+  if (sql%notfound) then
+    raise no_data_found;
+  end if;
+
+  delete from PER_CAGR_ENTITLEMENT_ITEMS
+  where CAGR_ENTITLEMENT_ITEM_ID = X_CAGR_ENTITLEMENT_ITEM_ID;
+
+  if (sql%notfound) then
+    raise no_data_found;
+  end if;
+end DELETE_ROW;
+
+procedure ADD_LANGUAGE
+is
+begin
+  delete from PER_CAGR_ENTITLEMENT_ITEMS_TL T
+  where not exists
+    (select NULL
+    from PER_CAGR_ENTITLEMENT_ITEMS B
+    where B.CAGR_ENTITLEMENT_ITEM_ID = T.CAGR_ENTITLEMENT_ITEM_ID
+    );
+
+  update PER_CAGR_ENTITLEMENT_ITEMS_TL T set (
+      ITEM_NAME
+    ) = (select
+      B.ITEM_NAME
+    from PER_CAGR_ENTITLEMENT_ITEMS_TL B
+    where B.CAGR_ENTITLEMENT_ITEM_ID = T.CAGR_ENTITLEMENT_ITEM_ID
+    and B.LANGUAGE = T.SOURCE_LANG)
+  where (
+      T.CAGR_ENTITLEMENT_ITEM_ID,
+      T.LANGUAGE
+  ) in (select
+      SUBT.CAGR_ENTITLEMENT_ITEM_ID,
+      SUBT.LANGUAGE
+    from PER_CAGR_ENTITLEMENT_ITEMS_TL SUBB, PER_CAGR_ENTITLEMENT_ITEMS_TL SUBT
+    where SUBB.CAGR_ENTITLEMENT_ITEM_ID = SUBT.CAGR_ENTITLEMENT_ITEM_ID
+    and SUBB.LANGUAGE = SUBT.SOURCE_LANG
+    and (SUBB.ITEM_NAME <> SUBT.ITEM_NAME
+  ));
+
+  insert into PER_CAGR_ENTITLEMENT_ITEMS_TL (
+    CREATED_BY,
+    CREATION_DATE,
+    LAST_UPDATE_LOGIN,
+    LAST_UPDATE_DATE,
+    LAST_UPDATED_BY,
+    CAGR_ENTITLEMENT_ITEM_ID,
+    ITEM_NAME,
+    LANGUAGE,
+    SOURCE_LANG
+  ) select /*+ ORDERED */
+    B.CREATED_BY,
+    B.CREATION_DATE,
+    B.LAST_UPDATE_LOGIN,
+    B.LAST_UPDATE_DATE,
+    B.LAST_UPDATED_BY,
+    B.CAGR_ENTITLEMENT_ITEM_ID,
+    B.ITEM_NAME,
+    L.LANGUAGE_CODE,
+    B.SOURCE_LANG
+  from PER_CAGR_ENTITLEMENT_ITEMS_TL B, FND_LANGUAGES L
+  where L.INSTALLED_FLAG in ('I', 'B')
+  and B.LANGUAGE = userenv('LANG')
+  and not exists
+    (select NULL
+    from PER_CAGR_ENTITLEMENT_ITEMS_TL T
+    where T.CAGR_ENTITLEMENT_ITEM_ID = B.CAGR_ENTITLEMENT_ITEM_ID
+    and T.LANGUAGE = L.LANGUAGE_CODE);
+end ADD_LANGUAGE;
+
+
+end PER_CAGR_ENTITLEMENT_ITEMS_PKG;
+
+/

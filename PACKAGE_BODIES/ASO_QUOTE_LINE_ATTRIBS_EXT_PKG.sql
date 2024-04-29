@@ -1,0 +1,326 @@
+--------------------------------------------------------
+--  DDL for Package Body ASO_QUOTE_LINE_ATTRIBS_EXT_PKG
+--------------------------------------------------------
+
+  CREATE OR REPLACE EDITIONABLE PACKAGE BODY "APPS"."ASO_QUOTE_LINE_ATTRIBS_EXT_PKG" as
+/* $Header: asotlatb.pls 120.1 2005/06/29 12:39:03 appldev ship $ */
+-- Start of Comments
+-- Package name     : ASO_QUOTE_LINE_ATTRIBS_EXT_PKG
+-- Purpose          :
+-- History          :
+-- NOTE             :
+-- End of Comments
+
+
+G_PKG_NAME CONSTANT VARCHAR2(30):= 'ASO_QUOTE_LINE_ATTRIBS_EXT_PKG';
+G_FILE_NAME CONSTANT VARCHAR2(12) := 'asotlatb.pls';
+
+PROCEDURE Insert_Row(
+          px_LINE_ATTRIBUTE_ID  IN OUT NOCOPY /* file.sql.39 change */   NUMBER,
+          p_CREATION_DATE    DATE,
+          p_CREATED_BY    NUMBER,
+          p_LAST_UPDATE_DATE    DATE,
+          p_LAST_UPDATED_BY    NUMBER,
+          p_LAST_UPDATE_LOGIN    NUMBER,
+          p_REQUEST_ID    NUMBER,
+          p_PROGRAM_APPLICATION_ID    NUMBER,
+          p_PROGRAM_ID    NUMBER,
+          p_PROGRAM_UPDATE_DATE    DATE,
+          p_APPLICATION_ID NUMBER,
+          p_STATUS     VARCHAR2,
+          p_QUOTE_LINE_ID    NUMBER,
+          p_ATTRIBUTE_TYPE_CODE    VARCHAR2,
+		p_QUOTE_HEADER_ID NUMBER,
+		p_QUOTE_SHIPMENT_ID NUMBER,
+          p_NAME    VARCHAR2,
+          p_VALUE    VARCHAR2,
+          p_VALUE_TYPE VARCHAR2,
+          p_START_DATE_ACTIVE    DATE,
+          p_END_DATE_ACTIVE    DATE,
+          p_OBJECT_VERSION_NUMBER  NUMBER
+		)
+
+ IS
+   CURSOR C2 IS SELECT ASO_QUOTE_LINE_ATTRIBS_EXT_S.nextval FROM sys.dual;
+BEGIN
+   If (px_LINE_ATTRIBUTE_ID IS NULL) OR (px_LINE_ATTRIBUTE_ID = FND_API.G_MISS_NUM) then
+       OPEN C2;
+       FETCH C2 INTO px_LINE_ATTRIBUTE_ID;
+       CLOSE C2;
+   End If;
+   INSERT INTO ASO_QUOTE_LINE_ATTRIBS_EXT(
+           LINE_ATTRIBUTE_ID,
+           CREATION_DATE,
+           CREATED_BY,
+           LAST_UPDATE_DATE,
+           LAST_UPDATED_BY,
+           LAST_UPDATE_LOGIN,
+           REQUEST_ID,
+           PROGRAM_APPLICATION_ID,
+           PROGRAM_ID,
+           PROGRAM_UPDATE_DATE,
+           APPLICATION_ID ,
+           STATUS,
+           QUOTE_LINE_ID,
+           ATTRIBUTE_TYPE_CODE,
+		 QUOTE_HEADER_ID,
+		 QUOTE_SHIPMENT_ID,
+           NAME,
+           VALUE,
+           VALUE_TYPE,
+           START_DATE_ACTIVE,
+           END_DATE_ACTIVE,
+           OBJECT_VERSION_NUMBER
+          ) VALUES (
+           px_LINE_ATTRIBUTE_ID,
+           ASO_UTILITY_PVT.decode( p_CREATION_DATE, FND_API.G_MISS_DATE, NULL, p_CREATION_DATE),
+           decode( p_CREATED_BY, FND_API.G_MISS_NUM, NULL, p_CREATED_BY),
+           ASO_UTILITY_PVT.decode( p_LAST_UPDATE_DATE, FND_API.G_MISS_DATE, NULL, p_LAST_UPDATE_DATE),
+           decode( p_LAST_UPDATED_BY, FND_API.G_MISS_NUM, NULL, p_LAST_UPDATED_BY),
+           decode( p_LAST_UPDATE_LOGIN, FND_API.G_MISS_NUM, NULL, p_LAST_UPDATE_LOGIN),
+           decode( p_REQUEST_ID, FND_API.G_MISS_NUM, NULL, p_REQUEST_ID),
+           decode( p_PROGRAM_APPLICATION_ID, FND_API.G_MISS_NUM, NULL, p_PROGRAM_APPLICATION_ID),
+           decode( p_PROGRAM_ID, FND_API.G_MISS_NUM, NULL, p_PROGRAM_ID),
+           ASO_UTILITY_PVT.decode( p_PROGRAM_UPDATE_DATE, FND_API.G_MISS_DATE, NULL, p_PROGRAM_UPDATE_DATE),
+            decode( p_APPLICATION_ID, FND_API.G_MISS_NUM, NULL, p_APPLICATION_ID),
+           decode(p_STATUS, FND_API.G_MISS_CHAR, NULL, p_STATUS),
+           decode( p_QUOTE_LINE_ID, FND_API.G_MISS_NUM, NULL, p_QUOTE_LINE_ID),
+           decode( p_ATTRIBUTE_TYPE_CODE, FND_API.G_MISS_CHAR, NULL, p_ATTRIBUTE_TYPE_CODE),
+		 decode( p_QUOTE_HEADER_ID, FND_API.G_MISS_NUM, NULL, p_QUOTE_HEADER_ID),
+		  decode( p_QUOTE_SHIPMENT_ID, FND_API.G_MISS_NUM, NULL, p_QUOTE_SHIPMENT_ID),
+           decode( p_NAME, FND_API.G_MISS_CHAR, NULL, p_NAME),
+           decode( p_VALUE, FND_API.G_MISS_CHAR, NULL, p_VALUE),
+            decode(p_VALUE_TYPE, FND_API.G_MISS_CHAR, NULL, p_VALUE_TYPE),
+           ASO_UTILITY_PVT.decode( p_START_DATE_ACTIVE, FND_API.G_MISS_DATE, NULL, p_START_DATE_ACTIVE),
+           ASO_UTILITY_PVT.decode( p_END_DATE_ACTIVE, FND_API.G_MISS_DATE, NULL, p_END_DATE_ACTIVE),
+		 decode ( p_OBJECT_VERSION_NUMBER, FND_API.G_MISS_NUM,1,NULL,1, p_OBJECT_VERSION_NUMBER)
+		 );
+End Insert_Row;
+
+PROCEDURE Update_Row(
+          p_LINE_ATTRIBUTE_ID    NUMBER,
+          p_CREATION_DATE    DATE,
+          p_CREATED_BY    NUMBER,
+          p_LAST_UPDATE_DATE    DATE,
+          p_LAST_UPDATED_BY    NUMBER,
+          p_LAST_UPDATE_LOGIN    NUMBER,
+          p_REQUEST_ID    NUMBER,
+          p_PROGRAM_APPLICATION_ID    NUMBER,
+          p_PROGRAM_ID    NUMBER,
+          p_PROGRAM_UPDATE_DATE    DATE,
+           p_APPLICATION_ID NUMBER,
+          p_STATUS     VARCHAR2,
+          p_QUOTE_LINE_ID    NUMBER,
+          p_ATTRIBUTE_TYPE_CODE    VARCHAR2,
+		p_QUOTE_HEADER_ID NUMBER,
+		p_QUOTE_SHIPMENT_ID NUMBER,
+          p_NAME    VARCHAR2,
+          p_VALUE    VARCHAR2,
+          p_VALUE_TYPE VARCHAR2,
+          p_START_DATE_ACTIVE    DATE,
+          p_END_DATE_ACTIVE    DATE,
+          p_OBJECT_VERSION_NUMBER  NUMBER
+		)
+
+ IS
+ BEGIN
+    Update ASO_QUOTE_LINE_ATTRIBS_EXT
+    SET
+          /*    CREATION_DATE = ASO_UTILITY_PVT.decode( p_CREATION_DATE, FND_API.G_MISS_DATE, CREATION_DATE, p_CREATION_DATE),
+              CREATED_BY = decode( p_CREATED_BY, FND_API.G_MISS_NUM, CREATED_BY, p_CREATED_BY),*/
+              LAST_UPDATE_DATE = ASO_UTILITY_PVT.decode( p_LAST_UPDATE_DATE, FND_API.G_MISS_DATE, LAST_UPDATE_DATE, p_LAST_UPDATE_DATE),
+              LAST_UPDATED_BY = decode( p_LAST_UPDATED_BY, FND_API.G_MISS_NUM, LAST_UPDATED_BY, p_LAST_UPDATED_BY),
+              LAST_UPDATE_LOGIN = decode( p_LAST_UPDATE_LOGIN, FND_API.G_MISS_NUM, LAST_UPDATE_LOGIN, p_LAST_UPDATE_LOGIN),
+              REQUEST_ID = decode( p_REQUEST_ID, FND_API.G_MISS_NUM, REQUEST_ID, p_REQUEST_ID),
+              PROGRAM_APPLICATION_ID = decode( p_PROGRAM_APPLICATION_ID, FND_API.G_MISS_NUM, PROGRAM_APPLICATION_ID, p_PROGRAM_APPLICATION_ID),
+              PROGRAM_ID = decode( p_PROGRAM_ID, FND_API.G_MISS_NUM, PROGRAM_ID, p_PROGRAM_ID),
+              PROGRAM_UPDATE_DATE = ASO_UTILITY_PVT.decode( p_PROGRAM_UPDATE_DATE, FND_API.G_MISS_DATE, PROGRAM_UPDATE_DATE, p_PROGRAM_UPDATE_DATE),
+ APPLICATION_ID = decode(p_APPLICATION_ID, FND_API.G_MISS_NUM, APPLICATION_ID, p_APPLICATION_ID),
+              STATUS = decode(p_STATUS, FND_API.G_MISS_CHAR, STATUS, p_STATUS),
+
+              QUOTE_LINE_ID = decode( p_QUOTE_LINE_ID, FND_API.G_MISS_NUM, QUOTE_LINE_ID, p_QUOTE_LINE_ID),
+              ATTRIBUTE_TYPE_CODE = decode( p_ATTRIBUTE_TYPE_CODE, FND_API.G_MISS_CHAR, ATTRIBUTE_TYPE_CODE, p_ATTRIBUTE_TYPE_CODE),
+		    QUOTE_HEADER_ID = decode( p_QUOTE_HEADER_ID, FND_API.G_MISS_NUM, QUOTE_HEADER_ID, p_QUOTE_HEADER_ID),
+		    QUOTE_SHIPMENT_ID = decode( p_QUOTE_SHIPMENT_ID, FND_API.G_MISS_NUM, QUOTE_SHIPMENT_ID, p_QUOTE_SHIPMENT_ID),
+              NAME = decode( p_NAME, FND_API.G_MISS_CHAR, NAME, p_NAME),
+              VALUE = decode( p_VALUE, FND_API.G_MISS_CHAR, VALUE, p_VALUE),
+ VALUE_TYPE = decode(p_VALUE_TYPE, FND_API.G_MISS_CHAR, VALUE_TYPE, p_VALUE_TYPE),
+              START_DATE_ACTIVE = ASO_UTILITY_PVT.decode( p_START_DATE_ACTIVE, FND_API.G_MISS_DATE, START_DATE_ACTIVE, p_START_DATE_ACTIVE),
+              END_DATE_ACTIVE = ASO_UTILITY_PVT.decode( p_END_DATE_ACTIVE, FND_API.G_MISS_DATE, END_DATE_ACTIVE, p_END_DATE_ACTIVE),
+		    OBJECT_VERSION_NUMBER = decode( p_OBJECT_VERSION_NUMBER, FND_API.G_MISS_NUM, nvl(OBJECT_VERSION_NUMBER,0)+1, nvl(p_OBJECT_VERSION_NUMBER, nvl(OBJECT_VERSION_NUMBER,0))+1)
+    where LINE_ATTRIBUTE_ID = p_LINE_ATTRIBUTE_ID;
+
+    If (SQL%NOTFOUND) then
+        RAISE NO_DATA_FOUND;
+    End If;
+END Update_Row;
+
+PROCEDURE Delete_Row(
+    p_LINE_ATTRIB_ID  NUMBER)
+ IS
+ BEGIN
+   DELETE FROM ASO_QUOTE_LINE_ATTRIBS_EXT
+    WHERE LINE_ATTRIBUTE_ID = p_LINE_ATTRIB_ID;
+   If (SQL%NOTFOUND) then
+       RAISE NO_DATA_FOUND;
+   End If;
+ END Delete_Row;
+
+
+
+PROCEDURE Delete_Row(
+    p_QUOTE_LINE_ID  NUMBER)
+ IS
+ BEGIN
+   DELETE FROM ASO_QUOTE_LINE_ATTRIBS_EXT
+    WHERE QUOTE_LINE_ID = p_QUOTE_LINE_ID;
+   If (SQL%NOTFOUND) then
+       RAISE NO_DATA_FOUND;
+   End If;
+ END Delete_Row;
+
+
+PROCEDURE Lock_Row(
+          --p_OBJECT_VERSION_NUMBER  NUMBER,
+          p_LINE_ATTRIBUTE_ID    NUMBER,
+          p_CREATION_DATE    DATE,
+          p_CREATED_BY    NUMBER,
+          p_LAST_UPDATE_DATE    DATE,
+          p_LAST_UPDATED_BY    NUMBER,
+          p_LAST_UPDATE_LOGIN    NUMBER,
+          p_REQUEST_ID    NUMBER,
+          p_PROGRAM_APPLICATION_ID    NUMBER,
+          p_PROGRAM_ID    NUMBER,
+          p_PROGRAM_UPDATE_DATE    DATE,
+           p_APPLICATION_ID NUMBER,
+           p_STATUS     VARCHAR2,
+          p_QUOTE_LINE_ID    NUMBER,
+          p_ATTRIBUTE_TYPE_CODE    VARCHAR2,
+		p_QUOTE_HEADER_ID NUMBER,
+		p_QUOTE_SHIPMENT_ID NUMBER,
+          p_NAME    VARCHAR2,
+          p_VALUE    VARCHAR2,
+           p_VALUE_TYPE VARCHAR2,
+          p_START_DATE_ACTIVE    DATE,
+          p_END_DATE_ACTIVE    DATE)
+
+ IS
+   CURSOR C IS
+        SELECT LINE_ATTRIBUTE_ID,
+	   --OBJECT_VERSION_NUMBER,
+CREATION_DATE,
+CREATED_BY,
+LAST_UPDATE_DATE,
+LAST_UPDATED_BY,
+LAST_UPDATE_LOGIN,
+REQUEST_ID,
+PROGRAM_APPLICATION_ID,
+PROGRAM_ID,
+PROGRAM_UPDATE_DATE,
+APPLICATION_ID,
+STATUS,
+QUOTE_LINE_ID,
+ATTRIBUTE_TYPE_CODE,
+QUOTE_HEADER_ID ,
+QUOTE_SHIPMENT_ID ,
+NAME,
+VALUE,
+VALUE_TYPE,
+START_DATE_ACTIVE,
+END_DATE_ACTIVE
+         FROM ASO_QUOTE_LINE_ATTRIBS_EXT
+        WHERE LINE_ATTRIBUTE_ID =  p_LINE_ATTRIBUTE_ID
+        FOR UPDATE of LINE_ATTRIBUTE_ID NOWAIT;
+   Recinfo C%ROWTYPE;
+ BEGIN
+    OPEN C;
+    FETCH C INTO Recinfo;
+    If (C%NOTFOUND) then
+        CLOSE C;
+        FND_MESSAGE.SET_NAME('FND', 'FORM_RECORD_DELETED');
+        APP_EXCEPTION.RAISE_EXCEPTION;
+    End If;
+    CLOSE C;
+    if (
+/*
+           (      Recinfo.LINE_ATTRIBUTE_ID = p_LINE_ATTRIBUTE_ID)
+       AND (    ( Recinfo.CREATION_DATE = p_CREATION_DATE)
+            OR (    ( Recinfo.CREATION_DATE IS NULL )
+                AND (  p_CREATION_DATE IS NULL )))
+       AND (    ( Recinfo.CREATED_BY = p_CREATED_BY)
+            OR (    ( Recinfo.CREATED_BY IS NULL )
+                AND (  p_CREATED_BY IS NULL )))
+       AND
+*/
+	  (    ( Recinfo.LAST_UPDATE_DATE = p_LAST_UPDATE_DATE)
+            OR (    ( Recinfo.LAST_UPDATE_DATE IS NULL )
+                AND (  p_LAST_UPDATE_DATE IS NULL )))
+/*
+       AND
+	   (    ( Recinfo.OBJECT_VERSION_NUMBER = p_OBJECT_VERSION_NUMBER)
+	      OR (    ( Recinfo.OBJECT_VERSION_NUMBER IS NULL )
+		         AND (  p_OBJECT_VERSION_NUMBER IS NULL )))
+       AND (    ( Recinfo.LAST_UPDATED_BY = p_LAST_UPDATED_BY)
+            OR (    ( Recinfo.LAST_UPDATED_BY IS NULL )
+                AND (  p_LAST_UPDATED_BY IS NULL )))
+       AND (    ( Recinfo.LAST_UPDATE_LOGIN = p_LAST_UPDATE_LOGIN)
+            OR (    ( Recinfo.LAST_UPDATE_LOGIN IS NULL )
+                AND (  p_LAST_UPDATE_LOGIN IS NULL )))
+       AND (    ( Recinfo.REQUEST_ID = p_REQUEST_ID)
+            OR (    ( Recinfo.REQUEST_ID IS NULL )
+                AND (  p_REQUEST_ID IS NULL )))
+       AND (    ( Recinfo.PROGRAM_APPLICATION_ID = p_PROGRAM_APPLICATION_ID)
+            OR (    ( Recinfo.PROGRAM_APPLICATION_ID IS NULL )
+                AND (  p_PROGRAM_APPLICATION_ID IS NULL )))
+       AND (    ( Recinfo.PROGRAM_ID = p_PROGRAM_ID)
+            OR (    ( Recinfo.PROGRAM_ID IS NULL )
+                AND (  p_PROGRAM_ID IS NULL )))
+       AND (    ( Recinfo.PROGRAM_UPDATE_DATE = p_PROGRAM_UPDATE_DATE)
+            OR (    ( Recinfo.PROGRAM_UPDATE_DATE IS NULL )
+                AND (  p_PROGRAM_UPDATE_DATE IS NULL )))
+       AND (    ( Recinfo.APPLICATION_ID = p_APPLICATION_ID)
+            OR (    ( Recinfo.APPLICATION_ID IS NULL )
+                AND (  p_APPLICATION_ID IS NULL )))
+       AND (    ( Recinfo.STATUS = p_STATUS)
+            OR (    ( Recinfo.STATUS IS NULL )
+       AND (  p_STATUS IS NULL )))
+
+       AND (    ( Recinfo.QUOTE_LINE_ID = p_QUOTE_LINE_ID)
+            OR (    ( Recinfo.QUOTE_LINE_ID IS NULL )
+                AND (  p_QUOTE_LINE_ID IS NULL )))
+       AND (    ( Recinfo.ATTRIBUTE_TYPE_CODE = p_ATTRIBUTE_TYPE_CODE)
+            OR (    ( Recinfo.ATTRIBUTE_TYPE_CODE IS NULL )
+                AND (  p_ATTRIBUTE_TYPE_CODE IS NULL )))
+       AND (    ( Recinfo.QUOTE_HEADER_ID = p_QUOTE_HEADER_ID)
+	    OR (    ( Recinfo.QUOTE_HEADER_ID IS NULL )
+			AND (  p_QUOTE_HEADER_ID IS NULL )))
+       AND (    ( Recinfo.QUOTE_SHIPMENT_ID = p_QUOTE_SHIPMENT_ID)
+		  OR (    ( Recinfo.QUOTE_SHIPMENT_ID IS NULL )
+			AND (  p_QUOTE_SHIPMENT_ID IS NULL )))
+       AND (    ( Recinfo.NAME = p_NAME)
+            OR (    ( Recinfo.NAME IS NULL )
+                AND (  p_NAME IS NULL )))
+       AND (    ( Recinfo.VALUE = p_VALUE)
+            OR (    ( Recinfo.VALUE IS NULL )
+                AND (  p_VALUE IS NULL )))
+       AND (    ( Recinfo.VALUE_TYPE = p_VALUE_TYPE)
+           OR (    ( Recinfo.VALUE_TYPE IS NULL )
+              AND (  p_VALUE_TYPE IS NULL )))
+       AND (    ( Recinfo.START_DATE_ACTIVE = p_START_DATE_ACTIVE)
+            OR (    ( Recinfo.START_DATE_ACTIVE IS NULL )
+                AND (  p_START_DATE_ACTIVE IS NULL )))
+       AND (    ( Recinfo.END_DATE_ACTIVE = p_END_DATE_ACTIVE)
+            OR (    ( Recinfo.END_DATE_ACTIVE IS NULL )
+                AND (  p_END_DATE_ACTIVE IS NULL )))
+*/
+       ) then
+       return;
+   else
+       FND_MESSAGE.SET_NAME('FND', 'FORM_RECORD_CHANGED');
+       APP_EXCEPTION.RAISE_EXCEPTION;
+   End If;
+END Lock_Row;
+
+End ASO_QUOTE_LINE_ATTRIBS_EXT_PKG;
+
+/

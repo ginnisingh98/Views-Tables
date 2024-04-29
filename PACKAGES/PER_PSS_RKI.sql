@@ -1,0 +1,50 @@
+--------------------------------------------------------
+--  DDL for Package PER_PSS_RKI
+--------------------------------------------------------
+
+  CREATE OR REPLACE EDITIONABLE PACKAGE "APPS"."PER_PSS_RKI" AUTHID CURRENT_USER as
+/* $Header: pepssrhi.pkh 120.0 2005/05/31 15:35:00 appldev noship $ */
+--
+-- -----------------------------------------------------------------------
+-- |---------------------------< after_insert >--------------------------|
+-- -----------------------------------------------------------------------
+--
+procedure after_insert
+ (p_salary_survey_id             in number,
+  p_object_version_number        in number,
+  p_survey_name                  in varchar2,
+  p_survey_company_code          in varchar2,
+  p_identifier                   in varchar2,
+--ras  p_currency_code                in varchar2,
+  p_survey_type_code             in varchar2,
+  p_base_region                  in varchar2,
+  p_effective_date               in date,
+  p_attribute_category           in varchar2,
+  p_attribute1                   in varchar2,
+  p_attribute2                   in varchar2,
+  p_attribute3                   in varchar2,
+  p_attribute4                   in varchar2,
+  p_attribute5                   in varchar2,
+  p_attribute6                   in varchar2,
+  p_attribute7                   in varchar2,
+  p_attribute8                   in varchar2,
+  p_attribute9                   in varchar2,
+  p_attribute10                  in varchar2,
+  p_attribute11                  in varchar2,
+  p_attribute12                  in varchar2,
+  p_attribute13                  in varchar2,
+  p_attribute14                  in varchar2,
+  p_attribute15                  in varchar2,
+  p_attribute16                  in varchar2,
+  p_attribute17                  in varchar2,
+  p_attribute18                  in varchar2,
+  p_attribute19                  in varchar2,
+  p_attribute20                  in varchar2
+
+);
+
+end per_pss_rki;
+
+ 
+
+/

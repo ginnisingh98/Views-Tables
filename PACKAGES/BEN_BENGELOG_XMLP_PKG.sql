@@ -1,0 +1,97 @@
+--------------------------------------------------------
+--  DDL for Package BEN_BENGELOG_XMLP_PKG
+--------------------------------------------------------
+
+  CREATE OR REPLACE EDITIONABLE PACKAGE "APPS"."BEN_BENGELOG_XMLP_PKG" AUTHID CURRENT_USER AS
+/* $Header: BENGELOGS.pls 120.1 2007/12/10 08:35:11 vjaganat noship $ */
+    run_mode varchar2(100);
+	P_CONCURRENT_REQUEST_ID	number;
+	P_CONC_REQUEST_ID	number;
+	CP_PROCESS_DATE	varchar2(1000);
+	CP_DERIVABLE_FACTORS	varchar2(1000);
+	CP_VALIDATE	varchar2(1000);
+	CP_PERSON	varchar2(1000);
+	CP_PERSON_TYPE	varchar2(1000);
+	CP_PROGRAM	varchar2(1000);
+	CP_BUSINESS_GROUP	varchar2(1000);
+	CP_PLAN	varchar2(1000);
+	CP_ENROLLMENT_TYPE_CYCLE	varchar2(1000);
+	CP_PLANS_NOT_IN_PROGRAMS	varchar2(1000);
+	CP_JUST_PROGRAMS	varchar2(1000);
+	CP_COMP_OBJECT_SELECTION_RULE	varchar2(1000);
+	CP_PERSON_SELECTION_RULE	varchar2(1000);
+	CP_LIFE_EVENT_REASON	varchar2(1000);
+	CP_ORGANIZATION	varchar2(1000);
+	CP_POSTAL_ZIP_RANGE	varchar2(1000);
+	CP_REPORTING_GROUP	varchar2(1000);
+	CP_PLAN_TYPE	varchar2(1000);
+	CP_OPTION	varchar2(1000);
+	CP_ELIGIBILITY_PROFILE	varchar2(1000);
+	CP_VARIABLE_RATE_PROFILE	varchar2(1000);
+	CP_LEGAL_ENTITY	varchar2(1000);
+	CP_PAYROLL	varchar2(1000);
+	CP_CONCURRENT_PROGRAM_NAME	varchar2(1000);
+	CP_START_DATE	varchar2(1000);
+	CP_END_DATE	varchar2(1000);
+	CP_ELAPSED_TIME	varchar2(1000);
+	CP_PERSONS_SELECTED	number;
+	CP_PERSONS_PROCESSED	number;
+	CP_MODE	varchar2(1000);
+	CP_STATUS	varchar2(1000);
+	CP_START_TIME	varchar2(1000);
+	CP_END_TIME	varchar2(1000);
+	CP_PERSONS_UNPROCESSED	number;
+	CP_PERSONS_PROCESSED_SUCC	number;
+	CP_PERSONS_ERRORED	number;
+	CP_LOCATION	varchar2(240);
+	CP_PERSON_BNFT_GRP	varchar2(240);
+	CP_AUDIT_LOG	varchar2(20);
+	CP_LMT_BY_ORG	varchar2(240);
+	function CF_STANDARD_HEADERFormula return Number  ;
+	function CF_PROCESS_INFORMATIONFormula return Number  ;
+	function BeforeReport return boolean  ;
+	function AfterReport return boolean  ;
+	function AfterPForm return boolean  ;
+	Function CP_PROCESS_DATE_p return varchar2;
+	Function CP_DERIVABLE_FACTORS_p return varchar2;
+	Function CP_VALIDATE_p return varchar2;
+	Function CP_PERSON_p return varchar2;
+	Function CP_PERSON_TYPE_p return varchar2;
+	Function CP_PROGRAM_p return varchar2;
+	Function CP_BUSINESS_GROUP_p return varchar2;
+	Function CP_PLAN_p return varchar2;
+	Function CP_ENROLLMENT_TYPE_CYCLE_p return varchar2;
+	Function CP_PLANS_NOT_IN_PROGRAMS_p return varchar2;
+	Function CP_JUST_PROGRAMS_p return varchar2;
+	Function CP_COMP_OBJECT_SELECTION_RULE1 return varchar2;
+	Function CP_PERSON_SELECTION_RULE_p return varchar2;
+	Function CP_LIFE_EVENT_REASON_p return varchar2;
+	Function CP_ORGANIZATION_p return varchar2;
+	Function CP_POSTAL_ZIP_RANGE_p return varchar2;
+	Function CP_REPORTING_GROUP_p return varchar2;
+	Function CP_PLAN_TYPE_p return varchar2;
+	Function CP_OPTION_p return varchar2;
+	Function CP_ELIGIBILITY_PROFILE_p return varchar2;
+	Function CP_VARIABLE_RATE_PROFILE_p return varchar2;
+	Function CP_LEGAL_ENTITY_p return varchar2;
+	Function CP_PAYROLL_p return varchar2;
+	Function CP_CONCURRENT_PROGRAM_NAME_p return varchar2;
+	Function CP_START_DATE_p return varchar2;
+	Function CP_END_DATE_p return varchar2;
+	Function CP_ELAPSED_TIME_p return varchar2;
+	Function CP_PERSONS_SELECTED_p return number;
+	Function CP_PERSONS_PROCESSED_p return number;
+	Function CP_MODE_p return varchar2;
+	Function CP_STATUS_p return varchar2;
+	Function CP_START_TIME_p return varchar2;
+	Function CP_END_TIME_p return varchar2;
+	Function CP_PERSONS_UNPROCESSED_p return number;
+	Function CP_PERSONS_PROCESSED_SUCC_p return number;
+	Function CP_PERSONS_ERRORED_p return number;
+	Function CP_LOCATION_p return varchar2;
+	Function CP_PERSON_BNFT_GRP_p return varchar2;
+	Function CP_AUDIT_LOG_p return varchar2;
+	Function CP_LMT_BY_ORG_p return varchar2;
+END BEN_BENGELOG_XMLP_PKG;
+
+/

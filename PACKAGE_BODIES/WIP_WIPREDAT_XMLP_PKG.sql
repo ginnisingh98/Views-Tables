@@ -1,0 +1,123 @@
+--------------------------------------------------------
+--  DDL for Package Body WIP_WIPREDAT_XMLP_PKG
+--------------------------------------------------------
+
+  CREATE OR REPLACE EDITIONABLE PACKAGE BODY "APPS"."WIP_WIPREDAT_XMLP_PKG" AS
+/* $Header: WIPREDATB.pls 120.1 2008/01/31 12:33:15 npannamp noship $ */
+  FUNCTION BEFOREREPORT RETURN BOOLEAN IS
+  BEGIN
+    P_CONC_REQUEST_ID := FND_GLOBAL.CONC_REQUEST_ID;
+    /*SRW.USER_EXIT('FND SRWINIT')*/NULL;
+    /*SRW.USER_EXIT('FND FLEXSQL CODE="MTLL" APPL_SHORT_NAME="INV"
+                  	       OUTPUT=":P_CMPL_LOCATOR" MODE="SELECT" DISPLAY="ALL"
+                                 TABLEALIAS="MLOC"')*/NULL;
+   RETURN (TRUE);
+  END BEFOREREPORT;
+
+  FUNCTION AFTERREPORT RETURN BOOLEAN IS
+  BEGIN
+    /*SRW.USER_EXIT('FND SRWEXIT')*/NULL;
+    RETURN (TRUE);
+  END AFTERREPORT;
+
+  FUNCTION LINE_LIMITER RETURN CHARACTER IS
+    LIMIT_LINES VARCHAR2(200);
+  BEGIN
+    IF (P_FROM_LINE IS NOT NULL) THEN
+      IF (P_TO_LINE IS NOT NULL) THEN
+        LIMIT_LINES := ' AND WL.LINE_CODE BETWEEN ''' || P_FROM_LINE || ''' AND ''' || P_TO_LINE || '''';
+      ELSE
+        LIMIT_LINES := ' AND WL.LINE_CODE >= ''' || P_FROM_LINE || '''';
+      END IF;
+    ELSE
+      IF (P_TO_LINE IS NOT NULL) THEN
+        LIMIT_LINES := ' AND WL.LINE_CODE <= ''' || P_TO_LINE || '''';
+      ELSE
+        LIMIT_LINES := ' ';
+      END IF;
+    END IF;
+    RETURN (LIMIT_LINES);
+  END LINE_LIMITER;
+
+  FUNCTION ASSEMBLY_LIMITER RETURN CHARACTER IS
+    LIMIT_ASSLY VARCHAR2(80);
+  BEGIN
+    IF (P_FROM_ASSEMBLY IS NOT NULL) THEN
+      IF (P_TO_ASSEMBLY IS NOT NULL) THEN
+        LIMIT_ASSLY := ' AND WE.WIP_ENTITY_NAME BETWEEN ''' || P_FROM_ASSEMBLY || ''' AND ''' || P_TO_ASSEMBLY || '''';
+      ELSE
+        LIMIT_ASSLY := ' AND WE.WIP_ENTITY_NAME >= ''' || P_FROM_ASSEMBLY || '''';
+      END IF;
+    ELSE
+      IF (P_TO_ASSEMBLY IS NOT NULL) THEN
+        LIMIT_ASSLY := ' AND WE.WIP_ENTITY_NAME <= ''' || P_TO_ASSEMBLY || '''';
+      ELSE
+        LIMIT_ASSLY := ' ';
+      END IF;
+    END IF;
+    RETURN (LIMIT_ASSLY);
+  END ASSEMBLY_LIMITER;
+
+  FUNCTION FUS_DATE_LIMITER RETURN CHARACTER IS
+    LIMIT_DATES VARCHAR2(150);
+  BEGIN
+    IF (P_FROM_START_DATE IS NOT NULL) THEN
+      IF (P_TO_START_DATE IS NOT NULL) THEN
+        LIMIT_DATES := ' AND TRUNC(WRS.FIRST_UNIT_START_DATE) BETWEEN TO_DATE(''' || TO_CHAR(P_FROM_START_DATE
+                              ,'YYYYMMDD') || ''',''YYYYMMDD'') AND TO_DATE(''' || TO_CHAR(P_TO_START_DATE
+                              ,'YYYYMMDD') || ''',''YYYYMMDD'')';
+      ELSE
+        LIMIT_DATES := ' AND TRUNC(WRS.FIRST_UNIT_START_DATE) >= TO_DATE(''' || TO_CHAR(P_FROM_START_DATE
+                              ,'YYYYMMDD') || ''',''YYYYMMDD'')';
+      END IF;
+    ELSE
+      IF (P_TO_START_DATE IS NOT NULL) THEN
+        LIMIT_DATES := ' AND TRUNC(WRS.FIRST_UNIT_START_DATE) <= TO_DATE(''' || TO_CHAR(P_TO_START_DATE
+                              ,'YYYYMMDD') || ''',''YYYYMMDD'')';
+      ELSE
+        LIMIT_DATES := ' ';
+      END IF;
+    END IF;
+    RETURN (LIMIT_DATES);
+  END FUS_DATE_LIMITER;
+
+  FUNCTION C_STATUS_LIMITERFORMULA RETURN VARCHAR2 IS
+  BEGIN
+    IF (P_STATUS_LIMITER = 1) THEN
+      RETURN ('AND WRS.STATUS_TYPE IN (1,3,4,6,13)');
+    ELSE
+      RETURN (' ');
+    END IF;
+    RETURN NULL;
+  END C_STATUS_LIMITERFORMULA;
+
+  FUNCTION AFTERPFORM RETURN BOOLEAN IS
+  BEGIN
+    RETURN (TRUE);
+  END AFTERPFORM;
+
+  function get_precision(qty_precision in number) return VARCHAR2 is
+  begin
+
+	if qty_precision = 0 then return('999G999G999G990');
+
+	elsif qty_precision = 1 then return('999G999G999G990D0');
+
+	elsif qty_precision = 3 then return('999G999G999G990D000');
+
+	elsif qty_precision = 4 then return('999G999G999G990D0000');
+
+	elsif qty_precision = 5 then return('999G999G999G990D00000');
+
+	elsif qty_precision = 6 then  return('999G999G999G990D000000');
+
+	else return('999G999G999G990D00');
+
+	end if;
+
+  end;
+
+  END WIP_WIPREDAT_XMLP_PKG;
+
+
+/

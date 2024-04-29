@@ -1,0 +1,122 @@
+--------------------------------------------------------
+--  DDL for Package BOM_BOMRWUIT_XMLP_PKG
+--------------------------------------------------------
+
+  CREATE OR REPLACE EDITIONABLE PACKAGE "APPS"."BOM_BOMRWUIT_XMLP_PKG" AUTHID CURRENT_USER AS
+/* $Header: BOMRWUITS.pls 120.1 2008/01/07 07:11:30 nchinnam noship $ */
+  P_ORG_ID NUMBER;
+  LP_ORG_ID NUMBER;
+
+  P_REPORT_OPTION NUMBER;
+
+  P_ITEM_FROM VARCHAR2(80);
+
+  P_ITEM_TO VARCHAR2(80);
+
+  P_SET_ID NUMBER;
+
+  P_CAT_FROM VARCHAR2(80);
+
+  P_CAT_TO VARCHAR2(80);
+
+  P_IMPLEMENTED NUMBER;
+
+  P_DATE VARCHAR2(32767);
+
+  P_DATE_1 VARCHAR2(32767);
+
+  P_DATE_OPTION NUMBER;
+
+  P_LEVEL NUMBER;
+
+  P_ITEM_ID NUMBER;
+
+  P_ITEM_REV VARCHAR2(3);
+
+  P_ENG_BILL_FLAG VARCHAR2(3);
+
+  P_CATEGORY_STRUCTURE_ID NUMBER;
+
+  P_ITEM_STRUCTURE_ID NUMBER;
+
+  P_ASS_BETWEEN VARCHAR2(480);
+
+  P_CAT_BETWEEN VARCHAR2(480);
+
+  P_CONC_REQUEST_ID NUMBER := 0;
+
+  P_SEQUENCE_ID NUMBER := 9999;
+
+  P_SPECIFIC_ITEM VARCHAR2(245);
+
+  P_DEBUG VARCHAR2(2);
+
+  P_QTY_PRECISION NUMBER;
+
+  P_MSG_BUF VARCHAR2(80);
+
+  P_ERR_MSG VARCHAR2(80);
+
+  P_ALL_ORGS NUMBER;
+
+  P_ORG_HIERARCHY VARCHAR2(30);
+
+  LP_QTY_PRECISION VARCHAR2(30);
+
+  FUNCTION BEFOREREPORT RETURN BOOLEAN;
+
+  FUNCTION AFTERREPORT RETURN BOOLEAN;
+
+  FUNCTION GET_STATUS(REVISED_ITEM_SEQUENCE_ID IN NUMBER
+                     ,IMPLEMENTED_FLAG IN NUMBER
+                     ,NOTICE IN VARCHAR2) RETURN VARCHAR2;
+
+  FUNCTION GET_ORGCODE(ORGANIZATION_ID IN NUMBER) RETURN VARCHAR2;
+
+  FUNCTION CF_ALL_ORGSFORMULA RETURN CHAR;
+
+  function get_precision(qty_precision in number) return VARCHAR2;
+
+  PROCEDURE IMPLODER_USEREXIT(SEQUENCE_ID IN NUMBER
+                             ,ENG_MFG_FLAG IN NUMBER
+                             ,ORG_ID IN NUMBER
+                             ,IMPL_FLAG IN NUMBER
+                             ,DISPLAY_OPTION IN NUMBER
+                             ,LEVELS_TO_IMPLODE IN NUMBER
+                             ,ITEM_ID IN NUMBER
+                             ,IMPL_DATE IN VARCHAR2
+                             ,ERR_MSG OUT NOCOPY VARCHAR2
+                             ,ERR_CODE OUT NOCOPY NUMBER);
+
+  PROCEDURE IMPLOSION(SEQUENCE_ID IN NUMBER
+                     ,ENG_MFG_FLAG IN NUMBER
+                     ,ORG_ID IN NUMBER
+                     ,IMPL_FLAG IN NUMBER
+                     ,DISPLAY_OPTION IN NUMBER
+                     ,LEVELS_TO_IMPLODE IN NUMBER
+                     ,IMPL_DATE IN VARCHAR2
+                     ,ERR_MSG OUT NOCOPY VARCHAR2
+                     ,ERR_CODE OUT NOCOPY NUMBER);
+
+  PROCEDURE SL_IMPLODER(SEQUENCE_ID IN NUMBER
+                       ,ENG_MFG_FLAG IN NUMBER
+                       ,ORG_ID IN NUMBER
+                       ,IMPL_FLAG IN NUMBER
+                       ,DISPLAY_OPTION IN NUMBER
+                       ,IMPL_DATE IN VARCHAR2
+                       ,ERR_MSG OUT NOCOPY VARCHAR2
+                       ,ERROR_CODE OUT NOCOPY NUMBER);
+
+  PROCEDURE ML_IMPLODER(SEQUENCE_ID IN NUMBER
+                       ,ENG_MFG_FLAG IN NUMBER
+                       ,ORG_ID IN NUMBER
+                       ,IMPL_FLAG IN NUMBER
+                       ,A_LEVELS_TO_IMPLODE IN NUMBER
+                       ,IMPL_DATE IN VARCHAR2
+                       ,ERR_MSG OUT NOCOPY VARCHAR2
+                       ,ERROR_CODE OUT NOCOPY NUMBER);
+
+END BOM_BOMRWUIT_XMLP_PKG;
+
+
+/

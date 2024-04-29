@@ -1,0 +1,163 @@
+--------------------------------------------------------
+--  DDL for Package Body AR_ARXCURLL_XMLP_PKG
+--------------------------------------------------------
+
+  CREATE OR REPLACE EDITIONABLE PACKAGE BODY "APPS"."AR_ARXCURLL_XMLP_PKG" AS
+/* $Header: ARXCURLLB.pls 120.0 2007/12/27 13:45:47 abraghun noship $ */
+  FUNCTION REPORT_NAMEFORMULA(COMPANY_NAME IN VARCHAR2) RETURN VARCHAR2 IS
+  BEGIN
+    DECLARE
+      L_REPORT_NAME VARCHAR2(80);
+    BEGIN
+      RP_COMPANY_NAME := COMPANY_NAME;
+      SELECT
+        SUBSTRB(CP.USER_CONCURRENT_PROGRAM_NAME
+               ,1
+               ,80)
+      INTO L_REPORT_NAME
+      FROM
+        FND_CONCURRENT_PROGRAMS_VL CP,
+        FND_CONCURRENT_REQUESTS CR
+      WHERE CR.REQUEST_ID = P_CONC_REQUEST_ID
+        AND CP.APPLICATION_ID = CR.PROGRAM_APPLICATION_ID
+        AND CP.CONCURRENT_PROGRAM_ID = CR.CONCURRENT_PROGRAM_ID;
+      RP_REPORT_NAME := L_REPORT_NAME;
+      RETURN (L_REPORT_NAME);
+    EXCEPTION
+      WHEN NO_DATA_FOUND THEN
+        RP_REPORT_NAME := 'Customer Relationship Listing';
+        RETURN ('Customer Relationship Listing');
+    END;
+    RETURN NULL;
+  END REPORT_NAMEFORMULA;
+
+  FUNCTION BEFOREREPORT RETURN BOOLEAN IS
+  BEGIN
+    BEGIN
+      IF P_IN_BALANCING_SEGMENT_LOW IS NOT NULL THEN
+        LP_BALANCING_SEGMENT_LOW := ' and  nvl(' || LP_BALANCING_SEGMENT_LOW || ',''NULL'') >= ''' || P_IN_BALANCING_SEGMENT_LOW || ''' ';
+      END IF;
+      IF P_IN_BALANCING_SEGMENT_HIGH IS NOT NULL THEN
+        LP_BALANCING_SEGMENT_HIGH := ' and  nvl(' || LP_BALANCING_SEGMENT_HIGH || ',''NULL'') <= ''' || P_IN_BALANCING_SEGMENT_HIGH || ''' ';
+      END IF;
+    END;
+    RETURN (TRUE);
+  END BEFOREREPORT;
+
+  FUNCTION SUB_TITLEFORMULA RETURN VARCHAR2 IS
+  BEGIN
+    BEGIN
+      RP_SUB_TITLE := ' ';
+      RETURN (' ');
+    END;
+    RETURN NULL;
+  END SUB_TITLEFORMULA;
+
+  FUNCTION AFTERREPORT RETURN BOOLEAN IS
+  BEGIN
+    /*SRW.USER_EXIT('FND SRWEXIT')*/NULL;
+    RETURN (TRUE);
+  END AFTERREPORT;
+
+  FUNCTION ACCT_FLEX_ALL_SEGFORMULA(COA_ID IN NUMBER
+                                   ,ACCT_FLEX_ALL_SEG IN VARCHAR2) RETURN VARCHAR2 IS
+  BEGIN
+    /*SRW.REFERENCE(COA_ID)*/NULL;
+    RETURN (ACCT_FLEX_ALL_SEG);
+  END ACCT_FLEX_ALL_SEGFORMULA;
+
+  FUNCTION ACCT_BAL_LPROMPTFORMULA(COA_ID IN NUMBER
+                                  ,ACCT_BAL_LPROMPT IN VARCHAR2) RETURN VARCHAR2 IS
+  BEGIN
+    /*SRW.REFERENCE(COA_ID)*/NULL;
+    RETURN (ACCT_BAL_LPROMPT);
+  END ACCT_BAL_LPROMPTFORMULA;
+
+  FUNCTION AFTERPFORM RETURN BOOLEAN IS
+  BEGIN
+    P_CONC_REQUEST_ID := FND_GLOBAL.CONC_REQUEST_ID;
+    /*SRW.USER_EXIT('FND SRWINIT')*/NULL;
+    IF P_CUSTOMER_NAME_LOW IS NOT NULL THEN
+      IF P_CUSTOMER_NAME_HIGH IS NOT NULL THEN
+        LP_CUSTOMER_NAME := ' AND sub.party_name BETWEEN :p_customer_name_low AND :p_customer_name_high ';
+      ELSE
+        LP_CUSTOMER_NAME := ' AND sub.party_name >= :p_customer_name_low ';
+      END IF;
+    ELSE
+      IF P_CUSTOMER_NAME_HIGH IS NOT NULL THEN
+        LP_CUSTOMER_NAME := ' AND sub.party_name <= :p_customer_name_high ';
+      ELSE
+        LP_CUSTOMER_NAME := ' ';
+      END IF;
+    END IF;
+    IF P_CUSTOMER_NUMBER_LOW IS NOT NULL THEN
+      IF P_CUSTOMER_NUMBER_HIGH IS NOT NULL THEN
+        LP_CUSTOMER_NUMBER := ' AND cu1.account_number BETWEEN :p_customer_number_low AND :p_customer_number_high ';
+      ELSE
+        LP_CUSTOMER_NUMBER := ' AND cu1.account_number >= :p_customer_number_low ';
+      END IF;
+    ELSE
+      IF P_CUSTOMER_NUMBER_HIGH IS NOT NULL THEN
+        LP_CUSTOMER_NUMBER := ' AND cu1.account_number <= :p_customer_number_high ';
+      ELSE
+        LP_CUSTOMER_NUMBER := ' ';
+      END IF;
+    END IF;
+    IF P_REGISTRY_ID_LOW IS NOT NULL THEN
+      IF P_REGISTRY_ID_HIGH IS NOT NULL THEN
+        LP_REGISTRY_ID := ' AND sub.party_number BETWEEN :p_registry_id_low AND :p_registry_id_high ';
+      ELSE
+        LP_REGISTRY_ID := ' AND sub.party_number >= :p_registry_id_low ';
+      END IF;
+    ELSE
+      IF P_REGISTRY_ID_HIGH IS NOT NULL THEN
+        LP_REGISTRY_ID := ' AND sub.party_number <= :p_registry_id_high ';
+      ELSE
+        LP_REGISTRY_ID := ' ';
+      END IF;
+    END IF;
+    IF P_REL_TYPE_LOW IS NOT NULL THEN
+      IF P_REL_TYPE_HIGH IS NOT NULL THEN
+        LP_REL_TYPE := ' AND lrt.meaning BETWEEN :p_rel_type_low AND :p_rel_type_high ';
+      ELSE
+        LP_REL_TYPE := ' AND lrt.meaning >= :p_rel_type_low ';
+      END IF;
+    ELSE
+      IF P_REL_TYPE_HIGH IS NOT NULL THEN
+        LP_REL_TYPE := ' AND lrt.meaning <= :p_rel_type_high ';
+      ELSE
+        LP_REL_TYPE := ' ';
+      END IF;
+    END IF;
+    RETURN (TRUE);
+  END AFTERPFORM;
+
+  FUNCTION ACCT_BAL_APROMPT_P RETURN VARCHAR2 IS
+  BEGIN
+    RETURN ACCT_BAL_APROMPT;
+  END ACCT_BAL_APROMPT_P;
+
+  FUNCTION RP_COMPANY_NAME_P RETURN VARCHAR2 IS
+  BEGIN
+    RETURN RP_COMPANY_NAME;
+  END RP_COMPANY_NAME_P;
+
+  FUNCTION RP_REPORT_NAME_P RETURN VARCHAR2 IS
+  BEGIN
+    RETURN RP_REPORT_NAME;
+  END RP_REPORT_NAME_P;
+
+  FUNCTION RP_DATA_FOUND_P RETURN VARCHAR2 IS
+  BEGIN
+    RETURN RP_DATA_FOUND;
+  END RP_DATA_FOUND_P;
+
+  FUNCTION RP_SUB_TITLE_P RETURN VARCHAR2 IS
+  BEGIN
+    RETURN RP_SUB_TITLE;
+  END RP_SUB_TITLE_P;
+
+END AR_ARXCURLL_XMLP_PKG;
+
+
+/

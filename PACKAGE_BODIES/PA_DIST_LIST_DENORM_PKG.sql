@@ -1,0 +1,107 @@
+--------------------------------------------------------
+--  DDL for Package Body PA_DIST_LIST_DENORM_PKG
+--------------------------------------------------------
+
+  CREATE OR REPLACE EDITIONABLE PACKAGE BODY "APPS"."PA_DIST_LIST_DENORM_PKG" AS
+ /* $Header: PATDLDHB.pls 115.1 2002/04/09 11:33:31 pkm ship     $ */
+procedure INSERT_ROW (
+  P_LIST_ID 		in NUMBER,
+  P_RESOURCE_TYPE_ID	in NUMBER,
+  P_RESOURCE_SOURCE_ID	in NUMBER,
+  P_ACCESS_LEVEL 	in NUMBER,
+  P_MENU_ID 		in NUMBER,
+  P_CREATED_BY 		in NUMBER,
+  P_CREATION_DATE 	in DATE,
+  P_LAST_UPDATED_BY 	in NUMBER,
+  P_LAST_UPDATE_DATE 	in DATE,
+  P_LAST_UPDATE_LOGIN 	in NUMBER
+) IS
+     CURSOR  c1 IS
+      SELECT rowid
+        FROM   PA_DISTRIBUTION_LISTS
+        WHERE  list_id = p_list_id;
+  l_row_id  ROWID;
+ BEGIN
+    Insert into PA_DIST_LIST_DENORM (
+  LIST_ID             ,
+  RESOURCE_TYPE_ID    ,
+  RESOURCE_SOURCE_ID  ,
+  ACCESS_LEVEL        ,
+  MENU_ID             ,
+  CREATED_BY          ,
+  CREATION_DATE       ,
+  LAST_UPDATED_BY     ,
+  LAST_UPDATE_DATE    ,
+  LAST_UPDATE_LOGIN
+  ) VALUES (
+  P_LIST_ID             ,
+  P_RESOURCE_TYPE_ID    ,
+  P_RESOURCE_SOURCE_ID  ,
+  P_ACCESS_LEVEL        ,
+  P_MENU_ID             ,
+  P_CREATED_BY          ,
+  P_CREATION_DATE       ,
+  P_LAST_UPDATED_BY     ,
+  P_LAST_UPDATE_DATE    ,
+  P_LAST_UPDATE_LOGIN
+  );
+ OPEN c1;
+  FETCH c1 INTO l_row_id;
+  IF (c1%NOTFOUND) THEN
+    CLOSE c1;
+    RAISE NO_DATA_FOUND;
+  END IF;
+  CLOSE c1;
+
+EXCEPTION
+    WHEN OTHERS THEN -- catch the exceptions here
+        RAISE;
+END INSERT_ROW;
+
+procedure UPDATE_ROW (
+  P_LIST_ID             in NUMBER,
+  P_RESOURCE_TYPE_ID    in NUMBER,
+  P_RESOURCE_SOURCE_ID  in NUMBER,
+  P_ACCESS_LEVEL        in NUMBER,
+  P_MENU_ID             in NUMBER,
+  P_LAST_UPDATED_BY     in NUMBER,
+  P_LAST_UPDATE_DATE    in DATE,
+  P_LAST_UPDATE_LOGIN   in NUMBER
+) IS
+ BEGIN
+   UPDATE PA_DIST_LIST_DENORM
+   SET
+      ACCESS_LEVEL 	    = P_ACCESS_LEVEL,
+      MENU_ID               = P_MENU_ID,
+      LAST_UPDATED_BY       = P_LAST_UPDATED_BY,
+      LAST_UPDATE_DATE      = P_LAST_UPDATE_DATE,
+      LAST_UPDATE_LOGIN     = P_LAST_UPDATE_LOGIN
+   WHERE LIST_ID = P_LIST_ID
+   AND RESOURCE_TYPE_ID = P_RESOURCE_TYPE_ID
+   AND RESOURCE_SOURCE_ID = P_RESOURCE_SOURCE_ID;
+ EXCEPTION
+    WHEN OTHERS THEN -- catch the exceptins here
+        RAISE;
+ END UPDATE_ROW;
+
+
+procedure DELETE_ROW (
+  P_LIST_ID             in NUMBER,
+  P_RESOURCE_TYPE_ID    in NUMBER,
+  P_RESOURCE_SOURCE_ID  in NUMBER
+)
+  IS
+ BEGIN
+   DELETE FROM PA_DIST_LIST_DENORM
+   WHERE LIST_ID = P_LIST_ID
+   AND RESOURCE_TYPE_ID = P_RESOURCE_TYPE_ID
+   AND RESOURCE_SOURCE_ID = P_RESOURCE_SOURCE_ID;
+
+ EXCEPTION
+    WHEN OTHERS THEN
+        RAISE;
+ END DELETE_ROW;
+
+END  PA_DIST_LIST_DENORM_PKG;
+
+/

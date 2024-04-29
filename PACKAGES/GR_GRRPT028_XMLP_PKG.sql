@@ -1,0 +1,19 @@
+--------------------------------------------------------
+--  DDL for Package GR_GRRPT028_XMLP_PKG
+--------------------------------------------------------
+
+  CREATE OR REPLACE EDITIONABLE PACKAGE "APPS"."GR_GRRPT028_XMLP_PKG" AUTHID CURRENT_USER AS
+/* $Header: GRRPT028S.pls 120.0 2007/12/24 12:37:43 nchinnam noship $ */
+  P_GENERIC_SELECT1 VARCHAR2(40);
+
+  P_GENERIC_SELECT2 VARCHAR2(40);
+
+  FUNCTION BEFOREREPORT RETURN BOOLEAN;
+
+  PROCEDURE GR_GRRPT028_XMLP_PKG_HEADER;
+
+END GR_GRRPT028_XMLP_PKG;
+
+
+
+/

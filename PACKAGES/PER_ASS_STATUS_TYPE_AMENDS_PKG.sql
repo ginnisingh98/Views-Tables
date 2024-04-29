@@ -1,0 +1,50 @@
+--------------------------------------------------------
+--  DDL for Package PER_ASS_STATUS_TYPE_AMENDS_PKG
+--------------------------------------------------------
+
+  CREATE OR REPLACE EDITIONABLE PACKAGE "APPS"."PER_ASS_STATUS_TYPE_AMENDS_PKG" AUTHID CURRENT_USER as
+/* $Header: peastamd.pkh 120.1 2006/06/27 10:39:50 bshukla noship $ */
+procedure INSERT_ROW (
+  X_ASS_STATUS_TYPE_AMEND_ID in NUMBER,
+  X_USER_STATUS		in VARCHAR2,
+  X_LAST_UPDATE_DATE	in DATE,
+  X_LAST_UPDATED_BY	in NUMBER,
+  X_LAST_UPDATE_LOGIN	in NUMBER,
+  X_CREATION_DATE	in DATE,
+  X_CREATED_BY		in NUMBER);
+
+procedure UPDATE_ROW (
+  X_ASS_STATUS_TYPE_AMEND_ID in NUMBER,
+  X_USER_STATUS		in VARCHAR2,
+  X_LAST_UPDATE_DATE	in DATE,
+  X_LAST_UPDATED_BY	in NUMBER,
+  X_LAST_UPDATE_LOGIN	in NUMBER,
+  X_CREATION_DATE	in DATE,
+  X_CREATED_BY		in NUMBER);
+
+procedure DELETE_ROW (
+  X_ASS_STATUS_TYPE_AMEND_ID in NUMBER);
+
+procedure ADD_LANGUAGE;
+
+procedure LOAD_ROW(
+  X_STATUS		in VARCHAR2,
+  X_BUSINESS_GROUP_NAME in VARCHAR2,
+  X_OWNER          	in VARCHAR2,
+  X_USER_STATUS         in VARCHAR2,
+  X_LAST_UPDATE_DATE IN VARCHAR2 default sysdate,
+  X_CUSTOM_MODE IN VARCHAR2 default null);
+
+procedure TRANSLATE_ROW(
+  X_STATUS		in VARCHAR2,
+  X_BUSINESS_GROUP_NAME in VARCHAR2,
+  X_OWNER               in VARCHAR2,
+  X_USER_STATUS         in VARCHAR2,
+  X_LAST_UPDATE_DATE IN VARCHAR2 default sysdate,
+  X_CUSTOM_MODE IN VARCHAR2 default null);
+
+end PER_ASS_STATUS_TYPE_AMENDS_PKG;
+
+ 
+
+/

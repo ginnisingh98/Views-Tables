@@ -1,0 +1,208 @@
+--------------------------------------------------------
+--  DDL for Package Body CSD_GENERIC_ERRMSGS_PKG
+--------------------------------------------------------
+
+  CREATE OR REPLACE EDITIONABLE PACKAGE BODY "APPS"."CSD_GENERIC_ERRMSGS_PKG" as
+/* $Header: csdtgemb.pls 115.1 2003/09/09 19:01:28 vparvath noship $ */
+-- Start of Comments
+-- Package name     : CSD_GENERIC_ERRMSGS_PKG
+-- Purpose          :
+-- History          :
+-- NOTE             :
+-- End of Comments
+
+
+G_PKG_NAME CONSTANT VARCHAR2(30):= 'CSD_GENERIC_ERRMSGS_PKG';
+G_FILE_NAME CONSTANT VARCHAR2(12) := 'csdtgemb.pls';
+
+PROCEDURE Insert_Row(
+          px_GENERIC_ERRMSGS_ID   IN OUT NOCOPY NUMBER
+         ,p_MODULE_CODE    VARCHAR2
+         ,p_SOURCE_ENTITY_ID1    NUMBER
+         ,p_SOURCE_ENTITY_ID2    NUMBER
+         ,p_SOURCE_ENTITY_TYPE_CODE    VARCHAR2
+         ,p_MSG_TYPE_CODE    VARCHAR2
+         ,p_MSG    VARCHAR2
+         ,p_MSG_STATUS    VARCHAR2
+         ,p_CREATED_BY    NUMBER
+         ,p_CREATION_DATE    DATE
+         ,p_LAST_UPDATED_BY    NUMBER
+         ,p_LAST_UPDATE_DATE    DATE
+         ,p_LAST_UPDATE_LOGIN    NUMBER
+         ,p_OBJECT_VERSION_NUMBER    NUMBER)
+
+ IS
+   CURSOR C2 IS SELECT CSD_GENERIC_ERRMSGS_S1.nextval FROM sys.dual;
+BEGIN
+   If (px_GENERIC_ERRMSGS_ID IS NULL) OR (px_GENERIC_ERRMSGS_ID = FND_API.G_MISS_NUM) then
+       OPEN C2;
+       FETCH C2 INTO px_GENERIC_ERRMSGS_ID;
+       CLOSE C2;
+   End If;
+   INSERT INTO CSD_GENERIC_ERRMSGS(
+           GENERIC_ERRMSGS_ID
+          ,MODULE_CODE
+          ,SOURCE_ENTITY_ID1
+          ,SOURCE_ENTITY_ID2
+          ,SOURCE_ENTITY_TYPE_CODE
+          ,MSG_TYPE_CODE
+          ,MSG
+          ,MSG_STATUS
+          ,CREATED_BY
+          ,CREATION_DATE
+          ,LAST_UPDATED_BY
+          ,LAST_UPDATE_DATE
+          ,LAST_UPDATE_LOGIN
+           ,OBJECT_VERSION_NUMBER
+          ) VALUES (
+           px_GENERIC_ERRMSGS_ID
+          ,decode( p_MODULE_CODE, FND_API.G_MISS_CHAR, NULL, p_MODULE_CODE)
+          ,decode( p_SOURCE_ENTITY_ID1, FND_API.G_MISS_NUM, NULL, p_SOURCE_ENTITY_ID1)
+          ,decode( p_SOURCE_ENTITY_ID2, FND_API.G_MISS_NUM, NULL, p_SOURCE_ENTITY_ID2)
+          ,decode( p_SOURCE_ENTITY_TYPE_CODE, FND_API.G_MISS_CHAR, NULL, p_SOURCE_ENTITY_TYPE_CODE)
+          ,decode( p_MSG_TYPE_CODE, FND_API.G_MISS_CHAR, NULL, p_MSG_TYPE_CODE)
+          ,decode( p_MSG, FND_API.G_MISS_CHAR, NULL, p_MSG)
+          ,decode( p_MSG_STATUS, FND_API.G_MISS_CHAR, NULL, p_MSG_STATUS)
+          ,decode( p_CREATED_BY, FND_API.G_MISS_NUM, NULL, p_CREATED_BY)
+          ,decode( p_CREATION_DATE, FND_API.G_MISS_DATE, TO_DATE(NULL), p_CREATION_DATE)
+          ,decode( p_LAST_UPDATED_BY, FND_API.G_MISS_NUM, NULL, p_LAST_UPDATED_BY)
+          ,decode( p_LAST_UPDATE_DATE, FND_API.G_MISS_DATE, TO_DATE(NULL), p_LAST_UPDATE_DATE)
+          ,decode( p_LAST_UPDATE_LOGIN, FND_API.G_MISS_NUM, NULL, p_LAST_UPDATE_LOGIN)
+          ,decode( p_OBJECT_VERSION_NUMBER, FND_API.G_MISS_NUM, NULL, p_OBJECT_VERSION_NUMBER));
+End Insert_Row;
+
+PROCEDURE Update_Row(
+          p_GENERIC_ERRMSGS_ID    NUMBER
+         ,p_MODULE_CODE    VARCHAR2
+         ,p_SOURCE_ENTITY_ID1    NUMBER
+         ,p_SOURCE_ENTITY_ID2    NUMBER
+         ,p_SOURCE_ENTITY_TYPE_CODE    VARCHAR2
+         ,p_MSG_TYPE_CODE    VARCHAR2
+         ,p_MSG    VARCHAR2
+         ,p_MSG_STATUS    VARCHAR2
+         ,p_CREATED_BY    NUMBER
+         ,p_CREATION_DATE    DATE
+         ,p_LAST_UPDATED_BY    NUMBER
+         ,p_LAST_UPDATE_DATE    DATE
+         ,p_LAST_UPDATE_LOGIN    NUMBER
+         ,p_OBJECT_VERSION_NUMBER    NUMBER)
+
+IS
+BEGIN
+    Update CSD_GENERIC_ERRMSGS
+    SET
+        MODULE_CODE = decode( p_MODULE_CODE, FND_API.G_MISS_CHAR,NULL,NULL, MODULE_CODE, p_MODULE_CODE)
+       ,SOURCE_ENTITY_ID1 = decode( p_SOURCE_ENTITY_ID1, FND_API.G_MISS_NUM,NULL,NULL,  SOURCE_ENTITY_ID1, p_SOURCE_ENTITY_ID1)
+       ,SOURCE_ENTITY_ID2 = decode( p_SOURCE_ENTITY_ID2, FND_API.G_MISS_NUM,NULL,NULL,  SOURCE_ENTITY_ID2, p_SOURCE_ENTITY_ID2)
+       ,SOURCE_ENTITY_TYPE_CODE = decode( p_SOURCE_ENTITY_TYPE_CODE, FND_API.G_MISS_CHAR,NULL,NULL,  SOURCE_ENTITY_TYPE_CODE, p_SOURCE_ENTITY_TYPE_CODE)
+       ,MSG_TYPE_CODE = decode( p_MSG_TYPE_CODE, FND_API.G_MISS_CHAR, NULL,NULL, MSG_TYPE_CODE, p_MSG_TYPE_CODE)
+       ,MSG = decode( p_MSG, FND_API.G_MISS_CHAR,NULL,NULL,  MSG, p_MSG)
+       ,MSG_STATUS = decode( p_MSG_STATUS, FND_API.G_MISS_CHAR, NULL,NULL, MSG_STATUS, p_MSG_STATUS)
+       ,CREATED_BY = decode( p_CREATED_BY, FND_API.G_MISS_NUM,NULL,NULL,  CREATED_BY, p_CREATED_BY)
+       ,CREATION_DATE = decode( p_CREATION_DATE, FND_API.G_MISS_DATE,NULL,NULL,  CREATION_DATE, p_CREATION_DATE)
+       ,LAST_UPDATED_BY = decode( p_LAST_UPDATED_BY, FND_API.G_MISS_NUM,NULL,NULL,  LAST_UPDATED_BY, p_LAST_UPDATED_BY)
+       ,LAST_UPDATE_DATE = decode( p_LAST_UPDATE_DATE, FND_API.G_MISS_DATE,NULL,NULL,  LAST_UPDATE_DATE, p_LAST_UPDATE_DATE)
+       ,LAST_UPDATE_LOGIN = decode( p_LAST_UPDATE_LOGIN, FND_API.G_MISS_NUM,NULL,NULL,  LAST_UPDATE_LOGIN, p_LAST_UPDATE_LOGIN)
+       ,OBJECT_VERSION_NUMBER = decode( p_OBJECT_VERSION_NUMBER, FND_API.G_MISS_NUM,NULL,NULL,  OBJECT_VERSION_NUMBER, p_OBJECT_VERSION_NUMBER)
+    where GENERIC_ERRMSGS_ID = p_GENERIC_ERRMSGS_ID;
+
+    If (SQL%NOTFOUND) then
+        RAISE NO_DATA_FOUND;
+    End If;
+END Update_Row;
+
+PROCEDURE Delete_Row(
+    p_GENERIC_ERRMSGS_ID  NUMBER)
+IS
+BEGIN
+    DELETE FROM CSD_GENERIC_ERRMSGS
+    WHERE GENERIC_ERRMSGS_ID = p_GENERIC_ERRMSGS_ID;
+    If (SQL%NOTFOUND) then
+        RAISE NO_DATA_FOUND;
+    End If;
+END Delete_Row;
+
+PROCEDURE Lock_Row(
+          p_GENERIC_ERRMSGS_ID    NUMBER
+         ,p_MODULE_CODE    VARCHAR2
+         ,p_SOURCE_ENTITY_ID1    NUMBER
+         ,p_SOURCE_ENTITY_ID2    NUMBER
+         ,p_SOURCE_ENTITY_TYPE_CODE    VARCHAR2
+         ,p_MSG_TYPE_CODE    VARCHAR2
+         ,p_MSG    VARCHAR2
+         ,p_MSG_STATUS    VARCHAR2
+         ,p_CREATED_BY    NUMBER
+         ,p_CREATION_DATE    DATE
+         ,p_LAST_UPDATED_BY    NUMBER
+         ,p_LAST_UPDATE_DATE    DATE
+         ,p_LAST_UPDATE_LOGIN    NUMBER
+         ,p_OBJECT_VERSION_NUMBER    NUMBER)
+
+ IS
+   CURSOR C IS
+       SELECT *
+       FROM CSD_GENERIC_ERRMSGS
+       WHERE GENERIC_ERRMSGS_ID =  p_GENERIC_ERRMSGS_ID
+       FOR UPDATE of GENERIC_ERRMSGS_ID NOWAIT;
+   Recinfo C%ROWTYPE;
+BEGIN
+    OPEN C;
+    FETCH C INTO Recinfo;
+    If (C%NOTFOUND) then
+        CLOSE C;
+        FND_MESSAGE.SET_NAME('FND', 'FORM_RECORD_DELETED');
+        APP_EXCEPTION.RAISE_EXCEPTION;
+    End If;
+    CLOSE C;
+    if (
+           (      Recinfo.GENERIC_ERRMSGS_ID = p_GENERIC_ERRMSGS_ID)
+       AND (    ( Recinfo.MODULE_CODE = p_MODULE_CODE)
+            OR (    ( Recinfo.MODULE_CODE IS NULL )
+                AND (  p_MODULE_CODE IS NULL )))
+       AND (    ( Recinfo.SOURCE_ENTITY_ID1 = p_SOURCE_ENTITY_ID1)
+            OR (    ( Recinfo.SOURCE_ENTITY_ID1 IS NULL )
+                AND (  p_SOURCE_ENTITY_ID1 IS NULL )))
+       AND (    ( Recinfo.SOURCE_ENTITY_ID2 = p_SOURCE_ENTITY_ID2)
+            OR (    ( Recinfo.SOURCE_ENTITY_ID2 IS NULL )
+                AND (  p_SOURCE_ENTITY_ID2 IS NULL )))
+       AND (    ( Recinfo.SOURCE_ENTITY_TYPE_CODE = p_SOURCE_ENTITY_TYPE_CODE)
+            OR (    ( Recinfo.SOURCE_ENTITY_TYPE_CODE IS NULL )
+                AND (  p_SOURCE_ENTITY_TYPE_CODE IS NULL )))
+       AND (    ( Recinfo.MSG_TYPE_CODE = p_MSG_TYPE_CODE)
+            OR (    ( Recinfo.MSG_TYPE_CODE IS NULL )
+                AND (  p_MSG_TYPE_CODE IS NULL )))
+       AND (    ( Recinfo.MSG = p_MSG)
+            OR (    ( Recinfo.MSG IS NULL )
+                AND (  p_MSG IS NULL )))
+       AND (    ( Recinfo.MSG_STATUS = p_MSG_STATUS)
+            OR (    ( Recinfo.MSG_STATUS IS NULL )
+                AND (  p_MSG_STATUS IS NULL )))
+       AND (    ( Recinfo.CREATED_BY = p_CREATED_BY)
+            OR (    ( Recinfo.CREATED_BY IS NULL )
+                AND (  p_CREATED_BY IS NULL )))
+       AND (    ( Recinfo.CREATION_DATE = p_CREATION_DATE)
+            OR (    ( Recinfo.CREATION_DATE IS NULL )
+                AND (  p_CREATION_DATE IS NULL )))
+       AND (    ( Recinfo.LAST_UPDATED_BY = p_LAST_UPDATED_BY)
+            OR (    ( Recinfo.LAST_UPDATED_BY IS NULL )
+                AND (  p_LAST_UPDATED_BY IS NULL )))
+       AND (    ( Recinfo.LAST_UPDATE_DATE = p_LAST_UPDATE_DATE)
+            OR (    ( Recinfo.LAST_UPDATE_DATE IS NULL )
+                AND (  p_LAST_UPDATE_DATE IS NULL )))
+       AND (    ( Recinfo.LAST_UPDATE_LOGIN = p_LAST_UPDATE_LOGIN)
+            OR (    ( Recinfo.LAST_UPDATE_LOGIN IS NULL )
+                AND (  p_LAST_UPDATE_LOGIN IS NULL )))
+       AND (    ( Recinfo.OBJECT_VERSION_NUMBER = p_OBJECT_VERSION_NUMBER)
+            OR (    ( Recinfo.OBJECT_VERSION_NUMBER IS NULL )
+                AND (  p_OBJECT_VERSION_NUMBER IS NULL )))
+        ) then
+        return;
+    else
+        FND_MESSAGE.SET_NAME('FND', 'FORM_RECORD_CHANGED');
+        APP_EXCEPTION.RAISE_EXCEPTION;
+    End If;
+END Lock_Row;
+
+End CSD_GENERIC_ERRMSGS_PKG;
+
+/

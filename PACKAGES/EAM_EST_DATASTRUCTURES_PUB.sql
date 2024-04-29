@@ -1,0 +1,210 @@
+--------------------------------------------------------
+--  DDL for Package EAM_EST_DATASTRUCTURES_PUB
+--------------------------------------------------------
+
+  CREATE OR REPLACE EDITIONABLE PACKAGE "APPS"."EAM_EST_DATASTRUCTURES_PUB" AUTHID CURRENT_USER AS
+/* $Header: EAMPEDSS.pls 120.0.12010000.3 2009/01/03 00:12:17 devijay noship $ */
+-- Start of Comments
+-- Package name     : EAM_EST_DATASTRUCTURES_PUB
+-- Purpose          : Package Specification for Construction estimate DS
+-- History          :
+-- NOTE             :
+-- End of Comments
+
+G_PKG_NAME  CONSTANT VARCHAR2(30) := 'EAM_EST_DATASTRUCTURES_PUB';
+G_FILE_NAME CONSTANT VARCHAR2(12) := 'EAMPEDSS.pls';
+
+TYPE EAM_CE_MESSAGE_REC IS RECORD
+(   ORGANIZATION_ID              NUMBER,
+    ESTIMATE_ID                  VARCHAR2(3),
+    MESSAGE_TEXT                 VARCHAR2(2000),
+    ROW_REFERENCE                NUMBER,
+    MESSAGE_CODE                 VARCHAR2(30),
+    MESSAGE_TYPE                 VARCHAR2(1)
+);
+
+TYPE EAM_CE_MESSAGE_TBL IS TABLE OF EAM_CE_MESSAGE_REC
+        INDEX BY BINARY_INTEGER;
+
+--+=================================================================+
+--| Record Name : EAM_CE_WO_DEFAULTS_REC                            |
+--| Description : Work Order defaults record                        |
+--+=================================================================+
+TYPE EAM_CE_WO_DEFAULTS_REC IS RECORD
+(
+ ESTIMATE_ID                      NUMBER,
+ DEFAULT_WORK_ORDER_NUMBER        VARCHAR2(30) := NULL,
+ ORGANIZATION_ID                  NUMBER,
+ ASSET_GROUP_ID                   NUMBER,
+ ASSET_NUMBER			                VARCHAR2(30) := NULL,
+ MAINTENANCE_OBJECT_ID            NUMBER,
+ MAINTENANCE_OBJECT_TYPE          NUMBER,
+ MAINTENANCE_OBJECT_SOURCE        NUMBER,
+ WORK_ORDER_DESCRIPTION           VARCHAR2(240):= NULL,
+ ACCT_CLASS_CODE                  VARCHAR2(10) := NULL,
+ PROJECT_ID                       NUMBER,
+ TASK_ID                          NUMBER,
+ SCHEDULED_START_DATE             DATE,
+ SCHEDULED_COMPLETION_DATE        DATE,
+ USER_DEFINED_STATUS_ID           NUMBER,
+ GROUPING_OPTION                  NUMBER
+);
+
+TYPE EAM_CE_PARENT_WO_REC IS RECORD
+(
+ ESTIMATE_ID                      NUMBER,
+ PARENT_WORK_ORDER_NUMBER         VARCHAR2(30) := NULL,
+ ORGANIZATION_ID                  NUMBER,
+ ASSET_GROUP_ID                   NUMBER,
+ ASSET_NUMBER			                VARCHAR2(30) := NULL,
+ MAINTENANCE_OBJECT_ID            NUMBER,
+ MAINTENANCE_OBJECT_TYPE          NUMBER,
+ MAINTENANCE_OBJECT_SOURCE        NUMBER,
+ WORK_ORDER_DESCRIPTION           VARCHAR2(240):= NULL,
+ ACCT_CLASS_CODE                  VARCHAR2(10) := NULL,
+ PROJECT_ID                       NUMBER,
+ TASK_ID                          NUMBER,
+ SCHEDULED_START_DATE             DATE,
+ SCHEDULED_COMPLETION_DATE        DATE,
+ STATUS_TYPE                      NUMBER,
+ CREATE_PARENT_FLAG               VARCHAR2(1)  := NULL,
+ OWNING_DEPARTMENT_ID           NUMBER
+);
+
+TYPE EAM_CONSTRUCTION_ESTIMATE_REC IS RECORD
+(
+  ESTIMATE_ID                     NUMBER,
+  ORGANIZATION_ID                 NUMBER,
+  ESTIMATE_NUMBER                 VARCHAR2(30),
+  ESTIMATE_DESCRIPTION            VARCHAR2(240),
+  GROUPING_OPTION                 NUMBER,
+  PARENT_WO_ID                    NUMBER,
+  CREATE_PARENT_WO_FLAG           VARCHAR2(1),
+  ATTRIBUTE_CATEGORY        VARCHAR2(30)		:= FND_API.G_MISS_CHAR,
+  ATTRIBUTE1                VARCHAR2(150)		:= FND_API.G_MISS_CHAR,
+  ATTRIBUTE2                VARCHAR2(150)		:= FND_API.G_MISS_CHAR,
+  ATTRIBUTE3                VARCHAR2(150)		:= FND_API.G_MISS_CHAR,
+  ATTRIBUTE4                VARCHAR2(150)		:= FND_API.G_MISS_CHAR,
+  ATTRIBUTE5                VARCHAR2(150)		:= FND_API.G_MISS_CHAR,
+  ATTRIBUTE6                VARCHAR2(150)		:= FND_API.G_MISS_CHAR,
+  ATTRIBUTE7                VARCHAR2(150)		:= FND_API.G_MISS_CHAR,
+  ATTRIBUTE8                VARCHAR2(150)		:= FND_API.G_MISS_CHAR,
+  ATTRIBUTE9                VARCHAR2(150)		:= FND_API.G_MISS_CHAR,
+  ATTRIBUTE10               VARCHAR2(150)		:= FND_API.G_MISS_CHAR,
+  ATTRIBUTE11               VARCHAR2(150)		:= FND_API.G_MISS_CHAR,
+  ATTRIBUTE12               VARCHAR2(150)		:= FND_API.G_MISS_CHAR,
+  ATTRIBUTE13               VARCHAR2(150)		:= FND_API.G_MISS_CHAR,
+  ATTRIBUTE14               VARCHAR2(150)		:= FND_API.G_MISS_CHAR,
+  ATTRIBUTE15               VARCHAR2(150)		:= FND_API.G_MISS_CHAR
+);
+
+TYPE EAM_CONSTRUCTION_ESTIMATE_TBL IS TABLE OF EAM_CONSTRUCTION_ESTIMATE_REC INDEX BY BINARY_INTEGER;
+
+TYPE EAM_CONSTRUCTION_UNITS_REC IS RECORD
+(
+  CU_ID                          NUMBER,
+  CU_NAME                        VARCHAR2(50),
+  DESCRIPTION                    VARCHAR2(240),
+  ORGANIZATION_ID                NUMBER,
+  CU_EFFECTIVE_FROM              DATE,
+  CU_EFFECTIVE_TO                DATE
+);
+
+TYPE EAM_CONSTRUCTION_UNITS_TBL IS TABLE OF EAM_CONSTRUCTION_UNITS_REC INDEX BY BINARY_INTEGER;
+
+TYPE EAM_ESTIMATE_ASSOCIATIONS_REC IS RECORD
+(
+  ESTIMATE_ASSOCIATION_ID        NUMBER,
+  ORGANIZATION_ID                NUMBER,
+  ESTIMATE_ID                    NUMBER,
+  CU_ID                          NUMBER,
+  CU_QTY                         NUMBER,
+  CU_NAME                        VARCHAR2(50),
+  CU_DESCRIPTION                 VARCHAR2(240),
+  ACCT_CLASS_CODE                VARCHAR2(10),
+  ACTIVITY_ID                    NUMBER,
+  ACTIVITY_NAME                  VARCHAR2(40),
+  ACTIVITY_DESCRIPTION           VARCHAR2(240),
+  ACTIVITY_QTY                   NUMBER,
+  DIFFICULTY_ID                  NUMBER,
+  RESOURCE_MULTIPLIER            NUMBER
+);
+
+TYPE EAM_ESTIMATE_ASSOCIATIONS_TBL IS TABLE OF EAM_ESTIMATE_ASSOCIATIONS_REC INDEX BY BINARY_INTEGER;
+
+TYPE EAM_CE_WORK_ORDER_LINES_REC IS RECORD
+(
+  ESTIMATE_WORK_ORDER_LINE_ID    NUMBER,
+  SRC_CU_ID	                 NUMBER,
+  SRC_ACTIVITY_ID                NUMBER,
+  SRC_ACTIVITY_QTY               NUMBER,
+  SRC_OP_SEQ_NUM                 NUMBER,
+  SRC_ACCT_CLASS_CODE            VARCHAR2(10) := NULL,
+  ESTIMATE_ID                    NUMBER,
+  ORGANIZATION_ID                NUMBER,
+  WORK_ORDER_SEQ_NUM             NUMBER,
+  WORK_ORDER_NUMBER              VARCHAR2(30) := NULL,
+  WORK_ORDER_DESCRIPTION         VARCHAR2(240):= NULL,
+  REF_WIP_ENTITY_ID              NUMBER,
+  PRIMARY_ITEM_ID                NUMBER,
+  STATUS_TYPE                    NUMBER,
+  ACCT_CLASS_CODE                VARCHAR2(10) := NULL,
+  SCHEDULED_START_DATE           DATE,
+  SCHEDULED_COMPLETION_DATE      DATE,
+  PROJECT_ID                     NUMBER,
+  TASK_ID                        NUMBER,
+  MAINTENANCE_OBJECT_ID          NUMBER,
+  MAINTENANCE_OBJECT_TYPE        NUMBER,
+  MAINTENANCE_OBJECT_SOURCE      NUMBER,
+  OWNING_DEPARTMENT_ID           NUMBER,
+  USER_DEFINED_STATUS_ID         NUMBER,
+  OP_SEQ_NUM                     NUMBER,
+  OP_DESCRIPTION                 VARCHAR2(240):= NULL,
+  STANDARD_OPERATION_ID          NUMBER,
+  OP_DEPARTMENT_ID               NUMBER,
+  OP_LONG_DESCRIPTION            VARCHAR2(4000):= NULL,
+  RES_SEQ_NUM                    NUMBER,
+  RES_ID                         NUMBER,
+  RES_UOM                        VARCHAR2(3) := NULL,
+  RES_BASIS_TYPE                 NUMBER,
+  RES_USAGE_RATE_OR_AMOUNT       NUMBER,
+  RES_REQUIRED_UNITS             NUMBER,
+  RES_ASSIGNED_UNITS             NUMBER,
+  ITEM_TYPE	                 NUMBER,
+  REQUIRED_QUANTITY              NUMBER,
+  UNIT_PRICE	                 NUMBER,
+  UOM	                         VARCHAR2(3) := NULL,
+  BASIS_TYPE	                 NUMBER,
+  SUGGESTED_VENDOR_NAME	         VARCHAR2(240):= NULL,
+  SUGGESTED_VENDOR_ID	         NUMBER,
+  SUGGESTED_VENDOR_SITE	         VARCHAR2(15):=NULL,
+  SUGGESTED_VENDOR_SITE_ID	 NUMBER,
+  MAT_INVENTORY_ITEM_ID	         NUMBER,
+  MAT_COMPONENT_SEQ_NUM	         NUMBER,
+  MAT_SUPPLY_SUBINVENTORY	 VARCHAR2(10):=NULL,
+  MAT_SUPPLY_LOCATOR_ID	         NUMBER,
+  DI_AMOUNT 	                 NUMBER,
+  DI_ORDER_TYPE_LOOKUP_CODE  	 VARCHAR2(25):=NULL,
+  DI_DESCRIPTION	         VARCHAR2(240):=NULL,
+  DI_PURCHASE_CATEGORY_ID	 NUMBER,
+  DI_AUTO_REQUEST_MATERIAL	 VARCHAR2(1):=NULL,
+  DI_NEED_BY_DATE	         DATE,
+  WORK_ORDER_LINE_COST           NUMBER,
+  DIFFICULTY_QTY   NUMBER,
+  DIFFICULTY_ID NUMBER,
+  CU_QTY NUMBER,
+  ITEM_COMMENTS VARCHAR2(240),
+  WORK_ORDER_TYPE NUMBER,
+  ACTIVITY_TYPE                           NUMBER,
+  ACTIVITY_CAUSE                          NUMBER,
+  ACTIVITY_SOURCE                         NUMBER,
+  AVAILABLE_QUANTITY                      NUMBER,
+  RES_SCHEDULED_FLAG NUMBER
+);
+
+TYPE EAM_CE_WORK_ORDER_LINES_TBL IS TABLE OF EAM_CE_WORK_ORDER_LINES_REC
+                                                    INDEX BY BINARY_INTEGER;
+
+End EAM_EST_DATASTRUCTURES_PUB;
+
+/

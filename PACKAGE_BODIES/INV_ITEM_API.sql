@@ -1,0 +1,1126 @@
+--------------------------------------------------------
+--  DDL for Package Body INV_ITEM_API
+--------------------------------------------------------
+
+  CREATE OR REPLACE EDITIONABLE PACKAGE BODY "APPS"."INV_ITEM_API" AS
+/* $Header: INVVIPIB.pls 120.7.12010000.3 2010/07/29 14:56:08 ccsingh ship $ */
+
+G_PKG_NAME       CONSTANT   VARCHAR2(30)  :=  'INV_ITEM_API';
+
+-- =============================================================================
+--                   Package variables, constants and cursors
+-- =============================================================================
+
+-- Org Item_B cursor
+--
+CURSOR Item_csr
+(
+   p_Item_ID        IN   NUMBER
+,  p_Org_ID         IN   NUMBER
+,  p_fetch_Master   IN   VARCHAR2   :=  g_TRUE
+,  p_fetch_Orgs     IN   VARCHAR2   :=  g_FALSE
+)
+RETURN Item_rec_type
+IS
+--  Use explicit list of columns (not a "select *") because
+--  the cursor is to be fetched into Item-type record variable
+--  defined with the specific list of columns.
+--
+SELECT
+   MSI.INVENTORY_ITEM_ID
+,  MSI.ORGANIZATION_ID
+,       MP1.MASTER_ORGANIZATION_ID
+,       MSI.DESCRIPTION
+--,     MSITL.LONG_DESCRIPTION
+,  NULL                                        LONG_DESCRIPTION
+,       MSI.PRIMARY_UOM_CODE
+,       MSI.PRIMARY_UNIT_OF_MEASURE
+,       MSI.ITEM_TYPE
+,       MSI.INVENTORY_ITEM_STATUS_CODE
+,       MSI.ALLOWED_UNITS_LOOKUP_CODE
+,       MSI.ITEM_CATALOG_GROUP_ID
+,       MSI.CATALOG_STATUS_FLAG
+,       MSI.INVENTORY_ITEM_FLAG
+,       MSI.STOCK_ENABLED_FLAG
+,       MSI.MTL_TRANSACTIONS_ENABLED_FLAG
+,       MSI.CHECK_SHORTAGES_FLAG
+,       MSI.REVISION_QTY_CONTROL_CODE
+,       MSI.RESERVABLE_TYPE
+,       MSI.SHELF_LIFE_CODE
+,       MSI.SHELF_LIFE_DAYS
+,       MSI.CYCLE_COUNT_ENABLED_FLAG
+,       MSI.NEGATIVE_MEASUREMENT_ERROR
+,       MSI.POSITIVE_MEASUREMENT_ERROR
+,       MSI.LOT_CONTROL_CODE
+,       MSI.AUTO_LOT_ALPHA_PREFIX
+,       MSI.START_AUTO_LOT_NUMBER
+,       MSI.SERIAL_NUMBER_CONTROL_CODE
+,       MSI.AUTO_SERIAL_ALPHA_PREFIX
+,       MSI.START_AUTO_SERIAL_NUMBER
+,       MSI.LOCATION_CONTROL_CODE
+,       MSI.RESTRICT_SUBINVENTORIES_CODE
+,       MSI.RESTRICT_LOCATORS_CODE
+,       MSI.BOM_ENABLED_FLAG
+,       MSI.BOM_ITEM_TYPE
+,       MSI.BASE_ITEM_ID
+,       MSI.EFFECTIVITY_CONTROL
+,       MSI.ENG_ITEM_FLAG
+,       MSI.ENGINEERING_ECN_CODE
+,       MSI.ENGINEERING_ITEM_ID
+,       MSI.ENGINEERING_DATE
+,       MSI.PRODUCT_FAMILY_ITEM_ID
+,       MSI.AUTO_CREATED_CONFIG_FLAG
+,       MSI.MODEL_CONFIG_CLAUSE_NAME
+,       MSI.NEW_REVISION_CODE
+,       MSI.COSTING_ENABLED_FLAG
+,       MSI.INVENTORY_ASSET_FLAG
+,       MSI.DEFAULT_INCLUDE_IN_ROLLUP_FLAG
+,       MSI.COST_OF_SALES_ACCOUNT
+,       MSI.STD_LOT_SIZE
+,       MSI.PURCHASING_ITEM_FLAG
+,       MSI.PURCHASING_ENABLED_FLAG
+,       MSI.MUST_USE_APPROVED_VENDOR_FLAG
+,       MSI.ALLOW_ITEM_DESC_UPDATE_FLAG
+,       MSI.RFQ_REQUIRED_FLAG
+,       MSI.OUTSIDE_OPERATION_FLAG
+,       MSI.OUTSIDE_OPERATION_UOM_TYPE
+,       MSI.TAXABLE_FLAG
+,       MSI.PURCHASING_TAX_CODE
+,       MSI.RECEIPT_REQUIRED_FLAG
+,       MSI.INSPECTION_REQUIRED_FLAG
+,       MSI.BUYER_ID
+,       MSI.UNIT_OF_ISSUE
+,       MSI.RECEIVE_CLOSE_TOLERANCE
+,       MSI.INVOICE_CLOSE_TOLERANCE
+,       MSI.UN_NUMBER_ID
+,       MSI.HAZARD_CLASS_ID
+,       MSI.LIST_PRICE_PER_UNIT
+,       MSI.MARKET_PRICE
+,       MSI.PRICE_TOLERANCE_PERCENT
+,       MSI.ROUNDING_FACTOR
+,       MSI.ENCUMBRANCE_ACCOUNT
+,       MSI.EXPENSE_ACCOUNT
+,       MSI.ASSET_CATEGORY_ID
+,       MSI.RECEIPT_DAYS_EXCEPTION_CODE
+,       MSI.DAYS_EARLY_RECEIPT_ALLOWED
+,       MSI.DAYS_LATE_RECEIPT_ALLOWED
+,       MSI.ALLOW_SUBSTITUTE_RECEIPTS_FLAG
+,       MSI.ALLOW_UNORDERED_RECEIPTS_FLAG
+,       MSI.ALLOW_EXPRESS_DELIVERY_FLAG
+,       MSI.QTY_RCV_EXCEPTION_CODE
+,       MSI.QTY_RCV_TOLERANCE
+,       MSI.RECEIVING_ROUTING_ID
+,       MSI.ENFORCE_SHIP_TO_LOCATION_CODE
+,       MSI.WEIGHT_UOM_CODE
+,       MSI.UNIT_WEIGHT
+,       MSI.VOLUME_UOM_CODE
+,       MSI.UNIT_VOLUME
+,       MSI.CONTAINER_ITEM_FLAG
+,       MSI.VEHICLE_ITEM_FLAG
+,       MSI.CONTAINER_TYPE_CODE
+,       MSI.INTERNAL_VOLUME
+,       MSI.MAXIMUM_LOAD_WEIGHT
+,       MSI.MINIMUM_FILL_PERCENT
+,       MSI.INVENTORY_PLANNING_CODE
+,       MSI.PLANNER_CODE
+,       MSI.PLANNING_MAKE_BUY_CODE
+,       MSI.MIN_MINMAX_QUANTITY
+,       MSI.MAX_MINMAX_QUANTITY
+,       MSI.MINIMUM_ORDER_QUANTITY
+,       MSI.MAXIMUM_ORDER_QUANTITY
+,       MSI.ORDER_COST
+,       MSI.CARRYING_COST
+,       MSI.SOURCE_TYPE
+,       MSI.SOURCE_ORGANIZATION_ID
+,       MSI.SOURCE_SUBINVENTORY
+,       MSI.MRP_SAFETY_STOCK_CODE
+,       MSI.SAFETY_STOCK_BUCKET_DAYS
+,       MSI.MRP_SAFETY_STOCK_PERCENT
+,       MSI.FIXED_ORDER_QUANTITY
+,       MSI.FIXED_DAYS_SUPPLY
+,       MSI.FIXED_LOT_MULTIPLIER
+,       MSI.MRP_PLANNING_CODE
+,       MSI.ATO_FORECAST_CONTROL
+,       MSI.PLANNING_EXCEPTION_SET
+,       MSI.END_ASSEMBLY_PEGGING_FLAG
+,       MSI.SHRINKAGE_RATE
+,       MSI.ROUNDING_CONTROL_TYPE
+,       MSI.ACCEPTABLE_EARLY_DAYS
+,       MSI.REPETITIVE_PLANNING_FLAG
+,       MSI.OVERRUN_PERCENTAGE
+,       MSI.ACCEPTABLE_RATE_INCREASE
+,       MSI.ACCEPTABLE_RATE_DECREASE
+,       MSI.MRP_CALCULATE_ATP_FLAG
+,       MSI.AUTO_REDUCE_MPS
+,       MSI.PLANNING_TIME_FENCE_CODE
+,       MSI.PLANNING_TIME_FENCE_DAYS
+,       MSI.DEMAND_TIME_FENCE_CODE
+,       MSI.DEMAND_TIME_FENCE_DAYS
+,       MSI.RELEASE_TIME_FENCE_CODE
+,       MSI.RELEASE_TIME_FENCE_DAYS
+,       MSI.PREPROCESSING_LEAD_TIME
+,       MSI.FULL_LEAD_TIME
+,       MSI.POSTPROCESSING_LEAD_TIME
+,       MSI.FIXED_LEAD_TIME
+,       MSI.VARIABLE_LEAD_TIME
+,       MSI.CUM_MANUFACTURING_LEAD_TIME
+,       MSI.CUMULATIVE_TOTAL_LEAD_TIME
+,       MSI.LEAD_TIME_LOT_SIZE
+,       MSI.BUILD_IN_WIP_FLAG
+,       MSI.WIP_SUPPLY_TYPE
+,       MSI.WIP_SUPPLY_SUBINVENTORY
+,       MSI.WIP_SUPPLY_LOCATOR_ID
+,       MSI.OVERCOMPLETION_TOLERANCE_TYPE
+,       MSI.OVERCOMPLETION_TOLERANCE_VALUE
+,       MSI.CUSTOMER_ORDER_FLAG
+,       MSI.CUSTOMER_ORDER_ENABLED_FLAG
+,       MSI.SHIPPABLE_ITEM_FLAG
+,       MSI.INTERNAL_ORDER_FLAG
+,       MSI.INTERNAL_ORDER_ENABLED_FLAG
+,       MSI.SO_TRANSACTIONS_FLAG
+,       MSI.PICK_COMPONENTS_FLAG
+,       MSI.ATP_FLAG
+,       MSI.REPLENISH_TO_ORDER_FLAG
+,       MSI.ATP_RULE_ID
+,       MSI.ATP_COMPONENTS_FLAG
+,       MSI.SHIP_MODEL_COMPLETE_FLAG
+,       MSI.PICKING_RULE_ID
+,       MSI.COLLATERAL_FLAG
+,       MSI.DEFAULT_SHIPPING_ORG
+,       MSI.RETURNABLE_FLAG
+,       MSI.RETURN_INSPECTION_REQUIREMENT
+,       MSI.OVER_SHIPMENT_TOLERANCE
+,       MSI.UNDER_SHIPMENT_TOLERANCE
+,       MSI.OVER_RETURN_TOLERANCE
+,       MSI.UNDER_RETURN_TOLERANCE
+,       MSI.INVOICEABLE_ITEM_FLAG
+,       MSI.INVOICE_ENABLED_FLAG
+,       MSI.ACCOUNTING_RULE_ID
+,       MSI.INVOICING_RULE_ID
+,       MSI.TAX_CODE
+,       MSI.SALES_ACCOUNT
+,       MSI.PAYMENT_TERMS_ID
+,       MSI.COVERAGE_SCHEDULE_ID
+,       MSI.SERVICE_DURATION
+,       MSI.SERVICE_DURATION_PERIOD_CODE
+,       MSI.SERVICEABLE_PRODUCT_FLAG
+,       MSI.SERVICE_STARTING_DELAY
+,       MSI.MATERIAL_BILLABLE_FLAG
+,       MSI.SERVICEABLE_COMPONENT_FLAG
+,       MSI.PREVENTIVE_MAINTENANCE_FLAG
+,       MSI.PRORATE_SERVICE_FLAG
+,       MSI.SERVICEABLE_ITEM_CLASS_ID
+,       MSI.BASE_WARRANTY_SERVICE_ID
+,       MSI.WARRANTY_VENDOR_ID
+,       MSI.MAX_WARRANTY_AMOUNT
+,       MSI.RESPONSE_TIME_PERIOD_CODE
+,       MSI.RESPONSE_TIME_VALUE
+,       MSI.PRIMARY_SPECIALIST_ID
+,       MSI.SECONDARY_SPECIALIST_ID
+,       MSI.WH_UPDATE_DATE
+,        MSI.EQUIPMENT_TYPE
+,        MSI.RECOVERED_PART_DISP_CODE
+,        MSI.DEFECT_TRACKING_ON_FLAG
+,        MSI.EVENT_FLAG
+,        MSI.ELECTRONIC_FLAG
+,        MSI.DOWNLOADABLE_FLAG
+,        MSI.VOL_DISCOUNT_EXEMPT_FLAG
+,        MSI.COUPON_EXEMPT_FLAG
+,        MSI.COMMS_NL_TRACKABLE_FLAG
+,        MSI.ASSET_CREATION_CODE
+,        MSI.COMMS_ACTIVATION_REQD_FLAG
+,        MSI.ORDERABLE_ON_WEB_FLAG
+,        MSI.BACK_ORDERABLE_FLAG
+,        MSI.WEB_STATUS
+,        MSI.INDIVISIBLE_FLAG
+,        MSI.DIMENSION_UOM_CODE
+,        MSI.UNIT_LENGTH
+,        MSI.UNIT_WIDTH
+,        MSI.UNIT_HEIGHT
+,        MSI.BULK_PICKED_FLAG
+,        MSI.LOT_STATUS_ENABLED
+,        MSI.DEFAULT_LOT_STATUS_ID
+,        MSI.SERIAL_STATUS_ENABLED
+,        MSI.DEFAULT_SERIAL_STATUS_ID
+,        MSI.LOT_SPLIT_ENABLED
+,        MSI.LOT_MERGE_ENABLED
+,       MSI.INVENTORY_CARRY_PENALTY
+,       MSI.OPERATION_SLACK_PENALTY
+,       MSI.FINANCING_ALLOWED_FLAG
+,        MSI.EAM_ITEM_TYPE
+,        MSI.EAM_ACTIVITY_TYPE_CODE
+,        MSI.EAM_ACTIVITY_CAUSE_CODE
+,        MSI.EAM_ACT_NOTIFICATION_FLAG
+,        MSI.EAM_ACT_SHUTDOWN_STATUS
+,        MSI.DUAL_UOM_CONTROL
+,        MSI.SECONDARY_UOM_CODE
+,        MSI.DUAL_UOM_DEVIATION_HIGH
+,        MSI.DUAL_UOM_DEVIATION_LOW
+-- Derived attributes
+--,  MSI.SERVICE_ITEM_FLAG
+--,  MSI.VENDOR_WARRANTY_FLAG
+--,  MSI.USAGE_ITEM_FLAG
+,        MSI.CONTRACT_ITEM_TYPE_CODE
+,        MSI.SUBSCRIPTION_DEPEND_FLAG
+,  MSI.SERV_REQ_ENABLED_CODE
+,  MSI.SERV_BILLING_ENABLED_FLAG
+,  MSI.SERV_IMPORTANCE_LEVEL
+,  MSI.PLANNED_INV_POINT_FLAG
+,  MSI.LOT_TRANSLATE_ENABLED
+,  MSI.DEFAULT_SO_SOURCE_TYPE
+,  MSI.CREATE_SUPPLY_FLAG
+,  MSI.SUBSTITUTION_WINDOW_CODE
+,  MSI.SUBSTITUTION_WINDOW_DAYS
+,  MSI.IB_ITEM_INSTANCE_CLASS
+,  MSI.CONFIG_MODEL_TYPE
+--Added as part of 11.5.9 ENH
+,  MSI.LOT_SUBSTITUTION_ENABLED
+,  MSI.MINIMUM_LICENSE_QUANTITY
+,  MSI.EAM_ACTIVITY_SOURCE_CODE
+--Added as part of 11.5.10 ENH
+,  MSI.TRACKING_QUANTITY_IND
+,  MSI.ONT_PRICING_QTY_SOURCE
+,  MSI.SECONDARY_DEFAULT_IND
+,  MSI.OPTION_SPECIFIC_SOURCED
+,  MSI.CONFIG_ORGS
+,  MSI.CONFIG_MATCH
+--,       g_miss_CHAR                         ITEM_NUMBER
+,       MSI.SEGMENT1
+,       MSI.SEGMENT2
+,       MSI.SEGMENT3
+,       MSI.SEGMENT4
+,       MSI.SEGMENT5
+,       MSI.SEGMENT6
+,       MSI.SEGMENT7
+,       MSI.SEGMENT8
+,       MSI.SEGMENT9
+,       MSI.SEGMENT10
+,       MSI.SEGMENT11
+,       MSI.SEGMENT12
+,       MSI.SEGMENT13
+,       MSI.SEGMENT14
+,       MSI.SEGMENT15
+,       MSI.SEGMENT16
+,       MSI.SEGMENT17
+,       MSI.SEGMENT18
+,       MSI.SEGMENT19
+,       MSI.SEGMENT20
+,       MSI.SUMMARY_FLAG
+,       MSI.ENABLED_FLAG
+,       MSI.START_DATE_ACTIVE
+,       MSI.END_DATE_ACTIVE
+,       MSI.ATTRIBUTE_CATEGORY
+,       MSI.ATTRIBUTE1
+,       MSI.ATTRIBUTE2
+,       MSI.ATTRIBUTE3
+,       MSI.ATTRIBUTE4
+,       MSI.ATTRIBUTE5
+,       MSI.ATTRIBUTE6
+,       MSI.ATTRIBUTE7
+,       MSI.ATTRIBUTE8
+,       MSI.ATTRIBUTE9
+,       MSI.ATTRIBUTE10
+,       MSI.ATTRIBUTE11
+,       MSI.ATTRIBUTE12
+,       MSI.ATTRIBUTE13
+,       MSI.ATTRIBUTE14
+,       MSI.ATTRIBUTE15
+,       MSI.GLOBAL_ATTRIBUTE_CATEGORY
+,       MSI.GLOBAL_ATTRIBUTE1
+,       MSI.GLOBAL_ATTRIBUTE2
+,       MSI.GLOBAL_ATTRIBUTE3
+,       MSI.GLOBAL_ATTRIBUTE4
+,       MSI.GLOBAL_ATTRIBUTE5
+,       MSI.GLOBAL_ATTRIBUTE6
+,       MSI.GLOBAL_ATTRIBUTE7
+,       MSI.GLOBAL_ATTRIBUTE8
+,       MSI.GLOBAL_ATTRIBUTE9
+,       MSI.GLOBAL_ATTRIBUTE10
+,       MSI.GLOBAL_ATTRIBUTE11
+,       MSI.GLOBAL_ATTRIBUTE12
+,       MSI.GLOBAL_ATTRIBUTE13
+,       MSI.GLOBAL_ATTRIBUTE14
+,       MSI.GLOBAL_ATTRIBUTE15
+,       MSI.GLOBAL_ATTRIBUTE16
+,       MSI.GLOBAL_ATTRIBUTE17
+,       MSI.GLOBAL_ATTRIBUTE18
+,       MSI.GLOBAL_ATTRIBUTE19
+,       MSI.GLOBAL_ATTRIBUTE20
+,       MSI.CREATION_DATE
+,       MSI.CREATED_BY
+,       MSI.LAST_UPDATE_DATE
+,       MSI.LAST_UPDATED_BY
+,       MSI.LAST_UPDATE_LOGIN
+,       MSI.REQUEST_ID
+,       MSI.PROGRAM_APPLICATION_ID
+,       MSI.PROGRAM_ID
+,       MSI.PROGRAM_UPDATE_DATE
+,       MSI.LIFECYCLE_ID
+,       MSI.CURRENT_PHASE_ID
+,       MSI.VMI_MINIMUM_UNITS
+,       MSI.VMI_MINIMUM_DAYS
+,       MSI.VMI_MAXIMUM_UNITS
+,       MSI.VMI_MAXIMUM_DAYS
+,       MSI.VMI_FIXED_ORDER_QUANTITY
+,       MSI.SO_AUTHORIZATION_FLAG
+,       MSI.CONSIGNED_FLAG
+,       MSI.ASN_AUTOEXPIRE_FLAG
+,       MSI.VMI_FORECAST_TYPE
+,       MSI.FORECAST_HORIZON
+,       MSI.EXCLUDE_FROM_BUDGET_FLAG
+,       MSI.DAYS_TGT_INV_SUPPLY
+,       MSI.DAYS_TGT_INV_WINDOW
+,       MSI.DAYS_MAX_INV_SUPPLY
+,       MSI.DAYS_MAX_INV_WINDOW
+,       MSI.DRP_PLANNED_FLAG
+,       MSI.CRITICAL_COMPONENT_FLAG
+,       MSI.CONTINOUS_TRANSFER
+,       MSI.CONVERGENCE
+,       MSI.DIVERGENCE
+/* Start Bug 3713912 */
+, MSI.LOT_DIVISIBLE_FLAG                ,
+MSI.GRADE_CONTROL_FLAG          ,
+MSI.DEFAULT_GRADE                       ,
+MSI.CHILD_LOT_FLAG              ,
+MSI.PARENT_CHILD_GENERATION_FLAG        ,
+MSI.CHILD_LOT_PREFIX            ,
+MSI.CHILD_LOT_STARTING_NUMBER      ,
+MSI.CHILD_LOT_VALIDATION_FLAG   ,
+MSI.COPY_LOT_ATTRIBUTE_FLAG     ,
+MSI.RECIPE_ENABLED_FLAG         ,
+MSI.PROCESS_QUALITY_ENABLED_FLAG        ,
+MSI.PROCESS_EXECUTION_ENABLED_FLAG ,
+MSI.PROCESS_COSTING_ENABLED_FLAG        ,
+MSI.PROCESS_SUPPLY_SUBINVENTORY ,
+MSI.PROCESS_SUPPLY_LOCATOR_ID,
+MSI.PROCESS_YIELD_SUBINVENTORY  ,
+MSI.PROCESS_YIELD_LOCATOR_ID,
+MSI.HAZARDOUS_MATERIAL_FLAG     ,
+MSI.CAS_NUMBER                  ,
+MSI.RETEST_INTERVAL                   ,
+MSI.EXPIRATION_ACTION_INTERVAL        ,
+MSI.EXPIRATION_ACTION_CODE      ,
+MSI.MATURITY_DAYS                          ,
+MSI.HOLD_DAYS                    ,
+MSI.ATTRIBUTE16                 ,
+MSI.ATTRIBUTE17                 ,
+MSI.ATTRIBUTE18                 ,
+MSI.ATTRIBUTE19                 ,
+MSI.ATTRIBUTE20                 ,
+MSI.ATTRIBUTE21                 ,
+MSI.ATTRIBUTE22                 ,
+MSI.ATTRIBUTE23                 ,
+MSI.ATTRIBUTE24                 ,
+MSI.ATTRIBUTE25                 ,
+MSI.ATTRIBUTE26                 ,
+MSI.ATTRIBUTE27                 ,
+MSI.ATTRIBUTE28                 ,
+MSI.ATTRIBUTE29                 ,
+MSI.ATTRIBUTE30
+/* End Bug 3713912 */
+--Added for R12 ENH
+,       MSI.CHARGE_PERIODICITY_CODE
+,       MSI.REPAIR_LEADTIME
+,       MSI.REPAIR_YIELD
+,       MSI.PREPOSITION_POINT
+,       MSI.REPAIR_PROGRAM
+,       MSI.SUBCONTRACTING_COMPONENT
+,       MSI.OUTSOURCED_ASSEMBLY
+-- Fix for Bug#6644711
+,MSI.DEFAULT_MATERIAL_STATUS_ID
+-- Serial_Tagging Enh -- bug 9913552
+,MSI.SERIAL_TAGGING_FLAG
+FROM
+   MTL_SYSTEM_ITEMS_B  MSI
+,  MTL_PARAMETERS      MP1
+WHERE
+       INVENTORY_ITEM_ID = p_Item_ID
+  AND  MSI.ORGANIZATION_ID = MP1.ORGANIZATION_ID
+  AND  ( ( p_fetch_Master = g_TRUE AND MSI.ORGANIZATION_ID = p_Org_ID ) OR
+         ( p_fetch_Orgs = g_TRUE AND
+           MSI.ORGANIZATION_ID IN
+           ( SELECT  MP2.ORGANIZATION_ID
+             FROM  MTL_PARAMETERS  MP2
+             WHERE  MP2.MASTER_ORGANIZATION_ID = p_Org_ID
+               AND  MP2.ORGANIZATION_ID <> p_Org_ID
+           )
+         )
+       )
+ORDER BY  DECODE( MSI.ORGANIZATION_ID, MP1.MASTER_ORGANIZATION_ID, 1, 2 ) ASC
+FOR UPDATE OF INVENTORY_ITEM_ID NOWAIT;
+--
+-- End of Org Item_B cursor
+
+
+-- Org Item_TL cursor
+--
+CURSOR Item_TL_csr
+(
+   p_Item_ID        IN   NUMBER
+,  p_Org_ID         IN   NUMBER
+,  p_fetch_Master   IN   VARCHAR2   :=  g_TRUE
+,  p_fetch_Orgs     IN   VARCHAR2   :=  g_FALSE
+,  p_restrict_Lang  IN   VARCHAR2   :=  g_FALSE
+)
+RETURN Item_TL_rec_type
+IS
+SELECT
+   INVENTORY_ITEM_ID
+,  ORGANIZATION_ID
+,  LANGUAGE
+,  SOURCE_LANG
+,  DESCRIPTION
+,  LONG_DESCRIPTION
+,  CREATION_DATE
+,  CREATED_BY
+,  LAST_UPDATE_DATE
+,  LAST_UPDATED_BY
+,  LAST_UPDATE_LOGIN
+FROM
+   MTL_SYSTEM_ITEMS_TL
+WHERE
+   INVENTORY_ITEM_ID = p_Item_ID
+   AND ( ( p_fetch_Master = g_TRUE AND ORGANIZATION_ID = p_Org_ID ) OR
+         ( p_fetch_Orgs = g_TRUE AND
+           ORGANIZATION_ID IN
+           ( SELECT  ORGANIZATION_ID
+             FROM  MTL_PARAMETERS
+             WHERE  MASTER_ORGANIZATION_ID = p_Org_ID
+               AND  ORGANIZATION_ID <> p_Org_ID
+           )
+         )
+       )
+   AND ( p_restrict_Lang = g_FALSE OR
+         userenv('LANG') IN ( LANGUAGE, SOURCE_LANG )
+       )
+FOR UPDATE OF INVENTORY_ITEM_ID NOWAIT;
+--
+-- End of Org Item_TL cursor
+
+
+-- Item attributes cursor
+--
+CURSOR Item_Attribute_csr
+RETURN Item_Attribute_rec_type
+IS
+  SELECT        SUBSTR(ATTRIBUTE_NAME,18)  Attribute_Code
+        ,       ATTRIBUTE_NAME
+        ,       USER_ATTRIBUTE_NAME_GUI
+        ,       ATTRIBUTE_GROUP_ID_GUI
+        ,       SEQUENCE_GUI
+        ,       DATA_TYPE
+        ,       VALIDATION_CODE
+        ,       MANDATORY_FLAG
+        ,       CONTROL_LEVEL
+        ,       LEVEL_UPDATEABLE_FLAG
+        ,       STATUS_CONTROL_CODE
+        ,       LAST_UPDATE_DATE
+        ,       LAST_UPDATED_BY
+        ,       CREATION_DATE
+        ,       CREATED_BY
+        ,       LAST_UPDATE_LOGIN
+  FROM
+     MTL_ITEM_ATTRIBUTES;
+--
+-- End of Item attributes cursor
+
+
+-- =============================================================================
+--                                  Procedures
+-- =============================================================================
+
+/*----------------------------- Update_Item_Row ------------------------------*/
+
+PROCEDURE Update_Item_Row
+(
+    p_Item_rec          IN   Item_rec_type
+,   p_update_Item_TL    IN   BOOLEAN
+,   p_Lang_Flag         IN   VARCHAR2
+,   x_return_status     OUT NOCOPY  VARCHAR2
+)
+IS
+--  l_Item_ID         NUMBER;
+--  l_Org_ID          NUMBER;
+
+--  l_return_status   VARCHAR2(1);
+
+   l_SERVICE_ITEM_FLAG          VARCHAR2(1);
+   l_VENDOR_WARRANTY_FLAG       VARCHAR2(1);
+   l_USAGE_ITEM_FLAG            VARCHAR2(1);
+   l_Primary_Unit_of_Measure    VARCHAR2(2000);
+BEGIN
+
+--  l_Item_ID := p_Item_rec.INVENTORY_ITEM_ID;
+--  l_Org_ID  := p_Item_rec.ORGANIZATION_ID;
+
+   -- Get derived attribute values.
+
+   -- Service Item, Warranty, Usage flag attributes are dependent on
+   -- and derived from Contract Item Type; supported for view only.
+
+   IF ( p_Item_rec.CONTRACT_ITEM_TYPE_CODE = 'SERVICE' ) THEN
+      l_SERVICE_ITEM_FLAG := 'Y';
+      l_VENDOR_WARRANTY_FLAG := 'N';
+      l_USAGE_ITEM_FLAG := NULL;
+   ELSIF ( p_Item_rec.CONTRACT_ITEM_TYPE_CODE = 'WARRANTY' ) THEN
+      l_SERVICE_ITEM_FLAG := 'Y';
+      l_VENDOR_WARRANTY_FLAG := 'Y';
+      l_USAGE_ITEM_FLAG := NULL;
+   ELSIF ( p_Item_rec.CONTRACT_ITEM_TYPE_CODE = 'USAGE' ) THEN
+      l_SERVICE_ITEM_FLAG := 'N';
+      l_VENDOR_WARRANTY_FLAG := 'N';
+      l_USAGE_ITEM_FLAG := 'Y';
+   ELSE
+      l_SERVICE_ITEM_FLAG := 'N';
+      l_VENDOR_WARRANTY_FLAG := 'N';
+      l_USAGE_ITEM_FLAG := NULL;
+   END IF;
+
+  -------------------------------------------------------------------
+  -- Update item row in the base table at Item_csr cursor position --
+  -------------------------------------------------------------------
+   -- Bug: 2801185 Primary_Unit_of_Measure lookup
+
+   SELECT  unit_of_measure	--5192495 Reverted the Bug 4465182 Select translated unit of measure value
+   INTO    l_Primary_Unit_of_Measure
+   FROM    mtl_units_of_measure_vl
+   WHERE   uom_code = P_Item_Rec.PRIMARY_UOM_CODE;
+
+  UPDATE MTL_SYSTEM_ITEMS_B
+  SET
+     -- Update DESCRIPTION in the base table (MSI_B) only
+     -- if current language is the base language.
+     --
+     DESCRIPTION = DECODE( p_Lang_Flag,
+                           'B',  trim(p_Item_rec.DESCRIPTION),
+                           DESCRIPTION )
+  ,  PRIMARY_UOM_CODE                = p_Item_rec.PRIMARY_UOM_CODE
+  ,  PRIMARY_UNIT_OF_MEASURE         = l_Primary_Unit_of_Measure --Bug: 2801185
+  ,  ITEM_TYPE                       = p_Item_rec.ITEM_TYPE
+  ,  INVENTORY_ITEM_STATUS_CODE      = p_Item_rec.INVENTORY_ITEM_STATUS_CODE
+  ,  ALLOWED_UNITS_LOOKUP_CODE       = p_Item_rec.ALLOWED_UNITS_LOOKUP_CODE
+  ,  ITEM_CATALOG_GROUP_ID           = p_Item_rec.ITEM_CATALOG_GROUP_ID
+  ,  CATALOG_STATUS_FLAG             = p_Item_rec.CATALOG_STATUS_FLAG
+  ,  INVENTORY_ITEM_FLAG             = p_Item_rec.INVENTORY_ITEM_FLAG
+  ,  STOCK_ENABLED_FLAG              = p_Item_rec.STOCK_ENABLED_FLAG
+  ,  MTL_TRANSACTIONS_ENABLED_FLAG   = p_Item_rec.MTL_TRANSACTIONS_ENABLED_FLAG
+  ,  CHECK_SHORTAGES_FLAG            = p_Item_rec.CHECK_SHORTAGES_FLAG
+  ,  REVISION_QTY_CONTROL_CODE       = p_Item_rec.REVISION_QTY_CONTROL_CODE
+  ,  RESERVABLE_TYPE                 = p_Item_rec.RESERVABLE_TYPE
+  ,  SHELF_LIFE_CODE                 = p_Item_rec.SHELF_LIFE_CODE
+  ,  SHELF_LIFE_DAYS                 = p_Item_rec.SHELF_LIFE_DAYS
+  ,  CYCLE_COUNT_ENABLED_FLAG        = p_Item_rec.CYCLE_COUNT_ENABLED_FLAG
+  ,  NEGATIVE_MEASUREMENT_ERROR      = p_Item_rec.NEGATIVE_MEASUREMENT_ERROR
+  ,  POSITIVE_MEASUREMENT_ERROR      = p_Item_rec.POSITIVE_MEASUREMENT_ERROR
+  ,  LOT_CONTROL_CODE                = p_Item_rec.LOT_CONTROL_CODE
+  ,  AUTO_LOT_ALPHA_PREFIX           = p_Item_rec.AUTO_LOT_ALPHA_PREFIX
+  ,  START_AUTO_LOT_NUMBER           = p_Item_rec.START_AUTO_LOT_NUMBER
+  ,  SERIAL_NUMBER_CONTROL_CODE      = p_Item_rec.SERIAL_NUMBER_CONTROL_CODE
+  ,  AUTO_SERIAL_ALPHA_PREFIX        = p_Item_rec.AUTO_SERIAL_ALPHA_PREFIX
+  ,  START_AUTO_SERIAL_NUMBER        = p_Item_rec.START_AUTO_SERIAL_NUMBER
+  ,  LOCATION_CONTROL_CODE           = p_Item_rec.LOCATION_CONTROL_CODE
+  ,  RESTRICT_SUBINVENTORIES_CODE    = p_Item_rec.RESTRICT_SUBINVENTORIES_CODE
+  ,  RESTRICT_LOCATORS_CODE          = p_Item_rec.RESTRICT_LOCATORS_CODE
+  ,  BOM_ENABLED_FLAG                = p_Item_rec.BOM_ENABLED_FLAG
+  ,  BOM_ITEM_TYPE                   = p_Item_rec.BOM_ITEM_TYPE
+  ,  BASE_ITEM_ID                    = p_Item_rec.BASE_ITEM_ID
+  ,  EFFECTIVITY_CONTROL             = p_Item_rec.EFFECTIVITY_CONTROL
+  ,  ENG_ITEM_FLAG                   = p_Item_rec.ENG_ITEM_FLAG
+  ,  ENGINEERING_ECN_CODE            = p_Item_rec.ENGINEERING_ECN_CODE
+  ,  ENGINEERING_ITEM_ID             = p_Item_rec.ENGINEERING_ITEM_ID
+  ,  ENGINEERING_DATE                = p_Item_rec.ENGINEERING_DATE
+  ,  PRODUCT_FAMILY_ITEM_ID          = p_Item_rec.PRODUCT_FAMILY_ITEM_ID
+  ,  AUTO_CREATED_CONFIG_FLAG        = p_Item_rec.AUTO_CREATED_CONFIG_FLAG
+  ,  MODEL_CONFIG_CLAUSE_NAME        = p_Item_rec.MODEL_CONFIG_CLAUSE_NAME
+-- Attribute not in the form
+  ,  NEW_REVISION_CODE               = p_Item_rec.NEW_REVISION_CODE
+  ,  COSTING_ENABLED_FLAG            = p_Item_rec.COSTING_ENABLED_FLAG
+  ,  INVENTORY_ASSET_FLAG            = p_Item_rec.INVENTORY_ASSET_FLAG
+  ,  DEFAULT_INCLUDE_IN_ROLLUP_FLAG  = p_Item_rec.DEFAULT_INCLUDE_IN_ROLLUP_FLAG
+  ,  COST_OF_SALES_ACCOUNT           = p_Item_rec.COST_OF_SALES_ACCOUNT
+  ,  STD_LOT_SIZE                    = p_Item_rec.STD_LOT_SIZE
+  ,  PURCHASING_ITEM_FLAG            = p_Item_rec.PURCHASING_ITEM_FLAG
+  ,  PURCHASING_ENABLED_FLAG         = p_Item_rec.PURCHASING_ENABLED_FLAG
+  ,  MUST_USE_APPROVED_VENDOR_FLAG   = p_Item_rec.MUST_USE_APPROVED_VENDOR_FLAG
+  ,  ALLOW_ITEM_DESC_UPDATE_FLAG     = p_Item_rec.ALLOW_ITEM_DESC_UPDATE_FLAG
+  ,  RFQ_REQUIRED_FLAG               = p_Item_rec.RFQ_REQUIRED_FLAG
+  ,  OUTSIDE_OPERATION_FLAG          = p_Item_rec.OUTSIDE_OPERATION_FLAG
+  ,  OUTSIDE_OPERATION_UOM_TYPE      = p_Item_rec.OUTSIDE_OPERATION_UOM_TYPE
+  ,  TAXABLE_FLAG                    = p_Item_rec.TAXABLE_FLAG
+  ,  PURCHASING_TAX_CODE             = p_Item_rec.PURCHASING_TAX_CODE
+  ,  RECEIPT_REQUIRED_FLAG           = p_Item_rec.RECEIPT_REQUIRED_FLAG
+  ,  INSPECTION_REQUIRED_FLAG        = p_Item_rec.INSPECTION_REQUIRED_FLAG
+  ,  BUYER_ID                        = p_Item_rec.BUYER_ID
+  ,  UNIT_OF_ISSUE                   = p_Item_rec.UNIT_OF_ISSUE
+  ,  RECEIVE_CLOSE_TOLERANCE         = p_Item_rec.RECEIVE_CLOSE_TOLERANCE
+  ,  INVOICE_CLOSE_TOLERANCE         = p_Item_rec.INVOICE_CLOSE_TOLERANCE
+  ,  UN_NUMBER_ID                    = p_Item_rec.UN_NUMBER_ID
+  ,  HAZARD_CLASS_ID                 = p_Item_rec.HAZARD_CLASS_ID
+  ,  LIST_PRICE_PER_UNIT             = p_Item_rec.LIST_PRICE_PER_UNIT
+  ,  MARKET_PRICE                    = p_Item_rec.MARKET_PRICE
+  ,  PRICE_TOLERANCE_PERCENT         = p_Item_rec.PRICE_TOLERANCE_PERCENT
+  ,  ROUNDING_FACTOR                 = p_Item_rec.ROUNDING_FACTOR
+  ,  ENCUMBRANCE_ACCOUNT             = p_Item_rec.ENCUMBRANCE_ACCOUNT
+  ,  EXPENSE_ACCOUNT                 = p_Item_rec.EXPENSE_ACCOUNT
+  ,  ASSET_CATEGORY_ID               = p_Item_rec.ASSET_CATEGORY_ID
+  ,  RECEIPT_DAYS_EXCEPTION_CODE     = p_Item_rec.RECEIPT_DAYS_EXCEPTION_CODE
+  ,  DAYS_EARLY_RECEIPT_ALLOWED      = p_Item_rec.DAYS_EARLY_RECEIPT_ALLOWED
+  ,  DAYS_LATE_RECEIPT_ALLOWED       = p_Item_rec.DAYS_LATE_RECEIPT_ALLOWED
+  ,  ALLOW_SUBSTITUTE_RECEIPTS_FLAG  = p_Item_rec.ALLOW_SUBSTITUTE_RECEIPTS_FLAG
+  ,  ALLOW_UNORDERED_RECEIPTS_FLAG   = p_Item_rec.ALLOW_UNORDERED_RECEIPTS_FLAG
+  ,  ALLOW_EXPRESS_DELIVERY_FLAG     = p_Item_rec.ALLOW_EXPRESS_DELIVERY_FLAG
+  ,  QTY_RCV_EXCEPTION_CODE          = p_Item_rec.QTY_RCV_EXCEPTION_CODE
+  ,  QTY_RCV_TOLERANCE               = p_Item_rec.QTY_RCV_TOLERANCE
+  ,  RECEIVING_ROUTING_ID            = p_Item_rec.RECEIVING_ROUTING_ID
+  ,  ENFORCE_SHIP_TO_LOCATION_CODE   = p_Item_rec.ENFORCE_SHIP_TO_LOCATION_CODE
+  ,  WEIGHT_UOM_CODE                 = p_Item_rec.WEIGHT_UOM_CODE
+  ,  UNIT_WEIGHT                     = p_Item_rec.UNIT_WEIGHT
+  ,  VOLUME_UOM_CODE                 = p_Item_rec.VOLUME_UOM_CODE
+  ,  UNIT_VOLUME                     = p_Item_rec.UNIT_VOLUME
+  ,  CONTAINER_ITEM_FLAG             = p_Item_rec.CONTAINER_ITEM_FLAG
+  ,  VEHICLE_ITEM_FLAG               = p_Item_rec.VEHICLE_ITEM_FLAG
+  ,  CONTAINER_TYPE_CODE             = p_Item_rec.CONTAINER_TYPE_CODE
+  ,  INTERNAL_VOLUME                 = p_Item_rec.INTERNAL_VOLUME
+  ,  MAXIMUM_LOAD_WEIGHT             = p_Item_rec.MAXIMUM_LOAD_WEIGHT
+  ,  MINIMUM_FILL_PERCENT            = p_Item_rec.MINIMUM_FILL_PERCENT
+  ,  INVENTORY_PLANNING_CODE         = p_Item_rec.INVENTORY_PLANNING_CODE
+  ,  PLANNER_CODE                    = p_Item_rec.PLANNER_CODE
+  ,  PLANNING_MAKE_BUY_CODE          = p_Item_rec.PLANNING_MAKE_BUY_CODE
+  ,  MIN_MINMAX_QUANTITY             = p_Item_rec.MIN_MINMAX_QUANTITY
+  ,  MAX_MINMAX_QUANTITY             = p_Item_rec.MAX_MINMAX_QUANTITY
+  ,  MINIMUM_ORDER_QUANTITY          = p_Item_rec.MINIMUM_ORDER_QUANTITY
+  ,  MAXIMUM_ORDER_QUANTITY          = p_Item_rec.MAXIMUM_ORDER_QUANTITY
+  ,  ORDER_COST                      = p_Item_rec.ORDER_COST
+  ,  CARRYING_COST                   = p_Item_rec.CARRYING_COST
+  ,  SOURCE_TYPE                     = p_Item_rec.SOURCE_TYPE
+  ,  SOURCE_ORGANIZATION_ID          = p_Item_rec.SOURCE_ORGANIZATION_ID
+  ,  SOURCE_SUBINVENTORY             = p_Item_rec.SOURCE_SUBINVENTORY
+  ,  MRP_SAFETY_STOCK_CODE           = p_Item_rec.MRP_SAFETY_STOCK_CODE
+  ,  SAFETY_STOCK_BUCKET_DAYS        = p_Item_rec.SAFETY_STOCK_BUCKET_DAYS
+  ,  MRP_SAFETY_STOCK_PERCENT        = p_Item_rec.MRP_SAFETY_STOCK_PERCENT
+  ,  FIXED_ORDER_QUANTITY            = p_Item_rec.FIXED_ORDER_QUANTITY
+  ,  FIXED_DAYS_SUPPLY               = p_Item_rec.FIXED_DAYS_SUPPLY
+  ,  FIXED_LOT_MULTIPLIER            = p_Item_rec.FIXED_LOT_MULTIPLIER
+  ,  MRP_PLANNING_CODE               = p_Item_rec.MRP_PLANNING_CODE
+  ,  ATO_FORECAST_CONTROL            = p_Item_rec.ATO_FORECAST_CONTROL
+  ,  PLANNING_EXCEPTION_SET          = p_Item_rec.PLANNING_EXCEPTION_SET
+  ,  END_ASSEMBLY_PEGGING_FLAG       = p_Item_rec.END_ASSEMBLY_PEGGING_FLAG
+  ,  SHRINKAGE_RATE                  = p_Item_rec.SHRINKAGE_RATE
+  ,  ROUNDING_CONTROL_TYPE           = p_Item_rec.ROUNDING_CONTROL_TYPE
+  ,  ACCEPTABLE_EARLY_DAYS           = p_Item_rec.ACCEPTABLE_EARLY_DAYS
+  ,  REPETITIVE_PLANNING_FLAG        = p_Item_rec.REPETITIVE_PLANNING_FLAG
+  ,  OVERRUN_PERCENTAGE              = p_Item_rec.OVERRUN_PERCENTAGE
+  ,  ACCEPTABLE_RATE_INCREASE        = p_Item_rec.ACCEPTABLE_RATE_INCREASE
+  ,  ACCEPTABLE_RATE_DECREASE        = p_Item_rec.ACCEPTABLE_RATE_DECREASE
+  ,  MRP_CALCULATE_ATP_FLAG          = p_Item_rec.MRP_CALCULATE_ATP_FLAG
+  ,  AUTO_REDUCE_MPS                 = p_Item_rec.AUTO_REDUCE_MPS
+  ,  PLANNING_TIME_FENCE_CODE        = p_Item_rec.PLANNING_TIME_FENCE_CODE
+  ,  PLANNING_TIME_FENCE_DAYS        = p_Item_rec.PLANNING_TIME_FENCE_DAYS
+  ,  DEMAND_TIME_FENCE_CODE          = p_Item_rec.DEMAND_TIME_FENCE_CODE
+  ,  DEMAND_TIME_FENCE_DAYS          = p_Item_rec.DEMAND_TIME_FENCE_DAYS
+  ,  RELEASE_TIME_FENCE_CODE         = p_Item_rec.RELEASE_TIME_FENCE_CODE
+  ,  RELEASE_TIME_FENCE_DAYS         = p_Item_rec.RELEASE_TIME_FENCE_DAYS
+  ,  PREPROCESSING_LEAD_TIME         = p_Item_rec.PREPROCESSING_LEAD_TIME
+  ,  FULL_LEAD_TIME                  = p_Item_rec.FULL_LEAD_TIME
+  ,  POSTPROCESSING_LEAD_TIME        = p_Item_rec.POSTPROCESSING_LEAD_TIME
+  ,  FIXED_LEAD_TIME                 = p_Item_rec.FIXED_LEAD_TIME
+  ,  VARIABLE_LEAD_TIME              = p_Item_rec.VARIABLE_LEAD_TIME
+  ,  CUM_MANUFACTURING_LEAD_TIME     = p_Item_rec.CUM_MANUFACTURING_LEAD_TIME
+  ,  CUMULATIVE_TOTAL_LEAD_TIME      = p_Item_rec.CUMULATIVE_TOTAL_LEAD_TIME
+  ,  LEAD_TIME_LOT_SIZE              = p_Item_rec.LEAD_TIME_LOT_SIZE
+  ,  BUILD_IN_WIP_FLAG               = p_Item_rec.BUILD_IN_WIP_FLAG
+  ,  WIP_SUPPLY_TYPE                 = p_Item_rec.WIP_SUPPLY_TYPE
+  ,  WIP_SUPPLY_SUBINVENTORY         = p_Item_rec.WIP_SUPPLY_SUBINVENTORY
+  ,  WIP_SUPPLY_LOCATOR_ID           = p_Item_rec.WIP_SUPPLY_LOCATOR_ID
+  ,  OVERCOMPLETION_TOLERANCE_TYPE   = p_Item_rec.OVERCOMPLETION_TOLERANCE_TYPE
+  ,  OVERCOMPLETION_TOLERANCE_VALUE  = p_Item_rec.OVERCOMPLETION_TOLERANCE_VALUE
+  ,  CUSTOMER_ORDER_FLAG             = p_Item_rec.CUSTOMER_ORDER_FLAG
+  ,  CUSTOMER_ORDER_ENABLED_FLAG     = p_Item_rec.CUSTOMER_ORDER_ENABLED_FLAG
+  ,  SHIPPABLE_ITEM_FLAG             = p_Item_rec.SHIPPABLE_ITEM_FLAG
+  ,  INTERNAL_ORDER_FLAG             = p_Item_rec.INTERNAL_ORDER_FLAG
+  ,  INTERNAL_ORDER_ENABLED_FLAG     = p_Item_rec.INTERNAL_ORDER_ENABLED_FLAG
+  ,  SO_TRANSACTIONS_FLAG            = p_Item_rec.SO_TRANSACTIONS_FLAG
+  ,  PICK_COMPONENTS_FLAG            = p_Item_rec.PICK_COMPONENTS_FLAG
+  ,  ATP_FLAG                        = p_Item_rec.ATP_FLAG
+  ,  REPLENISH_TO_ORDER_FLAG         = p_Item_rec.REPLENISH_TO_ORDER_FLAG
+  ,  ATP_RULE_ID                     = p_Item_rec.ATP_RULE_ID
+  ,  ATP_COMPONENTS_FLAG             = p_Item_rec.ATP_COMPONENTS_FLAG
+  ,  SHIP_MODEL_COMPLETE_FLAG        = p_Item_rec.SHIP_MODEL_COMPLETE_FLAG
+  ,  PICKING_RULE_ID                 = p_Item_rec.PICKING_RULE_ID
+  ,  COLLATERAL_FLAG                 = p_Item_rec.COLLATERAL_FLAG
+  ,  DEFAULT_SHIPPING_ORG            = p_Item_rec.DEFAULT_SHIPPING_ORG
+  ,  RETURNABLE_FLAG                 = p_Item_rec.RETURNABLE_FLAG
+  ,  RETURN_INSPECTION_REQUIREMENT   = p_Item_rec.RETURN_INSPECTION_REQUIREMENT
+  ,  OVER_SHIPMENT_TOLERANCE         = p_Item_rec.OVER_SHIPMENT_TOLERANCE
+  ,  UNDER_SHIPMENT_TOLERANCE        = p_Item_rec.UNDER_SHIPMENT_TOLERANCE
+  ,  OVER_RETURN_TOLERANCE           = p_Item_rec.OVER_RETURN_TOLERANCE
+  ,  UNDER_RETURN_TOLERANCE          = p_Item_rec.UNDER_RETURN_TOLERANCE
+  ,  INVOICEABLE_ITEM_FLAG           = p_Item_rec.INVOICEABLE_ITEM_FLAG
+  ,  INVOICE_ENABLED_FLAG            = p_Item_rec.INVOICE_ENABLED_FLAG
+  ,  ACCOUNTING_RULE_ID              = p_Item_rec.ACCOUNTING_RULE_ID
+  ,  INVOICING_RULE_ID               = p_Item_rec.INVOICING_RULE_ID
+  ,  TAX_CODE                        = p_Item_rec.TAX_CODE
+  ,  SALES_ACCOUNT                   = p_Item_rec.SALES_ACCOUNT
+  ,  PAYMENT_TERMS_ID                = p_Item_rec.PAYMENT_TERMS_ID
+  ,  COVERAGE_SCHEDULE_ID            = p_Item_rec.COVERAGE_SCHEDULE_ID
+  ,  SERVICE_DURATION                = p_Item_rec.SERVICE_DURATION
+  ,  SERVICE_DURATION_PERIOD_CODE    = p_Item_rec.SERVICE_DURATION_PERIOD_CODE
+  ,  SERVICEABLE_PRODUCT_FLAG        = p_Item_rec.SERVICEABLE_PRODUCT_FLAG
+  ,  SERVICE_STARTING_DELAY          = p_Item_rec.SERVICE_STARTING_DELAY
+  ,  MATERIAL_BILLABLE_FLAG          = p_Item_rec.MATERIAL_BILLABLE_FLAG
+  ,  SERVICEABLE_COMPONENT_FLAG      = p_Item_rec.SERVICEABLE_COMPONENT_FLAG
+  ,  PREVENTIVE_MAINTENANCE_FLAG     = p_Item_rec.PREVENTIVE_MAINTENANCE_FLAG
+  ,  PRORATE_SERVICE_FLAG            = p_Item_rec.PRORATE_SERVICE_FLAG
+-- Attribute not in the form
+  ,  SERVICEABLE_ITEM_CLASS_ID       = p_Item_rec.SERVICEABLE_ITEM_CLASS_ID
+-- Attribute not in the form
+  ,  BASE_WARRANTY_SERVICE_ID        = p_Item_rec.BASE_WARRANTY_SERVICE_ID
+-- Attribute not in the form
+  ,  WARRANTY_VENDOR_ID              = p_Item_rec.WARRANTY_VENDOR_ID
+-- Attribute not in the form
+  ,  MAX_WARRANTY_AMOUNT             = p_Item_rec.MAX_WARRANTY_AMOUNT
+-- Attribute not in the form
+  ,  RESPONSE_TIME_PERIOD_CODE       = p_Item_rec.RESPONSE_TIME_PERIOD_CODE
+-- Attribute not in the form
+  ,  RESPONSE_TIME_VALUE             = p_Item_rec.RESPONSE_TIME_VALUE
+-- Attribute not in the form
+  ,  PRIMARY_SPECIALIST_ID           = p_Item_rec.PRIMARY_SPECIALIST_ID
+-- Attribute not in the form
+  ,  SECONDARY_SPECIALIST_ID         = p_Item_rec.SECONDARY_SPECIALIST_ID
+  ,  WH_UPDATE_DATE                  = p_Item_rec.WH_UPDATE_DATE
+  ,  EQUIPMENT_TYPE                  = p_Item_rec.EQUIPMENT_TYPE
+  ,  RECOVERED_PART_DISP_CODE        = p_Item_rec.RECOVERED_PART_DISP_CODE
+  ,  DEFECT_TRACKING_ON_FLAG         = p_Item_rec.DEFECT_TRACKING_ON_FLAG
+  ,  EVENT_FLAG                      = p_Item_rec.EVENT_FLAG
+  ,  ELECTRONIC_FLAG                 = p_Item_rec.ELECTRONIC_FLAG
+  ,  DOWNLOADABLE_FLAG               = p_Item_rec.DOWNLOADABLE_FLAG
+  ,  VOL_DISCOUNT_EXEMPT_FLAG        = p_Item_rec.VOL_DISCOUNT_EXEMPT_FLAG
+  ,  COUPON_EXEMPT_FLAG              = p_Item_rec.COUPON_EXEMPT_FLAG
+  ,  COMMS_NL_TRACKABLE_FLAG         = p_Item_rec.COMMS_NL_TRACKABLE_FLAG
+  ,  ASSET_CREATION_CODE             = p_Item_rec.ASSET_CREATION_CODE
+  ,  COMMS_ACTIVATION_REQD_FLAG      = p_Item_rec.COMMS_ACTIVATION_REQD_FLAG
+  ,  ORDERABLE_ON_WEB_FLAG           = p_Item_rec.ORDERABLE_ON_WEB_FLAG
+  ,  BACK_ORDERABLE_FLAG             = p_Item_rec.BACK_ORDERABLE_FLAG
+  ,  WEB_STATUS                      = p_Item_rec.WEB_STATUS
+  ,  INDIVISIBLE_FLAG                = p_Item_rec.INDIVISIBLE_FLAG
+  ,  DIMENSION_UOM_CODE              = p_Item_rec.DIMENSION_UOM_CODE
+  ,  UNIT_LENGTH                     = p_Item_rec.UNIT_LENGTH
+  ,  UNIT_WIDTH                      = p_Item_rec.UNIT_WIDTH
+  ,  UNIT_HEIGHT                     = p_Item_rec.UNIT_HEIGHT
+  ,  BULK_PICKED_FLAG                = p_Item_rec.BULK_PICKED_FLAG
+  ,  LOT_STATUS_ENABLED              = p_Item_rec.LOT_STATUS_ENABLED
+  ,  DEFAULT_LOT_STATUS_ID           = p_Item_rec.DEFAULT_LOT_STATUS_ID
+  ,  SERIAL_STATUS_ENABLED           = p_Item_rec.SERIAL_STATUS_ENABLED
+  ,  DEFAULT_SERIAL_STATUS_ID        = p_Item_rec.DEFAULT_SERIAL_STATUS_ID
+  ,  LOT_SPLIT_ENABLED               = p_Item_rec.LOT_SPLIT_ENABLED
+  ,  LOT_MERGE_ENABLED               = p_Item_rec.LOT_MERGE_ENABLED
+  ,  INVENTORY_CARRY_PENALTY         = p_Item_rec.INVENTORY_CARRY_PENALTY
+  ,  OPERATION_SLACK_PENALTY         = p_Item_rec.OPERATION_SLACK_PENALTY
+  ,  FINANCING_ALLOWED_FLAG          = p_Item_rec.FINANCING_ALLOWED_FLAG
+  ,  EAM_ITEM_TYPE                   = p_Item_rec.EAM_ITEM_TYPE
+  ,  EAM_ACTIVITY_TYPE_CODE          = p_Item_rec.EAM_ACTIVITY_TYPE_CODE
+  ,  EAM_ACTIVITY_CAUSE_CODE         = p_Item_rec.EAM_ACTIVITY_CAUSE_CODE
+  ,  EAM_ACT_NOTIFICATION_FLAG       = p_Item_rec.EAM_ACT_NOTIFICATION_FLAG
+  ,  EAM_ACT_SHUTDOWN_STATUS         = p_Item_rec.EAM_ACT_SHUTDOWN_STATUS
+  ,  DUAL_UOM_CONTROL                = p_Item_rec.DUAL_UOM_CONTROL
+  ,  SECONDARY_UOM_CODE              = p_Item_rec.SECONDARY_UOM_CODE
+  ,  DUAL_UOM_DEVIATION_HIGH         = p_Item_rec.DUAL_UOM_DEVIATION_HIGH
+  ,  DUAL_UOM_DEVIATION_LOW          = p_Item_rec.DUAL_UOM_DEVIATION_LOW
+  -- Derived Service attributes
+  ,  SERVICE_ITEM_FLAG               =  l_SERVICE_ITEM_FLAG
+  ,  VENDOR_WARRANTY_FLAG            =  l_VENDOR_WARRANTY_FLAG
+  ,  USAGE_ITEM_FLAG                 =  l_USAGE_ITEM_FLAG
+  --
+  ,  CONTRACT_ITEM_TYPE_CODE         =  p_Item_rec.CONTRACT_ITEM_TYPE_CODE
+  ,  SUBSCRIPTION_DEPEND_FLAG        =  p_Item_rec.SUBSCRIPTION_DEPEND_FLAG
+   ,  SERV_REQ_ENABLED_CODE           =  p_Item_rec.SERV_REQ_ENABLED_CODE
+   ,  SERV_BILLING_ENABLED_FLAG       =  p_Item_rec.SERV_BILLING_ENABLED_FLAG
+   ,  SERV_IMPORTANCE_LEVEL           =  p_Item_rec.SERV_IMPORTANCE_LEVEL
+   ,  PLANNED_INV_POINT_FLAG          =  p_Item_rec.PLANNED_INV_POINT_FLAG
+   ,  LOT_TRANSLATE_ENABLED           =  p_Item_rec.LOT_TRANSLATE_ENABLED
+   ,  DEFAULT_SO_SOURCE_TYPE          =  p_Item_rec.DEFAULT_SO_SOURCE_TYPE
+   ,  CREATE_SUPPLY_FLAG              =  p_Item_rec.CREATE_SUPPLY_FLAG
+   ,  SUBSTITUTION_WINDOW_CODE        =  p_Item_rec.SUBSTITUTION_WINDOW_CODE
+   ,  SUBSTITUTION_WINDOW_DAYS        =  p_Item_rec.SUBSTITUTION_WINDOW_DAYS
+   ,  IB_ITEM_INSTANCE_CLASS          =  p_Item_rec.IB_ITEM_INSTANCE_CLASS
+   ,  CONFIG_MODEL_TYPE               =  p_Item_rec.CONFIG_MODEL_TYPE
+--ADDED as part of 11.5.9 ENH
+   ,  LOT_SUBSTITUTION_ENABLED        =  p_Item_rec.LOT_SUBSTITUTION_ENABLED
+   ,  MINIMUM_LICENSE_QUANTITY        =  p_Item_rec.MINIMUM_LICENSE_QUANTITY
+   ,  EAM_ACTIVITY_SOURCE_CODE        =  p_Item_rec.EAM_ACTIVITY_SOURCE_CODE
+--ADDED as part of 11.5.10 ENH
+  ,  TRACKING_QUANTITY_IND           = p_Item_rec.TRACKING_QUANTITY_IND
+  ,  ONT_PRICING_QTY_SOURCE          = p_Item_rec.ONT_PRICING_QTY_SOURCE
+  ,  SECONDARY_DEFAULT_IND           = p_Item_rec.SECONDARY_DEFAULT_IND
+  ,  OPTION_SPECIFIC_SOURCED         = p_Item_rec.OPTION_SPECIFIC_SOURCED
+  ,  CONFIG_ORGS                     = p_Item_rec.CONFIG_ORGS
+  ,  CONFIG_MATCH                    = p_Item_rec.CONFIG_MATCH
+  ,  SEGMENT1                        = p_Item_rec.SEGMENT1
+  ,  SEGMENT2                        = p_Item_rec.SEGMENT2
+  ,  SEGMENT3                        = p_Item_rec.SEGMENT3
+  ,  SEGMENT4                        = p_Item_rec.SEGMENT4
+  ,  SEGMENT5                        = p_Item_rec.SEGMENT5
+  ,  SEGMENT6                        = p_Item_rec.SEGMENT6
+  ,  SEGMENT7                        = p_Item_rec.SEGMENT7
+  ,  SEGMENT8                        = p_Item_rec.SEGMENT8
+  ,  SEGMENT9                        = p_Item_rec.SEGMENT9
+  ,  SEGMENT10                       = p_Item_rec.SEGMENT10
+  ,  SEGMENT11                       = p_Item_rec.SEGMENT11
+  ,  SEGMENT12                       = p_Item_rec.SEGMENT12
+  ,  SEGMENT13                       = p_Item_rec.SEGMENT13
+  ,  SEGMENT14                       = p_Item_rec.SEGMENT14
+  ,  SEGMENT15                       = p_Item_rec.SEGMENT15
+  ,  SEGMENT16                       = p_Item_rec.SEGMENT16
+  ,  SEGMENT17                       = p_Item_rec.SEGMENT17
+  ,  SEGMENT18                       = p_Item_rec.SEGMENT18
+  ,  SEGMENT19                       = p_Item_rec.SEGMENT19
+  ,  SEGMENT20                       = p_Item_rec.SEGMENT20
+  ,  SUMMARY_FLAG                    = p_Item_rec.SUMMARY_FLAG
+  ,  ENABLED_FLAG                    = p_Item_rec.ENABLED_FLAG
+  ,  START_DATE_ACTIVE               = p_Item_rec.START_DATE_ACTIVE
+  ,  END_DATE_ACTIVE                 = p_Item_rec.END_DATE_ACTIVE
+  ,  ATTRIBUTE_CATEGORY              = p_Item_rec.ATTRIBUTE_CATEGORY
+  ,  ATTRIBUTE1                      = p_Item_rec.ATTRIBUTE1
+  ,  ATTRIBUTE2                      = p_Item_rec.ATTRIBUTE2
+  ,  ATTRIBUTE3                      = p_Item_rec.ATTRIBUTE3
+  ,  ATTRIBUTE4                      = p_Item_rec.ATTRIBUTE4
+  ,  ATTRIBUTE5                      = p_Item_rec.ATTRIBUTE5
+  ,  ATTRIBUTE6                      = p_Item_rec.ATTRIBUTE6
+  ,  ATTRIBUTE7                      = p_Item_rec.ATTRIBUTE7
+  ,  ATTRIBUTE8                      = p_Item_rec.ATTRIBUTE8
+  ,  ATTRIBUTE9                      = p_Item_rec.ATTRIBUTE9
+  ,  ATTRIBUTE10                     = p_Item_rec.ATTRIBUTE10
+  ,  ATTRIBUTE11                     = p_Item_rec.ATTRIBUTE11
+  ,  ATTRIBUTE12                     = p_Item_rec.ATTRIBUTE12
+  ,  ATTRIBUTE13                     = p_Item_rec.ATTRIBUTE13
+  ,  ATTRIBUTE14                     = p_Item_rec.ATTRIBUTE14
+  ,  ATTRIBUTE15                     = p_Item_rec.ATTRIBUTE15
+  ,  GLOBAL_ATTRIBUTE_CATEGORY       = p_Item_rec.GLOBAL_ATTRIBUTE_CATEGORY
+  ,  GLOBAL_ATTRIBUTE1               = p_Item_rec.GLOBAL_ATTRIBUTE1
+  ,  GLOBAL_ATTRIBUTE2               = p_Item_rec.GLOBAL_ATTRIBUTE2
+  ,  GLOBAL_ATTRIBUTE3               = p_Item_rec.GLOBAL_ATTRIBUTE3
+  ,  GLOBAL_ATTRIBUTE4               = p_Item_rec.GLOBAL_ATTRIBUTE4
+  ,  GLOBAL_ATTRIBUTE5               = p_Item_rec.GLOBAL_ATTRIBUTE5
+  ,  GLOBAL_ATTRIBUTE6               = p_Item_rec.GLOBAL_ATTRIBUTE6
+  ,  GLOBAL_ATTRIBUTE7               = p_Item_rec.GLOBAL_ATTRIBUTE7
+  ,  GLOBAL_ATTRIBUTE8               = p_Item_rec.GLOBAL_ATTRIBUTE8
+  ,  GLOBAL_ATTRIBUTE9               = p_Item_rec.GLOBAL_ATTRIBUTE9
+  ,  GLOBAL_ATTRIBUTE10              = p_Item_rec.GLOBAL_ATTRIBUTE10
+,  GLOBAL_ATTRIBUTE11               = p_Item_rec.GLOBAL_ATTRIBUTE11
+  ,  GLOBAL_ATTRIBUTE12               = p_Item_rec.GLOBAL_ATTRIBUTE12
+  ,  GLOBAL_ATTRIBUTE13               = p_Item_rec.GLOBAL_ATTRIBUTE13
+  ,  GLOBAL_ATTRIBUTE14               = p_Item_rec.GLOBAL_ATTRIBUTE14
+  ,  GLOBAL_ATTRIBUTE15               = p_Item_rec.GLOBAL_ATTRIBUTE15
+  ,  GLOBAL_ATTRIBUTE16               = p_Item_rec.GLOBAL_ATTRIBUTE16
+  ,  GLOBAL_ATTRIBUTE17               = p_Item_rec.GLOBAL_ATTRIBUTE17
+  ,  GLOBAL_ATTRIBUTE18               = p_Item_rec.GLOBAL_ATTRIBUTE18
+  ,  GLOBAL_ATTRIBUTE19               = p_Item_rec.GLOBAL_ATTRIBUTE19
+  ,  GLOBAL_ATTRIBUTE20              = p_Item_rec.GLOBAL_ATTRIBUTE20
+-- Do not update CREATE info
+--  ,  CREATION_DATE                   = p_Item_rec.CREATION_DATE
+--  ,  CREATED_BY                      = p_Item_rec.CREATED_BY
+--
+  ,  LAST_UPDATE_DATE                = p_Item_rec.LAST_UPDATE_DATE
+  ,  LAST_UPDATED_BY                 = p_Item_rec.LAST_UPDATED_BY
+  ,  LAST_UPDATE_LOGIN               = p_Item_rec.LAST_UPDATE_LOGIN
+  ,  REQUEST_ID                      = p_Item_rec.REQUEST_ID
+  ,  PROGRAM_APPLICATION_ID          = p_Item_rec.PROGRAM_APPLICATION_ID
+  ,  PROGRAM_ID                      = p_Item_rec.PROGRAM_ID
+  ,  PROGRAM_UPDATE_DATE             = p_Item_rec.PROGRAM_UPDATE_DATE
+  ,VMI_MINIMUM_UNITS                 = P_item_rec.VMI_MINIMUM_UNITS
+  ,VMI_MINIMUM_DAYS                  = P_item_rec.VMI_MINIMUM_DAYS
+  ,VMI_MAXIMUM_UNITS                 = P_item_rec.VMI_MAXIMUM_UNITS
+  ,VMI_MAXIMUM_DAYS                  = P_item_rec.VMI_MAXIMUM_DAYS
+  ,VMI_FIXED_ORDER_QUANTITY          = P_item_rec.VMI_FIXED_ORDER_QUANTITY
+  ,SO_AUTHORIZATION_FLAG             = P_item_rec.SO_AUTHORIZATION_FLAG
+  ,CONSIGNED_FLAG                    = P_item_rec.CONSIGNED_FLAG
+  ,ASN_AUTOEXPIRE_FLAG               = P_item_rec.ASN_AUTOEXPIRE_FLAG
+  ,VMI_FORECAST_TYPE                 = P_item_rec.VMI_FORECAST_TYPE
+  ,FORECAST_HORIZON                  = P_item_rec.FORECAST_HORIZON
+  ,EXCLUDE_FROM_BUDGET_FLAG          = P_item_rec.EXCLUDE_FROM_BUDGET_FLAG
+  ,DAYS_TGT_INV_SUPPLY               = P_item_rec.DAYS_TGT_INV_SUPPLY
+  ,DAYS_TGT_INV_WINDOW               = P_item_rec.DAYS_TGT_INV_WINDOW
+  ,DAYS_MAX_INV_SUPPLY               = P_item_rec.DAYS_MAX_INV_SUPPLY
+  ,DAYS_MAX_INV_WINDOW               = P_item_rec.DAYS_MAX_INV_WINDOW
+  ,DRP_PLANNED_FLAG                  = P_item_rec.DRP_PLANNED_FLAG
+  ,CRITICAL_COMPONENT_FLAG           = P_item_rec.CRITICAL_COMPONENT_FLAG
+  ,CONTINOUS_TRANSFER                = P_item_rec.CONTINOUS_TRANSFER
+  ,CONVERGENCE                       = P_item_rec.CONVERGENCE
+  ,DIVERGENCE                        = P_item_rec.DIVERGENCE
+/* Start Bug 3713912 */
+,  LOT_DIVISIBLE_FLAG                = P_item_rec.LOT_DIVISIBLE_FLAG
+,  GRADE_CONTROL_FLAG                = P_item_rec.GRADE_CONTROL_FLAG
+,  DEFAULT_GRADE                     = P_item_rec.DEFAULT_GRADE
+,  CHILD_LOT_FLAG                    = P_item_rec.CHILD_LOT_FLAG
+,  PARENT_CHILD_GENERATION_FLAG      = P_item_rec.PARENT_CHILD_GENERATION_FLAG
+,  CHILD_LOT_PREFIX                  = P_item_rec.CHILD_LOT_PREFIX
+,  CHILD_LOT_STARTING_NUMBER         = P_item_rec.CHILD_LOT_STARTING_NUMBER
+,  CHILD_LOT_VALIDATION_FLAG         = P_item_rec.CHILD_LOT_VALIDATION_FLAG
+,  COPY_LOT_ATTRIBUTE_FLAG           = P_item_rec.COPY_LOT_ATTRIBUTE_FLAG
+,  RECIPE_ENABLED_FLAG               = P_item_rec.RECIPE_ENABLED_FLAG
+,  PROCESS_QUALITY_ENABLED_FLAG      = P_item_rec.PROCESS_QUALITY_ENABLED_FLAG
+,  PROCESS_EXECUTION_ENABLED_FLAG    = P_item_rec.PROCESS_EXECUTION_ENABLED_FLAG
+,  PROCESS_COSTING_ENABLED_FLAG      = P_item_rec.PROCESS_COSTING_ENABLED_FLAG
+,  PROCESS_SUPPLY_SUBINVENTORY       = P_item_rec.PROCESS_SUPPLY_SUBINVENTORY
+,  PROCESS_SUPPLY_LOCATOR_ID         = P_item_rec.PROCESS_SUPPLY_LOCATOR_ID
+,  PROCESS_YIELD_SUBINVENTORY        = P_item_rec.PROCESS_YIELD_SUBINVENTORY
+,  PROCESS_YIELD_LOCATOR_ID          = P_item_rec.PROCESS_YIELD_LOCATOR_ID
+,  HAZARDOUS_MATERIAL_FLAG           = P_item_rec.HAZARDOUS_MATERIAL_FLAG
+,  CAS_NUMBER                        = P_item_rec.CAS_NUMBER
+,  RETEST_INTERVAL                   = P_item_rec.RETEST_INTERVAL
+,  EXPIRATION_ACTION_INTERVAL        = P_item_rec.EXPIRATION_ACTION_INTERVAL
+,  EXPIRATION_ACTION_CODE            = P_item_rec.EXPIRATION_ACTION_CODE
+,  MATURITY_DAYS                     = P_item_rec.MATURITY_DAYS
+,  HOLD_DAYS                         = P_item_rec.HOLD_DAYS
+,  ATTRIBUTE16                       = P_item_rec.ATTRIBUTE16
+,  ATTRIBUTE17                       = P_item_rec.ATTRIBUTE17
+,  ATTRIBUTE18                       = P_item_rec.ATTRIBUTE18
+,  ATTRIBUTE19                       = P_item_rec.ATTRIBUTE19
+,  ATTRIBUTE20                       = P_item_rec.ATTRIBUTE20
+,  ATTRIBUTE21                       = P_item_rec.ATTRIBUTE21
+,  ATTRIBUTE22                       = P_item_rec.ATTRIBUTE22
+,  ATTRIBUTE23                       = P_item_rec.ATTRIBUTE23
+,  ATTRIBUTE24                       = P_item_rec.ATTRIBUTE24
+,  ATTRIBUTE25                       = P_item_rec.ATTRIBUTE25
+,  ATTRIBUTE26                       = P_item_rec.ATTRIBUTE26
+,  ATTRIBUTE27                       = P_item_rec.ATTRIBUTE27
+,  ATTRIBUTE28                       = P_item_rec.ATTRIBUTE28
+,  ATTRIBUTE29                       = P_item_rec.ATTRIBUTE29
+,  ATTRIBUTE30                       = P_item_rec.ATTRIBUTE30
+/* End Bug 3713912 */
+--Added for R12 ENH
+  ,  CHARGE_PERIODICITY_CODE         = p_Item_rec.CHARGE_PERIODICITY_CODE
+  ,  REPAIR_LEADTIME                 = p_Item_rec.REPAIR_LEADTIME
+  ,  REPAIR_YIELD                    = p_Item_rec.REPAIR_YIELD
+  ,  PREPOSITION_POINT               = p_Item_rec.PREPOSITION_POINT
+  ,  REPAIR_PROGRAM                  = p_Item_rec.REPAIR_PROGRAM
+  ,  SUBCONTRACTING_COMPONENT        = p_Item_rec.SUBCONTRACTING_COMPONENT
+  ,  OUTSOURCED_ASSEMBLY             = p_Item_rec.OUTSOURCED_ASSEMBLY
+  -- Fix for Bug#6644711
+  ,  DEFAULT_MATERIAL_STATUS_ID      = p_Item_rec.DEFAULT_MATERIAL_STATUS_ID
+/*  Bug 4224512 Updating the object version number - Anmurali */
+  ,  OBJECT_VERSION_NUMBER               = NVL(OBJECT_VERSION_NUMBER,1)+1
+  -- Serial_Tagging Enh -- bug 9913552
+  ,  SERIAL_TAGGING_FLAG            = p_Item_rec.SERIAL_TAGGING_FLAG
+  WHERE
+     CURRENT OF Item_csr;
+
+/*
+  WHERE
+          INVENTORY_ITEM_ID = l_Item_ID
+     AND  ORGANIZATION_ID   = l_Org_ID;
+
+  IF ( SQL%NOTFOUND ) THEN
+--     RAISE no_data_found;
+     x_return_status := FND_API.g_RET_STS_UNEXP_ERROR;
+     FND_MESSAGE.Set_Name ('INV', 'INV_Update_Item_Row_notfound');
+     FND_MSG_PUB.Add;
+     RETURN;
+  END IF;
+*/
+
+  ------------------------------------------------------------
+  -- Update item translation rows in the translations table --
+  ------------------------------------------------------------
+
+  IF ( p_update_Item_TL ) THEN
+
+     BEGIN  -- Update block
+
+        --  Do not validate Item and Org IDs since p_Item_rec is fetched
+
+        UPDATE MTL_SYSTEM_ITEMS_TL
+        SET
+           DESCRIPTION        =  NVL(trim(p_Item_rec.DESCRIPTION),DESCRIPTION)  --Bug 4416173
+        ,  LONG_DESCRIPTION   =  trim(p_Item_rec.LONG_DESCRIPTION)
+        ,  LAST_UPDATE_DATE   =  p_Item_rec.LAST_UPDATE_DATE
+        ,  LAST_UPDATED_BY    =  p_Item_rec.LAST_UPDATED_BY
+        ,  LAST_UPDATE_LOGIN  =  p_Item_rec.LAST_UPDATE_LOGIN
+        ,  SOURCE_LANG        =  userenv('LANG')
+        WHERE
+                INVENTORY_ITEM_ID = p_Item_rec.INVENTORY_ITEM_ID
+           AND  ORGANIZATION_ID   = p_Item_rec.ORGANIZATION_ID
+           AND  userenv('LANG') IN ( LANGUAGE, SOURCE_LANG );
+
+     END;  -- Update block
+
+  END IF;  -- Update translated item rows
+  ---------------------------------------
+
+  x_return_status := FND_API.g_RET_STS_SUCCESS;
+
+END Update_Item_Row;
+
+
+/*---------------------------- Update_Item_TL_Row ----------------------------*/
+
+-- Currently not used
+/*
+PROCEDURE Update_Item_TL_Row
+(
+    p_Item_TL_rec       IN   Item_TL_rec_type
+,   x_return_status     OUT  VARCHAR2
+)
+IS
+BEGIN
+
+  -- Update translated item row at Item_TL_csr cursor position
+  --
+  UPDATE MTL_SYSTEM_ITEMS_TL
+  SET
+     DESCRIPTION                     = p_Item_TL_rec.DESCRIPTION
+  ,  LONG_DESCRIPTION                = p_Item_TL_rec.LONG_DESCRIPTION
+  ,  LAST_UPDATE_DATE                = p_Item_TL_rec.LAST_UPDATE_DATE
+  ,  LAST_UPDATED_BY                 = p_Item_TL_rec.LAST_UPDATED_BY
+  ,  LAST_UPDATE_LOGIN               = p_Item_TL_rec.LAST_UPDATE_LOGIN
+--
+--  ,  SOURCE_LANG                     = p_Item_TL_rec.SOURCE_LANG
+--
+  -- Always use current language when updating item translation rows
+  ,  SOURCE_LANG = userenv('LANG')
+  WHERE
+     CURRENT OF Item_TL_csr;
+
+  x_return_status := FND_API.g_RET_STS_SUCCESS;
+
+END Update_Item_TL_Row;
+*/
+
+
+-- -------------------- To_Boolchar ---------------------
+
+-- Currently not used
+/*
+FUNCTION  To_Boolchar
+(
+   p_bool        IN   BOOLEAN
+)
+RETURN  VARCHAR2
+IS
+  l_api_name  CONSTANT  VARCHAR2(30)  :=  'To_Boolchar';
+BEGIN
+
+  IF ( p_bool = TRUE ) THEN
+     RETURN FND_API.g_TRUE;
+  ELSIF ( p_bool = FALSE ) THEN
+     RETURN FND_API.g_FALSE;
+  ELSE
+
+     FND_MSG_PUB.Add_Exc_Msg
+     (   p_pkg_name         =>  G_PKG_NAME
+     ,   p_procedure_name   =>  l_api_name
+--     ,   p_error_text       =>  'Unrecognized parameter value : p_bool='
+     );
+--     RETURN NULL;
+
+     RAISE FND_API.g_EXC_UNEXPECTED_ERROR;
+
+  END IF;
+
+END To_Boolchar;
+*/
+
+
+END INV_ITEM_API;
+
+/

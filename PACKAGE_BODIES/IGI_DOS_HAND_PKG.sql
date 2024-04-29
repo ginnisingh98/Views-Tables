@@ -1,0 +1,49 @@
+--------------------------------------------------------
+--  DDL for Package Body IGI_DOS_HAND_PKG
+--------------------------------------------------------
+
+  CREATE OR REPLACE EDITIONABLE PACKAGE BODY "APPS"."IGI_DOS_HAND_PKG" AS
+-- $Header: igidoscb.pls 120.4.12000000.1 2007/06/08 09:51:20 vkilambi ship $
+
+PROCEDURE Lock_Row_Head(X_Rowid  VARCHAR2,
+			X_Trx_Id NUMBER,
+			X_Dossier_Name VARCHAR2,
+			X_Trx_Number VARCHAR2,
+			X_Packet_Id NUMBER,
+			X_Trx_Status VARCHAR2,
+			X_Dossier_id NUMBER) IS
+BEGIN
+ NULL;
+END lock_row_head;
+
+
+PROCEDURE Lock_Row_Sources(X_Rowid  VARCHAR2,
+			X_Dossier_id NUMBER,
+			X_Sob_Id NUMBER,
+			X_TRX_ID NUMBER,
+ 			X_SOURCE_TRX_ID NUMBER,
+ 			X_SOURCE_ID NUMBER,
+ 			X_CODE_COMBINATION_ID NUMBER,
+ 			X_PROFILE_CODE VARCHAR2,
+ 			X_BUDGET_NAME VARCHAR2,
+ 			X_BUDGET_ENTITY_ID NUMBER,
+ 			X_BUDGET_VERSION_ID NUMBER,
+ 			X_BUDGET_AMOUNT NUMBER,
+ 			X_FUNDS_AVAILABLE NUMBER,
+ 			X_NEW_BALANCE NUMBER,
+ 			X_CURRENCY_CODE VARCHAR2,
+ 			X_VISIBLE_SEGMENTS VARCHAR2,
+ 			X_ACTUAL_SEGMENTS VARCHAR2,
+ 			X_PERIOD_NAME VARCHAR2,
+ 			X_PERIOD_YEAR NUMBER,
+ 			X_PERIOD_NUM NUMBER,
+ 			X_STATUS VARCHAR2,
+ 			X_GROUP_ID NUMBER,
+ 			X_QUARTER_NUM NUMBER) IS
+BEGIN
+ NULL;
+END lock_row_sources;
+
+END IGI_DOS_HAND_PKG;
+
+/

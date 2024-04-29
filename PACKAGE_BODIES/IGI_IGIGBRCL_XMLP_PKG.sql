@@ -1,0 +1,75 @@
+--------------------------------------------------------
+--  DDL for Package Body IGI_IGIGBRCL_XMLP_PKG
+--------------------------------------------------------
+
+  CREATE OR REPLACE EDITIONABLE PACKAGE BODY "APPS"."IGI_IGIGBRCL_XMLP_PKG" AS
+/* $Header: IGIGBRCLB.pls 120.0.12010000.1 2008/07/29 08:58:05 appldev ship $ */
+  FUNCTION AFTERREPORT RETURN BOOLEAN IS
+  BEGIN
+    IF P_RUN_AOL = 'Y' THEN
+      /*SRW.USER_EXIT('FND SRWEXIT')*/NULL;
+    END IF;
+    RETURN (TRUE);
+  END AFTERREPORT;
+
+  FUNCTION BEFOREREPORT RETURN BOOLEAN IS
+  BEGIN
+    IF P_RUN_AOL = 'Y' THEN
+      P_CONC_REQUEST_ID := FND_GLOBAL.CONC_REQUEST_ID;
+      /*SRW.USER_EXIT('FND SRWINIT')*/NULL;
+      /*SRW.REFERENCE(P_STRUCT_NUM)*/NULL;
+      /*SRW.USER_EXIT('FND FLEXRSQL
+                    	CODE="GL#"
+                    	NUM=":P_STRUCT_NUM"
+                    	APPL_SHORT_NAME="SQLGL"
+                    	OUTPUT="CP_FLEX"
+                    	TABLE_ALIAS="RANGES"')*/NULL;
+    END IF;
+    RETURN (TRUE);
+  END BEFOREREPORT;
+
+  FUNCTION CF_FLEX_HIGHFORMULA(HIGH_RANGE IN VARCHAR2
+                              ,CF_FLEX_HIGH IN VARCHAR2) RETURN VARCHAR2 IS
+  BEGIN
+    IF P_RUN_AOL = 'Y' THEN
+      /*SRW.REFERENCE(P_STRUCT_NUM)*/NULL;
+      /*SRW.REFERENCE(HIGH_RANGE)*/NULL;
+      /*SRW.USER_EXIT('FND FLEXRIDVAL
+                    	CODE="GL#"
+                    	NUM=":P_STRUCT_NUM"
+                    	APPL_SHORT_NAME="SQLGL"
+                    	DATA=":HIGH_RANGE"
+                    	VALUE=":CF_FLEX_HIGH"')*/NULL;
+    END IF;
+    RETURN (CF_FLEX_HIGH);
+  END CF_FLEX_HIGHFORMULA;
+
+  FUNCTION CF_FLEX_LOWFORMULA(LOW_RANGE IN VARCHAR2
+                             ,CF_FLEX_LOW IN VARCHAR2) RETURN VARCHAR2 IS
+  BEGIN
+    IF P_RUN_AOL = 'Y' THEN
+      /*SRW.REFERENCE(P_STRUCT_NUM)*/NULL;
+      /*SRW.REFERENCE(LOW_RANGE)*/NULL;
+      /*SRW.USER_EXIT('FND FLEXRIDVAL
+                    	CODE="GL#"
+                    	NUM=":P_STRUCT_NUM"
+                    	APPL_SHORT_NAME="SQLGL"
+                    	DATA=":LOW_RANGE"
+                    	VALUE=":CF_FLEX_LOW"')*/NULL;
+    END IF;
+    RETURN (CF_FLEX_LOW);
+  END CF_FLEX_LOWFORMULA;
+
+  FUNCTION CP_FLEX_LOW_P RETURN VARCHAR2 IS
+  BEGIN
+    RETURN CP_FLEX_LOW;
+  END CP_FLEX_LOW_P;
+
+  FUNCTION CP_FLEX_HIGH_P RETURN VARCHAR2 IS
+  BEGIN
+    RETURN CP_FLEX_HIGH;
+  END CP_FLEX_HIGH_P;
+
+END IGI_IGIGBRCL_XMLP_PKG;
+
+/

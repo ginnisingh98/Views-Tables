@@ -1,0 +1,27 @@
+--------------------------------------------------------
+--  DDL for Package OKS_ARFETCH_PUB
+--------------------------------------------------------
+
+  CREATE OR REPLACE EDITIONABLE PACKAGE "APPS"."OKS_ARFETCH_PUB" AUTHID CURRENT_USER AS
+/* $Header: OKSPARGS.pls 120.0 2005/05/25 18:12:02 appldev noship $ */
+
+G_SUM   CONSTANT NUMBER := 1;
+G_DET   CONSTANT NUMBER := 2;
+G_SOURCE_NAME CONSTANT VARCHAR2(10) := 'OKS';
+G_LINE_TYPE   CONSTANT VARCHAR2(20) := 'LINE';
+G_QTY   CONSTANT NUMBER := 1;
+
+G_RAIL_REC RA_INTERFACE_LINES%ROWTYPE;
+
+PROCEDURE	ARFetch_Main
+		(ERRBUF   	OUT  NOCOPY VARCHAR2,
+		 RETCODE     	OUT  NOCOPY NUMBER	);
+
+PROCEDURE	Get_AR_RECORD
+		( x_return_status     OUT NOCOPY VARCHAR2);
+
+END OKS_ARFETCH_PUB;
+
+ 
+
+/

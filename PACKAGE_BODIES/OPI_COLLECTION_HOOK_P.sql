@@ -1,0 +1,2309 @@
+--------------------------------------------------------
+--  DDL for Package Body OPI_COLLECTION_HOOK_P
+--------------------------------------------------------
+
+  CREATE OR REPLACE EDITIONABLE PACKAGE BODY "APPS"."OPI_COLLECTION_HOOK_P" AS
+    /*$Header: OPICOLLB.pls 120.0 2005/05/24 17:56:39 appldev noship $ */
+
+/* Constants for session - including schema name for truncating and
+collecting stats */
+    g_opi_schema      VARCHAR2(30);
+    g_status          VARCHAR2(30);
+    g_industry        VARCHAR2(30);
+
+Procedure POST_IPS_COLL(FACT_NAME IN Varchar2)IS
+BEGIN
+
+ /* get global session parameters */
+ IF NOT (fnd_installation.get_app_info( 'OPI', g_status,
+    g_industry, g_opi_schema)) THEN
+    RAISE_APPLICATION_ERROR (-20000, 'Unable to get session information.');
+  END IF;
+
+  execute immediate 'truncate table ' || g_opi_schema || '.OPI_EDW_IDS_OPICOLLB_LOG';
+  execute immediate 'truncate table ' || g_opi_schema || '.OPI_EDW_IDS_NET_CHG';
+  execute immediate 'truncate table ' || g_opi_schema || '.OPI_EDW_IPS_NET_CHG';
+
+  COMMIT;
+
+  -- Gather stats on the daily status fact to optimize joins to it.
+  OPI_COLLECTION_HOOK_P.GATHER_STATS('OPI_EDW_INV_DAILY_STAT_F');
+
+
+  EDW_OWB_COLLECTION_UTIL.write_to_log_file('get distinct row ids from IDS Snapshot Log log table');
+  EDW_OWB_COLLECTION_UTIL.write_to_log_file(to_char(SYSDATE,'DD-MON-YYYY HH24:MI:SS'));
+/* get distinct row ids from IDS Snapshot Log log table */
+IF FACT_NAME = 'OPI_EDW_INV_DAILY_STAT_F' THEN
+ INSERT INTO OPI_EDW_IDS_OPICOLLB_LOG (ROW_ID)
+ SELECT DISTINCT M_ROW$$
+ FROM MLOG$_OPI_EDW_INV_DAILY_ST ;
+ELSIF FACT_NAME = 'OPI_EDW_INV_PERD_STAT_F' THEN
+ INSERT INTO OPI_EDW_IDS_OPICOLLB_LOG (ROW_ID)
+ SELECT ROWID
+ FROM OPI_EDW_INV_DAILY_STAT_F
+ WHERE period_flag = 1 ;  -- add this condition to minimize join below for the
+                          -- initial load
+END IF;
+
+  EDW_OWB_COLLECTION_UTIL.write_to_log_file('Number of rows changed in IDS'||SQL%ROWCOUNT);
+  EDW_OWB_COLLECTION_UTIL.write_to_log_file(to_char(SYSDATE,'DD-MON-YYYY HH24:MI:SS'));
+
+  OPI_COLLECTION_HOOK_P.GATHER_STATS('OPI_EDW_IDS_OPICOLLB_LOG');
+
+/* Move Non Attribute Columns into Tep Table 1 */
+
+  EDW_OWB_COLLECTION_UTIL.write_to_log_file('Populate Non key attributes into OPI_EDW_IDS_NET_CHG Table');
+  EDW_OWB_COLLECTION_UTIL.write_to_log_file(to_char(SYSDATE,'DD-MON-YYYY HH24:MI:SS'));
+
+
+INSERT INTO OPI_EDW_IDS_NET_CHG(
+      BASE_UOM_FK_KEY,
+    BASE_CURRENCY_FK_KEY,
+    INSTANCE_FK_KEY,
+    INV_ORG_FK_KEY,
+    ITEM_ORG_FK_KEY,
+    LOCATOR_FK_KEY,
+    LOT_FK_KEY,
+    PRD_DATE_FK_KEY,
+      COST_GROUP,
+      NETTABLE_FLAG,
+      ITEM_STATUS)
+SELECT /*+ROWID(OPI_EDW_INV_DAILY_STAT_F)*/
+    BASE_UOM_FK_KEY,
+    BASE_CURRENCY_FK_KEY,
+    INSTANCE_FK_KEY,
+    INV_ORG_FK_KEY,
+    ITEM_ORG_FK_KEY,
+    LOCATOR_FK_KEY,
+    LOT_FK_KEY,
+    PRD_DATE_FK_KEY,
+      COST_GROUP,
+    MAX(NETTABLE_FLAG),
+    MAX(ITEM_STATUS)
+FROM OPI_EDW_INV_DAILY_STAT_F IDS, OPI_EDW_IDS_OPICOLLB_LOG  CHANGED
+WHERE IDS.ROWID = CHANGED.ROW_ID
+AND IDS.PERIOD_FLAG = 1
+GROUP BY
+    BASE_UOM_FK_KEY,
+    BASE_CURRENCY_FK_KEY,
+    INSTANCE_FK_KEY,
+    INV_ORG_FK_KEY,
+    ITEM_ORG_FK_KEY,
+    LOCATOR_FK_KEY,
+    LOT_FK_KEY,
+    PRD_DATE_FK_KEY,
+      COST_GROUP;
+
+  EDW_OWB_COLLECTION_UTIL.write_to_log_file('Populated Non key attributes into OPI_EDW_IDS_NET_CHG Table'||SQL%ROWCOUNT);
+  EDW_OWB_COLLECTION_UTIL.write_to_log_file(to_char(SYSDATE,'DD-MON-YYYY HH24:MI:SS'));
+
+  OPI_COLLECTION_HOOK_P.GATHER_STATS('OPI_EDW_IDS_NET_CHG');
+
+/* Move net change data from IPS and Temp OPI_EDW_IPS_NET_CHG */
+
+  EDW_OWB_COLLECTION_UTIL.write_to_log_file('Move net change data from IPS and Temp OPI_EDW_IPS_NET_CHG ');
+  EDW_OWB_COLLECTION_UTIL.write_to_log_file(to_char(SYSDATE,'DD-MON-YYYY HH24:MI:SS'));
+
+INSERT INTO OPI_EDW_IPS_NET_CHG
+(     ROW_ID
+,AVG_INT_QTY
+,AVG_INT_VAL_B
+,AVG_INT_VAL_G
+,AVG_ONH_QTY
+,AVG_ONH_VAL_B
+,AVG_ONH_VAL_G
+,AVG_WIP_QTY
+,AVG_WIP_VAL_B
+,AVG_WIP_VAL_G
+,BASE_CURRENCY_FK_KEY
+,BASE_UOM_FK_KEY
+,BEG_INT_QTY
+,BEG_INT_VAL_B
+,BEG_INT_VAL_G
+,BEG_ONH_QTY
+,BEG_ONH_VAL_B
+,BEG_ONH_VAL_G
+,BEG_WIP_QTY
+,BEG_WIP_VAL_B
+,BEG_WIP_VAL_G
+,COST_GROUP
+,CREATION_DATE
+,END_INT_QTY
+,END_INT_VAL_B
+,END_INT_VAL_G
+,END_ONH_QTY
+,END_ONH_VAL_B
+,END_ONH_VAL_G
+,END_WIP_QTY
+,END_WIP_VAL_B
+,END_WIP_VAL_G
+,FROM_ORG_QTY
+,FROM_ORG_VAL_B
+,FROM_ORG_VAL_G
+,INSTANCE_FK_KEY
+,INV_ADJ_QTY
+,INV_ADJ_VAL_B
+,INV_ADJ_VAL_G
+,INV_ORG_FK_KEY
+,INV_PERIOD_STATUS_PK
+,INV_PERIOD_STATUS_PK_KEY
+,ITEM_ORG_FK_KEY
+,ITEM_STATUS
+,LAST_UPDATE_DATE
+,LOCATOR_FK_KEY
+,LOT_FK_KEY
+,NETTABLE_FLAG
+,PO_DEL_QTY
+,PO_DEL_VAL_B
+,PO_DEL_VAL_G
+,PRD_DATE_FK_KEY
+,TOTAL_REC_QTY
+,TOTAL_REC_VAL_B
+,TOTAL_REC_VAL_G
+,TOT_CUST_SHIP_QTY
+,TOT_CUST_SHIP_VAL_B
+,TOT_CUST_SHIP_VAL_G
+,TOT_ISSUES_QTY
+,TOT_ISSUES_VAL_B
+,TOT_ISSUES_VAL_G
+,TO_ORG_QTY
+,TO_ORG_VAL_B
+,TO_ORG_VAL_G
+,USER_ATTRIBUTE1
+,USER_ATTRIBUTE10
+,USER_ATTRIBUTE11
+,USER_ATTRIBUTE12
+,USER_ATTRIBUTE13
+,USER_ATTRIBUTE14
+,USER_ATTRIBUTE15
+,USER_ATTRIBUTE2
+,USER_ATTRIBUTE3
+,USER_ATTRIBUTE4
+,USER_ATTRIBUTE5
+,USER_ATTRIBUTE6
+,USER_ATTRIBUTE7
+,USER_ATTRIBUTE8
+,USER_ATTRIBUTE9
+,USER_FK1_KEY
+,USER_FK2_KEY
+,USER_FK3_KEY
+,USER_FK4_KEY
+,USER_FK5_KEY
+,USER_MEASURE1
+,USER_MEASURE2
+,USER_MEASURE3
+,USER_MEASURE4
+,USER_MEASURE5
+,WIP_ASSY_QTY
+,WIP_ASSY_VAL_B
+,WIP_ASSY_VAL_G
+,WIP_COMP_QTY
+,WIP_COMP_VAL_B
+,WIP_COMP_VAL_G
+,WIP_ISSUE_QTY
+,WIP_ISSUE_VAL_B
+,WIP_ISSUE_VAL_G)
+SELECT
+     IPS.ROWID
+, IPS.AVG_INT_QTY
+, IPS.AVG_INT_VAL_B
+, IPS.AVG_INT_VAL_G
+, IPS.AVG_ONH_QTY
+, IPS.AVG_ONH_VAL_B
+, IPS.AVG_ONH_VAL_G
+, IPS.AVG_WIP_QTY
+, IPS.AVG_WIP_VAL_B
+, IPS.AVG_WIP_VAL_G
+, IPS.BASE_CURRENCY_FK_KEY
+, IPS.BASE_UOM_FK_KEY
+, IPS.BEG_INT_QTY
+, IPS.BEG_INT_VAL_B
+, IPS.BEG_INT_VAL_G
+, IPS.BEG_ONH_QTY
+, IPS.BEG_ONH_VAL_B
+, IPS.BEG_ONH_VAL_G
+, IPS.BEG_WIP_QTY
+, IPS.BEG_WIP_VAL_B
+, IPS.BEG_WIP_VAL_G
+, IPS.COST_GROUP
+, IPS.CREATION_DATE
+, IPS.END_INT_QTY
+, IPS.END_INT_VAL_B
+, IPS.END_INT_VAL_G
+, IPS.END_ONH_QTY
+, IPS.END_ONH_VAL_B
+, IPS.END_ONH_VAL_G
+, IPS.END_WIP_QTY
+, IPS.END_WIP_VAL_B
+, IPS.END_WIP_VAL_G
+, IPS.FROM_ORG_QTY
+, IPS.FROM_ORG_VAL_B
+, IPS.FROM_ORG_VAL_G
+, IPS.INSTANCE_FK_KEY
+, IPS.INV_ADJ_QTY
+, IPS.INV_ADJ_VAL_B
+, IPS.INV_ADJ_VAL_G
+, IPS.INV_ORG_FK_KEY
+, IPS.INV_PERIOD_STATUS_PK
+, IPS.INV_PERIOD_STATUS_PK_KEY
+, IPS.ITEM_ORG_FK_KEY
+, WK2.ITEM_STATUS
+, IPS.LAST_UPDATE_DATE
+, IPS.LOCATOR_FK_KEY
+, IPS.LOT_FK_KEY
+, WK2.NETTABLE_FLAG
+, IPS.PO_DEL_QTY
+, IPS.PO_DEL_VAL_B
+, IPS.PO_DEL_VAL_G
+, IPS.PRD_DATE_FK_KEY
+, IPS.TOTAL_REC_QTY
+, IPS.TOTAL_REC_VAL_B
+, IPS.TOTAL_REC_VAL_G
+, IPS.TOT_CUST_SHIP_QTY
+, IPS.TOT_CUST_SHIP_VAL_B
+, IPS.TOT_CUST_SHIP_VAL_G
+, IPS.TOT_ISSUES_QTY
+, IPS.TOT_ISSUES_VAL_B
+, IPS.TOT_ISSUES_VAL_G
+, IPS.TO_ORG_QTY
+, IPS.TO_ORG_VAL_B
+, IPS.TO_ORG_VAL_G
+, IPS.USER_ATTRIBUTE1
+, IPS.USER_ATTRIBUTE10
+, IPS.USER_ATTRIBUTE11
+, IPS.USER_ATTRIBUTE12
+, IPS.USER_ATTRIBUTE13
+, IPS.USER_ATTRIBUTE14
+, IPS.USER_ATTRIBUTE15
+, IPS.USER_ATTRIBUTE2
+, IPS.USER_ATTRIBUTE3
+, IPS.USER_ATTRIBUTE4
+, IPS.USER_ATTRIBUTE5
+, IPS.USER_ATTRIBUTE6
+, IPS.USER_ATTRIBUTE7
+, IPS.USER_ATTRIBUTE8
+, IPS.USER_ATTRIBUTE9
+, IPS.USER_FK1_KEY
+, IPS.USER_FK2_KEY
+, IPS.USER_FK3_KEY
+, IPS.USER_FK4_KEY
+, IPS.USER_FK5_KEY
+, IPS.USER_MEASURE1
+, IPS.USER_MEASURE2
+, IPS.USER_MEASURE3
+, IPS.USER_MEASURE4
+, IPS.USER_MEASURE5
+, IPS.WIP_ASSY_QTY
+, IPS.WIP_ASSY_VAL_B
+, IPS.WIP_ASSY_VAL_G
+, IPS.WIP_COMP_QTY
+, IPS.WIP_COMP_VAL_B
+, IPS.WIP_COMP_VAL_G
+, IPS.WIP_ISSUE_QTY
+, IPS.WIP_ISSUE_VAL_B
+, IPS.WIP_ISSUE_VAL_G
+FROM OPI_EDW_INV_PERD_STAT_F IPS, OPI_EDW_IDS_NET_CHG WK2
+WHERE
+    IPS.BASE_UOM_FK_KEY = WK2.BASE_UOM_FK_KEY         AND
+    IPS.BASE_CURRENCY_FK_KEY=WK2.BASE_CURRENCY_FK_KEY AND
+    IPS.INSTANCE_FK_KEY=WK2.INSTANCE_FK_KEY           AND
+    IPS.INV_ORG_FK_KEY =WK2.INV_ORG_FK_KEY            AND
+    IPS.ITEM_ORG_FK_KEY=WK2.ITEM_ORG_FK_KEY           AND
+    IPS.LOCATOR_FK_KEY=WK2.LOCATOR_FK_KEY             AND
+    IPS.LOT_FK_KEY=WK2.LOT_FK_KEY                     AND
+    IPS.PRD_DATE_FK_KEY=WK2.PRD_DATE_FK_KEY           AND
+      NVL(IPS.COST_GROUP,'0') = NVL(WK2.COST_GROUP,'0');
+
+  EDW_OWB_COLLECTION_UTIL.write_to_log_file('Moved net change data from IPS and Temp OPI_EDW_IPS_NET_CHG ' ||SQL%ROWCOUNT);
+  EDW_OWB_COLLECTION_UTIL.write_to_log_file(to_char(SYSDATE,'DD-MON-YYYY HH24:MI:SS'));
+
+  OPI_COLLECTION_HOOK_P.GATHER_STATS('OPI_EDW_IPS_NET_CHG');
+
+/* Delete IPS table for Changed rows */
+
+  EDW_OWB_COLLECTION_UTIL.write_to_log_file('Deleting Changed rows from IPS ');
+  EDW_OWB_COLLECTION_UTIL.write_to_log_file(to_char(SYSDATE,'DD-MON-YYYY HH24:MI:SS'));
+
+ DELETE OPI_EDW_INV_PERD_STAT_F
+ WHERE ROWID IN (SELECT ROW_ID FROM OPI_EDW_IPS_NET_CHG);
+
+  EDW_OWB_COLLECTION_UTIL.write_to_log_file('Deleted Changed rows from IPS ' ||SQL%ROWCOUNT);
+  EDW_OWB_COLLECTION_UTIL.write_to_log_file(to_char(SYSDATE,'DD-MON-YYYY HH24:MI:SS'));
+
+
+/* insert data from temp Table to IPS */
+
+  EDW_OWB_COLLECTION_UTIL.write_to_log_file('Moving Data from Work table to IPS');
+  EDW_OWB_COLLECTION_UTIL.write_to_log_file(to_char(SYSDATE,'DD-MON-YYYY HH24:MI:SS'));
+
+
+INSERT INTO OPI_EDW_INV_PERD_STAT_F (
+        AVG_INT_QTY
+       ,AVG_INT_VAL_B
+       ,AVG_INT_VAL_G
+       ,AVG_ONH_QTY
+       ,AVG_ONH_VAL_B
+       ,AVG_ONH_VAL_G
+       ,AVG_WIP_QTY
+       ,AVG_WIP_VAL_B
+       ,AVG_WIP_VAL_G
+       ,BASE_CURRENCY_FK_KEY
+       ,BASE_UOM_FK_KEY
+       ,BEG_INT_QTY
+       ,BEG_INT_VAL_B
+       ,BEG_INT_VAL_G
+       ,BEG_ONH_QTY
+       ,BEG_ONH_VAL_B
+       ,BEG_ONH_VAL_G
+       ,BEG_WIP_QTY
+       ,BEG_WIP_VAL_B
+       ,BEG_WIP_VAL_G
+       ,COST_GROUP
+      ,CREATION_DATE
+      ,END_INT_QTY
+      ,END_INT_VAL_B
+      ,END_INT_VAL_G
+      ,END_ONH_QTY
+      ,END_ONH_VAL_B
+      ,END_ONH_VAL_G
+      ,END_WIP_QTY
+      ,END_WIP_VAL_B
+      ,END_WIP_VAL_G
+      ,FROM_ORG_QTY
+      ,FROM_ORG_VAL_B
+      ,FROM_ORG_VAL_G
+      ,INSTANCE_FK_KEY
+      ,INV_ADJ_QTY
+      ,INV_ADJ_VAL_B
+      ,INV_ADJ_VAL_G
+      ,INV_ORG_FK_KEY
+      ,INV_PERIOD_STATUS_PK
+      ,INV_PERIOD_STATUS_PK_KEY
+     ,ITEM_ORG_FK_KEY
+     ,ITEM_STATUS
+     ,LAST_UPDATE_DATE
+     ,LOCATOR_FK_KEY
+     ,LOT_FK_KEY
+     ,NETTABLE_FLAG
+     ,PO_DEL_QTY
+     ,PO_DEL_VAL_B
+     ,PO_DEL_VAL_G
+     ,PRD_DATE_FK_KEY
+     ,TOTAL_REC_QTY
+     ,TOTAL_REC_VAL_B
+     ,TOTAL_REC_VAL_G
+     ,TOT_CUST_SHIP_QTY
+     ,TOT_CUST_SHIP_VAL_B
+     ,TOT_CUST_SHIP_VAL_G
+     ,TOT_ISSUES_QTY
+     ,TOT_ISSUES_VAL_B
+     ,TOT_ISSUES_VAL_G
+     ,TO_ORG_QTY
+     ,TO_ORG_VAL_B
+     ,TO_ORG_VAL_G
+     ,USER_ATTRIBUTE1
+     ,USER_ATTRIBUTE10
+     ,USER_ATTRIBUTE11
+     ,USER_ATTRIBUTE12
+     ,USER_ATTRIBUTE13
+     ,USER_ATTRIBUTE14
+     ,USER_ATTRIBUTE15
+     ,USER_ATTRIBUTE2
+     ,USER_ATTRIBUTE3
+     ,USER_ATTRIBUTE4
+     ,USER_ATTRIBUTE5
+     ,USER_ATTRIBUTE6
+     ,USER_ATTRIBUTE7
+     ,USER_ATTRIBUTE8
+     ,USER_ATTRIBUTE9
+     ,USER_FK1_KEY
+     ,USER_FK2_KEY
+     ,USER_FK3_KEY
+     ,USER_FK4_KEY
+     ,USER_FK5_KEY
+     ,USER_MEASURE1
+     ,USER_MEASURE2
+     ,USER_MEASURE3
+     ,USER_MEASURE4
+     ,USER_MEASURE5
+     ,WIP_ASSY_QTY
+     ,WIP_ASSY_VAL_B
+     ,WIP_ASSY_VAL_G
+     ,WIP_COMP_QTY
+     ,WIP_COMP_VAL_B
+     ,WIP_COMP_VAL_G
+     ,WIP_ISSUE_QTY
+     ,WIP_ISSUE_VAL_B
+     ,WIP_ISSUE_VAL_G)
+SELECT
+        (BEG_INT_QTY+END_INT_QTY)/2 AVG_INT_QTY
+       ,(BEG_INT_VAL_B+END_INT_VAL_B)/2  AVG_INT_VAL_B
+       ,(BEG_INT_VAL_G+END_INT_VAL_G)/2 AVG_INT_VAL_G
+       ,(BEG_ONH_QTY+END_ONH_QTY)/2 AVG_ONH_QTY
+       ,(BEG_ONH_VAL_B+END_ONH_VAL_B)/2 AVG_ONH_VAL_B
+       ,(BEG_ONH_VAL_G+END_ONH_VAL_G)/2 AVG_ONH_VAL_G
+       ,(BEG_WIP_QTY+END_WIP_QTY)/2 AVG_WIP_QTY
+       , (BEG_WIP_VAL_B+END_WIP_VAL_B)/2 AVG_WIP_VAL_B
+       ,(BEG_WIP_VAL_G+END_WIP_VAL_G)/2 AVG_WIP_VAL_G
+       ,BASE_CURRENCY_FK_KEY
+       ,BASE_UOM_FK_KEY
+       ,BEG_INT_QTY
+       ,BEG_INT_VAL_B
+       ,BEG_INT_VAL_G
+       ,BEG_ONH_QTY
+       ,BEG_ONH_VAL_B
+       ,BEG_ONH_VAL_G
+       ,BEG_WIP_QTY
+       ,BEG_WIP_VAL_B
+       ,BEG_WIP_VAL_G
+       ,COST_GROUP
+      ,CREATION_DATE
+      ,END_INT_QTY
+      ,END_INT_VAL_B
+      ,END_INT_VAL_G
+      ,END_ONH_QTY
+      ,END_ONH_VAL_B
+      ,END_ONH_VAL_G
+      ,END_WIP_QTY
+      ,END_WIP_VAL_B
+      ,END_WIP_VAL_G
+      ,FROM_ORG_QTY
+      ,FROM_ORG_VAL_B
+      ,FROM_ORG_VAL_G
+      ,INSTANCE_FK_KEY
+      ,INV_ADJ_QTY
+      ,INV_ADJ_VAL_B
+      ,INV_ADJ_VAL_G
+      ,INV_ORG_FK_KEY
+      ,INV_PERIOD_STATUS_PK
+      ,INV_PERIOD_STATUS_PK_KEY
+     ,ITEM_ORG_FK_KEY
+     ,ITEM_STATUS
+     ,LAST_UPDATE_DATE
+     ,LOCATOR_FK_KEY
+     ,LOT_FK_KEY
+     ,NETTABLE_FLAG
+     ,PO_DEL_QTY
+     ,PO_DEL_VAL_B
+     ,PO_DEL_VAL_G
+     ,PRD_DATE_FK_KEY
+     ,TOTAL_REC_QTY
+     ,TOTAL_REC_VAL_B
+     ,TOTAL_REC_VAL_G
+     ,TOT_CUST_SHIP_QTY
+     ,TOT_CUST_SHIP_VAL_B
+     ,TOT_CUST_SHIP_VAL_G
+     ,TOT_ISSUES_QTY
+     ,TOT_ISSUES_VAL_B
+     ,TOT_ISSUES_VAL_G
+     ,TO_ORG_QTY
+     ,TO_ORG_VAL_B
+     ,TO_ORG_VAL_G
+     ,USER_ATTRIBUTE1
+     ,USER_ATTRIBUTE10
+     ,USER_ATTRIBUTE11
+     ,USER_ATTRIBUTE12
+     ,USER_ATTRIBUTE13
+     ,USER_ATTRIBUTE14
+     ,USER_ATTRIBUTE15
+     ,USER_ATTRIBUTE2
+     ,USER_ATTRIBUTE3
+     ,USER_ATTRIBUTE4
+     ,USER_ATTRIBUTE5
+     ,USER_ATTRIBUTE6
+     ,USER_ATTRIBUTE7
+     ,USER_ATTRIBUTE8
+     ,USER_ATTRIBUTE9
+     ,USER_FK1_KEY
+     ,USER_FK2_KEY
+     ,USER_FK3_KEY
+     ,USER_FK4_KEY
+     ,USER_FK5_KEY
+     ,USER_MEASURE1
+     ,USER_MEASURE2
+     ,USER_MEASURE3
+     ,USER_MEASURE4
+     ,USER_MEASURE5
+     ,WIP_ASSY_QTY
+     ,WIP_ASSY_VAL_B
+     ,WIP_ASSY_VAL_G
+     ,WIP_COMP_QTY
+     ,WIP_COMP_VAL_B
+     ,WIP_COMP_VAL_G
+     ,WIP_ISSUE_QTY
+     ,WIP_ISSUE_VAL_B
+     ,WIP_ISSUE_VAL_G
+FROM OPI_EDW_IPS_NET_CHG;
+
+  EDW_OWB_COLLECTION_UTIL.write_to_log_file('Moved Data from Work table to IPS' ||SQL%ROWCOUNT);
+  EDW_OWB_COLLECTION_UTIL.write_to_log_file(to_char(SYSDATE,'DD-MON-YYYY HH24:MI:SS'));
+
+  OPI_COLLECTION_HOOK_P.GATHER_STATS('OPI_EDW_INV_PERD_STAT_F');
+
+  execute immediate 'truncate table ' || g_opi_schema || '.OPI_EDW_IDS_OPICOLLB_LOG';
+  execute immediate 'truncate table ' || g_opi_schema || '.OPI_EDW_IDS_NET_CHG';
+  execute immediate 'truncate table ' || g_opi_schema || '.OPI_EDW_IPS_NET_CHG';
+
+  COMMIT;
+
+END;
+
+PROCEDURE POST_MARGIN_COLL(p_Base_fact_name VARCHAR2) IS
+  l_table_owner   VARCHAR2(40);
+  l_stmt          VARCHAR2(200);
+  l_chunk_size    NUMBER := NVL(fnd_profile.value('EDW_COLLECTION_SIZE'),20000);
+  l_insert    NUMBER := 0;
+BEGIN
+
+--
+--
+--  Clean up Temporary work tables data. if previous run failed these tables will have data.
+--
+--
+OPI_COLLECTION_HOOK_P.TURNC_TAB('OPI_EDW_MARGIN_PERD_ILOG');
+OPI_COLLECTION_HOOK_P.TURNC_TAB('OPI_EDW_MRG_MAX_VALUES');
+OPI_COLLECTION_HOOK_P.TURNC_TAB('OPI_EDW_MRG_KEYS');
+OPI_COLLECTION_HOOK_P.TURNC_TAB('OPI_EDW_PERD_MARGIN_FT');
+OPI_COLLECTION_HOOK_P.TURNC_TAB('OPI_EDW_PERD_MARGIN_FUR');
+OPI_COLLECTION_HOOK_P.TURNC_TAB('OPI_EDW_MARGIN_PERD_FIR');
+OPI_COLLECTION_HOOK_P.TURNC_TAB('OPI_EDW_MARGIN_PERD_FDLG');
+OPI_COLLECTION_HOOK_P.TURNC_TAB('OPI_EDW_MARGIN_PERD_FD');
+OPI_COLLECTION_HOOK_P.TURNC_TAB('OPI_EDW_MRGIN_COGSPOSTCOLL_FUR');
+OPI_COLLECTION_HOOK_P.TURNC_TAB('OPI_EDW_MRGIN_REV_POSTCOLL_FUR');
+--
+--
+--  Clean up section is over
+--
+--
+
+
+--
+--
+--  Identify the rows which are modified or deleted in margin fact.
+--  First add all the changed rows from margin to period summary
+--  then subtract old rows backed up by following insert statement.
+--
+--
+IF p_base_fact_name <> 'OPI_EDW_MARGIN_F' THEN
+ EXECUTE IMMEDIATE ' insert into OPI_EDW_MARGIN_PERD_FDLG (SOB_FK_KEY
+  ,USER_MEASURE5
+  ,USER_MEASURE4
+  ,USER_MEASURE3
+  ,USER_MEASURE2
+  ,USER_MEASURE1
+  ,ICAP_QTY
+  ,RMA_QTY
+  ,SHIPPED_QTY
+  ,PROD_LINE_QTY_CREDITED
+  ,PROD_LINE_QTY_INVOICED
+  ,PROD_AMT_B
+  ,PROD_AMT_G
+  ,COGS_B
+  ,COGS_G
+  ,UOM_FK_KEY
+  ,PROJECT_FK_KEY
+  ,GL_PERIOD_FK_KEY
+  ,SHIP_TO_LOC_FK_KEY
+  ,BILL_TO_LOC_FK_KEY
+  ,PRIM_SALES_REP_FK_KEY
+  ,INSTANCE_FK_KEY
+  ,SALES_CHANNEL_FK_KEY
+  ,CUSTOMER_FK_KEY
+  ,OPERATING_UNIT_FK_KEY
+  ,ITEM_ORG_FK_KEY
+  ,BASE_CURRENCY_FK_KEY
+  ,COGS_DATE_FK_KEY
+  ,INVOICE_DATE
+  ,MARGIN_DATE_FK_KEY
+  ,ORDER_DATE
+  ,ORDER_LINE_ID
+  ,ORDER_NO
+  ,REVENUE_DATE_FK_KEY
+  ,SHIP_DATE
+  ,SHIP_LOCATION_FK_KEY
+  ,UNIT_SELLING_PRICE)
+ SELECT
+    SOB_FK_KEY
+    ,USER_MEASURE5
+    ,USER_MEASURE4
+    ,USER_MEASURE3
+    ,USER_MEASURE2
+    ,USER_MEASURE1
+    ,ICAP_QTY
+    ,RMA_QTY
+    ,SHIPPED_QTY
+    ,PROD_LINE_QTY_CREDITED
+    ,PROD_LINE_QTY_INVOICED
+    ,PROD_AMT_B
+    ,PROD_AMT_G
+    ,COGS_B
+    ,COGS_G
+    ,UOM_FK_KEY
+    ,PROJECT_FK_KEY
+    ,GL_PERIOD_FK_KEY
+    ,SHIP_TO_LOC_FK_KEY
+    ,BILL_TO_LOC_FK_KEY
+    ,PRIM_SALES_REP_FK_KEY
+    ,INSTANCE_FK_KEY
+    ,SALES_CHANNEL_FK_KEY
+    ,CUSTOMER_FK_KEY
+    ,OPERATING_UNIT_FK_KEY
+    ,ITEM_ORG_FK_KEY
+    ,BASE_CURRENCY_FK_KEY
+    ,COGS_DATE_FK_KEY
+    ,INVOICE_DATE
+    ,MARGIN_DATE_FK_KEY
+    ,ORDER_DATE
+    ,ORDER_LINE_ID
+    ,ORDER_NO
+    ,REVENUE_DATE_FK_KEY
+    ,SHIP_DATE
+    ,SHIP_LOCATION_FK_KEY
+    ,UNIT_SELLING_PRICE
+FROM
+(
+SELECT
+    SOB_FK_KEY
+    ,USER_MEASURE5
+    ,USER_MEASURE4
+    ,USER_MEASURE3
+    ,USER_MEASURE2
+    ,USER_MEASURE1
+    ,ICAP_QTY
+    ,RMA_QTY
+    ,SHIPPED_QTY
+    ,PROD_LINE_QTY_CREDITED
+    ,PROD_LINE_QTY_INVOICED
+    ,PROD_AMT_B
+    ,PROD_AMT_G
+    ,COGS_B
+    ,COGS_G
+    ,UOM_FK_KEY
+    ,PROJECT_FK_KEY
+    ,GL_PERIOD_FK_KEY
+    ,SHIP_TO_LOC_FK_KEY
+    ,BILL_TO_LOC_FK_KEY
+    ,PRIM_SALES_REP_FK_KEY
+    ,INSTANCE_FK_KEY
+    ,SALES_CHANNEL_FK_KEY
+    ,CUSTOMER_FK_KEY
+    ,OPERATING_UNIT_FK_KEY
+    ,ITEM_ORG_FK_KEY
+    ,BASE_CURRENCY_FK_KEY
+    ,COGS_DATE_FK_KEY
+    ,INVOICE_DATE
+    ,MARGIN_DATE_FK_KEY
+    ,ORDER_DATE
+    ,ORDER_LINE_ID
+    ,ORDER_NO
+    ,REVENUE_DATE_FK_KEY
+    ,SHIP_DATE
+    ,SHIP_LOCATION_FK_KEY
+    ,UNIT_SELLING_PRICE
+      ,LAST_UPDATE_DATE
+      ,MIN(LAST_UPDATE_DATE) OVER (PARTITION BY M_ROW$$) FIRST_UPDATE_DATE
+    FROM MLOG$_OPI_EDW_MARGIN_F a
+     WHERE a.DMLTYPE$$ IN (''D'',''U'')
+       AND a.GL_PERIOD_FK_KEY IS NOT NULL
+       AND a.GL_PERIOD_FK_KEY <>  ''0'' )
+WHERE
+    FIRST_UPDATE_DATE = LAST_UPDATE_DATE';
+
+   EDW_OWB_COLLECTION_UTIL.write_to_log_file('Number of rows inserted into  OPI_EDW_MARGIN_PERD_FDLG '||SQL%ROWCOUNT);
+   EDW_OWB_COLLECTION_UTIL.write_to_log_file(to_char(SYSDATE,'DD-MON-YYYY HH24:MI:SS'));
+   commit;
+--
+--
+--   Gather table statistics these stats will be used by CBO for query optimisation.
+--
+--
+
+  OPI_COLLECTION_HOOK_P.GATHER_STATS('OPI_EDW_MARGIN_PERD_FDLG');
+
+insert into OPI_EDW_MARGIN_PERD_FD (select rowid ,0 from OPI_EDW_MARGIN_PERD_FDLG);
+
+EDW_OWB_COLLECTION_UTIL.write_to_log_file('Number of rows inserted into  OPI_EDW_MARGIN_PERD_FD '||SQL%ROWCOUNT);
+EDW_OWB_COLLECTION_UTIL.write_to_log_file(to_char(SYSDATE,'DD-MON-YYYY HH24:MI:SS'));
+commit;
+
+--
+--
+--   Gather table statistics these stats will be used by CBO for query optimisation.
+--
+--
+
+  OPI_COLLECTION_HOOK_P.GATHER_STATS('OPI_EDW_MARGIN_PERD_FD');
+
+ELSE
+/***********************************************************************************************************
+*** Trancate the Period Margin Fact because margin fact is rebuilt so we need to rebuild period summary ****
+************************************************************************************************************/
+  OPI_COLLECTION_HOOK_P.TURNC_TAB('OPI_EDW_PERD_MARGIN_F');
+END IF;
+
+--
+--
+--   Gather table statistics these stats will be used by CBO for query optimisation.
+--
+--
+
+  OPI_COLLECTION_HOOK_P.GATHER_STATS('MLOG$_OPI_EDW_MARGIN_F');
+
+--
+--
+--   Take the backup of changed rows
+--
+--
+
+insert into OPI_EDW_MARGIN_PERD_ILOG(ROW_ID,STATUS) (select /*+ ALL_ROWS */ distinct m_row$$ ,0 from MLOG$_OPI_EDW_MARGIN_F);
+
+EDW_OWB_COLLECTION_UTIL.write_to_log_file('Number of rows to be processed to build margin period summary'||SQL%ROWCOUNT);
+EDW_OWB_COLLECTION_UTIL.write_to_log_file(to_char(SYSDATE,'DD-MON-YYYY HH24:MI:SS'));
+
+--
+--
+--   Gather table statistics these stats will be used by CBO for query optimisation.
+--
+--
+
+  OPI_COLLECTION_HOOK_P.GATHER_STATS('OPI_EDW_MARGIN_PERD_ILOG');
+
+commit;
+
+
+/****************************************************************************************+
+***   Update Margin Base fact with non common keys and attributes from base fact       ***
+***   COGS and REVENUE based on Fact name passed by collection Engine.                 ***
++*****************************************************************************************/
+IF p_Base_fact_name  = 'FII_AR_TRX_DIST_F' /*  Revenue Fact */
+THEN
+    INSERT INTO OPI_EDW_MRG_KEYS (ORDER_LINE_ID,
+                                UOM_FK_KEY,
+                                PROJECT_FK_KEY,
+                                SHIP_TO_LOC_FK_KEY,
+                                BILL_TO_LOC_FK_KEY,
+                                PRIM_SALES_REP_FK_KEY,
+                                INSTANCE_FK_KEY,
+                                SALES_CHANNEL_FK_KEY,
+                                CUSTOMER_FK_KEY,
+                                OPERATING_UNIT_FK_KEY,
+                                ITEM_ORG_FK_KEY,
+                                BASE_CURRENCY_FK_KEY,
+                                SOB_FK_KEY)
+           select DISTINCT      ORDER_LINE_ID,   /*bug3331025 - Removed RULE Hint*/
+                                UOM_FK_KEY,
+                                PROJECT_FK_KEY,
+                                SHIP_TO_SITE_FK_KEY,
+                                BILL_TO_SITE_FK_KEY,
+                                PRIM_SALESREP_FK_KEY,
+                                INSTANCE_FK_KEY,
+                                SALESCHANNEL_FK_KEY,
+                                SOLD_TO_CUSTOMER_FK_KEY,
+                                ORGANIZATION_FK_KEY,
+                                PARENT_ITEM_FK_KEY,
+                                FUNCTIONAL_CURRENCY_FK_KEY,
+                                SET_OF_BOOKS_FK_KEY
+           FROM FII_AR_TRX_DIST_F,OPI_EDW_REV_LOG
+           WHERE GL_DATE_FK_KEY      <> 0
+             AND FII_AR_TRX_DIST_F.ROWID = OPI_EDW_REV_LOG.row_id;
+
+    OPI_COLLECTION_HOOK_P.GATHER_STATS('OPI_EDW_MRG_KEYS');
+   INSERT INTO OPI_EDW_MRG_MAX_VALUES
+             (ORDER_LINE_ID,
+              UOM_FK_KEY,
+              PROJECT_FK_KEY,
+              SHIP_TO_LOC_FK_KEY,
+              BILL_TO_LOC_FK_KEY,
+              PRIM_SALES_REP_FK_KEY,
+              INSTANCE_FK_KEY,
+              SALES_CHANNEL_FK_KEY,
+              CUSTOMER_FK_KEY,
+              OPERATING_UNIT_FK_KEY,
+              ITEM_ORG_FK_KEY,
+              BASE_CURRENCY_FK_KEY,
+              SOB_FK_KEY,
+              MAX_GL_POSTED_DATE,
+              MAX_UNIT_SELLING_PRICE,
+              GL_DATE_FK_KEY)
+   SELECT /*+ ORDERED */ DISTINCT MAXVALS.ORDER_LINE_ID,
+          MAXVALS.UOM_FK_KEY,
+          MAXVALS.PROJECT_FK_KEY,
+          MAXVALS.SHIP_TO_SITE_FK_KEY,
+          MAXVALS.BILL_TO_SITE_FK_KEY,
+          MAXVALS.PRIM_SALESREP_FK_KEY,
+          MAXVALS.INSTANCE_FK_KEY,
+          MAXVALS.SALESCHANNEL_FK_KEY,
+          MAXVALS.SOLD_TO_CUSTOMER_FK_KEY,
+          MAXVALS.ORGANIZATION_FK_KEY,
+          MAXVALS.PARENT_ITEM_FK_KEY,
+          MAXVALS.FUNCTIONAL_CURRENCY_FK_KEY,
+          MAXVALS.SET_OF_BOOKS_FK_KEY,
+        MAXVALS.GL_DATE,
+        MAXVALS.UNIT_SELLING_PRICE,
+          REV.GL_DATE_FK_KEY
+   FROM
+       FII_AR_TRX_DIST_F REV,
+    (select /*+ use_hash(REV) */ REV.ORDER_LINE_ID,
+              REV.UOM_FK_KEY,
+              REV.PROJECT_FK_KEY,
+              REV.SHIP_TO_SITE_FK_KEY,
+              REV.BILL_TO_SITE_FK_KEY,
+              REV.PRIM_SALESREP_FK_KEY,
+              REV.INSTANCE_FK_KEY,
+              REV.SALESCHANNEL_FK_KEY,
+              REV.SOLD_TO_CUSTOMER_FK_KEY,
+              REV.ORGANIZATION_FK_KEY,
+              REV.PARENT_ITEM_FK_KEY,
+              REV.FUNCTIONAL_CURRENCY_FK_KEY,
+              REV.SET_OF_BOOKS_FK_KEY,
+            MAX(GL_DATE) GL_DATE,
+            MAX(UNIT_SELLING_PRICE) UNIT_SELLING_PRICE
+      FROM FII_AR_TRX_DIST_F REV,
+           OPI_EDW_MRG_KEYS  KEYS
+      WHERE KEYS.ORDER_LINE_ID         = REV.ORDER_LINE_ID
+          AND KEYS.UOM_FK_KEY            = REV.UOM_FK_KEY
+          AND KEYS.PROJECT_FK_KEY        = REV.PROJECT_FK_KEY
+          AND KEYS.SHIP_TO_LOC_FK_KEY    = REV.SHIP_TO_SITE_FK_KEY
+          AND KEYS.BILL_TO_LOC_FK_KEY    = REV.BILL_TO_SITE_FK_KEY
+          AND KEYS.PRIM_SALES_REP_FK_KEY = REV.PRIM_SALESREP_FK_KEY
+          AND KEYS.INSTANCE_FK_KEY       = REV.INSTANCE_FK_KEY
+          AND KEYS.SALES_CHANNEL_FK_KEY  = REV.SALESCHANNEL_FK_KEY
+          AND KEYS.CUSTOMER_FK_KEY       = REV.SOLD_TO_CUSTOMER_FK_KEY
+          AND KEYS.OPERATING_UNIT_FK_KEY = REV.ORGANIZATION_FK_KEY
+          AND KEYS.ITEM_ORG_FK_KEY       = REV.PARENT_ITEM_FK_KEY
+          AND KEYS.BASE_CURRENCY_FK_KEY  = REV.FUNCTIONAL_CURRENCY_FK_KEY
+          AND KEYS.SOB_FK_KEY            = REV.SET_OF_BOOKS_FK_KEY
+        AND REV.GL_DATE_FK_KEY  <> 0
+      GROUP BY
+        REV.ORDER_LINE_ID,
+          REV.UOM_FK_KEY,
+          REV.PROJECT_FK_KEY,
+          REV.SHIP_TO_SITE_FK_KEY,
+          REV.BILL_TO_SITE_FK_KEY,
+          REV.PRIM_SALESREP_FK_KEY,
+          REV.INSTANCE_FK_KEY,
+          REV.SALESCHANNEL_FK_KEY,
+          REV.SOLD_TO_CUSTOMER_FK_KEY,
+          REV.ORGANIZATION_FK_KEY,
+          REV.PARENT_ITEM_FK_KEY,
+          REV.FUNCTIONAL_CURRENCY_FK_KEY,
+          REV.SET_OF_BOOKS_FK_KEY) MAXVALS
+     WHERE  MAXVALS.ORDER_LINE_ID        = REV.ORDER_LINE_ID
+       AND MAXVALS.GL_DATE               = REV.GL_DATE
+       AND MAXVALS.UOM_FK_KEY            = REV.UOM_FK_KEY
+       AND MAXVALS.PROJECT_FK_KEY        = REV.PROJECT_FK_KEY
+       AND MAXVALS.SHIP_TO_SITE_FK_KEY   = REV.SHIP_TO_SITE_FK_KEY
+       AND MAXVALS.BILL_TO_SITE_FK_KEY   = REV.BILL_TO_SITE_FK_KEY
+       AND MAXVALS.PRIM_SALESREP_FK_KEY  = REV.PRIM_SALESREP_FK_KEY
+       AND MAXVALS.INSTANCE_FK_KEY       = REV.INSTANCE_FK_KEY
+       AND MAXVALS.SALESCHANNEL_FK_KEY   = REV.SALESCHANNEL_FK_KEY
+       AND MAXVALS.SOLD_TO_CUSTOMER_FK_KEY= REV.SOLD_TO_CUSTOMER_FK_KEY
+       AND MAXVALS.ORGANIZATION_FK_KEY   = REV.ORGANIZATION_FK_KEY
+       AND MAXVALS.PARENT_ITEM_FK_KEY    = REV.PARENT_ITEM_FK_KEY
+       AND MAXVALS.FUNCTIONAL_CURRENCY_FK_KEY  = REV.FUNCTIONAL_CURRENCY_FK_KEY
+       AND MAXVALS.SET_OF_BOOKS_FK_KEY   = REV.SET_OF_BOOKS_FK_KEY
+       AND REV.GL_DATE_FK_KEY         <> 0;
+
+    OPI_COLLECTION_HOOK_P.GATHER_STATS('OPI_EDW_MRG_MAX_VALUES');
+
+    LOOP
+      UPDATE OPI_EDW_MARGIN_PERD_ILOG
+      SET  STATUS =1
+      WHERE STATUS = 0 AND
+        ROWNUM < l_chunk_size;
+      IF SQL%ROWCOUNT = 0 THEN
+        EXIT;
+      END IF;
+      INSERT INTO OPI_EDW_MRGIN_REV_POSTCOLL_FUR
+             (MAX_GL_POSTED_DATE,
+              MAX_UNIT_SELLING_PRICE,
+              GL_DATE_FK_KEY,
+              ROW_ID)
+      SELECT /*+ INDEX(MRG, OPI_EDW_MARGIN_F_U)
+                 INDEX(LOG, OPI_EDW_MARGIN_PERD_ILOG_U1) */
+           MAXVALS.MAX_GL_POSTED_DATE,
+           MAXVALS.MAX_UNIT_SELLING_PRICE,
+           MAXVALS.GL_DATE_FK_KEY,
+           MRG.ROWID
+      FROM
+           OPI_EDW_MARGIN_PERD_ILOG LOG,
+           OPI_EDW_MARGIN_F   MRG,
+           OPI_EDW_MRG_MAX_VALUES  MAXVALS
+      WHERE
+               MAXVALS.ORDER_LINE_ID         = MRG.ORDER_LINE_ID
+           AND MAXVALS.UOM_FK_KEY            = MRG.UOM_FK_KEY
+           AND MAXVALS.PROJECT_FK_KEY        = MRG.PROJECT_FK_KEY
+           AND MAXVALS.SHIP_TO_LOC_FK_KEY    = MRG.SHIP_TO_LOC_FK_KEY
+           AND MAXVALS.BILL_TO_LOC_FK_KEY    = MRG.BILL_TO_LOC_FK_KEY
+           AND MAXVALS.PRIM_SALES_REP_FK_KEY = MRG.PRIM_SALES_REP_FK_KEY
+           AND MAXVALS.INSTANCE_FK_KEY       = MRG.INSTANCE_FK_KEY
+           AND MAXVALS.SALES_CHANNEL_FK_KEY  = MRG.SALES_CHANNEL_FK_KEY
+           AND MAXVALS.CUSTOMER_FK_KEY       = MRG.CUSTOMER_FK_KEY
+           AND MAXVALS.OPERATING_UNIT_FK_KEY = MRG.OPERATING_UNIT_FK_KEY
+           AND MAXVALS.ITEM_ORG_FK_KEY       = MRG.ITEM_ORG_FK_KEY
+           AND MAXVALS.BASE_CURRENCY_FK_KEY  = MRG.BASE_CURRENCY_FK_KEY
+           AND MAXVALS.SOB_FK_KEY            = MRG.SOB_FK_KEY
+           AND LOG.ROW_ID                    = MRG.ROWID
+           AND LOG.STATUS                    = 1;
+
+      OPI_COLLECTION_HOOK_P.GATHER_STATS('OPI_EDW_MRGIN_REV_POSTCOLL_FUR');
+
+      UPDATE OPI_EDW_MARGIN_F MRG
+      SET (INVOICE_DATE
+       ,REVENUE_DATE_FK_KEY
+       ,UNIT_SELLING_PRICE)=(SELECT distinct MAXVALS.MAX_GL_POSTED_DATE
+                              ,MAXVALS.GL_DATE_FK_KEY
+                              ,MAXVALS.MAX_UNIT_SELLING_PRICE FROM OPI_EDW_MRGIN_REV_POSTCOLL_FUR  MAXVALS WHERE MRG.rowid = MAXVALS.ROW_ID)
+      where EXISTS (SELECT 1
+              FROM  OPI_EDW_MRGIN_REV_POSTCOLL_FUR  MAXVALS
+              WHERE MRG.rowid = MAXVALS.ROW_ID);
+
+      EDW_OWB_COLLECTION_UTIL.write_to_log_file('Number of rows udated OPI_EDW_MARGIN_F from revenue fact'||SQL%ROWCOUNT);
+      EDW_OWB_COLLECTION_UTIL.write_to_log_file(to_char(SYSDATE,'DD-MON-YYYY HH24:MI:SS'));
+      OPI_COLLECTION_HOOK_P.TURNC_TAB('OPI_EDW_MRGIN_REV_POSTCOLL_FUR');
+      UPDATE OPI_EDW_MARGIN_PERD_ILOG
+      SET  STATUS =2
+      WHERE STATUS = 1;
+  END LOOP;
+  UPDATE OPI_EDW_MARGIN_PERD_ILOG
+  SET  STATUS =0;
+  COMMIT;
+ELSIF p_Base_fact_name = 'OPI_EDW_COGS_F' /*COGS Fact */
+THEN
+   INSERT INTO OPI_EDW_MRG_KEYS (ORDER_LINE_ID,
+                                UOM_FK_KEY,
+                                PROJECT_FK_KEY,
+                                SHIP_TO_LOC_FK_KEY,
+                                BILL_TO_LOC_FK_KEY,
+                                PRIM_SALES_REP_FK_KEY,
+                                INSTANCE_FK_KEY,
+                                SALES_CHANNEL_FK_KEY,
+                                CUSTOMER_FK_KEY,
+                                OPERATING_UNIT_FK_KEY,
+                                ITEM_ORG_FK_KEY,
+                                BASE_CURRENCY_FK_KEY,
+                                SOB_FK_KEY)
+    select  DISTINCT            ORDER_LINE_ID,      /*bug3331025 - Removed RULE Hint*/
+                                BASE_UOM_FK_KEY,
+                                PROJECT_FK_KEY,
+                                SHIP_TO_LOC_FK_KEY,
+                                BILL_TO_LOC_FK_KEY,
+                                PRIM_SALES_REP_FK_KEY,
+                                INSTANCE_FK_KEY,
+                                SALES_CHANNEL_FK_KEY,
+                                CUSTOMER_FK_KEY,
+                                OPERATING_UNIT_FK_KEY,
+                                top_model_item_fk_key,
+                                BASE_CURRENCY_FK_KEY,
+                                GL_SET_OF_BOOKS_FK_KEY
+    FROM OPI_EDW_COGS_F,
+         OPI_EDW_COGS_LOG
+    WHERE OPI_EDW_COGS_F.ROWID = OPI_EDW_COGS_LOG.row_id;
+
+   OPI_COLLECTION_HOOK_P.GATHER_STATS('OPI_EDW_MRG_KEYS');
+
+   INSERT INTO OPI_EDW_MRG_MAX_VALUES
+             (ORDER_LINE_ID,
+              UOM_FK_KEY,
+              PROJECT_FK_KEY,
+              SHIP_TO_LOC_FK_KEY,
+              BILL_TO_LOC_FK_KEY,
+              PRIM_SALES_REP_FK_KEY,
+              INSTANCE_FK_KEY,
+              SALES_CHANNEL_FK_KEY,
+              CUSTOMER_FK_KEY,
+              OPERATING_UNIT_FK_KEY,
+              ITEM_ORG_FK_KEY,
+              BASE_CURRENCY_FK_KEY,
+              SOB_FK_KEY,
+              MAX_COGS_DATE,
+              MAX_ORDER_NUMBER,
+              MAX_ORDER_DATE,
+              SHIP_INV_LOCATOR_FK_KEY,
+              COGS_DATE_FK_KEY)
+    SELECT /*+ ORDERED */ DISTINCT
+          MAXVALS.ORDER_LINE_ID,
+          MAXVALS.BASE_UOM_FK_KEY,
+          MAXVALS.PROJECT_FK_KEY,
+          MAXVALS.SHIP_TO_LOC_FK_KEY,
+          MAXVALS.BILL_TO_LOC_FK_KEY,
+          MAXVALS.PRIM_SALES_REP_FK_KEY,
+          MAXVALS.INSTANCE_FK_KEY,
+          MAXVALS.SALES_CHANNEL_FK_KEY,
+          MAXVALS.CUSTOMER_FK_KEY,
+          MAXVALS.OPERATING_UNIT_FK_KEY,
+          MAXVALS.ITEM_ORG_FK_KEY,
+          MAXVALS.BASE_CURRENCY_FK_KEY,
+          MAXVALS.GL_SET_OF_BOOKS_FK_KEY,
+        MAXVALS.COGS_DATE,
+        MAXVALS.ORDER_NUMBER,
+        MAXVALS.ORDER_DATE,
+          COGS.SHIP_INV_LOCATOR_FK_KEY,
+          COGS.COGS_DATE_FK_KEY
+    FROM
+       OPI_EDW_COGS_F COGS,
+      (select COGS.ORDER_LINE_ID,
+          COGS.BASE_UOM_FK_KEY,
+          COGS.PROJECT_FK_KEY,
+          COGS.SHIP_TO_LOC_FK_KEY,
+          COGS.BILL_TO_LOC_FK_KEY,
+          COGS.PRIM_SALES_REP_FK_KEY,
+          COGS.INSTANCE_FK_KEY,
+          COGS.SALES_CHANNEL_FK_KEY,
+          COGS.CUSTOMER_FK_KEY,
+          COGS.OPERATING_UNIT_FK_KEY,
+          COGS.top_model_item_fk_key ITEM_ORG_FK_KEY,
+          COGS.BASE_CURRENCY_FK_KEY,
+          COGS.GL_SET_OF_BOOKS_FK_KEY,
+        MAX(COGS.COGS_DATE)   COGS_DATE,
+        MAX(COGS.ORDER_NUMBER) ORDER_NUMBER,
+        MAX(COGS.ORDER_DATE) ORDER_DATE
+        FROM OPI_EDW_COGS_F COGS,
+           OPI_EDW_MRG_KEYS  KEYS
+      WHERE KEYS.ORDER_LINE_ID         = COGS.ORDER_LINE_ID
+          AND KEYS.UOM_FK_KEY            = COGS.BASE_UOM_FK_KEY
+          AND KEYS.PROJECT_FK_KEY        = COGS.PROJECT_FK_KEY
+          AND KEYS.SHIP_TO_LOC_FK_KEY    = COGS.SHIP_TO_LOC_FK_KEY
+          AND KEYS.BILL_TO_LOC_FK_KEY    = COGS.BILL_TO_LOC_FK_KEY
+          AND KEYS.PRIM_SALES_REP_FK_KEY = COGS.PRIM_SALES_REP_FK_KEY
+          AND KEYS.INSTANCE_FK_KEY       = COGS.INSTANCE_FK_KEY
+          AND KEYS.SALES_CHANNEL_FK_KEY  = COGS.SALES_CHANNEL_FK_KEY
+          AND KEYS.CUSTOMER_FK_KEY       = COGS.CUSTOMER_FK_KEY
+          AND KEYS.OPERATING_UNIT_FK_KEY = COGS.OPERATING_UNIT_FK_KEY
+          AND KEYS.ITEM_ORG_FK_KEY       = COGS.top_model_item_fk_key
+          AND KEYS.BASE_CURRENCY_FK_KEY  = COGS.BASE_CURRENCY_FK_KEY
+          AND KEYS.SOB_FK_KEY            = COGS.GL_SET_OF_BOOKS_FK_KEY
+      GROUP BY
+        COGS.ORDER_LINE_ID,
+          COGS.BASE_UOM_FK_KEY,
+          COGS.PROJECT_FK_KEY,
+          COGS.SHIP_TO_LOC_FK_KEY,
+          COGS.BILL_TO_LOC_FK_KEY,
+          COGS.PRIM_SALES_REP_FK_KEY,
+          COGS.INSTANCE_FK_KEY,
+          COGS.SALES_CHANNEL_FK_KEY,
+          COGS.CUSTOMER_FK_KEY,
+          COGS.OPERATING_UNIT_FK_KEY,
+          COGS.top_model_item_fk_key,
+          COGS.BASE_CURRENCY_FK_KEY,
+          COGS.GL_SET_OF_BOOKS_FK_KEY) MAXVALS
+    WHERE
+           MAXVALS.ORDER_LINE_ID         = COGS.ORDER_LINE_ID
+       AND MAXVALS.COGS_DATE             = COGS.COGS_DATE
+       AND MAXVALS.BASE_UOM_FK_KEY       = COGS.BASE_UOM_FK_KEY
+       AND MAXVALS.PROJECT_FK_KEY        = COGS.PROJECT_FK_KEY
+       AND MAXVALS.SHIP_TO_LOC_FK_KEY    = COGS.SHIP_TO_LOC_FK_KEY
+       AND MAXVALS.BILL_TO_LOC_FK_KEY    = COGS.BILL_TO_LOC_FK_KEY
+       AND MAXVALS.PRIM_SALES_REP_FK_KEY = COGS.PRIM_SALES_REP_FK_KEY
+       AND MAXVALS.INSTANCE_FK_KEY       = COGS.INSTANCE_FK_KEY
+       AND MAXVALS.SALES_CHANNEL_FK_KEY  = COGS.SALES_CHANNEL_FK_KEY
+       AND MAXVALS.CUSTOMER_FK_KEY       = COGS.CUSTOMER_FK_KEY
+       AND MAXVALS.OPERATING_UNIT_FK_KEY = COGS.OPERATING_UNIT_FK_KEY
+       AND MAXVALS.ITEM_ORG_FK_KEY       = COGS.top_model_item_fk_key
+       AND MAXVALS.BASE_CURRENCY_FK_KEY  = COGS.BASE_CURRENCY_FK_KEY
+       AND MAXVALS.GL_SET_OF_BOOKS_FK_KEY= COGS.GL_SET_OF_BOOKS_FK_KEY;
+
+    OPI_COLLECTION_HOOK_P.GATHER_STATS('OPI_EDW_MRG_MAX_VALUES');
+
+
+
+    LOOP
+      UPDATE OPI_EDW_MARGIN_PERD_ILOG
+      SET  STATUS =1
+      WHERE STATUS = 0 AND
+        ROWNUM < l_chunk_size;
+      IF SQL%ROWCOUNT = 0 THEN
+        EXIT;
+      END IF;
+      INSERT INTO OPI_EDW_MRGIN_COGSPOSTCOLL_FUR
+             (MAX_ORDER_DATE,
+              SHIP_INV_LOCATOR_FK_KEY ,
+              COGS_DATE_FK_KEY,
+              MAX_ORDER_NUMBER,
+              MAX_COGS_DATE,
+              ROW_ID)
+      SELECT /*+ INDEX(MRG, OPI_EDW_MARGIN_F_U) */ MAXVALS.MAX_ORDER_DATE,
+           MAXVALS.SHIP_INV_LOCATOR_FK_KEY,
+           MAXVALS.COGS_DATE_FK_KEY,
+           MAXVALS.MAX_ORDER_NUMBER,
+           MAXVALS.MAX_COGS_DATE,
+           MRG.ROWID
+      FROM
+           OPI_EDW_MARGIN_PERD_ILOG LOG,
+           OPI_EDW_MARGIN_F   MRG,
+           OPI_EDW_MRG_MAX_VALUES  MAXVALS
+      WHERE
+               MAXVALS.ORDER_LINE_ID         = MRG.ORDER_LINE_ID
+           AND MAXVALS.UOM_FK_KEY            = MRG.UOM_FK_KEY
+           AND MAXVALS.PROJECT_FK_KEY        = MRG.PROJECT_FK_KEY
+           AND MAXVALS.SHIP_TO_LOC_FK_KEY    = MRG.SHIP_TO_LOC_FK_KEY
+           AND MAXVALS.BILL_TO_LOC_FK_KEY    = MRG.BILL_TO_LOC_FK_KEY
+           AND MAXVALS.PRIM_SALES_REP_FK_KEY = MRG.PRIM_SALES_REP_FK_KEY
+           AND MAXVALS.INSTANCE_FK_KEY       = MRG.INSTANCE_FK_KEY
+           AND MAXVALS.SALES_CHANNEL_FK_KEY  = MRG.SALES_CHANNEL_FK_KEY
+           AND MAXVALS.CUSTOMER_FK_KEY       = MRG.CUSTOMER_FK_KEY
+           AND MAXVALS.OPERATING_UNIT_FK_KEY = MRG.OPERATING_UNIT_FK_KEY
+           AND MAXVALS.ITEM_ORG_FK_KEY       = MRG.ITEM_ORG_FK_KEY
+           AND MAXVALS.BASE_CURRENCY_FK_KEY  = MRG.BASE_CURRENCY_FK_KEY
+           AND MAXVALS.SOB_FK_KEY            = MRG.SOB_FK_KEY
+           AND LOG.ROW_ID                    = MRG.ROWID
+           AND LOG.STATUS                    = 1;
+
+        OPI_COLLECTION_HOOK_P.GATHER_STATS('OPI_EDW_MRGIN_COGSPOSTCOLL_FUR');
+
+    UPDATE OPI_EDW_MARGIN_F MRG
+    SET (ORDER_DATE
+       ,ORDER_NO
+       ,SHIP_DATE
+       ,SHIP_LOCATION_FK_KEY
+       ,COGS_DATE_FK_KEY)=(SELECT distinct MAXVALS.MAX_ORDER_DATE
+                              ,MAXVALS.MAX_ORDER_NUMBER
+                              ,MAXVALS.MAX_COGS_DATE
+                              ,MAXVALS.SHIP_INV_LOCATOR_FK_KEY
+                              ,MAXVALS.COGS_DATE_FK_KEY
+                       FROM OPI_EDW_MRGIN_COGSPOSTCOLL_FUR  MAXVALS
+                         WHERE MRG.rowid = MAXVALS.ROW_ID)
+      where EXISTS (SELECT 1
+              FROM  OPI_EDW_MRGIN_COGSPOSTCOLL_FUR  MAXVALS
+              WHERE MRG.rowid = MAXVALS.ROW_ID);
+
+      EDW_OWB_COLLECTION_UTIL.write_to_log_file('Number of rows udated OPI_EDW_MARGIN_F from revenue fact'||SQL%ROWCOUNT);
+      EDW_OWB_COLLECTION_UTIL.write_to_log_file(to_char(SYSDATE,'DD-MON-YYYY HH24:MI:SS'));
+
+      OPI_COLLECTION_HOOK_P.TURNC_TAB('OPI_EDW_MRGIN_COGSPOSTCOLL_FUR');
+
+      UPDATE OPI_EDW_MARGIN_PERD_ILOG
+      SET  STATUS =2
+      WHERE STATUS = 1;
+  END LOOP;
+  UPDATE OPI_EDW_MARGIN_PERD_ILOG
+  SET  STATUS =0;
+  COMMIT;
+ELSIF p_base_fact_name = 'OPI_EDW_MARGIN_F'  /* if it is a full Refesh */
+THEN
+    INSERT INTO OPI_EDW_MRG_KEYS (ORDER_LINE_ID,
+                                UOM_FK_KEY,
+                                PROJECT_FK_KEY,
+                                SHIP_TO_LOC_FK_KEY,
+                                BILL_TO_LOC_FK_KEY,
+                                PRIM_SALES_REP_FK_KEY,
+                                INSTANCE_FK_KEY,
+                                SALES_CHANNEL_FK_KEY,
+                                CUSTOMER_FK_KEY,
+                                OPERATING_UNIT_FK_KEY,
+                                ITEM_ORG_FK_KEY,
+                                BASE_CURRENCY_FK_KEY,
+                                SOB_FK_KEY)
+        select DISTINCT         ORDER_LINE_ID,      /*bug3331025 - Removed RULE Hint*/
+                                UOM_FK_KEY,
+                                PROJECT_FK_KEY,
+                                SHIP_TO_SITE_FK_KEY,
+                                BILL_TO_SITE_FK_KEY,
+                                PRIM_SALESREP_FK_KEY,
+                                INSTANCE_FK_KEY,
+                                SALESCHANNEL_FK_KEY,
+                                SOLD_TO_CUSTOMER_FK_KEY,
+                                ORGANIZATION_FK_KEY,
+                                PARENT_ITEM_FK_KEY,
+                                FUNCTIONAL_CURRENCY_FK_KEY,
+                                SET_OF_BOOKS_FK_KEY
+        FROM FII_AR_TRX_DIST_F
+        WHERE GL_DATE_FK_KEY      <> 0;
+
+    OPI_COLLECTION_HOOK_P.GATHER_STATS('OPI_EDW_MRG_KEYS');
+
+
+   INSERT INTO OPI_EDW_MRG_MAX_VALUES
+             (ORDER_LINE_ID,
+              UOM_FK_KEY,
+              PROJECT_FK_KEY,
+              SHIP_TO_LOC_FK_KEY,
+              BILL_TO_LOC_FK_KEY,
+              PRIM_SALES_REP_FK_KEY,
+              INSTANCE_FK_KEY,
+              SALES_CHANNEL_FK_KEY,
+              CUSTOMER_FK_KEY,
+              OPERATING_UNIT_FK_KEY,
+              ITEM_ORG_FK_KEY,
+              BASE_CURRENCY_FK_KEY,
+              SOB_FK_KEY,
+              MAX_GL_POSTED_DATE,
+              MAX_UNIT_SELLING_PRICE,
+              GL_DATE_FK_KEY)
+   SELECT /*+ ORDERED */ DISTINCT MAXVALS.ORDER_LINE_ID,
+          MAXVALS.UOM_FK_KEY,
+          MAXVALS.PROJECT_FK_KEY,
+          MAXVALS.SHIP_TO_SITE_FK_KEY,
+          MAXVALS.BILL_TO_SITE_FK_KEY,
+          MAXVALS.PRIM_SALESREP_FK_KEY,
+          MAXVALS.INSTANCE_FK_KEY,
+          MAXVALS.SALESCHANNEL_FK_KEY,
+          MAXVALS.SOLD_TO_CUSTOMER_FK_KEY,
+          MAXVALS.ORGANIZATION_FK_KEY,
+          MAXVALS.PARENT_ITEM_FK_KEY,
+          MAXVALS.FUNCTIONAL_CURRENCY_FK_KEY,
+          MAXVALS.SET_OF_BOOKS_FK_KEY,
+        MAXVALS.GL_DATE,
+        MAXVALS.UNIT_SELLING_PRICE,
+          REV.GL_DATE_FK_KEY
+   FROM
+       FII_AR_TRX_DIST_F REV,
+    (select REV.ORDER_LINE_ID,
+              REV.UOM_FK_KEY,
+              REV.PROJECT_FK_KEY,
+              REV.SHIP_TO_SITE_FK_KEY,
+              REV.BILL_TO_SITE_FK_KEY,
+              REV.PRIM_SALESREP_FK_KEY,
+              REV.INSTANCE_FK_KEY,
+              REV.SALESCHANNEL_FK_KEY,
+              REV.SOLD_TO_CUSTOMER_FK_KEY,
+              REV.ORGANIZATION_FK_KEY,
+              REV.PARENT_ITEM_FK_KEY,
+              REV.FUNCTIONAL_CURRENCY_FK_KEY,
+              REV.SET_OF_BOOKS_FK_KEY,
+            MAX(GL_DATE) GL_DATE,
+            MAX(UNIT_SELLING_PRICE) UNIT_SELLING_PRICE
+      FROM FII_AR_TRX_DIST_F REV,
+           OPI_EDW_MRG_KEYS  KEYS
+      WHERE KEYS.ORDER_LINE_ID         = REV.ORDER_LINE_ID
+          AND KEYS.UOM_FK_KEY            = REV.UOM_FK_KEY
+          AND KEYS.PROJECT_FK_KEY        = REV.PROJECT_FK_KEY
+          AND KEYS.SHIP_TO_LOC_FK_KEY    = REV.SHIP_TO_SITE_FK_KEY
+          AND KEYS.BILL_TO_LOC_FK_KEY    = REV.BILL_TO_SITE_FK_KEY
+          AND KEYS.PRIM_SALES_REP_FK_KEY = REV.PRIM_SALESREP_FK_KEY
+          AND KEYS.INSTANCE_FK_KEY       = REV.INSTANCE_FK_KEY
+          AND KEYS.SALES_CHANNEL_FK_KEY  = REV.SALESCHANNEL_FK_KEY
+          AND KEYS.CUSTOMER_FK_KEY       = REV.SOLD_TO_CUSTOMER_FK_KEY
+          AND KEYS.OPERATING_UNIT_FK_KEY = REV.ORGANIZATION_FK_KEY
+          AND KEYS.ITEM_ORG_FK_KEY       = REV.PARENT_ITEM_FK_KEY
+          AND KEYS.BASE_CURRENCY_FK_KEY  = REV.FUNCTIONAL_CURRENCY_FK_KEY
+          AND KEYS.SOB_FK_KEY            = REV.SET_OF_BOOKS_FK_KEY
+        AND REV.GL_DATE_FK_KEY  <> 0
+      GROUP BY
+        REV.ORDER_LINE_ID,
+          REV.UOM_FK_KEY,
+          REV.PROJECT_FK_KEY,
+          REV.SHIP_TO_SITE_FK_KEY,
+          REV.BILL_TO_SITE_FK_KEY,
+          REV.PRIM_SALESREP_FK_KEY,
+          REV.INSTANCE_FK_KEY,
+          REV.SALESCHANNEL_FK_KEY,
+          REV.SOLD_TO_CUSTOMER_FK_KEY,
+          REV.ORGANIZATION_FK_KEY,
+          REV.PARENT_ITEM_FK_KEY,
+          REV.FUNCTIONAL_CURRENCY_FK_KEY,
+          REV.SET_OF_BOOKS_FK_KEY) MAXVALS
+     WHERE  MAXVALS.ORDER_LINE_ID        = REV.ORDER_LINE_ID
+       AND MAXVALS.GL_DATE               = REV.GL_DATE
+       AND MAXVALS.UOM_FK_KEY            = REV.UOM_FK_KEY
+       AND MAXVALS.PROJECT_FK_KEY        = REV.PROJECT_FK_KEY
+       AND MAXVALS.SHIP_TO_SITE_FK_KEY   = REV.SHIP_TO_SITE_FK_KEY
+       AND MAXVALS.BILL_TO_SITE_FK_KEY   = REV.BILL_TO_SITE_FK_KEY
+       AND MAXVALS.PRIM_SALESREP_FK_KEY  = REV.PRIM_SALESREP_FK_KEY
+       AND MAXVALS.INSTANCE_FK_KEY       = REV.INSTANCE_FK_KEY
+       AND MAXVALS.SALESCHANNEL_FK_KEY   = REV.SALESCHANNEL_FK_KEY
+       AND MAXVALS.SOLD_TO_CUSTOMER_FK_KEY= REV.SOLD_TO_CUSTOMER_FK_KEY
+       AND MAXVALS.ORGANIZATION_FK_KEY   = REV.ORGANIZATION_FK_KEY
+       AND MAXVALS.PARENT_ITEM_FK_KEY    = REV.PARENT_ITEM_FK_KEY
+       AND MAXVALS.FUNCTIONAL_CURRENCY_FK_KEY  = REV.FUNCTIONAL_CURRENCY_FK_KEY
+       AND MAXVALS.SET_OF_BOOKS_FK_KEY   = REV.SET_OF_BOOKS_FK_KEY
+       AND REV.GL_DATE_FK_KEY         <> 0;
+
+    OPI_COLLECTION_HOOK_P.GATHER_STATS('OPI_EDW_MRG_MAX_VALUES');
+
+    LOOP
+      UPDATE OPI_EDW_MARGIN_PERD_ILOG
+      SET  STATUS =1
+      WHERE STATUS = 0 AND
+        ROWNUM < l_chunk_size;
+      IF SQL%ROWCOUNT = 0 THEN
+        EXIT;
+      END IF;
+      INSERT INTO OPI_EDW_MRGIN_REV_POSTCOLL_FUR
+             (MAX_GL_POSTED_DATE,
+              MAX_UNIT_SELLING_PRICE,
+              GL_DATE_FK_KEY,
+              ROW_ID)
+      SELECT MAXVALS.MAX_GL_POSTED_DATE,
+           MAXVALS.MAX_UNIT_SELLING_PRICE,
+           MAXVALS.GL_DATE_FK_KEY,
+           MRG.ROWID
+      FROM
+           OPI_EDW_MARGIN_PERD_ILOG LOG,
+           OPI_EDW_MARGIN_F   MRG,
+           OPI_EDW_MRG_MAX_VALUES  MAXVALS
+      WHERE
+               MAXVALS.ORDER_LINE_ID         = MRG.ORDER_LINE_ID
+           AND MAXVALS.UOM_FK_KEY            = MRG.UOM_FK_KEY
+           AND MAXVALS.PROJECT_FK_KEY        = MRG.PROJECT_FK_KEY
+           AND MAXVALS.SHIP_TO_LOC_FK_KEY    = MRG.SHIP_TO_LOC_FK_KEY
+           AND MAXVALS.BILL_TO_LOC_FK_KEY    = MRG.BILL_TO_LOC_FK_KEY
+           AND MAXVALS.PRIM_SALES_REP_FK_KEY = MRG.PRIM_SALES_REP_FK_KEY
+           AND MAXVALS.INSTANCE_FK_KEY       = MRG.INSTANCE_FK_KEY
+           AND MAXVALS.SALES_CHANNEL_FK_KEY  = MRG.SALES_CHANNEL_FK_KEY
+           AND MAXVALS.CUSTOMER_FK_KEY       = MRG.CUSTOMER_FK_KEY
+           AND MAXVALS.OPERATING_UNIT_FK_KEY = MRG.OPERATING_UNIT_FK_KEY
+           AND MAXVALS.ITEM_ORG_FK_KEY       = MRG.ITEM_ORG_FK_KEY
+           AND MAXVALS.BASE_CURRENCY_FK_KEY  = MRG.BASE_CURRENCY_FK_KEY
+           AND MAXVALS.SOB_FK_KEY            = MRG.SOB_FK_KEY
+           AND LOG.ROW_ID                    = MRG.ROWID
+           AND LOG.STATUS                    = 1;
+
+      OPI_COLLECTION_HOOK_P.GATHER_STATS('OPI_EDW_MRGIN_REV_POSTCOLL_FUR');
+
+      UPDATE OPI_EDW_MARGIN_F MRG
+      SET (INVOICE_DATE
+       ,REVENUE_DATE_FK_KEY
+       ,UNIT_SELLING_PRICE)=(SELECT distinct MAXVALS.MAX_GL_POSTED_DATE
+                              ,MAXVALS.GL_DATE_FK_KEY
+                              ,MAXVALS.MAX_UNIT_SELLING_PRICE
+                       FROM OPI_EDW_MRGIN_REV_POSTCOLL_FUR  MAXVALS
+                         WHERE MRG.rowid = MAXVALS.ROW_ID)
+      where EXISTS (SELECT 1
+              FROM  OPI_EDW_MRGIN_REV_POSTCOLL_FUR  MAXVALS
+              WHERE MRG.rowid = MAXVALS.ROW_ID);
+
+      EDW_OWB_COLLECTION_UTIL.write_to_log_file('Number of rows udated OPI_EDW_MARGIN_F from revenue fact'||SQL%ROWCOUNT);
+      EDW_OWB_COLLECTION_UTIL.write_to_log_file(to_char(SYSDATE,'DD-MON-YYYY HH24:MI:SS'));
+
+      OPI_COLLECTION_HOOK_P.TURNC_TAB('OPI_EDW_MRGIN_REV_POSTCOLL_FUR');
+
+      UPDATE OPI_EDW_MARGIN_PERD_ILOG
+      SET  STATUS =2
+      WHERE STATUS = 1;
+  END LOOP;
+  UPDATE OPI_EDW_MARGIN_PERD_ILOG
+  SET  STATUS =0;
+  COMMIT;
+
+OPI_COLLECTION_HOOK_P.TURNC_TAB('OPI_EDW_MRG_MAX_VALUES');
+OPI_COLLECTION_HOOK_P.TURNC_TAB('OPI_EDW_MRG_KEYS');
+
+/*********************************************************************************************
+***  Populate COGS data for full refresh                                                  ****
+**********************************************************************************************/
+
+   INSERT INTO OPI_EDW_MRG_KEYS (ORDER_LINE_ID,
+                                UOM_FK_KEY,
+                                PROJECT_FK_KEY,
+                                SHIP_TO_LOC_FK_KEY,
+                                BILL_TO_LOC_FK_KEY,
+                                PRIM_SALES_REP_FK_KEY,
+                                INSTANCE_FK_KEY,
+                                SALES_CHANNEL_FK_KEY,
+                                CUSTOMER_FK_KEY,
+                                OPERATING_UNIT_FK_KEY,
+                                ITEM_ORG_FK_KEY,
+                                BASE_CURRENCY_FK_KEY,
+                                SOB_FK_KEY)
+    select DISTINCT ORDER_LINE_ID,
+                                BASE_UOM_FK_KEY,
+                                PROJECT_FK_KEY,
+                                SHIP_TO_LOC_FK_KEY,
+                                BILL_TO_LOC_FK_KEY,
+                                PRIM_SALES_REP_FK_KEY,
+                                INSTANCE_FK_KEY,
+                                SALES_CHANNEL_FK_KEY,
+                                CUSTOMER_FK_KEY,
+                                OPERATING_UNIT_FK_KEY,
+                                top_model_item_fk_key,
+                                BASE_CURRENCY_FK_KEY,
+                                GL_SET_OF_BOOKS_FK_KEY
+    FROM OPI_EDW_COGS_F;
+EDW_OWB_COLLECTION_UTIL.write_to_log_file('1 sqlcount  ddd ' || SQL%rowcount);
+   OPI_COLLECTION_HOOK_P.GATHER_STATS('OPI_EDW_MRG_KEYS');
+
+   INSERT INTO OPI_EDW_MRG_MAX_VALUES
+             (ORDER_LINE_ID,
+              UOM_FK_KEY,
+              PROJECT_FK_KEY,
+              SHIP_TO_LOC_FK_KEY,
+              BILL_TO_LOC_FK_KEY,
+              PRIM_SALES_REP_FK_KEY,
+              INSTANCE_FK_KEY,
+              SALES_CHANNEL_FK_KEY,
+              CUSTOMER_FK_KEY,
+              OPERATING_UNIT_FK_KEY,
+              ITEM_ORG_FK_KEY,
+              BASE_CURRENCY_FK_KEY,
+              SOB_FK_KEY,
+              MAX_COGS_DATE,
+              MAX_ORDER_NUMBER,
+              MAX_ORDER_DATE,
+              SHIP_INV_LOCATOR_FK_KEY,
+              COGS_DATE_FK_KEY)
+    SELECT DISTINCT
+          MAXVALS.ORDER_LINE_ID,
+          MAXVALS.BASE_UOM_FK_KEY,
+          MAXVALS.PROJECT_FK_KEY,
+          MAXVALS.SHIP_TO_LOC_FK_KEY,
+          MAXVALS.BILL_TO_LOC_FK_KEY,
+          MAXVALS.PRIM_SALES_REP_FK_KEY,
+          MAXVALS.INSTANCE_FK_KEY,
+          MAXVALS.SALES_CHANNEL_FK_KEY,
+          MAXVALS.CUSTOMER_FK_KEY,
+          MAXVALS.OPERATING_UNIT_FK_KEY,
+          MAXVALS.ITEM_ORG_FK_KEY,
+          MAXVALS.BASE_CURRENCY_FK_KEY,
+          MAXVALS.GL_SET_OF_BOOKS_FK_KEY,
+        MAXVALS.COGS_DATE,
+        MAXVALS.ORDER_NUMBER,
+        MAXVALS.ORDER_DATE,
+          COGS.SHIP_INV_LOCATOR_FK_KEY,
+          COGS.COGS_DATE_FK_KEY
+    FROM
+       OPI_EDW_COGS_F COGS,
+      (select COGS.ORDER_LINE_ID,
+          COGS.BASE_UOM_FK_KEY,
+          COGS.PROJECT_FK_KEY,
+          COGS.SHIP_TO_LOC_FK_KEY,
+          COGS.BILL_TO_LOC_FK_KEY,
+          COGS.PRIM_SALES_REP_FK_KEY,
+          COGS.INSTANCE_FK_KEY,
+          COGS.SALES_CHANNEL_FK_KEY,
+          COGS.CUSTOMER_FK_KEY,
+          COGS.OPERATING_UNIT_FK_KEY,
+          COGS.top_model_item_fk_key ITEM_ORG_FK_KEY,
+          COGS.BASE_CURRENCY_FK_KEY,
+          COGS.GL_SET_OF_BOOKS_FK_KEY,
+        MAX(COGS.COGS_DATE)   COGS_DATE,
+        MAX(COGS.ORDER_NUMBER) ORDER_NUMBER,
+        MAX(COGS.ORDER_DATE) ORDER_DATE
+        FROM OPI_EDW_COGS_F COGS,
+           OPI_EDW_MRG_KEYS  KEYS
+      WHERE KEYS.ORDER_LINE_ID         = COGS.ORDER_LINE_ID
+          AND KEYS.UOM_FK_KEY            = COGS.BASE_UOM_FK_KEY
+          AND KEYS.PROJECT_FK_KEY        = COGS.PROJECT_FK_KEY
+          AND KEYS.SHIP_TO_LOC_FK_KEY    = COGS.SHIP_TO_LOC_FK_KEY
+          AND KEYS.BILL_TO_LOC_FK_KEY    = COGS.BILL_TO_LOC_FK_KEY
+          AND KEYS.PRIM_SALES_REP_FK_KEY = COGS.PRIM_SALES_REP_FK_KEY
+          AND KEYS.INSTANCE_FK_KEY       = COGS.INSTANCE_FK_KEY
+          AND KEYS.SALES_CHANNEL_FK_KEY  = COGS.SALES_CHANNEL_FK_KEY
+          AND KEYS.CUSTOMER_FK_KEY       = COGS.CUSTOMER_FK_KEY
+          AND KEYS.OPERATING_UNIT_FK_KEY = COGS.OPERATING_UNIT_FK_KEY
+          AND KEYS.ITEM_ORG_FK_KEY       = COGS.top_model_item_fk_key
+          AND KEYS.BASE_CURRENCY_FK_KEY  = COGS.BASE_CURRENCY_FK_KEY
+          AND KEYS.SOB_FK_KEY            = COGS.GL_SET_OF_BOOKS_FK_KEY
+      GROUP BY
+        COGS.ORDER_LINE_ID,
+          COGS.BASE_UOM_FK_KEY,
+          COGS.PROJECT_FK_KEY,
+          COGS.SHIP_TO_LOC_FK_KEY,
+          COGS.BILL_TO_LOC_FK_KEY,
+          COGS.PRIM_SALES_REP_FK_KEY,
+          COGS.INSTANCE_FK_KEY,
+          COGS.SALES_CHANNEL_FK_KEY,
+          COGS.CUSTOMER_FK_KEY,
+          COGS.OPERATING_UNIT_FK_KEY,
+          COGS.top_model_item_fk_key,
+          COGS.BASE_CURRENCY_FK_KEY,
+          COGS.GL_SET_OF_BOOKS_FK_KEY) MAXVALS
+    WHERE
+           MAXVALS.ORDER_LINE_ID         = COGS.ORDER_LINE_ID
+       AND MAXVALS.COGS_DATE             = COGS.COGS_DATE
+       AND MAXVALS.BASE_UOM_FK_KEY       = COGS.BASE_UOM_FK_KEY
+       AND MAXVALS.PROJECT_FK_KEY        = COGS.PROJECT_FK_KEY
+       AND MAXVALS.SHIP_TO_LOC_FK_KEY    = COGS.SHIP_TO_LOC_FK_KEY
+       AND MAXVALS.BILL_TO_LOC_FK_KEY    = COGS.BILL_TO_LOC_FK_KEY
+       AND MAXVALS.PRIM_SALES_REP_FK_KEY = COGS.PRIM_SALES_REP_FK_KEY
+       AND MAXVALS.INSTANCE_FK_KEY       = COGS.INSTANCE_FK_KEY
+       AND MAXVALS.SALES_CHANNEL_FK_KEY  = COGS.SALES_CHANNEL_FK_KEY
+       AND MAXVALS.CUSTOMER_FK_KEY       = COGS.CUSTOMER_FK_KEY
+       AND MAXVALS.OPERATING_UNIT_FK_KEY = COGS.OPERATING_UNIT_FK_KEY
+       AND MAXVALS.ITEM_ORG_FK_KEY       = COGS.top_model_item_fk_key
+       AND MAXVALS.BASE_CURRENCY_FK_KEY  = COGS.BASE_CURRENCY_FK_KEY
+       AND MAXVALS.GL_SET_OF_BOOKS_FK_KEY= COGS.GL_SET_OF_BOOKS_FK_KEY;
+EDW_OWB_COLLECTION_UTIL.write_to_log_file('2 sqlcount  ddd ' || SQL%rowcount);
+    OPI_COLLECTION_HOOK_P.GATHER_STATS('OPI_EDW_MRG_MAX_VALUES');
+
+
+
+    LOOP
+      UPDATE OPI_EDW_MARGIN_PERD_ILOG
+      SET  STATUS =1
+      WHERE STATUS = 0 AND
+        ROWNUM < l_chunk_size;
+      IF SQL%ROWCOUNT = 0 THEN
+        EXIT;
+      END IF;
+      INSERT INTO OPI_EDW_MRGIN_COGSPOSTCOLL_FUR
+             (MAX_ORDER_DATE,
+              SHIP_INV_LOCATOR_FK_KEY ,
+              COGS_DATE_FK_KEY,
+              MAX_ORDER_NUMBER,
+              MAX_COGS_DATE,
+              ROW_ID)
+      SELECT  MAXVALS.MAX_ORDER_DATE,       /*bug3331025 - Removed RULE Hint*/
+           MAXVALS.SHIP_INV_LOCATOR_FK_KEY,
+           MAXVALS.COGS_DATE_FK_KEY,
+           MAXVALS.MAX_ORDER_NUMBER,
+           MAXVALS.MAX_COGS_DATE,
+           MRG.ROWID
+      FROM
+           OPI_EDW_MARGIN_PERD_ILOG LOG,
+           OPI_EDW_MARGIN_F   MRG,
+           OPI_EDW_MRG_MAX_VALUES  MAXVALS
+      WHERE
+               MAXVALS.ORDER_LINE_ID         = MRG.ORDER_LINE_ID
+           AND MAXVALS.UOM_FK_KEY            = MRG.UOM_FK_KEY
+           AND MAXVALS.PROJECT_FK_KEY        = MRG.PROJECT_FK_KEY
+           AND MAXVALS.SHIP_TO_LOC_FK_KEY    = MRG.SHIP_TO_LOC_FK_KEY
+           AND MAXVALS.BILL_TO_LOC_FK_KEY    = MRG.BILL_TO_LOC_FK_KEY
+           AND MAXVALS.PRIM_SALES_REP_FK_KEY = MRG.PRIM_SALES_REP_FK_KEY
+           AND MAXVALS.INSTANCE_FK_KEY       = MRG.INSTANCE_FK_KEY
+           AND MAXVALS.SALES_CHANNEL_FK_KEY  = MRG.SALES_CHANNEL_FK_KEY
+           AND MAXVALS.CUSTOMER_FK_KEY       = MRG.CUSTOMER_FK_KEY
+           AND MAXVALS.OPERATING_UNIT_FK_KEY = MRG.OPERATING_UNIT_FK_KEY
+           AND MAXVALS.ITEM_ORG_FK_KEY       = MRG.ITEM_ORG_FK_KEY
+           AND MAXVALS.BASE_CURRENCY_FK_KEY  = MRG.BASE_CURRENCY_FK_KEY
+           AND MAXVALS.SOB_FK_KEY            = MRG.SOB_FK_KEY
+           AND LOG.ROW_ID                    = MRG.ROWID
+           AND LOG.STATUS                    = 1;
+EDW_OWB_COLLECTION_UTIL.write_to_log_file('3 sqlcount  ddd ' || SQL%rowcount);
+       OPI_COLLECTION_HOOK_P.GATHER_STATS('OPI_EDW_MRGIN_COGSPOSTCOLL_FUR');
+
+    UPDATE OPI_EDW_MARGIN_F MRG
+    SET (ORDER_DATE
+       ,ORDER_NO
+       ,SHIP_DATE
+       ,SHIP_LOCATION_FK_KEY
+       ,COGS_DATE_FK_KEY)=(SELECT distinct MAXVALS.MAX_ORDER_DATE
+                              ,MAXVALS.MAX_ORDER_NUMBER
+                              ,MAXVALS.MAX_COGS_DATE
+                              ,MAXVALS.SHIP_INV_LOCATOR_FK_KEY
+                              ,MAXVALS.COGS_DATE_FK_KEY
+                       FROM OPI_EDW_MRGIN_COGSPOSTCOLL_FUR  MAXVALS
+                         WHERE MRG.rowid = MAXVALS.ROW_ID)
+      where EXISTS (SELECT 1
+              FROM  OPI_EDW_MRGIN_COGSPOSTCOLL_FUR  MAXVALS
+              WHERE MRG.rowid = MAXVALS.ROW_ID);
+
+      EDW_OWB_COLLECTION_UTIL.write_to_log_file('Number of rows udated OPI_EDW_MARGIN_F from revenue fact'||SQL%ROWCOUNT);
+      EDW_OWB_COLLECTION_UTIL.write_to_log_file(to_char(SYSDATE,'DD-MON-YYYY HH24:MI:SS'));
+
+      OPI_COLLECTION_HOOK_P.TURNC_TAB('OPI_EDW_MRGIN_COGSPOSTCOLL_FUR');
+
+      UPDATE OPI_EDW_MARGIN_PERD_ILOG
+      SET  STATUS =2
+      WHERE STATUS = 1;
+  END LOOP;
+  UPDATE OPI_EDW_MARGIN_PERD_ILOG
+  SET  STATUS =0;
+  COMMIT;
+
+    EDW_OWB_COLLECTION_UTIL.write_to_log_file('Number of rows udated OPI_EDW_MARGIN_F from cogs fact'||SQL%ROWCOUNT);
+    EDW_OWB_COLLECTION_UTIL.write_to_log_file(to_char(SYSDATE,'DD-MON-YYYY HH24:MI:SS'));
+
+END IF;
+/****************************************************************************************+
+***   Find Max of SHIP_DATE and INVOICE_DATE based on that populate Margin Date FK Key ***
+***   with either COGS Date FK KEy OR Revenue Date Fk Key                              ***
++*****************************************************************************************/
+
+LOOP
+  UPDATE OPI_EDW_MARGIN_PERD_ILOG
+  SET  STATUS =1
+  WHERE STATUS = 0 AND
+      ROWNUM < l_chunk_size;
+  IF SQL%ROWCOUNT = 0 THEN
+    EXIT;
+  END IF;
+/**********************************************************************
+***  Update Margin Date FK Key with COGS Date FK Key if Ship date is **
+***  greater than or equal to Invoice Date                           **
+***********************************************************************/
+
+ UPDATE OPI_EDW_MARGIN_F MRG
+ SET MARGIN_DATE_FK_KEY = MRG.COGS_DATE_FK_KEY,
+      GL_PERIOD_FK_KEY =
+    (SELECT TIM2.CDAY_CAL_DAY_PK_KEY
+       FROM EDW_TIME_M TIM1,
+            EDW_TIME_M TIM2,
+            EDW_TIME_CAL_PERIOD_LTC PERDLTC
+     WHERE MRG.SHIP_DATE IS NOT NULL
+         AND MRG.INVOICE_DATE IS NOT NULL
+         AND MRG.COGS_DATE_FK_KEY = TIM1.CDAY_CAL_DAY_PK_KEY
+         AND TIM1.CPER_CAL_PERIOD_PK_KEY= PERDLTC.CAL_PERIOD_PK_KEY
+         AND TIM2.CDAY_CAL_DAY_PK = PERDLTC.CAL_PERIOD_PK ||'-CPER' )
+ WHERE MRG.SHIP_DATE IS NOT NULL
+   AND MRG.INVOICE_DATE IS NOT NULL
+   AND MRG.ship_date >= MRG.invoice_date
+   AND EXISTS (SELECT 1
+               FROM OPI_EDW_MARGIN_PERD_ILOG
+               WHERE MRG.ROWID = ROW_ID
+                 AND STATUS = 1);
+/*************************************************************************
+***  Update Margin Date FK Key with Revenue Date FK Key if Ship date is **
+***  Less than Invoice Date                                             **
+**************************************************************************/
+--3836905 -- Added this for RMA transcations
+UPDATE OPI_EDW_MARGIN_F MRG
+ SET MARGIN_DATE_FK_KEY = MRG.COGS_DATE_FK_KEY,
+        invoice_date= MRG.ship_date ,
+      GL_PERIOD_FK_KEY =
+    (SELECT TIM2.CDAY_CAL_DAY_PK_KEY
+       FROM EDW_TIME_M TIM1,
+            EDW_TIME_M TIM2,
+            EDW_TIME_CAL_PERIOD_LTC PERDLTC
+     WHERE MRG.SHIP_DATE IS NOT NULL
+         AND MRG.INVOICE_DATE IS NOT NULL
+         AND MRG.COGS_DATE_FK_KEY = TIM1.CDAY_CAL_DAY_PK_KEY
+         AND TIM1.CPER_CAL_PERIOD_PK_KEY= PERDLTC.CAL_PERIOD_PK_KEY
+         AND TIM2.CDAY_CAL_DAY_PK = PERDLTC.CAL_PERIOD_PK ||'-CPER' )
+ WHERE MRG.SHIP_DATE IS NOT NULL
+   AND MRG.RMA_QTY IS NOT NULL
+   AND EXISTS (SELECT 1
+               FROM OPI_EDW_MARGIN_PERD_ILOG
+               WHERE MRG.ROWID = ROW_ID
+                 AND STATUS = 1);
+-- End of addition --
+ UPDATE OPI_EDW_MARGIN_F MRG
+ SET MARGIN_DATE_FK_KEY = MRG.REVENUE_DATE_FK_KEY,
+     GL_PERIOD_FK_KEY  =
+    (SELECT TIM2.CDAY_CAL_DAY_PK_KEY
+       FROM EDW_TIME_M TIM1,
+            EDW_TIME_M TIM2,
+            EDW_TIME_CAL_PERIOD_LTC PERDLTC
+     WHERE MRG.SHIP_DATE is NOT NULL
+         AND MRG.INVOICE_DATE is NOT NULL
+         AND MRG.REVENUE_DATE_FK_KEY = TIM1.CDAY_CAL_DAY_PK_KEY
+         AND TIM1.CPER_CAL_PERIOD_PK_KEY= PERDLTC.CAL_PERIOD_PK_KEY
+         AND TIM2.CDAY_CAL_DAY_PK = PERDLTC.CAL_PERIOD_PK ||'-CPER' )
+ WHERE MRG.SHIP_DATE is NOT NULL
+   AND MRG.INVOICE_DATE is NOT NULL
+   AND MRG.ship_date < MRG.invoice_date
+   AND  EXISTS (SELECT 1
+               FROM OPI_EDW_MARGIN_PERD_ILOG
+               WHERE MRG.ROWID = ROW_ID
+                 AND STATUS = 1);
+
+      UPDATE OPI_EDW_MARGIN_PERD_ILOG
+      SET  STATUS =2
+      WHERE STATUS = 1;
+  END LOOP;
+  UPDATE OPI_EDW_MARGIN_PERD_ILOG
+  SET  STATUS =0;
+  COMMIT;
+
+EDW_OWB_COLLECTION_UTIL.write_to_log_file('Number of rows udated OPI_EDW_MARGIN_F generated period FK KEY'||SQL%ROWCOUNT);
+EDW_OWB_COLLECTION_UTIL.write_to_log_file(to_char(SYSDATE,'DD-MON-YYYY HH24:MI:SS'));
+/***************************************************************************************+
+*****  Delete Snapshot log of margin.  Since this on derived fact collection engine *****
+*****  doesn't delete it.                                                           *****
++****************************************************************************************/
+
+
+    --    delete MLOG$_OPI_EDW_MARGIN_F;
+LOOP
+  UPDATE OPI_EDW_MARGIN_PERD_ILOG
+  SET  STATUS =1
+  WHERE STATUS = 0 AND
+      ROWNUM < l_chunk_size;
+  IF SQL%ROWCOUNT = 0 THEN
+    EXIT;
+  END IF;
+  EDW_OWB_COLLECTION_UTIL.write_to_log_file('Number of rows in processing'||SQL%ROWCOUNT);
+  EDW_OWB_COLLECTION_UTIL.write_to_log_file(to_char(SYSDATE,'DD-MON-YYYY HH24:MI:SS'));
+  COMMIT;
+  INSERT INTO OPI_EDW_PERD_MARGIN_FT(
+    ITEM_ORG_FK_KEY
+    ,OPERATING_UNIT_FK_KEY
+      ,BASE_CURRENCY_FK_KEY
+    ,SOB_FK_KEY
+    ,CUSTOMER_FK_KEY
+    ,SALES_CHANNEL_FK_KEY
+    ,INSTANCE_FK_KEY
+    ,PRIM_SALES_REP_FK_KEY
+    ,BILL_TO_LOC_FK_KEY
+    ,SHIP_TO_LOC_FK_KEY
+    ,PROJECT_FK_KEY
+    ,UOM_FK_KEY
+    ,SHIP_LOCATION_FK_KEY
+    ,MARGIN_PERIOD_FK_KEY
+    ,USER_FK5_KEY
+    ,USER_FK4_KEY
+    ,USER_FK3_KEY
+    ,USER_FK2_KEY
+    ,USER_FK1_KEY
+    ,COGS_G
+    ,COGS_B
+    ,PROD_AMT_G
+    ,PROD_AMT_B
+    ,PROD_LINE_QTY_INVOICED
+    ,PROD_LINE_QTY_CREDITED
+    ,SHIPPED_QTY
+    ,RMA_QTY
+    ,ICAP_QTY
+    ,USER_MEASURE5
+    ,USER_MEASURE4
+    ,USER_MEASURE3
+    ,USER_MEASURE2
+    ,USER_MEASURE1)
+  (SELECT /*+ ALL_ROWS */
+    ITEM_ORG_FK_KEY
+    ,OPERATING_UNIT_FK_KEY
+      ,BASE_CURRENCY_FK_KEY
+    ,SOB_FK_KEY
+    ,CUSTOMER_FK_KEY
+    ,SALES_CHANNEL_FK_KEY
+    ,INSTANCE_FK_KEY
+    ,PRIM_SALES_REP_FK_KEY
+    ,BILL_TO_LOC_FK_KEY
+    ,SHIP_TO_LOC_FK_KEY
+    ,PROJECT_FK_KEY
+    ,UOM_FK_KEY
+    ,SHIP_LOCATION_FK_KEY
+    ,GL_PERIOD_FK_KEY
+    ,USER_FK5_KEY
+    ,USER_FK4_KEY
+    ,USER_FK3_KEY
+    ,USER_FK2_KEY
+    ,USER_FK1_KEY
+    ,SUM(COGS_G)
+    ,SUM(COGS_B)
+    ,SUM(PROD_AMT_G)
+    ,SUM(PROD_AMT_B)
+    ,SUM(PROD_LINE_QTY_INVOICED)
+    ,SUM(PROD_LINE_QTY_CREDITED)
+    ,SUM(SHIPPED_QTY)
+    ,SUM(RMA_QTY)
+    ,SUM(ICAP_QTY)
+    ,SUM(USER_MEASURE5)
+    ,SUM(USER_MEASURE4)
+    ,SUM(USER_MEASURE3)
+    ,SUM(USER_MEASURE2)
+    ,SUM(USER_MEASURE1)
+    FROM OPI_EDW_MARGIN_F, OPI_EDW_MARGIN_PERD_ILOG
+   WHERE  OPI_EDW_MARGIN_PERD_ILOG.ROW_ID = OPI_EDW_MARGIN_F.ROWID
+          AND OPI_EDW_MARGIN_PERD_ILOG.STATUS = 1
+          AND GL_PERIOD_FK_KEY IS NOT NULL
+          AND GL_PERIOD_FK_KEY <>  '0'
+   GROUP BY
+    ITEM_ORG_FK_KEY
+    ,OPERATING_UNIT_FK_KEY
+      ,BASE_CURRENCY_FK_KEY
+    ,SOB_FK_KEY
+    ,CUSTOMER_FK_KEY
+    ,SALES_CHANNEL_FK_KEY
+    ,INSTANCE_FK_KEY
+    ,PRIM_SALES_REP_FK_KEY
+    ,BILL_TO_LOC_FK_KEY
+    ,SHIP_TO_LOC_FK_KEY
+    ,PROJECT_FK_KEY
+    ,UOM_FK_KEY
+    ,SHIP_LOCATION_FK_KEY
+    ,GL_PERIOD_FK_KEY
+    ,USER_FK5_KEY
+    ,USER_FK4_KEY
+    ,USER_FK3_KEY
+    ,USER_FK2_KEY
+    ,USER_FK1_KEY);
+
+  EDW_OWB_COLLECTION_UTIL.write_to_log_file('Number of rows moved to OPI_EDW_PERD_MARGIN_FT '||SQL%ROWCOUNT);
+  EDW_OWB_COLLECTION_UTIL.write_to_log_file(to_char(SYSDATE,'DD-MON-YYYY HH24:MI:SS'));
+  OPI_COLLECTION_HOOK_P.GATHER_STATS('OPI_EDW_PERD_MARGIN_FT');
+
+
+  INSERT INTO OPI_EDW_PERD_MARGIN_FUR(
+     COGS_G
+    ,COGS_B
+    ,PROD_AMT_G
+    ,PROD_AMT_B
+    ,PROD_LINE_QTY_INVOICED
+    ,PROD_LINE_QTY_CREDITED
+    ,SHIPPED_QTY
+    ,RMA_QTY
+    ,ICAP_QTY
+    ,USER_MEASURE5
+    ,USER_MEASURE4
+    ,USER_MEASURE3
+    ,USER_MEASURE2
+    ,USER_MEASURE1
+               ,ROW_ID
+               ,ROW_ID1)
+  (SELECT /*+ ALL_ROWS */
+    NVL(MRGF.COGS_G,0) +NVL(MRGFT.COGS_G,0)
+    ,NVL(MRGF.COGS_B,0) +NVL(MRGFT.COGS_B,0)
+    ,NVL(MRGF.PROD_AMT_G,0) +NVL(MRGFT.PROD_AMT_G,0)
+    ,NVL(MRGF.PROD_AMT_B,0) +NVL(MRGFT.PROD_AMT_B,0)
+    ,NVL(MRGF.PROD_LINE_QTY_INVOICED,0) +NVL(MRGFT.PROD_LINE_QTY_INVOICED,0)
+    ,NVL(MRGF.PROD_LINE_QTY_CREDITED,0) +NVL(MRGFT.PROD_LINE_QTY_CREDITED,0)
+    ,NVL(MRGF.SHIPPED_QTY,0) +NVL(MRGFT.SHIPPED_QTY,0)
+    ,NVL(MRGF.RMA_QTY,0) +NVL(MRGFT.RMA_QTY,0)
+    ,NVL(MRGF.ICAP_QTY,0) +NVL(MRGFT.ICAP_QTY,0)
+    ,NVL(MRGF.USER_MEASURE5,0) +NVL(MRGFT.USER_MEASURE5,0)
+    ,NVL(MRGF.USER_MEASURE4,0) +NVL(MRGFT.USER_MEASURE4,0)
+    ,NVL(MRGF.USER_MEASURE3,0) +NVL(MRGFT.USER_MEASURE3,0)
+    ,NVL(MRGF.USER_MEASURE2,0) +NVL(MRGFT.USER_MEASURE2,0)
+    ,NVL(MRGF.USER_MEASURE1,0) +NVL(MRGFT.USER_MEASURE1,0)
+    ,MRGFT.ROWID
+    ,MRGF.ROWID
+  FROM OPI_EDW_PERD_MARGIN_F MRGF, OPI_EDW_PERD_MARGIN_FT MRGFT
+  WHERE MRGF.ITEM_ORG_FK_KEY=MRGFT.ITEM_ORG_FK_KEY
+    AND MRGF.OPERATING_UNIT_FK_KEY=MRGFT.OPERATING_UNIT_FK_KEY
+    AND MRGF.BASE_CURR_FK_KEY  = MRGFT.BASE_CURRENCY_FK_KEY
+    AND MRGF.SOB_FK_KEY=MRGFT.SOB_FK_KEY
+    AND MRGF.CUSTOMER_FK_KEY=MRGFT.CUSTOMER_FK_KEY
+    AND MRGF.SALES_CHANNEL_FK_KEY=MRGFT.SALES_CHANNEL_FK_KEY
+    AND MRGF.INSTANCE_FK_KEY=MRGFT.INSTANCE_FK_KEY
+    AND MRGF.PRIM_SALES_REP_FK_KEY=MRGFT.PRIM_SALES_REP_FK_KEY
+    AND MRGF.BILL_TO_LOC_FK_KEY=MRGFT.BILL_TO_LOC_FK_KEY
+    AND MRGF.SHIP_TO_LOC_FK_KEY=MRGFT.SHIP_TO_LOC_FK_KEY
+    AND MRGF.PROJECT_FK_KEY=MRGFT.PROJECT_FK_KEY
+    AND MRGF.UOM_FK_KEY=MRGFT.UOM_FK_KEY
+    AND MRGF.SHIP_LOCATION_FK_KEY=MRGFT.SHIP_LOCATION_FK_KEY
+    AND MRGF.MARGIN_PERIOD_FK_KEY=MRGFT.MARGIN_PERIOD_FK_KEY
+    AND NVL(MRGF.USER_FK5_KEY,0)=NVL(MRGFT.USER_FK5_KEY,0)
+    AND NVL(MRGF.USER_FK4_KEY,0)=NVL(MRGFT.USER_FK4_KEY,0)
+    AND NVL(MRGF.USER_FK3_KEY,0)=NVL(MRGFT.USER_FK3_KEY,0)
+    AND NVL(MRGF.USER_FK2_KEY,0)=NVL(MRGFT.USER_FK2_KEY,0)
+    AND NVL(MRGF.USER_FK1_KEY,0)=NVL(MRGFT.USER_FK1_KEY,0));
+
+  EDW_OWB_COLLECTION_UTIL.write_to_log_file('Number of rows moved to OPI_EDW_PERD_MARGIN_FUR '||SQL%ROWCOUNT);
+  EDW_OWB_COLLECTION_UTIL.write_to_log_file(to_char(SYSDATE,'DD-MON-YYYY HH24:MI:SS'));
+  OPI_COLLECTION_HOOK_P.GATHER_STATS('OPI_EDW_PERD_MARGIN_FUR');
+
+
+  COMMIT;
+
+  INSERT INTO OPI_EDW_MARGIN_PERD_FIR (
+                SELECT /*+ ALL_ROWS */ ROWID ROW_ID FROM OPI_EDW_PERD_MARGIN_FT
+                MINUS
+                SELECT /*+ ALL_ROWS */ ROW_ID ROW_ID FROM OPI_EDW_PERD_MARGIN_FUR);
+
+  EDW_OWB_COLLECTION_UTIL.write_to_log_file('Number of rows to be inserted into Margin period summary  '||SQL%ROWCOUNT);
+
+  l_insert := SQL%ROWCOUNT;
+
+  EDW_OWB_COLLECTION_UTIL.write_to_log_file('end Time '||to_char(SYSDATE,'DD-MON-YYYY HH24:MI:SS'));
+  OPI_COLLECTION_HOOK_P.GATHER_STATS('OPI_EDW_MARGIN_PERD_FIR');
+
+
+  IF l_insert <> 0 THEN
+    INSERT INTO OPI_EDW_PERD_MARGIN_F
+    (ITEM_ORG_FK_KEY
+    ,OPERATING_UNIT_FK_KEY
+      ,BASE_CURR_FK_KEY
+    ,SOB_FK_KEY
+    ,CUSTOMER_FK_KEY
+    ,SALES_CHANNEL_FK_KEY
+    ,INSTANCE_FK_KEY
+    ,PRIM_SALES_REP_FK_KEY
+    ,BILL_TO_LOC_FK_KEY
+    ,SHIP_TO_LOC_FK_KEY
+    ,PROJECT_FK_KEY
+    ,UOM_FK_KEY
+    ,SHIP_LOCATION_FK_KEY
+    ,MARGIN_PERIOD_FK_KEY
+    ,COGS_G
+    ,COGS_B
+    ,PROD_AMT_G
+    ,PROD_AMT_B
+    ,PROD_LINE_QTY_INVOICED
+    ,PROD_LINE_QTY_CREDITED
+    ,SHIPPED_QTY
+    ,RMA_QTY
+    ,ICAP_QTY
+    ,LAST_UPDATE_DATE
+    ,CREATION_DATE
+    ,USER_FK5_KEY
+    ,USER_FK4_KEY
+    ,USER_FK3_KEY
+    ,USER_FK2_KEY
+    ,USER_FK1_KEY
+    ,USER_MEASURE5
+    ,USER_MEASURE4
+    ,USER_MEASURE3
+    ,USER_MEASURE2
+    ,USER_MEASURE1)
+    SELECT /*+ ALL_ROWS */
+    ITEM_ORG_FK_KEY
+    ,OPERATING_UNIT_FK_KEY
+      ,BASE_CURRENCY_FK_KEY
+    ,SOB_FK_KEY
+    ,CUSTOMER_FK_KEY
+    ,SALES_CHANNEL_FK_KEY
+    ,INSTANCE_FK_KEY
+    ,PRIM_SALES_REP_FK_KEY
+    ,BILL_TO_LOC_FK_KEY
+    ,SHIP_TO_LOC_FK_KEY
+    ,PROJECT_FK_KEY
+    ,UOM_FK_KEY
+    ,SHIP_LOCATION_FK_KEY
+    ,MARGIN_PERIOD_FK_KEY
+    ,COGS_G
+    ,COGS_B
+    ,PROD_AMT_G
+    ,PROD_AMT_B
+    ,PROD_LINE_QTY_INVOICED
+    ,PROD_LINE_QTY_CREDITED
+    ,SHIPPED_QTY
+    ,RMA_QTY
+    ,ICAP_QTY
+    ,SYSDATE
+    ,SYSDATE
+    ,USER_FK5_KEY
+    ,USER_FK4_KEY
+    ,USER_FK3_KEY
+    ,USER_FK2_KEY
+    ,USER_FK1_KEY
+    ,USER_MEASURE5
+    ,USER_MEASURE4
+    ,USER_MEASURE3
+    ,USER_MEASURE2
+    ,USER_MEASURE1
+    FROM  OPI_EDW_PERD_MARGIN_FT  ,
+      OPI_EDW_MARGIN_PERD_FIR
+    WHERE  OPI_EDW_PERD_MARGIN_FT.ROWID = OPI_EDW_MARGIN_PERD_FIR.ROW_ID;
+    EDW_OWB_COLLECTION_UTIL.write_to_log_file('Number of rows inserted into Margin period summary  '||SQL%ROWCOUNT);
+    EDW_OWB_COLLECTION_UTIL.write_to_log_file('end Time '||to_char(SYSDATE,'DD-MON-YYYY HH24:MI:SS'));
+ END IF;
+ COMMIT;
+
+  OPI_COLLECTION_HOOK_P.GATHER_STATS('OPI_EDW_PERD_MARGIN_F');
+
+  UPDATE  OPI_EDW_PERD_MARGIN_F MRGF
+  SET    (COGS_G
+    ,COGS_B
+    ,PROD_AMT_G
+    ,PROD_AMT_B
+    ,PROD_LINE_QTY_INVOICED
+    ,PROD_LINE_QTY_CREDITED
+    ,SHIPPED_QTY
+    ,RMA_QTY
+    ,ICAP_QTY
+    ,USER_MEASURE5
+    ,USER_MEASURE4
+    ,USER_MEASURE3
+    ,USER_MEASURE2
+    ,USER_MEASURE1) =
+         (SELECT COGS_G
+    ,COGS_B
+    ,PROD_AMT_G
+    ,PROD_AMT_B
+    ,PROD_LINE_QTY_INVOICED
+    ,PROD_LINE_QTY_CREDITED
+    ,SHIPPED_QTY
+    ,RMA_QTY
+    ,ICAP_QTY
+    ,USER_MEASURE5
+    ,USER_MEASURE4
+    ,USER_MEASURE3
+    ,USER_MEASURE2
+    ,USER_MEASURE1
+     FROM OPI_EDW_PERD_MARGIN_FUR MRGFU
+     WHERE MRGF.ROWID = MRGFU.ROW_ID1)
+  WHERE  EXISTS (SELECT 1
+               FROM OPI_EDW_PERD_MARGIN_FUR MRGFU
+               WHERE MRGF.ROWID = MRGFU.ROW_ID1);
+  EDW_OWB_COLLECTION_UTIL.write_to_log_file('Number of rows updated in Margin period summary  '||SQL%ROWCOUNT);
+  EDW_OWB_COLLECTION_UTIL.write_to_log_file('end Time '||to_char(SYSDATE,'DD-MON-YYYY HH24:MI:SS'));
+  COMMIT;
+  UPDATE OPI_EDW_MARGIN_PERD_ILOG
+  SET  STATUS =2
+  WHERE STATUS = 1;
+  OPI_COLLECTION_HOOK_P.TURNC_TAB('OPI_EDW_PERD_MARGIN_FT');
+  OPI_COLLECTION_HOOK_P.TURNC_TAB('OPI_EDW_PERD_MARGIN_FUR');
+  OPI_COLLECTION_HOOK_P.TURNC_TAB('OPI_EDW_MARGIN_PERD_FIR');
+END LOOP;
+INSERT INTO OPI_EDW_PERD_MARGIN_FT(
+    ITEM_ORG_FK_KEY
+    ,OPERATING_UNIT_FK_KEY
+      ,BASE_CURRENCY_FK_KEY
+    ,SOB_FK_KEY
+    ,CUSTOMER_FK_KEY
+    ,SALES_CHANNEL_FK_KEY
+    ,INSTANCE_FK_KEY
+    ,PRIM_SALES_REP_FK_KEY
+    ,BILL_TO_LOC_FK_KEY
+    ,SHIP_TO_LOC_FK_KEY
+    ,PROJECT_FK_KEY
+    ,UOM_FK_KEY
+    ,SHIP_LOCATION_FK_KEY
+    ,MARGIN_PERIOD_FK_KEY
+    ,USER_FK5_KEY
+    ,USER_FK4_KEY
+    ,USER_FK3_KEY
+    ,USER_FK2_KEY
+    ,USER_FK1_KEY
+    ,COGS_G
+    ,COGS_B
+    ,PROD_AMT_G
+    ,PROD_AMT_B
+    ,PROD_LINE_QTY_INVOICED
+    ,PROD_LINE_QTY_CREDITED
+    ,SHIPPED_QTY
+    ,RMA_QTY
+    ,ICAP_QTY
+    ,USER_MEASURE5
+    ,USER_MEASURE4
+    ,USER_MEASURE3
+    ,USER_MEASURE2
+    ,USER_MEASURE1)
+(SELECT /*+ ALL_ROWS */
+    ITEM_ORG_FK_KEY
+    ,OPERATING_UNIT_FK_KEY
+      ,BASE_CURRENCY_FK_KEY
+    ,SOB_FK_KEY
+    ,CUSTOMER_FK_KEY
+    ,SALES_CHANNEL_FK_KEY
+    ,INSTANCE_FK_KEY
+    ,PRIM_SALES_REP_FK_KEY
+    ,BILL_TO_LOC_FK_KEY
+    ,SHIP_TO_LOC_FK_KEY
+    ,PROJECT_FK_KEY
+    ,UOM_FK_KEY
+    ,SHIP_LOCATION_FK_KEY
+    ,GL_PERIOD_FK_KEY
+    ,USER_FK5_KEY
+    ,USER_FK4_KEY
+    ,USER_FK3_KEY
+    ,USER_FK2_KEY
+    ,USER_FK1_KEY
+    ,SUM(COGS_G)
+    ,SUM(COGS_B)
+    ,SUM(PROD_AMT_G)
+    ,SUM(PROD_AMT_B)
+    ,SUM(PROD_LINE_QTY_INVOICED)
+    ,SUM(PROD_LINE_QTY_CREDITED)
+    ,SUM(SHIPPED_QTY)
+    ,SUM(RMA_QTY)
+    ,SUM(ICAP_QTY)
+    ,SUM(USER_MEASURE5)
+    ,SUM(USER_MEASURE4)
+    ,SUM(USER_MEASURE3)
+    ,SUM(USER_MEASURE2)
+    ,SUM(USER_MEASURE1)
+    FROM OPI_EDW_MARGIN_PERD_FDLG
+GROUP BY
+    ITEM_ORG_FK_KEY
+    ,OPERATING_UNIT_FK_KEY
+      ,BASE_CURRENCY_FK_KEY
+    ,SOB_FK_KEY
+    ,CUSTOMER_FK_KEY
+    ,SALES_CHANNEL_FK_KEY
+    ,INSTANCE_FK_KEY
+    ,PRIM_SALES_REP_FK_KEY
+    ,BILL_TO_LOC_FK_KEY
+    ,SHIP_TO_LOC_FK_KEY
+    ,PROJECT_FK_KEY
+    ,UOM_FK_KEY
+    ,SHIP_LOCATION_FK_KEY
+    ,GL_PERIOD_FK_KEY
+    ,USER_FK5_KEY
+    ,USER_FK4_KEY
+    ,USER_FK3_KEY
+    ,USER_FK2_KEY
+    ,USER_FK1_KEY);
+COMMIT;
+
+  OPI_COLLECTION_HOOK_P.GATHER_STATS('OPI_EDW_PERD_MARGIN_FT');
+
+
+INSERT INTO OPI_EDW_PERD_MARGIN_FUR(
+     COGS_G
+    ,COGS_B
+    ,PROD_AMT_G
+    ,PROD_AMT_B
+    ,PROD_LINE_QTY_INVOICED
+    ,PROD_LINE_QTY_CREDITED
+    ,SHIPPED_QTY
+    ,RMA_QTY
+    ,ICAP_QTY
+    ,USER_MEASURE5
+    ,USER_MEASURE4
+    ,USER_MEASURE3
+    ,USER_MEASURE2
+    ,USER_MEASURE1
+               ,ROW_ID
+               ,ROW_ID1)
+(SELECT /*+ ALL_ROWS */
+    NVL(MRGF.COGS_G,0) -NVL(MRGFT.COGS_G,0)
+    ,NVL(MRGF.COGS_B,0) -NVL(MRGFT.COGS_B,0)
+    ,NVL(MRGF.PROD_AMT_G,0) -NVL(MRGFT.PROD_AMT_G,0)
+    ,NVL(MRGF.PROD_AMT_B,0) -NVL(MRGFT.PROD_AMT_B,0)
+    ,NVL(MRGF.PROD_LINE_QTY_INVOICED,0) -NVL(MRGFT.PROD_LINE_QTY_INVOICED,0)
+    ,NVL(MRGF.PROD_LINE_QTY_CREDITED,0) -NVL(MRGFT.PROD_LINE_QTY_CREDITED,0)
+    ,NVL(MRGF.SHIPPED_QTY,0) -NVL(MRGFT.SHIPPED_QTY,0)
+    ,NVL(MRGF.RMA_QTY,0) -NVL(MRGFT.RMA_QTY,0)
+    ,NVL(MRGF.ICAP_QTY,0) -NVL(MRGFT.ICAP_QTY,0)
+    ,NVL(MRGF.USER_MEASURE5,0) -NVL(MRGFT.USER_MEASURE5,0)
+    ,NVL(MRGF.USER_MEASURE4,0) -NVL(MRGFT.USER_MEASURE4,0)
+    ,NVL(MRGF.USER_MEASURE3,0) -NVL(MRGFT.USER_MEASURE3,0)
+    ,NVL(MRGF.USER_MEASURE2,0) -NVL(MRGFT.USER_MEASURE2,0)
+    ,NVL(MRGF.USER_MEASURE1,0) -NVL(MRGFT.USER_MEASURE1,0)
+    ,MRGFT.ROWID
+    ,MRGF.ROWID
+ FROM OPI_EDW_PERD_MARGIN_F MRGF, OPI_EDW_PERD_MARGIN_FT MRGFT
+ WHERE MRGF.ITEM_ORG_FK_KEY=MRGFT.ITEM_ORG_FK_KEY
+  AND MRGF.OPERATING_UNIT_FK_KEY=MRGFT.OPERATING_UNIT_FK_KEY
+  AND MRGF.BASE_CURR_FK_KEY    = MRGFT.BASE_CURRENCY_FK_KEY
+  AND MRGF.SOB_FK_KEY=MRGFT.SOB_FK_KEY
+  AND MRGF.CUSTOMER_FK_KEY=MRGFT.CUSTOMER_FK_KEY
+  AND MRGF.SALES_CHANNEL_FK_KEY=MRGFT.SALES_CHANNEL_FK_KEY
+  AND MRGF.INSTANCE_FK_KEY=MRGFT.INSTANCE_FK_KEY
+  AND MRGF.PRIM_SALES_REP_FK_KEY=MRGFT.PRIM_SALES_REP_FK_KEY
+  AND MRGF.BILL_TO_LOC_FK_KEY=MRGFT.BILL_TO_LOC_FK_KEY
+  AND MRGF.SHIP_TO_LOC_FK_KEY=MRGFT.SHIP_TO_LOC_FK_KEY
+  AND MRGF.PROJECT_FK_KEY=MRGFT.PROJECT_FK_KEY
+  AND MRGF.UOM_FK_KEY=MRGFT.UOM_FK_KEY
+  AND MRGF.SHIP_LOCATION_FK_KEY=MRGFT.SHIP_LOCATION_FK_KEY
+  AND MRGF.MARGIN_PERIOD_FK_KEY=MRGFT.MARGIN_PERIOD_FK_KEY
+  AND NVL(MRGF.USER_FK5_KEY,0)=NVL(MRGFT.USER_FK5_KEY,0)
+  AND NVL(MRGF.USER_FK4_KEY,0)=NVL(MRGFT.USER_FK4_KEY,0)
+  AND NVL(MRGF.USER_FK3_KEY,0)=NVL(MRGFT.USER_FK3_KEY,0)
+  AND NVL(MRGF.USER_FK2_KEY,0)=NVL(MRGFT.USER_FK2_KEY,0)
+  AND NVL(MRGF.USER_FK1_KEY,0)=NVL(MRGFT.USER_FK1_KEY,0));
+  COMMIT;
+
+  OPI_COLLECTION_HOOK_P.GATHER_STATS('OPI_EDW_PERD_MARGIN_FUR');
+
+
+  UPDATE  OPI_EDW_PERD_MARGIN_F MRGF
+  SET    (COGS_G
+    ,COGS_B
+    ,PROD_AMT_G
+    ,PROD_AMT_B
+    ,PROD_LINE_QTY_INVOICED
+    ,PROD_LINE_QTY_CREDITED
+    ,SHIPPED_QTY
+    ,RMA_QTY
+    ,ICAP_QTY
+    ,USER_MEASURE5
+    ,USER_MEASURE4
+    ,USER_MEASURE3
+    ,USER_MEASURE2
+    ,USER_MEASURE1) =
+         (SELECT COGS_G
+    ,COGS_B
+    ,PROD_AMT_G
+    ,PROD_AMT_B
+    ,PROD_LINE_QTY_INVOICED
+    ,PROD_LINE_QTY_CREDITED
+    ,SHIPPED_QTY
+    ,RMA_QTY
+    ,ICAP_QTY
+    ,USER_MEASURE5
+    ,USER_MEASURE4
+    ,USER_MEASURE3
+    ,USER_MEASURE2
+    ,USER_MEASURE1
+     FROM OPI_EDW_PERD_MARGIN_FUR MRGFU
+     WHERE MRGF.ROWID = MRGFU.ROW_ID1)
+  WHERE  EXISTS (SELECT 1
+               FROM OPI_EDW_PERD_MARGIN_FUR MRGFU
+               WHERE MRGF.ROWID = MRGFU.ROW_ID1);
+  COMMIT;
+  OPI_COLLECTION_HOOK_P.TURNC_TAB('OPI_EDW_PERD_MARGIN_FT');
+  OPI_COLLECTION_HOOK_P.TURNC_TAB('OPI_EDW_PERD_MARGIN_FUR');
+  OPI_COLLECTION_HOOK_P.TURNC_TAB('OPI_EDW_MARGIN_PERD_FIR');
+  OPI_COLLECTION_HOOK_P.TURNC_TAB('MLOG$_OPI_EDW_MARGIN_F');
+  OPI_COLLECTION_HOOK_P.TURNC_TAB('OPI_EDW_MARGIN_PERD_FDLG');
+  OPI_COLLECTION_HOOK_P.TURNC_TAB('OPI_EDW_MARGIN_PERD_FD');
+  OPI_COLLECTION_HOOK_P.TURNC_TAB('OPI_EDW_MARGIN_PERD_ILOG');
+  OPI_COLLECTION_HOOK_P.TURNC_TAB('OPI_EDW_REV_LOG');
+  OPI_COLLECTION_HOOK_P.TURNC_TAB('OPI_EDW_MRG_MAX_VALUES');
+  OPI_COLLECTION_HOOK_P.TURNC_TAB('OPI_EDW_MRG_KEYS');
+  OPI_COLLECTION_HOOK_P.TURNC_TAB('OPI_EDW_COGS_LOG');
+  OPI_COLLECTION_HOOK_P.TURNC_TAB('OPI_EDW_MRGIN_COGSPOSTCOLL_FUR');
+  OPI_COLLECTION_HOOK_P.TURNC_TAB('OPI_EDW_MRGIN_REV_POSTCOLL_FUR');
+END POST_MARGIN_COLL;
+PROCEDURE PRE_MARGIN_COLL IS
+BEGIN
+ /* get global session parameters */
+ IF NOT (fnd_installation.get_app_info( 'OPI', g_status,
+        g_industry, g_opi_schema)) THEN
+        RAISE_APPLICATION_ERROR (-20000, 'Unable to get session information.');
+  END IF;
+
+  execute immediate 'truncate table ' || g_opi_schema || '.MLOG$_OPI_EDW_MARGIN_F';
+
+  COMMIT;
+
+END PRE_MARGIN_COLL;
+PROCEDURE POST_REVENUE_COLL IS
+BEGIN
+
+ /* get global session parameters */
+ IF NOT (fnd_installation.get_app_info( 'OPI', g_status,
+        g_industry, g_opi_schema)) THEN
+        RAISE_APPLICATION_ERROR (-20000, 'Unable to get session information.');
+  END IF;
+
+  execute immediate 'truncate table ' || g_opi_schema || '.MLOG$_OPI_EDW_MARGIN_F';
+  execute immediate 'truncate table ' || g_opi_schema || '.OPI_EDW_REV_LOG';
+
+  COMMIT;
+
+  INSERT INTO OPI_EDW_REV_LOG (select /*+ ALL_ROWS */ distinct m_row$$,0 from MLOG$_FII_AR_TRX_DIST_F);
+  OPI_COLLECTION_HOOK_P.GATHER_STATS('OPI_EDW_REV_LOG');
+END;
+PROCEDURE POST_COGS_COLL IS
+BEGIN
+
+ /* get global session parameters */
+ IF NOT (fnd_installation.get_app_info( 'OPI', g_status,
+        g_industry, g_opi_schema)) THEN
+        RAISE_APPLICATION_ERROR (-20000, 'Unable to get session information.');
+  END IF;
+
+  execute immediate 'truncate table ' || g_opi_schema || '.MLOG$_OPI_EDW_MARGIN_F';
+  execute immediate 'truncate table ' || g_opi_schema || '.OPI_EDW_COGS_LOG';
+
+  COMMIT;
+
+  INSERT INTO OPI_EDW_COGS_LOG (select /*+ ALL_ROWS */ distinct m_row$$,0 from MLOG$_OPI_EDW_COGS_F);
+  OPI_COLLECTION_HOOK_P.GATHER_STATS('OPI_EDW_COGS_LOG');
+END;
+PROCEDURE GATHER_STATS(P_TABLE_NAME   VARCHAR2) IS
+  l_TABLE_OWNER  VARCHAR2(32);
+BEGIN
+-- --
+--
+-- Find owner of the table passed to procedure
+--
+-- --
+SELECT TABLE_OWNER INTO l_table_owner
+FROM USER_SYNONYMS
+WHERE SYNONYM_NAME = P_TABLE_NAME;
+
+--
+--
+--   Gather table statistics these stats will be used by CBO for query optimisation.
+--
+--
+
+FND_STATS.GATHER_TABLE_STATS(l_table_owner,P_TABLE_NAME);
+
+END GATHER_STATS;
+
+PROCEDURE TURNC_TAB (p_table_name VARCHAR2) IS
+  l_TABLE_OWNER  VARCHAR2(32);
+  l_stmt     VARCHAR2(200);
+BEGIN
+-- --
+--
+-- Find owner of the table passed to procedure
+--
+-- --
+SELECT TABLE_OWNER INTO l_table_owner
+FROM USER_SYNONYMS
+WHERE SYNONYM_NAME = P_TABLE_NAME;
+
+--
+--
+--   Truncate the table
+--
+--
+    IF l_table_owner IS NOT NULL THEN
+       l_stmt := 'truncate table '||l_table_owner||'.'||P_TABLE_NAME;
+       execute immediate l_stmt;
+    END IF;
+  EXCEPTION WHEN  OTHERS THEN
+     NULL;
+  END  TURNC_TAB;
+
+
+End OPI_COLLECTION_HOOK_P;
+
+/

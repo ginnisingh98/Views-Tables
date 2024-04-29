@@ -1,0 +1,45 @@
+--------------------------------------------------------
+--  DDL for Package IGW_PROP_PROGRAM_ADDRESS_PKG
+--------------------------------------------------------
+
+  CREATE OR REPLACE EDITIONABLE PACKAGE "APPS"."IGW_PROP_PROGRAM_ADDRESS_PKG" AUTHID CURRENT_USER as
+ /* $Header: igwpr20s.pls 115.6 2002/03/28 19:13:26 pkm ship      $ */
+procedure INSERT_ROW (
+  X_ROWID in out VARCHAR2,
+  X_PROPOSAL_ID in NUMBER,
+  X_ADDRESS_ID in NUMBER,
+  X_NUMBER_OF_COPIES in NUMBER,
+  X_MAIL_DESCRIPTION in VARCHAR2,
+  X_MODE in VARCHAR2 default 'R'
+  );
+procedure LOCK_ROW (
+  X_ROWID in VARCHAR2,
+  X_PROPOSAL_ID in NUMBER,
+  X_ADDRESS_ID in NUMBER,
+  X_NUMBER_OF_COPIES in NUMBER,
+  X_MAIL_DESCRIPTION in VARCHAR2
+);
+procedure UPDATE_ROW (
+  X_ROWID in VARCHAR2,
+  X_PROPOSAL_ID in NUMBER,
+  X_ADDRESS_ID in NUMBER,
+  X_NUMBER_OF_COPIES in NUMBER,
+  X_MAIL_DESCRIPTION in VARCHAR2,
+  X_MODE in VARCHAR2 default 'R'
+  );
+procedure ADD_ROW (
+  X_ROWID in out VARCHAR2,
+  X_PROPOSAL_ID in NUMBER,
+  X_ADDRESS_ID in NUMBER,
+  X_NUMBER_OF_COPIES in NUMBER,
+  X_MAIL_DESCRIPTION in VARCHAR2,
+  X_MODE in VARCHAR2 default 'R'
+  );
+procedure DELETE_ROW (
+  X_ROWID in VARCHAR2
+);
+end IGW_PROP_PROGRAM_ADDRESS_PKG;
+
+ 
+
+/

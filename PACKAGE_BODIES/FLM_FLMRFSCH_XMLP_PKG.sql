@@ -1,0 +1,70 @@
+--------------------------------------------------------
+--  DDL for Package Body FLM_FLMRFSCH_XMLP_PKG
+--------------------------------------------------------
+
+  CREATE OR REPLACE EDITIONABLE PACKAGE BODY "APPS"."FLM_FLMRFSCH_XMLP_PKG" AS
+/* $Header: FLMRFSCHB.pls 120.0 2007/12/24 15:32:39 nchinnam noship $ */
+  FUNCTION BEFOREREPORT RETURN BOOLEAN IS
+  BEGIN
+    SELECT
+      O.ORGANIZATION_NAME
+    INTO P_ORGANIZATION
+    FROM
+      ORG_ORGANIZATION_DEFINITIONS O
+    WHERE O.ORGANIZATION_ID = P_ORG_ID;
+    IF (P_LINE_FROM IS NULL AND P_LINE_TO IS NOT NULL) THEN
+      CP_LINE_FROM := P_LINE_TO;
+    ELSIF (P_LINE_FROM IS NOT NULL AND P_LINE_TO IS NULL) THEN
+      CP_LINE_TO := P_LINE_FROM;
+    END IF;
+    IF (P_LINE_FROM IS NOT NULL) THEN
+      P_LIMIT_LINE := 'and wl.line_code >= ''' || P_LINE_FROM || '''';
+    ELSE
+      P_LIMIT_LINE := ' ';
+    END IF;
+    IF (P_LINE_TO IS NOT NULL) THEN
+      P_LIMIT_LINE := P_LIMIT_LINE || ' and wl.line_code <= ''' || P_LINE_TO || '''';
+    ELSE
+      P_LIMIT_LINE := ' ';
+    END IF;
+    IF (P_SCH_GROUP IS NOT NULL) THEN
+      P_LIMIT_SCH_GROUP := 'and wsg.schedule_group_name = ''' || P_SCH_GROUP || '''';
+    ELSE
+      P_LIMIT_SCH_GROUP := ' ';
+    END IF;
+   SELECT FIFST.ID_FLEX_NUM
+         INTO P_ITEM_FLEX_NUM
+           FROM FND_ID_FLEX_STRUCTURES FIFST
+        WHERE FIFST.APPLICATION_ID = 401
+          AND FIFST.ID_FLEX_CODE = 'MSTK'
+          AND FIFST.ENABLED_FLAG = 'Y'
+          AND FIFST.FREEZE_FLEX_DEFINITION_FLAG = 'Y'
+	AND ROWNUM<2 ;
+     P_CONC_REQUEST_ID := FND_GLOBAL.CONC_REQUEST_ID;
+     CP_DATE_FROM := TO_CHAR(P_DATE_FROM,'DD-MON-YY');
+     CP_DATE_TO := TO_CHAR(P_DATE_TO,'DD-MON-YY');
+    /*SRW.USER_EXIT('FND SRWINIT')*/NULL;
+    /*SRW.USER_EXIT('
+                    FND FLEXSQL
+                    CODE="MSTK"
+                    APPL_SHORT_NAME="INV"
+                    OUTPUT=":P_ASSY_FLEX"
+                    TABLEALIAS="MSI1"
+                    MODE="SELECT"
+                    DISPLAY="ALL"
+                  ')*/NULL;
+    RETURN (TRUE);
+  END BEFOREREPORT;
+  FUNCTION AFTERREPORT RETURN BOOLEAN IS
+  BEGIN
+    /*SRW.USER_EXIT('FND SRWEXIT')*/NULL;
+    RETURN (TRUE);
+  END AFTERREPORT;
+  FUNCTION AFTERPFORM RETURN BOOLEAN IS
+  BEGIN
+    RETURN (TRUE);
+  END AFTERPFORM;
+END FLM_FLMRFSCH_XMLP_PKG;
+
+
+/

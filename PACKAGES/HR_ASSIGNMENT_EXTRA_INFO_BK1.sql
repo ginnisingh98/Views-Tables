@@ -1,0 +1,133 @@
+--------------------------------------------------------
+--  DDL for Package HR_ASSIGNMENT_EXTRA_INFO_BK1
+--------------------------------------------------------
+
+  CREATE OR REPLACE EDITIONABLE PACKAGE "APPS"."HR_ASSIGNMENT_EXTRA_INFO_BK1" AUTHID CURRENT_USER as
+/* $Header: peaeiapi.pkh 120.2 2006/05/30 05:24:04 sspratur noship $ */
+--
+--
+-- create_assignment_extra_info_b
+--
+Procedure create_assignment_extra_info_b
+	(p_assignment_id			in	number	,
+	p_information_type		in	varchar2	,
+	p_aei_attribute_category	in	varchar2 	,
+	p_aei_attribute1			in	varchar2	,
+	p_aei_attribute2			in	varchar2	,
+	p_aei_attribute3			in	varchar2	,
+	p_aei_attribute4			in	varchar2	,
+	p_aei_attribute5			in	varchar2	,
+	p_aei_attribute6			in	varchar2	,
+	p_aei_attribute7			in	varchar2	,
+	p_aei_attribute8			in	varchar2	,
+	p_aei_attribute9			in	varchar2	,
+	p_aei_attribute10			in	varchar2	,
+	p_aei_attribute11			in	varchar2	,
+	p_aei_attribute12			in	varchar2	,
+	p_aei_attribute13			in	varchar2	,
+	p_aei_attribute14			in	varchar2	,
+	p_aei_attribute15			in	varchar2	,
+	p_aei_attribute16			in	varchar2	,
+	p_aei_attribute17			in	varchar2	,
+	p_aei_attribute18			in	varchar2	,
+	p_aei_attribute19			in	varchar2	,
+	p_aei_attribute20			in	varchar2	,
+	p_aei_information_category	in	varchar2	,
+	p_aei_information1		in	varchar2	,
+	p_aei_information2		in	varchar2	,
+	p_aei_information3		in	varchar2	,
+	p_aei_information4		in	varchar2	,
+	p_aei_information5		in	varchar2	,
+	p_aei_information6		in	varchar2	,
+	p_aei_information7		in	varchar2	,
+	p_aei_information8		in	varchar2	,
+	p_aei_information9		in	varchar2	,
+	p_aei_information10		in	varchar2	,
+	p_aei_information11		in	varchar2	,
+	p_aei_information12		in	varchar2	,
+	p_aei_information13		in	varchar2	,
+	p_aei_information14		in	varchar2	,
+	p_aei_information15		in	varchar2	,
+	p_aei_information16		in	varchar2	,
+	p_aei_information17		in	varchar2	,
+	p_aei_information18		in	varchar2	,
+	p_aei_information19		in	varchar2	,
+	p_aei_information20		in	varchar2	,
+	p_aei_information21		in	varchar2	,
+	p_aei_information22		in	varchar2	,
+	p_aei_information23		in	varchar2	,
+	p_aei_information24		in	varchar2	,
+	p_aei_information25		in	varchar2	,
+	p_aei_information26		in	varchar2	,
+	p_aei_information27		in	varchar2	,
+	p_aei_information28		in	varchar2	,
+	p_aei_information29		in	varchar2	,
+	p_aei_information30		in	varchar2	);
+--
+-- create_assignment_extra_info_a
+--
+Procedure create_assignment_extra_info_a
+	(p_assignment_id			in	number	,
+	p_information_type		in	varchar2	,
+	p_aei_attribute_category	in	varchar2 	,
+	p_aei_attribute1			in	varchar2	,
+	p_aei_attribute2			in	varchar2	,
+	p_aei_attribute3			in	varchar2	,
+	p_aei_attribute4			in	varchar2	,
+	p_aei_attribute5			in	varchar2	,
+	p_aei_attribute6			in	varchar2	,
+	p_aei_attribute7			in	varchar2	,
+	p_aei_attribute8			in	varchar2	,
+	p_aei_attribute9			in	varchar2	,
+	p_aei_attribute10			in	varchar2	,
+	p_aei_attribute11			in	varchar2	,
+	p_aei_attribute12			in	varchar2	,
+	p_aei_attribute13			in	varchar2	,
+	p_aei_attribute14			in	varchar2	,
+	p_aei_attribute15			in	varchar2	,
+	p_aei_attribute16			in	varchar2	,
+	p_aei_attribute17			in	varchar2	,
+	p_aei_attribute18			in	varchar2	,
+	p_aei_attribute19			in	varchar2	,
+	p_aei_attribute20			in	varchar2	,
+	p_aei_information_category	in	varchar2	,
+	p_aei_information1		in	varchar2	,
+	p_aei_information2		in	varchar2	,
+	p_aei_information3		in	varchar2	,
+	p_aei_information4		in	varchar2	,
+	p_aei_information5		in	varchar2	,
+	p_aei_information6		in	varchar2	,
+	p_aei_information7		in	varchar2	,
+	p_aei_information8		in	varchar2	,
+
+	p_aei_information9		in	varchar2	,
+	p_aei_information10		in	varchar2	,
+	p_aei_information11		in	varchar2	,
+	p_aei_information12		in	varchar2	,
+	p_aei_information13		in	varchar2	,
+	p_aei_information14		in	varchar2	,
+	p_aei_information15		in	varchar2	,
+	p_aei_information16		in	varchar2	,
+	p_aei_information17		in	varchar2	,
+	p_aei_information18		in	varchar2	,
+	p_aei_information19		in	varchar2	,
+	p_aei_information20		in	varchar2	,
+	p_aei_information21		in	varchar2	,
+	p_aei_information22		in	varchar2	,
+	p_aei_information23		in	varchar2	,
+	p_aei_information24		in	varchar2	,
+	p_aei_information25		in	varchar2	,
+	p_aei_information26		in	varchar2	,
+	p_aei_information27		in	varchar2	,
+	p_aei_information28		in	varchar2	,
+	p_aei_information29		in	varchar2	,
+	p_aei_information30		in	varchar2	,
+	p_assignment_extra_info_id	in	number	,
+	p_object_version_number		in	number
+);
+
+end hr_assignment_extra_info_bk1;
+
+ 
+
+/

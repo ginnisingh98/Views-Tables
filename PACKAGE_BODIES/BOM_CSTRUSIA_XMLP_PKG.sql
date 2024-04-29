@@ -1,0 +1,329 @@
+--------------------------------------------------------
+--  DDL for Package Body BOM_CSTRUSIA_XMLP_PKG
+--------------------------------------------------------
+
+  CREATE OR REPLACE EDITIONABLE PACKAGE BODY "APPS"."BOM_CSTRUSIA_XMLP_PKG" AS
+/* $Header: CSTRUSIAB.pls 120.1 2008/01/02 15:05:37 dwkrishn noship $ */
+  FUNCTION BEFOREREPORT RETURN BOOLEAN IS
+  BEGIN
+  qty_precision:=bom_common_xmlp_pkg.get_precision(P_qty_precision);
+    BEGIN
+      IF P_RPT_ONLY = 1 THEN
+        SELECT
+          FC.CURRENCY_CODE,
+          NVL(FC.EXTENDED_PRECISION
+             ,FC.PRECISION),
+          NVL(FC.MINIMUM_ACCOUNTABLE_UNIT
+             ,POWER(10
+                  ,NVL(-PRECISION
+                     ,0))),
+          SOB.CHART_OF_ACCOUNTS_ID,
+          CAT.CATEGORY_SET_NAME,
+          CAT.CATEGORY_SET_ID,
+          CAT.STRUCTURE_ID,
+          O.ORGANIZATION_NAME ORGANIZATION,
+          LU1.MEANING,
+          LU2.MEANING,
+          CCT.COST_TYPE
+        INTO P_CURRENCY_CODE,EXT_PREC,ROUND_UNIT,P_GL_NUM,P_CAT_SET_NAME,P_CATEGORY_SET,P_CAT_NUM,P_ORGANIZATION,P_SORT_BY,P_ITEM_RANGE,P_COST_TYPE
+        FROM
+          FND_CURRENCIES FC,
+          GL_SETS_OF_BOOKS SOB,
+          ORG_ORGANIZATION_DEFINITIONS O,
+          MTL_CATEGORY_SETS CAT,
+          MTL_DEFAULT_CATEGORY_SETS DCAT,
+          CST_COST_TYPES CCT,
+          MFG_LOOKUPS LU1,
+          MFG_LOOKUPS LU2
+        WHERE O.ORGANIZATION_ID = P_ORG_ID
+          AND O.SET_OF_BOOKS_ID = SOB.SET_OF_BOOKS_ID
+          AND SOB.CURRENCY_CODE = FC.CURRENCY_CODE
+          AND FC.ENABLED_FLAG = 'Y'
+          AND DCAT.FUNCTIONAL_AREA_ID = 5
+          AND CAT.CATEGORY_SET_ID = DECODE(P_RANGE_OPTION
+              ,5
+              ,P_CATEGORY_SET
+              ,DECODE(P_SORT_OPTION
+                    ,2
+                    ,P_CATEGORY_SET
+                    ,DCAT.CATEGORY_SET_ID))
+          AND LU1.LOOKUP_TYPE = 'CST_ITEM_REPORT_SORT'
+          AND LU1.LOOKUP_CODE = P_SORT_OPTION
+          AND LU2.LOOKUP_TYPE = 'CST_ITEM_RANGE'
+          AND LU2.LOOKUP_CODE = P_RANGE_OPTION
+          AND CCT.COST_TYPE_ID = P_COST_TYPE_ID;
+      ELSE
+        SELECT
+          FC.CURRENCY_CODE,
+          NVL(FC.EXTENDED_PRECISION
+             ,FC.PRECISION),
+          NVL(FC.MINIMUM_ACCOUNTABLE_UNIT
+             ,POWER(10
+                  ,NVL(-PRECISION
+                     ,0))),
+          SOB.CHART_OF_ACCOUNTS_ID,
+          CAT.CATEGORY_SET_NAME,
+          CAT.CATEGORY_SET_ID,
+          CAT.STRUCTURE_ID,
+          O.ORGANIZATION_NAME,
+          C.RANGE_OPTION,
+          LU1.MEANING,
+          LU2.MEANING,
+          C.ITEM_RANGE_LOW,
+          C.ITEM_RANGE_HIGH,
+          C.SINGLE_ITEM,
+          C.CATEGORY_ID,
+          C.INV_ADJUSTMENT_ACCOUNT,
+          C.UPDATE_DATE,
+          C.DESCRIPTION,
+          CCT.COST_TYPE
+        INTO P_CURRENCY_CODE,EXT_PREC,ROUND_UNIT,P_GL_NUM,P_CAT_SET_NAME,P_CATEGORY_SET,P_CAT_NUM,P_ORGANIZATION,P_RANGE_OPTION,P_SORT_BY,P_ITEM_RANGE,P_ITEM_FROM,P_ITEM_TO,P_ITEM,P_CAT,P_ADJ_ACCOUNT,P_UPDATE_DATE,P_UPDATE_DESC,P_COST_TYPE
+        FROM
+          FND_CURRENCIES FC,
+          GL_SETS_OF_BOOKS SOB,
+          ORG_ORGANIZATION_DEFINITIONS O,
+          MTL_CATEGORY_SETS CAT,
+          MTL_DEFAULT_CATEGORY_SETS DCAT,
+          MFG_LOOKUPS LU1,
+          MFG_LOOKUPS LU2,
+          CST_COST_TYPES CCT,
+          CST_COST_UPDATES C
+        WHERE C.COST_UPDATE_ID = P_UPDATE_ID
+          AND O.ORGANIZATION_ID = C.ORGANIZATION_ID
+          AND O.SET_OF_BOOKS_ID = SOB.SET_OF_BOOKS_ID
+          AND SOB.CURRENCY_CODE = FC.CURRENCY_CODE
+          AND FC.ENABLED_FLAG = 'Y'
+          AND DCAT.FUNCTIONAL_AREA_ID = 5
+          AND CAT.CATEGORY_SET_ID = NVL(C.CATEGORY_SET_ID
+           ,DCAT.CATEGORY_SET_ID)
+          AND LU1.LOOKUP_TYPE = 'CST_ITEM_REPORT_SORT'
+          AND LU1.LOOKUP_CODE = P_SORT_OPTION
+          AND LU2.LOOKUP_TYPE = 'CST_ITEM_RANGE'
+          AND LU2.LOOKUP_CODE = C.RANGE_OPTION
+          AND CCT.COST_TYPE_ID = C.COST_TYPE_ID;
+      END IF;
+      IF P_SORT_OPTION = 3 THEN
+        /*SRW.SET_MAXROW('Q_IC_MAIN'
+                      ,0)*/NULL;
+      ELSE
+        /*SRW.SET_MAXROW('Q_SI_MAIN'
+                      ,0)*/NULL;
+      END IF;
+      IF P_RANGE_OPTION <> 2 THEN
+        /*SRW.SET_MAXROW('Q_ITEM'
+                      ,0)*/NULL;
+      END IF;
+      IF P_RANGE_OPTION <> 5 THEN
+        /*SRW.SET_MAXROW('Q_CAT'
+                      ,0)*/NULL;
+      END IF;
+      BEGIN
+        P_CONC_REQUEST_ID := FND_GLOBAL.CONC_REQUEST_ID;
+        /*SRW.USER_EXIT('FND SRWINIT')*/NULL;
+      EXCEPTION
+        WHEN OTHERS THEN
+          /*SRW.MESSAGE(999
+                     ,'FND SRWINIT >X')*/NULL;
+          RAISE;
+      END;
+      BEGIN
+        NULL;
+      EXCEPTION
+        WHEN OTHERS THEN
+          /*SRW.MESSAGE(999
+                     ,'FND FLEXSQL(MCAT) >X')*/NULL;
+          RAISE;
+      END;
+      BEGIN
+        NULL;
+      EXCEPTION
+        WHEN OTHERS THEN
+          /*SRW.MESSAGE(999
+                     ,'FND FLEXSQL(MSTK) >X')*/NULL;
+          RAISE;
+      END;
+      BEGIN
+        NULL;
+      EXCEPTION
+        WHEN OTHERS THEN
+          /*SRW.MESSAGE(999
+                     ,'FND FLEXSQL(GL#) >X')*/NULL;
+          RAISE;
+      END;
+      /*SRW.MESSAGE(0
+                 ,'BOM_CSTRUSIA_XMLP_PKG <<     ' || TO_CHAR(SYSDATE
+                        ,'Dy Mon FmDD HH24:MI:SS YYYY'))*/NULL;
+    EXCEPTION
+      WHEN OTHERS THEN
+        /*SRW.MESSAGE(999
+                   ,SQLERRM)*/NULL;
+        /*SRW.MESSAGE(999
+                   ,'BOM_CSTRUSIA_XMLP_PKG >X     ' || TO_CHAR(SYSDATE
+                          ,'Dy Mon FmDD HH24:MI:SS YYYY'))*/NULL;
+        /*RAISE SRW.PROGRAM_ABORT*/RAISE_APPLICATION_ERROR(-20101,null);
+    END;
+    RETURN (TRUE);
+  END BEFOREREPORT;
+
+  FUNCTION AFTERREPORT RETURN BOOLEAN IS
+  BEGIN
+    BEGIN
+      IF P_DEL_SNAPSHOT = 1 THEN
+        ROLLBACK;
+        DELETE FROM CST_STD_COST_ADJ_VALUES
+         WHERE COST_UPDATE_ID = P_UPDATE_ID
+           AND TRANSACTION_TYPE = 1;
+        COMMIT;
+      END IF;
+      /*SRW.USER_EXIT('FND SRWEXIT')*/NULL;
+      /*SRW.MESSAGE(0
+                 ,'BOM_CSTRUSIA_XMLP_PKG >>     ' || TO_CHAR(SYSDATE
+                        ,'Dy Mon FmDD HH24:MI:SS YYYY'))*/NULL;
+    EXCEPTION
+      WHEN OTHERS THEN
+        /*SRW.MESSAGE(999
+                   ,SQLERRM)*/NULL;
+    END;
+    RETURN (TRUE);
+  END AFTERREPORT;
+
+  FUNCTION G_FILTER1 RETURN BOOLEAN IS
+  BEGIN
+IF P_SORT_OPTION = 3 THEN
+ RETURN(FALSE);
+ ELSE
+  RETURN(TRUE);
+
+ END IF;
+ END G_FILTER1;
+
+ FUNCTION G_FILTER2 RETURN BOOLEAN IS
+  BEGIN
+IF P_SORT_OPTION <> 3 THEN
+ RETURN(FALSE);
+ ELSE
+  RETURN(TRUE);
+
+ END IF;
+ END G_FILTER2;
+ FUNCTION G_FILTER3 RETURN BOOLEAN IS
+  BEGIN
+IF P_RANGE_OPTION <> 2 THEN
+ RETURN(FALSE);
+ ELSE
+  RETURN(TRUE);
+
+ END IF;
+ END G_FILTER3;
+
+  FUNCTION G_FILTER4 RETURN BOOLEAN IS
+  BEGIN
+ IF P_RANGE_OPTION <> 5 THEN
+ RETURN(FALSE);
+ ELSE
+  RETURN(TRUE);
+
+ END IF;
+ END G_FILTER4;
+
+  FUNCTION SI_SI_ADJFORMULA(SI_SI_MTL IN NUMBER
+                           ,SI_SI_MOH IN NUMBER
+                           ,SI_SI_RES IN NUMBER
+                           ,SI_SI_OSP IN NUMBER
+                           ,SI_SI_OVH IN NUMBER) RETURN NUMBER IS
+  BEGIN
+    RETURN (-(SI_SI_MTL + SI_SI_MOH + SI_SI_RES + SI_SI_OSP + SI_SI_OVH));
+  END SI_SI_ADJFORMULA;
+
+  FUNCTION ORG_ADJFORMULA(SI_ORG_MTL IN NUMBER
+                         ,SI_ORG_MOH IN NUMBER
+                         ,SI_ORG_RES IN NUMBER
+                         ,SI_ORG_OSP IN NUMBER
+                         ,SI_ORG_OVH IN NUMBER
+                         ,IC_ORG_MTL IN NUMBER
+                         ,IC_ORG_MOH IN NUMBER
+                         ,IC_ORG_RES IN NUMBER
+                         ,IC_ORG_OSP IN NUMBER
+                         ,IC_ORG_OVH IN NUMBER) RETURN NUMBER IS
+  BEGIN
+    IF P_SORT_OPTION = 3 THEN
+      RETURN (-(SI_ORG_MTL + SI_ORG_MOH + SI_ORG_RES + SI_ORG_OSP + SI_ORG_OVH));
+    ELSE
+      RETURN (-(IC_ORG_MTL + IC_ORG_MOH + IC_ORG_RES + IC_ORG_OSP + IC_ORG_OVH));
+    END IF;
+    RETURN NULL;
+  END ORG_ADJFORMULA;
+
+  FUNCTION REP_ADJFORMULA(SI_REP_MTL IN NUMBER
+                         ,SI_REP_MOH IN NUMBER
+                         ,SI_REP_RES IN NUMBER
+                         ,SI_REP_OSP IN NUMBER
+                         ,SI_REP_OVH IN NUMBER
+                         ,IC_REP_MTL IN NUMBER
+                         ,IC_REP_MOH IN NUMBER
+                         ,IC_REP_RES IN NUMBER
+                         ,IC_REP_OSP IN NUMBER
+                         ,IC_REP_OVH IN NUMBER) RETURN NUMBER IS
+  BEGIN
+    IF P_SORT_OPTION = 3 THEN
+      RETURN (-(SI_REP_MTL + SI_REP_MOH + SI_REP_RES + SI_REP_OSP + SI_REP_OVH));
+    ELSE
+      RETURN (-(IC_REP_MTL + IC_REP_MOH + IC_REP_RES + IC_REP_OSP + IC_REP_OVH));
+    END IF;
+    RETURN NULL;
+  END REP_ADJFORMULA;
+
+  FUNCTION IC_ORDERFORMULA(IC_ITEM_NUMBER IN VARCHAR2
+                          ,IC_CATEGORY IN VARCHAR2
+                          ,IC_ITEM_SEG IN VARCHAR2
+                          ,IC_CAT_SEG IN VARCHAR2
+                          ,IC_ITEM_PSEG IN VARCHAR2
+                          ,IC_CAT_PSEG IN VARCHAR2) RETURN VARCHAR2 IS
+  BEGIN
+    /*SRW.REFERENCE(IC_ITEM_NUMBER)*/NULL;
+    /*SRW.REFERENCE(IC_CATEGORY)*/NULL;
+    /*SRW.REFERENCE(IC_ITEM_SEG)*/NULL;
+    /*SRW.REFERENCE(IC_CAT_SEG)*/NULL;
+    /*SRW.REFERENCE(IC_ITEM_PSEG)*/NULL;
+    /*SRW.REFERENCE(IC_CAT_PSEG)*/NULL;
+    IF P_SORT_OPTION = 1 THEN
+      RETURN (IC_ITEM_PSEG);
+    ELSE
+      RETURN (IC_CAT_PSEG);
+    END IF;
+    RETURN NULL;
+  END IC_ORDERFORMULA;
+
+  FUNCTION IC_CAT_PSEGFORMULA(IC_CATEGORY IN VARCHAR2
+                             ,IC_CAT_SEG IN VARCHAR2
+                             ,IC_CAT_PSEG IN VARCHAR2) RETURN VARCHAR2 IS
+  BEGIN
+    /*SRW.REFERENCE(IC_CATEGORY)*/NULL;
+    /*SRW.REFERENCE(IC_CAT_SEG)*/NULL;
+    RETURN (IC_CAT_PSEG);
+  END IC_CAT_PSEGFORMULA;
+
+  FUNCTION IC_ITEM_PSEGFORMULA(IC_ITEM_NUMBER IN VARCHAR2
+                              ,IC_ITEM_SEG IN VARCHAR2
+                              ,IC_ITEM_PSEG IN VARCHAR2) RETURN VARCHAR2 IS
+  BEGIN
+    /*SRW.REFERENCE(IC_ITEM_NUMBER)*/NULL;
+    /*SRW.REFERENCE(IC_ITEM_SEG)*/NULL;
+    /*SRW.REFERENCE(IC_ITEM_PSEG)*/NULL;
+    RETURN (IC_ITEM_PSEG);
+  END IC_ITEM_PSEGFORMULA;
+
+  FUNCTION SI_ITEM_PSEGFORMULA(SI_ITEM_NUMBER IN VARCHAR2
+                              ,SI_ITEM_SEG IN VARCHAR2
+                              ,SI_ITEM_PSEG IN VARCHAR2) RETURN VARCHAR2 IS
+  BEGIN
+    /*SRW.REFERENCE(SI_ITEM_NUMBER)*/NULL;
+    /*SRW.REFERENCE(SI_ITEM_SEG)*/NULL;
+    /*SRW.REFERENCE(SI_ITEM_PSEG)*/NULL;
+    RETURN (SI_ITEM_PSEG);
+  END SI_ITEM_PSEGFORMULA;
+
+END BOM_CSTRUSIA_XMLP_PKG;
+
+
+/

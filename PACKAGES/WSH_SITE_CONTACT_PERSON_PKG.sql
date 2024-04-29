@@ -1,0 +1,55 @@
+--------------------------------------------------------
+--  DDL for Package WSH_SITE_CONTACT_PERSON_PKG
+--------------------------------------------------------
+
+  CREATE OR REPLACE EDITIONABLE PACKAGE "APPS"."WSH_SITE_CONTACT_PERSON_PKG" AUTHID CURRENT_USER as
+/* $Header: WSHSPTHS.pls 120.0.12010000.1 2008/07/29 06:18:37 appldev ship $*/
+
+PROCEDURE Create_ContactPerson(
+  P_CARRIER_PARTY_ID         IN     NUMBER,
+  P_STATUS                   IN     VARCHAR2,
+  P_PERSON_NAME_PRE_ADJUNCT  IN     VARCHAR2,
+  P_PERSON_FIRST_NAME        IN     VARCHAR2 DEFAULT NULL,
+  P_PERSON_LAST_NAME         IN     VARCHAR2,
+  P_CARRIER_SITE_ID          IN     NUMBER,
+  P_CONTACT_NUMBER           IN     VARCHAR2,
+  P_LOAD_TENDER_FLAG         IN     VARCHAR2,
+  P_JOB_TITLE                IN     VARCHAR2,
+  P_EMAIL_ADDRESS            IN     VARCHAR2,
+  X_ORG_CONTACT_ID           OUT NOCOPY     NUMBER,
+  X_PERSON_ID                OUT NOCOPY     NUMBER,
+  X_RELATIONSHIP_ID          OUT NOCOPY     NUMBER,
+  X_CONTACT_POINT_ID         OUT NOCOPY     NUMBER,
+  X_RETURN_STATUS            OUT NOCOPY     VARCHAR2,
+  X_EXCEPTION_MSG            OUT NOCOPY     VARCHAR2,
+  X_POSITION                 OUT NOCOPY     NUMBER,
+  X_PROCEDURE                OUT NOCOPY     VARCHAR2,
+  X_SQLERR                   OUT NOCOPY     VARCHAR2,
+  X_SQL_CODE                 OUT NOCOPY     VARCHAR2
+  );
+
+
+
+PROCEDURE UPDATE_CONTACTPERSON(
+  P_PERSON_PARTY_ID           IN    NUMBER,
+  P_PERSON_NAME_PRE_ADJUNCT   IN    VARCHAR2,
+  P_PERSON_FIRST_NAME         IN    VARCHAR2,
+  P_PERSON_LAST_NAME          IN    VARCHAR2,
+  P_CONTACT_NUMBER            IN    VARCHAR2,
+  P_JOB_TITLE                 IN    VARCHAR2,
+  P_EMAIL_ADDRESS             IN    VARCHAR2,
+  P_STATUS                    IN    VARCHAR2,
+  P_LOAD_TENDER_FLAG          IN    VARCHAR2,
+  P_ORG_CONTACT_ID            IN    NUMBER,
+  P_CONTACT_POINT_ID          IN    NUMBER,
+  X_RETURN_STATUS            OUT NOCOPY     VARCHAR2,
+  X_EXCEPTION_MSG            OUT NOCOPY     VARCHAR2,
+  X_POSITION                 OUT NOCOPY     NUMBER,
+  X_PROCEDURE                OUT NOCOPY     VARCHAR2,
+  X_SQLERR                   OUT NOCOPY     VARCHAR2,
+  X_SQL_CODE                 OUT NOCOPY     VARCHAR2 );
+
+
+END WSH_SITE_CONTACT_PERSON_PKG;
+
+/

@@ -1,0 +1,199 @@
+--------------------------------------------------------
+--  DDL for Package HR_API_WF_EVENTS
+--------------------------------------------------------
+
+  CREATE OR REPLACE EDITIONABLE PACKAGE "APPS"."HR_API_WF_EVENTS" AUTHID CURRENT_USER as
+/* $Header: hrapiwfe.pkh 120.1 2005/12/14 17:51:14 rbanda noship $ */
+--
+-- ----------------------------------------------------------------------------
+-- |----------------------< create_business_event_code >----------------------|
+-- ----------------------------------------------------------------------------
+-- {Start Of Comments}
+--
+-- Description:
+--   This code creates a package body and header for sending workflow
+--   business events for an api hook
+--
+-- Prerequisites:
+--   A valid api hook package
+--
+-- In Parameters:
+--   Name                           Reqd Type     Description
+--   p_hook_package                 Yes  varchar2 Name of the package to
+--                                                generate code for
+-- Post Success:
+--   A package will be created to call workflow business events.
+--
+-- Post Failure:
+--   A package will not be created, and an error will be raised.
+--
+-- Access Status:
+--   Internal Use Only.
+--
+-- {End Of Comments}
+--
+procedure create_business_event_code(p_hook_package varchar2);
+--
+-- ----------------------------------------------------------------------------
+-- |-------------------< subscribe_business_event_code >----------------------|
+-- ----------------------------------------------------------------------------
+-- {Start Of Comments}
+--
+-- Description:
+--   This code subscribes the business event code to the user hook
+--
+-- Prerequisites:
+--   A valid generated business event package
+--
+-- In Parameters:
+--   Name                           Reqd Type     Description
+--   p_hook_package                 Yes  varchar2 Name of the package to
+--                                                subscribe events to
+--   p_regenerate                   No   boolean  if true, the user hooks will
+--                                                be regenerated.
+-- Post Success:
+--   The business event code will be added to the user hooks.
+--
+-- Post Failure:
+--   The business event code will not be added to the user hooks and an error
+--   will be raised.
+--
+-- Access Status:
+--   Internal Use Only.
+--
+-- {End Of Comments}
+--
+procedure subscribe_business_event_code(p_hook_package varchar2
+                                       ,p_regenerate   boolean  default TRUE);
+--
+-- ----------------------------------------------------------------------------
+-- |--------------------< register_business_event >---------------------------|
+-- ----------------------------------------------------------------------------
+-- {Start Of Comments}
+--
+-- Description:
+--   This code registers a the workflow business events for a user hook
+--   package with the business events system
+--
+-- Prerequisites:
+--   A valid generated business event package
+--
+-- In Parameters:
+--   Name                           Reqd Type     Description
+--   p_hook_package                 Yes  varchar2 Name of the package to
+--                                                register events for
+-- Post Success:
+--   The business event code will be registered.
+--
+-- Post Failure:
+--   The business event code will not be registered and an error
+--   will be raised.
+--
+-- Access Status:
+--   Internal Use Only.
+--
+-- {End Of Comments}
+--
+procedure register_business_event(p_hook_package varchar2);
+--
+-- ----------------------------------------------------------------------------
+-- |-----------------------------< add_event >--------------------------------|
+-- ----------------------------------------------------------------------------
+-- {Start Of Comments}
+--
+-- Description:
+--   This code calls create_business_event_code, subscribe_business_event_code
+--   and subscribe_business_event for a user hook package
+--
+-- Prerequisites:
+--   A valid user hook package
+--
+-- In Parameters:
+--   Name                           Reqd Type     Description
+--   p_hook_package                 Yes  varchar2 Name of the package to
+--                                                build events for
+--   p_regenerate                   No   boolean  if true, the user hooks will
+--                                                be regenerated.
+-- Post Success:
+--   The business event code will generated, added to the user hook and
+--   registered with the business events system.
+--
+-- Post Failure:
+--   An error will be raised.
+--
+-- Access Status:
+--   Internal Use Only.
+--
+-- {End Of Comments}
+--
+procedure add_event(p_hook_package varchar2
+                   ,p_regenerate   boolean  default TRUE);
+--
+-- ----------------------------------------------------------------------------
+-- |------------------------< add_event_for_api >-----------------------------|
+-- ----------------------------------------------------------------------------
+-- {Start Of Comments}
+--
+-- Description:
+--   This code calls create_business_event_code, subscribe_business_event_code
+--   and subscribe_business_event for all of the user hooks for an api package
+--
+-- Prerequisites:
+--   A valid user hook package
+--
+-- In Parameters:
+--   Name                           Reqd Type     Description
+--   p_api_package                  Yes  varchar2 Name of the api package to
+--                                                build events for
+--   p_regenerate                   No   boolean  if true, the user hooks will
+--                                                be regenerated.
+-- Post Success:
+--   The business event code will generated, added to the user hook and
+--   registered with the business events system.
+--
+-- Post Failure:
+--   An error will be raised.
+--
+-- Access Status:
+--   Internal Use Only.
+--
+-- {End Of Comments}
+--
+--
+procedure add_events_for_api(p_api_package varchar2
+                            ,p_regenerate  boolean  default TRUE);
+--
+-- ----------------------------------------------------------------------------
+-- |---------------------------< default_rule >-------------------------------|
+-- ----------------------------------------------------------------------------
+-- {Start Of Comments}
+--
+-- Description:
+--   This is a rule function that is set on a subscription which results in
+-- CORRELATION_ID attribute of P_EVENT to be unique.
+--
+-- Prerequisites:
+--
+-- In Parameters:
+--   Name                           Reqd Type     Description
+--   p_subscription_guid            Yes  raw      GUID of the subscription
+--   p_event                        Yes  wf_event_t
+--
+-- Post Success:
+--
+-- Post Failure:
+--
+-- Access Status:
+--   Internal Use Only.
+--
+-- {End Of Comments}
+--
+function default_rule(p_subscription_guid in RAW,
+                      p_event in out nocopy wf_event_t)
+  return varchar2;
+--
+end hr_api_wf_events;
+
+ 
+
+/

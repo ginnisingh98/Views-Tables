@@ -1,0 +1,51 @@
+--------------------------------------------------------
+--  DDL for Package JTF_TASK_TEMP_GROUP_VUHK
+--------------------------------------------------------
+
+  CREATE OR REPLACE EDITIONABLE PACKAGE "APPS"."JTF_TASK_TEMP_GROUP_VUHK" AUTHID CURRENT_USER AS
+/* $Header: jtfttkgs.pls 115.4 2002/12/04 23:45:21 cjang ship $ */
+
+
+G_PKG_NAME      CONSTANT        VARCHAR2(30):='JTF_TASK_TEMP_GROUP_CUHK';
+
+Procedure  CREATE_TASK_TEMPLATE_GROUP_pre
+  (
+  p_TEMPLATE_GROUP          in JTF_TASK_TEMP_GROUP_pub.TASK_TEMPLATE_GROUP_REC,
+  X_RETURN_STATUS           OUT NOCOPY VARCHAR2
+  );
+
+Procedure  CREATE_TASK_TEMPLATE_GROUP_pst
+  (
+  p_TEMPLATE_GROUP          in JTF_TASK_TEMP_GROUP_pub.TASK_TEMPLATE_GROUP_REC,
+  X_RETURN_STATUS           OUT NOCOPY VARCHAR2
+  );
+
+Procedure  update_TASK_TEMPLATE_GROUP_pre
+  (
+  p_TEMPLATE_GROUP          in JTF_TASK_TEMP_GROUP_pub.TASK_TEMPLATE_GROUP_REC,
+  X_RETURN_STATUS           OUT NOCOPY VARCHAR2
+  );
+
+Procedure  update_TASK_TEMPLATE_GROUP_pst
+  (
+  p_TEMPLATE_GROUP          in JTF_TASK_TEMP_GROUP_pub.TASK_TEMPLATE_GROUP_REC,
+  X_RETURN_STATUS           OUT NOCOPY VARCHAR2
+  );
+
+Procedure  delete_TASK_TEMPLATE_GROUP_pre
+  (
+  p_TEMPLATE_GROUP          in JTF_TASK_TEMP_GROUP_pub.TASK_TEMPLATE_GROUP_REC,
+  X_RETURN_STATUS           OUT NOCOPY VARCHAR2
+  );
+
+Procedure  delete_TASK_TEMPLATE_GROUP_pst
+  (
+  p_TEMPLATE_GROUP          in JTF_TASK_TEMP_GROUP_pub.TASK_TEMPLATE_GROUP_REC,
+  X_RETURN_STATUS           OUT NOCOPY VARCHAR2
+  );
+
+END ;
+
+ 
+
+/

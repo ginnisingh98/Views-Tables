@@ -1,0 +1,377 @@
+--------------------------------------------------------
+--  DDL for Package Body BSC_TAB_VIEW_KPI_PKG
+--------------------------------------------------------
+
+  CREATE OR REPLACE EDITIONABLE PACKAGE BODY "APPS"."BSC_TAB_VIEW_KPI_PKG" as
+/* $Header: BSCTBVKB.pls 115.7 2004/03/04 16:23:50 meastmon ship $ */
+procedure INSERT_ROW (
+  X_ROWID in out NOCOPY VARCHAR2,
+  X_TAB_ID in NUMBER,
+  X_TAB_VIEW_ID in NUMBER,
+  X_INDICATOR in NUMBER,
+  X_TEXT_FLAG in NUMBER,
+  X_LEFT_POSITION in NUMBER,
+  X_TOP_POSITION in NUMBER,
+  X_WIDTH in NUMBER,
+  X_HEIGHT in NUMBER,
+  X_FONT_SIZE in NUMBER,
+  X_FONT_STYLE in NUMBER,
+  X_FONT_COLOR in NUMBER,
+  X_COLOR_LEFT_POSITION in NUMBER,
+  X_COLOR_TOP_POSITION in NUMBER,
+  X_COLOR_WIDTH in NUMBER,
+  X_COLOR_HEIGHT in NUMBER,
+  X_COLOR_SIZE in NUMBER,
+  X_CREATION_DATE in DATE,
+  X_CREATED_BY in NUMBER,
+  X_LAST_UPDATE_DATE in DATE,
+  X_LAST_UPDATED_BY in NUMBER,
+  X_LAST_UPDATE_LOGIN in NUMBER
+) is
+  cursor C is select ROWID from BSC_TAB_VIEW_KPI_TL
+    where TAB_ID = X_TAB_ID
+    and TAB_VIEW_ID = X_TAB_VIEW_ID
+    and INDICATOR = X_INDICATOR
+    and LANGUAGE = userenv('LANG')
+    ;
+begin
+  insert into BSC_TAB_VIEW_KPI_TL (
+    TAB_ID,
+    TAB_VIEW_ID,
+    INDICATOR,
+    TEXT_FLAG,
+    LEFT_POSITION,
+    TOP_POSITION,
+    WIDTH,
+    HEIGHT,
+    FONT_SIZE,
+    FONT_STYLE,
+    FONT_COLOR,
+    COLOR_LEFT_POSITION,
+    COLOR_TOP_POSITION,
+    COLOR_WIDTH,
+    COLOR_HEIGHT,
+    COLOR_SIZE,
+    CREATION_DATE ,
+    CREATED_BY,
+    LAST_UPDATE_DATE,
+    LAST_UPDATED_BY ,
+    LAST_UPDATE_LOGIN,
+    LANGUAGE,
+    SOURCE_LANG
+  ) select
+	  X_TAB_ID,
+	  X_TAB_VIEW_ID,
+	  X_INDICATOR,
+	  X_TEXT_FLAG,
+	  X_LEFT_POSITION,
+	  X_TOP_POSITION,
+	  X_WIDTH,
+	  X_HEIGHT,
+	  X_FONT_SIZE,
+	  X_FONT_STYLE,
+	  X_FONT_COLOR,
+	  X_COLOR_LEFT_POSITION,
+	  X_COLOR_TOP_POSITION,
+	  X_COLOR_WIDTH,
+	  X_COLOR_HEIGHT,
+	  X_COLOR_SIZE,
+	  X_CREATION_DATE ,
+	  X_CREATED_BY,
+	  X_LAST_UPDATE_DATE,
+	  X_LAST_UPDATED_BY ,
+	  X_LAST_UPDATE_LOGIN,
+	  L.LANGUAGE_CODE,
+	  userenv('LANG')
+  from FND_LANGUAGES L
+  where L.INSTALLED_FLAG in ('I', 'B')
+  and not exists
+    (select NULL
+    from BSC_TAB_VIEW_KPI_TL T
+    where T.TAB_ID = X_TAB_ID
+    and T.TAB_VIEW_ID = X_TAB_VIEW_ID
+    and T.INDICATOR = X_INDICATOR
+    and T.LANGUAGE = L.LANGUAGE_CODE);
+
+  open c;
+  fetch c into X_ROWID;
+  if (c%notfound) then
+    close c;
+    raise no_data_found;
+  end if;
+  close c;
+
+end INSERT_ROW;
+
+procedure LOCK_ROW (
+  X_TAB_ID in NUMBER,
+  X_TAB_VIEW_ID in NUMBER,
+  X_INDICATOR in NUMBER,
+  X_TEXT_FLAG in NUMBER,
+  X_LEFT_POSITION in NUMBER,
+  X_TOP_POSITION in NUMBER,
+  X_WIDTH in NUMBER,
+  X_HEIGHT in NUMBER,
+  X_FONT_SIZE in NUMBER,
+  X_FONT_STYLE in NUMBER,
+  X_FONT_COLOR in NUMBER,
+  X_COLOR_LEFT_POSITION in NUMBER,
+  X_COLOR_TOP_POSITION in NUMBER,
+  X_COLOR_WIDTH in NUMBER,
+  X_COLOR_HEIGHT in NUMBER,
+  X_COLOR_SIZE in NUMBER
+) is
+  cursor c1 is select
+        TEXT_FLAG,
+	LEFT_POSITION,
+	TOP_POSITION,
+	WIDTH,
+	HEIGHT,
+	FONT_SIZE,
+	FONT_STYLE,
+	FONT_COLOR,
+	COLOR_LEFT_POSITION,
+	COLOR_TOP_POSITION,
+	COLOR_WIDTH,
+	COLOR_HEIGHT,
+	COLOR_SIZE,
+      decode(LANGUAGE, userenv('LANG'), 'Y', 'N') BASELANG
+    from BSC_TAB_VIEW_KPI_TL
+    where TAB_ID = X_TAB_ID
+    and TAB_VIEW_ID = X_TAB_VIEW_ID
+    and INDICATOR = X_INDICATOR
+    and userenv('LANG') in (LANGUAGE, SOURCE_LANG)
+    for update of TAB_ID nowait;
+begin
+  for tlinfo in c1 loop
+    if (tlinfo.BASELANG = 'Y') then
+      if (    (tlinfo.TEXT_FLAG = X_TEXT_FLAG)
+          AND (tlinfo.LEFT_POSITION = X_LEFT_POSITION)
+          AND (tlinfo.TOP_POSITION = X_TOP_POSITION)
+          AND (tlinfo.WIDTH = X_WIDTH)
+          AND (tlinfo.HEIGHT = X_HEIGHT)
+          AND (tlinfo.FONT_SIZE = X_FONT_SIZE)
+          AND (tlinfo.FONT_STYLE = X_FONT_STYLE)
+          AND (tlinfo.FONT_COLOR = X_FONT_COLOR)
+          AND (tlinfo.COLOR_LEFT_POSITION = X_COLOR_LEFT_POSITION)
+          AND (tlinfo.COLOR_TOP_POSITION = X_COLOR_TOP_POSITION)
+          AND (tlinfo.COLOR_WIDTH = X_COLOR_WIDTH)
+          AND (tlinfo.COLOR_HEIGHT = X_COLOR_HEIGHT)
+          AND (tlinfo.COLOR_SIZE = X_COLOR_SIZE)
+      ) then
+        null;
+      else
+        fnd_message.set_name('FND', 'FORM_RECORD_CHANGED');
+        app_exception.raise_exception;
+      end if;
+    end if;
+  end loop;
+  return;
+end LOCK_ROW;
+
+procedure UPDATE_ROW (
+  X_TAB_ID in NUMBER,
+  X_TAB_VIEW_ID in NUMBER,
+  X_INDICATOR in NUMBER,
+  X_TEXT_FLAG in NUMBER,
+  X_LEFT_POSITION in NUMBER,
+  X_TOP_POSITION in NUMBER,
+  X_WIDTH in NUMBER,
+  X_HEIGHT in NUMBER,
+  X_FONT_SIZE in NUMBER,
+  X_FONT_STYLE in NUMBER,
+  X_FONT_COLOR in NUMBER,
+  X_COLOR_LEFT_POSITION in NUMBER,
+  X_COLOR_TOP_POSITION in NUMBER,
+  X_COLOR_WIDTH in NUMBER,
+  X_COLOR_HEIGHT in NUMBER,
+  X_COLOR_SIZE in NUMBER,
+  X_CREATION_DATE in DATE,
+  X_CREATED_BY in NUMBER,
+  X_LAST_UPDATE_DATE in DATE,
+  X_LAST_UPDATED_BY in NUMBER,
+  X_LAST_UPDATE_LOGIN in NUMBER
+) is
+begin
+  update BSC_TAB_VIEW_KPI_TL set
+     TEXT_FLAG = X_TEXT_FLAG,
+     LEFT_POSITION = X_LEFT_POSITION,
+     TOP_POSITION = X_TOP_POSITION,
+     WIDTH = X_WIDTH,
+     HEIGHT = X_HEIGHT,
+     FONT_SIZE = X_FONT_SIZE,
+     FONT_STYLE = X_FONT_STYLE,
+     FONT_COLOR = X_FONT_COLOR,
+     COLOR_LEFT_POSITION = X_COLOR_LEFT_POSITION,
+     COLOR_TOP_POSITION = X_COLOR_TOP_POSITION,
+     COLOR_WIDTH = X_COLOR_WIDTH,
+     COLOR_HEIGHT = X_COLOR_HEIGHT,
+     COLOR_SIZE = X_COLOR_SIZE,
+     LAST_UPDATE_DATE = DECODE(LAST_UPDATED_BY,1,X_LAST_UPDATE_DATE,LAST_UPDATE_DATE),
+     LAST_UPDATED_BY = DECODE(LAST_UPDATED_BY,1,X_LAST_UPDATED_BY,LAST_UPDATED_BY),
+     LAST_UPDATE_LOGIN = DECODE(LAST_UPDATED_BY,1,X_LAST_UPDATE_LOGIN,LAST_UPDATE_LOGIN),
+     SOURCE_LANG = userenv('LANG')
+  where TAB_ID = X_TAB_ID
+  and TAB_VIEW_ID = X_TAB_VIEW_ID
+  and INDICATOR = X_INDICATOR
+  and userenv('LANG') in (LANGUAGE, SOURCE_LANG);
+
+  if (sql%notfound) then
+    raise no_data_found;
+  end if;
+end UPDATE_ROW;
+
+procedure DELETE_ROW (
+  X_TAB_ID in NUMBER,
+  X_TAB_VIEW_ID in NUMBER,
+  X_INDICATOR in NUMBER
+) is
+begin
+  delete from BSC_TAB_VIEW_KPI_TL
+  where TAB_ID = X_TAB_ID
+  and TAB_VIEW_ID = X_TAB_VIEW_ID
+  and INDICATOR = X_INDICATOR;
+
+  if (sql%notfound) then
+    raise no_data_found;
+  end if;
+
+end DELETE_ROW;
+
+procedure ADD_LANGUAGE
+is
+l_user NUMBER;
+begin
+
+  -- Ref: bug#3482442 In corner cases this query can return more than one
+  -- row and it will fail. AUDSID is not PK. After meeting with
+  -- Vinod and Kris and Venu, we should use FNG_GLOBAL.user_id
+  l_user := BSC_APPS.fnd_global_user_id;
+
+  update BSC_TAB_VIEW_KPI_TL T set (
+    TEXT_FLAG,
+    LEFT_POSITION,
+    TOP_POSITION,
+    WIDTH,
+    HEIGHT,
+    FONT_SIZE,
+    FONT_STYLE,
+    FONT_COLOR,
+    COLOR_LEFT_POSITION,
+    COLOR_TOP_POSITION,
+    COLOR_WIDTH,
+    COLOR_HEIGHT,
+    COLOR_SIZE
+    ) = (select
+      B.TEXT_FLAG,
+      B.LEFT_POSITION,
+      B.TOP_POSITION,
+      B.WIDTH,
+      B.HEIGHT,
+      B.FONT_SIZE,
+      B.FONT_STYLE,
+      B.FONT_COLOR,
+      B.COLOR_LEFT_POSITION,
+      B.COLOR_TOP_POSITION,
+      B.COLOR_WIDTH,
+      B.COLOR_HEIGHT,
+      B.COLOR_SIZE
+    from BSC_TAB_VIEW_KPI_TL B
+    where B.TAB_ID = T.TAB_ID
+    and B.TAB_VIEW_ID = T.TAB_VIEW_ID
+    and B.INDICATOR = T.INDICATOR
+    and B.LANGUAGE = T.SOURCE_LANG)
+  where (
+      T.TAB_ID,
+      T.TAB_VIEW_ID,
+      T.INDICATOR,
+      T.LANGUAGE
+  ) in (select
+      SUBT.TAB_ID,
+      SUBT.TAB_VIEW_ID,
+      SUBT.INDICATOR,
+      SUBT.LANGUAGE
+    from BSC_TAB_VIEW_KPI_TL SUBB, BSC_TAB_VIEW_KPI_TL SUBT
+    where SUBB.TAB_ID = SUBT.TAB_ID
+    and SUBB.TAB_VIEW_ID = SUBT.TAB_VIEW_ID
+    and SUBB.INDICATOR = SUBT.INDICATOR
+    and SUBB.LANGUAGE = SUBT.SOURCE_LANG
+    and (SUBB.TEXT_FLAG <> SUBT.TEXT_FLAG
+      or SUBB.LEFT_POSITION <> SUBT.LEFT_POSITION
+      or SUBB.TOP_POSITION <> SUBT.TOP_POSITION
+      or SUBB.LEFT_POSITION <> SUBT.LEFT_POSITION
+      or SUBB.WIDTH <> SUBT.WIDTH
+      or SUBB.HEIGHT <> SUBT.HEIGHT
+      or SUBB.FONT_SIZE <> SUBT.FONT_SIZE
+      or SUBB.FONT_STYLE <> SUBT.FONT_STYLE
+      or SUBB.FONT_COLOR <> SUBT.FONT_COLOR
+      or SUBB.COLOR_LEFT_POSITION <> SUBT.COLOR_LEFT_POSITION
+      or SUBB.COLOR_TOP_POSITION <> SUBT.COLOR_TOP_POSITION
+      or SUBB.COLOR_WIDTH <> SUBT.COLOR_WIDTH
+      or SUBB.COLOR_HEIGHT <> SUBT.COLOR_HEIGHT
+      or SUBB.COLOR_SIZE <> SUBT.COLOR_SIZE
+  ));
+
+  insert into BSC_TAB_VIEW_KPI_TL (
+    TAB_ID,
+    TAB_VIEW_ID,
+    INDICATOR,
+    TEXT_FLAG,
+    LEFT_POSITION,
+    TOP_POSITION,
+    WIDTH,
+    HEIGHT,
+    FONT_SIZE,
+    FONT_STYLE,
+    FONT_COLOR,
+    COLOR_LEFT_POSITION,
+    COLOR_TOP_POSITION,
+    COLOR_WIDTH,
+    COLOR_HEIGHT,
+    COLOR_SIZE,
+    CREATION_DATE ,
+    CREATED_BY,
+    LAST_UPDATE_DATE,
+    LAST_UPDATED_BY ,
+    LAST_UPDATE_LOGIN,
+    LANGUAGE,
+    SOURCE_LANG
+  ) select
+    B.TAB_ID,
+    B.TAB_VIEW_ID,
+    B.INDICATOR,
+      B.TEXT_FLAG,
+      B.LEFT_POSITION,
+      B.TOP_POSITION,
+      B.WIDTH,
+      B.HEIGHT,
+      B.FONT_SIZE,
+      B.FONT_STYLE,
+      B.FONT_COLOR,
+      B.COLOR_LEFT_POSITION,
+      B.COLOR_TOP_POSITION,
+      B.COLOR_WIDTH,
+      B.COLOR_HEIGHT,
+      B.COLOR_SIZE,
+      SYSDATE,
+    l_user,
+    SYSDATE,
+    l_user,
+    l_user,
+    L.LANGUAGE_CODE,
+    B.SOURCE_LANG
+  from BSC_TAB_VIEW_KPI_TL B, FND_LANGUAGES L
+  where L.INSTALLED_FLAG in ('I', 'B')
+  and B.LANGUAGE = userenv('LANG')
+  and not exists
+    (select NULL
+    from BSC_TAB_VIEW_KPI_TL T
+    where T.TAB_ID = B.TAB_ID
+    and T.TAB_VIEW_ID = B.TAB_VIEW_ID
+    and T.INDICATOR = B.INDICATOR
+    and T.LANGUAGE = L.LANGUAGE_CODE);
+end ADD_LANGUAGE;
+
+end BSC_TAB_VIEW_KPI_PKG;
+
+/

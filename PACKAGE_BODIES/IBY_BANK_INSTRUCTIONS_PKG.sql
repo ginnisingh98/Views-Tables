@@ -1,0 +1,370 @@
+--------------------------------------------------------
+--  DDL for Package Body IBY_BANK_INSTRUCTIONS_PKG
+--------------------------------------------------------
+
+  CREATE OR REPLACE EDITIONABLE PACKAGE BODY "APPS"."IBY_BANK_INSTRUCTIONS_PKG" as
+/* $Header: ibybicdb.pls 120.3 2005/12/01 21:52:39 chhu noship $ */
+
+procedure INSERT_ROW (
+  X_ROWID in out nocopy VARCHAR2,
+  X_BANK_INSTRUCTION_CODE in VARCHAR2,
+  X_INACTIVE_DATE in DATE,
+  X_TERRITORY_CODE in VARCHAR2,
+  X_OBJECT_VERSION_NUMBER in NUMBER,
+  X_FORMAT_VALUE in VARCHAR2,
+  X_MEANING in VARCHAR2,
+  X_DESCRIPTION in VARCHAR2,
+  X_CREATION_DATE in DATE,
+  X_CREATED_BY in NUMBER,
+  X_LAST_UPDATE_DATE in DATE,
+  X_LAST_UPDATED_BY in NUMBER,
+  X_LAST_UPDATE_LOGIN in NUMBER,
+  X_SEEDED_FLAG in VARCHAR2
+) is
+  cursor C is select ROWID from IBY_BANK_INSTRUCTIONS_B
+    where BANK_INSTRUCTION_CODE = X_BANK_INSTRUCTION_CODE
+    ;
+begin
+  insert into IBY_BANK_INSTRUCTIONS_B (
+    INACTIVE_DATE,
+    TERRITORY_CODE,
+    OBJECT_VERSION_NUMBER,
+    BANK_INSTRUCTION_CODE,
+    FORMAT_VALUE,
+    CREATION_DATE,
+    CREATED_BY,
+    LAST_UPDATE_DATE,
+    LAST_UPDATED_BY,
+    LAST_UPDATE_LOGIN,
+    SEEDED_FLAG
+  ) values (
+    X_INACTIVE_DATE,
+    X_TERRITORY_CODE,
+    X_OBJECT_VERSION_NUMBER,
+    X_BANK_INSTRUCTION_CODE,
+    X_FORMAT_VALUE,
+    X_CREATION_DATE,
+    X_CREATED_BY,
+    X_LAST_UPDATE_DATE,
+    X_LAST_UPDATED_BY,
+    X_LAST_UPDATE_LOGIN,
+    X_SEEDED_FLAG
+  );
+
+  insert into IBY_BANK_INSTRUCTIONS_TL (
+    CREATED_BY,
+    CREATION_DATE,
+    LAST_UPDATED_BY,
+    LAST_UPDATE_DATE,
+    LAST_UPDATE_LOGIN,
+    OBJECT_VERSION_NUMBER,
+    BANK_INSTRUCTION_CODE,
+    MEANING,
+    DESCRIPTION,
+    LANGUAGE,
+    SOURCE_LANG
+  ) select
+    X_CREATED_BY,
+    X_CREATION_DATE,
+    X_LAST_UPDATED_BY,
+    X_LAST_UPDATE_DATE,
+    X_LAST_UPDATE_LOGIN,
+    X_OBJECT_VERSION_NUMBER,
+    X_BANK_INSTRUCTION_CODE,
+    X_MEANING,
+    X_DESCRIPTION,
+    L.LANGUAGE_CODE,
+    userenv('LANG')
+  from FND_LANGUAGES L
+  where L.INSTALLED_FLAG in ('I', 'B')
+  and not exists
+    (select NULL
+    from IBY_BANK_INSTRUCTIONS_TL T
+    where T.BANK_INSTRUCTION_CODE = X_BANK_INSTRUCTION_CODE
+    and T.LANGUAGE = L.LANGUAGE_CODE);
+
+  open c;
+  fetch c into X_ROWID;
+  if (c%notfound) then
+    close c;
+    raise no_data_found;
+  end if;
+  close c;
+
+end INSERT_ROW;
+
+procedure LOCK_ROW (
+  X_BANK_INSTRUCTION_CODE in VARCHAR2,
+  X_INACTIVE_DATE in DATE,
+  X_TERRITORY_CODE in VARCHAR2,
+  X_OBJECT_VERSION_NUMBER in NUMBER,
+  X_FORMAT_VALUE in VARCHAR2,
+  X_MEANING in VARCHAR2,
+  X_DESCRIPTION in VARCHAR2
+) is
+  cursor c is select
+      INACTIVE_DATE,
+      TERRITORY_CODE,
+      OBJECT_VERSION_NUMBER,
+      FORMAT_VALUE
+    from IBY_BANK_INSTRUCTIONS_B
+    where BANK_INSTRUCTION_CODE = X_BANK_INSTRUCTION_CODE
+    for update of BANK_INSTRUCTION_CODE nowait;
+  recinfo c%rowtype;
+
+  cursor c1 is select
+      MEANING,
+      DESCRIPTION,
+      decode(LANGUAGE, userenv('LANG'), 'Y', 'N') BASELANG
+    from IBY_BANK_INSTRUCTIONS_TL
+    where BANK_INSTRUCTION_CODE = X_BANK_INSTRUCTION_CODE
+    and userenv('LANG') in (LANGUAGE, SOURCE_LANG)
+    for update of BANK_INSTRUCTION_CODE nowait;
+begin
+  open c;
+  fetch c into recinfo;
+  if (c%notfound) then
+    close c;
+    fnd_message.set_name('FND', 'FORM_RECORD_DELETED');
+    app_exception.raise_exception;
+  end if;
+  close c;
+  if (    ((recinfo.INACTIVE_DATE = X_INACTIVE_DATE)
+           OR ((recinfo.INACTIVE_DATE is null) AND (X_INACTIVE_DATE is null)))
+      AND ((recinfo.TERRITORY_CODE = X_TERRITORY_CODE)
+           OR ((recinfo.TERRITORY_CODE is null) AND (X_TERRITORY_CODE is null)))
+      AND (recinfo.OBJECT_VERSION_NUMBER = X_OBJECT_VERSION_NUMBER)
+      AND ((recinfo.FORMAT_VALUE = X_FORMAT_VALUE)
+           OR ((recinfo.FORMAT_VALUE is null) AND (X_FORMAT_VALUE is null)))
+  ) then
+    null;
+  else
+    fnd_message.set_name('FND', 'FORM_RECORD_CHANGED');
+    app_exception.raise_exception;
+  end if;
+
+  for tlinfo in c1 loop
+    if (tlinfo.BASELANG = 'Y') then
+      if (    ((tlinfo.MEANING = X_MEANING)
+               OR ((tlinfo.MEANING is null) AND (X_MEANING is null)))
+          AND ((tlinfo.DESCRIPTION = X_DESCRIPTION)
+               OR ((tlinfo.DESCRIPTION is null) AND (X_DESCRIPTION is null)))
+      ) then
+        null;
+      else
+        fnd_message.set_name('FND', 'FORM_RECORD_CHANGED');
+        app_exception.raise_exception;
+      end if;
+    end if;
+  end loop;
+  return;
+end LOCK_ROW;
+
+procedure UPDATE_ROW (
+  X_BANK_INSTRUCTION_CODE in VARCHAR2,
+  X_INACTIVE_DATE in DATE,
+  X_TERRITORY_CODE in VARCHAR2,
+  X_OBJECT_VERSION_NUMBER in NUMBER,
+  X_FORMAT_VALUE in VARCHAR2,
+  X_MEANING in VARCHAR2,
+  X_DESCRIPTION in VARCHAR2,
+  X_LAST_UPDATE_DATE in DATE,
+  X_LAST_UPDATED_BY in NUMBER,
+  X_LAST_UPDATE_LOGIN in NUMBER
+) is
+begin
+  update IBY_BANK_INSTRUCTIONS_B set
+    INACTIVE_DATE = X_INACTIVE_DATE,
+    TERRITORY_CODE = X_TERRITORY_CODE,
+    OBJECT_VERSION_NUMBER = X_OBJECT_VERSION_NUMBER,
+    FORMAT_VALUE = X_FORMAT_VALUE,
+    LAST_UPDATE_DATE = X_LAST_UPDATE_DATE,
+    LAST_UPDATED_BY = X_LAST_UPDATED_BY,
+    LAST_UPDATE_LOGIN = X_LAST_UPDATE_LOGIN
+  where BANK_INSTRUCTION_CODE = X_BANK_INSTRUCTION_CODE;
+
+  if (sql%notfound) then
+    raise no_data_found;
+  end if;
+
+  update IBY_BANK_INSTRUCTIONS_TL set
+    MEANING = X_MEANING,
+    DESCRIPTION = X_DESCRIPTION,
+    LAST_UPDATE_DATE = X_LAST_UPDATE_DATE,
+    LAST_UPDATED_BY = X_LAST_UPDATED_BY,
+    LAST_UPDATE_LOGIN = X_LAST_UPDATE_LOGIN,
+    SOURCE_LANG = userenv('LANG')
+  where BANK_INSTRUCTION_CODE = X_BANK_INSTRUCTION_CODE
+  and userenv('LANG') in (LANGUAGE, SOURCE_LANG);
+
+  if (sql%notfound) then
+    raise no_data_found;
+  end if;
+end UPDATE_ROW;
+
+procedure DELETE_ROW (
+  X_BANK_INSTRUCTION_CODE in VARCHAR2
+) is
+begin
+  delete from IBY_BANK_INSTRUCTIONS_TL
+  where BANK_INSTRUCTION_CODE = X_BANK_INSTRUCTION_CODE;
+
+  if (sql%notfound) then
+    raise no_data_found;
+  end if;
+
+  delete from IBY_BANK_INSTRUCTIONS_B
+  where BANK_INSTRUCTION_CODE = X_BANK_INSTRUCTION_CODE;
+
+  if (sql%notfound) then
+    raise no_data_found;
+  end if;
+end DELETE_ROW;
+
+procedure ADD_LANGUAGE
+is
+begin
+  delete from IBY_BANK_INSTRUCTIONS_TL T
+  where not exists
+    (select NULL
+    from IBY_BANK_INSTRUCTIONS_B B
+    where B.BANK_INSTRUCTION_CODE = T.BANK_INSTRUCTION_CODE
+    );
+
+  update IBY_BANK_INSTRUCTIONS_TL T set (
+      MEANING,
+      DESCRIPTION
+    ) = (select
+      B.MEANING,
+      B.DESCRIPTION
+    from IBY_BANK_INSTRUCTIONS_TL B
+    where B.BANK_INSTRUCTION_CODE = T.BANK_INSTRUCTION_CODE
+    and B.LANGUAGE = T.SOURCE_LANG)
+  where (
+      T.BANK_INSTRUCTION_CODE,
+      T.LANGUAGE
+  ) in (select
+      SUBT.BANK_INSTRUCTION_CODE,
+      SUBT.LANGUAGE
+    from IBY_BANK_INSTRUCTIONS_TL SUBB, IBY_BANK_INSTRUCTIONS_TL SUBT
+    where SUBB.BANK_INSTRUCTION_CODE = SUBT.BANK_INSTRUCTION_CODE
+    and SUBB.LANGUAGE = SUBT.SOURCE_LANG
+    and (SUBB.MEANING <> SUBT.MEANING
+      or (SUBB.MEANING is null and SUBT.MEANING is not null)
+      or (SUBB.MEANING is not null and SUBT.MEANING is null)
+      or SUBB.DESCRIPTION <> SUBT.DESCRIPTION
+      or (SUBB.DESCRIPTION is null and SUBT.DESCRIPTION is not null)
+      or (SUBB.DESCRIPTION is not null and SUBT.DESCRIPTION is null)
+  ));
+
+  insert into IBY_BANK_INSTRUCTIONS_TL (
+    CREATED_BY,
+    CREATION_DATE,
+    LAST_UPDATED_BY,
+    LAST_UPDATE_DATE,
+    LAST_UPDATE_LOGIN,
+    OBJECT_VERSION_NUMBER,
+    BANK_INSTRUCTION_CODE,
+    MEANING,
+    DESCRIPTION,
+    LANGUAGE,
+    SOURCE_LANG
+  ) select /*+ ORDERED */
+    B.CREATED_BY,
+    B.CREATION_DATE,
+    B.LAST_UPDATED_BY,
+    B.LAST_UPDATE_DATE,
+    B.LAST_UPDATE_LOGIN,
+    B.OBJECT_VERSION_NUMBER,
+    B.BANK_INSTRUCTION_CODE,
+    B.MEANING,
+    B.DESCRIPTION,
+    L.LANGUAGE_CODE,
+    B.SOURCE_LANG
+  from IBY_BANK_INSTRUCTIONS_TL B, FND_LANGUAGES L
+  where L.INSTALLED_FLAG in ('I', 'B')
+  and B.LANGUAGE = userenv('LANG')
+  and not exists
+    (select NULL
+    from IBY_BANK_INSTRUCTIONS_TL T
+    where T.BANK_INSTRUCTION_CODE = B.BANK_INSTRUCTION_CODE
+    and T.LANGUAGE = L.LANGUAGE_CODE);
+end ADD_LANGUAGE;
+
+
+procedure LOAD_SEED_ROW (
+  X_BANK_INSTRUCTION_CODE in VARCHAR2,
+  X_INACTIVE_DATE in DATE,
+  X_TERRITORY_CODE in VARCHAR2,
+  X_OBJECT_VERSION_NUMBER in NUMBER,
+  X_FORMAT_VALUE in VARCHAR2,
+  X_MEANING in VARCHAR2,
+  X_DESCRIPTION in VARCHAR2,
+  X_SEEDED_FLAG in VARCHAR2,
+  X_CREATION_DATE in DATE,
+  X_CREATED_BY in NUMBER,
+  X_LAST_UPDATE_DATE in DATE,
+  X_LAST_UPDATED_BY in NUMBER,
+  X_LAST_UPDATE_LOGIN in NUMBER)
+
+is
+    row_id VARCHAR2(200);
+  begin
+UPDATE_ROW (
+   X_BANK_INSTRUCTION_CODE,
+  X_INACTIVE_DATE,
+  X_TERRITORY_CODE,
+  X_OBJECT_VERSION_NUMBER,
+  X_FORMAT_VALUE,
+  X_MEANING,
+  X_DESCRIPTION,
+  X_LAST_UPDATE_DATE,
+  X_LAST_UPDATED_BY,
+  X_LAST_UPDATE_LOGIN
+);
+
+  exception
+    when no_data_found then
+
+INSERT_ROW (
+  row_id,
+  X_BANK_INSTRUCTION_CODE,
+  X_INACTIVE_DATE,
+  X_TERRITORY_CODE,
+  X_OBJECT_VERSION_NUMBER,
+  X_FORMAT_VALUE,
+  X_MEANING,
+  X_DESCRIPTION,
+  X_CREATION_DATE,
+  X_CREATED_BY,
+  X_LAST_UPDATE_DATE,
+  X_LAST_UPDATED_BY,
+  X_LAST_UPDATE_LOGIN,
+  X_SEEDED_FLAG
+);
+
+  end;
+
+procedure TRANSLATE_ROW (
+  X_BANK_INSTRUCTION_CODE in VARCHAR2,
+  X_MEANING in VARCHAR2,
+  X_DESCRIPTION in VARCHAR2,
+  X_OBJECT_VERSION_NUMBER in NUMBER,
+  X_OWNER in VARCHAR2)
+is
+begin
+  update iby_bank_instructions_tl set
+    MEANING = X_MEANING,
+    DESCRIPTION = X_DESCRIPTION,
+    OBJECT_VERSION_NUMBER = X_OBJECT_VERSION_NUMBER,
+    LAST_UPDATED_BY = fnd_load_util.owner_id(X_OWNER),
+    LAST_UPDATE_DATE = trunc(sysdate),
+    LAST_UPDATE_LOGIN = fnd_load_util.owner_id(X_OWNER),
+    SOURCE_LANG = userenv('LANG')
+  where userenv('LANG') in (LANGUAGE, SOURCE_LANG)
+    and BANK_INSTRUCTION_CODE = X_BANK_INSTRUCTION_CODE;
+end;
+
+end IBY_BANK_INSTRUCTIONS_PKG;
+
+/

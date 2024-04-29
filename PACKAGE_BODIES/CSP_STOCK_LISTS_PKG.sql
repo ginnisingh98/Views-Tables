@@ -1,0 +1,170 @@
+--------------------------------------------------------
+--  DDL for Package Body CSP_STOCK_LISTS_PKG
+--------------------------------------------------------
+
+  CREATE OR REPLACE EDITIONABLE PACKAGE BODY "APPS"."CSP_STOCK_LISTS_PKG" as
+/* $Header: csptpslb.pls 115.3 2002/11/26 06:43:07 hhaugeru noship $ */
+-- Start of Comments
+-- Package name     : CSP_STOCK_LISTS_PKG
+-- Purpose          :
+-- History          :
+-- NOTE             :
+-- End of Comments
+
+G_PKG_NAME CONSTANT VARCHAR2(30):= 'CSP_STOCK_LISTS_PKG';
+G_FILE_NAME CONSTANT VARCHAR2(12) := 'csptpslb.pls';
+PROCEDURE Insert_Row(
+          p_ORGANIZATION_ID    NUMBER
+         ,p_INVENTORY_ITEM_ID   NUMBER
+         ,p_SUBINVENTORY_CODE    VARCHAR2
+         ,p_MANUAL_AUTO    VARCHAR2
+         ,p_REASON_CODE    VARCHAR2
+         ,p_CREATED_BY    NUMBER
+         ,p_CREATION_DATE    DATE
+         ,p_LAST_UPDATED_BY    NUMBER
+         ,p_LAST_UPDATE_DATE    DATE
+         ,p_LAST_UPDATE_LOGIN    NUMBER
+)
+ IS
+BEGIN
+   INSERT INTO CSP_STOCK_LISTS(
+           ORGANIZATION_ID
+          ,INVENTORY_ITEM_ID
+          ,SUBINVENTORY_CODE
+          ,MANUAL_AUTO
+          ,REASON_CODE
+          ,CREATED_BY
+          ,CREATION_DATE
+          ,LAST_UPDATED_BY
+          ,LAST_UPDATE_DATE
+          ,LAST_UPDATE_LOGIN
+          ) VALUES (
+          decode( p_ORGANIZATION_ID, FND_API.G_MISS_NUM, NULL, p_ORGANIZATION_ID)
+          ,decode( p_INVENTORY_ITEM_ID, FND_API.G_MISS_NUM, NULL, p_INVENTORY_ITEM_ID)
+          ,decode( p_SUBINVENTORY_CODE, FND_API.G_MISS_CHAR, NULL, p_SUBINVENTORY_CODE)
+          ,decode( p_MANUAL_AUTO, FND_API.G_MISS_CHAR, NULL, p_MANUAL_AUTO)
+          ,decode( p_REASON_CODE, FND_API.G_MISS_CHAR, NULL, p_REASON_CODE)
+          ,decode( p_CREATED_BY, FND_API.G_MISS_NUM, NULL, p_CREATED_BY)
+          ,decode( p_CREATION_DATE, FND_API.G_MISS_DATE, TO_DATE(NULL), p_CREATION_DATE)
+          ,decode( p_LAST_UPDATED_BY, FND_API.G_MISS_NUM, NULL, p_LAST_UPDATED_BY)
+          ,decode( p_LAST_UPDATE_DATE, FND_API.G_MISS_DATE, TO_DATE(NULL), p_LAST_UPDATE_DATE)
+          ,decode( p_LAST_UPDATE_LOGIN, FND_API.G_MISS_NUM, NULL, p_LAST_UPDATE_LOGIN)
+);
+End Insert_Row;
+PROCEDURE Update_Row(
+          p_ORGANIZATION_ID    NUMBER
+         ,p_INVENTORY_ITEM_ID    NUMBER
+         ,p_SUBINVENTORY_CODE    VARCHAR2
+         ,p_MANUAL_AUTO    VARCHAR2
+         ,p_REASON_CODE    VARCHAR2
+         ,p_CREATED_BY    NUMBER
+         ,p_CREATION_DATE    DATE
+         ,p_LAST_UPDATED_BY    NUMBER
+         ,p_LAST_UPDATE_DATE    DATE
+         ,p_LAST_UPDATE_LOGIN    NUMBER
+)
+IS
+BEGIN
+    Update CSP_STOCK_LISTS
+    SET
+        ORGANIZATION_ID = decode( p_ORGANIZATION_ID, FND_API.G_MISS_NUM, ORGANIZATION_ID, p_ORGANIZATION_ID)
+       ,INVENTORY_ITEM_ID = decode( p_INVENTORY_ITEM_ID, FND_API.G_MISS_NUM, INVENTORY_ITEM_ID, p_INVENTORY_ITEM_ID)
+       ,SUBINVENTORY_CODE = decode( p_SUBINVENTORY_CODE, FND_API.G_MISS_CHAR, SUBINVENTORY_CODE, p_SUBINVENTORY_CODE)
+       ,MANUAL_AUTO = decode( p_MANUAL_AUTO, FND_API.G_MISS_CHAR, MANUAL_AUTO, p_MANUAL_AUTO)
+       ,REASON_CODE = decode( p_REASON_CODE, FND_API.G_MISS_CHAR, REASON_CODE, p_REASON_CODE)
+       ,CREATED_BY = decode( p_CREATED_BY, FND_API.G_MISS_NUM, CREATED_BY, p_CREATED_BY)
+       ,CREATION_DATE = decode( p_CREATION_DATE, FND_API.G_MISS_DATE, CREATION_DATE, p_CREATION_DATE)
+       ,LAST_UPDATED_BY = decode( p_LAST_UPDATED_BY, FND_API.G_MISS_NUM, LAST_UPDATED_BY, p_LAST_UPDATED_BY)
+       ,LAST_UPDATE_DATE = decode( p_LAST_UPDATE_DATE, FND_API.G_MISS_DATE, LAST_UPDATE_DATE, p_LAST_UPDATE_DATE)
+       ,LAST_UPDATE_LOGIN = decode( p_LAST_UPDATE_LOGIN, FND_API.G_MISS_NUM, LAST_UPDATE_LOGIN, p_LAST_UPDATE_LOGIN)
+    where INVENTORY_ITEM_ID = p_INVENTORY_ITEM_ID
+    AND   ORGANIZATION_ID = P_ORGANIZATION_ID
+    AND   NVL(SUBINVENTORY_CODE,'X')  = NVL(P_SUBINVENTORY_CODE,'X');
+
+    If (SQL%NOTFOUND) then
+        RAISE NO_DATA_FOUND;
+    End If;
+END Update_Row;
+
+PROCEDURE Delete_Row(
+    p_INVENTORY_ITEM_ID  NUMBER
+   ,p_ORGANIZATION_ID    NUMBER
+   ,p_SUBINVENTORY_CODE  VARCHAR2)
+IS
+BEGIN
+    DELETE FROM CSP_STOCK_LISTS
+    WHERE INVENTORY_ITEM_ID = p_INVENTORY_ITEM_ID
+    AND   ORGANIZATION_ID = P_ORGANIZATION_ID
+    AND   NVL(SUBINVENTORY_CODE,'X')  = NVL(P_SUBINVENTORY_CODE,'X');
+
+    If (SQL%NOTFOUND) then
+        RAISE NO_DATA_FOUND;
+    End If;
+END Delete_Row;
+PROCEDURE Lock_Row(
+          p_ORGANIZATION_ID    NUMBER
+         ,p_INVENTORY_ITEM_ID    NUMBER
+         ,p_SUBINVENTORY_CODE    VARCHAR2
+         ,p_MANUAL_AUTO    VARCHAR2
+         ,p_REASON_CODE    VARCHAR2
+         ,p_CREATED_BY    NUMBER
+         ,p_CREATION_DATE    DATE
+         ,p_LAST_UPDATED_BY    NUMBER
+         ,p_LAST_UPDATE_DATE    DATE
+         ,p_LAST_UPDATE_LOGIN    NUMBER
+)
+ IS
+   CURSOR C IS
+       SELECT *
+       FROM CSP_STOCK_LISTS
+       WHERE INVENTORY_ITEM_ID =  p_INVENTORY_ITEM_ID
+       FOR UPDATE of INVENTORY_ITEM_ID NOWAIT;
+   Recinfo C%ROWTYPE;
+BEGIN
+    OPEN C;
+    FETCH C INTO Recinfo;
+    If (C%NOTFOUND) then
+        CLOSE C;
+        FND_MESSAGE.SET_NAME('FND', 'FORM_RECORD_DELETED');
+        APP_EXCEPTION.RAISE_EXCEPTION;
+    End If;
+    CLOSE C;
+    if (
+           (      Recinfo.ORGANIZATION_ID = p_ORGANIZATION_ID)
+       AND (    ( Recinfo.INVENTORY_ITEM_ID = p_INVENTORY_ITEM_ID)
+            OR (    ( Recinfo.INVENTORY_ITEM_ID IS NULL )
+                AND (  p_INVENTORY_ITEM_ID IS NULL )))
+       AND (    ( Recinfo.SUBINVENTORY_CODE = p_SUBINVENTORY_CODE)
+            OR (    ( Recinfo.SUBINVENTORY_CODE IS NULL )
+                AND (  p_SUBINVENTORY_CODE IS NULL )))
+       AND (    ( Recinfo.MANUAL_AUTO = p_MANUAL_AUTO)
+            OR (    ( Recinfo.MANUAL_AUTO IS NULL )
+                AND (  p_MANUAL_AUTO IS NULL )))
+       AND (    ( Recinfo.REASON_CODE = p_REASON_CODE)
+            OR (    ( Recinfo.REASON_CODE IS NULL )
+                AND (  p_REASON_CODE IS NULL )))
+       AND (    ( Recinfo.CREATED_BY = p_CREATED_BY)
+            OR (    ( Recinfo.CREATED_BY IS NULL )
+                AND (  p_CREATED_BY IS NULL )))
+       AND (    ( Recinfo.CREATION_DATE = p_CREATION_DATE)
+            OR (    ( Recinfo.CREATION_DATE IS NULL )
+                AND (  p_CREATION_DATE IS NULL )))
+       AND (    ( Recinfo.LAST_UPDATED_BY = p_LAST_UPDATED_BY)
+            OR (    ( Recinfo.LAST_UPDATED_BY IS NULL )
+                AND (  p_LAST_UPDATED_BY IS NULL )))
+       AND (    ( Recinfo.LAST_UPDATE_DATE = p_LAST_UPDATE_DATE)
+            OR (    ( Recinfo.LAST_UPDATE_DATE IS NULL )
+                AND (  p_LAST_UPDATE_DATE IS NULL )))
+       AND (    ( Recinfo.LAST_UPDATE_LOGIN = p_LAST_UPDATE_LOGIN)
+            OR (    ( Recinfo.LAST_UPDATE_LOGIN IS NULL )
+                AND (  p_LAST_UPDATE_LOGIN IS NULL )))
+        ) then
+        return;
+    else
+        FND_MESSAGE.SET_NAME('FND', 'FORM_RECORD_CHANGED');
+        APP_EXCEPTION.RAISE_EXCEPTION;
+    End If;
+END Lock_Row;
+End CSP_STOCK_LISTS_PKG;
+
+/

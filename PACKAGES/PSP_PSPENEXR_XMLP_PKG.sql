@@ -1,0 +1,70 @@
+--------------------------------------------------------
+--  DDL for Package PSP_PSPENEXR_XMLP_PKG
+--------------------------------------------------------
+
+  CREATE OR REPLACE EDITIONABLE PACKAGE "APPS"."PSP_PSPENEXR_XMLP_PKG" AUTHID CURRENT_USER AS
+/* $Header: PSPENEXRS.pls 120.6 2007/11/01 06:41:39 amakrish noship $ */
+  P_BUSINESS_GROUP NUMBER;
+
+  P_CONC_REQUEST_ID NUMBER;
+
+  P_SORT_BY VARCHAR2(40);
+
+  P_SET_OF_BOOKS_ID NUMBER;
+
+  P_PAYROLL_ID NUMBER;
+
+  P_ACTUAL_SELECT VARCHAR2(20000);
+
+  P_GMS_APPLICATION_ID VARCHAR2(40);
+
+  P_GL_APPLICATION_ID VARCHAR2(40);
+
+  P_PAYROLL_ACTION_ID NUMBER;
+
+  CP_SORT_DESCRIPTION2 VARCHAR2(4000);
+
+  CP_SORT_BY_DETAIL VARCHAR2(40);
+
+  FUNCTION BEFOREREPORT RETURN BOOLEAN;
+
+  FUNCTION CF_ELEMENT_NAMEFORMULA(ELEMENT_TYPE_ID IN NUMBER
+                                 ,MAX_END_DATE IN DATE
+                                 ,MIN_START_DATE IN DATE
+                                 ,SORT_OPTION22 IN NUMBER
+                                 ,SORT_OPTION23 IN NUMBER
+                                 ,SORT_OPTION24 IN NUMBER
+                                 ,SORT_OPTION25 IN NUMBER
+                                 ,SORT_OPTION26 IN NUMBER
+                                 ,SORT_OPTION27 IN VARCHAR2
+                                 ,SORT_OPTION21 IN NUMBER) RETURN CHAR;
+
+  FUNCTION CF_SORT_DESCRIPTION1FORMULA(SORT_OPTION11 IN NUMBER
+                                      ,SORT_OPTION12 IN NUMBER
+                                      ,SORT_OPTION13 IN NUMBER
+                                      ,SORT_OPTION14 IN NUMBER
+                                      ,SORT_OPTION15 IN NUMBER
+                                      ,SORT_OPTION16 IN NUMBER
+                                      ,SORT_OPTION17 IN VARCHAR2) RETURN CHAR;
+
+  FUNCTION CF_SORT_BY_HEADERFORMULA RETURN CHAR;
+
+  FUNCTION AFTERREPORT RETURN BOOLEAN;
+
+  FUNCTION CF_PAYROLL_NAMEFORMULA(PAYROLL_ID IN NUMBER) RETURN CHAR;
+
+  FUNCTION CF_PERSON_NAMEFORMULA(PERSON_ID IN NUMBER
+                                ,MAX_END_DATE IN DATE
+                                ,MIN_START_DATE IN DATE) RETURN CHAR;
+
+  FUNCTION CF_ASSIGNMENT_NUMBERFORMULA(ASSIGNMENT_ID IN NUMBER
+                                      ,MAX_END_DATE IN DATE
+                                      ,MIN_START_DATE IN DATE) RETURN CHAR;
+
+  FUNCTION CP_SORT_DESCRIPTION2_P RETURN VARCHAR2;
+
+  FUNCTION CP_SORT_BY_DETAIL_P RETURN VARCHAR2;
+
+END PSP_PSPENEXR_XMLP_PKG;
+
+/

@@ -1,0 +1,90 @@
+--------------------------------------------------------
+--  DDL for Package Body JA_JAIN57PR_XMLP_PKG
+--------------------------------------------------------
+
+  CREATE OR REPLACE EDITIONABLE PACKAGE BODY "APPS"."JA_JAIN57PR_XMLP_PKG" AS
+/* $Header: JAIN57PRB.pls 120.1 2007/12/25 16:09:34 dwkrishn noship $ */
+  FUNCTION BEFOREREPORT RETURN BOOLEAN IS
+    CURSOR C_PROGRAM_ID(P_REQUEST_ID IN NUMBER) IS
+      SELECT
+        CONCURRENT_PROGRAM_ID,
+        NVL(ENABLE_TRACE
+           ,'N')
+      FROM
+        FND_CONCURRENT_REQUESTS
+      WHERE REQUEST_ID = P_REQUEST_ID;
+    CURSOR GET_AUDSID IS
+      SELECT
+        A.SID,
+        A.SERIAL#,
+        B.SPID
+      FROM
+        V$SESSION A,
+        V$PROCESS B
+      WHERE AUDSID = USERENV('SESSIONID')
+        AND A.PADDR = B.ADDR;
+    CURSOR GET_DBNAME IS
+      SELECT
+        NAME
+      FROM
+        V$DATABASE;
+    V_ENABLE_TRACE FND_CONCURRENT_PROGRAMS.ENABLE_TRACE%TYPE;
+    V_PROGRAM_ID FND_CONCURRENT_PROGRAMS.CONCURRENT_PROGRAM_ID%TYPE;
+    V_AUDSID NUMBER := USERENV('SESSIONID');
+    V_SID NUMBER;
+    V_SERIAL NUMBER;
+    V_SPID VARCHAR2(9);
+    V_DBNAME VARCHAR2(25);
+  BEGIN
+    P_CONC_REQUEST_ID := FND_GLOBAL.CONC_REQUEST_ID;
+    /*SRW.USER_EXIT('FND SRWINIT')*/NULL;
+    /*SRW.MESSAGE(1275
+               ,'Report Version is 120.3 Last modified date is 26/06/2007')*/NULL;
+    BEGIN
+      OPEN C_PROGRAM_ID(P_CONC_REQUEST_ID);
+      FETCH C_PROGRAM_ID
+       INTO V_PROGRAM_ID,V_ENABLE_TRACE;
+      CLOSE C_PROGRAM_ID;
+      /*SRW.MESSAGE(1275
+                 ,'v_program_id -> ' || V_PROGRAM_ID || ', v_enable_trace -> ' || V_ENABLE_TRACE || ', request_id -> ' || P_CONC_REQUEST_ID)*/NULL;
+      IF V_ENABLE_TRACE = 'Y' THEN
+        OPEN GET_AUDSID;
+        FETCH GET_AUDSID
+         INTO V_SID,V_SERIAL,V_SPID;
+        CLOSE GET_AUDSID;
+        OPEN GET_DBNAME;
+        FETCH GET_DBNAME
+         INTO V_DBNAME;
+        CLOSE GET_DBNAME;
+        /*SRW.MESSAGE(1275
+                   ,'TraceFile Name = ' || LOWER(V_DBNAME) || '_ora_' || V_SPID || '.trc')*/NULL;
+        EXECUTE IMMEDIATE
+          'ALTER SESSION SET EVENTS ''10046 trace name context forever, level 4''';
+      END IF;
+      RETURN (TRUE);
+    EXCEPTION
+      WHEN OTHERS THEN
+        /*SRW.MESSAGE(1275
+                   ,'Error during enabling the trace. ErrCode -> ' || SQLCODE || ', ErrMesg -> ' || SQLERRM)*/NULL;
+    END;
+  END BEFOREREPORT;
+
+  FUNCTION AFTERREPORT RETURN BOOLEAN IS
+  BEGIN
+    /*SRW.USER_EXIT('FND SRWEXIT')*/NULL;
+    RETURN (TRUE);
+  END AFTERREPORT;
+
+  FUNCTION CF_PENDING_DUTYFORMULA(DUTY_AMT IN NUMBER
+                                 ,PENDING_QTY IN NUMBER) RETURN NUMBER IS
+    PENDING_DUTY NUMBER := 0;
+  BEGIN
+    PENDING_DUTY := DUTY_AMT * PENDING_QTY;
+    RETURN (PENDING_DUTY);
+  END CF_PENDING_DUTYFORMULA;
+
+END JA_JAIN57PR_XMLP_PKG;
+
+
+
+/

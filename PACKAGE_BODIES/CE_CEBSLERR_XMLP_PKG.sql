@@ -1,0 +1,111 @@
+--------------------------------------------------------
+--  DDL for Package Body CE_CEBSLERR_XMLP_PKG
+--------------------------------------------------------
+
+  CREATE OR REPLACE EDITIONABLE PACKAGE BODY "APPS"."CE_CEBSLERR_XMLP_PKG" AS
+/* $Header: CEBSLERRB.pls 120.0 2007/12/28 07:48:16 abraghun noship $ */
+  FUNCTION BEFOREREPORT RETURN BOOLEAN IS
+  BEGIN
+    DECLARE
+      L_MESSAGE FND_NEW_MESSAGES.MESSAGE_TEXT%TYPE;
+    BEGIN
+      P_CONC_REQUEST_ID := FND_GLOBAL.CONC_REQUEST_ID;
+ select SUBSTR(argument1,INSTR(argument1,'=',1)+1,LENGTH(argument1)),
+SUBSTR(argument2,INSTR(argument2,'=',1)+1,LENGTH(argument2))
+into P_MAP_ID_1,P_FILE_NAME_1
+        from FND_CONCURRENT_REQUESTS
+where request_id=P_CONC_REQUEST_ID;
+      /*SRW.USER_EXIT('FND SRWINIT')*/NULL;
+      COMMIT;
+      SELECT
+        count(*)
+      INTO CP_FATAL_ERR_COUNT
+      FROM
+        CE_SQLLDR_ERRORS
+      WHERE REC_NO IS NULL
+      OR STATEMENT_NUMBER IS NULL
+      OR BANK_ACCOUNT_NUM IS NULL;
+      SELECT
+        count(*)
+      INTO CP_TOTAL_ERR_COUNT
+      FROM
+        CE_SQLLDR_ERRORS;
+      /*SRW.REFERENCE(P_MAP_ID)*/NULL;
+      IF (P_MAP_ID_1 IS NOT NULL) THEN
+        BEGIN
+          SELECT
+            FORMAT_NAME,
+            DESCRIPTION,
+            FORMAT_TYPE,
+            RTRIM(CONTROL_FILE_NAME
+                 ,'.ctl') || '.ctl'
+          INTO C_NAME,C_DESCRIPTION,C_FORMAT_TYPE,C_CONTROL_FILE_NAME
+          FROM
+            CE_BANK_STMT_INT_MAP
+          WHERE MAP_ID = P_MAP_ID_1;
+        EXCEPTION
+          WHEN NO_DATA_FOUND THEN
+            /*SRW.MESSAGE('10'
+                       ,'no data found in pre-query')*/NULL;
+          WHEN TOO_MANY_ROWS THEN
+            /*SRW.MESSAGE('12'
+                       ,'too many rows')*/NULL;
+          WHEN OTHERS THEN
+            FND_MESSAGE.SET_NAME('CE'
+                                ,'CE_INVALID_SQLLDR');
+            L_MESSAGE := FND_MESSAGE.GET;
+            /*SRW.MESSAGE('1'
+                       ,L_MESSAGE)*/NULL;
+            /*RAISE SRW.PROGRAM_ABORT*/RAISE_APPLICATION_ERROR(-20101,null);
+        END;
+        COMMIT;
+        IF (P_DEBUG_MODE = 'Y') THEN
+          /*SRW.BREAK*/NULL;
+        END IF;
+      END IF;
+    END;
+    RETURN (TRUE);
+  END BEFOREREPORT;
+
+  FUNCTION AFTERREPORT RETURN BOOLEAN IS
+  BEGIN
+    BEGIN
+      /*SRW.USER_EXIT('FND SRWEXIT')*/NULL;
+    END;
+    RETURN (TRUE);
+  END AFTERREPORT;
+
+  FUNCTION C_NAME_P RETURN VARCHAR2 IS
+  BEGIN
+    RETURN C_NAME;
+  END C_NAME_P;
+
+  FUNCTION C_DESCRIPTION_P RETURN VARCHAR2 IS
+  BEGIN
+    RETURN C_DESCRIPTION;
+  END C_DESCRIPTION_P;
+
+  FUNCTION C_FORMAT_TYPE_P RETURN VARCHAR2 IS
+  BEGIN
+    RETURN C_FORMAT_TYPE;
+  END C_FORMAT_TYPE_P;
+
+  FUNCTION C_CONTROL_FILE_NAME_P RETURN VARCHAR2 IS
+  BEGIN
+    RETURN C_CONTROL_FILE_NAME;
+  END C_CONTROL_FILE_NAME_P;
+
+  FUNCTION CP_FATAL_ERR_COUNT_P RETURN NUMBER IS
+  BEGIN
+    RETURN CP_FATAL_ERR_COUNT;
+  END CP_FATAL_ERR_COUNT_P;
+
+  FUNCTION CP_TOTAL_ERR_COUNT_P RETURN NUMBER IS
+  BEGIN
+    RETURN CP_TOTAL_ERR_COUNT;
+  END CP_TOTAL_ERR_COUNT_P;
+
+END CE_CEBSLERR_XMLP_PKG;
+
+
+/

@@ -1,0 +1,141 @@
+--------------------------------------------------------
+--  DDL for Package IGI_RPI_STANDING_CHARGES_PKG
+--------------------------------------------------------
+
+  CREATE OR REPLACE EDITIONABLE PACKAGE "APPS"."IGI_RPI_STANDING_CHARGES_PKG" AUTHID CURRENT_USER as
+--- $Header: igirstcs.pls 120.4.12000000.1 2007/08/31 05:53:47 mbremkum ship $
+
+  PROCEDURE Insert_Row(X_Rowid                   IN OUT NOCOPY VARCHAR2,
+                       X_Standing_Charge_Id             IN OUT NOCOPY NUMBER,
+                       X_Charge_Reference               VARCHAR2,
+                       X_Set_Of_Books_Id                NUMBER,
+                       X_Standing_Charge_Date           DATE,
+                       X_Status                         VARCHAR2,
+                       X_Bill_To_Customer_Id            NUMBER,
+                       X_Bill_To_Site_Use_Id            NUMBER,
+                       X_Batch_Source_Id                NUMBER,
+                       X_Cust_Trx_Type_Id               NUMBER,
+                       X_Salesrep_Id                    NUMBER,
+                       X_Advance_Arrears_Ind            VARCHAR2,
+                       X_Period_Name                    VARCHAR2,
+                       X_Start_Date                     DATE,
+                       X_Next_Due_Date                  DATE,
+                       X_Creation_Date                  DATE,
+                       X_Created_By                     NUMBER,
+                       X_Last_Update_Date               DATE,
+                       X_Last_Updated_By                NUMBER,
+                       X_Last_Update_Login              NUMBER,
+                       X_Bill_To_Contact_Id             NUMBER,
+                       X_Ship_To_Customer_Id            NUMBER,
+                       X_Ship_To_Site_Use_Id            NUMBER,
+                       X_Ship_To_Contact_Id             NUMBER,
+                       X_Reminder_Days                  NUMBER,
+                       X_Receipt_Method_Id              NUMBER,
+                       X_Bank_Account_Id                NUMBER,
+                       X_Generate_Sequence              NUMBER,
+                       X_End_Date                       DATE,
+                       X_Review_Date                    DATE,
+                       X_Previous_Due_Date              DATE,
+                       X_Suppress_Inv_Print             VARCHAR2,
+                       X_Comments                       VARCHAR2,
+                       X_Description                    VARCHAR2,
+                       X_Ship_To_Address_Id             NUMBER,
+                       X_Bill_To_Address_Id             NUMBER,
+                       X_term_id                        NUMBER,
+                       X_Currency_code                  VARCHAR2,
+                       X_Default_Invoicing_Rule		VARCHAR2,
+			/*MOAC Impact Bug No 5905216- Start*/
+		       X_Org_Id				NUMBER,
+		       X_Legal_Entity_Id		NUMBER,
+		       X_Payment_Trxn_Extension_Id	NUMBER
+			/*MOAC Impact Bug No 5905216- Start*/
+                      );
+  PROCEDURE Lock_Row(X_Rowid                            VARCHAR2,
+                     X_Standing_Charge_Id               NUMBER,
+                     X_Charge_Reference                 VARCHAR2,
+                     X_Set_Of_Books_Id                  NUMBER,
+                     X_Standing_Charge_Date             DATE,
+                     X_Status                           VARCHAR2,
+                     X_Bill_To_Customer_Id              NUMBER,
+                     X_Bill_To_Site_Use_Id              NUMBER,
+                     X_Batch_Source_Id                  NUMBER,
+                     X_Cust_Trx_Type_Id                 NUMBER,
+                     X_Salesrep_Id                      NUMBER,
+                     X_Advance_Arrears_Ind              VARCHAR2,
+                     X_Period_Name                      VARCHAR2,
+                     X_Start_Date                       DATE,
+                     X_Next_Due_Date                    DATE,
+                     X_Bill_To_Contact_Id               NUMBER,
+                     X_Ship_To_Customer_Id              NUMBER,
+                     X_Ship_To_Site_Use_Id              NUMBER,
+                     X_Ship_To_Contact_Id               NUMBER,
+                     X_Reminder_Days                    NUMBER,
+                     X_Receipt_Method_Id                NUMBER,
+                     X_Bank_Account_Id                  NUMBER,
+                     X_Generate_Sequence                NUMBER,
+                     X_End_Date                         DATE,
+                     X_Review_Date                      DATE,
+                     X_Previous_Due_Date                DATE,
+                     X_Suppress_Inv_Print               VARCHAR2,
+                     X_Comments                         VARCHAR2,
+                     X_Description                      VARCHAR2,
+                     X_Ship_To_Address_Id               NUMBER,
+                     X_Bill_To_Address_Id               NUMBER,
+                     X_term_id                          NUMBER,
+                     X_Currency_code                    VARCHAR2,
+                     X_Default_Invoicing_Rule		VARCHAR2,
+			/*MOAC Impact Bug No 5905216- Start*/
+		     X_Legal_Entity_Id			NUMBER,
+		     X_Payment_Trxn_Extension_Id	NUMBER
+			/*MOAC Impact Bug No 5905216- End*/
+                    );
+
+  PROCEDURE Update_Row(X_Rowid                          VARCHAR2,
+                       X_Standing_Charge_Id             NUMBER,
+                       X_Charge_Reference               VARCHAR2,
+                       X_Set_Of_Books_Id                NUMBER,
+                       X_Standing_Charge_Date           DATE,
+                       X_Status                         VARCHAR2,
+                       X_Bill_To_Customer_Id            NUMBER,
+                       X_Bill_To_Site_Use_Id            NUMBER,
+                       X_Batch_Source_Id                NUMBER,
+                       X_Cust_Trx_Type_Id               NUMBER,
+                       X_Salesrep_Id                    NUMBER,
+                       X_Advance_Arrears_Ind            VARCHAR2,
+                       X_Period_Name                    VARCHAR2,
+                       X_Start_Date                     DATE,
+                       X_Next_Due_Date                  DATE,
+                       X_Last_Update_Date               DATE,
+                       X_Last_Updated_By                NUMBER,
+                       X_Last_Update_Login              NUMBER,
+                       X_Bill_To_Contact_Id             NUMBER,
+                       X_Ship_To_Customer_Id            NUMBER,
+                       X_Ship_To_Site_Use_Id            NUMBER,
+                       X_Ship_To_Contact_Id             NUMBER,
+                       X_Reminder_Days                  NUMBER,
+                       X_Receipt_Method_Id              NUMBER,
+                       X_Bank_Account_Id                NUMBER,
+                       X_Generate_Sequence              NUMBER,
+                       X_End_Date                       DATE,
+                       X_Review_Date                    DATE,
+                       X_Previous_Due_Date              DATE,
+                       X_Suppress_Inv_Print             VARCHAR2,
+                       X_Comments                       VARCHAR2,
+                       X_Description                    VARCHAR2,
+                       X_Ship_To_Address_Id             NUMBER,
+                       X_Bill_To_Address_Id             NUMBER,
+                       X_term_id                        NUMBER,
+                       X_Currency_code                  VARCHAR2,
+                       X_Default_Invoicing_rule		VARCHAR2,
+			/*MOAC Impact Bug No 5905216- Start*/
+		       X_Legal_Entity_Id		NUMBER,
+		       X_Payment_Trxn_Extension_Id	NUMBER
+			/*MOAC Impact Bug No 5905216- End*/
+                      );
+  PROCEDURE Delete_Row(X_Rowid VARCHAR2);
+
+END IGI_RPI_STANDING_CHARGES_PKG;
+
+ 
+
+/

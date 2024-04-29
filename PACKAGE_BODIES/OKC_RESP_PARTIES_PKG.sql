@@ -1,0 +1,331 @@
+--------------------------------------------------------
+--  DDL for Package Body OKC_RESP_PARTIES_PKG
+--------------------------------------------------------
+
+  CREATE OR REPLACE EDITIONABLE PACKAGE BODY "APPS"."OKC_RESP_PARTIES_PKG" as
+/* $Header: OKCRPARTYB.pls 120.1 2005/06/22 10:40:06 appldev noship $ */
+procedure INSERT_ROW (
+  X_ROWID in out NOCOPY VARCHAR2,
+  X_DOCUMENT_TYPE_CLASS in VARCHAR2,
+  X_RESP_PARTY_CODE in VARCHAR2,
+  X_INTENT in VARCHAR2,
+  X_OBJECT_VERSION_NUMBER in NUMBER,
+  X_INTERNAL_EXTERNAL_FLAG in VARCHAR2,
+  X_NAME in VARCHAR2,
+  X_ALTERNATE_NAME in VARCHAR2,
+  X_DESCRIPTION in VARCHAR2,
+  X_CREATION_DATE in DATE,
+  X_CREATED_BY in NUMBER,
+  X_LAST_UPDATE_DATE in DATE,
+  X_LAST_UPDATED_BY in NUMBER,
+  X_LAST_UPDATE_LOGIN in NUMBER
+) is
+  cursor C is select ROWID from OKC_RESP_PARTIES_B
+    where DOCUMENT_TYPE_CLASS = X_DOCUMENT_TYPE_CLASS
+    and RESP_PARTY_CODE = X_RESP_PARTY_CODE
+    and INTENT = X_INTENT
+    ;
+begin
+  insert into OKC_RESP_PARTIES_B (
+    OBJECT_VERSION_NUMBER,
+    DOCUMENT_TYPE_CLASS,
+    RESP_PARTY_CODE,
+    INTENT,
+    INTERNAL_EXTERNAL_FLAG,
+    CREATION_DATE,
+    CREATED_BY,
+    LAST_UPDATE_DATE,
+    LAST_UPDATED_BY,
+    LAST_UPDATE_LOGIN
+  ) values (
+    X_OBJECT_VERSION_NUMBER,
+    X_DOCUMENT_TYPE_CLASS,
+    X_RESP_PARTY_CODE,
+    X_INTENT,
+    X_INTERNAL_EXTERNAL_FLAG,
+    X_CREATION_DATE,
+    X_CREATED_BY,
+    X_LAST_UPDATE_DATE,
+    X_LAST_UPDATED_BY,
+    X_LAST_UPDATE_LOGIN
+  );
+
+  insert into OKC_RESP_PARTIES_TL (
+    DOCUMENT_TYPE_CLASS,
+    RESP_PARTY_CODE,
+    INTENT,
+    NAME,
+    ALTERNATE_NAME,
+    DESCRIPTION,
+    CREATED_BY,
+    CREATION_DATE,
+    LAST_UPDATED_BY,
+    LAST_UPDATE_DATE,
+    LAST_UPDATE_LOGIN,
+    LANGUAGE,
+    SOURCE_LANG
+  ) select
+    X_DOCUMENT_TYPE_CLASS,
+    X_RESP_PARTY_CODE,
+    X_INTENT,
+    X_NAME,
+    X_ALTERNATE_NAME,
+    X_DESCRIPTION,
+    X_CREATED_BY,
+    X_CREATION_DATE,
+    X_LAST_UPDATED_BY,
+    X_LAST_UPDATE_DATE,
+    X_LAST_UPDATE_LOGIN,
+    L.LANGUAGE_CODE,
+    userenv('LANG')
+  from FND_LANGUAGES L
+  where L.INSTALLED_FLAG in ('I', 'B')
+  and not exists
+    (select NULL
+    from OKC_RESP_PARTIES_TL T
+    where T.DOCUMENT_TYPE_CLASS = X_DOCUMENT_TYPE_CLASS
+    and T.RESP_PARTY_CODE = X_RESP_PARTY_CODE
+    and T.INTENT = X_INTENT
+    and T.LANGUAGE = L.LANGUAGE_CODE);
+
+  open c;
+  fetch c into X_ROWID;
+  if (c%notfound) then
+    close c;
+    raise no_data_found;
+  end if;
+  close c;
+
+end INSERT_ROW;
+
+procedure LOCK_ROW (
+  X_DOCUMENT_TYPE_CLASS in VARCHAR2,
+  X_RESP_PARTY_CODE in VARCHAR2,
+  X_INTENT in VARCHAR2,
+  X_OBJECT_VERSION_NUMBER in NUMBER,
+  X_INTERNAL_EXTERNAL_FLAG in VARCHAR2,
+  X_NAME in VARCHAR2,
+  X_ALTERNATE_NAME in VARCHAR2,
+  X_DESCRIPTION in VARCHAR2
+) is
+  cursor c is select
+      OBJECT_VERSION_NUMBER,
+      INTERNAL_EXTERNAL_FLAG
+    from OKC_RESP_PARTIES_B
+    where DOCUMENT_TYPE_CLASS = X_DOCUMENT_TYPE_CLASS
+    and RESP_PARTY_CODE = X_RESP_PARTY_CODE
+    and INTENT = X_INTENT
+    for update of DOCUMENT_TYPE_CLASS nowait;
+  recinfo c%rowtype;
+
+  cursor c1 is select
+      NAME,
+      ALTERNATE_NAME,
+      DESCRIPTION,
+      decode(LANGUAGE, userenv('LANG'), 'Y', 'N') BASELANG
+    from OKC_RESP_PARTIES_TL
+    where DOCUMENT_TYPE_CLASS = X_DOCUMENT_TYPE_CLASS
+    and RESP_PARTY_CODE = X_RESP_PARTY_CODE
+    and INTENT = X_INTENT
+    and userenv('LANG') in (LANGUAGE, SOURCE_LANG)
+    for update of DOCUMENT_TYPE_CLASS nowait;
+begin
+  open c;
+  fetch c into recinfo;
+  if (c%notfound) then
+    close c;
+    fnd_message.set_name('FND', 'FORM_RECORD_DELETED');
+    app_exception.raise_exception;
+  end if;
+  close c;
+  if (    ((recinfo.OBJECT_VERSION_NUMBER = X_OBJECT_VERSION_NUMBER)
+           OR ((recinfo.OBJECT_VERSION_NUMBER is null) AND (X_OBJECT_VERSION_NUMBER is null)))
+      AND (recinfo.INTERNAL_EXTERNAL_FLAG = X_INTERNAL_EXTERNAL_FLAG)
+  ) then
+    null;
+  else
+    fnd_message.set_name('FND', 'FORM_RECORD_CHANGED');
+    app_exception.raise_exception;
+  end if;
+
+  for tlinfo in c1 loop
+    if (tlinfo.BASELANG = 'Y') then
+      if (    (tlinfo.NAME = X_NAME)
+          AND ((tlinfo.ALTERNATE_NAME = X_ALTERNATE_NAME)
+               OR ((tlinfo.ALTERNATE_NAME is null) AND (X_ALTERNATE_NAME is null)))
+          AND ((tlinfo.DESCRIPTION = X_DESCRIPTION)
+               OR ((tlinfo.DESCRIPTION is null) AND (X_DESCRIPTION is null)))
+      ) then
+        null;
+      else
+        fnd_message.set_name('FND', 'FORM_RECORD_CHANGED');
+        app_exception.raise_exception;
+      end if;
+    end if;
+  end loop;
+  return;
+end LOCK_ROW;
+
+procedure UPDATE_ROW (
+  X_DOCUMENT_TYPE_CLASS in VARCHAR2,
+  X_RESP_PARTY_CODE in VARCHAR2,
+  X_INTENT in VARCHAR2,
+  X_OBJECT_VERSION_NUMBER in NUMBER,
+  X_INTERNAL_EXTERNAL_FLAG in VARCHAR2,
+  X_NAME in VARCHAR2,
+  X_ALTERNATE_NAME in VARCHAR2,
+  X_DESCRIPTION in VARCHAR2,
+  X_LAST_UPDATE_DATE in DATE,
+  X_LAST_UPDATED_BY in NUMBER,
+  X_LAST_UPDATE_LOGIN in NUMBER
+) is
+begin
+  update OKC_RESP_PARTIES_B set
+    OBJECT_VERSION_NUMBER = X_OBJECT_VERSION_NUMBER,
+    INTERNAL_EXTERNAL_FLAG = X_INTERNAL_EXTERNAL_FLAG,
+    LAST_UPDATE_DATE = X_LAST_UPDATE_DATE,
+    LAST_UPDATED_BY = X_LAST_UPDATED_BY,
+    LAST_UPDATE_LOGIN = X_LAST_UPDATE_LOGIN
+  where DOCUMENT_TYPE_CLASS = X_DOCUMENT_TYPE_CLASS
+  and RESP_PARTY_CODE = X_RESP_PARTY_CODE
+  and INTENT = X_INTENT;
+
+  if (sql%notfound) then
+    raise no_data_found;
+  end if;
+
+  update OKC_RESP_PARTIES_TL set
+    NAME = X_NAME,
+    ALTERNATE_NAME = X_ALTERNATE_NAME,
+    DESCRIPTION = X_DESCRIPTION,
+    LAST_UPDATE_DATE = X_LAST_UPDATE_DATE,
+    LAST_UPDATED_BY = X_LAST_UPDATED_BY,
+    LAST_UPDATE_LOGIN = X_LAST_UPDATE_LOGIN,
+    SOURCE_LANG = userenv('LANG')
+  where DOCUMENT_TYPE_CLASS = X_DOCUMENT_TYPE_CLASS
+  and RESP_PARTY_CODE = X_RESP_PARTY_CODE
+  and INTENT = X_INTENT
+  and userenv('LANG') in (LANGUAGE, SOURCE_LANG);
+
+  if (sql%notfound) then
+    raise no_data_found;
+  end if;
+end UPDATE_ROW;
+
+procedure DELETE_ROW (
+  X_DOCUMENT_TYPE_CLASS in VARCHAR2,
+  X_RESP_PARTY_CODE in VARCHAR2,
+  X_INTENT in VARCHAR2
+) is
+begin
+  delete from OKC_RESP_PARTIES_TL
+  where DOCUMENT_TYPE_CLASS = X_DOCUMENT_TYPE_CLASS
+  and RESP_PARTY_CODE = X_RESP_PARTY_CODE
+  and INTENT = X_INTENT;
+
+  if (sql%notfound) then
+    raise no_data_found;
+  end if;
+
+  delete from OKC_RESP_PARTIES_B
+  where DOCUMENT_TYPE_CLASS = X_DOCUMENT_TYPE_CLASS
+  and RESP_PARTY_CODE = X_RESP_PARTY_CODE
+  and INTENT = X_INTENT;
+
+  if (sql%notfound) then
+    raise no_data_found;
+  end if;
+end DELETE_ROW;
+
+procedure ADD_LANGUAGE
+is
+begin
+  delete from OKC_RESP_PARTIES_TL T
+  where not exists
+    (select NULL
+    from OKC_RESP_PARTIES_B B
+    where B.DOCUMENT_TYPE_CLASS = T.DOCUMENT_TYPE_CLASS
+    and B.RESP_PARTY_CODE = T.RESP_PARTY_CODE
+    and B.INTENT = T.INTENT
+    );
+
+  update OKC_RESP_PARTIES_TL T set (
+      NAME,
+      ALTERNATE_NAME,
+      DESCRIPTION
+    ) = (select
+      B.NAME,
+      B.ALTERNATE_NAME,
+      B.DESCRIPTION
+    from OKC_RESP_PARTIES_TL B
+    where B.DOCUMENT_TYPE_CLASS = T.DOCUMENT_TYPE_CLASS
+    and B.RESP_PARTY_CODE = T.RESP_PARTY_CODE
+    and B.INTENT = T.INTENT
+    and B.LANGUAGE = T.SOURCE_LANG)
+  where (
+      T.DOCUMENT_TYPE_CLASS,
+      T.RESP_PARTY_CODE,
+      T.INTENT,
+      T.LANGUAGE
+  ) in (select
+      SUBT.DOCUMENT_TYPE_CLASS,
+      SUBT.RESP_PARTY_CODE,
+      SUBT.INTENT,
+      SUBT.LANGUAGE
+    from OKC_RESP_PARTIES_TL SUBB, OKC_RESP_PARTIES_TL SUBT
+    where SUBB.DOCUMENT_TYPE_CLASS = SUBT.DOCUMENT_TYPE_CLASS
+    and SUBB.RESP_PARTY_CODE = SUBT.RESP_PARTY_CODE
+    and SUBB.INTENT = SUBT.INTENT
+    and SUBB.LANGUAGE = SUBT.SOURCE_LANG
+    and (SUBB.NAME <> SUBT.NAME
+      or SUBB.ALTERNATE_NAME <> SUBT.ALTERNATE_NAME
+      or (SUBB.ALTERNATE_NAME is null and SUBT.ALTERNATE_NAME is not null)
+      or (SUBB.ALTERNATE_NAME is not null and SUBT.ALTERNATE_NAME is null)
+      or SUBB.DESCRIPTION <> SUBT.DESCRIPTION
+      or (SUBB.DESCRIPTION is null and SUBT.DESCRIPTION is not null)
+      or (SUBB.DESCRIPTION is not null and SUBT.DESCRIPTION is null)
+  ));
+
+  insert into OKC_RESP_PARTIES_TL (
+    DOCUMENT_TYPE_CLASS,
+    RESP_PARTY_CODE,
+    INTENT,
+    NAME,
+    ALTERNATE_NAME,
+    DESCRIPTION,
+    CREATED_BY,
+    CREATION_DATE,
+    LAST_UPDATED_BY,
+    LAST_UPDATE_DATE,
+    LAST_UPDATE_LOGIN,
+    LANGUAGE,
+    SOURCE_LANG
+  ) select /*+ ORDERED */
+    B.DOCUMENT_TYPE_CLASS,
+    B.RESP_PARTY_CODE,
+    B.INTENT,
+    B.NAME,
+    B.ALTERNATE_NAME,
+    B.DESCRIPTION,
+    B.CREATED_BY,
+    B.CREATION_DATE,
+    B.LAST_UPDATED_BY,
+    B.LAST_UPDATE_DATE,
+    B.LAST_UPDATE_LOGIN,
+    L.LANGUAGE_CODE,
+    B.SOURCE_LANG
+  from OKC_RESP_PARTIES_TL B, FND_LANGUAGES L
+  where L.INSTALLED_FLAG in ('I', 'B')
+  and B.LANGUAGE = userenv('LANG')
+  and not exists
+    (select NULL
+    from OKC_RESP_PARTIES_TL T
+    where T.DOCUMENT_TYPE_CLASS = B.DOCUMENT_TYPE_CLASS
+    and T.RESP_PARTY_CODE = B.RESP_PARTY_CODE
+    and T.INTENT = B.INTENT
+    and T.LANGUAGE = L.LANGUAGE_CODE);
+end ADD_LANGUAGE;
+
+end OKC_RESP_PARTIES_PKG;
+
+/

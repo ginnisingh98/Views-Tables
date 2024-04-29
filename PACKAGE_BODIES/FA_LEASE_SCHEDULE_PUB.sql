@@ -1,0 +1,384 @@
+--------------------------------------------------------
+--  DDL for Package Body FA_LEASE_SCHEDULE_PUB
+--------------------------------------------------------
+
+  CREATE OR REPLACE EDITIONABLE PACKAGE BODY "APPS"."FA_LEASE_SCHEDULE_PUB" AS
+/* $Header: FAPLSCB.pls 120.3.12010000.2 2009/07/19 12:15:25 glchen ship $ */
+
+--*********************** GLOBAL CONSTANTS *******************************
+G_PKG_NAME      CONSTANT   VARCHAR2(30) := 'FA_LEASE_SCHEDULE_PUB';
+G_API_NAME      CONSTANT   VARCHAR2(30) := 'LEASE SCHEDULE API';
+G_API_VERSION   CONSTANT   NUMBER       := 1.0;
+
+g_log_level_rec fa_api_types.log_level_rec_type;
+
+--*********************** PUBLIC PROCEDURES *****************************
+-- CREATE PAYMENTS PUBLIC API
+PROCEDURE CREATE_PAYMENTS   (
+   -- STANDARD PARAMTERS --
+   P_API_VERSION              IN     NUMBER,
+   P_INIT_MSG_LIST            IN     VARCHAR2 := FND_API.G_FALSE,
+   P_COMMIT                   IN     VARCHAR2 := FND_API.G_FALSE,
+   P_VALIDATION_LEVEL         IN     NUMBER   :=FND_API.G_VALID_LEVEL_FULL,
+   X_RETURN_STATUS               OUT NOCOPY VARCHAR2,
+   X_MSG_COUNT                   OUT NOCOPY NUMBER,
+   X_MSG_DATA                    OUT NOCOPY VARCHAR2,
+   P_CALLING_FN               IN     VARCHAR2,
+   P_TRANS_REC		      IN     FA_API_TYPES.TRANS_REC_TYPE,
+   PX_LEASE_SCHEDULES_REC     IN OUT NOCOPY FA_API_TYPES.LEASE_SCHEDULES_REC_TYPE,
+   P_LEASE_PAYMENTS_TBL       IN     FA_API_TYPES.LEASE_PAYMENTS_TBL_TYPE) IS
+
+   VALUE_ERROR_EXCEPTION      EXCEPTION;
+   L_API_NAME                 CONSTANT VARCHAR2(30) := 'CREATE_PAYMENTS';
+   L_API_VERSION              CONSTANT NUMBER := 1.0;
+   L_PAYMENT_LINE_NUMBER      NUMBER;
+   L_PAYMENT_SCHEDULE_ID      NUMBER;
+   L_END_DATE                 DATE;
+   L_MONTHS_PER_PERIOD        NUMBER;
+
+BEGIN
+
+  	SAVEPOINT CREATE_PAYMENTS;
+
+   if (not g_log_level_rec.initialized) then
+      if (NOT fa_util_pub.get_log_level_rec (
+                x_log_level_rec =>  g_log_level_rec
+      )) then
+         raise VALUE_ERROR_EXCEPTION ;
+      end if;
+   end if;
+
+	----------------------------------------------------
+	-- STANDARD CALL TO CHECK FOR CALL COMPATIBILITY.
+	----------------------------------------------------
+	IF NOT FND_API.COMPATIBLE_API_CALL(L_API_VERSION,P_API_VERSION,L_API_NAME,G_PKG_NAME)
+	THEN
+		RAISE	FND_API.G_EXC_UNEXPECTED_ERROR;
+	END IF;
+
+	-------------------------------------------------------------
+	-- INITIALIZE MESSAGE LIST IF P_INIT_MSG_LIST IS SET TO TRUE.
+	-------------------------------------------------------------
+	IF FND_API.TO_BOOLEAN(P_INIT_MSG_LIST) THEN
+		FA_SRVR_MSG.INIT_SERVER_MESSAGE;
+		FA_DEBUG_PKG.INITIALIZE;
+	END IF;
+
+	----------------------------------------------------
+	-- VALIDATE SUPPLIED INFORMATION
+	----------------------------------------------------
+	IF NOT FA_LEASE_SCHEDULE_PVT.VALIDATE_PAYMENTS(PX_LEASE_SCHEDULES_REC,P_LEASE_PAYMENTS_TBL,L_MONTHS_PER_PERIOD, p_log_level_rec => g_log_level_rec)
+	THEN
+      	   RAISE VALUE_ERROR_EXCEPTION;
+	END IF;
+
+
+	----------------------------------------------------
+	-- EVERYTHING LOOKS OK LET'S INSERT THIS ROW
+	----------------------------------------------------
+	SELECT FA_LEASE_SCHEDULES_S.NEXTVAL
+	INTO
+	L_PAYMENT_SCHEDULE_ID
+	FROM DUAL;
+
+	IF (g_log_level_rec.statement_level)
+	THEN
+               FA_DEBUG_PKG.ADD('FA_LEASE_SCHEDULE_PUB', 'PAYMENT_SCHEDULE_ID', L_PAYMENT_SCHEDULE_ID, p_log_level_rec => g_log_level_rec);
+        END IF;
+
+	INSERT INTO FA_LEASE_SCHEDULES
+	(PAYMENT_SCHEDULE_ID
+	,PAYMENT_SCHEDULE_NAME
+	,PRESENT_VALUE
+	,INTEREST_RATE
+	,LEASE_INCEPTION_DATE
+	,CREATED_BY
+	,CREATION_DATE
+	,LAST_UPDATE_LOGIN
+	,LAST_UPDATE_DATE
+	,LAST_UPDATED_BY
+	,CURRENCY_CODE
+	,FREQUENCY)
+	VALUES
+	(L_PAYMENT_SCHEDULE_ID
+	,PX_LEASE_SCHEDULES_REC.PAYMENT_SCHEDULE_NAME
+	,PX_LEASE_SCHEDULES_REC.PRESENT_VALUE
+	,PX_LEASE_SCHEDULES_REC.INTEREST_RATE
+	,PX_LEASE_SCHEDULES_REC.LEASE_INCEPTION_DATE
+	,NVL(P_TRANS_REC.WHO_INFO.CREATED_BY,-1)
+	,NVL(P_TRANS_REC.WHO_INFO.CREATION_DATE,SYSDATE)
+	,NVL(P_TRANS_REC.WHO_INFO.LAST_UPDATE_LOGIN,-1)
+	,NVL(P_TRANS_REC.WHO_INFO.LAST_UPDATE_DATE,SYSDATE)
+	,NVL(P_TRANS_REC.WHO_INFO.LAST_UPDATED_BY,-1)
+	,PX_LEASE_SCHEDULES_REC.CURRENCY_CODE
+	,UPPER(PX_LEASE_SCHEDULES_REC.FREQUENCY));
+
+      	L_PAYMENT_LINE_NUMBER:=1;
+      	FOR TBL_INDEX IN 1..P_LEASE_PAYMENTS_TBL.COUNT LOOP
+	      	L_END_DATE:=NULL;
+		L_END_DATE:=FA_LEASE_SCHEDULE_PVT.CALC_END_DATE(P_LEASE_PAYMENTS_TBL(TBL_INDEX).NUMBER_OF_PAYMENTS,L_MONTHS_PER_PERIOD,P_LEASE_PAYMENTS_TBL(TBL_INDEX).START_DATE,g_log_level_rec);
+
+		INSERT INTO FA_LEASE_PAYMENTS (
+		PAYMENT_LINE_NUMBER
+		,PAYMENT_SCHEDULE_ID
+		,START_DATE
+		,PAYMENT_AMOUNT
+		,NUMBER_OF_PAYMENTS
+		,PERIOD
+		,END_DATE
+		,ROW_PRESENT_VALUE
+		,CREATED_BY
+		,CREATION_DATE
+		,LAST_UPDATE_LOGIN
+		,LAST_UPDATE_DATE
+		,LAST_UPDATED_BY )
+		VALUES
+		(L_PAYMENT_LINE_NUMBER
+		,L_PAYMENT_SCHEDULE_ID
+		,P_LEASE_PAYMENTS_TBL(TBL_INDEX).START_DATE
+		,P_LEASE_PAYMENTS_TBL(TBL_INDEX).PAYMENT_AMOUNT
+		,P_LEASE_PAYMENTS_TBL(TBL_INDEX).NUMBER_OF_PAYMENTS
+		,P_LEASE_PAYMENTS_TBL(TBL_INDEX).PAYMENT_TYPE
+		,L_END_DATE
+		,NULL
+		,NVL(P_TRANS_REC.WHO_INFO.CREATED_BY,-1)
+		,NVL(P_TRANS_REC.WHO_INFO.CREATION_DATE,SYSDATE)
+		,NVL(P_TRANS_REC.WHO_INFO.LAST_UPDATE_LOGIN,-1)
+		,NVL(P_TRANS_REC.WHO_INFO.LAST_UPDATE_DATE,SYSDATE)
+		,NVL(P_TRANS_REC.WHO_INFO.LAST_UPDATED_BY,-1)
+		);
+
+      		L_PAYMENT_LINE_NUMBER:=L_PAYMENT_LINE_NUMBER+1;
+
+      	END LOOP;
+
+      	PX_LEASE_SCHEDULES_REC.PAYMENT_SCHEDULE_ID:=L_PAYMENT_SCHEDULE_ID;
+
+	----------------------------------------------------
+	-- CHECK FOR COMMIT
+	----------------------------------------------------
+
+	IF FND_API.TO_BOOLEAN( P_COMMIT ) THEN
+   		COMMIT WORK;
+	END IF;
+
+	X_RETURN_STATUS := FND_API.G_RET_STS_SUCCESS;
+
+EXCEPTION
+      WHEN VALUE_ERROR_EXCEPTION THEN
+        ROLLBACK TO CREATE_PAYMENTS;
+        X_RETURN_STATUS := FND_API.G_RET_STS_ERROR;
+      WHEN OTHERS THEN
+       ROLLBACK TO CREATE_PAYMENTS;
+       X_RETURN_STATUS := FND_API.G_RET_STS_UNEXP_ERROR;
+       X_MSG_DATA:=SQLERRM;
+END CREATE_PAYMENTS;
+
+-- CREATE AMORTIZATION API
+PROCEDURE CREATE_AMORTIZATION  (
+   -- STANDARD PARAMTERS --
+   P_API_VERSION              IN     NUMBER,
+   P_INIT_MSG_LIST            IN     VARCHAR2 := FND_API.G_FALSE,
+   P_COMMIT                   IN     VARCHAR2 := FND_API.G_FALSE,
+   P_VALIDATION_LEVEL         IN     NUMBER:=FND_API.G_VALID_LEVEL_FULL,
+   X_RETURN_STATUS               OUT NOCOPY VARCHAR2,
+   X_MSG_COUNT                   OUT NOCOPY NUMBER,
+   X_MSG_DATA                    OUT NOCOPY VARCHAR2,
+   P_CALLING_FN               IN     VARCHAR2,
+   P_TRANS_REC		      IN     FA_API_TYPES.TRANS_REC_TYPE,
+   P_PAYMENT_SCHEDULE_ID      IN     NUMBER) IS
+
+   L_API_NAME                 CONSTANT VARCHAR2(30) := 'CREATE_AMORTIZATION';
+   L_API_VERSION              CONSTANT NUMBER := 1.0;
+   VALUE_ERROR_EXCEPTION      EXCEPTION;
+
+BEGIN
+
+	SAVEPOINT CREATE_AMORTIZATION;
+
+   if (not g_log_level_rec.initialized) then
+      if (NOT fa_util_pub.get_log_level_rec (
+                x_log_level_rec =>  g_log_level_rec
+      )) then
+         raise VALUE_ERROR_EXCEPTION ;
+      end if;
+   end if;
+
+
+	----------------------------------------------------
+	-- STANDARD CALL TO CHECK FOR CALL COMPATIBILITY.
+	----------------------------------------------------
+
+	IF NOT FND_API.COMPATIBLE_API_CALL(L_API_VERSION, P_API_VERSION,L_API_NAME, G_PKG_NAME)
+	THEN
+		RAISE	FND_API.G_EXC_UNEXPECTED_ERROR;
+	END IF;
+
+	-------------------------------------------------------------
+	-- INITIALIZE MESSAGE LIST IF P_INIT_MSG_LIST IS SET TO TRUE.
+	-------------------------------------------------------------
+
+	IF FND_API.TO_BOOLEAN(P_INIT_MSG_LIST) THEN
+		FA_SRVR_MSG.INIT_SERVER_MESSAGE;
+		FA_DEBUG_PKG.INITIALIZE;
+	END IF;
+
+	IF (g_log_level_rec.statement_level) THEN
+               FA_DEBUG_PKG.ADD('FA_LEASE_SCHEDULE_PUB', 'PAYMENT_SCHEDULE_ID', P_PAYMENT_SCHEDULE_ID, p_log_level_rec => g_log_level_rec);
+        END IF;
+
+
+	----------------------------------------------------
+	-- AMORTIZE.
+	----------------------------------------------------
+	IF NOT FA_LEASE_SCHEDULE_PVT.AMORTIZE(P_PAYMENT_SCHEDULE_ID,P_TRANS_REC, p_log_level_rec => g_log_level_rec)
+	THEN
+      	   RAISE VALUE_ERROR_EXCEPTION;
+	END IF;
+
+	DELETE FROM FA_AMORT_SCHEDULES WHERE PAYMENT_SCHEDULE_ID=P_PAYMENT_SCHEDULE_ID;
+
+	IF NOT FA_LEASE_SCHEDULE_PVT.AMORTIZE(P_PAYMENT_SCHEDULE_ID,P_TRANS_REC, p_log_level_rec => g_log_level_rec)
+	THEN
+      	   RAISE VALUE_ERROR_EXCEPTION;
+	END IF;
+
+	----------------------------------------------------
+	-- CHECK FOR COMMIT
+	----------------------------------------------------
+	IF FND_API.TO_BOOLEAN( P_COMMIT ) THEN
+   		COMMIT WORK;
+	END IF;
+
+	X_RETURN_STATUS := FND_API.G_RET_STS_SUCCESS;
+
+EXCEPTION
+      WHEN VALUE_ERROR_EXCEPTION THEN
+        ROLLBACK TO CREATE_AMORTIZATION;
+        X_RETURN_STATUS := FND_API.G_RET_STS_ERROR;
+      WHEN OTHERS THEN
+       ROLLBACK TO CREATE_AMORTIZATION;
+       X_RETURN_STATUS := FND_API.G_RET_STS_UNEXP_ERROR;
+       X_MSG_DATA:=SQLERRM;
+END CREATE_AMORTIZATION;
+
+-- CREATE LEASE SCHEDULE API
+PROCEDURE CREATE_LEASE_SCHEDULE (
+   -- STANDARD PARAMTERS --
+   P_API_VERSION              IN     NUMBER,
+   P_INIT_MSG_LIST            IN     VARCHAR2 := FND_API.G_FALSE,
+   P_COMMIT                   IN     VARCHAR2 := FND_API.G_FALSE,
+   P_VALIDATION_LEVEL         IN     NUMBER:=FND_API.G_VALID_LEVEL_FULL,
+   X_RETURN_STATUS               OUT NOCOPY VARCHAR2,
+   X_MSG_COUNT                   OUT NOCOPY NUMBER,
+   X_MSG_DATA                    OUT NOCOPY VARCHAR2,
+   P_CALLING_FN               IN     VARCHAR2,
+   P_TRANS_REC		      IN     FA_API_TYPES.TRANS_REC_TYPE,
+   PX_LEASE_SCHEDULES_REC     IN OUT NOCOPY FA_API_TYPES.LEASE_SCHEDULES_REC_TYPE,
+   P_LEASE_PAYMENTS_TBL       IN     FA_API_TYPES.LEASE_PAYMENTS_TBL_TYPE) IS
+
+   VALUE_ERROR_EXCEPTION     EXCEPTION;
+   L_API_NAME                CONSTANT VARCHAR2(30) := 'CREATE_LEASE_SCHEDULE';
+   L_API_VERSION             CONSTANT NUMBER := 1.0;
+   L_RETURN_STATUS           VARCHAR2(1);
+   L_MESG_COUNT              NUMBER := 0;
+   L_MESG_LEN                NUMBER;
+   L_MESG                    VARCHAR2(4000);
+
+BEGIN
+
+	SAVEPOINT CREATE_LEASE_SCHEDULE;
+
+   if (not g_log_level_rec.initialized) then
+      if (NOT fa_util_pub.get_log_level_rec (
+                x_log_level_rec =>  g_log_level_rec
+      )) then
+         raise VALUE_ERROR_EXCEPTION ;
+      end if;
+   end if;
+
+	----------------------------------------------------
+	-- STANDARD CALL TO CHECK FOR CALL COMPATIBILITY.
+	----------------------------------------------------
+	IF NOT FND_API.COMPATIBLE_API_CALL(L_API_VERSION, P_API_VERSION,
+			               L_API_NAME, G_PKG_NAME)
+	THEN
+		RAISE	FND_API.G_EXC_UNEXPECTED_ERROR;
+	END IF;
+	-------------------------------------------------------------
+	-- INITIALIZE MESSAGE LIST IF P_INIT_MSG_LIST IS SET TO TRUE.
+	-------------------------------------------------------------
+
+	IF FND_API.TO_BOOLEAN(P_INIT_MSG_LIST) THEN
+		FA_SRVR_MSG.INIT_SERVER_MESSAGE;
+		FA_DEBUG_PKG.INITIALIZE;
+	END IF;
+
+	----------------------------------------------------
+	-- CREATE PAYMENTS.
+	----------------------------------------------------
+
+ 	FA_LEASE_SCHEDULE_PUB.CREATE_PAYMENTS
+      	(P_API_VERSION             => 1.0,
+      	 P_INIT_MSG_LIST           => FND_API.G_FALSE,
+      	 P_COMMIT                  => FND_API.G_FALSE,
+      	 P_VALIDATION_LEVEL        => FND_API.G_VALID_LEVEL_FULL,
+      	 X_RETURN_STATUS           => L_RETURN_STATUS,
+      	 X_MSG_COUNT               => L_MESG_COUNT,
+      	 X_MSG_DATA                => L_MESG,
+      	 P_CALLING_FN		   =>'CREATE_LEASE_SCHEDULE',
+      	 P_TRANS_REC		   =>P_TRANS_REC,
+      	 PX_LEASE_SCHEDULES_REC    =>PX_LEASE_SCHEDULES_REC,
+      	 P_LEASE_PAYMENTS_TBL      =>P_LEASE_PAYMENTS_TBL
+      	);
+
+	  IF (L_RETURN_STATUS <> FND_API.G_RET_STS_SUCCESS) THEN
+       		X_RETURN_STATUS:=L_RETURN_STATUS;
+       		X_MSG_COUNT:=L_MESG_COUNT;
+       		X_MSG_DATA:=L_MESG;
+   	  ELSE
+		----------------------------------------------------
+		-- IF CREATE PAYMENTS, SUCCESS, AMORTIZE
+		----------------------------------------------------
+            	FA_LEASE_SCHEDULE_PUB.CREATE_AMORTIZATION
+      		(P_API_VERSION             => 1.0,
+       		P_INIT_MSG_LIST           => FND_API.G_FALSE,
+       		P_COMMIT                  => FND_API.G_FALSE,
+       		P_VALIDATION_LEVEL        => FND_API.G_VALID_LEVEL_FULL,
+       		X_RETURN_STATUS           => L_RETURN_STATUS,
+       		X_MSG_COUNT               => L_MESG_COUNT,
+       		X_MSG_DATA                => L_MESG,
+       		P_CALLING_FN		  =>'CREATE_LEASE_SCHEDULE',
+       		P_TRANS_REC		  =>P_TRANS_REC,
+       		P_PAYMENT_SCHEDULE_ID	  =>PX_LEASE_SCHEDULES_REC.PAYMENT_SCHEDULE_ID
+       		);
+     		IF (L_RETURN_STATUS <> FND_API.G_RET_STS_SUCCESS) THEN
+       			X_RETURN_STATUS:=L_RETURN_STATUS;
+       			X_MSG_COUNT:=L_MESG_COUNT;
+       			X_MSG_DATA:=L_MESG;
+     		ELSE
+ 			L_RETURN_STATUS := FND_API.G_RET_STS_SUCCESS;
+     		END IF;
+   	   END IF;
+
+	----------------------------------------------------
+	-- CHECK FOR COMMIT
+	----------------------------------------------------
+
+	IF FND_API.TO_BOOLEAN( P_COMMIT ) THEN
+   		COMMIT WORK;
+	END IF;
+
+EXCEPTION
+      WHEN VALUE_ERROR_EXCEPTION THEN
+	      ROLLBACK TO CREATE_LEASE_SCHEDULE;
+      	      X_RETURN_STATUS := FND_API.G_RET_STS_ERROR;
+      WHEN OTHERS THEN
+      	     ROLLBACK TO CREATE_LEASE_SCHEDULE;
+      	     X_RETURN_STATUS := FND_API.G_RET_STS_UNEXP_ERROR;
+       	     X_MSG_DATA:=SQLERRM;
+END CREATE_LEASE_SCHEDULE;
+
+END FA_LEASE_SCHEDULE_PUB;
+
+/

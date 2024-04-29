@@ -1,0 +1,203 @@
+--------------------------------------------------------
+--  DDL for Package IGS_FI_F_TYP_CA_INST_PKG
+--------------------------------------------------------
+
+  CREATE OR REPLACE EDITIONABLE PACKAGE "APPS"."IGS_FI_F_TYP_CA_INST_PKG" AUTHID CURRENT_USER AS
+/* $Header: IGSSI49S.pls 120.3 2005/09/03 10:49:30 appldev ship $*/
+--by vvutukur on 11-jan-2002 as part of Bug 2175865
+--since subaccount is moved from detail to master of fee types
+--removing the subaccount_id column in all the calls.
+procedure INSERT_ROW (
+  X_ROWID in out NOCOPY VARCHAR2,
+  X_FEE_TYPE in VARCHAR2,
+  X_FEE_CAL_TYPE in VARCHAR2,
+  X_FEE_CI_SEQUENCE_NUMBER in NUMBER,
+  X_FEE_TYPE_CI_STATUS in VARCHAR2,
+  X_START_DT_ALIAS in VARCHAR2,
+  X_START_DAI_SEQUENCE_NUMBER in NUMBER,
+  X_END_DT_ALIAS in VARCHAR2,
+  X_END_DAI_SEQUENCE_NUMBER in NUMBER,
+  X_RETRO_DT_ALIAS in VARCHAR2,
+  X_RETRO_DAI_SEQUENCE_NUMBER in NUMBER,
+  X_S_CHG_METHOD_TYPE in VARCHAR2,
+  X_RUL_SEQUENCE_NUMBER in NUMBER,
+  X_ORG_ID  in NUMBER default NULL,
+  X_MODE in VARCHAR2 default 'R',
+  X_INITIAL_DEFAULT_AMOUNT in NUMBER DEFAULT NULL,
+  x_acct_hier_id IN NUMBER DEFAULT NULL,
+  x_rec_gl_ccid IN NUMBER DEFAULT NULL,
+  x_rev_account_cd IN VARCHAR2 DEFAULT NULL,
+  x_rec_account_cd IN VARCHAR2 DEFAULT NULL,
+  x_ret_gl_ccid IN NUMBER DEFAULT NULL,
+  x_ret_account_cd IN VARCHAR2 DEFAULT NULL,
+  x_retention_level_code IN VARCHAR2 DEFAULT NULL,
+  x_complete_ret_flag IN VARCHAR2 DEFAULT NULL,
+  x_nonzero_billable_cp_flag IN VARCHAR2 DEFAULT NULL,
+  X_SCOPE_RUL_SEQUENCE_NUM IN NUMBER DEFAULT NULL,
+  X_ELM_RNG_ORDER_NAME IN VARCHAR2 DEFAULT NULL,
+  X_MAX_CHG_ELEMENTS IN NUMBER DEFAULT NULL
+  );
+procedure LOCK_ROW (
+  X_ROWID in VARCHAR2,
+  X_FEE_TYPE in VARCHAR2,
+  X_FEE_CAL_TYPE in VARCHAR2,
+  X_FEE_CI_SEQUENCE_NUMBER in NUMBER,
+  X_FEE_TYPE_CI_STATUS in VARCHAR2,
+  X_START_DT_ALIAS in VARCHAR2,
+  X_START_DAI_SEQUENCE_NUMBER in NUMBER,
+  X_END_DT_ALIAS in VARCHAR2,
+  X_END_DAI_SEQUENCE_NUMBER in NUMBER,
+  X_RETRO_DT_ALIAS in VARCHAR2,
+  X_RETRO_DAI_SEQUENCE_NUMBER in NUMBER,
+  X_S_CHG_METHOD_TYPE in VARCHAR2,
+  X_RUL_SEQUENCE_NUMBER in NUMBER,
+  X_INITIAL_DEFAULT_AMOUNT in NUMBER DEFAULT NULL,
+  x_acct_hier_id IN NUMBER DEFAULT NULL,
+  x_rec_gl_ccid IN NUMBER DEFAULT NULL,
+  x_rev_account_cd IN VARCHAR2 DEFAULT NULL,
+  x_rec_account_cd IN VARCHAR2 DEFAULT NULL,
+  x_ret_gl_ccid IN NUMBER DEFAULT NULL,
+  x_ret_account_cd IN VARCHAR2 DEFAULT NULL,
+  x_retention_level_code IN VARCHAR2 DEFAULT NULL,
+  x_complete_ret_flag IN VARCHAR2 DEFAULT NULL,
+  x_nonzero_billable_cp_flag IN VARCHAR2 DEFAULT NULL,
+  X_SCOPE_RUL_SEQUENCE_NUM IN NUMBER DEFAULT NULL,
+  X_ELM_RNG_ORDER_NAME IN VARCHAR2 DEFAULT NULL,
+  X_MAX_CHG_ELEMENTS IN NUMBER DEFAULT NULL
+ );
+procedure UPDATE_ROW (
+  X_ROWID in VARCHAR2,
+  X_FEE_TYPE in VARCHAR2,
+  X_FEE_CAL_TYPE in VARCHAR2,
+  X_FEE_CI_SEQUENCE_NUMBER in NUMBER,
+  X_FEE_TYPE_CI_STATUS in VARCHAR2,
+  X_START_DT_ALIAS in VARCHAR2,
+  X_START_DAI_SEQUENCE_NUMBER in NUMBER,
+  X_END_DT_ALIAS in VARCHAR2,
+  X_END_DAI_SEQUENCE_NUMBER in NUMBER,
+  X_RETRO_DT_ALIAS in VARCHAR2,
+  X_RETRO_DAI_SEQUENCE_NUMBER in NUMBER,
+  X_S_CHG_METHOD_TYPE in VARCHAR2,
+  X_RUL_SEQUENCE_NUMBER in NUMBER,
+  X_MODE in VARCHAR2 default 'R',
+  X_INITIAL_DEFAULT_AMOUNT in NUMBER DEFAULT NULL ,
+  x_acct_hier_id IN NUMBER DEFAULT NULL,
+  x_rec_gl_ccid IN NUMBER DEFAULT NULL,
+  x_rev_account_cd IN VARCHAR2 DEFAULT NULL,
+  x_rec_account_cd IN VARCHAR2 DEFAULT NULL,
+  x_ret_gl_ccid IN NUMBER DEFAULT NULL,
+  x_ret_account_cd IN VARCHAR2 DEFAULT NULL,
+  x_retention_level_code IN VARCHAR2 DEFAULT NULL,
+  x_complete_ret_flag IN VARCHAR2 DEFAULT NULL,
+  x_nonzero_billable_cp_flag IN VARCHAR2 DEFAULT NULL,
+  X_SCOPE_RUL_SEQUENCE_NUM IN NUMBER DEFAULT NULL,
+  X_ELM_RNG_ORDER_NAME IN VARCHAR2 DEFAULT NULL,
+  X_MAX_CHG_ELEMENTS IN NUMBER DEFAULT NULL
+  );
+procedure ADD_ROW (
+  X_ROWID in out NOCOPY VARCHAR2,
+  X_FEE_TYPE in VARCHAR2,
+  X_FEE_CAL_TYPE in VARCHAR2,
+  X_FEE_CI_SEQUENCE_NUMBER in NUMBER,
+  X_FEE_TYPE_CI_STATUS in VARCHAR2,
+  X_START_DT_ALIAS in VARCHAR2,
+  X_START_DAI_SEQUENCE_NUMBER in NUMBER,
+  X_END_DT_ALIAS in VARCHAR2,
+  X_END_DAI_SEQUENCE_NUMBER in NUMBER,
+  X_RETRO_DT_ALIAS in VARCHAR2,
+  X_RETRO_DAI_SEQUENCE_NUMBER in NUMBER,
+  X_S_CHG_METHOD_TYPE in VARCHAR2,
+  X_RUL_SEQUENCE_NUMBER in NUMBER,
+  X_ORG_ID  in NUMBER default NULL,
+  X_MODE in VARCHAR2 default 'R',
+  X_INITIAL_DEFAULT_AMOUNT in NUMBER DEFAULT NULL ,
+  x_acct_hier_id IN NUMBER DEFAULT NULL,
+  x_rec_gl_ccid IN NUMBER DEFAULT NULL,
+  x_rev_account_cd IN VARCHAR2 DEFAULT NULL,
+  x_rec_account_cd IN VARCHAR2 DEFAULT NULL,
+  x_ret_gl_ccid IN NUMBER DEFAULT NULL,
+  x_ret_account_cd IN VARCHAR2 DEFAULT NULL,
+  x_retention_level_code IN VARCHAR2 DEFAULT NULL,
+  x_complete_ret_flag IN VARCHAR2 DEFAULT NULL,
+  x_nonzero_billable_cp_flag IN VARCHAR2 DEFAULT NULL,
+  X_SCOPE_RUL_SEQUENCE_NUM IN NUMBER DEFAULT NULL,
+  X_ELM_RNG_ORDER_NAME IN VARCHAR2 DEFAULT NULL,
+  X_MAX_CHG_ELEMENTS IN NUMBER DEFAULT NULL
+  );
+
+  FUNCTION Get_PK_For_Validation (
+    x_fee_type IN VARCHAR2,
+    x_fee_cal_type IN VARCHAR2,
+    x_fee_ci_sequence_number IN NUMBER
+    ) RETURN BOOLEAN;
+  PROCEDURE Check_Constraints (
+    column_name  IN  VARCHAR2 DEFAULT NULL,
+    column_value IN  VARCHAR2 DEFAULT NULL
+  );
+  PROCEDURE Before_DML (
+    p_action IN VARCHAR2,
+    x_rowid IN VARCHAR2 DEFAULT NULL,
+    x_fee_type IN VARCHAR2 DEFAULT NULL,
+    x_fee_cal_type IN VARCHAR2 DEFAULT NULL,
+    x_fee_ci_sequence_number IN NUMBER DEFAULT NULL,
+    x_fee_type_ci_status IN VARCHAR2 DEFAULT NULL,
+    x_start_dt_alias IN VARCHAR2 DEFAULT NULL,
+    x_start_dai_sequence_number IN NUMBER DEFAULT NULL,
+    x_end_dt_alias IN VARCHAR2 DEFAULT NULL,
+    x_end_dai_sequence_number IN NUMBER DEFAULT NULL,
+    x_retro_dt_alias IN VARCHAR2 DEFAULT NULL,
+    x_retro_dai_sequence_number IN NUMBER DEFAULT NULL,
+    x_s_chg_method_type IN VARCHAR2 DEFAULT NULL,
+    x_rul_sequence_number IN NUMBER DEFAULT NULL,
+    x_org_id in NUMBER DEFAULT NULL,
+    x_creation_date IN DATE DEFAULT NULL,
+    x_created_by IN NUMBER DEFAULT NULL,
+    x_last_update_date IN DATE DEFAULT NULL,
+    x_last_updated_by IN NUMBER DEFAULT NULL,
+    x_last_update_login IN NUMBER DEFAULT NULL,
+    x_initial_default_amount in NUMBER DEFAULT NULL,
+    x_acct_hier_id IN NUMBER DEFAULT NULL,
+    x_rec_gl_ccid IN NUMBER DEFAULT NULL,
+    x_rev_account_cd IN VARCHAR2 DEFAULT NULL,
+    x_rec_account_cd IN VARCHAR2 DEFAULT NULL,
+    x_ret_gl_ccid IN NUMBER DEFAULT NULL,
+    x_ret_account_cd IN VARCHAR2 DEFAULT NULL,
+    x_retention_level_code IN VARCHAR2 DEFAULT NULL,
+    x_complete_ret_flag IN VARCHAR2 DEFAULT NULL,
+    x_nonzero_billable_cp_flag IN VARCHAR2 DEFAULT NULL,
+    X_SCOPE_RUL_SEQUENCE_NUM IN NUMBER DEFAULT NULL,
+    X_ELM_RNG_ORDER_NAME IN VARCHAR2 DEFAULT NULL,
+    X_MAX_CHG_ELEMENTS IN NUMBER DEFAULT NULL
+  );
+  PROCEDURE GET_FK_IGS_CA_INST (
+    x_cal_type IN VARCHAR2,
+    x_sequence_number IN NUMBER
+    );
+  PROCEDURE GET_FK_IGS_CA_DA_INST (
+    x_dt_alias IN VARCHAR2,
+    x_sequence_number IN NUMBER,
+    x_cal_type IN VARCHAR2,
+    x_ci_sequence_number IN NUMBER
+    );
+  PROCEDURE GET_FK_IGS_FI_FEE_STR_STAT (
+    x_fee_structure_status IN VARCHAR2
+    );
+
+  PROCEDURE GET_FK_IGS_RU_RULE (
+    x_sequence_number IN NUMBER
+    );
+  PROCEDURE GET_FK_IGS_LOOKUPS_VIEW (
+    x_s_chg_method_type IN VARCHAR2
+    );
+
+  PROCEDURE GET_FK_IGS_FI_ELM_RNG_ORDS (
+    x_elm_rng_order_name IN VARCHAR2
+    );
+  PROCEDURE GET_FK1_IGS_RU_RULE (
+    x_scope_rul_sequence_num IN NUMBER
+    );
+end IGS_FI_F_TYP_CA_INST_PKG;
+
+ 
+
+/

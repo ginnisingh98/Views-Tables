@@ -1,0 +1,370 @@
+--------------------------------------------------------
+--  DDL for Package HR_ASSIGNMENT_BK1
+--------------------------------------------------------
+
+  CREATE OR REPLACE EDITIONABLE PACKAGE "APPS"."HR_ASSIGNMENT_BK1" AUTHID CURRENT_USER as
+/* $Header: peasgapi.pkh 120.11.12010000.4 2009/07/28 10:08:56 ghshanka ship $ */
+--
+-- ----------------------------------------------------------------------------
+-- |--------------------< create_secondary_emp_asg_b >------------------------|
+-- ----------------------------------------------------------------------------
+--
+procedure create_secondary_emp_asg_b
+  (p_effective_date               in     date
+  ,p_person_id                    in     number
+  ,p_organization_id              in     number
+  ,p_grade_id                     in     number
+  ,p_position_id                  in     number
+  ,p_job_id                       in     number
+  ,p_assignment_status_type_id    in     number
+  ,p_payroll_id                   in     number
+  ,p_location_id                  in     number
+  ,p_supervisor_id                in     number
+  ,p_special_ceiling_step_id      in     number
+  ,p_pay_basis_id                 in     number
+  ,p_assignment_number            in     varchar2
+  ,p_change_reason                in     varchar2
+  ,p_comments                     in     varchar2
+  ,p_date_probation_end           in     date
+  ,p_default_code_comb_id         in     number
+  ,p_employment_category          in     varchar2
+  ,p_frequency                    in     varchar2
+  ,p_internal_address_line        in     varchar2
+  ,p_manager_flag                 in     varchar2
+  ,p_normal_hours                 in     number
+  ,p_perf_review_period           in     number
+  ,p_perf_review_period_frequency in     varchar2
+  ,p_probation_period             in     number
+  ,p_probation_unit               in     varchar2
+  ,p_sal_review_period            in     number
+  ,p_sal_review_period_frequency  in     varchar2
+  ,p_set_of_books_id              in     number
+  ,p_source_type                  in     varchar2
+  ,p_time_normal_finish           in     varchar2
+  ,p_time_normal_start            in     varchar2
+  ,p_bargaining_unit_code         in     varchar2
+  ,p_labour_union_member_flag     in     varchar2
+  ,p_hourly_salaried_code         in     varchar2
+  ,p_ass_attribute_category       in     varchar2
+  ,p_ass_attribute1               in     varchar2
+  ,p_ass_attribute2               in     varchar2
+  ,p_ass_attribute3               in     varchar2
+  ,p_ass_attribute4               in     varchar2
+  ,p_ass_attribute5               in     varchar2
+  ,p_ass_attribute6               in     varchar2
+  ,p_ass_attribute7               in     varchar2
+  ,p_ass_attribute8               in     varchar2
+  ,p_ass_attribute9               in     varchar2
+  ,p_ass_attribute10              in     varchar2
+  ,p_ass_attribute11              in     varchar2
+  ,p_ass_attribute12              in     varchar2
+  ,p_ass_attribute13              in     varchar2
+  ,p_ass_attribute14              in     varchar2
+  ,p_ass_attribute15              in     varchar2
+  ,p_ass_attribute16              in     varchar2
+  ,p_ass_attribute17              in     varchar2
+  ,p_ass_attribute18              in     varchar2
+  ,p_ass_attribute19              in     varchar2
+  ,p_ass_attribute20              in     varchar2
+  ,p_ass_attribute21              in     varchar2
+  ,p_ass_attribute22              in     varchar2
+  ,p_ass_attribute23              in     varchar2
+  ,p_ass_attribute24              in     varchar2
+  ,p_ass_attribute25              in     varchar2
+  ,p_ass_attribute26              in     varchar2
+  ,p_ass_attribute27              in     varchar2
+  ,p_ass_attribute28              in     varchar2
+  ,p_ass_attribute29              in     varchar2
+  ,p_ass_attribute30              in     varchar2
+  ,p_title                        in     varchar2
+  ,p_scl_segment1                 in     varchar2
+  ,p_scl_segment2                 in     varchar2
+  ,p_scl_segment3                 in     varchar2
+  ,p_scl_segment4                 in     varchar2
+  ,p_scl_segment5                 in     varchar2
+  ,p_scl_segment6                 in     varchar2
+  ,p_scl_segment7                 in     varchar2
+  ,p_scl_segment8                 in     varchar2
+  ,p_scl_segment9                 in     varchar2
+  ,p_scl_segment10                in     varchar2
+  ,p_scl_segment11                in     varchar2
+  ,p_scl_segment12                in     varchar2
+  ,p_scl_segment13                in     varchar2
+  ,p_scl_segment14                in     varchar2
+  ,p_scl_segment15                in     varchar2
+  ,p_scl_segment16                in     varchar2
+  ,p_scl_segment17                in     varchar2
+  ,p_scl_segment18                in     varchar2
+  ,p_scl_segment19                in     varchar2
+  ,p_scl_segment20                in     varchar2
+  ,p_scl_segment21                in     varchar2
+  ,p_scl_segment22                in     varchar2
+  ,p_scl_segment23                in     varchar2
+  ,p_scl_segment24                in     varchar2
+  ,p_scl_segment25                in     varchar2
+  ,p_scl_segment26                in     varchar2
+  ,p_scl_segment27                in     varchar2
+  ,p_scl_segment28                in     varchar2
+  ,p_scl_segment29                in     varchar2
+  ,p_scl_segment30                in     varchar2
+-- Bug 944911
+-- Amended scl_concatenated_segments by scl_concat_segments
+  ,p_scl_concat_segments          in     varchar2
+  ,p_pgp_segment1                 in     varchar2
+  ,p_pgp_segment2                 in     varchar2
+  ,p_pgp_segment3                 in     varchar2
+  ,p_pgp_segment4                 in     varchar2
+  ,p_pgp_segment5                 in     varchar2
+  ,p_pgp_segment6                 in     varchar2
+  ,p_pgp_segment7                 in     varchar2
+  ,p_pgp_segment8                 in     varchar2
+  ,p_pgp_segment9                 in     varchar2
+  ,p_pgp_segment10                in     varchar2
+  ,p_pgp_segment11                in     varchar2
+  ,p_pgp_segment12                in     varchar2
+  ,p_pgp_segment13                in     varchar2
+  ,p_pgp_segment14                in     varchar2
+  ,p_pgp_segment15                in     varchar2
+  ,p_pgp_segment16                in     varchar2
+  ,p_pgp_segment17                in     varchar2
+  ,p_pgp_segment18                in     varchar2
+  ,p_pgp_segment19                in     varchar2
+  ,p_pgp_segment20                in     varchar2
+  ,p_pgp_segment21                in     varchar2
+  ,p_pgp_segment22                in     varchar2
+  ,p_pgp_segment23                in     varchar2
+  ,p_pgp_segment24                in     varchar2
+  ,p_pgp_segment25                in     varchar2
+  ,p_pgp_segment26                in     varchar2
+  ,p_pgp_segment27                in     varchar2
+  ,p_pgp_segment28                in     varchar2
+  ,p_pgp_segment29                in     varchar2
+  ,p_pgp_segment30                in     varchar2
+-- Bug 944911
+-- Amended p_group_name by p_pgp_concat_segments
+  ,p_pgp_concat_segments          in     varchar2
+  ,p_contract_id                  in     number
+  ,p_establishment_id             in     number
+  ,p_collective_agreement_id      in     number
+  ,p_cagr_id_flex_num             in     number
+  ,p_cag_segment1                 in     varchar2
+  ,p_cag_segment2                 in     varchar2
+  ,p_cag_segment3                 in     varchar2
+  ,p_cag_segment4                 in     varchar2
+  ,p_cag_segment5                 in     varchar2
+  ,p_cag_segment6                 in     varchar2
+  ,p_cag_segment7                 in     varchar2
+  ,p_cag_segment8                 in     varchar2
+  ,p_cag_segment9                 in     varchar2
+  ,p_cag_segment10                in     varchar2
+  ,p_cag_segment11                in     varchar2
+  ,p_cag_segment12                in     varchar2
+  ,p_cag_segment13                in     varchar2
+  ,p_cag_segment14                in     varchar2
+  ,p_cag_segment15                in     varchar2
+  ,p_cag_segment16                in     varchar2
+  ,p_cag_segment17                in     varchar2
+  ,p_cag_segment18                in     varchar2
+  ,p_cag_segment19                in     varchar2
+  ,p_cag_segment20                in     varchar2
+  ,p_notice_period		  in	 number
+  ,p_notice_period_uom		  in     varchar2
+  ,p_employee_category		  in     varchar2
+  ,p_work_at_home		  in	 varchar2
+  ,p_job_post_source_name         in     varchar2
+  ,p_grade_ladder_pgm_id          in     number
+  ,p_supervisor_assignment_id     in     number
+  );
+--
+-- ----------------------------------------------------------------------------
+-- |--------------------< create_secondary_emp_asg_a >------------------------|
+-- ----------------------------------------------------------------------------
+--
+procedure create_secondary_emp_asg_a
+  (p_effective_date               in     date
+  ,p_person_id                    in     number
+  ,p_organization_id              in     number
+  ,p_grade_id                     in     number
+  ,p_position_id                  in     number
+  ,p_job_id                       in     number
+  ,p_assignment_status_type_id    in     number
+  ,p_payroll_id                   in     number
+  ,p_location_id                  in     number
+  ,p_supervisor_id                in     number
+  ,p_special_ceiling_step_id      in     number
+  ,p_pay_basis_id                 in     number
+  ,p_assignment_number            in     varchar2
+  ,p_change_reason                in     varchar2
+  ,p_comments                     in     varchar2
+  ,p_date_probation_end           in     date
+  ,p_default_code_comb_id         in     number
+  ,p_employment_category          in     varchar2
+  ,p_frequency                    in     varchar2
+  ,p_internal_address_line        in     varchar2
+  ,p_manager_flag                 in     varchar2
+  ,p_normal_hours                 in     number
+  ,p_perf_review_period           in     number
+  ,p_perf_review_period_frequency in     varchar2
+  ,p_probation_period             in     number
+  ,p_probation_unit               in     varchar2
+  ,p_sal_review_period            in     number
+  ,p_sal_review_period_frequency  in     varchar2
+  ,p_set_of_books_id              in     number
+  ,p_source_type                  in     varchar2
+  ,p_time_normal_finish           in     varchar2
+  ,p_time_normal_start            in     varchar2
+  ,p_bargaining_unit_code         in     varchar2
+  ,p_labour_union_member_flag     in     varchar2
+  ,p_hourly_salaried_code         in     varchar2
+  ,p_ass_attribute_category       in     varchar2
+  ,p_ass_attribute1               in     varchar2
+  ,p_ass_attribute2               in     varchar2
+  ,p_ass_attribute3               in     varchar2
+  ,p_ass_attribute4               in     varchar2
+  ,p_ass_attribute5               in     varchar2
+  ,p_ass_attribute6               in     varchar2
+  ,p_ass_attribute7               in     varchar2
+  ,p_ass_attribute8               in     varchar2
+  ,p_ass_attribute9               in     varchar2
+  ,p_ass_attribute10              in     varchar2
+  ,p_ass_attribute11              in     varchar2
+  ,p_ass_attribute12              in     varchar2
+  ,p_ass_attribute13              in     varchar2
+  ,p_ass_attribute14              in     varchar2
+  ,p_ass_attribute15              in     varchar2
+  ,p_ass_attribute16              in     varchar2
+  ,p_ass_attribute17              in     varchar2
+  ,p_ass_attribute18              in     varchar2
+  ,p_ass_attribute19              in     varchar2
+  ,p_ass_attribute20              in     varchar2
+  ,p_ass_attribute21              in     varchar2
+  ,p_ass_attribute22              in     varchar2
+  ,p_ass_attribute23              in     varchar2
+  ,p_ass_attribute24              in     varchar2
+  ,p_ass_attribute25              in     varchar2
+  ,p_ass_attribute26              in     varchar2
+  ,p_ass_attribute27              in     varchar2
+  ,p_ass_attribute28              in     varchar2
+  ,p_ass_attribute29              in     varchar2
+  ,p_ass_attribute30              in     varchar2
+  ,p_title                        in     varchar2
+  ,p_scl_segment1                 in     varchar2
+  ,p_scl_segment2                 in     varchar2
+  ,p_scl_segment3                 in     varchar2
+  ,p_scl_segment4                 in     varchar2
+  ,p_scl_segment5                 in     varchar2
+  ,p_scl_segment6                 in     varchar2
+  ,p_scl_segment7                 in     varchar2
+  ,p_scl_segment8                 in     varchar2
+  ,p_scl_segment9                 in     varchar2
+  ,p_scl_segment10                in     varchar2
+  ,p_scl_segment11                in     varchar2
+  ,p_scl_segment12                in     varchar2
+  ,p_scl_segment13                in     varchar2
+  ,p_scl_segment14                in     varchar2
+  ,p_scl_segment15                in     varchar2
+  ,p_scl_segment16                in     varchar2
+  ,p_scl_segment17                in     varchar2
+  ,p_scl_segment18                in     varchar2
+  ,p_scl_segment19                in     varchar2
+  ,p_scl_segment20                in     varchar2
+  ,p_scl_segment21                in     varchar2
+  ,p_scl_segment22                in     varchar2
+  ,p_scl_segment23                in     varchar2
+  ,p_scl_segment24                in     varchar2
+  ,p_scl_segment25                in     varchar2
+  ,p_scl_segment26                in     varchar2
+  ,p_scl_segment27                in     varchar2
+  ,p_scl_segment28                in     varchar2
+  ,p_scl_segment29                in     varchar2
+  ,p_scl_segment30                in     varchar2
+-- Bug 944911
+-- Amended this to be p_concatenated_segments from p_scl_concanated_segments
+  ,p_concatenated_segments        in     varchar2
+  ,p_pgp_segment1                 in     varchar2
+  ,p_pgp_segment2                 in     varchar2
+  ,p_pgp_segment3                 in     varchar2
+  ,p_pgp_segment4                 in     varchar2
+  ,p_pgp_segment5                 in     varchar2
+  ,p_pgp_segment6                 in     varchar2
+  ,p_pgp_segment7                 in     varchar2
+  ,p_pgp_segment8                 in     varchar2
+  ,p_pgp_segment9                 in     varchar2
+  ,p_pgp_segment10                in     varchar2
+  ,p_pgp_segment11                in     varchar2
+  ,p_pgp_segment12                in     varchar2
+  ,p_pgp_segment13                in     varchar2
+  ,p_pgp_segment14                in     varchar2
+  ,p_pgp_segment15                in     varchar2
+  ,p_pgp_segment16                in     varchar2
+  ,p_pgp_segment17                in     varchar2
+  ,p_pgp_segment18                in     varchar2
+  ,p_pgp_segment19                in     varchar2
+  ,p_pgp_segment20                in     varchar2
+  ,p_pgp_segment21                in     varchar2
+  ,p_pgp_segment22                in     varchar2
+  ,p_pgp_segment23                in     varchar2
+  ,p_pgp_segment24                in     varchar2
+  ,p_pgp_segment25                in     varchar2
+  ,p_pgp_segment26                in     varchar2
+  ,p_pgp_segment27                in     varchar2
+  ,p_pgp_segment28                in     varchar2
+  ,p_pgp_segment29                in     varchar2
+  ,p_pgp_segment30                in     varchar2
+  ,p_contract_id                  in     number
+  ,p_establishment_id             in     number
+  ,p_collective_agreement_id      in     number
+  ,p_cagr_id_flex_num             in     number
+  ,p_cag_segment1                 in     varchar2
+  ,p_cag_segment2                 in     varchar2
+  ,p_cag_segment3                 in     varchar2
+  ,p_cag_segment4                 in     varchar2
+  ,p_cag_segment5                 in     varchar2
+  ,p_cag_segment6                 in     varchar2
+  ,p_cag_segment7                 in     varchar2
+  ,p_cag_segment8                 in     varchar2
+  ,p_cag_segment9                 in     varchar2
+  ,p_cag_segment10                in     varchar2
+  ,p_cag_segment11                in     varchar2
+  ,p_cag_segment12                in     varchar2
+  ,p_cag_segment13                in     varchar2
+  ,p_cag_segment14                in     varchar2
+  ,p_cag_segment15                in     varchar2
+  ,p_cag_segment16                in     varchar2
+  ,p_cag_segment17                in     varchar2
+  ,p_cag_segment18                in     varchar2
+  ,p_cag_segment19                in     varchar2
+  ,p_cag_segment20                in     varchar2
+  ,p_notice_period		  in	 number
+  ,p_notice_period_uom		  in     varchar2
+  ,p_employee_category		  in     varchar2
+  ,p_work_at_home		  in	 varchar2
+  ,p_job_post_source_name         in     varchar2
+  ,p_cagr_concatenated_segments   in     varchar2
+  ,p_cagr_grade_def_id            in     number -- vik change to in-out
+  ,p_group_name                   in     varchar2
+  ,p_assignment_id                in     number
+  ,p_soft_coding_keyflex_id       in     number  -- vik change to in-out
+  ,p_people_group_id              in     number  -- vik change to in-out
+  ,p_object_version_number        in     number
+  ,p_effective_start_date         in     date
+  ,p_effective_end_date           in     date
+  ,p_assignment_sequence          in     number
+  ,p_comment_id                   in     number
+  ,p_other_manager_warning        in     boolean
+  ,p_hourly_salaried_warning      in     boolean
+-- Added these 2 new params
+-- Bug 944911
+-- Replaced p_group_name with p_pgp_concat_segments
+   ,p_pgp_concat_segments         in     varchar2
+-- Bug 944911
+-- Amended p_scl_concatenated_Segments by p_scl_concat_segments
+   ,p_scl_concat_segments          in     varchar2
+  ,p_grade_ladder_pgm_id          in     number
+  ,p_supervisor_assignment_id     in     number
+
+  );
+--
+end hr_assignment_bk1;
+
+/

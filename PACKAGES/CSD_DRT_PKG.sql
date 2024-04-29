@@ -1,0 +1,22 @@
+--------------------------------------------------------
+--  DDL for Package CSD_DRT_PKG
+--------------------------------------------------------
+
+  CREATE OR REPLACE EDITIONABLE PACKAGE "APPS"."CSD_DRT_PKG" AUTHID CURRENT_USER AS
+/* $Header: csddrtps.pls 120.0.12010000.1 2018/04/26 01:23:54 swai noship $ */
+
+  ENTITY_TYPE_HR  CONSTANT VARCHAR2(3) := 'HR';
+  ENTITY_TYPE_TCA CONSTANT VARCHAR2(3) := 'TCA';
+  ENTITY_TYPE_FND CONSTANT VARCHAR2(3) := 'FND';
+
+PROCEDURE CSD_TCA_DRC(PERSON_ID       IN NUMBER,
+                      RESULT_TBL      OUT NOCOPY PER_DRT_PKG.RESULT_TBL_TYPE);
+
+PROCEDURE CSD_HR_DRC(PERSON_ID       IN NUMBER,
+                      RESULT_TBL      OUT NOCOPY PER_DRT_PKG.RESULT_TBL_TYPE);
+
+PROCEDURE CSD_FND_DRC(PERSON_ID       IN NUMBER,
+                      RESULT_TBL      OUT NOCOPY PER_DRT_PKG.RESULT_TBL_TYPE);
+END CSD_DRT_PKG;
+
+/

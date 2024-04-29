@@ -1,0 +1,122 @@
+--------------------------------------------------------
+--  DDL for Package IGS_FI_FEE_AS_RT_HT_PKG
+--------------------------------------------------------
+
+  CREATE OR REPLACE EDITIONABLE PACKAGE "APPS"."IGS_FI_FEE_AS_RT_HT_PKG" AUTHID CURRENT_USER AS
+ /* $Header: IGSSI22S.pls 115.5 2003/02/11 06:36:48 pathipat ship $ */
+procedure INSERT_ROW (
+  X_ROWID in out NOCOPY VARCHAR2,
+  X_PERSON_ID in NUMBER,
+  X_COURSE_CD in VARCHAR2,
+  X_FEE_TYPE in VARCHAR2,
+  X_START_DT in DATE,
+  X_HIST_START_DT in DATE,
+  X_HIST_END_DT in DATE,
+  X_HIST_WHO in NUMBER,
+  X_END_DT in DATE,
+  X_LOCATION_CD in VARCHAR2,
+  X_ATTENDANCE_TYPE in VARCHAR2,
+  X_ATTENDANCE_MODE in VARCHAR2,
+  X_CHG_RATE in NUMBER,
+  X_LOWER_NRML_RATE_OVRD_IND in VARCHAR2,
+  X_ORG_ID in NUMBER,
+  X_MODE in VARCHAR2 default 'R'
+  );
+procedure LOCK_ROW (
+  X_ROWID in VARCHAR2,
+  X_PERSON_ID in NUMBER,
+  X_COURSE_CD in VARCHAR2,
+  X_FEE_TYPE in VARCHAR2,
+  X_START_DT in DATE,
+  X_HIST_START_DT in DATE,
+  X_HIST_END_DT in DATE,
+  X_HIST_WHO in NUMBER,
+  X_END_DT in DATE,
+  X_LOCATION_CD in VARCHAR2,
+  X_ATTENDANCE_TYPE in VARCHAR2,
+  X_ATTENDANCE_MODE in VARCHAR2,
+  X_CHG_RATE in NUMBER,
+  X_LOWER_NRML_RATE_OVRD_IND in VARCHAR2
+);
+procedure UPDATE_ROW (
+  X_ROWID in VARCHAR2,
+  X_PERSON_ID in NUMBER,
+  X_COURSE_CD in VARCHAR2,
+  X_FEE_TYPE in VARCHAR2,
+  X_START_DT in DATE,
+  X_HIST_START_DT in DATE,
+  X_HIST_END_DT in DATE,
+  X_HIST_WHO in NUMBER,
+  X_END_DT in DATE,
+  X_LOCATION_CD in VARCHAR2,
+  X_ATTENDANCE_TYPE in VARCHAR2,
+  X_ATTENDANCE_MODE in VARCHAR2,
+  X_CHG_RATE in NUMBER,
+  X_LOWER_NRML_RATE_OVRD_IND in VARCHAR2,
+  X_MODE in VARCHAR2 default 'R'
+  );
+procedure ADD_ROW (
+  X_ROWID in out NOCOPY VARCHAR2,
+  X_PERSON_ID in NUMBER,
+  X_COURSE_CD in VARCHAR2,
+  X_FEE_TYPE in VARCHAR2,
+  X_START_DT in DATE,
+  X_HIST_START_DT in DATE,
+  X_HIST_END_DT in DATE,
+  X_HIST_WHO in NUMBER,
+  X_END_DT in DATE,
+  X_LOCATION_CD in VARCHAR2,
+  X_ATTENDANCE_TYPE in VARCHAR2,
+  X_ATTENDANCE_MODE in VARCHAR2,
+  X_CHG_RATE in NUMBER,
+  X_LOWER_NRML_RATE_OVRD_IND in VARCHAR2,
+  X_ORG_ID in NUMBER,
+  X_MODE in VARCHAR2 default 'R'
+  );
+procedure DELETE_ROW (
+  X_ROWID in VARCHAR2
+);
+  FUNCTION Get_PK_For_Validation (
+    x_person_id IN NUMBER,
+    x_course_cd IN VARCHAR2,
+    x_fee_type IN VARCHAR2,
+    x_start_dt IN DATE,
+    x_hist_start_dt IN DATE
+    )
+	RETURN BOOLEAN ;
+
+  PROCEDURE GET_FK_IGS_PE_PERSON (
+    x_person_id IN NUMBER
+    );
+  PROCEDURE Check_Constraints (
+	 Column_Name	IN	VARCHAR2	DEFAULT NULL,
+	 Column_Value 	IN	VARCHAR2	DEFAULT NULL
+    );
+  PROCEDURE Before_DML (
+    p_action IN VARCHAR2,
+    x_rowid IN VARCHAR2 DEFAULT NULL,
+    x_person_id IN NUMBER DEFAULT NULL,
+    x_course_cd IN VARCHAR2 DEFAULT NULL,
+    x_fee_type IN VARCHAR2 DEFAULT NULL,
+    x_start_dt IN DATE DEFAULT NULL,
+    x_hist_start_dt IN DATE DEFAULT NULL,
+    x_hist_end_dt IN DATE DEFAULT NULL,
+    x_hist_who IN VARCHAR2 DEFAULT NULL,
+    x_end_dt IN DATE DEFAULT NULL,
+    x_location_cd IN VARCHAR2 DEFAULT NULL,
+    x_attendance_type IN VARCHAR2 DEFAULT NULL,
+    x_attendance_mode IN VARCHAR2 DEFAULT NULL,
+    x_chg_rate IN NUMBER DEFAULT NULL,
+    x_lower_nrml_rate_ovrd_ind IN VARCHAR2 DEFAULT NULL,
+    x_org_id IN NUMBER DEFAULT NULL,
+    x_creation_date IN DATE DEFAULT NULL,
+    x_created_by IN NUMBER DEFAULT NULL,
+    x_last_update_date IN DATE DEFAULT NULL,
+    x_last_updated_by IN NUMBER DEFAULT NULL,
+    x_last_update_login IN NUMBER DEFAULT NULL
+  )	;
+end IGS_FI_FEE_AS_RT_HT_PKG;
+
+ 
+
+/

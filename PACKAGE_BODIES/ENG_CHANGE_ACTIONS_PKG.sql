@@ -1,0 +1,465 @@
+--------------------------------------------------------
+--  DDL for Package Body ENG_CHANGE_ACTIONS_PKG
+--------------------------------------------------------
+
+  CREATE OR REPLACE EDITIONABLE PACKAGE BODY "APPS"."ENG_CHANGE_ACTIONS_PKG" as
+/* $Header: ENGUCAMB.pls 120.3 2005/12/22 04:23:17 lkasturi noship $ */
+
+procedure INSERT_ROW (
+  X_ROWID in out NOCOPY VARCHAR2,
+  X_ACTION_ID in NUMBER,
+  X_ORIGINAL_SYSTEM_REFERENCE in VARCHAR2,
+  X_WORKFLOW_ITEM_KEY in VARCHAR2,
+  X_REQUEST_ID in NUMBER,
+  X_STATUS_CODE in NUMBER,
+  X_PRIORITY_CODE in VARCHAR2,
+  X_ASSIGNEE_ID in NUMBER,
+  X_RESPONSE_BY_DATE in DATE,
+  X_PARTY_ID_LIST in VARCHAR2,
+  X_PARENT_STATUS_CODE in NUMBER,
+  X_WORKFLOW_ITEM_TYPE in VARCHAR2,
+  X_ROUTE_ID in NUMBER,
+  X_PARENT_ACTION_ID in NUMBER,
+  X_ACTION_TYPE in VARCHAR2,
+  X_OBJECT_NAME in VARCHAR2,
+  X_OBJECT_ID1 in NUMBER,
+  X_OBJECT_ID2 in NUMBER,
+  X_OBJECT_ID3 in NUMBER,
+  X_OBJECT_ID4 in NUMBER,
+  X_OBJECT_ID5 in NUMBER,
+  X_DESCRIPTION in VARCHAR2,
+  X_PROGRAM_ID in NUMBER,
+  X_PROGRAM_APPLICATION_ID in NUMBER,
+  X_PROGRAM_UPDATE_DATE in DATE,
+  X_CREATION_DATE in DATE,
+  X_CREATED_BY in NUMBER,
+  X_LAST_UPDATE_DATE in DATE,
+  X_LAST_UPDATED_BY in NUMBER,
+  X_LAST_UPDATE_LOGIN in NUMBER,
+  X_IMPLEMENTATION_REQ_ID in NUMBER DEFAULT NULL,
+  X_LOCAL_ORGANIZATION_ID in NUMBER DEFAULT NULL -- Bug 4704384
+) is
+  cursor C is select ROWID from ENG_CHANGE_ACTIONS
+              where ACTION_ID = X_ACTION_ID;
+begin
+  insert into ENG_CHANGE_ACTIONS (
+    ORIGINAL_SYSTEM_REFERENCE,
+    WORKFLOW_ITEM_KEY,
+    REQUEST_ID,
+    STATUS_CODE,
+    PRIORITY_CODE,
+    ASSIGNEE_ID,
+    RESPONSE_BY_DATE,
+    PARTY_ID_LIST,
+    PARENT_STATUS_CODE,
+    WORKFLOW_ITEM_TYPE,
+    ROUTE_ID,
+    PARENT_ACTION_ID,
+    ACTION_ID,
+    ACTION_TYPE,
+    OBJECT_NAME,
+    OBJECT_ID1,
+    OBJECT_ID2,
+    OBJECT_ID3,
+    OBJECT_ID4,
+    OBJECT_ID5,
+    PROGRAM_ID,
+    PROGRAM_APPLICATION_ID,
+    PROGRAM_UPDATE_DATE,
+    CREATION_DATE,
+    CREATED_BY,
+    LAST_UPDATE_DATE,
+    LAST_UPDATED_BY,
+    LAST_UPDATE_LOGIN,
+    IMPLEMENTATION_REQ_ID,
+    LOCAL_ORGANIZATION_ID  -- Bug 4704384
+  ) values (
+    X_ORIGINAL_SYSTEM_REFERENCE,
+    X_WORKFLOW_ITEM_KEY,
+    X_REQUEST_ID,
+    X_STATUS_CODE,
+    X_PRIORITY_CODE,
+    X_ASSIGNEE_ID,
+    X_RESPONSE_BY_DATE,
+    X_PARTY_ID_LIST,
+    X_PARENT_STATUS_CODE,
+    X_WORKFLOW_ITEM_TYPE,
+    X_ROUTE_ID,
+    X_PARENT_ACTION_ID,
+    X_ACTION_ID,
+    X_ACTION_TYPE,
+    X_OBJECT_NAME,
+    X_OBJECT_ID1,
+    X_OBJECT_ID2,
+    X_OBJECT_ID3,
+    X_OBJECT_ID4,
+    X_OBJECT_ID5,
+    X_PROGRAM_ID,
+    X_PROGRAM_APPLICATION_ID,
+    X_PROGRAM_UPDATE_DATE,
+    X_CREATION_DATE,
+    X_CREATED_BY,
+    X_LAST_UPDATE_DATE,
+    X_LAST_UPDATED_BY,
+    X_LAST_UPDATE_LOGIN,
+    X_IMPLEMENTATION_REQ_ID,
+    X_LOCAL_ORGANIZATION_ID  -- Bug 4704384
+  );
+
+  insert into ENG_CHANGE_ACTIONS_TL (
+    LAST_UPDATED_BY,
+    LAST_UPDATE_LOGIN,
+    LAST_UPDATE_DATE,
+    CREATED_BY,
+    DESCRIPTION,
+    CREATION_DATE,
+    ACTION_ID,
+    LANGUAGE,
+    SOURCE_LANG
+  ) select
+    X_LAST_UPDATED_BY,
+    X_LAST_UPDATE_LOGIN,
+    X_LAST_UPDATE_DATE,
+    X_CREATED_BY,
+    X_DESCRIPTION,
+    X_CREATION_DATE,
+    X_ACTION_ID,
+    L.LANGUAGE_CODE,
+    userenv('LANG')
+  from FND_LANGUAGES L
+  where L.INSTALLED_FLAG in ('I', 'B')
+  and not exists
+    (select NULL
+     from ENG_CHANGE_ACTIONS_TL T
+     where T.ACTION_ID = X_ACTION_ID
+     and T.LANGUAGE = L.LANGUAGE_CODE);
+
+  open c;
+  fetch c into X_ROWID;
+  if (c%notfound) then
+    close c;
+    raise no_data_found;
+  end if;
+  close c;
+
+BEGIN
+
+     ENG_CHANGE_TEXT_UTIL.Insert_Update_Change ( p_change_id => X_OBJECT_ID1 );
+
+EXCEPTION
+     WHEN others THEN
+          NULL;
+END;
+
+end INSERT_ROW;
+
+
+procedure LOCK_ROW (
+  X_ACTION_ID in NUMBER,
+  X_ORIGINAL_SYSTEM_REFERENCE in VARCHAR2,
+  X_WORKFLOW_ITEM_KEY in VARCHAR2,
+  X_REQUEST_ID in NUMBER,
+  X_STATUS_CODE in NUMBER,
+  X_PRIORITY_CODE in VARCHAR2,
+  X_ASSIGNEE_ID in NUMBER,
+  X_RESPONSE_BY_DATE in DATE,
+  X_PARTY_ID_LIST in VARCHAR2,
+  X_PARENT_STATUS_CODE in NUMBER,
+  X_WORKFLOW_ITEM_TYPE in VARCHAR2,
+  X_ROUTE_ID in NUMBER,
+  X_PARENT_ACTION_ID in NUMBER,
+  X_ACTION_TYPE in VARCHAR2,
+  X_OBJECT_NAME in VARCHAR2,
+  X_OBJECT_ID1 in NUMBER,
+  X_OBJECT_ID2 in NUMBER,
+  X_OBJECT_ID3 in NUMBER,
+  X_OBJECT_ID4 in NUMBER,
+  X_OBJECT_ID5 in NUMBER,
+  X_DESCRIPTION in VARCHAR2,
+  X_PROGRAM_ID in NUMBER,
+  X_PROGRAM_APPLICATION_ID in NUMBER,
+  X_PROGRAM_UPDATE_DATE in DATE,
+  X_IMPLEMENTATION_REQ_ID in NUMBER,
+  X_LOCAL_ORGANIZATION_ID  in NUMBER  DEFAULT NULL -- Bug 4704384
+
+) is
+  cursor c is select
+      ORIGINAL_SYSTEM_REFERENCE,
+      WORKFLOW_ITEM_KEY,
+      REQUEST_ID,
+      STATUS_CODE,
+      PRIORITY_CODE,
+      ASSIGNEE_ID,
+      RESPONSE_BY_DATE,
+      PARTY_ID_LIST,
+      PARENT_STATUS_CODE,
+      WORKFLOW_ITEM_TYPE,
+      ROUTE_ID,
+      PARENT_ACTION_ID,
+      ACTION_TYPE,
+      OBJECT_NAME,
+      OBJECT_ID1,
+      OBJECT_ID2,
+      OBJECT_ID3,
+      OBJECT_ID4,
+      OBJECT_ID5,
+      PROGRAM_ID,
+      PROGRAM_APPLICATION_ID,
+      PROGRAM_UPDATE_DATE,
+      IMPLEMENTATION_REQ_ID,
+      LOCAL_ORGANIZATION_ID
+    from ENG_CHANGE_ACTIONS
+    where ACTION_ID = X_ACTION_ID
+    for update of ACTION_ID nowait;
+  recinfo c%rowtype;
+
+  cursor c1 is select
+      DESCRIPTION,
+      decode(LANGUAGE, userenv('LANG'), 'Y', 'N') BASELANG
+    from ENG_CHANGE_ACTIONS_TL
+    where ACTION_ID = X_ACTION_ID
+    and userenv('LANG') in (LANGUAGE, SOURCE_LANG)
+    for update of ACTION_ID nowait;
+begin
+  open c;
+  fetch c into recinfo;
+  if (c%notfound) then
+    close c;
+    fnd_message.set_name('FND', 'FORM_RECORD_DELETED');
+    app_exception.raise_exception;
+  end if;
+  close c;
+  if (    ((recinfo.ORIGINAL_SYSTEM_REFERENCE = X_ORIGINAL_SYSTEM_REFERENCE)
+           OR ((recinfo.ORIGINAL_SYSTEM_REFERENCE is null) AND (X_ORIGINAL_SYSTEM_REFERENCE is null)))
+      AND ((recinfo.WORKFLOW_ITEM_KEY = X_WORKFLOW_ITEM_KEY)
+           OR ((recinfo.WORKFLOW_ITEM_KEY is null) AND (X_WORKFLOW_ITEM_KEY is null)))
+      AND ((recinfo.REQUEST_ID = X_REQUEST_ID)
+           OR ((recinfo.REQUEST_ID is null) AND (X_REQUEST_ID is null)))
+      AND ((recinfo.STATUS_CODE = X_STATUS_CODE)
+           OR ((recinfo.STATUS_CODE is null) AND (X_STATUS_CODE is null)))
+      AND ((recinfo.PRIORITY_CODE = X_PRIORITY_CODE)
+           OR ((recinfo.PRIORITY_CODE is null) AND (X_PRIORITY_CODE is null)))
+      AND ((recinfo.ASSIGNEE_ID = X_ASSIGNEE_ID)
+           OR ((recinfo.ASSIGNEE_ID is null) AND (X_ASSIGNEE_ID is null)))
+      AND ((recinfo.RESPONSE_BY_DATE = X_RESPONSE_BY_DATE)
+           OR ((recinfo.RESPONSE_BY_DATE is null) AND (X_RESPONSE_BY_DATE is null)))
+      AND ((recinfo.PARTY_ID_LIST = X_PARTY_ID_LIST)
+           OR ((recinfo.PARTY_ID_LIST is null) AND (X_PARTY_ID_LIST is null)))
+      AND ((recinfo.PARENT_STATUS_CODE = X_PARENT_STATUS_CODE)
+           OR ((recinfo.PARENT_STATUS_CODE is null) AND (X_PARENT_STATUS_CODE is null)))
+      AND ((recinfo.WORKFLOW_ITEM_TYPE = X_WORKFLOW_ITEM_TYPE)
+           OR ((recinfo.WORKFLOW_ITEM_TYPE is null) AND (X_WORKFLOW_ITEM_TYPE is null)))
+      AND ((recinfo.ROUTE_ID = X_ROUTE_ID)
+           OR ((recinfo.ROUTE_ID is null) AND (X_ROUTE_ID is null)))
+      AND ((recinfo.PARENT_ACTION_ID = X_PARENT_ACTION_ID)
+           OR ((recinfo.PARENT_ACTION_ID is null) AND (X_PARENT_ACTION_ID is null)))
+      AND (recinfo.ACTION_TYPE = X_ACTION_TYPE)
+      AND (recinfo.OBJECT_NAME = X_OBJECT_NAME)
+      AND (recinfo.OBJECT_ID1 = X_OBJECT_ID1)
+      AND ((recinfo.OBJECT_ID2 = X_OBJECT_ID2)
+           OR ((recinfo.OBJECT_ID2 is null) AND (X_OBJECT_ID2 is null)))
+      AND ((recinfo.OBJECT_ID3 = X_OBJECT_ID3)
+           OR ((recinfo.OBJECT_ID3 is null) AND (X_OBJECT_ID3 is null)))
+      AND ((recinfo.OBJECT_ID4 = X_OBJECT_ID4)
+           OR ((recinfo.OBJECT_ID4 is null) AND (X_OBJECT_ID4 is null)))
+      AND ((recinfo.OBJECT_ID5 = X_OBJECT_ID5)
+           OR ((recinfo.OBJECT_ID5 is null) AND (X_OBJECT_ID5 is null)))
+      AND ((recinfo.PROGRAM_ID = X_PROGRAM_ID)
+           OR ((recinfo.PROGRAM_ID is null) AND (X_PROGRAM_ID is null)))
+      AND ((recinfo.PROGRAM_APPLICATION_ID = X_PROGRAM_APPLICATION_ID)
+           OR ((recinfo.PROGRAM_APPLICATION_ID is null) AND (X_PROGRAM_APPLICATION_ID is null)))
+      AND ((recinfo.PROGRAM_UPDATE_DATE = X_PROGRAM_UPDATE_DATE)
+           OR ((recinfo.PROGRAM_UPDATE_DATE is null) AND (X_PROGRAM_UPDATE_DATE is null)))
+      AND ((recinfo.IMPLEMENTATION_REQ_ID = X_IMPLEMENTATION_REQ_ID)
+           OR ((recinfo.IMPLEMENTATION_REQ_ID is null) AND (X_IMPLEMENTATION_REQ_ID is null)))
+      -- Bug 4704384
+      AND ((recinfo.LOCAL_ORGANIZATION_ID = X_LOCAL_ORGANIZATION_ID)
+           OR ((recinfo.LOCAL_ORGANIZATION_ID is null) AND (X_LOCAL_ORGANIZATION_ID is null)))
+
+  ) then
+    null;
+  else
+    fnd_message.set_name('FND', 'FORM_RECORD_CHANGED');
+    app_exception.raise_exception;
+  end if;
+
+  for tlinfo in c1 loop
+    if (tlinfo.BASELANG = 'Y') then
+      if (    ((tlinfo.DESCRIPTION = X_DESCRIPTION)
+               OR ((tlinfo.DESCRIPTION is null) AND (X_DESCRIPTION is null)))
+      ) then
+        null;
+      else
+        fnd_message.set_name('FND', 'FORM_RECORD_CHANGED');
+        app_exception.raise_exception;
+      end if;
+    end if;
+  end loop;
+  return;
+end LOCK_ROW;
+
+procedure UPDATE_ROW (
+  X_ACTION_ID in NUMBER,
+  X_ORIGINAL_SYSTEM_REFERENCE in VARCHAR2,
+  X_WORKFLOW_ITEM_KEY in VARCHAR2,
+  X_REQUEST_ID in NUMBER,
+  X_STATUS_CODE in NUMBER,
+  X_PRIORITY_CODE in VARCHAR2,
+  X_ASSIGNEE_ID in NUMBER,
+  X_RESPONSE_BY_DATE in DATE,
+  X_PARTY_ID_LIST in VARCHAR2,
+  X_PARENT_STATUS_CODE in NUMBER,
+  X_WORKFLOW_ITEM_TYPE in VARCHAR2,
+  X_ROUTE_ID in NUMBER,
+  X_PARENT_ACTION_ID in NUMBER,
+  X_ACTION_TYPE in VARCHAR2,
+  X_OBJECT_NAME in VARCHAR2,
+  X_OBJECT_ID1 in NUMBER,
+  X_OBJECT_ID2 in NUMBER,
+  X_OBJECT_ID3 in NUMBER,
+  X_OBJECT_ID4 in NUMBER,
+  X_OBJECT_ID5 in NUMBER,
+  X_DESCRIPTION in VARCHAR2,
+  X_PROGRAM_ID in NUMBER,
+  X_PROGRAM_APPLICATION_ID in NUMBER,
+  X_PROGRAM_UPDATE_DATE in DATE,
+  X_LAST_UPDATE_DATE in DATE,
+  X_LAST_UPDATED_BY in NUMBER,
+  X_LAST_UPDATE_LOGIN in NUMBER,
+  X_IMPLEMENTATION_REQ_ID in NUMBER,
+  X_LOCAL_ORGANIZATION_ID  in NUMBER DEFAULT NULL -- Bug 4704384
+
+) is
+begin
+  update ENG_CHANGE_ACTIONS set
+    ORIGINAL_SYSTEM_REFERENCE = X_ORIGINAL_SYSTEM_REFERENCE,
+    WORKFLOW_ITEM_KEY = X_WORKFLOW_ITEM_KEY,
+    REQUEST_ID = X_REQUEST_ID,
+    STATUS_CODE = X_STATUS_CODE,
+    PRIORITY_CODE = X_PRIORITY_CODE,
+    ASSIGNEE_ID = X_ASSIGNEE_ID,
+    RESPONSE_BY_DATE = X_RESPONSE_BY_DATE,
+    PARTY_ID_LIST = X_PARTY_ID_LIST,
+    PARENT_STATUS_CODE = X_PARENT_STATUS_CODE,
+    WORKFLOW_ITEM_TYPE = X_WORKFLOW_ITEM_TYPE,
+    ROUTE_ID = X_ROUTE_ID,
+    PARENT_ACTION_ID = X_PARENT_ACTION_ID,
+    ACTION_TYPE = X_ACTION_TYPE,
+    OBJECT_NAME = X_OBJECT_NAME,
+    OBJECT_ID1 = X_OBJECT_ID1,
+    OBJECT_ID2 = X_OBJECT_ID2,
+    OBJECT_ID3 = X_OBJECT_ID3,
+    OBJECT_ID4 = X_OBJECT_ID4,
+    OBJECT_ID5 = X_OBJECT_ID5,
+    PROGRAM_ID = X_PROGRAM_ID,
+    PROGRAM_APPLICATION_ID = X_PROGRAM_APPLICATION_ID,
+    PROGRAM_UPDATE_DATE = X_PROGRAM_UPDATE_DATE,
+    LAST_UPDATE_DATE = X_LAST_UPDATE_DATE,
+    LAST_UPDATED_BY = X_LAST_UPDATED_BY,
+    LAST_UPDATE_LOGIN = X_LAST_UPDATE_LOGIN,
+    IMPLEMENTATION_REQ_ID = X_IMPLEMENTATION_REQ_ID,
+    LOCAL_ORGANIZATION_ID = X_LOCAL_ORGANIZATION_ID -- Bug 4704384
+  where ACTION_ID = X_ACTION_ID;
+
+  if (sql%notfound) then
+    raise no_data_found;
+  end if;
+
+  update ENG_CHANGE_ACTIONS_TL set
+    DESCRIPTION = X_DESCRIPTION,
+    LAST_UPDATE_DATE = X_LAST_UPDATE_DATE,
+    LAST_UPDATED_BY = X_LAST_UPDATED_BY,
+    LAST_UPDATE_LOGIN = X_LAST_UPDATE_LOGIN,
+    SOURCE_LANG = userenv('LANG')
+  where ACTION_ID = X_ACTION_ID
+  and userenv('LANG') in (LANGUAGE, SOURCE_LANG);
+
+  if (sql%notfound) then
+    raise no_data_found;
+  end if;
+end UPDATE_ROW;
+
+procedure DELETE_ROW (
+  X_ACTION_ID in NUMBER
+) is
+begin
+  delete from ENG_CHANGE_ACTIONS_TL
+  where ACTION_ID = X_ACTION_ID;
+
+  if (sql%notfound) then
+    raise no_data_found;
+  end if;
+
+  delete from ENG_CHANGE_ACTIONS
+  where ACTION_ID = X_ACTION_ID;
+
+  if (sql%notfound) then
+    raise no_data_found;
+  end if;
+end DELETE_ROW;
+
+procedure ADD_LANGUAGE
+is
+begin
+  delete from ENG_CHANGE_ACTIONS_TL T
+  where not exists
+    (select NULL
+    from ENG_CHANGE_ACTIONS B
+    where B.ACTION_ID = T.ACTION_ID
+    );
+
+  update ENG_CHANGE_ACTIONS_TL T set (
+      DESCRIPTION
+    ) = (select
+      B.DESCRIPTION
+    from ENG_CHANGE_ACTIONS_TL B
+    where B.ACTION_ID = T.ACTION_ID
+    and B.LANGUAGE = T.SOURCE_LANG)
+  where (
+      T.ACTION_ID,
+      T.LANGUAGE
+  ) in (select
+      SUBT.ACTION_ID,
+      SUBT.LANGUAGE
+    from ENG_CHANGE_ACTIONS_TL SUBB, ENG_CHANGE_ACTIONS_TL SUBT
+    where SUBB.ACTION_ID = SUBT.ACTION_ID
+    and SUBB.LANGUAGE = SUBT.SOURCE_LANG
+    and (SUBB.DESCRIPTION <> SUBT.DESCRIPTION
+      or (SUBB.DESCRIPTION is null and SUBT.DESCRIPTION is not null)
+      or (SUBB.DESCRIPTION is not null and SUBT.DESCRIPTION is null)
+  ));
+
+  insert into ENG_CHANGE_ACTIONS_TL (
+    LAST_UPDATED_BY,
+    LAST_UPDATE_LOGIN,
+    LAST_UPDATE_DATE,
+    CREATED_BY,
+    DESCRIPTION,
+    CREATION_DATE,
+    ACTION_ID,
+    LANGUAGE,
+    SOURCE_LANG
+  ) select
+    B.LAST_UPDATED_BY,
+    B.LAST_UPDATE_LOGIN,
+    B.LAST_UPDATE_DATE,
+    B.CREATED_BY,
+    B.DESCRIPTION,
+    B.CREATION_DATE,
+    B.ACTION_ID,
+    L.LANGUAGE_CODE,
+    B.SOURCE_LANG
+  from ENG_CHANGE_ACTIONS_TL B, FND_LANGUAGES L
+  where L.INSTALLED_FLAG in ('I', 'B')
+  and B.LANGUAGE = userenv('LANG')
+  and not exists
+    (select NULL
+    from ENG_CHANGE_ACTIONS_TL T
+    where T.ACTION_ID = B.ACTION_ID
+    and T.LANGUAGE = L.LANGUAGE_CODE);
+end ADD_LANGUAGE;
+
+
+end ENG_CHANGE_ACTIONS_PKG;
+
+/

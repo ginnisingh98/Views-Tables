@@ -1,0 +1,62 @@
+--------------------------------------------------------
+--  DDL for Package BNE_STYLE_PROPERTIES_PKG
+--------------------------------------------------------
+
+  CREATE OR REPLACE EDITIONABLE PACKAGE "APPS"."BNE_STYLE_PROPERTIES_PKG" AUTHID CURRENT_USER as
+/* $Header: bnestyleps.pls 120.3 2005/08/18 07:28:41 dagroves noship $ */
+
+procedure INSERT_ROW (
+  X_ROWID in out NOCOPY VARCHAR2,
+  X_APPLICATION_ID in NUMBER,
+  X_STYLE_CODE in VARCHAR2,
+  X_STYLE_PROPERTY_NAME in VARCHAR2,
+  X_OBJECT_VERSION_NUMBER in NUMBER,
+  X_VALUE in VARCHAR2,
+  X_CREATION_DATE in DATE,
+  X_CREATED_BY in NUMBER,
+  X_LAST_UPDATE_DATE in DATE,
+  X_LAST_UPDATED_BY in NUMBER,
+  X_LAST_UPDATE_LOGIN in NUMBER,
+  X_DATA_TYPE in VARCHAR2 DEFAULT NULL);
+procedure LOCK_ROW (
+  X_APPLICATION_ID in NUMBER,
+  X_STYLE_CODE in VARCHAR2,
+  X_STYLE_PROPERTY_NAME in VARCHAR2,
+  X_OBJECT_VERSION_NUMBER in NUMBER,
+  X_VALUE in VARCHAR2,
+  X_DATA_TYPE in VARCHAR2 DEFAULT NULL
+);
+procedure UPDATE_ROW (
+  X_APPLICATION_ID in NUMBER,
+  X_STYLE_CODE in VARCHAR2,
+  X_STYLE_PROPERTY_NAME in VARCHAR2,
+  X_OBJECT_VERSION_NUMBER in NUMBER,
+  X_VALUE in VARCHAR2,
+  X_LAST_UPDATE_DATE in DATE,
+  X_LAST_UPDATED_BY in NUMBER,
+  X_LAST_UPDATE_LOGIN in NUMBER,
+  X_DATA_TYPE in VARCHAR2 DEFAULT NULL
+);
+procedure DELETE_ROW (
+  X_APPLICATION_ID in NUMBER,
+  X_STYLE_CODE in VARCHAR2,
+  X_STYLE_PROPERTY_NAME in VARCHAR2
+);
+procedure ADD_LANGUAGE;
+procedure LOAD_ROW(
+  x_style_asn             IN VARCHAR2,
+  x_style_code            IN VARCHAR2,
+  x_object_version_number IN VARCHAR2,
+  x_style_property_name   IN VARCHAR2,
+  x_value                 IN VARCHAR2,
+  x_owner                 IN VARCHAR2,
+  x_last_update_date      IN VARCHAR2,
+  x_custom_mode           IN VARCHAR2,
+  x_data_type             IN VARCHAR2 DEFAULT NULL
+);
+
+end BNE_STYLE_PROPERTIES_PKG;
+
+ 
+
+/

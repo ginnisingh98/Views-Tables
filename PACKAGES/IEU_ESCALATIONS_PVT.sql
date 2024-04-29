@@ -1,0 +1,24 @@
+--------------------------------------------------------
+--  DDL for Package IEU_ESCALATIONS_PVT
+--------------------------------------------------------
+
+  CREATE OR REPLACE EDITIONABLE PACKAGE "APPS"."IEU_ESCALATIONS_PVT" AUTHID CURRENT_USER AS
+/* $Header: IEUEESVS.pls 120.0 2005/06/02 15:50:48 appldev noship $ */
+
+PROCEDURE ENUMERATE_ESC_MYOWN_NODES
+  (P_RESOURCE_ID      IN NUMBER
+  ,P_LANGUAGE         IN VARCHAR2
+  ,P_SOURCE_LANG      IN VARCHAR2
+  ,P_SEL_ENUM_ID      IN NUMBER
+  );
+
+PROCEDURE REFRESH_ESC_MYOWN_NODES
+  (P_RESOURCE_ID IN NUMBER,
+   P_NODE_ID IN NUMBER,
+   P_COUNT OUT NOCOPY NUMBER);
+
+
+END IEU_ESCALATIONS_PVT;
+ 
+
+/

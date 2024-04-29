@@ -1,0 +1,38 @@
+--------------------------------------------------------
+--  DDL for Package OE_HEADER_PAYMENT_CL_DEP_ATTR
+--------------------------------------------------------
+
+  CREATE OR REPLACE EDITIONABLE PACKAGE "APPS"."OE_HEADER_PAYMENT_CL_DEP_ATTR" AUTHID CURRENT_USER AS
+/* $Header: OEXNHPMS.pls 115.1 2003/10/20 07:02:37 appldev ship $ */
+
+
+PROCEDURE PAYMENT_LEVEL_CODE
+(p_x_header_payment_rec			IN OUT NOCOPY OE_AK_HEADER_PAYMENTS_V%ROWTYPE
+);
+
+PROCEDURE PAYMENT_TYPE_CODE
+(p_x_header_payment_rec			IN OUT NOCOPY OE_AK_HEADER_PAYMENTS_V%ROWTYPE
+);
+
+PROCEDURE PAYMENT_TRX
+(p_x_header_payment_rec			IN OUT NOCOPY OE_AK_HEADER_PAYMENTS_V%ROWTYPE
+);
+
+PROCEDURE RECEIPT_METHOD
+(p_x_header_payment_rec			IN OUT NOCOPY OE_AK_HEADER_PAYMENTS_V%ROWTYPE
+);
+
+PROCEDURE PAYMENT_COLLECTION_EVENT
+(p_x_header_payment_rec			IN OUT NOCOPY OE_AK_HEADER_PAYMENTS_V%ROWTYPE
+);
+
+PROCEDURE CHECK_NUMBER
+(p_x_header_payment_rec			IN OUT NOCOPY OE_AK_HEADER_PAYMENTS_V%ROWTYPE
+);
+
+
+END OE_Header_Payment_Cl_Dep_Attr;
+
+ 
+
+/

@@ -1,0 +1,46 @@
+--------------------------------------------------------
+--  DDL for Package JTF_FM_MD_MIGRATION_PVT
+--------------------------------------------------------
+
+  CREATE OR REPLACE EDITIONABLE PACKAGE "APPS"."JTF_FM_MD_MIGRATION_PVT" AUTHID CURRENT_USER AS
+/* $Header: JTFFMVMS.pls 120.0 2005/05/11 09:06:47 appldev noship $ */
+
+g_pkg_name   CONSTANT VARCHAR2(30):='JTF_FM_M_MIGRATION_PVT';
+g_api_version CONSTANT NUMBER := 1.0;
+
+-- Fo debug
+g_debug VARCHAR2(1) := NVL(fnd_profile.value('APPS_DEBUG'),'N');
+
+
+-- TYPE ATTACHMENT
+TYPE MASTERDOC_QRY_REC_TYPE IS RECORD (
+  MIGRATION_CODE VARCHAR2(100),
+  ITEM_ID NUMBER,
+  CONTENT_TYPE_CODE VARCHAR2(100),
+  CONTENT_ITEM_ID NUMBER,
+  CITEM_VERSION_ID NUMBER,
+  FILE_ID NUMBER,
+  FILE_NAME VARCHAR2(240),
+  DESCRIPTION VARCHAR2(2000),
+  QUERY_CITEM_ID NUMBER
+  );
+
+TYPE MASTERDOC_QRY_TBL_TYPE IS TABLE OF
+  MASTERDOC_QRY_REC_TYPE INDEX BY BINARY_INTEGER;
+
+
+
+-- This migration procedure is for IBE.O
+PROCEDURE master_document_mig(
+  x_status OUT NOCOPY VARCHAR2);
+
+
+PROCEDURE ocmMigration(errbuf OUT NOCOPY VARCHAR2,
+  retcode OUT NOCOPY VARCHAR2,
+  p_debug_flag IN VARCHAR2);
+
+END JTF_FM_MD_MIGRATION_PVT;
+
+ 
+
+/

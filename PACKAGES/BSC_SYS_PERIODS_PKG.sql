@@ -1,0 +1,42 @@
+--------------------------------------------------------
+--  DDL for Package BSC_SYS_PERIODS_PKG
+--------------------------------------------------------
+
+  CREATE OR REPLACE EDITIONABLE PACKAGE "APPS"."BSC_SYS_PERIODS_PKG" AUTHID CURRENT_USER as
+/* $Header: BSCSPRDS.pls 115.7 2003/02/12 14:29:35 adeulgao ship $ */
+procedure INSERT_ROW (
+  X_ROWID in out NOCOPY VARCHAR2,
+  X_YEAR in NUMBER,
+  X_PERIODICITY_ID in NUMBER,
+  X_PERIOD_ID in NUMBER,
+  X_MONTH in NUMBER,
+  X_NAME in VARCHAR2,
+  X_SHORT_NAME in VARCHAR2);
+procedure LOCK_ROW (
+  X_YEAR in NUMBER,
+  X_PERIODICITY_ID in NUMBER,
+  X_PERIOD_ID in NUMBER,
+  X_MONTH in NUMBER,
+  X_NAME in VARCHAR2,
+  X_SHORT_NAME in VARCHAR2
+);
+procedure UPDATE_ROW (
+  X_YEAR in NUMBER,
+  X_PERIODICITY_ID in NUMBER,
+  X_PERIOD_ID in NUMBER,
+  X_MONTH in NUMBER,
+  X_NAME in VARCHAR2,
+  X_SHORT_NAME in VARCHAR2
+);
+procedure DELETE_ROW (
+  X_YEAR in NUMBER,
+  X_PERIODICITY_ID in NUMBER,
+  X_PERIOD_ID in NUMBER,
+  X_MONTH in NUMBER
+);
+procedure ADD_LANGUAGE;
+end BSC_SYS_PERIODS_PKG;
+
+ 
+
+/

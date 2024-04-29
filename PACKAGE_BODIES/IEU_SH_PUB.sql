@@ -1,0 +1,181 @@
+--------------------------------------------------------
+--  DDL for Package Body IEU_SH_PUB
+--------------------------------------------------------
+
+  CREATE OR REPLACE EDITIONABLE PACKAGE BODY "APPS"."IEU_SH_PUB" AS
+/* $Header: IEUPSHB.pls 120.0 2005/06/02 15:49:02 appldev noship $ */
+PROCEDURE UWQ_BEGIN_SESSION
+( P_API_VERSION               IN NUMBER,
+  P_INIT_MSG_LIST             IN VARCHAR2 DEFAULT fnd_api.g_false,
+  P_COMMIT                    IN VARCHAR2 DEFAULT fnd_api.g_false,
+  P_RESOURCE_ID               IN NUMBER,
+  P_USER_ID                   IN NUMBER,
+  P_LOGIN_ID                  IN NUMBER,
+  P_EXTENSION                 IN VARCHAR2 DEFAULT NULL,
+  P_APPLICATION_ID            IN NUMBER,
+  X_SESSION_ID                OUT NOCOPY NUMBER,
+  X_MSG_COUNT                 OUT NOCOPY NUMBER,
+  X_MSG_DATA                  OUT NOCOPY VARCHAR2,
+  X_RETURN_STATUS             OUT NOCOPY VARCHAR2) IS
+
+--
+BEGIN
+
+        IEU_SH_PVT.UWQ_BEGIN_SESSION
+        ( P_API_VERSION,
+         P_INIT_MSG_LIST,
+         P_COMMIT,
+         P_RESOURCE_ID,
+         P_USER_ID,
+         P_LOGIN_ID,
+         P_EXTENSION,
+         P_APPLICATION_ID,
+         X_SESSION_ID,
+         X_MSG_COUNT,
+         X_MSG_DATA,
+         X_RETURN_STATUS);
+
+
+END UWQ_BEGIN_SESSION;
+
+PROCEDURE UWQ_END_SESSION
+( P_API_VERSION               IN NUMBER,
+  P_INIT_MSG_LIST             IN VARCHAR2 DEFAULT fnd_api.g_false,
+  P_COMMIT                    IN VARCHAR2 DEFAULT fnd_api.g_false,
+  P_SESSION_ID                IN NUMBER,
+  P_END_REASON_CODE           IN VARCHAR2 DEFAULT NULL,
+  X_MSG_COUNT                 OUT NOCOPY NUMBER,
+  X_MSG_DATA                  OUT NOCOPY VARCHAR2,
+  X_RETURN_STATUS             OUT NOCOPY VARCHAR2 ) IS
+
+BEGIN
+
+          IEU_SH_PVT.UWQ_END_SESSION
+          ( P_API_VERSION,
+            P_INIT_MSG_LIST,
+            P_COMMIT,
+            P_SESSION_ID,
+            P_END_REASON_CODE,
+            X_MSG_COUNT,
+            X_MSG_DATA,
+            X_RETURN_STATUS);
+
+END UWQ_END_SESSION;
+
+PROCEDURE UWQ_BEGIN_ACTIVITY
+( P_API_VERSION               IN NUMBER,
+  P_INIT_MSG_LIST             IN VARCHAR2 DEFAULT fnd_api.g_false,
+  P_COMMIT                    IN VARCHAR2 DEFAULT fnd_api.g_false,
+  P_SESSION_ID                IN NUMBER,
+--  P_ACTIVITY_TYPE_ID          IN NUMBER,
+  P_ACTIVITY_TYPE_CODE        IN VARCHAR2,
+  P_MEDIA_TYPE_ID             IN NUMBER   DEFAULT NULL,
+  P_MEDIA_ID                  IN NUMBER   DEFAULT NULL,
+  P_USER_ID                   IN NUMBER,
+  P_LOGIN_ID                  IN NUMBER,
+  P_REASON_CODE               IN VARCHAR2 DEFAULT NULL,
+  P_REQUEST_METHOD            IN VARCHAR2 DEFAULT NULL,
+  P_REQUESTED_MEDIA_TYPE_ID   IN NUMBER   DEFAULT NULL,
+  P_WORK_ITEM_TYPE_CODE       IN VARCHAR2 DEFAULT NULL,
+  P_WORK_ITEM_PK_ID           IN NUMBER   DEFAULT NULL,
+  P_END_ACTIVITY_FLAG         IN VARCHAR2 DEFAULT NULL,
+  X_ACTIVITY_ID               OUT NOCOPY NUMBER,
+  X_MSG_COUNT                 OUT NOCOPY NUMBER,
+  X_MSG_DATA                  OUT NOCOPY VARCHAR2,
+  X_RETURN_STATUS             OUT NOCOPY VARCHAR2) IS
+
+BEGIN
+
+
+        IEU_SH_PVT.UWQ_BEGIN_ACTIVITY
+        ( P_API_VERSION => P_API_VERSION,
+          P_INIT_MSG_LIST => P_INIT_MSG_LIST ,
+          P_COMMIT => P_COMMIT ,
+          P_SESSION_ID => P_SESSION_ID ,
+--          P_ACTIVITY_TYPE_ID => ,
+          P_ACTIVITY_TYPE_CODE => P_ACTIVITY_TYPE_CODE ,
+          P_MEDIA_TYPE_ID => P_MEDIA_TYPE_ID ,
+          P_MEDIA_ID => P_MEDIA_ID ,
+          P_USER_ID => P_USER_ID ,
+          P_LOGIN_ID => P_LOGIN_ID ,
+          P_REASON_CODE => P_REASON_CODE ,
+          P_REQUEST_METHOD => P_REQUEST_METHOD ,
+          P_REQUESTED_MEDIA_TYPE_ID => P_REQUESTED_MEDIA_TYPE_ID ,
+          P_WORK_ITEM_TYPE_CODE => P_WORK_ITEM_TYPE_CODE ,
+          P_WORK_ITEM_PK_ID => P_WORK_ITEM_PK_ID ,
+          P_END_ACTIVITY_FLAG => P_END_ACTIVITY_FLAG ,
+          X_ACTIVITY_ID => X_ACTIVITY_ID ,
+          X_MSG_COUNT => X_MSG_COUNT ,
+          X_MSG_DATA => X_MSG_DATA ,
+          X_RETURN_STATUS => X_RETURN_STATUS );
+
+
+END UWQ_BEGIN_ACTIVITY;
+
+
+PROCEDURE UWQ_UPDATE_ACTIVITY
+( P_API_VERSION               IN NUMBER,
+  P_INIT_MSG_LIST             IN VARCHAR2 DEFAULT fnd_api.g_false,
+  P_COMMIT                    IN VARCHAR2 DEFAULT fnd_api.g_false,
+  P_ACTIVITY_ID               IN NUMBER,
+  P_INTERMEDIATE_STATE_CODE   IN VARCHAR2 DEFAULT NULL,
+  P_MEDIA_TYPE_ID             IN NUMBER   DEFAULT NULL,
+  P_MEDIA_ID                  IN NUMBER   DEFAULT NULL,
+  P_REASON_CODE               IN VARCHAR2 DEFAULT NULL,
+  X_MSG_COUNT                 OUT NOCOPY NUMBER,
+  X_MSG_DATA                  OUT NOCOPY VARCHAR2,
+  X_RETURN_STATUS             OUT NOCOPY VARCHAR2) IS
+
+BEGIN
+
+
+        IEU_SH_PVT.UWQ_UPDATE_ACTIVITY
+        ( P_API_VERSION,
+          P_INIT_MSG_LIST,
+          P_COMMIT,
+          P_ACTIVITY_ID,
+          P_INTERMEDIATE_STATE_CODE,
+          P_MEDIA_TYPE_ID,
+          P_MEDIA_ID,
+          P_REASON_CODE,
+          X_MSG_COUNT,
+          X_MSG_DATA,
+          X_RETURN_STATUS);
+
+
+END UWQ_UPDATE_ACTIVITY;
+
+
+PROCEDURE UWQ_END_ACTIVITY
+( P_API_VERSION               IN NUMBER,
+  P_INIT_MSG_LIST             IN VARCHAR2 DEFAULT fnd_api.g_false,
+  P_COMMIT                    IN VARCHAR2 DEFAULT fnd_api.g_false,
+  P_ACTIVITY_ID               IN NUMBER,
+  P_MEDIA_TYPE_ID             IN NUMBER   DEFAULT NULL,
+  P_MEDIA_ID                  IN NUMBER   DEFAULT NULL,
+  P_COMPLETION_CODE           IN VARCHAR2 DEFAULT NULL,
+  X_MSG_COUNT                 OUT NOCOPY NUMBER,
+  X_MSG_DATA                  OUT NOCOPY VARCHAR2,
+  X_RETURN_STATUS             OUT NOCOPY VARCHAR2) IS
+
+BEGIN
+
+
+        IEU_SH_PVT.UWQ_END_ACTIVITY
+        ( P_API_VERSION => P_API_VERSION,
+          P_INIT_MSG_LIST => P_INIT_MSG_LIST,
+          P_COMMIT => P_COMMIT,
+          P_ACTIVITY_ID => P_ACTIVITY_ID,
+          P_MEDIA_TYPE_ID => P_MEDIA_TYPE_ID,
+          P_MEDIA_ID => P_MEDIA_ID,
+          P_COMPLETION_CODE => P_COMPLETION_CODE,
+          X_MSG_COUNT => X_MSG_COUNT,
+          X_MSG_DATA => X_MSG_DATA,
+          X_RETURN_STATUS => X_RETURN_STATUS);
+
+
+END UWQ_END_ACTIVITY;
+
+END IEU_SH_PUB;
+
+/

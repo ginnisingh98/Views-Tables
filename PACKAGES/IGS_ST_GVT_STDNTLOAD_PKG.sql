@@ -1,0 +1,162 @@
+--------------------------------------------------------
+--  DDL for Package IGS_ST_GVT_STDNTLOAD_PKG
+--------------------------------------------------------
+
+  CREATE OR REPLACE EDITIONABLE PACKAGE "APPS"."IGS_ST_GVT_STDNTLOAD_PKG" AUTHID CURRENT_USER as
+/* $Header: IGSVI09S.pls 115.4 2003/05/20 06:08:24 svanukur ship $ */
+procedure INSERT_ROW (
+  X_ROWID in out NOCOPY VARCHAR2,
+  X_SUBMISSION_YR in NUMBER,
+  X_SUBMISSION_NUMBER in NUMBER,
+  X_PERSON_ID in NUMBER,
+  X_COURSE_CD in VARCHAR2,
+  X_GOVT_SEMESTER in NUMBER,
+  X_UNIT_CD in VARCHAR2,
+  X_SUA_CAL_TYPE in VARCHAR2,
+  X_SUA_CI_SEQUENCE_NUMBER in NUMBER,
+  X_TR_ORG_UNIT_CD in VARCHAR2,
+  X_TR_OU_START_DT in DATE,
+  X_DISCIPLINE_GROUP_CD in VARCHAR2,
+  X_GOVT_DISCIPLINE_GROUP_CD in VARCHAR2,
+  X_INDUSTRIAL_IND in VARCHAR2,
+  X_EFTSU in NUMBER,
+  X_UNIT_COMPLETION_STATUS in NUMBER,
+  X_CRV_VERSION_NUMBER in NUMBER,
+  X_UV_VERSION_NUMBER in NUMBER,
+  X_MODE in VARCHAR2 default 'R',
+  X_UNIT_CLASS in VARCHAR2,
+  X_SUA_LOCATION_CD in varchar2
+  );
+procedure LOCK_ROW (
+  X_ROWID in VARCHAR2,
+  X_SUBMISSION_YR in NUMBER,
+  X_SUBMISSION_NUMBER in NUMBER,
+  X_PERSON_ID in NUMBER,
+  X_COURSE_CD in VARCHAR2,
+  X_GOVT_SEMESTER in NUMBER,
+  X_UNIT_CD in VARCHAR2,
+  X_SUA_CAL_TYPE in VARCHAR2,
+  X_SUA_CI_SEQUENCE_NUMBER in NUMBER,
+  X_TR_ORG_UNIT_CD in VARCHAR2,
+  X_TR_OU_START_DT in DATE,
+  X_DISCIPLINE_GROUP_CD in VARCHAR2,
+  X_GOVT_DISCIPLINE_GROUP_CD in VARCHAR2,
+  X_INDUSTRIAL_IND in VARCHAR2,
+  X_EFTSU in NUMBER,
+  X_UNIT_COMPLETION_STATUS in NUMBER,
+  X_CRV_VERSION_NUMBER in NUMBER,
+  X_UV_VERSION_NUMBER in NUMBER,
+  X_UNIT_CLASS in VARCHAR2,
+  X_SUA_LOCATION_CD in varchar2
+);
+procedure UPDATE_ROW (
+  X_ROWID in VARCHAR2,
+  X_SUBMISSION_YR in NUMBER,
+  X_SUBMISSION_NUMBER in NUMBER,
+  X_PERSON_ID in NUMBER,
+  X_COURSE_CD in VARCHAR2,
+  X_GOVT_SEMESTER in NUMBER,
+  X_UNIT_CD in VARCHAR2,
+  X_SUA_CAL_TYPE in VARCHAR2,
+  X_SUA_CI_SEQUENCE_NUMBER in NUMBER,
+  X_TR_ORG_UNIT_CD in VARCHAR2,
+  X_TR_OU_START_DT in DATE,
+  X_DISCIPLINE_GROUP_CD in VARCHAR2,
+  X_GOVT_DISCIPLINE_GROUP_CD in VARCHAR2,
+  X_INDUSTRIAL_IND in VARCHAR2,
+  X_EFTSU in NUMBER,
+  X_UNIT_COMPLETION_STATUS in NUMBER,
+  X_CRV_VERSION_NUMBER in NUMBER,
+  X_UV_VERSION_NUMBER in NUMBER,
+  X_MODE in VARCHAR2 default 'R',
+  X_UNIT_CLASS in VARCHAR2,
+  X_SUA_LOCATION_CD in varchar2
+  );
+procedure ADD_ROW (
+  X_ROWID in out NOCOPY VARCHAR2,
+  X_SUBMISSION_YR in NUMBER,
+  X_SUBMISSION_NUMBER in NUMBER,
+  X_PERSON_ID in NUMBER,
+  X_COURSE_CD in VARCHAR2,
+  X_GOVT_SEMESTER in NUMBER,
+  X_UNIT_CD in VARCHAR2,
+  X_SUA_CAL_TYPE in VARCHAR2,
+  X_SUA_CI_SEQUENCE_NUMBER in NUMBER,
+  X_TR_ORG_UNIT_CD in VARCHAR2,
+  X_TR_OU_START_DT in DATE,
+  X_DISCIPLINE_GROUP_CD in VARCHAR2,
+  X_GOVT_DISCIPLINE_GROUP_CD in VARCHAR2,
+  X_INDUSTRIAL_IND in VARCHAR2,
+  X_EFTSU in NUMBER,
+  X_UNIT_COMPLETION_STATUS in NUMBER,
+  X_CRV_VERSION_NUMBER in NUMBER,
+  X_UV_VERSION_NUMBER in NUMBER,
+  X_MODE in VARCHAR2 default 'R',
+  X_UNIT_CLASS in VARCHAR2,
+  X_SUA_LOCATION_CD in varchar2
+  );
+procedure DELETE_ROW (
+  X_ROWID in VARCHAR2
+);
+
+FUNCTION Get_PK_For_Validation (
+    x_submission_yr IN NUMBER,
+    x_submission_number IN NUMBER,
+    x_person_id IN NUMBER,
+    x_course_cd IN VARCHAR2,
+    x_govt_semester IN NUMBER,
+    x_unit_cd IN VARCHAR2,
+    x_sua_cal_type IN VARCHAR2,
+    x_sua_ci_sequence_number IN NUMBER,
+    x_tr_org_unit_cd IN VARCHAR2,
+    x_tr_ou_start_dt IN DATE,
+    x_discipline_group_cd IN VARCHAR2,
+    x_govt_discipline_group_cd IN VARCHAR2
+    )
+RETURN BOOLEAN;
+
+PROCEDURE GET_FK_IGS_ST_GOVT_SEMESTER (
+    x_submission_yr IN NUMBER,
+    x_submission_number IN NUMBER,
+    x_govt_semester IN NUMBER
+    );
+
+-- added to take care of check constraints
+PROCEDURE CHECK_CONSTRAINTS(
+     column_name IN VARCHAR2 DEFAULT NULL,
+     column_value IN VARCHAR2 DEFAULT NULL
+);
+
+PROCEDURE Before_DML (
+    p_action IN VARCHAR2,
+    x_rowid IN VARCHAR2 DEFAULT NULL,
+    x_submission_yr IN NUMBER DEFAULT NULL,
+    x_submission_number IN NUMBER DEFAULT NULL,
+    x_person_id IN NUMBER DEFAULT NULL,
+    x_course_cd IN VARCHAR2 DEFAULT NULL,
+    x_crv_version_number IN NUMBER DEFAULT NULL,
+    x_govt_semester IN NUMBER DEFAULT NULL,
+    x_unit_cd IN VARCHAR2 DEFAULT NULL,
+    x_uv_version_number IN NUMBER DEFAULT NULL,
+    x_sua_cal_type IN VARCHAR2 DEFAULT NULL,
+    x_sua_ci_sequence_number IN NUMBER DEFAULT NULL,
+    x_tr_org_unit_cd IN VARCHAR2 DEFAULT NULL,
+    x_tr_ou_start_dt IN DATE DEFAULT NULL,
+    x_discipline_group_cd IN VARCHAR2 DEFAULT NULL,
+    x_govt_discipline_group_cd IN VARCHAR2 DEFAULT NULL,
+    x_industrial_ind IN VARCHAR2 DEFAULT NULL,
+    x_eftsu IN NUMBER DEFAULT NULL,
+    x_unit_completion_status IN NUMBER DEFAULT NULL,
+    x_creation_date IN DATE DEFAULT NULL,
+    x_created_by IN NUMBER DEFAULT NULL,
+    x_last_update_date IN DATE DEFAULT NULL,
+    x_last_updated_by IN NUMBER DEFAULT NULL,
+    x_last_update_login IN NUMBER DEFAULT NULL,
+    x_unit_class IN VARCHAR2 DEFAULT NULL,
+    x_sua_location_cd IN VARCHAR2 DEFAULT NULL
+  );
+end IGS_ST_GVT_STDNTLOAD_PKG;
+
+ 
+
+/

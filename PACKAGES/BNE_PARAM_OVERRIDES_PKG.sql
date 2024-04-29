@@ -1,0 +1,96 @@
+--------------------------------------------------------
+--  DDL for Package BNE_PARAM_OVERRIDES_PKG
+--------------------------------------------------------
+
+  CREATE OR REPLACE EDITIONABLE PACKAGE "APPS"."BNE_PARAM_OVERRIDES_PKG" AUTHID CURRENT_USER as
+/* $Header: bneparamovs.pls 120.2 2005/06/29 03:40:31 dvayro noship $ */
+
+procedure INSERT_ROW (
+  X_ROWID in out NOCOPY VARCHAR2,
+  X_APPLICATION_ID in NUMBER,
+  X_PARAM_DEFN_CODE in VARCHAR2,
+  X_LVL in NUMBER,
+  X_OVERRIDE_ID in NUMBER,
+  X_OBJECT_VERSION_NUMBER in NUMBER,
+  X_REQUIRED_FLAG in VARCHAR2,
+  X_VISIBLE_FLAG in VARCHAR2,
+  X_USER_MODIFYABLE_FLAG in VARCHAR2,
+  X_DEFAULT_DATE in DATE,
+  X_DEFAULT_NUMBER in NUMBER,
+  X_DEFAULT_BOOLEAN_FLAG in VARCHAR2,
+  X_DEFAULT_FORMULA in VARCHAR2,
+  X_DESC_VALUE in VARCHAR2,
+  X_DEFAULT_STRING in VARCHAR2,
+  X_CREATION_DATE in DATE,
+  X_CREATED_BY in NUMBER,
+  X_LAST_UPDATE_DATE in DATE,
+  X_LAST_UPDATED_BY in NUMBER,
+  X_LAST_UPDATE_LOGIN in NUMBER);
+procedure LOCK_ROW (
+  X_APPLICATION_ID in NUMBER,
+  X_PARAM_DEFN_CODE in VARCHAR2,
+  X_LVL in NUMBER,
+  X_OVERRIDE_ID in NUMBER,
+  X_OBJECT_VERSION_NUMBER in NUMBER,
+  X_REQUIRED_FLAG in VARCHAR2,
+  X_VISIBLE_FLAG in VARCHAR2,
+  X_USER_MODIFYABLE_FLAG in VARCHAR2,
+  X_DEFAULT_DATE in DATE,
+  X_DEFAULT_NUMBER in NUMBER,
+  X_DEFAULT_BOOLEAN_FLAG in VARCHAR2,
+  X_DEFAULT_FORMULA in VARCHAR2,
+  X_DESC_VALUE in VARCHAR2,
+  X_DEFAULT_STRING in VARCHAR2
+);
+procedure UPDATE_ROW (
+  X_APPLICATION_ID in NUMBER,
+  X_PARAM_DEFN_CODE in VARCHAR2,
+  X_LVL in NUMBER,
+  X_OVERRIDE_ID in NUMBER,
+  X_OBJECT_VERSION_NUMBER in NUMBER,
+  X_REQUIRED_FLAG in VARCHAR2,
+  X_VISIBLE_FLAG in VARCHAR2,
+  X_USER_MODIFYABLE_FLAG in VARCHAR2,
+  X_DEFAULT_DATE in DATE,
+  X_DEFAULT_NUMBER in NUMBER,
+  X_DEFAULT_BOOLEAN_FLAG in VARCHAR2,
+  X_DEFAULT_FORMULA in VARCHAR2,
+  X_DESC_VALUE in VARCHAR2,
+  X_DEFAULT_STRING in VARCHAR2,
+  X_LAST_UPDATE_DATE in DATE,
+  X_LAST_UPDATED_BY in NUMBER,
+  X_LAST_UPDATE_LOGIN in NUMBER
+);
+procedure DELETE_ROW (
+  X_APPLICATION_ID in NUMBER,
+  X_PARAM_DEFN_CODE in VARCHAR2,
+  X_LVL in NUMBER,
+  X_OVERRIDE_ID in NUMBER
+);
+procedure ADD_LANGUAGE;
+procedure LOAD_ROW(
+  x_param_defn_asn        in VARCHAR2,
+  x_param_defn_code       in VARCHAR2,
+  x_lvl                   in VARCHAR2,
+  x_override_id           in VARCHAR2,
+  x_object_version_number in VARCHAR2,
+  x_required_flag         in VARCHAR2,
+  x_visible_flag          in VARCHAR2,
+  x_user_modifyable_flag  in VARCHAR2,
+  x_default_string        in VARCHAR2,
+  x_default_date          in VARCHAR2,
+  x_default_number        in VARCHAR2,
+  x_default_boolean_flag  in VARCHAR2,
+  x_default_formula       in VARCHAR2,
+  x_desc_value            in VARCHAR2,
+  x_owner                 in VARCHAR2,
+  x_last_update_date      in VARCHAR2,
+  x_custom_mode           in VARCHAR2
+);
+
+
+end BNE_PARAM_OVERRIDES_PKG;
+
+ 
+
+/

@@ -1,0 +1,209 @@
+--------------------------------------------------------
+--  DDL for Package Body OKS_OKSSUMCO_XMLP_PKG
+--------------------------------------------------------
+
+  CREATE OR REPLACE EDITIONABLE PACKAGE BODY "APPS"."OKS_OKSSUMCO_XMLP_PKG" AS
+/* $Header: OKSSUMCOB.pls 120.2 2008/01/04 14:37:20 dwkrishn noship $ */
+  FUNCTION BEFOREREPORT RETURN BOOLEAN IS
+  BEGIN
+    RETURN (TRUE);
+  END BEFOREREPORT;
+
+  FUNCTION CF_SALESREP_NAMEFORMULA(REP_NAME IN VARCHAR2
+                                  ,ORG_ID IN NUMBER) RETURN CHAR IS
+    CURSOR C1(CN_SALESREP_ID IN NUMBER,CN_ORG_ID IN NUMBER) IS
+      SELECT
+        NAME
+      FROM
+        JTF_RS_SALESREPS SREP
+      WHERE SALESREP_ID = CN_SALESREP_ID
+        AND ORG_ID = CN_ORG_ID;
+    LN_SALESREP_ID NUMBER;
+    LV_SALESREP_NAME VARCHAR2(500);
+  BEGIN
+    LN_SALESREP_ID := TO_NUMBER(REP_NAME);
+    OPEN C1(LN_SALESREP_ID,ORG_ID);
+    FETCH C1
+     INTO LV_SALESREP_NAME;
+    CLOSE C1;
+    RETURN (LV_SALESREP_NAME);
+  END CF_SALESREP_NAMEFORMULA;
+
+  FUNCTION AFTERPFORM RETURN BOOLEAN IS
+    X_REP_NAME VARCHAR2(800);
+    X_CUSTOMER_NAME VARCHAR2(800);
+    X_CUSTOMER_NUMBER VARCHAR2(800);
+    X_ORG_ID VARCHAR2(800);
+    X_CURRENCY_CODE VARCHAR2(800);
+  BEGIN
+    BEGIN
+      P_CONC_REQUEST_ID := FND_GLOBAL.CONC_REQUEST_ID;
+      LP_END_TO_DATE := to_char(P_END_TO_DATE, 'DD-MM-YYYY');
+      LP_END_FROM_DATE := to_char(P_END_FROM_DATE, 'DD-MM-YYYY');
+      LP_START_TO_DATE := to_char(P_START_TO_DATE, 'DD-MM-YYYY');
+      LP_START_FROM_DATE := to_char(P_START_FROM_DATE, 'DD-MM-YYYY');
+      /*SRW.USER_EXIT('FND SRWINIT')*/NULL;
+    EXCEPTION
+      WHEN /*SRW.USER_EXIT_FAILURE*/OTHERS THEN
+        /*SRW.MESSAGE(1
+                   ,'srw_init')*/NULL;
+    END;
+    P_VENDOR_CONT_ROLE := NVL(FND_PROFILE.VALUE('OKS_VENDOR_CONTACT_ROLE')
+                             ,'SUP_SALES');
+    IF P_ORG_ID IS NULL AND FND_PROFILE.VALUE('OKC_VIEW_K_BY_ORG') = 'Y' THEN
+      P_ORG_ID := FND_PROFILE.VALUE('ORG_ID');
+    END IF;
+    IF P_ORG_ID IS NOT NULL THEN
+      X_ORG_ID := ' and KHD.Authoring_Org_Id = :p_org_id ';
+      P_ORG_ID_WHERE := X_ORG_ID;
+    END IF;
+    IF P_REP_NAME IS NOT NULL THEN
+      P_REP_ID_CHAR := TO_CHAR(P_REP_NAME);
+      X_REP_NAME := ' and KCTS.Object1_Id1 = :p_rep_id_char';
+      P_REP_NAME_WHERE := X_REP_NAME;
+    END IF;
+    IF P_CUSTOMER_NAME IS NOT NULL THEN
+      P_PARTY_ID_NAME_CHAR := TO_CHAR(P_CUSTOMER_NAME);
+      X_CUSTOMER_NAME := ' and KPRC.Object1_Id1 = :p_party_id_name_char';
+      P_CUSTOMER_NAME_WHERE := X_CUSTOMER_NAME;
+    END IF;
+    IF P_CUSTOMER_NUMBER IS NOT NULL THEN
+      P_PARTY_ID_NUM_CHAR := TO_CHAR(P_CUSTOMER_NUMBER);
+      X_CUSTOMER_NUMBER := ' and  KPRC.Object1_Id1 = :p_party_id_num_char';
+      P_CUSTOMER_NUMBER_WHERE := X_CUSTOMER_NUMBER;
+    END IF;
+    IF P_STATUS_CODE IS NOT NULL THEN
+      P_STATUS_CODE_WHERE := ' and KHD.Sts_Code = :p_status_code ';
+    END IF;
+    IF P_STATUS_TYPE IS NOT NULL THEN
+      P_STATUS_TYPE_WHERE := ' and KSTB.STE_Code = :p_status_type ';
+    END IF;
+    IF P_CURRENCY_CODE IS NOT NULL THEN
+      X_CURRENCY_CODE := ' and KHD.Currency_Code = :p_currency_code';
+      P_CURRENCY_CODE_WHERE := X_CURRENCY_CODE;
+    END IF;
+    P_START_END_DATE_WHERE := ' ';
+    IF P_START_FROM_DATE IS NOT NULL THEN
+      P_START_END_DATE_WHERE := P_START_END_DATE_WHERE || ' and KHD.Start_Date >= to_date(:LP_START_FROM_DATE,''DD-MM-YYYY'') ';
+    END IF;
+    IF P_START_TO_DATE IS NOT NULL THEN
+      P_START_END_DATE_WHERE := P_START_END_DATE_WHERE || ' and KHD.Start_Date <= to_date(:lP_START_TO_DATE,''DD-MM-YYYY'') ';
+    END IF;
+    IF P_END_FROM_DATE IS NOT NULL THEN
+      P_START_END_DATE_WHERE := P_START_END_DATE_WHERE || ' and KHD.End_Date >= to_date(:lP_END_FROM_DATE,''DD-MM-YYYY'') ';
+    END IF;
+    IF P_END_TO_DATE IS NOT NULL THEN
+      P_START_END_DATE_WHERE := P_START_END_DATE_WHERE || ' and KHD.End_Date <= to_date(:lP_END_TO_DATE,''DD-MM-YYYY'') ';
+    END IF;
+    IF P_CONTRACT_GROUP IS NOT NULL THEN
+      P_CONTRACT_GROUP_FROM := ' ,  ( select INCLUDED_CHR_ID
+                                                                  from okc_k_grpings
+                                                                  start with INCLUDED_CHR_ID IN
+                                                                         ( select /*+ cardinality (b,1) */ id
+                                                                           from okc_k_headers_b b
+                                                                           where start_date between to_date(:lP_START_FROM_DATE,''DD-MM-YYYY'') and to_date(:lP_START_TO_DATE,''DD-MM-YYYY'')
+                                                                           and scs_code in ( ''SERVICE'' , ''WARRANTY'' ) )
+                                                                and CGP_PARENT_ID = :p_contract_group
+                                                                connect by CGP_PARENT_ID = PRIOR INCLUDED_CGP_ID ) cgrp ';
+      P_CONTRACT_GROUP_WHERE := 'and KHD.ID = cgrp.included_chr_id ';
+    END IF;
+    RETURN (TRUE);
+  END AFTERPFORM;
+
+  FUNCTION CF_TYPEFORMULA(STATUS_TYPE_SUBSTR IN VARCHAR2) RETURN CHAR IS
+  BEGIN
+    RETURN (STATUS_TYPE_SUBSTR);
+  END CF_TYPEFORMULA;
+
+  FUNCTION CF_STATUSCODEFORMULA(STATUS_CODE_SUBSTR IN VARCHAR2) RETURN CHAR IS
+  BEGIN
+    RETURN (STATUS_CODE_SUBSTR);
+  END CF_STATUSCODEFORMULA;
+
+  FUNCTION CF_PRODLINEVALUEFORMULA(CONTRACT_ID IN NUMBER
+                                  ,STATUS_CODE IN VARCHAR2
+                                  ,CURRENCY_CODE IN VARCHAR2) RETURN NUMBER IS
+    CURSOR C1(CN_CONTRACT_ID IN NUMBER,CV_STS_CODE IN VARCHAR2) IS
+      SELECT
+        SUM(PRICE_NEGOTIATED)
+      FROM
+        OKC_K_LINES_B
+      WHERE DNZ_CHR_ID = CN_CONTRACT_ID
+        AND LSE_ID IN ( 7 , 8 , 9 , 10 , 11 , 35 , 13 , 18 , 25 )
+        AND STS_CODE = CV_STS_CODE;
+    LN_CONTRACT_ID NUMBER;
+    LV_STATUS_CODE VARCHAR2(200);
+    LV_CURRENCY_CODE VARCHAR2(200);
+    LN_PROD_VALUE NUMBER;
+    LN_PROD_VALUE_ROUND NUMBER;
+  BEGIN
+    LN_CONTRACT_ID := CONTRACT_ID;
+    LV_STATUS_CODE := LTRIM(RTRIM(STATUS_CODE));
+    LV_CURRENCY_CODE := LTRIM(RTRIM(CURRENCY_CODE));
+    OPEN C1(LN_CONTRACT_ID,LV_STATUS_CODE);
+    FETCH C1
+     INTO LN_PROD_VALUE;
+    CLOSE C1;
+    LN_PROD_VALUE_ROUND := ROUND(OKS_EXTWAR_UTIL_PVT.ROUND_CURRENCY_AMT(LN_PROD_VALUE
+                                                                       ,LV_CURRENCY_CODE)
+                                ,0);
+    RETURN (LN_PROD_VALUE_ROUND);
+  END CF_PRODLINEVALUEFORMULA;
+
+  FUNCTION CF_RECCOUNTFORMULA RETURN NUMBER IS
+  BEGIN
+    RETURN (1);
+  END CF_RECCOUNTFORMULA;
+
+  FUNCTION CF_PRODLINE_VALUEPERDAYFORMULA(CONTRACT_ID IN NUMBER
+                                         ,STATUS_CODE IN VARCHAR2
+                                         ,CURRENCY_CODE IN VARCHAR2) RETURN NUMBER IS
+    CURSOR C1(CN_CONTRACT_ID IN NUMBER,CV_STS_CODE IN VARCHAR2) IS
+      SELECT
+        SUM(PRICE_NEGOTIATED / (END_DATE - START_DATE + 1))
+      FROM
+        OKC_K_LINES_B
+      WHERE DNZ_CHR_ID = CN_CONTRACT_ID
+        AND LSE_ID IN ( 7 , 8 , 9 , 10 , 11 , 35 , 13 , 18 , 25 )
+        AND STS_CODE = CV_STS_CODE;
+    LN_CONTRACT_ID NUMBER;
+    LV_STATUS_CODE VARCHAR2(200);
+    LV_CURRENCY_CODE VARCHAR2(200);
+    LN_PROD_VALUEPERDAY NUMBER;
+    LN_PROD_VALUEPERDAY1 NUMBER;
+  BEGIN
+    LN_CONTRACT_ID := CONTRACT_ID;
+    LV_STATUS_CODE := LTRIM(RTRIM(STATUS_CODE));
+    LV_CURRENCY_CODE := LTRIM(RTRIM(CURRENCY_CODE));
+    OPEN C1(LN_CONTRACT_ID,LV_STATUS_CODE);
+    FETCH C1
+     INTO LN_PROD_VALUEPERDAY;
+    CLOSE C1;
+    LN_PROD_VALUEPERDAY1 := ROUND(OKS_EXTWAR_UTIL_PVT.ROUND_CURRENCY_AMT(LN_PROD_VALUEPERDAY
+                                                                        ,LV_CURRENCY_CODE)
+                                 ,2);
+    RETURN (LN_PROD_VALUEPERDAY1);
+  END CF_PRODLINE_VALUEPERDAYFORMULA;
+
+  FUNCTION CF_PRODLINE_ANNRATEFORMULA(CF_PRODLINE_VALUEPERDAY IN NUMBER) RETURN NUMBER IS
+  BEGIN
+    RETURN (ROUND(CF_PRODLINE_VALUEPERDAY * 365
+                ,0));
+  END CF_PRODLINE_ANNRATEFORMULA;
+
+  FUNCTION AFTERREPORT RETURN BOOLEAN IS
+  BEGIN
+    BEGIN
+      /*SRW.USER_EXIT('FND SRWEXIT')*/NULL;
+    EXCEPTION
+      WHEN /*SRW.USER_EXIT_FAILURE*/OTHERS THEN
+        /*SRW.MESSAGE(1
+                   ,'srw_exit')*/NULL;
+    END;
+    RETURN (TRUE);
+  END AFTERREPORT;
+
+END OKS_OKSSUMCO_XMLP_PKG;
+
+
+/

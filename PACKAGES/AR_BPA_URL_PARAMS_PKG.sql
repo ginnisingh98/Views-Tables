@@ -1,0 +1,65 @@
+--------------------------------------------------------
+--  DDL for Package AR_BPA_URL_PARAMS_PKG
+--------------------------------------------------------
+
+  CREATE OR REPLACE EDITIONABLE PACKAGE "APPS"."AR_BPA_URL_PARAMS_PKG" AUTHID CURRENT_USER as
+/* $Header: ARBPURPS.pls 120.1 2004/12/03 01:45:28 orashid noship $ */
+procedure INSERT_ROW (
+  X_ROWID in out NOCOPY VARCHAR2,
+  X_URL_PARAM_ID in NUMBER,
+  X_URL_ID in NUMBER,
+  X_PARAM_TYPE in VARCHAR2,
+  X_PARAM_NAME in VARCHAR2,
+  X_PARAM_VALUE in VARCHAR2,
+  X_ITEM_ID in NUMBER,
+  X_ENCRYPTED_FLAG in VARCHAR2,
+  X_CREATION_DATE in DATE,
+  X_CREATED_BY in NUMBER,
+  X_LAST_UPDATE_DATE in DATE,
+  X_LAST_UPDATED_BY in NUMBER,
+  X_LAST_UPDATE_LOGIN in NUMBER);
+
+procedure LOCK_ROW (
+  X_URL_PARAM_ID in NUMBER,
+  X_URL_ID in NUMBER,
+  X_PARAM_TYPE in VARCHAR2,
+  X_PARAM_NAME in VARCHAR2,
+  X_PARAM_VALUE in VARCHAR2,
+  X_ITEM_ID in NUMBER,
+  X_ENCRYPTED_FLAG in VARCHAR2
+);
+
+procedure UPDATE_ROW (
+  X_URL_PARAM_ID in NUMBER,
+  X_URL_ID in NUMBER,
+  X_PARAM_TYPE in VARCHAR2,
+  X_PARAM_NAME in VARCHAR2,
+  X_PARAM_VALUE in VARCHAR2,
+  X_ITEM_ID in NUMBER,
+  X_ENCRYPTED_FLAG in VARCHAR2,
+  X_LAST_UPDATE_DATE in DATE,
+  X_LAST_UPDATED_BY in NUMBER,
+  X_LAST_UPDATE_LOGIN in NUMBER);
+
+procedure DELETE_ROW (
+  X_URL_PARAM_ID in NUMBER
+);
+
+-- no need for translate_row as this table has no translations
+
+-- load row used by lct
+procedure LOAD_ROW (
+		  X_URL_PARAM_ID in NUMBER,
+		  X_URL_ID in NUMBER,
+		  X_PARAM_TYPE in VARCHAR2,
+		  X_PARAM_NAME in VARCHAR2,
+		  X_PARAM_VALUE in VARCHAR2,
+		  X_ITEM_ID in NUMBER,
+		  X_ENCRYPTED_FLAG in VARCHAR2,
+          X_OWNER IN VARCHAR2);
+
+end AR_BPA_URL_PARAMS_PKG;
+
+ 
+
+/

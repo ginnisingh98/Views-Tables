@@ -1,0 +1,248 @@
+--------------------------------------------------------
+--  DDL for Package IGS_FI_CR_TYPES_PKG
+--------------------------------------------------------
+
+  CREATE OR REPLACE EDITIONABLE PACKAGE "APPS"."IGS_FI_CR_TYPES_PKG" AUTHID CURRENT_USER AS
+/* $Header: IGSSI88S.pls 120.1 2005/09/22 01:51:01 appldev ship $ */
+
+  PROCEDURE insert_row (
+    x_rowid                             IN OUT NOCOPY VARCHAR2,
+    x_credit_type_id                    IN OUT NOCOPY NUMBER,
+    x_credit_type_name                  IN     VARCHAR2,
+    x_description                       IN     VARCHAR2,
+    x_credit_class                      IN     VARCHAR2,
+    x_dr_account_cd                     IN     VARCHAR2,
+    x_cr_account_cd                     IN     VARCHAR2,
+    x_dr_gl_ccid                        IN     NUMBER,
+    x_cr_gl_ccid                        IN     NUMBER,
+    x_effective_start_date              IN     DATE,
+    x_effective_end_date                IN     DATE,
+    x_refund_allowed                    IN     VARCHAR2,
+    x_payment_priority                  IN     NUMBER,
+    x_attribute_category                IN     VARCHAR2,
+    x_attribute1                        IN     VARCHAR2,
+    x_attribute2                        IN     VARCHAR2,
+    x_attribute3                        IN     VARCHAR2,
+    x_attribute4                        IN     VARCHAR2,
+    x_attribute5                        IN     VARCHAR2,
+    x_attribute6                        IN     VARCHAR2,
+    x_attribute7                        IN     VARCHAR2,
+    x_attribute8                        IN     VARCHAR2,
+    x_attribute9                        IN     VARCHAR2,
+    x_attribute10                       IN     VARCHAR2,
+    x_attribute11                       IN     VARCHAR2,
+    x_attribute12                       IN     VARCHAR2,
+    x_attribute13                       IN     VARCHAR2,
+    x_attribute14                       IN     VARCHAR2,
+    x_attribute15                       IN     VARCHAR2,
+    x_attribute16                       IN     VARCHAR2,
+    x_attribute17                       IN     VARCHAR2,
+    x_attribute18                       IN     VARCHAR2,
+    x_attribute19                       IN     VARCHAR2,
+    x_attribute20                       IN     VARCHAR2,
+    x_title4_type_ind                   IN     VARCHAR2    DEFAULT 'N',
+    x_mode                              IN     VARCHAR2    DEFAULT 'R',
+    x_payment_credit_type_id            IN     NUMBER   DEFAULT NULL,
+    x_forfeiture_gl_ccid                IN     NUMBER   DEFAULT NULL,
+    x_forfeiture_account_cd             IN     VARCHAR2 DEFAULT NULL,
+    x_appl_hierarchy_id			IN     NUMBER   DEFAULT NULL
+  );
+
+  PROCEDURE lock_row (
+    x_rowid                             IN     VARCHAR2,
+    x_credit_type_id                    IN     NUMBER,
+    x_credit_type_name                  IN     VARCHAR2,
+    x_description                       IN     VARCHAR2,
+    x_credit_class                      IN     VARCHAR2,
+    x_dr_account_cd                     IN     VARCHAR2,
+    x_cr_account_cd                     IN     VARCHAR2,
+    x_dr_gl_ccid                        IN     NUMBER,
+    x_cr_gl_ccid                        IN     NUMBER,
+    x_effective_start_date              IN     DATE,
+    x_effective_end_date                IN     DATE,
+    x_refund_allowed                    IN     VARCHAR2,
+    x_payment_priority                  IN     NUMBER,
+    x_attribute_category                IN     VARCHAR2,
+    x_attribute1                        IN     VARCHAR2,
+    x_attribute2                        IN     VARCHAR2,
+    x_attribute3                        IN     VARCHAR2,
+    x_attribute4                        IN     VARCHAR2,
+    x_attribute5                        IN     VARCHAR2,
+    x_attribute6                        IN     VARCHAR2,
+    x_attribute7                        IN     VARCHAR2,
+    x_attribute8                        IN     VARCHAR2,
+    x_attribute9                        IN     VARCHAR2,
+    x_attribute10                       IN     VARCHAR2,
+    x_attribute11                       IN     VARCHAR2,
+    x_attribute12                       IN     VARCHAR2,
+    x_attribute13                       IN     VARCHAR2,
+    x_attribute14                       IN     VARCHAR2,
+    x_attribute15                       IN     VARCHAR2,
+    x_attribute16                       IN     VARCHAR2,
+    x_attribute17                       IN     VARCHAR2,
+    x_attribute18                       IN     VARCHAR2,
+    x_attribute19                       IN     VARCHAR2,
+    x_attribute20                       IN     VARCHAR2,
+    x_title4_type_ind                   IN     VARCHAR2 DEFAULT 'N',
+    x_payment_credit_type_id            IN     NUMBER   DEFAULT NULL,
+    x_forfeiture_gl_ccid                IN     NUMBER   DEFAULT NULL,
+    x_forfeiture_account_cd             IN     VARCHAR2 DEFAULT NULL,
+    x_appl_hierarchy_id			IN     NUMBER   DEFAULT NULL
+  );
+
+  PROCEDURE update_row (
+    x_rowid                             IN     VARCHAR2,
+    x_credit_type_id                    IN     NUMBER,
+    x_credit_type_name                  IN     VARCHAR2,
+    x_description                       IN     VARCHAR2,
+    x_credit_class                      IN     VARCHAR2,
+    x_dr_account_cd                     IN     VARCHAR2,
+    x_cr_account_cd                     IN     VARCHAR2,
+    x_dr_gl_ccid                        IN     NUMBER,
+    x_cr_gl_ccid                        IN     NUMBER,
+    x_effective_start_date              IN     DATE,
+    x_effective_end_date                IN     DATE,
+    x_refund_allowed                    IN     VARCHAR2,
+    x_payment_priority                  IN     NUMBER,
+    x_attribute_category                IN     VARCHAR2,
+    x_attribute1                        IN     VARCHAR2,
+    x_attribute2                        IN     VARCHAR2,
+    x_attribute3                        IN     VARCHAR2,
+    x_attribute4                        IN     VARCHAR2,
+    x_attribute5                        IN     VARCHAR2,
+    x_attribute6                        IN     VARCHAR2,
+    x_attribute7                        IN     VARCHAR2,
+    x_attribute8                        IN     VARCHAR2,
+    x_attribute9                        IN     VARCHAR2,
+    x_attribute10                       IN     VARCHAR2,
+    x_attribute11                       IN     VARCHAR2,
+    x_attribute12                       IN     VARCHAR2,
+    x_attribute13                       IN     VARCHAR2,
+    x_attribute14                       IN     VARCHAR2,
+    x_attribute15                       IN     VARCHAR2,
+    x_attribute16                       IN     VARCHAR2,
+    x_attribute17                       IN     VARCHAR2,
+    x_attribute18                       IN     VARCHAR2,
+    x_attribute19                       IN     VARCHAR2,
+    x_attribute20                       IN     VARCHAR2,
+    x_title4_type_ind                   IN     VARCHAR2    DEFAULT 'N',
+    x_mode                              IN     VARCHAR2    DEFAULT 'R',
+    x_payment_credit_type_id            IN     NUMBER   DEFAULT NULL,
+    x_forfeiture_gl_ccid                IN     NUMBER   DEFAULT NULL,
+    x_forfeiture_account_cd             IN     VARCHAR2 DEFAULT NULL,
+    x_appl_hierarchy_id			IN     NUMBER   DEFAULT NULL
+  );
+
+  PROCEDURE add_row (
+    x_rowid                             IN OUT NOCOPY VARCHAR2,
+    x_credit_type_id                    IN OUT NOCOPY NUMBER,
+    x_credit_type_name                  IN     VARCHAR2,
+    x_description                       IN     VARCHAR2,
+    x_credit_class                      IN     VARCHAR2,
+    x_dr_account_cd                     IN     VARCHAR2,
+    x_cr_account_cd                     IN     VARCHAR2,
+    x_dr_gl_ccid                        IN     NUMBER,
+    x_cr_gl_ccid                        IN     NUMBER,
+    x_effective_start_date              IN     DATE,
+    x_effective_end_date                IN     DATE,
+    x_refund_allowed                    IN     VARCHAR2,
+    x_payment_priority                  IN     NUMBER,
+    x_attribute_category                IN     VARCHAR2,
+    x_attribute1                        IN     VARCHAR2,
+    x_attribute2                        IN     VARCHAR2,
+    x_attribute3                        IN     VARCHAR2,
+    x_attribute4                        IN     VARCHAR2,
+    x_attribute5                        IN     VARCHAR2,
+    x_attribute6                        IN     VARCHAR2,
+    x_attribute7                        IN     VARCHAR2,
+    x_attribute8                        IN     VARCHAR2,
+    x_attribute9                        IN     VARCHAR2,
+    x_attribute10                       IN     VARCHAR2,
+    x_attribute11                       IN     VARCHAR2,
+    x_attribute12                       IN     VARCHAR2,
+    x_attribute13                       IN     VARCHAR2,
+    x_attribute14                       IN     VARCHAR2,
+    x_attribute15                       IN     VARCHAR2,
+    x_attribute16                       IN     VARCHAR2,
+    x_attribute17                       IN     VARCHAR2,
+    x_attribute18                       IN     VARCHAR2,
+    x_attribute19                       IN     VARCHAR2,
+    x_attribute20                       IN     VARCHAR2,
+    x_title4_type_ind                   IN     VARCHAR2    DEFAULT 'N',
+    x_mode                              IN     VARCHAR2    DEFAULT 'R',
+    x_payment_credit_type_id            IN     NUMBER   DEFAULT NULL,
+    x_forfeiture_gl_ccid                IN     NUMBER   DEFAULT NULL,
+    x_forfeiture_account_cd             IN     VARCHAR2 DEFAULT NULL,
+    x_appl_hierarchy_id			IN     NUMBER   DEFAULT NULL
+  );
+
+  PROCEDURE delete_row (
+    x_rowid                             IN     VARCHAR2
+  );
+
+  FUNCTION get_pk_for_validation (
+    x_credit_type_id                    IN     NUMBER
+  ) RETURN BOOLEAN;
+
+  FUNCTION get_uk_for_validation (
+    x_credit_type_name                  IN     VARCHAR2,
+    x_effective_start_date              IN     DATE
+  ) RETURN BOOLEAN;
+
+  PROCEDURE GET_FK_IGS_FI_CR_TYPES_ALL(
+    x_credit_type_id IN NUMBER
+    );
+
+  PROCEDURE before_dml (
+    p_action                            IN     VARCHAR2,
+    x_rowid                             IN     VARCHAR2    DEFAULT NULL,
+    x_credit_type_id                    IN     NUMBER      DEFAULT NULL,
+    x_credit_type_name                  IN     VARCHAR2    DEFAULT NULL,
+    x_description                       IN     VARCHAR2    DEFAULT NULL,
+    x_credit_class                      IN     VARCHAR2    DEFAULT NULL,
+    x_dr_account_cd                     IN     VARCHAR2    DEFAULT NULL,
+    x_cr_account_cd                     IN     VARCHAR2    DEFAULT NULL,
+    x_dr_gl_ccid                        IN     NUMBER      DEFAULT NULL,
+    x_cr_gl_ccid                        IN     NUMBER      DEFAULT NULL,
+    x_effective_start_date              IN     DATE        DEFAULT NULL,
+    x_effective_end_date                IN     DATE        DEFAULT NULL,
+    x_refund_allowed                    IN     VARCHAR2    DEFAULT NULL,
+    x_payment_priority                  IN     NUMBER      DEFAULT NULL,
+    x_attribute_category                IN     VARCHAR2    DEFAULT NULL,
+    x_attribute1                        IN     VARCHAR2    DEFAULT NULL,
+    x_attribute2                        IN     VARCHAR2    DEFAULT NULL,
+    x_attribute3                        IN     VARCHAR2    DEFAULT NULL,
+    x_attribute4                        IN     VARCHAR2    DEFAULT NULL,
+    x_attribute5                        IN     VARCHAR2    DEFAULT NULL,
+    x_attribute6                        IN     VARCHAR2    DEFAULT NULL,
+    x_attribute7                        IN     VARCHAR2    DEFAULT NULL,
+    x_attribute8                        IN     VARCHAR2    DEFAULT NULL,
+    x_attribute9                        IN     VARCHAR2    DEFAULT NULL,
+    x_attribute10                       IN     VARCHAR2    DEFAULT NULL,
+    x_attribute11                       IN     VARCHAR2    DEFAULT NULL,
+    x_attribute12                       IN     VARCHAR2    DEFAULT NULL,
+    x_attribute13                       IN     VARCHAR2    DEFAULT NULL,
+    x_attribute14                       IN     VARCHAR2    DEFAULT NULL,
+    x_attribute15                       IN     VARCHAR2    DEFAULT NULL,
+    x_attribute16                       IN     VARCHAR2    DEFAULT NULL,
+    x_attribute17                       IN     VARCHAR2    DEFAULT NULL,
+    x_attribute18                       IN     VARCHAR2    DEFAULT NULL,
+    x_attribute19                       IN     VARCHAR2    DEFAULT NULL,
+    x_attribute20                       IN     VARCHAR2    DEFAULT NULL,
+    x_title4_type_ind                   IN     VARCHAR2    DEFAULT NULL,
+    x_creation_date                     IN     DATE        DEFAULT NULL,
+    x_created_by                        IN     NUMBER      DEFAULT NULL,
+    x_last_update_date                  IN     DATE        DEFAULT NULL,
+    x_last_updated_by                   IN     NUMBER      DEFAULT NULL,
+    x_last_update_login                 IN     NUMBER      DEFAULT NULL,
+    x_payment_credit_type_id            IN     NUMBER      DEFAULT NULL,
+    x_forfeiture_gl_ccid                IN     NUMBER      DEFAULT NULL,
+    x_forfeiture_account_cd             IN     VARCHAR2    DEFAULT NULL,
+    x_appl_hierarchy_id			IN     NUMBER	   DEFAULT NULL
+  );
+
+END igs_fi_cr_types_pkg;
+
+ 
+
+/

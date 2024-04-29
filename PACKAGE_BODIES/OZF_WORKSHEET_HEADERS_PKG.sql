@@ -1,0 +1,417 @@
+--------------------------------------------------------
+--  DDL for Package Body OZF_WORKSHEET_HEADERS_PKG
+--------------------------------------------------------
+
+  CREATE OR REPLACE EDITIONABLE PACKAGE BODY "APPS"."OZF_WORKSHEET_HEADERS_PKG" as
+/* $Header: ozftwkhb.pls 120.0 2005/05/31 23:57:59 appldev noship $ */
+procedure INSERT_ROW (
+  X_ROWID in out nocopy VARCHAR2,
+  X_WORKSHEET_HEADER_ID in NUMBER,
+  X_FORECAST_START_DATE in DATE,
+  X_FORECAST_END_DATE in DATE,
+  X_CURRENCY_CODE in VARCHAR2,
+  X_FORECAST_GENERATED in VARCHAR2,
+  X_FORECAST_BASIS in VARCHAR2,
+  X_OFFER_CODE in VARCHAR2,
+  X_OBJECT_VERSION_NUMBER in NUMBER,
+  X_START_DATE_ACTIVE in DATE,
+  X_END_DATE_ACTIVE in DATE,
+  X_CUSTOM_SETUP_ID in NUMBER,
+  X_OWNER_ID in NUMBER,
+  X_ACTIVITY_ID in NUMBER,
+  X_TIME_SPREAD in VARCHAR2,
+  X_PRICE_LIST_ID in NUMBER,
+  X_FORECAST_UOM_CODE in VARCHAR2,
+  X_INCREMENT_QUOTA in VARCHAR2,
+  X_OFFER_TYPE in VARCHAR2,
+  X_NAME in VARCHAR2,
+  X_DESCRIPTION in VARCHAR2,
+  X_VERSION_NO in VARCHAR2,
+  X_CREATION_DATE in DATE,
+  X_CREATED_BY in NUMBER,
+  X_LAST_UPDATE_DATE in DATE,
+  X_LAST_UPDATED_BY in NUMBER,
+  X_LAST_UPDATE_LOGIN in NUMBER
+) is
+  cursor C is select ROWID from OZF_WORKSHEET_HEADERS_B
+    where WORKSHEET_HEADER_ID = X_WORKSHEET_HEADER_ID
+    ;
+begin
+  insert into OZF_WORKSHEET_HEADERS_B (
+    FORECAST_START_DATE,
+    FORECAST_END_DATE,
+    CURRENCY_CODE,
+    FORECAST_GENERATED,
+    FORECAST_BASIS,
+    OFFER_CODE,
+    OBJECT_VERSION_NUMBER,
+    START_DATE_ACTIVE,
+    END_DATE_ACTIVE,
+    CUSTOM_SETUP_ID,
+    OWNER_ID,
+    ACTIVITY_ID,
+    TIME_SPREAD,
+    PRICE_LIST_ID,
+    FORECAST_UOM_CODE,
+    INCREMENT_QUOTA,
+    OFFER_TYPE,
+    WORKSHEET_HEADER_ID,
+    CREATION_DATE,
+    CREATED_BY,
+    LAST_UPDATE_DATE,
+    LAST_UPDATED_BY,
+    LAST_UPDATE_LOGIN
+  ) values (
+    X_FORECAST_START_DATE,
+    X_FORECAST_END_DATE,
+    X_CURRENCY_CODE,
+    X_FORECAST_GENERATED,
+    X_FORECAST_BASIS,
+    X_OFFER_CODE,
+    X_OBJECT_VERSION_NUMBER,
+    X_START_DATE_ACTIVE,
+    X_END_DATE_ACTIVE,
+    X_CUSTOM_SETUP_ID,
+    X_OWNER_ID,
+    X_ACTIVITY_ID,
+    X_TIME_SPREAD,
+    X_PRICE_LIST_ID,
+    X_FORECAST_UOM_CODE,
+    X_INCREMENT_QUOTA,
+    X_OFFER_TYPE,
+    X_WORKSHEET_HEADER_ID,
+    X_CREATION_DATE,
+    X_CREATED_BY,
+    X_LAST_UPDATE_DATE,
+    X_LAST_UPDATED_BY,
+    X_LAST_UPDATE_LOGIN
+  );
+
+  insert into OZF_WORKSHEET_HEADERS_TL (
+    WORKSHEET_HEADER_ID,
+    CREATION_DATE,
+    CREATED_BY,
+    LAST_UPDATE_DATE,
+    LAST_UPDATED_BY,
+    LAST_UPDATE_LOGIN,
+    NAME,
+    DESCRIPTION,
+    VERSION_NO,
+    LANGUAGE,
+    SOURCE_LANG
+  ) select
+    X_WORKSHEET_HEADER_ID,
+    X_CREATION_DATE,
+    X_CREATED_BY,
+    X_LAST_UPDATE_DATE,
+    X_LAST_UPDATED_BY,
+    X_LAST_UPDATE_LOGIN,
+    X_NAME,
+    X_DESCRIPTION,
+    X_VERSION_NO,
+    L.LANGUAGE_CODE,
+    userenv('LANG')
+  from FND_LANGUAGES L
+  where L.INSTALLED_FLAG in ('I', 'B')
+  and not exists
+    (select NULL
+    from OZF_WORKSHEET_HEADERS_TL T
+    where T.WORKSHEET_HEADER_ID = X_WORKSHEET_HEADER_ID
+    and T.LANGUAGE = L.LANGUAGE_CODE);
+
+  open c;
+  fetch c into X_ROWID;
+  if (c%notfound) then
+    close c;
+    raise no_data_found;
+  end if;
+  close c;
+
+end INSERT_ROW;
+
+procedure LOCK_ROW (
+  X_WORKSHEET_HEADER_ID in NUMBER,
+  X_FORECAST_START_DATE in DATE,
+  X_FORECAST_END_DATE in DATE,
+  X_CURRENCY_CODE in VARCHAR2,
+  X_FORECAST_GENERATED in VARCHAR2,
+  X_FORECAST_BASIS in VARCHAR2,
+  X_OFFER_CODE in VARCHAR2,
+  X_OBJECT_VERSION_NUMBER in NUMBER,
+  X_START_DATE_ACTIVE in DATE,
+  X_END_DATE_ACTIVE in DATE,
+  X_CUSTOM_SETUP_ID in NUMBER,
+  X_OWNER_ID in NUMBER,
+  X_ACTIVITY_ID in NUMBER,
+  X_TIME_SPREAD in VARCHAR2,
+  X_PRICE_LIST_ID in NUMBER,
+  X_FORECAST_UOM_CODE in VARCHAR2,
+  X_INCREMENT_QUOTA in VARCHAR2,
+  X_OFFER_TYPE in VARCHAR2,
+  X_NAME in VARCHAR2,
+  X_DESCRIPTION in VARCHAR2,
+  X_VERSION_NO in VARCHAR2
+) is
+  cursor c is select
+      FORECAST_START_DATE,
+      FORECAST_END_DATE,
+      CURRENCY_CODE,
+      FORECAST_GENERATED,
+      FORECAST_BASIS,
+      OFFER_CODE,
+      OBJECT_VERSION_NUMBER,
+      START_DATE_ACTIVE,
+      END_DATE_ACTIVE,
+      CUSTOM_SETUP_ID,
+      OWNER_ID,
+      ACTIVITY_ID,
+      TIME_SPREAD,
+      PRICE_LIST_ID,
+      FORECAST_UOM_CODE,
+      INCREMENT_QUOTA,
+      OFFER_TYPE
+    from OZF_WORKSHEET_HEADERS_B
+    where WORKSHEET_HEADER_ID = X_WORKSHEET_HEADER_ID
+    for update of WORKSHEET_HEADER_ID nowait;
+  recinfo c%rowtype;
+
+  cursor c1 is select
+      NAME,
+      DESCRIPTION,
+      VERSION_NO,
+      decode(LANGUAGE, userenv('LANG'), 'Y', 'N') BASELANG
+    from OZF_WORKSHEET_HEADERS_TL
+    where WORKSHEET_HEADER_ID = X_WORKSHEET_HEADER_ID
+    and userenv('LANG') in (LANGUAGE, SOURCE_LANG)
+    for update of WORKSHEET_HEADER_ID nowait;
+begin
+  open c;
+  fetch c into recinfo;
+  if (c%notfound) then
+    close c;
+    fnd_message.set_name('FND', 'FORM_RECORD_DELETED');
+    app_exception.raise_exception;
+  end if;
+  close c;
+  if (    ((recinfo.FORECAST_START_DATE = X_FORECAST_START_DATE)
+           OR ((recinfo.FORECAST_START_DATE is null) AND (X_FORECAST_START_DATE is null)))
+      AND ((recinfo.FORECAST_END_DATE = X_FORECAST_END_DATE)
+           OR ((recinfo.FORECAST_END_DATE is null) AND (X_FORECAST_END_DATE is null)))
+      AND ((recinfo.CURRENCY_CODE = X_CURRENCY_CODE)
+           OR ((recinfo.CURRENCY_CODE is null) AND (X_CURRENCY_CODE is null)))
+      AND ((recinfo.FORECAST_GENERATED = X_FORECAST_GENERATED)
+           OR ((recinfo.FORECAST_GENERATED is null) AND (X_FORECAST_GENERATED is null)))
+      AND ((recinfo.FORECAST_BASIS = X_FORECAST_BASIS)
+           OR ((recinfo.FORECAST_BASIS is null) AND (X_FORECAST_BASIS is null)))
+      AND ((recinfo.OFFER_CODE = X_OFFER_CODE)
+           OR ((recinfo.OFFER_CODE is null) AND (X_OFFER_CODE is null)))
+      AND ((recinfo.OBJECT_VERSION_NUMBER = X_OBJECT_VERSION_NUMBER)
+           OR ((recinfo.OBJECT_VERSION_NUMBER is null) AND (X_OBJECT_VERSION_NUMBER is null)))
+      AND ((recinfo.START_DATE_ACTIVE = X_START_DATE_ACTIVE)
+           OR ((recinfo.START_DATE_ACTIVE is null) AND (X_START_DATE_ACTIVE is null)))
+      AND ((recinfo.END_DATE_ACTIVE = X_END_DATE_ACTIVE)
+           OR ((recinfo.END_DATE_ACTIVE is null) AND (X_END_DATE_ACTIVE is null)))
+      AND (recinfo.CUSTOM_SETUP_ID = X_CUSTOM_SETUP_ID)
+      AND ((recinfo.OWNER_ID = X_OWNER_ID)
+           OR ((recinfo.OWNER_ID is null) AND (X_OWNER_ID is null)))
+      AND ((recinfo.ACTIVITY_ID = X_ACTIVITY_ID)
+           OR ((recinfo.ACTIVITY_ID is null) AND (X_ACTIVITY_ID is null)))
+      AND ((recinfo.TIME_SPREAD = X_TIME_SPREAD)
+           OR ((recinfo.TIME_SPREAD is null) AND (X_TIME_SPREAD is null)))
+      AND (recinfo.PRICE_LIST_ID = X_PRICE_LIST_ID)
+      AND ((recinfo.FORECAST_UOM_CODE = X_FORECAST_UOM_CODE)
+           OR ((recinfo.FORECAST_UOM_CODE is null) AND (X_FORECAST_UOM_CODE is null)))
+      AND ((recinfo.INCREMENT_QUOTA = X_INCREMENT_QUOTA)
+           OR ((recinfo.INCREMENT_QUOTA is null) AND (X_INCREMENT_QUOTA is null)))
+      AND ((recinfo.OFFER_TYPE = X_OFFER_TYPE)
+           OR ((recinfo.OFFER_TYPE is null) AND (X_OFFER_TYPE is null)))
+  ) then
+    null;
+  else
+    fnd_message.set_name('FND', 'FORM_RECORD_CHANGED');
+    app_exception.raise_exception;
+  end if;
+
+  for tlinfo in c1 loop
+    if (tlinfo.BASELANG = 'Y') then
+      if (    (tlinfo.NAME = X_NAME)
+          AND ((tlinfo.DESCRIPTION = X_DESCRIPTION)
+               OR ((tlinfo.DESCRIPTION is null) AND (X_DESCRIPTION is null)))
+          AND ((tlinfo.VERSION_NO = X_VERSION_NO)
+               OR ((tlinfo.VERSION_NO is null) AND (X_VERSION_NO is null)))
+      ) then
+        null;
+      else
+        fnd_message.set_name('FND', 'FORM_RECORD_CHANGED');
+        app_exception.raise_exception;
+      end if;
+    end if;
+  end loop;
+  return;
+end LOCK_ROW;
+
+procedure UPDATE_ROW (
+  X_WORKSHEET_HEADER_ID in NUMBER,
+  X_FORECAST_START_DATE in DATE,
+  X_FORECAST_END_DATE in DATE,
+  X_CURRENCY_CODE in VARCHAR2,
+  X_FORECAST_GENERATED in VARCHAR2,
+  X_FORECAST_BASIS in VARCHAR2,
+  X_OFFER_CODE in VARCHAR2,
+  X_OBJECT_VERSION_NUMBER in NUMBER,
+  X_START_DATE_ACTIVE in DATE,
+  X_END_DATE_ACTIVE in DATE,
+  X_CUSTOM_SETUP_ID in NUMBER,
+  X_OWNER_ID in NUMBER,
+  X_ACTIVITY_ID in NUMBER,
+  X_TIME_SPREAD in VARCHAR2,
+  X_PRICE_LIST_ID in NUMBER,
+  X_FORECAST_UOM_CODE in VARCHAR2,
+  X_INCREMENT_QUOTA in VARCHAR2,
+  X_OFFER_TYPE in VARCHAR2,
+  X_NAME in VARCHAR2,
+  X_DESCRIPTION in VARCHAR2,
+  X_VERSION_NO in VARCHAR2,
+  X_LAST_UPDATE_DATE in DATE,
+  X_LAST_UPDATED_BY in NUMBER,
+  X_LAST_UPDATE_LOGIN in NUMBER
+) is
+begin
+  update OZF_WORKSHEET_HEADERS_B set
+    FORECAST_START_DATE = X_FORECAST_START_DATE,
+    FORECAST_END_DATE = X_FORECAST_END_DATE,
+    CURRENCY_CODE = X_CURRENCY_CODE,
+    FORECAST_GENERATED = X_FORECAST_GENERATED,
+    FORECAST_BASIS = X_FORECAST_BASIS,
+    OFFER_CODE = X_OFFER_CODE,
+    OBJECT_VERSION_NUMBER = X_OBJECT_VERSION_NUMBER,
+    START_DATE_ACTIVE = X_START_DATE_ACTIVE,
+    END_DATE_ACTIVE = X_END_DATE_ACTIVE,
+    CUSTOM_SETUP_ID = X_CUSTOM_SETUP_ID,
+    OWNER_ID = X_OWNER_ID,
+    ACTIVITY_ID = X_ACTIVITY_ID,
+    TIME_SPREAD = X_TIME_SPREAD,
+    PRICE_LIST_ID = X_PRICE_LIST_ID,
+    FORECAST_UOM_CODE = X_FORECAST_UOM_CODE,
+    INCREMENT_QUOTA = X_INCREMENT_QUOTA,
+    OFFER_TYPE = X_OFFER_TYPE,
+    LAST_UPDATE_DATE = X_LAST_UPDATE_DATE,
+    LAST_UPDATED_BY = X_LAST_UPDATED_BY,
+    LAST_UPDATE_LOGIN = X_LAST_UPDATE_LOGIN
+  where WORKSHEET_HEADER_ID = X_WORKSHEET_HEADER_ID;
+
+  if (sql%notfound) then
+    raise no_data_found;
+  end if;
+
+  update OZF_WORKSHEET_HEADERS_TL set
+    NAME = X_NAME,
+    DESCRIPTION = X_DESCRIPTION,
+    VERSION_NO = X_VERSION_NO,
+    LAST_UPDATE_DATE = X_LAST_UPDATE_DATE,
+    LAST_UPDATED_BY = X_LAST_UPDATED_BY,
+    LAST_UPDATE_LOGIN = X_LAST_UPDATE_LOGIN,
+    SOURCE_LANG = userenv('LANG')
+  where WORKSHEET_HEADER_ID = X_WORKSHEET_HEADER_ID
+  and userenv('LANG') in (LANGUAGE, SOURCE_LANG);
+
+  if (sql%notfound) then
+    raise no_data_found;
+  end if;
+end UPDATE_ROW;
+
+procedure DELETE_ROW (
+  X_WORKSHEET_HEADER_ID in NUMBER
+) is
+begin
+  delete from OZF_WORKSHEET_HEADERS_TL
+  where WORKSHEET_HEADER_ID = X_WORKSHEET_HEADER_ID;
+
+  if (sql%notfound) then
+    raise no_data_found;
+  end if;
+
+  delete from OZF_WORKSHEET_HEADERS_B
+  where WORKSHEET_HEADER_ID = X_WORKSHEET_HEADER_ID;
+
+  if (sql%notfound) then
+    raise no_data_found;
+  end if;
+end DELETE_ROW;
+
+procedure ADD_LANGUAGE
+is
+begin
+  delete from OZF_WORKSHEET_HEADERS_TL T
+  where not exists
+    (select NULL
+    from OZF_WORKSHEET_HEADERS_B B
+    where B.WORKSHEET_HEADER_ID = T.WORKSHEET_HEADER_ID
+    );
+
+  update OZF_WORKSHEET_HEADERS_TL T set (
+      NAME,
+      DESCRIPTION,
+      VERSION_NO
+    ) = (select
+      B.NAME,
+      B.DESCRIPTION,
+      B.VERSION_NO
+    from OZF_WORKSHEET_HEADERS_TL B
+    where B.WORKSHEET_HEADER_ID = T.WORKSHEET_HEADER_ID
+    and B.LANGUAGE = T.SOURCE_LANG)
+  where (
+      T.WORKSHEET_HEADER_ID,
+      T.LANGUAGE
+  ) in (select
+      SUBT.WORKSHEET_HEADER_ID,
+      SUBT.LANGUAGE
+    from OZF_WORKSHEET_HEADERS_TL SUBB, OZF_WORKSHEET_HEADERS_TL SUBT
+    where SUBB.WORKSHEET_HEADER_ID = SUBT.WORKSHEET_HEADER_ID
+    and SUBB.LANGUAGE = SUBT.SOURCE_LANG
+    and (SUBB.NAME <> SUBT.NAME
+      or SUBB.DESCRIPTION <> SUBT.DESCRIPTION
+      or (SUBB.DESCRIPTION is null and SUBT.DESCRIPTION is not null)
+      or (SUBB.DESCRIPTION is not null and SUBT.DESCRIPTION is null)
+      or SUBB.VERSION_NO <> SUBT.VERSION_NO
+      or (SUBB.VERSION_NO is null and SUBT.VERSION_NO is not null)
+      or (SUBB.VERSION_NO is not null and SUBT.VERSION_NO is null)
+  ));
+
+  insert into OZF_WORKSHEET_HEADERS_TL (
+    WORKSHEET_HEADER_ID,
+    CREATION_DATE,
+    CREATED_BY,
+    LAST_UPDATE_DATE,
+    LAST_UPDATED_BY,
+    LAST_UPDATE_LOGIN,
+    NAME,
+    DESCRIPTION,
+    VERSION_NO,
+    LANGUAGE,
+    SOURCE_LANG
+  ) select /*+ ORDERED */
+    B.WORKSHEET_HEADER_ID,
+    B.CREATION_DATE,
+    B.CREATED_BY,
+    B.LAST_UPDATE_DATE,
+    B.LAST_UPDATED_BY,
+    B.LAST_UPDATE_LOGIN,
+    B.NAME,
+    B.DESCRIPTION,
+    B.VERSION_NO,
+    L.LANGUAGE_CODE,
+    B.SOURCE_LANG
+  from OZF_WORKSHEET_HEADERS_TL B, FND_LANGUAGES L
+  where L.INSTALLED_FLAG in ('I', 'B')
+  and B.LANGUAGE = userenv('LANG')
+  and not exists
+    (select NULL
+    from OZF_WORKSHEET_HEADERS_TL T
+    where T.WORKSHEET_HEADER_ID = B.WORKSHEET_HEADER_ID
+    and T.LANGUAGE = L.LANGUAGE_CODE);
+end ADD_LANGUAGE;
+
+end OZF_WORKSHEET_HEADERS_PKG;
+
+/

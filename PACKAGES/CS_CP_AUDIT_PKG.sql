@@ -1,0 +1,143 @@
+--------------------------------------------------------
+--  DDL for Package CS_CP_AUDIT_PKG
+--------------------------------------------------------
+
+  CREATE OR REPLACE EDITIONABLE PACKAGE "APPS"."CS_CP_AUDIT_PKG" AUTHID CURRENT_USER as
+/* $Header: csxciaus.pls 115.1 2000/09/11 18:59:09 pkm ship     $ */
+
+
+  PROCEDURE Insert_Row(X_Rowid                   IN OUT VARCHAR2,
+                       X_Customer_Product_Id            NUMBER,
+                       X_Last_Update_Date               DATE,
+                       X_Last_Updated_By                NUMBER,
+                       X_Creation_Date                  DATE,
+                       X_Created_By                     NUMBER,
+                       X_Last_Update_Login              NUMBER,
+                       X_Customer_Changed_Flag          VARCHAR2,
+                       X_Old_Customer_Id                NUMBER,
+                       X_Current_Customer_Id            NUMBER,
+                       X_System_Changed_Flag            VARCHAR2,
+                       X_Old_System_Id                  NUMBER,
+                       X_Current_System_Id              NUMBER,
+                       X_Prd_Agreement_Changed_Flag   VARCHAR2,
+                       X_Old_Product_Agreement_Id       NUMBER,
+                       X_Current_Product_Agreement_Id   NUMBER,
+                       X_Serv_Agreement_Changed_Flag   VARCHAR2,
+                       X_Old_Service_Agreement_Id       NUMBER,
+                       X_Current_Service_Agreement_Id   NUMBER,
+                       X_Attribute1                     VARCHAR2,
+                       X_Attribute2                     VARCHAR2,
+                       X_Attribute3                     VARCHAR2,
+                       X_Attribute4                     VARCHAR2,
+                       X_Attribute5                     VARCHAR2,
+                       X_Attribute6                     VARCHAR2,
+                       X_Attribute7                     VARCHAR2,
+                       X_Attribute8                     VARCHAR2,
+                       X_Attribute9                     VARCHAR2,
+                       X_Attribute10                    VARCHAR2,
+                       X_Context                        VARCHAR2,
+                       X_Attribute11                    VARCHAR2,
+                       X_Attribute12                    VARCHAR2,
+                       X_Attribute13                    VARCHAR2,
+                       X_Attribute14                    VARCHAR2,
+                       X_Attribute15                    VARCHAR2,
+                       X_Comments                       VARCHAR2,
+                       X_Cp_Status_Changed_Flag         VARCHAR2,
+                       X_Old_Cp_Status_Id               NUMBER,
+                       X_Current_Cp_Status_Id           NUMBER,
+                       X_Type_Code_Changed_Flag         VARCHAR2,
+                       X_Old_Type_Code                  VARCHAR2,
+                       X_Current_Type_Code              VARCHAR2
+                      );
+
+  PROCEDURE Lock_Row(X_Rowid                            VARCHAR2,
+
+                     X_Customer_Product_Id              NUMBER,
+                     X_Customer_Changed_Flag            VARCHAR2,
+                     X_Old_Customer_Id                  NUMBER,
+                     X_Current_Customer_Id              NUMBER,
+                     X_System_Changed_Flag              VARCHAR2,
+                     X_Old_System_Id                    NUMBER,
+                     X_Current_System_Id                NUMBER,
+                     X_Prd_Agreement_Changed_Flag   VARCHAR2,
+                     X_Old_Product_Agreement_Id         NUMBER,
+                     X_Current_Product_Agreement_Id     NUMBER,
+                     X_Serv_Agreement_Changed_Flag   VARCHAR2,
+                     X_Old_Service_Agreement_Id         NUMBER,
+                     X_Current_Service_Agreement_Id     NUMBER,
+                     X_Attribute1                       VARCHAR2,
+                     X_Attribute2                       VARCHAR2,
+                     X_Attribute3                       VARCHAR2,
+                     X_Attribute4                       VARCHAR2,
+                     X_Attribute5                       VARCHAR2,
+                     X_Attribute6                       VARCHAR2,
+                     X_Attribute7                       VARCHAR2,
+                     X_Attribute8                       VARCHAR2,
+                     X_Attribute9                       VARCHAR2,
+                     X_Attribute10                      VARCHAR2,
+                     X_Context                          VARCHAR2,
+                     X_Attribute11                      VARCHAR2,
+                     X_Attribute12                      VARCHAR2,
+                     X_Attribute13                      VARCHAR2,
+                     X_Attribute14                      VARCHAR2,
+                     X_Attribute15                      VARCHAR2,
+                     X_Comments                         VARCHAR2,
+                     X_Cp_Status_Changed_Flag           VARCHAR2,
+                     X_Old_Cp_Status_Id                 NUMBER,
+                     X_Current_Cp_Status_Id             NUMBER,
+                     X_Type_Code_Changed_Flag           VARCHAR2,
+                     X_Old_Type_Code                    VARCHAR2,
+                     X_Current_Type_Code                VARCHAR2
+                    );
+
+
+
+  PROCEDURE Update_Row(X_Rowid                          VARCHAR2,
+
+                       X_Customer_Product_Id            NUMBER,
+                       X_Last_Update_Date               DATE,
+                       X_Last_Updated_By                NUMBER,
+                       X_Last_Update_Login              NUMBER,
+                       X_Customer_Changed_Flag          VARCHAR2,
+                       X_Old_Customer_Id                NUMBER,
+                       X_Current_Customer_Id            NUMBER,
+                       X_System_Changed_Flag            VARCHAR2,
+                       X_Old_System_Id                  NUMBER,
+                       X_Current_System_Id              NUMBER,
+                       X_Prd_Agreement_Changed_Flag VARCHAR2,
+                       X_Old_Product_Agreement_Id       NUMBER,
+                       X_Current_Product_Agreement_Id   NUMBER,
+                       X_Serv_Agreement_Changed_Flag VARCHAR2,
+                       X_Old_Service_Agreement_Id       NUMBER,
+                       X_Current_Service_Agreement_Id   NUMBER,
+                       X_Attribute1                     VARCHAR2,
+                       X_Attribute2                     VARCHAR2,
+                       X_Attribute3                     VARCHAR2,
+                       X_Attribute4                     VARCHAR2,
+                       X_Attribute5                     VARCHAR2,
+                       X_Attribute6                     VARCHAR2,
+                       X_Attribute7                     VARCHAR2,
+                       X_Attribute8                     VARCHAR2,
+                       X_Attribute9                     VARCHAR2,
+                       X_Attribute10                    VARCHAR2,
+                       X_Context                        VARCHAR2,
+                       X_Attribute11                    VARCHAR2,
+                       X_Attribute12                    VARCHAR2,
+                       X_Attribute13                    VARCHAR2,
+                       X_Attribute14                    VARCHAR2,
+                       X_Attribute15                    VARCHAR2,
+                       X_Comments                       VARCHAR2,
+                       X_Cp_Status_Changed_Flag         VARCHAR2,
+                       X_Old_Cp_Status_Id               NUMBER,
+                       X_Current_Cp_Status_Id           NUMBER,
+                       X_Type_Code_Changed_Flag         VARCHAR2,
+                       X_Old_Type_Code                  VARCHAR2,
+                       X_Current_Type_Code              VARCHAR2
+                      );
+
+
+END CS_CP_AUDIT_PKG;
+
+ 
+
+/

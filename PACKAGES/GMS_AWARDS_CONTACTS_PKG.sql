@@ -1,0 +1,45 @@
+--------------------------------------------------------
+--  DDL for Package GMS_AWARDS_CONTACTS_PKG
+--------------------------------------------------------
+
+  CREATE OR REPLACE EDITIONABLE PACKAGE "APPS"."GMS_AWARDS_CONTACTS_PKG" AUTHID CURRENT_USER as
+-- $Header: gmsawcts.pls 115.6 2002/11/26 00:23:22 jmuthuku ship $
+
+procedure INSERT_ROW (
+  X_ROWID in out NOCOPY VARCHAR2,
+  X_AWARD_ID in NUMBER,
+  X_CONTACT_ID in NUMBER,
+  X_MODE in VARCHAR2 default 'R',
+  X_CUSTOMER_ID in NUMBER,
+  X_PRIMARY_FLAG in VARCHAR2 default 'N',
+  X_USAGE_CODE in VARCHAR2
+  );
+procedure LOCK_ROW (
+  X_AWARD_ID in NUMBER,
+  X_CONTACT_ID in NUMBER,
+  X_CUSTOMER_ID in NUMBER,
+  X_PRIMARY_FLAG IN VARCHAR2,
+  X_USAGE_CODE in VARCHAR2,
+  X_ROWID in VARCHAR2
+);
+procedure UPDATE_ROW (
+  X_AWARD_ID in NUMBER,
+  X_CONTACT_ID in NUMBER,
+  X_MODE in VARCHAR2 default 'R',
+  X_CUSTOMER_ID in NUMBER,
+  X_PRIMARY_FLAG in VARCHAR2,
+  X_USAGE_CODE in VARCHAR2,
+  X_ROWID in VARCHAR2
+  );
+
+procedure DELETE_ROW (
+  X_AWARD_ID in NUMBER,
+  X_CONTACT_ID in NUMBER,
+  X_CUSTOMER_ID in NUMBER,
+  X_ROWID in VARCHAR2
+);
+end GMS_AWARDS_CONTACTS_PKG;
+
+ 
+
+/

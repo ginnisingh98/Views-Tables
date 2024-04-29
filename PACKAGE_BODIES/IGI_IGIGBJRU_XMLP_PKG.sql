@@ -1,0 +1,25 @@
+--------------------------------------------------------
+--  DDL for Package Body IGI_IGIGBJRU_XMLP_PKG
+--------------------------------------------------------
+
+  CREATE OR REPLACE EDITIONABLE PACKAGE BODY "APPS"."IGI_IGIGBJRU_XMLP_PKG" AS
+/* $Header: IGIGBJRUB.pls 120.0.12010000.1 2008/07/29 08:57:59 appldev ship $ */
+  FUNCTION AFTERREPORT RETURN BOOLEAN IS
+  BEGIN
+    IF P_RUN_AOL = 'Y' THEN
+      /*SRW.USER_EXIT('FND SRWEXIT')*/NULL;
+    END IF;
+    RETURN (TRUE);
+  END AFTERREPORT;
+
+  FUNCTION BEFOREREPORT RETURN BOOLEAN IS
+  BEGIN
+    IF P_RUN_AOL = 'Y' THEN
+      /*SRW.USER_EXIT('FND SRWEXIT')*/NULL;
+    END IF;
+    RETURN (TRUE);
+  END BEFOREREPORT;
+
+END IGI_IGIGBJRU_XMLP_PKG;
+
+/

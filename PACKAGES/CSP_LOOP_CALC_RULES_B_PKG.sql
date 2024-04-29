@@ -1,0 +1,159 @@
+--------------------------------------------------------
+--  DDL for Package CSP_LOOP_CALC_RULES_B_PKG
+--------------------------------------------------------
+
+  CREATE OR REPLACE EDITIONABLE PACKAGE "APPS"."CSP_LOOP_CALC_RULES_B_PKG" AUTHID CURRENT_USER as
+/* $Header: csptpcrs.pls 115.6 2002/11/26 07:12:05 hhaugeru ship $ */
+-- Start of Comments
+-- Package name     : CSP_LOOP_CALC_RULES_B_PKG
+-- Purpose          :
+-- History          :
+-- NOTE             :
+-- End of Comments
+
+PROCEDURE Insert_Row(
+          px_CALCULATION_RULE_ID  IN OUT NOCOPY NUMBER,
+          p_CREATED_BY    NUMBER,
+          p_CREATION_DATE    DATE,
+          p_LAST_UPDATED_BY    NUMBER,
+          p_LAST_UPDATE_DATE    DATE,
+          p_LAST_UPDATE_LOGIN    NUMBER,
+          p_CALCULATION_RULE_NAME    VARCHAR2,
+          p_INCLUDE_SALES_ORDERS    VARCHAR2,
+          p_INCLUDE_MOVE_ORDERS    VARCHAR2,
+          p_INCLUDE_REPAIR_ORDERS    VARCHAR2,
+          p_INCLUDE_WORK_ORDERS    VARCHAR2,
+          p_INCLUDE_PURCHASE_ORDERS    VARCHAR2,
+          p_INCLUDE_REQUISITIONS    VARCHAR2,
+          p_INCLUDE_INTERORG_TRANSFERS    VARCHAR2,
+          p_INCLUDE_ONHAND_GOOD    VARCHAR2,
+          p_INCLUDE_ONHAND_BAD    VARCHAR2,
+          p_INCLUDE_INTRANSIT_MOVE_ORD    VARCHAR2,
+          p_TOLERANCE_PERCENT    NUMBER,
+          p_TIME_FENCE    NUMBER,
+		p_INCLUDE_DOA	VARCHAR2,
+		p_ROLLUP_SUPERCESSION VARCHAR2,
+		p_FORECAST_LOWER_SUPERCESSION VARCHAR2,
+          p_ATTRIBUTE_CATEGORY    VARCHAR2,
+          p_ATTRIBUTE1    VARCHAR2,
+          p_ATTRIBUTE2    VARCHAR2,
+          p_ATTRIBUTE3    VARCHAR2,
+          p_ATTRIBUTE4    VARCHAR2,
+          p_ATTRIBUTE5    VARCHAR2,
+          p_ATTRIBUTE6    VARCHAR2,
+          p_ATTRIBUTE7    VARCHAR2,
+          p_ATTRIBUTE8    VARCHAR2,
+          p_ATTRIBUTE9    VARCHAR2,
+          p_ATTRIBUTE10    VARCHAR2,
+          p_ATTRIBUTE11    VARCHAR2,
+          p_ATTRIBUTE12    VARCHAR2,
+          p_ATTRIBUTE13    VARCHAR2,
+          p_ATTRIBUTE14    VARCHAR2,
+          p_ATTRIBUTE15    VARCHAR2,
+          p_DESCRIPTION    VARCHAR2 );
+
+
+PROCEDURE Update_Row(
+          p_CALCULATION_RULE_ID    NUMBER,
+          p_CREATED_BY    NUMBER,
+          p_CREATION_DATE    DATE,
+          p_LAST_UPDATED_BY    NUMBER,
+          p_LAST_UPDATE_DATE    DATE,
+          p_LAST_UPDATE_LOGIN    NUMBER,
+          p_CALCULATION_RULE_NAME    VARCHAR2,
+          p_INCLUDE_SALES_ORDERS    VARCHAR2,
+          p_INCLUDE_MOVE_ORDERS    VARCHAR2,
+          p_INCLUDE_REPAIR_ORDERS    VARCHAR2,
+          p_INCLUDE_WORK_ORDERS    VARCHAR2,
+          p_INCLUDE_PURCHASE_ORDERS    VARCHAR2,
+          p_INCLUDE_REQUISITIONS    VARCHAR2,
+          p_INCLUDE_INTERORG_TRANSFERS    VARCHAR2,
+          p_INCLUDE_ONHAND_GOOD    VARCHAR2,
+          p_INCLUDE_ONHAND_BAD    VARCHAR2,
+          p_INCLUDE_INTRANSIT_MOVE_ORD    VARCHAR2,
+          p_TOLERANCE_PERCENT    NUMBER,
+          p_TIME_FENCE    NUMBER,
+		p_INCLUDE_DOA	VARCHAR2,
+		p_ROLLUP_SUPERCESSION VARCHAR2,
+		p_FORECAST_LOWER_SUPERCESSION VARCHAR2,
+          p_ATTRIBUTE_CATEGORY    VARCHAR2,
+          p_ATTRIBUTE1    VARCHAR2,
+          p_ATTRIBUTE2    VARCHAR2,
+          p_ATTRIBUTE3    VARCHAR2,
+          p_ATTRIBUTE4    VARCHAR2,
+          p_ATTRIBUTE5    VARCHAR2,
+          p_ATTRIBUTE6    VARCHAR2,
+          p_ATTRIBUTE7    VARCHAR2,
+          p_ATTRIBUTE8    VARCHAR2,
+          p_ATTRIBUTE9    VARCHAR2,
+          p_ATTRIBUTE10    VARCHAR2,
+          p_ATTRIBUTE11    VARCHAR2,
+          p_ATTRIBUTE12    VARCHAR2,
+          p_ATTRIBUTE13    VARCHAR2,
+          p_ATTRIBUTE14    VARCHAR2,
+          p_ATTRIBUTE15    VARCHAR2,
+          p_DESCRIPTION    VARCHAR2 );
+
+PROCEDURE Lock_Row(
+          p_CALCULATION_RULE_ID    NUMBER,
+          p_CREATED_BY    NUMBER,
+          p_CREATION_DATE    DATE,
+          p_LAST_UPDATED_BY    NUMBER,
+          p_LAST_UPDATE_DATE    DATE,
+          p_LAST_UPDATE_LOGIN    NUMBER,
+          p_CALCULATION_RULE_NAME    VARCHAR2,
+          p_INCLUDE_SALES_ORDERS    VARCHAR2,
+          p_INCLUDE_MOVE_ORDERS    VARCHAR2,
+          p_INCLUDE_REPAIR_ORDERS    VARCHAR2,
+          p_INCLUDE_WORK_ORDERS    VARCHAR2,
+          p_INCLUDE_PURCHASE_ORDERS    VARCHAR2,
+          p_INCLUDE_REQUISITIONS    VARCHAR2,
+          p_INCLUDE_INTERORG_TRANSFERS    VARCHAR2,
+          p_INCLUDE_ONHAND_GOOD    VARCHAR2,
+          p_INCLUDE_ONHAND_BAD    VARCHAR2,
+          p_INCLUDE_INTRANSIT_MOVE_ORD  VARCHAR2,
+          p_TOLERANCE_PERCENT    NUMBER,
+          p_TIME_FENCE    NUMBER,
+		p_INCLUDE_DOA	VARCHAR2,
+		p_ROLLUP_SUPERCESSION VARCHAR2,
+		p_FORECAST_LOWER_SUPERCESSION VARCHAR2,
+          p_ATTRIBUTE_CATEGORY    VARCHAR2,
+          p_ATTRIBUTE1    VARCHAR2,
+          p_ATTRIBUTE2    VARCHAR2,
+          p_ATTRIBUTE3    VARCHAR2,
+          p_ATTRIBUTE4    VARCHAR2,
+          p_ATTRIBUTE5    VARCHAR2,
+          p_ATTRIBUTE6    VARCHAR2,
+          p_ATTRIBUTE7    VARCHAR2,
+          p_ATTRIBUTE8    VARCHAR2,
+          p_ATTRIBUTE9    VARCHAR2,
+          p_ATTRIBUTE10    VARCHAR2,
+          p_ATTRIBUTE11    VARCHAR2,
+          p_ATTRIBUTE12    VARCHAR2,
+          p_ATTRIBUTE13    VARCHAR2,
+          p_ATTRIBUTE14    VARCHAR2,
+          p_ATTRIBUTE15    VARCHAR2,
+          p_DESCRIPTION    VARCHAR2 );
+
+PROCEDURE Delete_Row(
+    p_CALCULATION_RULE_ID  NUMBER);
+
+procedure ADD_LANGUAGE;
+
+PROCEDURE Translate_Row
+( p_calculation_rule_id IN  NUMBER
+, p_description  	  IN  VARCHAR2
+, p_owner             IN VARCHAR2
+);
+
+PROCEDURE Load_Row
+( p_calculation_rule_id IN  NUMBER
+, p_description  	  IN  VARCHAR2
+, p_owner             IN VARCHAR2
+);
+End CSP_LOOP_CALC_RULES_B_PKG;
+
+
+ 
+
+/

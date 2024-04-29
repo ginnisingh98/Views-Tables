@@ -1,0 +1,83 @@
+--------------------------------------------------------
+--  DDL for Package IEU_SH_PUB
+--------------------------------------------------------
+
+  CREATE OR REPLACE EDITIONABLE PACKAGE "APPS"."IEU_SH_PUB" AUTHID CURRENT_USER AS
+/* $Header: IEUPSHS.pls 120.0 2005/06/02 15:44:20 appldev noship $ */
+PROCEDURE UWQ_BEGIN_SESSION
+( P_API_VERSION               IN NUMBER,
+  P_INIT_MSG_LIST             IN VARCHAR2 DEFAULT fnd_api.g_false,
+  P_COMMIT                    IN VARCHAR2 DEFAULT fnd_api.g_false,
+  P_RESOURCE_ID               IN NUMBER,
+  P_USER_ID                   IN NUMBER,
+  P_LOGIN_ID                  IN NUMBER,
+  P_EXTENSION                 IN VARCHAR2 DEFAULT NULL,
+  P_APPLICATION_ID            IN NUMBER,
+  X_SESSION_ID                OUT NOCOPY NUMBER,
+  X_MSG_COUNT                 OUT NOCOPY NUMBER,
+  X_MSG_DATA                  OUT NOCOPY VARCHAR2,
+  X_RETURN_STATUS             OUT NOCOPY VARCHAR2);
+
+PROCEDURE UWQ_END_SESSION
+( P_API_VERSION               IN NUMBER,
+  P_INIT_MSG_LIST             IN VARCHAR2 DEFAULT fnd_api.g_false,
+  P_COMMIT                    IN VARCHAR2 DEFAULT fnd_api.g_false,
+  P_SESSION_ID                IN NUMBER,
+  P_END_REASON_CODE           IN VARCHAR2 DEFAULT NULL,
+  X_MSG_COUNT                 OUT NOCOPY NUMBER,
+  X_MSG_DATA                  OUT NOCOPY VARCHAR2,
+  X_RETURN_STATUS             OUT NOCOPY VARCHAR2 );
+
+PROCEDURE UWQ_BEGIN_ACTIVITY
+( P_API_VERSION               IN NUMBER,
+  P_INIT_MSG_LIST             IN VARCHAR2 DEFAULT fnd_api.g_false,
+  P_COMMIT                    IN VARCHAR2 DEFAULT fnd_api.g_false,
+  P_SESSION_ID                IN NUMBER,
+--  P_ACTIVITY_TYPE_ID          IN NUMBER,
+  P_ACTIVITY_TYPE_CODE        IN VARCHAR2,
+  P_MEDIA_TYPE_ID             IN NUMBER   DEFAULT NULL,
+  P_MEDIA_ID                  IN NUMBER   DEFAULT NULL,
+  P_USER_ID                   IN NUMBER,
+  P_LOGIN_ID                  IN NUMBER,
+  P_REASON_CODE               IN VARCHAR2 DEFAULT NULL,
+  P_REQUEST_METHOD            IN VARCHAR2 DEFAULT NULL,
+  P_REQUESTED_MEDIA_TYPE_ID   IN NUMBER   DEFAULT NULL,
+  P_WORK_ITEM_TYPE_CODE       IN VARCHAR2 DEFAULT NULL,
+  P_WORK_ITEM_PK_ID           IN NUMBER   DEFAULT NULL,
+  P_END_ACTIVITY_FLAG         IN VARCHAR2 DEFAULT NULL,
+  X_ACTIVITY_ID               OUT NOCOPY NUMBER,
+  X_MSG_COUNT                 OUT NOCOPY NUMBER,
+  X_MSG_DATA                  OUT NOCOPY VARCHAR2,
+  X_RETURN_STATUS             OUT NOCOPY VARCHAR2);
+
+PROCEDURE UWQ_UPDATE_ACTIVITY
+( P_API_VERSION               IN NUMBER,
+  P_INIT_MSG_LIST             IN VARCHAR2 DEFAULT fnd_api.g_false,
+  P_COMMIT                    IN VARCHAR2 DEFAULT fnd_api.g_false,
+  P_ACTIVITY_ID               IN NUMBER,
+  P_INTERMEDIATE_STATE_CODE   IN VARCHAR2 DEFAULT NULL,
+  P_MEDIA_TYPE_ID             IN NUMBER   DEFAULT NULL,
+  P_MEDIA_ID                  IN NUMBER   DEFAULT NULL,
+  P_REASON_CODE               IN VARCHAR2 DEFAULT NULL,
+  X_MSG_COUNT                 OUT NOCOPY NUMBER,
+  X_MSG_DATA                  OUT NOCOPY VARCHAR2,
+  X_RETURN_STATUS             OUT NOCOPY VARCHAR2);
+
+
+PROCEDURE UWQ_END_ACTIVITY
+( P_API_VERSION               IN NUMBER,
+  P_INIT_MSG_LIST             IN VARCHAR2 DEFAULT fnd_api.g_false,
+  P_COMMIT                    IN VARCHAR2 DEFAULT fnd_api.g_false,
+  P_ACTIVITY_ID               IN NUMBER,
+  P_MEDIA_TYPE_ID             IN NUMBER   DEFAULT NULL,
+  P_MEDIA_ID                  IN NUMBER   DEFAULT NULL,
+  P_COMPLETION_CODE           IN VARCHAR2 DEFAULT NULL,
+  X_MSG_COUNT                 OUT NOCOPY NUMBER,
+  X_MSG_DATA                  OUT NOCOPY VARCHAR2,
+  X_RETURN_STATUS             OUT NOCOPY VARCHAR2);
+
+END IEU_SH_PUB;
+
+ 
+
+/

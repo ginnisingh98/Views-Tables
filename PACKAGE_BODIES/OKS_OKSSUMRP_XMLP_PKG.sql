@@ -1,0 +1,128 @@
+--------------------------------------------------------
+--  DDL for Package Body OKS_OKSSUMRP_XMLP_PKG
+--------------------------------------------------------
+
+  CREATE OR REPLACE EDITIONABLE PACKAGE BODY "APPS"."OKS_OKSSUMRP_XMLP_PKG" AS
+/* $Header: OKSSUMRPB.pls 120.2 2007/12/25 08:01:44 nchinnam noship $ */
+  FUNCTION BEFOREREPORT RETURN BOOLEAN IS
+   apf boolean;
+  BEGIN
+    apf := afterpform;
+    IF P_OPERATING_UNIT IS NOT NULL THEN
+      MO_GLOBAL.SET_POLICY_CONTEXT('S'
+                                  ,P_OPERATING_UNIT);
+    END IF;
+    RETURN (TRUE);
+  END BEFOREREPORT;
+
+  FUNCTION CF_1FORMULA(REP_NAME1 IN VARCHAR2
+                      ,ORG_ID IN NUMBER) RETURN VARCHAR2 IS
+    L_REP_NAME VARCHAR2(240) := NULL;
+  BEGIN
+    SELECT
+      DISTINCT
+      NAME
+    INTO L_REP_NAME
+    FROM
+      JTF_RS_SALESREPS
+    WHERE SALESREP_ID = REP_NAME1
+      AND ORG_ID = CF_1FORMULA.ORG_ID
+      AND ROWNUM < 2;
+    RETURN (L_REP_NAME);
+  EXCEPTION
+    WHEN NO_DATA_FOUND THEN
+      L_REP_NAME := NULL;
+      RETURN (L_REP_NAME);
+    WHEN OTHERS THEN
+      L_REP_NAME := NULL;
+      RETURN (L_REP_NAME);
+  END CF_1FORMULA;
+
+  FUNCTION CF_LAST_INTRERACTIONFORMULA(CONTRACT_ID IN NUMBER) RETURN CHAR IS
+    V_LAST_INT_DATE DATE;
+    CURSOR C1 IS
+      SELECT
+        MAX(B.INT_END_DATE)
+      FROM
+        OKC_LAUNCH_COMMGRID_V B,
+        OKC_K_HEADERS_B A
+      WHERE A.ID = CONTRACT_ID
+        AND A.ID = B.CONTRACT_ID
+        AND ROWNUM < 2;
+  BEGIN
+    OPEN C1;
+    FETCH C1
+     INTO V_LAST_INT_DATE;
+    CLOSE C1;
+    RETURN (V_LAST_INT_DATE);
+  EXCEPTION
+    WHEN NO_DATA_FOUND THEN
+      V_LAST_INT_DATE := NULL;
+      RETURN (V_LAST_INT_DATE);
+    WHEN OTHERS THEN
+      V_LAST_INT_DATE := NULL;
+      RETURN (V_LAST_INT_DATE);
+  END CF_LAST_INTRERACTIONFORMULA;
+
+  FUNCTION AFTERPFORM RETURN BOOLEAN IS
+    X_REP_NAME VARCHAR2(800);
+    X_CUSTOMER_NAME VARCHAR2(800);
+    X_CUSTOMER_NUMBER VARCHAR2(800);
+    X_ORG_ID VARCHAR2(800);
+    X_CURRENCY_CODE VARCHAR2(800);
+  BEGIN
+    BEGIN
+      P_CONC_REQUEST_ID := FND_GLOBAL.CONC_REQUEST_ID;
+      /*SRW.USER_EXIT('FND SRWINIT')*/NULL;
+    EXCEPTION
+      WHEN /*SRW.USER_EXIT_FAILURE*/OTHERS THEN
+        /*SRW.MESSAGE(1
+                   ,'srw_init')*/NULL;
+    END;
+    IF P_REP_NAME IS NOT NULL THEN
+      X_REP_NAME := ' and rep_name = :p_rep_name';
+      P_REP_NAME_WHERE := X_REP_NAME;
+    END IF;
+    IF P_CUSTOMER_NAME IS NOT NULL THEN
+      X_CUSTOMER_NAME := ' and customer_id = :p_customer_name';
+      P_CUSTOMER_NAME_WHERE := X_CUSTOMER_NAME;
+    END IF;
+    IF P_CUSTOMER_NUMBER IS NOT NULL THEN
+      X_CUSTOMER_NUMBER := ' and customer_id = :p_customer_number';
+      P_CUSTOMER_NUMBER_WHERE := X_CUSTOMER_NUMBER;
+    END IF;
+    IF P_CURRENCY_CODE IS NOT NULL THEN
+      X_CURRENCY_CODE := ' and currency_code = :p_currency_code';
+      P_CURRENCY_CODE_WHERE := X_CURRENCY_CODE;
+    END IF;
+    P_START_DATE_WHERE := ' ';
+    IF P_FROM_DATE IS NOT NULL THEN
+      P_START_DATE_WHERE := P_START_DATE_WHERE || ' and START_DATE >= :p_from_date ';
+    END IF;
+    IF P_TO_DATE IS NOT NULL THEN
+      P_START_DATE_WHERE := P_START_DATE_WHERE || ' and START_DATE <= :p_to_date ';
+    END IF;
+    IF P_CONTRACT_GROUP IS NOT NULL THEN
+      P_CONTRACT_GROUP_WHERE := ' and contract_id in ( select INCLUDED_CHR_ID from okc_k_grpings
+                                                                                    start with CGP_PARENT_ID = :p_contract_group
+                                                                                    connect by CGP_PARENT_ID = PRIOR INCLUDED_CGP_ID ) ';
+    END IF;
+    RETURN (TRUE);
+  END AFTERPFORM;
+
+  FUNCTION AFTERREPORT RETURN BOOLEAN IS
+  BEGIN
+    BEGIN
+      /*SRW.USER_EXIT('FND SRWEXIT')*/NULL;
+    EXCEPTION
+      WHEN /*SRW.USER_EXIT_FAILURE*/OTHERS THEN
+        /*SRW.MESSAGE(1
+                   ,'srw_exit')*/NULL;
+    END;
+    RETURN (TRUE);
+  END AFTERREPORT;
+
+END OKS_OKSSUMRP_XMLP_PKG;
+
+
+/

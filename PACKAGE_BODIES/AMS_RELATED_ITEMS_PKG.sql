@@ -1,0 +1,241 @@
+--------------------------------------------------------
+--  DDL for Package Body AMS_RELATED_ITEMS_PKG
+--------------------------------------------------------
+
+  CREATE OR REPLACE EDITIONABLE PACKAGE BODY "APPS"."AMS_RELATED_ITEMS_PKG" as
+/* $Header: amstritb.pls 115.4 2002/11/11 22:05:43 abhola ship $ */
+-- Start of Comments
+-- Package name     : AMS_RELATED_ITEMS_PKG
+-- Purpose          :
+-- History          :
+-- NOTE             :
+-- End of Comments
+
+
+G_PKG_NAME CONSTANT VARCHAR2(30):= 'AMS_RELATED_ITEMS_PKG';
+G_FILE_NAME CONSTANT VARCHAR2(12) := 'amstritb.pls';
+
+PROCEDURE Insert_Row(
+          p_INVENTORY_ITEM_ID    NUMBER,
+          p_ORGANIZATION_ID    NUMBER,
+          p_RELATED_ITEM_ID    NUMBER,
+          p_RELATIONSHIP_TYPE_ID    NUMBER,
+          p_RECIPROCAL_FLAG    VARCHAR2,
+          p_LAST_UPDATE_DATE    DATE,
+          p_LAST_UPDATED_BY    NUMBER,
+          p_CREATION_DATE    DATE,
+          p_CREATED_BY    NUMBER,
+          p_LAST_UPDATE_LOGIN    NUMBER,
+          p_REQUEST_ID    NUMBER,
+          p_PROGRAM_APPLICATION_ID    NUMBER,
+          p_PROGRAM_ID    NUMBER,
+          p_PROGRAM_UPDATE_DATE    DATE)
+
+ IS
+X_ROWID    VARCHAR2(30);
+
+   CURSOR C IS SELECT rowid FROM MTL_RELATED_ITEMS
+            WHERE RELATED_ITEM_ID = p_RELATED_ITEM_ID
+		    AND ORGANIZATION_ID = p_ORGANIZATION_ID
+		    AND INVENTORY_ITEM_ID = p_INVENTORY_ITEM_ID
+		    AND RELATIONSHIP_TYPE_ID = p_RELATIONSHIP_TYPE_ID;
+
+BEGIN
+
+
+   INSERT INTO MTL_RELATED_ITEMS(
+           INVENTORY_ITEM_ID,
+           ORGANIZATION_ID,
+           RELATED_ITEM_ID,
+           RELATIONSHIP_TYPE_ID,
+           RECIPROCAL_FLAG,
+           LAST_UPDATE_DATE,
+           LAST_UPDATED_BY,
+           CREATION_DATE,
+           CREATED_BY,
+           LAST_UPDATE_LOGIN,
+           REQUEST_ID,
+           PROGRAM_APPLICATION_ID,
+           PROGRAM_ID,
+           PROGRAM_UPDATE_DATE,
+           object_version_number
+          ) VALUES (
+           decode( p_INVENTORY_ITEM_ID, FND_API.G_MISS_NUM, NULL, p_INVENTORY_ITEM_ID),
+           decode( p_ORGANIZATION_ID, FND_API.G_MISS_NUM, NULL, p_ORGANIZATION_ID),
+           decode( p_RELATED_ITEM_ID, FND_API.G_MISS_NUM, NULL, p_RELATED_ITEM_ID),
+           decode( p_RELATIONSHIP_TYPE_ID, FND_API.G_MISS_NUM, NULL, p_RELATIONSHIP_TYPE_ID),
+           decode( p_RECIPROCAL_FLAG, FND_API.G_MISS_CHAR, NULL, p_RECIPROCAL_FLAG),
+           decode( p_LAST_UPDATE_DATE, FND_API.G_MISS_DATE, NULL, p_LAST_UPDATE_DATE),
+           decode( p_LAST_UPDATED_BY, FND_API.G_MISS_NUM, NULL, p_LAST_UPDATED_BY),
+           decode( p_CREATION_DATE, FND_API.G_MISS_DATE, NULL, p_CREATION_DATE),
+           decode( p_CREATED_BY, FND_API.G_MISS_NUM, NULL, p_CREATED_BY),
+           decode( p_LAST_UPDATE_LOGIN, FND_API.G_MISS_NUM, NULL, p_LAST_UPDATE_LOGIN),
+           decode( p_REQUEST_ID, FND_API.G_MISS_NUM, NULL, p_REQUEST_ID),
+           decode( p_PROGRAM_APPLICATION_ID, FND_API.G_MISS_NUM, NULL, p_PROGRAM_APPLICATION_ID),
+           decode( p_PROGRAM_ID, FND_API.G_MISS_NUM, NULL, p_PROGRAM_ID),
+           decode( p_PROGRAM_UPDATE_DATE, FND_API.G_MISS_DATE, NULL, p_PROGRAM_UPDATE_DATE),
+           1 );
+   OPEN C;
+   FETCH C INTO x_rowid;
+   If (C%NOTFOUND) then
+       CLOSE C;
+       RAISE NO_DATA_FOUND;
+   End If;
+End Insert_Row;
+
+PROCEDURE Update_Row(
+          p_INVENTORY_ITEM_ID    NUMBER,
+          p_ORGANIZATION_ID    NUMBER,
+          p_RELATED_ITEM_ID    NUMBER,
+          p_RELATIONSHIP_TYPE_ID    NUMBER,
+          p_RECIPROCAL_FLAG    VARCHAR2,
+          p_LAST_UPDATE_DATE    DATE,
+          p_LAST_UPDATED_BY    NUMBER,
+          p_CREATION_DATE    DATE,
+          p_CREATED_BY    NUMBER,
+          p_LAST_UPDATE_LOGIN    NUMBER,
+          p_REQUEST_ID    NUMBER,
+          p_PROGRAM_APPLICATION_ID    NUMBER,
+          p_PROGRAM_ID    NUMBER,
+          p_PROGRAM_UPDATE_DATE    DATE)
+
+ IS
+ BEGIN
+    Update MTL_RELATED_ITEMS
+    SET
+              INVENTORY_ITEM_ID = decode( p_INVENTORY_ITEM_ID, FND_API.G_MISS_NUM, INVENTORY_ITEM_ID, p_INVENTORY_ITEM_ID),
+              ORGANIZATION_ID = decode( p_ORGANIZATION_ID, FND_API.G_MISS_NUM, ORGANIZATION_ID, p_ORGANIZATION_ID),
+              RELATED_ITEM_ID = decode( p_RELATED_ITEM_ID, FND_API.G_MISS_NUM, RELATED_ITEM_ID, p_RELATED_ITEM_ID),
+              RELATIONSHIP_TYPE_ID = decode( p_RELATIONSHIP_TYPE_ID, FND_API.G_MISS_NUM, RELATIONSHIP_TYPE_ID, p_RELATIONSHIP_TYPE_ID),
+              RECIPROCAL_FLAG = decode( p_RECIPROCAL_FLAG, FND_API.G_MISS_CHAR, RECIPROCAL_FLAG, p_RECIPROCAL_FLAG),
+              LAST_UPDATE_DATE = decode( p_LAST_UPDATE_DATE, FND_API.G_MISS_DATE, LAST_UPDATE_DATE, p_LAST_UPDATE_DATE),
+              LAST_UPDATED_BY = decode( p_LAST_UPDATED_BY, FND_API.G_MISS_NUM, LAST_UPDATED_BY, p_LAST_UPDATED_BY),
+              CREATION_DATE = decode( p_CREATION_DATE, FND_API.G_MISS_DATE, CREATION_DATE, p_CREATION_DATE),
+              CREATED_BY = decode( p_CREATED_BY, FND_API.G_MISS_NUM, CREATED_BY, p_CREATED_BY),
+              LAST_UPDATE_LOGIN = decode( p_LAST_UPDATE_LOGIN, FND_API.G_MISS_NUM, LAST_UPDATE_LOGIN, p_LAST_UPDATE_LOGIN),
+              REQUEST_ID = decode( p_REQUEST_ID, FND_API.G_MISS_NUM, REQUEST_ID, p_REQUEST_ID),
+              PROGRAM_APPLICATION_ID = decode( p_PROGRAM_APPLICATION_ID, FND_API.G_MISS_NUM, PROGRAM_APPLICATION_ID, p_PROGRAM_APPLICATION_ID),
+              PROGRAM_ID = decode( p_PROGRAM_ID, FND_API.G_MISS_NUM, PROGRAM_ID, p_PROGRAM_ID),
+              PROGRAM_UPDATE_DATE = decode( p_PROGRAM_UPDATE_DATE, FND_API.G_MISS_DATE, PROGRAM_UPDATE_DATE, p_PROGRAM_UPDATE_DATE)
+    where RELATED_ITEM_ID = p_RELATED_ITEM_ID
+	  AND ORGANIZATION_ID = p_ORGANIZATION_ID
+	  AND INVENTORY_ITEM_ID = p_INVENTORY_ITEM_ID
+	  AND RELATIONSHIP_TYPE_ID = p_RELATIONSHIP_TYPE_ID;
+
+    If (SQL%NOTFOUND) then
+        RAISE NO_DATA_FOUND;
+    End If;
+END Update_Row;
+
+PROCEDURE Delete_Row(
+          p_INVENTORY_ITEM_ID    NUMBER,
+          p_ORGANIZATION_ID      NUMBER,
+          p_RELATED_ITEM_ID      NUMBER,
+          p_RELATIONSHIP_TYPE_ID    NUMBER,
+          p_RECIPROCAL_FLAG    VARCHAR2,
+          p_LAST_UPDATE_DATE    DATE,
+          p_LAST_UPDATED_BY    NUMBER,
+          p_CREATION_DATE    DATE,
+          p_CREATED_BY    NUMBER,
+          p_LAST_UPDATE_LOGIN    NUMBER,
+          p_REQUEST_ID    NUMBER,
+          p_PROGRAM_APPLICATION_ID    NUMBER,
+          p_PROGRAM_ID    NUMBER,
+          p_PROGRAM_UPDATE_DATE    DATE)
+ IS
+ BEGIN
+   DELETE FROM MTL_RELATED_ITEMS
+    WHERE RELATED_ITEM_ID = p_RELATED_ITEM_ID
+	 AND INVENTORY_ITEM_ID = p_INVENTORY_ITEM_ID
+	 AND ORGANIZATION_ID = p_ORGANIZATION_ID
+	 AND RELATIONSHIP_TYPE_ID = p_RELATIONSHIP_TYPE_ID;
+
+   If (SQL%NOTFOUND) then
+       RAISE NO_DATA_FOUND;
+   End If;
+ END Delete_Row;
+
+PROCEDURE Lock_Row(
+          p_INVENTORY_ITEM_ID    NUMBER,
+          p_ORGANIZATION_ID    NUMBER,
+          p_RELATED_ITEM_ID    NUMBER,
+          p_RELATIONSHIP_TYPE_ID    NUMBER,
+          p_RECIPROCAL_FLAG    VARCHAR2,
+          p_LAST_UPDATE_DATE    DATE,
+          p_LAST_UPDATED_BY    NUMBER,
+          p_CREATION_DATE    DATE,
+          p_CREATED_BY    NUMBER,
+          p_LAST_UPDATE_LOGIN    NUMBER,
+          p_REQUEST_ID    NUMBER,
+          p_PROGRAM_APPLICATION_ID    NUMBER,
+          p_PROGRAM_ID    NUMBER,
+          p_PROGRAM_UPDATE_DATE    DATE)
+
+ IS
+   CURSOR C IS
+        SELECT *
+         FROM MTL_RELATED_ITEMS
+        WHERE RELATED_ITEM_ID =  p_RELATED_ITEM_ID
+        FOR UPDATE of RELATED_ITEM_ID NOWAIT;
+   Recinfo C%ROWTYPE;
+ BEGIN
+    OPEN C;
+    FETCH C INTO Recinfo;
+    If (C%NOTFOUND) then
+        CLOSE C;
+        FND_MESSAGE.SET_NAME('FND', 'FORM_RECORD_DELETED');
+        APP_EXCEPTION.RAISE_EXCEPTION;
+    End If;
+    CLOSE C;
+    if (
+           (      Recinfo.INVENTORY_ITEM_ID = p_INVENTORY_ITEM_ID)
+       AND (    ( Recinfo.ORGANIZATION_ID = p_ORGANIZATION_ID)
+            OR (    ( Recinfo.ORGANIZATION_ID IS NULL )
+                AND (  p_ORGANIZATION_ID IS NULL )))
+       AND (    ( Recinfo.RELATED_ITEM_ID = p_RELATED_ITEM_ID)
+            OR (    ( Recinfo.RELATED_ITEM_ID IS NULL )
+                AND (  p_RELATED_ITEM_ID IS NULL )))
+       AND (    ( Recinfo.RELATIONSHIP_TYPE_ID = p_RELATIONSHIP_TYPE_ID)
+            OR (    ( Recinfo.RELATIONSHIP_TYPE_ID IS NULL )
+                AND (  p_RELATIONSHIP_TYPE_ID IS NULL )))
+       AND (    ( Recinfo.RECIPROCAL_FLAG = p_RECIPROCAL_FLAG)
+            OR (    ( Recinfo.RECIPROCAL_FLAG IS NULL )
+                AND (  p_RECIPROCAL_FLAG IS NULL )))
+       AND (    ( Recinfo.LAST_UPDATE_DATE = p_LAST_UPDATE_DATE)
+            OR (    ( Recinfo.LAST_UPDATE_DATE IS NULL )
+                AND (  p_LAST_UPDATE_DATE IS NULL )))
+       AND (    ( Recinfo.LAST_UPDATED_BY = p_LAST_UPDATED_BY)
+            OR (    ( Recinfo.LAST_UPDATED_BY IS NULL )
+                AND (  p_LAST_UPDATED_BY IS NULL )))
+       AND (    ( Recinfo.CREATION_DATE = p_CREATION_DATE)
+            OR (    ( Recinfo.CREATION_DATE IS NULL )
+                AND (  p_CREATION_DATE IS NULL )))
+       AND (    ( Recinfo.CREATED_BY = p_CREATED_BY)
+            OR (    ( Recinfo.CREATED_BY IS NULL )
+                AND (  p_CREATED_BY IS NULL )))
+       AND (    ( Recinfo.LAST_UPDATE_LOGIN = p_LAST_UPDATE_LOGIN)
+            OR (    ( Recinfo.LAST_UPDATE_LOGIN IS NULL )
+                AND (  p_LAST_UPDATE_LOGIN IS NULL )))
+       AND (    ( Recinfo.REQUEST_ID = p_REQUEST_ID)
+            OR (    ( Recinfo.REQUEST_ID IS NULL )
+                AND (  p_REQUEST_ID IS NULL )))
+       AND (    ( Recinfo.PROGRAM_APPLICATION_ID = p_PROGRAM_APPLICATION_ID)
+            OR (    ( Recinfo.PROGRAM_APPLICATION_ID IS NULL )
+                AND (  p_PROGRAM_APPLICATION_ID IS NULL )))
+       AND (    ( Recinfo.PROGRAM_ID = p_PROGRAM_ID)
+            OR (    ( Recinfo.PROGRAM_ID IS NULL )
+                AND (  p_PROGRAM_ID IS NULL )))
+       AND (    ( Recinfo.PROGRAM_UPDATE_DATE = p_PROGRAM_UPDATE_DATE)
+            OR (    ( Recinfo.PROGRAM_UPDATE_DATE IS NULL )
+                AND (  p_PROGRAM_UPDATE_DATE IS NULL )))
+       ) then
+       return;
+   else
+       FND_MESSAGE.SET_NAME('FND', 'FORM_RECORD_CHANGED');
+       APP_EXCEPTION.RAISE_EXCEPTION;
+   End If;
+END Lock_Row;
+
+End AMS_RELATED_ITEMS_PKG;
+
+/

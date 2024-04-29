@@ -1,0 +1,140 @@
+--------------------------------------------------------
+--  DDL for Package IGS_AD_SBM_PS_FNTRGT_PKG
+--------------------------------------------------------
+
+  CREATE OR REPLACE EDITIONABLE PACKAGE "APPS"."IGS_AD_SBM_PS_FNTRGT_PKG" AUTHID CURRENT_USER as
+/* $Header: IGSAI60S.pls 115.3 2002/11/28 22:10:58 nsidana ship $ */
+
+procedure INSERT_ROW (
+  X_ROWID in out NOCOPY VARCHAR2,
+  X_SUBMISSION_YR in NUMBER,
+  X_SUBMISSION_NUMBER in NUMBER,
+  X_COURSE_CD in VARCHAR2,
+  X_CRV_VERSION_NUMBER in NUMBER,
+  X_FUNDING_SOURCE in VARCHAR2,
+  X_SEQUENCE_NUMBER in NUMBER,
+  X_LOCATION_CD in VARCHAR2,
+  X_ATTENDANCE_MODE in VARCHAR2,
+  X_ATTENDANCE_TYPE in VARCHAR2,
+  X_UNIT_SET_CD in VARCHAR2,
+  X_US_VERSION_NUMBER in NUMBER,
+  X_MODE in VARCHAR2 default 'R'
+  );
+procedure LOCK_ROW (
+  X_ROWID in VARCHAR2,
+  X_SUBMISSION_YR in NUMBER,
+  X_SUBMISSION_NUMBER in NUMBER,
+  X_COURSE_CD in VARCHAR2,
+  X_CRV_VERSION_NUMBER in NUMBER,
+  X_FUNDING_SOURCE in VARCHAR2,
+  X_SEQUENCE_NUMBER in NUMBER,
+  X_LOCATION_CD in VARCHAR2,
+  X_ATTENDANCE_MODE in VARCHAR2,
+  X_ATTENDANCE_TYPE in VARCHAR2,
+  X_UNIT_SET_CD in VARCHAR2,
+  X_US_VERSION_NUMBER in NUMBER
+);
+procedure UPDATE_ROW (
+  X_ROWID in VARCHAR2,
+  X_SUBMISSION_YR in NUMBER,
+  X_SUBMISSION_NUMBER in NUMBER,
+  X_COURSE_CD in VARCHAR2,
+  X_CRV_VERSION_NUMBER in NUMBER,
+  X_FUNDING_SOURCE in VARCHAR2,
+  X_SEQUENCE_NUMBER in NUMBER,
+  X_LOCATION_CD in VARCHAR2,
+  X_ATTENDANCE_MODE in VARCHAR2,
+  X_ATTENDANCE_TYPE in VARCHAR2,
+  X_UNIT_SET_CD in VARCHAR2,
+  X_US_VERSION_NUMBER in NUMBER,
+  X_MODE in VARCHAR2 default 'R'
+  );
+procedure ADD_ROW (
+  X_ROWID in out NOCOPY VARCHAR2,
+  X_SUBMISSION_YR in NUMBER,
+  X_SUBMISSION_NUMBER in NUMBER,
+  X_COURSE_CD in VARCHAR2,
+  X_CRV_VERSION_NUMBER in NUMBER,
+  X_FUNDING_SOURCE in VARCHAR2,
+  X_SEQUENCE_NUMBER in NUMBER,
+  X_LOCATION_CD in VARCHAR2,
+  X_ATTENDANCE_MODE in VARCHAR2,
+  X_ATTENDANCE_TYPE in VARCHAR2,
+  X_UNIT_SET_CD in VARCHAR2,
+  X_US_VERSION_NUMBER in NUMBER,
+  X_MODE in VARCHAR2 default 'R'
+  );
+procedure DELETE_ROW (
+  X_ROWID in VARCHAR2
+  );
+function Get_PK_For_Validation (
+    x_submission_yr IN NUMBER,
+    x_submission_number IN NUMBER,
+    x_course_cd IN VARCHAR2,
+    x_crv_version_number IN NUMBER,
+    x_funding_source IN VARCHAR2,
+    x_sequence_number IN NUMBER
+)return BOOLEAN;
+
+procedure Check_Constraints (
+  Column_Name IN VARCHAR2 DEFAULT NULL,
+  Column_Value IN VARCHAR2 DEFAULT NULL
+);
+
+  PROCEDURE GET_FK_IGS_EN_ATD_MODE (
+    x_attendance_mode IN VARCHAR2
+    );
+
+  PROCEDURE GET_FK_IGS_EN_ATD_TYPE (
+    x_attendance_type IN VARCHAR2
+    );
+
+  PROCEDURE GET_FK_IGS_PS_VER (
+    x_course_cd IN VARCHAR2,
+    x_version_number IN NUMBER
+    );
+
+  PROCEDURE GET_FK_IGS_FI_FUND_SRC (
+    x_funding_source IN VARCHAR2
+    );
+
+  PROCEDURE GET_FK_IGS_ST_GVT_SPSHT_CTL (
+    x_submission_yr IN NUMBER,
+    x_submission_number IN NUMBER
+    );
+
+  PROCEDURE GET_FK_IGS_AD_LOCATION (
+    x_location_cd IN VARCHAR2
+    );
+
+  PROCEDURE GET_FK_IGS_EN_UNIT_SET (
+    x_unit_set_cd IN VARCHAR2,
+    x_version_number IN NUMBER
+    );
+
+  PROCEDURE Before_DML (
+    p_action IN VARCHAR2,
+    x_rowid IN VARCHAR2 DEFAULT NULL,
+    x_submission_yr IN NUMBER DEFAULT NULL,
+    x_submission_number IN NUMBER DEFAULT NULL,
+    x_course_cd IN VARCHAR2 DEFAULT NULL,
+    x_crv_version_number IN NUMBER DEFAULT NULL,
+    x_funding_source IN VARCHAR2 DEFAULT NULL,
+    x_sequence_number IN NUMBER DEFAULT NULL,
+    x_location_cd IN VARCHAR2 DEFAULT NULL,
+    x_attendance_mode IN VARCHAR2 DEFAULT NULL,
+    x_attendance_type IN VARCHAR2 DEFAULT NULL,
+    x_unit_set_cd IN VARCHAR2 DEFAULT NULL,
+    x_us_version_number IN NUMBER DEFAULT NULL,
+    x_creation_date IN DATE DEFAULT NULL,
+    x_created_by IN NUMBER DEFAULT NULL,
+    x_last_update_date IN DATE DEFAULT NULL,
+    x_last_updated_by IN NUMBER DEFAULT NULL,
+    x_last_update_login IN NUMBER DEFAULT NULL
+  );
+
+end IGS_AD_SBM_PS_FNTRGT_PKG;
+
+ 
+
+/

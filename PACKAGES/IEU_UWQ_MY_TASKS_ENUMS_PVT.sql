@@ -1,0 +1,26 @@
+--------------------------------------------------------
+--  DDL for Package IEU_UWQ_MY_TASKS_ENUMS_PVT
+--------------------------------------------------------
+
+  CREATE OR REPLACE EDITIONABLE PACKAGE "APPS"."IEU_UWQ_MY_TASKS_ENUMS_PVT" AUTHID CURRENT_USER AS
+/* $Header: IEUEMTOS.pls 120.0 2005/06/02 15:43:46 appldev noship $ */
+
+
+-- Sub-Program Unit Declarations
+
+PROCEDURE ENUMERATE_MY_TASKS_OWN_NODES
+  (P_RESOURCE_ID      IN NUMBER
+  ,P_LANGUAGE         IN VARCHAR2
+  ,P_SOURCE_LANG      IN VARCHAR2
+  ,P_SEL_ENUM_ID      IN NUMBER );
+
+
+PROCEDURE REFRESH_MY_TASKS_OWN_NODES
+  (P_RESOURCE_ID IN NUMBER,
+   P_NODE_ID IN NUMBER,
+   P_COUNT OUT NOCOPY NUMBER);
+
+END IEU_UWQ_MY_TASKS_ENUMS_PVT;
+ 
+
+/

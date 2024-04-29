@@ -1,0 +1,56 @@
+--------------------------------------------------------
+--  DDL for Package Body INV_INVTRCLS_XMLP_PKG
+--------------------------------------------------------
+
+  CREATE OR REPLACE EDITIONABLE PACKAGE BODY "APPS"."INV_INVTRCLS_XMLP_PKG" AS
+/* $Header: INVTRCLSB.pls 120.1 2007/12/25 11:05:02 dwkrishn noship $ */
+  FUNCTION BEFOREREPORT RETURN BOOLEAN IS
+  BEGIN
+    BEGIN
+      P_CONC_REQUEST_ID := FND_GLOBAL.CONC_REQUEST_ID;
+      P_CLOSE_DATE_T := to_char(P_CLOSE_DATE,'DD-MON-YY');
+      /*SRW.USER_EXIT('FND SRWINIT')*/NULL;
+    EXCEPTION
+      WHEN /*SRW.USER_EXIT_FAILURE*/OTHERS THEN
+        /*SRW.MESSAGE(1
+                   ,'Failed in before report trigger:SRWINIT')*/NULL;
+        RAISE;
+    END;
+    RETURN (TRUE);
+  END BEFOREREPORT;
+  FUNCTION AFTERREPORT RETURN BOOLEAN IS
+  BEGIN
+    BEGIN
+      /*SRW.USER_EXIT('FND SRWEXIT')*/NULL;
+    EXCEPTION
+      WHEN /*SRW.USER_EXIT_FAILURE*/OTHERS THEN
+        /*SRW.MESSAGE(1
+                   ,'SRWEXIT failed')*/NULL;
+    END;
+    RETURN (TRUE);
+  END AFTERREPORT;
+  FUNCTION C_CURRENCY_CODEFORMULA(R_CURRENCY_CODE IN VARCHAR2) RETURN VARCHAR2 IS
+  BEGIN
+    RETURN ('(' || R_CURRENCY_CODE || ')');
+  END C_CURRENCY_CODEFORMULA;
+  FUNCTION C_ORDER_BYFORMULA RETURN VARCHAR2 IS
+  BEGIN
+    IF P_SORT_ID = 1 THEN
+      RETURN ('order by 1,3');
+    ELSE
+      IF P_SORT_ID = 2 THEN
+        RETURN ('order by 3 ASC, 1');
+      ELSE
+        IF P_SORT_ID = 3 THEN
+          RETURN ('order by 3 DESC, 1');
+        ELSE
+          RETURN (NULL);
+        END IF;
+      END IF;
+    END IF;
+    RETURN NULL;
+  END C_ORDER_BYFORMULA;
+END INV_INVTRCLS_XMLP_PKG;
+
+
+/

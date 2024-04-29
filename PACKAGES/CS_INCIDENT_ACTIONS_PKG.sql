@@ -1,0 +1,143 @@
+--------------------------------------------------------
+--  DDL for Package CS_INCIDENT_ACTIONS_PKG
+--------------------------------------------------------
+
+  CREATE OR REPLACE EDITIONABLE PACKAGE "APPS"."CS_INCIDENT_ACTIONS_PKG" AUTHID CURRENT_USER as
+/* $Header: csincas.pls 115.0 99/07/16 08:57:55 porting ship $ */
+
+
+  PROCEDURE Insert_Row(X_Rowid                   	IN OUT VARCHAR2,
+                       X_Incident_Action_Id      	IN OUT NUMBER,
+                       X_Last_Update_Date               DATE,
+                       X_Last_Updated_By                NUMBER,
+                       X_Creation_Date                  DATE,
+                       X_Created_By                     NUMBER,
+                       X_Last_Update_Login              NUMBER DEFAULT NULL,
+                       X_Incident_Id                    NUMBER,
+                       X_Action_Code                    VARCHAR2,
+                       X_Action_Num              	NUMBER,
+                       X_Action_Type_Id                 NUMBER DEFAULT NULL,
+                       X_Action_Status_Id               NUMBER DEFAULT NULL,
+                       X_Responsible_Person_Id          NUMBER DEFAULT NULL,
+                       X_Text                           VARCHAR2 DEFAULT NULL,
+                       X_Completion_Date                DATE DEFAULT NULL,
+                       X_actual_time                    number  DEFAULT NULL,
+                       X_Action_Severity_Id             NUMBER DEFAULT NULL,
+                       X_Text_Description               VARCHAR2 DEFAULT NULL,
+                       X_Text_Resolution                VARCHAR2 DEFAULT NULL,
+                       X_Action_Effective_Date          DATE DEFAULT NULL,
+                       X_Expected_Resolution_Date       DATE DEFAULT NULL,
+                       X_Attribute1                     VARCHAR2 DEFAULT NULL,
+                       X_Attribute2                     VARCHAR2 DEFAULT NULL,
+                       X_Attribute3                     VARCHAR2 DEFAULT NULL,
+                       X_Attribute4                     VARCHAR2 DEFAULT NULL,
+                       X_Attribute5                     VARCHAR2 DEFAULT NULL,
+                       X_Attribute6                     VARCHAR2 DEFAULT NULL,
+                       X_Attribute7                     VARCHAR2 DEFAULT NULL,
+                       X_Attribute8                     VARCHAR2 DEFAULT NULL,
+                       X_Attribute9                     VARCHAR2 DEFAULT NULL,
+                       X_Attribute10                    VARCHAR2 DEFAULT NULL,
+                       X_Attribute11                    VARCHAR2 DEFAULT NULL,
+                       X_Attribute12                    VARCHAR2 DEFAULT NULL,
+                       X_Attribute13                    VARCHAR2 DEFAULT NULL,
+                       X_Attribute14                    VARCHAR2 DEFAULT NULL,
+                       X_Attribute15                    VARCHAR2 DEFAULT NULL,
+                       X_Context                        VARCHAR2 DEFAULT NULL,
+		       X_OPEN_FLAG               	VARCHAR2 DEFAULT NULL );
+
+
+  PROCEDURE Lock_Row(X_Rowid                            VARCHAR2,
+                     X_Incident_Action_Id               NUMBER,
+                     X_Incident_Id                      NUMBER,
+                     X_Action_Code                      VARCHAR2,
+                     X_Action_Num                       NUMBER DEFAULT NULL,
+                     X_Action_Type_Id                   NUMBER DEFAULT NULL,
+                     X_Action_Status_Id                 NUMBER DEFAULT NULL,
+                     X_Responsible_Person_Id            NUMBER DEFAULT NULL,
+                     X_Text                             VARCHAR2 DEFAULT NULL,
+                     X_Completion_Date                  DATE DEFAULT NULL,
+                     X_actual_time                     number DEFAULT NULL,
+                     X_Action_Severity_Id               NUMBER DEFAULT NULL,
+                     X_Text_Description                 VARCHAR2 DEFAULT NULL,
+                     X_Text_Resolution                  VARCHAR2 DEFAULT NULL,
+                     X_Action_Effective_Date            DATE DEFAULT NULL,
+                     X_Expected_Resolution_Date         DATE DEFAULT NULL,
+                     X_Attribute1                       VARCHAR2 DEFAULT NULL,
+                     X_Attribute2                       VARCHAR2 DEFAULT NULL,
+                     X_Attribute3                       VARCHAR2 DEFAULT NULL,
+                     X_Attribute4                       VARCHAR2 DEFAULT NULL,
+                     X_Attribute5                       VARCHAR2 DEFAULT NULL,
+                     X_Attribute6                       VARCHAR2 DEFAULT NULL,
+                     X_Attribute7                       VARCHAR2 DEFAULT NULL,
+                     X_Attribute8                       VARCHAR2 DEFAULT NULL,
+                     X_Attribute9                       VARCHAR2 DEFAULT NULL,
+                     X_Attribute10                      VARCHAR2 DEFAULT NULL,
+                     X_Attribute11                      VARCHAR2 DEFAULT NULL,
+                     X_Attribute12                      VARCHAR2 DEFAULT NULL,
+                     X_Attribute13                      VARCHAR2 DEFAULT NULL,
+                     X_Attribute14                      VARCHAR2 DEFAULT NULL,
+                     X_Attribute15                      VARCHAR2 DEFAULT NULL,
+                     X_Context                          VARCHAR2 DEFAULT NULL,
+		   X_dispatcher_orig_syst    VARCHAR2 DEFAULT NULL,
+		   X_dispatcher_orig_syst_id    NUMBER DEFAULT NULL,
+		   X_dispatch_role_name    VARCHAR2 DEFAULT NULL
+				   );
+
+
+  PROCEDURE Update_Row(X_Rowid                          VARCHAR2,
+                       X_Incident_Action_Id             NUMBER,
+                       X_Last_Update_Date               DATE,
+                       X_Last_Updated_By                NUMBER,
+                       X_Last_Update_Login              NUMBER DEFAULT NULL,
+                       X_Incident_Id                    NUMBER,
+                       X_Action_Code                    VARCHAR2,
+                       X_Action_Num                     NUMBER DEFAULT NULL,
+                       X_Action_Type_Id                 NUMBER DEFAULT NULL,
+                       X_Action_Status_Id               NUMBER DEFAULT NULL,
+                       X_Responsible_Person_Id          NUMBER DEFAULT NULL,
+                       X_Text                           VARCHAR2 DEFAULT NULL,
+                       X_Completion_Date                DATE DEFAULT NULL,
+                       X_actual_time 			NUMBER DEFAULT NULL,
+                       X_Action_Severity_Id             NUMBER DEFAULT NULL,
+                       X_Text_Description               VARCHAR2 DEFAULT NULL,
+                       X_Text_Resolution                VARCHAR2 DEFAULT NULL,
+                       X_Action_Effective_Date          DATE DEFAULT NULL,
+                       X_Expected_Resolution_Date       DATE DEFAULT NULL,
+                       X_Attribute1                     VARCHAR2 DEFAULT NULL,
+                       X_Attribute2                     VARCHAR2 DEFAULT NULL,
+                       X_Attribute3                     VARCHAR2 DEFAULT NULL,
+                       X_Attribute4                     VARCHAR2 DEFAULT NULL,
+                       X_Attribute5                     VARCHAR2 DEFAULT NULL,
+                       X_Attribute6                     VARCHAR2 DEFAULT NULL,
+                       X_Attribute7                     VARCHAR2 DEFAULT NULL,
+                       X_Attribute8                     VARCHAR2 DEFAULT NULL,
+                       X_Attribute9                     VARCHAR2 DEFAULT NULL,
+                       X_Attribute10                    VARCHAR2 DEFAULT NULL,
+                       X_Attribute11                    VARCHAR2 DEFAULT NULL,
+                       X_Attribute12                    VARCHAR2 DEFAULT NULL,
+                       X_Attribute13                    VARCHAR2 DEFAULT NULL,
+                       X_Attribute14                    VARCHAR2 DEFAULT NULL,
+                       X_Attribute15                    VARCHAR2 DEFAULT NULL,
+                       X_Context                        VARCHAR2 DEFAULT NULL,
+    		       X_Orig_Action_Severity_Id        NUMBER   DEFAULT NULL,
+		       X_Orig_Action_Type_Id            NUMBER   DEFAULT NULL,
+		       X_Orig_Action_Status_id		NUMBER   DEFAULT NULL,
+		       X_Orig_Action_Owner_id		NUMBER   DEFAULT NULL,
+      		       X_Orig_Expected_Date             DATE     DEFAULT NULL,
+                       X_Open_Flag               	VARCHAR2 DEFAULT NULL ,
+		   X_dispatcher_orig_syst    VARCHAR2 DEFAULT NULL,
+		   X_dispatcher_orig_syst_id    NUMBER DEFAULT NULL,
+		   X_dispatch_role_name    VARCHAR2 DEFAULT NULL
+				   );
+
+  PROCEDURE Select_Summary(X_INCIDENT_ID		NUMBER,
+			   X_TOTAL			IN OUT NUMBER,
+			   X_TOTAL_RTOT_DB		IN OUT NUMBER);
+
+
+
+END CS_INCIDENT_ACTIONS_PKG;
+
+ 
+
+/

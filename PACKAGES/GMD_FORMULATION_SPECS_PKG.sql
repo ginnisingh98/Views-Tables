@@ -1,0 +1,323 @@
+--------------------------------------------------------
+--  DDL for Package GMD_FORMULATION_SPECS_PKG
+--------------------------------------------------------
+
+  CREATE OR REPLACE EDITIONABLE PACKAGE "APPS"."GMD_FORMULATION_SPECS_PKG" AUTHID CURRENT_USER AS
+/* $Header: GMDFSTHS.pls 120.3 2006/02/07 02:50:19 srsriran noship $ */
+
+/* Formulation Specification - Table Handlers */
+
+PROCEDURE INSERT_FORMULATION_SPEC(
+  X_ROWID			OUT NOCOPY VARCHAR2	,
+  X_FORMULATION_SPEC_ID		IN NUMBER		,
+  X_SPEC_VERS			IN NUMBER		,
+  X_PRODUCT_ID			IN NUMBER		,
+  X_OWNER_ORGANIZATION_ID	IN NUMBER		,
+  X_SPEC_STATUS			IN VARCHAR2		,
+  X_STD_QTY			IN NUMBER		,
+  X_STD_UOM			IN VARCHAR2		,
+  X_PROCESS_LOSS		IN NUMBER		,
+  X_START_DATE			IN DATE			,
+  X_END_DATE			IN DATE			,
+  X_MIN_INGREDS			IN NUMBER		,
+  X_MAX_INGREDS			IN NUMBER		,
+  X_INGRED_PICK_BASE_IND	IN VARCHAR2		,
+  X_PICK_LOT_STRATEGY		IN VARCHAR2		,
+  X_TECH_PARM_ID		IN NUMBER		,
+  X_OBJECTIVE_IND		IN NUMBER		,
+  X_ROUTING_ID			IN NUMBER		,
+  X_SPEC_NAME			IN VARCHAR2		,
+  X_TEXT_CODE			IN VARCHAR2		,
+  X_DELETE_MARK			IN NUMBER		,
+  X_CREATION_DATE		IN DATE			,
+  X_CREATED_BY			IN NUMBER		,
+  X_LAST_UPDATE_DATE		IN DATE			,
+  X_LAST_UPDATED_BY		IN NUMBER		,
+  X_LAST_UPDATE_LOGIN		IN NUMBER
+);
+
+PROCEDURE LOCK_FORMULATION_SPEC (
+  X_FORMULATION_SPEC_ID		IN NUMBER		,
+  X_SPEC_VERS			IN NUMBER		,
+  X_PRODUCT_ID			IN NUMBER		,
+  X_OWNER_ORGANIZATION_ID	IN NUMBER		,
+  X_SPEC_STATUS			IN VARCHAR2		,
+  X_STD_QTY			IN NUMBER		,
+  X_STD_UOM			IN VARCHAR2		,
+  X_PROCESS_LOSS		IN NUMBER		,
+  X_START_DATE			IN DATE			,
+  X_END_DATE			IN DATE			,
+  X_MIN_INGREDS			IN NUMBER		,
+  X_MAX_INGREDS			IN NUMBER		,
+  X_INGRED_PICK_BASE_IND	IN VARCHAR2		,
+  X_PICK_LOT_STRATEGY		IN VARCHAR2		,
+  X_TECH_PARM_ID		IN NUMBER		,
+  X_OBJECTIVE_IND		IN NUMBER		,
+  X_TEXT_CODE			IN VARCHAR2		,
+  X_DELETE_MARK			IN NUMBER		,
+  X_SPEC_NAME			IN VARCHAR2
+);
+
+
+PROCEDURE UPDATE_FORMULATION_SPEC (
+  X_FORMULATION_SPEC_ID		IN NUMBER		,
+  X_PRODUCT_ID			IN NUMBER		,
+  X_OWNER_ORGANIZATION_ID	IN NUMBER		,
+  X_SPEC_STATUS			IN VARCHAR2		,
+  X_STD_QTY			IN NUMBER		,
+  X_STD_UOM			IN VARCHAR2		,
+  X_PROCESS_LOSS		IN NUMBER		,
+  X_START_DATE			IN DATE			,
+  X_END_DATE			IN DATE			,
+  X_MIN_INGREDS			IN NUMBER		,
+  X_MAX_INGREDS			IN NUMBER		,
+  X_INGRED_PICK_BASE_IND	IN VARCHAR2		,
+  X_PICK_LOT_STRATEGY		IN VARCHAR2		,
+  X_TECH_PARM_ID		IN NUMBER		,
+  X_OBJECTIVE_IND		IN NUMBER		,
+  X_TEXT_CODE			IN VARCHAR2		,
+  X_DELETE_MARK			IN NUMBER		,
+  X_LAST_UPDATE_DATE		IN DATE			,
+  X_LAST_UPDATED_BY		IN NUMBER		,
+  X_LAST_UPDATE_LOGIN		IN NUMBER
+);
+
+PROCEDURE DELETE_FORMULATION_SPEC (
+  X_FORMULATION_SPEC_ID		IN NUMBER
+);
+
+/* END - Formulation Specification - Table Handlers */
+
+
+
+/* Material Req - Table Handlers */
+
+PROCEDURE INSERT_MATERIAL_REQ (
+  X_ROWID			OUT NOCOPY VARCHAR2	,
+  X_MATL_REQ_ID			IN NUMBER		,
+  X_FORMULATION_SPEC_ID		IN NUMBER		,
+  X_SPEC_ATTRIBUTE_ID		IN NUMBER		,
+  X_LINE_NO			IN NUMBER		,
+  X_INVENTORY_ITEM_ID		IN NUMBER		,
+  X_ITEM_UOM			IN VARCHAR2		,
+  X_MIN_QTY			IN NUMBER		,
+  X_MAX_QTY			IN NUMBER		,
+  X_RANGE_TYPE			IN NUMBER		,
+  X_CREATION_DATE		IN DATE			,
+  X_CREATED_BY			IN NUMBER		,
+  X_LAST_UPDATE_DATE		IN DATE			,
+  X_LAST_UPDATED_BY		IN NUMBER		,
+  X_LAST_UPDATE_LOGIN		IN NUMBER
+);
+
+
+PROCEDURE LOCK_MATERIAL_REQ (
+  X_MATL_REQ_ID			IN NUMBER		,
+  X_FORMULATION_SPEC_ID		IN NUMBER		,
+  X_SPEC_ATTRIBUTE_ID		IN NUMBER		,
+  X_LINE_NO			IN NUMBER		,
+  X_INVENTORY_ITEM_ID		IN NUMBER		,
+  X_ITEM_UOM			IN VARCHAR2		,
+  X_MIN_QTY			IN NUMBER		,
+  X_MAX_QTY			IN NUMBER		,
+  X_RANGE_TYPE			IN NUMBER
+);
+
+
+PROCEDURE UPDATE_MATERIAL_REQ (
+  X_MATL_REQ_ID			IN NUMBER		,
+  X_FORMULATION_SPEC_ID		IN NUMBER		,
+  X_SPEC_ATTRIBUTE_ID		IN NUMBER		,
+  X_LINE_NO			IN NUMBER		,
+  X_INVENTORY_ITEM_ID		IN NUMBER		,
+  X_ITEM_UOM			IN VARCHAR2		,
+  X_MIN_QTY			IN NUMBER		,
+  X_MAX_QTY			IN NUMBER		,
+  X_RANGE_TYPE			IN NUMBER		,
+  X_LAST_UPDATE_DATE		IN DATE			,
+  X_LAST_UPDATED_BY		IN NUMBER		,
+  X_LAST_UPDATE_LOGIN		IN NUMBER
+);
+
+
+PROCEDURE DELETE_MATERIAL_REQ (
+  X_MATL_REQ_ID			IN NUMBER
+);
+
+/* END - Material Req - Table Handlers */
+
+
+/* Compositional Req - Table Handlers */
+
+PROCEDURE INSERT_COMPOSITIONAL_REQ (
+  X_ROWID			OUT NOCOPY VARCHAR2	,
+  X_COMP_REQ_ID			IN NUMBER		,
+  X_FORMULATION_SPEC_ID		IN NUMBER		,
+  X_SPEC_ATTRIBUTE_ID		IN NUMBER		,
+  X_MIN_PCT			IN NUMBER		,
+  X_MAX_PCT			IN NUMBER		,
+  X_CATEGORY_SET_ID		IN NUMBER		,
+  X_CATEGORY_ID			IN NUMBER		,
+  X_PLANNED_PCT			IN NUMBER		,
+  X_ORDER_NO			IN NUMBER		,
+  X_CREATION_DATE		IN DATE			,
+  X_CREATED_BY			IN NUMBER		,
+  X_LAST_UPDATE_DATE		IN DATE			,
+  X_LAST_UPDATED_BY		IN NUMBER		,
+  X_LAST_UPDATE_LOGIN		IN NUMBER
+);
+
+
+PROCEDURE LOCK_COMPOSITIONAL_REQ (
+  X_COMP_REQ_ID			IN NUMBER		,
+  X_FORMULATION_SPEC_ID		IN NUMBER		,
+  X_SPEC_ATTRIBUTE_ID		IN NUMBER		,
+  X_MIN_PCT			IN NUMBER		,
+  X_MAX_PCT			IN NUMBER		,
+  X_CATEGORY_SET_ID		IN NUMBER		,
+  X_CATEGORY_ID			IN NUMBER		,
+  X_PLANNED_PCT			IN NUMBER		,
+  X_ORDER_NO			IN NUMBER
+);
+
+
+PROCEDURE UPDATE_COMPOSITIONAL_REQ (
+  X_COMP_REQ_ID			IN NUMBER		,
+  X_FORMULATION_SPEC_ID		IN NUMBER		,
+  X_SPEC_ATTRIBUTE_ID		IN NUMBER		,
+  X_MIN_PCT			IN NUMBER		,
+  X_MAX_PCT			IN NUMBER		,
+  X_CATEGORY_SET_ID		IN NUMBER		,
+  X_CATEGORY_ID			IN NUMBER		,
+  X_PLANNED_PCT			IN NUMBER		,
+  X_ORDER_NO			IN NUMBER		,
+  X_LAST_UPDATE_DATE		IN DATE			,
+  X_LAST_UPDATED_BY		IN NUMBER		,
+  X_LAST_UPDATE_LOGIN		IN NUMBER
+);
+
+
+PROCEDURE DELETE_COMPOSITIONAL_REQ (
+  X_COMP_REQ_ID			IN NUMBER
+);
+
+/* END - Compositional Req - Table Handlers */
+
+
+/* Technical Req - Table Handlers */
+
+PROCEDURE INSERT_TECHNICAL_REQ (
+  X_ROWID			OUT NOCOPY VARCHAR2	,
+  X_TECH_REQ_ID			IN NUMBER		,
+  X_FORMULATION_SPEC_ID		IN NUMBER		,
+  X_SPEC_ATTRIBUTE_ID		IN NUMBER		,
+  X_TECH_PARM_ID		IN NUMBER		,
+  X_MIN_VALUE			IN NUMBER		,
+  X_MAX_VALUE			IN NUMBER		,
+  X_CREATION_DATE		IN DATE			,
+  X_CREATED_BY			IN NUMBER		,
+  X_LAST_UPDATE_DATE		IN DATE			,
+  X_LAST_UPDATED_BY		IN NUMBER		,
+  X_LAST_UPDATE_LOGIN		IN NUMBER
+);
+
+
+PROCEDURE LOCK_TECHNICAL_REQ (
+  X_TECH_REQ_ID			IN NUMBER		,
+  X_FORMULATION_SPEC_ID		IN NUMBER		,
+  X_SPEC_ATTRIBUTE_ID		IN NUMBER		,
+  X_TECH_PARM_ID		IN NUMBER		,
+  X_MIN_VALUE			IN NUMBER		,
+  X_MAX_VALUE			IN NUMBER
+);
+
+
+PROCEDURE UPDATE_TECHNICAL_REQ (
+  X_TECH_REQ_ID			IN NUMBER		,
+  X_FORMULATION_SPEC_ID		IN NUMBER		,
+  X_SPEC_ATTRIBUTE_ID		IN NUMBER		,
+  X_TECH_PARM_ID		IN NUMBER		,
+  X_MIN_VALUE			IN NUMBER		,
+  X_MAX_VALUE			IN NUMBER		,
+  X_LAST_UPDATE_DATE		IN DATE			,
+  X_LAST_UPDATED_BY		IN NUMBER		,
+  X_LAST_UPDATE_LOGIN		IN NUMBER
+);
+
+
+PROCEDURE DELETE_TECHNICAL_REQ (
+  X_TECH_REQ_ID			IN NUMBER
+);
+
+/* END - Technical Req - Table Handlers */
+
+
+/* Specification Attributes - Table Handlers */
+
+PROCEDURE INSERT_SPEC_ATTRIBUTE (
+  X_ROWID			OUT NOCOPY VARCHAR2	,
+  X_SPEC_ATTRIBUTE_ID		IN NUMBER		,
+  X_FORMULATION_SPEC_ID		IN NUMBER		,
+  X_LOOKUP_TYPE			IN VARCHAR2		,
+  X_LOOKUP_CODE			IN VARCHAR2		,
+  X_CREATION_DATE		IN DATE			,
+  X_CREATED_BY			IN NUMBER		,
+  X_LAST_UPDATE_DATE		IN DATE			,
+  X_LAST_UPDATED_BY		IN NUMBER		,
+  X_LAST_UPDATE_LOGIN		IN NUMBER);
+
+PROCEDURE DELETE_SPEC_ATTRIBUTE (
+  X_SPEC_ATTRIBUTE_ID		IN NUMBER
+);
+
+/* END - Specification Attributes - Table Handlers */
+
+l_spec_rec gmd_formulation_specs%ROWTYPE;
+TYPE l_spec_table IS TABLE OF l_spec_rec%ROWTYPE INDEX BY BINARY_INTEGER;
+
+/*-------------------------------------------------------------------
+-- NAME
+--    Get_specifications
+--
+-- SYNOPSIS
+--    Procedure Get_specifications
+--
+-- DESCRIPTION
+--    This procedure is called to fetch specifications based on search
+-- condition passed to the API
+--
+--
+-- HISTORY
+--    Sriram    9/05/2005     Created for LCF Build
+--------------------------------------------------------------------*/
+
+PROCEDURE Get_specifications(	     p_spec_no           IN VARCHAR2	DEFAULT NULL ,
+	                             p_spec_vers         IN NUMBER	DEFAULT NULL ,
+	                             p_spec_status       IN NUMBER	DEFAULT NULL ,
+	                             p_product           IN VARCHAR2	DEFAULT NULL ,
+				     p_product_id        IN NUMBER	DEFAULT NULL ,
+                                     p_routing           IN VARCHAR2	DEFAULT NULL ,
+                                     p_routing_id        IN NUMBER	DEFAULT NULL ,
+                                     p_tech_parm_name    IN VARCHAR2	DEFAULT NULL ,
+                                     p_tech_parm_id      IN NUMBER	DEFAULT NULL ,
+                                     p_spec_organization IN VARCHAR2	DEFAULT NULL ,
+                                     p_start_date        IN VARCHAR2	DEFAULT NULL ,
+                                     p_end_date          IN VARCHAR2	DEFAULT NULL ,
+                                     p_min_ingreds       IN NUMBER	DEFAULT NULL ,
+                                     p_max_ingreds       IN NUMBER	DEFAULT NULL ,
+                                     p_process_loss      IN NUMBER	DEFAULT NULL ,
+                                     p_obj_ind           IN NUMBER	DEFAULT NULL ,
+                                     p_ingr_pick_base    IN VARCHAR2	DEFAULT NULL ,
+                                     p_lot_pick_strategy IN VARCHAR2	DEFAULT NULL ,
+                                     p_std_qty           IN NUMBER	DEFAULT NULL ,
+                                     p_std_uom           IN VARCHAR2	DEFAULT NULL ,
+				     x_search_clause	 IN OUT NOCOPY	VARCHAR2     ,
+				     x_spec_rec		 OUT NOCOPY	GMD_FORMULATION_SPECS_PKG.l_spec_table
+                                     );
+
+END GMD_FORMULATION_SPECS_PKG;
+
+
+ 
+
+/

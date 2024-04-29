@@ -1,0 +1,15 @@
+--------------------------------------------------------
+--  DDL for Package ISC_DBI_REV_BOOK_TREND_PKG
+--------------------------------------------------------
+
+  CREATE OR REPLACE EDITIONABLE PACKAGE "APPS"."ISC_DBI_REV_BOOK_TREND_PKG" AUTHID CURRENT_USER As
+/* $Header: ISCRGBHS.pls 115.0 2004/02/10 06:24:53 chu noship $ */
+
+PROCEDURE GET_SQL(p_param IN BIS_PMV_PAGE_PARAMETER_TBL,x_custom_sql OUT NOCOPY VARCHAR2,
+	x_custom_output OUT NOCOPY BIS_QUERY_ATTRIBUTES_TBL);
+
+END ISC_DBI_REV_BOOK_TREND_PKG ;
+
+ 
+
+/

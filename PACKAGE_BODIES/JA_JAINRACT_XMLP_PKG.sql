@@ -1,0 +1,62 @@
+--------------------------------------------------------
+--  DDL for Package Body JA_JAINRACT_XMLP_PKG
+--------------------------------------------------------
+
+  CREATE OR REPLACE EDITIONABLE PACKAGE BODY "APPS"."JA_JAINRACT_XMLP_PKG" AS
+/* $Header: JAINRACTB.pls 120.1 2007/12/25 16:26:38 dwkrishn noship $ */
+  FUNCTION P_ACCT_NATUREVALIDTRIGGER RETURN BOOLEAN IS
+  BEGIN
+    IF P_ACCT_NATURE = 'MODVAT' THEN
+      P_CENVAT := 'CENVAT';
+    ELSIF P_ACCT_NATURE = 'Expense' THEN
+      P_EXPENSE := 'Capital Expense';
+    END IF;
+    RETURN (TRUE);
+  END P_ACCT_NATUREVALIDTRIGGER;
+
+  FUNCTION BEFOREREPORT RETURN BOOLEAN IS
+    CURSOR C_PROGRAM_ID(P_REQUEST_ID IN NUMBER) IS
+      SELECT
+        CONCURRENT_PROGRAM_ID,
+        NVL(ENABLE_TRACE
+           ,'N')
+      FROM
+        FND_CONCURRENT_REQUESTS
+      WHERE REQUEST_ID = P_REQUEST_ID;
+    V_ENABLE_TRACE FND_CONCURRENT_PROGRAMS.ENABLE_TRACE%TYPE;
+    V_PROGRAM_ID FND_CONCURRENT_PROGRAMS.CONCURRENT_PROGRAM_ID%TYPE;
+  BEGIN
+    P_CONC_REQUEST_ID := FND_GLOBAL.CONC_REQUEST_ID;
+    /*SRW.USER_EXIT('FND SRWINIT')*/NULL;
+    /*SRW.MESSAGE(1275
+               ,'Report Version is 120.2 Last modified date is 25/07/2005')*/NULL;
+    BEGIN
+      OPEN C_PROGRAM_ID(P_CONC_REQUEST_ID);
+      FETCH C_PROGRAM_ID
+       INTO V_PROGRAM_ID,V_ENABLE_TRACE;
+      CLOSE C_PROGRAM_ID;
+      /*SRW.MESSAGE(1275
+                 ,'v_program_id -> ' || V_PROGRAM_ID || ', v_enable_trace -> ' || V_ENABLE_TRACE || ', request_id -> ' || P_CONC_REQUEST_ID)*/NULL;
+      IF V_ENABLE_TRACE = 'Y' THEN
+        EXECUTE IMMEDIATE
+          'ALTER SESSION SET EVENTS ''10046 trace name context forever, level 4''';
+      END IF;
+    EXCEPTION
+      WHEN OTHERS THEN
+        /*SRW.MESSAGE(1275
+                   ,'Error during enabling the trace. ErrCode -> ' || SQLCODE || ', ErrMesg -> ' || SQLERRM)*/NULL;
+    END;
+    RETURN (TRUE);
+  END BEFOREREPORT;
+
+  FUNCTION AFTERREPORT RETURN BOOLEAN IS
+  BEGIN
+    /*SRW.USER_EXIT('FND SRWEXIT')*/NULL;
+    RETURN (TRUE);
+  END AFTERREPORT;
+
+END JA_JAINRACT_XMLP_PKG;
+
+
+
+/

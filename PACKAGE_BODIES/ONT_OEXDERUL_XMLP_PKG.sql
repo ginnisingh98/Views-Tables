@@ -1,0 +1,180 @@
+--------------------------------------------------------
+--  DDL for Package Body ONT_OEXDERUL_XMLP_PKG
+--------------------------------------------------------
+
+  CREATE OR REPLACE EDITIONABLE PACKAGE BODY "APPS"."ONT_OEXDERUL_XMLP_PKG" AS
+/* $Header: OEXDERULB.pls 120.1 2007/12/25 07:11:28 npannamp noship $ */
+  FUNCTION BEFOREREPORT RETURN BOOLEAN IS
+  BEGIN
+    BEGIN
+      BEGIN
+        P_CONC_REQUEST_ID := FND_GLOBAL.CONC_REQUEST_ID;
+        /*SRW.USER_EXIT('FND SRWINIT')*/NULL;
+      EXCEPTION
+        WHEN /*SRW.USER_EXIT_FAILURE*/OTHERS THEN
+          /*SRW.MESSAGE(1000
+                     ,'Failed in BEFORE REPORT trigger')*/NULL;
+          RETURN (FALSE);
+      END;
+      DECLARE
+        L_REPORT_NAME VARCHAR2(240);
+      BEGIN
+        SELECT
+          CP.USER_CONCURRENT_PROGRAM_NAME
+        INTO L_REPORT_NAME
+        FROM
+          FND_CONCURRENT_PROGRAMS_VL CP,
+          FND_CONCURRENT_REQUESTS CR
+        WHERE CR.REQUEST_ID = P_CONC_REQUEST_ID
+          AND CP.APPLICATION_ID = CR.PROGRAM_APPLICATION_ID
+          AND CP.CONCURRENT_PROGRAM_ID = CR.CONCURRENT_PROGRAM_ID;
+	  l_report_name := substr(l_report_name,1,instr(l_report_name,' (XML)'));
+        RP_REPORT_NAME := L_REPORT_NAME;
+      EXCEPTION
+        WHEN NO_DATA_FOUND THEN
+          RP_REPORT_NAME := 'Defaulting Rules Listing Report';
+      END;
+      DECLARE
+        OBJECT VARCHAR2(80);
+        ATTRIBUTE VARCHAR2(80);
+        CONDITION VARCHAR2(80);
+        SEEDED VARCHAR2(2);
+      BEGIN
+        IF P_OBJECT IS NOT NULL THEN
+          SELECT
+            NAME
+          INTO OBJECT
+          FROM
+            OE_DEF_AK_OBJ_EXT_V
+          WHERE DATABASE_OBJECT_NAME = P_OBJECT;
+          RP_OBJECT := OBJECT;
+        ELSE
+          RP_OBJECT := 'All Objects';
+        END IF;
+        IF P_ATTRIBUTE IS NOT NULL THEN
+          SELECT
+            DISTINCT
+            ATTRIBUTE_DISPLAY_NAME
+          INTO ATTRIBUTE
+          FROM
+            OE_DEF_AK_ATTR_EXT_V
+          WHERE ATTRIBUTE_CODE = P_ATTRIBUTE;
+          RP_ATTRIBUTE := ATTRIBUTE;
+        ELSE
+          RP_ATTRIBUTE := 'All Attributes';
+        END IF;
+        IF P_CONDITION IS NOT NULL THEN
+          SELECT
+            DISTINCT
+            DISPLAY_NAME
+          INTO CONDITION
+          FROM
+            OE_DEF_CONDITIONS_VL
+          WHERE CONDITION_ID = P_CONDITION;
+          RP_CONDITION := CONDITION;
+        ELSE
+          RP_CONDITION := 'All Conditions';
+        END IF;
+        IF P_SEEDED IS NOT NULL THEN
+          RP_SEEDED := P_SEEDED;
+        ELSE
+          RP_SEEDED := 'All Values';
+        END IF;
+      EXCEPTION
+        WHEN NO_DATA_FOUND THEN
+          NULL;
+      END;
+    END;
+    RETURN (TRUE);
+  END BEFOREREPORT;
+
+  FUNCTION AFTERREPORT RETURN BOOLEAN IS
+  BEGIN
+    BEGIN
+      /*SRW.USER_EXIT('FND SRWEXIT')*/NULL;
+    EXCEPTION
+      WHEN /*SRW.USER_EXIT_FAILURE*/OTHERS THEN
+        /*SRW.MESSAGE(1
+                   ,'Failed in AFTER REPORT TRIGGER')*/NULL;
+        RETURN (FALSE);
+    END;
+    RETURN (TRUE);
+  END AFTERREPORT;
+
+  FUNCTION AFTERPFORM RETURN BOOLEAN IS
+  BEGIN
+    BEGIN
+      IF P_OBJECT IS NOT NULL THEN
+        OBJECT_WHERE := ' and d.database_object_name = :p_object ';
+      END IF;
+      IF P_ATTRIBUTE IS NOT NULL THEN
+        ATTRIBUTE_WHERE := ' and d.attribute_code = :p_attribute ';
+      END IF;
+      IF P_CONDITION IS NOT NULL THEN
+        CONDITION_WHERE := ' and d.condition_id = :p_condition ';
+      END IF;
+      IF P_SEEDED IS NOT NULL THEN
+        SEED_WHERE := ' and d.system_flag = :p_seeded ';
+      END IF;
+    END;
+    RETURN (TRUE);
+  END AFTERPFORM;
+
+  FUNCTION SOURCEVALUEFORMULA(SRC_TYPE IN VARCHAR2
+                             ,ATTRIBUTE_CODE IN VARCHAR2
+                             ,SOURCE IN VARCHAR2) RETURN CHAR IS
+  BEGIN
+    IF (SRC_TYPE = ATTRIBUTE_CODE) THEN
+      OM_REPORTS_COMMON_PKG.DF_SET_CONTEXT(SRC_TYPE);
+      OM_REPORTS_COMMON_PKG.DF_SET_COLUMN_VALUE('SRC_CONSTANT_VALUE'
+                                               ,SOURCE);
+      IF (OM_REPORTS_COMMON_PKG.DF_VALIDATE_FLEX('Defaulting Rules Flexfield'
+                                            ,'I')) THEN
+        RETURN OM_REPORTS_COMMON_PKG.DF_CONCATENATED_VALUES;
+      ELSE
+        RETURN 'Unable to get value';
+      END IF;
+    ELSE
+      RETURN SOURCE;
+    END IF;
+  END SOURCEVALUEFORMULA;
+
+  FUNCTION RP_REPORT_NAME_P RETURN VARCHAR2 IS
+  BEGIN
+    RETURN RP_REPORT_NAME;
+  END RP_REPORT_NAME_P;
+
+  FUNCTION RP_SUB_TITLE_P RETURN VARCHAR2 IS
+  BEGIN
+    RETURN RP_SUB_TITLE;
+  END RP_SUB_TITLE_P;
+
+  FUNCTION RP_DATA_FOUND_P RETURN VARCHAR2 IS
+  BEGIN
+    RETURN RP_DATA_FOUND;
+  END RP_DATA_FOUND_P;
+
+  FUNCTION RP_CONDITION_P RETURN VARCHAR2 IS
+  BEGIN
+    RETURN RP_CONDITION;
+  END RP_CONDITION_P;
+
+  FUNCTION RP_OBJECT_P RETURN VARCHAR2 IS
+  BEGIN
+    RETURN RP_OBJECT;
+  END RP_OBJECT_P;
+
+  FUNCTION RP_ATTRIBUTE_P RETURN VARCHAR2 IS
+  BEGIN
+    RETURN RP_ATTRIBUTE;
+  END RP_ATTRIBUTE_P;
+
+  FUNCTION RP_SEEDED_P RETURN VARCHAR2 IS
+  BEGIN
+    RETURN RP_SEEDED;
+  END RP_SEEDED_P;
+
+END ONT_OEXDERUL_XMLP_PKG;
+
+
+/

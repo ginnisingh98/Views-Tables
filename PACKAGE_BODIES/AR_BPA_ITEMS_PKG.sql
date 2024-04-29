@@ -1,0 +1,587 @@
+--------------------------------------------------------
+--  DDL for Package Body AR_BPA_ITEMS_PKG
+--------------------------------------------------------
+
+  CREATE OR REPLACE EDITIONABLE PACKAGE BODY "APPS"."AR_BPA_ITEMS_PKG" as
+/* $Header: ARBPITMB.pls 120.2 2005/10/30 04:13:33 appldev noship $ */
+procedure INSERT_ROW (
+  X_ROWID in out nocopy VARCHAR2,
+  X_AMOUNT_ITEM_FLAG in VARCHAR2,
+  X_ASSIGNMENT_ENABLED_FLAG in VARCHAR2,
+  X_DATA_SOURCE_ID in NUMBER,
+  X_DISPLAY_ENABLED_FLAG in VARCHAR2,
+  X_DISPLAY_LEVEL in VARCHAR2,
+  X_DISPLAY_PROMPT in VARCHAR2,
+  X_ITEM_CODE in VARCHAR2,
+  X_ITEM_DESCRIPTION in VARCHAR2,
+  X_ITEM_ID in NUMBER,
+  X_ITEM_IMAGE_FILENAME in VARCHAR2,
+  X_ITEM_MESSAGE_NAME in VARCHAR2,
+  X_ITEM_NAME in VARCHAR2,
+  X_ITEM_SOURCE in VARCHAR2,
+  X_ITEM_TEXT_VALUE in VARCHAR2,
+  X_ITEM_TYPE in VARCHAR2,
+  X_URL_ID in NUMBER,
+  X_CREATION_DATE in DATE,
+  X_CREATED_BY in NUMBER,
+  X_LAST_UPDATE_DATE in DATE,
+  X_LAST_UPDATED_BY in NUMBER,
+  X_LAST_UPDATE_LOGIN in NUMBER,
+  X_DISPLAYED_MULTI_LEVEL_FLAG in VARCHAR2,
+  X_SEEDED_APPLICATION_ID in NUMBER,
+  X_TAX_ITEM_FLAG in VARCHAR2,
+  X_TOTALS_ENABLED_FLAG in VARCHAR2,
+  X_LINK_ENABLED_FLAG in VARCHAR2,
+  X_DATA_TYPE in VARCHAR2,
+  X_URLCFG_ENABLED_FLAG in VARCHAR2,
+  X_FLEXFIELD_ITEM_FLAG in VARCHAR2,
+  X_COLUMN_NAME in VARCHAR2
+) is
+  cursor C is select ROWID from AR_BPA_ITEMS_B
+    where ITEM_ID = X_ITEM_ID
+    ;
+begin
+  insert into AR_BPA_ITEMS_B (
+    ITEM_ID,
+    ITEM_CODE,
+    ITEM_SOURCE,
+    ITEM_TYPE,
+    DISPLAY_LEVEL,
+    DATA_SOURCE_ID,
+    DISPLAY_ENABLED_FLAG,
+    ASSIGNMENT_ENABLED_FLAG,
+    AMOUNT_ITEM_FLAG,
+    URL_ID,
+    ITEM_IMAGE_FILENAME,
+    ITEM_MESSAGE_NAME,
+    CREATION_DATE,
+    CREATED_BY,
+    LAST_UPDATE_DATE,
+    LAST_UPDATED_BY,
+    LAST_UPDATE_LOGIN,
+	DISPLAYED_MULTI_LEVEL_FLAG,
+	SEEDED_APPLICATION_ID,
+  	TAX_ITEM_FLAG,
+    TOTALS_ENABLED_FLAG,
+    LINK_ENABLED_FLAG,
+  	DATA_TYPE,
+  	URLCFG_ENABLED_FLAG,
+	FLEXFIELD_ITEM_FLAG,
+	COLUMN_NAME
+  ) values (
+    X_ITEM_ID,
+    X_ITEM_CODE,
+    X_ITEM_SOURCE,
+    X_ITEM_TYPE,
+    X_DISPLAY_LEVEL,
+    X_DATA_SOURCE_ID,
+    X_DISPLAY_ENABLED_FLAG,
+    X_ASSIGNMENT_ENABLED_FLAG,
+    X_AMOUNT_ITEM_FLAG,
+    X_URL_ID,
+    X_ITEM_IMAGE_FILENAME,
+    X_ITEM_MESSAGE_NAME,
+    X_CREATION_DATE,
+    X_CREATED_BY,
+    X_LAST_UPDATE_DATE,
+    X_LAST_UPDATED_BY,
+    X_LAST_UPDATE_LOGIN,
+	X_DISPLAYED_MULTI_LEVEL_FLAG,
+	X_SEEDED_APPLICATION_ID,
+  	X_TAX_ITEM_FLAG,
+    X_TOTALS_ENABLED_FLAG,
+    X_LINK_ENABLED_FLAG,
+    X_DATA_TYPE,
+    X_URLCFG_ENABLED_FLAG,
+	X_FLEXFIELD_ITEM_FLAG,
+	X_COLUMN_NAME
+  );
+
+  insert into AR_BPA_ITEMS_TL (
+    ITEM_ID,
+    ITEM_NAME,
+    ITEM_TEXT_VALUE,
+    DISPLAY_PROMPT,
+    ITEM_DESCRIPTION,
+    LAST_UPDATE_DATE,
+    LAST_UPDATED_BY,
+    CREATION_DATE,
+    CREATED_BY,
+    LAST_UPDATE_LOGIN,
+    LANGUAGE,
+    SOURCE_LANG
+  ) select
+    X_ITEM_ID,
+    X_ITEM_NAME,
+    X_ITEM_TEXT_VALUE,
+    X_DISPLAY_PROMPT,
+    X_ITEM_DESCRIPTION,
+    X_LAST_UPDATE_DATE,
+    X_LAST_UPDATED_BY,
+    X_CREATION_DATE,
+    X_CREATED_BY,
+    X_LAST_UPDATE_LOGIN,
+    L.LANGUAGE_CODE,
+    userenv('LANG')
+  from FND_LANGUAGES L
+  where L.INSTALLED_FLAG in ('I', 'B')
+  and not exists
+    (select NULL
+    from AR_BPA_ITEMS_TL T
+    where T.ITEM_ID = X_ITEM_ID
+    and T.LANGUAGE = L.LANGUAGE_CODE);
+
+  open c;
+  fetch c into X_ROWID;
+  if (c%notfound) then
+    close c;
+    raise no_data_found;
+  end if;
+  close c;
+
+end INSERT_ROW;
+
+procedure LOCK_ROW (
+  X_ITEM_ID in NUMBER,
+  X_ITEM_CODE in VARCHAR2,
+  X_ITEM_SOURCE in VARCHAR2,
+  X_ITEM_TYPE in VARCHAR2,
+  X_DISPLAY_LEVEL in VARCHAR2,
+  X_DATA_SOURCE_ID in NUMBER,
+  X_DISPLAY_ENABLED_FLAG in VARCHAR2,
+  X_ASSIGNMENT_ENABLED_FLAG in VARCHAR2,
+  X_AMOUNT_ITEM_FLAG in VARCHAR2,
+  X_URL_ID in NUMBER,
+  X_ITEM_IMAGE_FILENAME in VARCHAR2,
+  X_ITEM_MESSAGE_NAME in VARCHAR2,
+  X_DISPLAYED_MULTI_LEVEL_FLAG in VARCHAR2,
+  X_SEEDED_APPLICATION_ID in NUMBER,
+  X_TAX_ITEM_FLAG in VARCHAR2,
+  X_TOTALS_ENABLED_FLAG in VARCHAR2,
+  X_LINK_ENABLED_FLAG in VARCHAR2,
+  X_DATA_TYPE in VARCHAR2,
+  X_URLCFG_ENABLED_FLAG in VARCHAR2,
+  X_FLEXFIELD_ITEM_FLAG in VARCHAR2,
+  X_COLUMN_NAME in VARCHAR2,
+  X_ITEM_NAME in VARCHAR2,
+  X_ITEM_TEXT_VALUE in VARCHAR2,
+  X_DISPLAY_PROMPT in VARCHAR2,
+  X_ITEM_DESCRIPTION in VARCHAR2
+) is
+  cursor c is select
+      ITEM_CODE,
+      ITEM_SOURCE,
+      ITEM_TYPE,
+      DISPLAY_LEVEL,
+      DATA_SOURCE_ID,
+      DISPLAY_ENABLED_FLAG,
+      ASSIGNMENT_ENABLED_FLAG,
+      AMOUNT_ITEM_FLAG,
+      URL_ID,
+      ITEM_IMAGE_FILENAME,
+      ITEM_MESSAGE_NAME,
+      DISPLAYED_MULTI_LEVEL_FLAG,
+      SEEDED_APPLICATION_ID,
+      TAX_ITEM_FLAG,
+      TOTALS_ENABLED_FLAG,
+      LINK_ENABLED_FLAG,
+      DATA_TYPE,
+      URLCFG_ENABLED_FLAG,
+      FLEXFIELD_ITEM_FLAG,
+      COLUMN_NAME
+    from AR_BPA_ITEMS_B
+    where ITEM_ID = X_ITEM_ID
+    for update of ITEM_ID nowait;
+  recinfo c%rowtype;
+
+  cursor c1 is select
+      ITEM_NAME,
+      ITEM_TEXT_VALUE,
+      DISPLAY_PROMPT,
+      ITEM_DESCRIPTION,
+      decode(LANGUAGE, userenv('LANG'), 'Y', 'N') BASELANG
+    from AR_BPA_ITEMS_TL
+    where ITEM_ID = X_ITEM_ID
+    and userenv('LANG') in (LANGUAGE, SOURCE_LANG)
+    for update of ITEM_ID nowait;
+begin
+  open c;
+  fetch c into recinfo;
+  if (c%notfound) then
+    close c;
+    fnd_message.set_name('FND', 'FORM_RECORD_DELETED');
+    app_exception.raise_exception;
+  end if;
+  close c;
+  if (    ((recinfo.ITEM_CODE = X_ITEM_CODE)
+           OR ((recinfo.ITEM_CODE is null) AND (X_ITEM_CODE is null)))
+      AND (recinfo.ITEM_SOURCE = X_ITEM_SOURCE)
+      AND (recinfo.ITEM_TYPE = X_ITEM_TYPE)
+      AND (recinfo.DISPLAY_LEVEL = X_DISPLAY_LEVEL)
+      AND ((recinfo.DATA_SOURCE_ID = X_DATA_SOURCE_ID)
+           OR ((recinfo.DATA_SOURCE_ID is null) AND (X_DATA_SOURCE_ID is null)))
+      AND ((recinfo.DISPLAY_ENABLED_FLAG = X_DISPLAY_ENABLED_FLAG)
+           OR ((recinfo.DISPLAY_ENABLED_FLAG is null) AND (X_DISPLAY_ENABLED_FLAG is null)))
+      AND ((recinfo.ASSIGNMENT_ENABLED_FLAG = X_ASSIGNMENT_ENABLED_FLAG)
+           OR ((recinfo.ASSIGNMENT_ENABLED_FLAG is null) AND (X_ASSIGNMENT_ENABLED_FLAG is null)))
+      AND ((recinfo.AMOUNT_ITEM_FLAG = X_AMOUNT_ITEM_FLAG)
+           OR ((recinfo.AMOUNT_ITEM_FLAG is null) AND (X_AMOUNT_ITEM_FLAG is null)))
+      AND ((recinfo.URL_ID = X_URL_ID)
+           OR ((recinfo.URL_ID is null) AND (X_URL_ID is null)))
+      AND ((recinfo.ITEM_IMAGE_FILENAME = X_ITEM_IMAGE_FILENAME)
+           OR ((recinfo.ITEM_IMAGE_FILENAME is null) AND (X_ITEM_IMAGE_FILENAME is null)))
+      AND ((recinfo.ITEM_MESSAGE_NAME = X_ITEM_MESSAGE_NAME)
+           OR ((recinfo.ITEM_MESSAGE_NAME is null) AND (X_ITEM_MESSAGE_NAME is null)))
+      AND ((recinfo.DISPLAYED_MULTI_LEVEL_FLAG = X_DISPLAYED_MULTI_LEVEL_FLAG)
+           OR ((recinfo.DISPLAYED_MULTI_LEVEL_FLAG is null) AND (X_DISPLAYED_MULTI_LEVEL_FLAG is null)))
+      AND ((recinfo.SEEDED_APPLICATION_ID = X_SEEDED_APPLICATION_ID)
+           OR ((recinfo.SEEDED_APPLICATION_ID is null) AND (X_SEEDED_APPLICATION_ID is null)))
+      AND ((recinfo.TAX_ITEM_FLAG = X_TAX_ITEM_FLAG)
+           OR ((recinfo.TAX_ITEM_FLAG is null) AND (X_TAX_ITEM_FLAG is null)))
+      AND ((recinfo.TOTALS_ENABLED_FLAG = X_TOTALS_ENABLED_FLAG)
+           OR ((recinfo.TOTALS_ENABLED_FLAG is null) AND (X_TOTALS_ENABLED_FLAG is null)))
+      AND ((recinfo.LINK_ENABLED_FLAG = X_LINK_ENABLED_FLAG)
+           OR ((recinfo.LINK_ENABLED_FLAG is null) AND (X_LINK_ENABLED_FLAG is null)))
+      AND ((recinfo.DATA_TYPE = X_DATA_TYPE)
+           OR ((recinfo.DATA_TYPE is null) AND (X_DATA_TYPE is null)))
+      AND ((recinfo.URLCFG_ENABLED_FLAG = X_URLCFG_ENABLED_FLAG)
+           OR ((recinfo.URLCFG_ENABLED_FLAG is null) AND (X_URLCFG_ENABLED_FLAG is null)))
+      AND ((recinfo.FLEXFIELD_ITEM_FLAG = X_FLEXFIELD_ITEM_FLAG)
+           OR ((recinfo.FLEXFIELD_ITEM_FLAG is null) AND (X_FLEXFIELD_ITEM_FLAG is null)))
+      AND ((recinfo.COLUMN_NAME = X_COLUMN_NAME)
+           OR ((recinfo.COLUMN_NAME is null) AND (X_COLUMN_NAME is null)))
+  ) then
+    null;
+  else
+    fnd_message.set_name('FND', 'FORM_RECORD_CHANGED');
+    app_exception.raise_exception;
+  end if;
+
+  for tlinfo in c1 loop
+    if (tlinfo.BASELANG = 'Y') then
+      if (    (tlinfo.ITEM_NAME = X_ITEM_NAME)
+          AND ((tlinfo.ITEM_TEXT_VALUE = X_ITEM_TEXT_VALUE)
+               OR ((tlinfo.ITEM_TEXT_VALUE is null) AND (X_ITEM_TEXT_VALUE is null)))
+          AND ((tlinfo.DISPLAY_PROMPT = X_DISPLAY_PROMPT)
+               OR ((tlinfo.DISPLAY_PROMPT is null) AND (X_DISPLAY_PROMPT is null)))
+          AND ((tlinfo.ITEM_DESCRIPTION = X_ITEM_DESCRIPTION)
+               OR ((tlinfo.ITEM_DESCRIPTION is null) AND (X_ITEM_DESCRIPTION is null)))
+      ) then
+        null;
+      else
+        fnd_message.set_name('FND', 'FORM_RECORD_CHANGED');
+        app_exception.raise_exception;
+      end if;
+    end if;
+  end loop;
+  return;
+end LOCK_ROW;
+
+procedure UPDATE_ROW (
+  X_AMOUNT_ITEM_FLAG in VARCHAR2,
+  X_ASSIGNMENT_ENABLED_FLAG in VARCHAR2,
+  X_DATA_SOURCE_ID in NUMBER,
+  X_DISPLAY_ENABLED_FLAG in VARCHAR2,
+  X_DISPLAY_LEVEL in VARCHAR2,
+  X_DISPLAY_PROMPT in VARCHAR2,
+  X_ITEM_CODE in VARCHAR2,
+  X_ITEM_DESCRIPTION in VARCHAR2,
+  X_ITEM_ID in NUMBER,
+  X_ITEM_IMAGE_FILENAME in VARCHAR2,
+  X_ITEM_MESSAGE_NAME in VARCHAR2,
+  X_ITEM_NAME in VARCHAR2,
+  X_ITEM_SOURCE in VARCHAR2,
+  X_ITEM_TEXT_VALUE in VARCHAR2,
+  X_ITEM_TYPE in VARCHAR2,
+  X_URL_ID in NUMBER,
+  X_LAST_UPDATE_DATE in DATE,
+  X_LAST_UPDATED_BY in NUMBER,
+  X_LAST_UPDATE_LOGIN in NUMBER,
+  X_DISPLAYED_MULTI_LEVEL_FLAG in VARCHAR2,
+  X_SEEDED_APPLICATION_ID in NUMBER,
+  X_TAX_ITEM_FLAG in VARCHAR2,
+  X_TOTALS_ENABLED_FLAG in VARCHAR2,
+  X_LINK_ENABLED_FLAG in VARCHAR2,
+  X_DATA_TYPE in VARCHAR2,
+  X_URLCFG_ENABLED_FLAG in VARCHAR2,
+  X_FLEXFIELD_ITEM_FLAG in VARCHAR2,
+  X_COLUMN_NAME in VARCHAR2
+) is
+begin
+  update AR_BPA_ITEMS_B set
+    ITEM_CODE = X_ITEM_CODE,
+    ITEM_SOURCE = X_ITEM_SOURCE,
+    ITEM_TYPE = X_ITEM_TYPE,
+    DISPLAY_LEVEL = X_DISPLAY_LEVEL,
+    DATA_SOURCE_ID = X_DATA_SOURCE_ID,
+    DISPLAY_ENABLED_FLAG = X_DISPLAY_ENABLED_FLAG,
+    ASSIGNMENT_ENABLED_FLAG = X_ASSIGNMENT_ENABLED_FLAG,
+    AMOUNT_ITEM_FLAG = X_AMOUNT_ITEM_FLAG,
+    URL_ID = X_URL_ID,
+    ITEM_IMAGE_FILENAME = X_ITEM_IMAGE_FILENAME,
+    ITEM_MESSAGE_NAME = X_ITEM_MESSAGE_NAME,
+    LAST_UPDATE_DATE = X_LAST_UPDATE_DATE,
+    LAST_UPDATED_BY = X_LAST_UPDATED_BY,
+    LAST_UPDATE_LOGIN = X_LAST_UPDATE_LOGIN,
+    DISPLAYED_MULTI_LEVEL_FLAG = X_DISPLAYED_MULTI_LEVEL_FLAG,
+    SEEDED_APPLICATION_ID = X_SEEDED_APPLICATION_ID,
+    TAX_ITEM_FLAG = X_TAX_ITEM_FLAG,
+    TOTALS_ENABLED_FLAG = X_TOTALS_ENABLED_FLAG,
+    LINK_ENABLED_FLAG = X_LINK_ENABLED_FLAG,
+    DATA_TYPE = X_DATA_TYPE,
+    URLCFG_ENABLED_FLAG = X_URLCFG_ENABLED_FLAG,
+    FLEXFIELD_ITEM_FLAG = X_FLEXFIELD_ITEM_FLAG,
+    COLUMN_NAME = X_COLUMN_NAME
+  where ITEM_ID = X_ITEM_ID;
+
+  if (sql%notfound) then
+    raise no_data_found;
+  end if;
+
+  update AR_BPA_ITEMS_TL set
+    ITEM_NAME = X_ITEM_NAME,
+    ITEM_TEXT_VALUE = X_ITEM_TEXT_VALUE,
+    DISPLAY_PROMPT = X_DISPLAY_PROMPT,
+    ITEM_DESCRIPTION = X_ITEM_DESCRIPTION,
+    LAST_UPDATE_DATE = X_LAST_UPDATE_DATE,
+    LAST_UPDATED_BY = X_LAST_UPDATED_BY,
+    LAST_UPDATE_LOGIN = X_LAST_UPDATE_LOGIN,
+    SOURCE_LANG = userenv('LANG')
+  where ITEM_ID = X_ITEM_ID
+  and userenv('LANG') in (LANGUAGE, SOURCE_LANG);
+
+  if (sql%notfound) then
+    raise no_data_found;
+  end if;
+end UPDATE_ROW;
+
+procedure DELETE_ROW (
+  X_ITEM_ID in NUMBER
+) is
+begin
+  delete from AR_BPA_ITEMS_TL
+  where ITEM_ID = X_ITEM_ID;
+
+  if (sql%notfound) then
+    raise no_data_found;
+  end if;
+
+  delete from AR_BPA_ITEMS_B
+  where ITEM_ID = X_ITEM_ID;
+
+  if (sql%notfound) then
+    raise no_data_found;
+  end if;
+end DELETE_ROW;
+
+procedure ADD_LANGUAGE
+is
+begin
+  delete from AR_BPA_ITEMS_TL T
+  where not exists
+    (select NULL
+    from AR_BPA_ITEMS_B B
+    where B.ITEM_ID = T.ITEM_ID
+    );
+
+  update AR_BPA_ITEMS_TL T set (
+      ITEM_NAME,
+      ITEM_TEXT_VALUE,
+      DISPLAY_PROMPT,
+      ITEM_DESCRIPTION
+    ) = (select
+      B.ITEM_NAME,
+      B.ITEM_TEXT_VALUE,
+      B.DISPLAY_PROMPT,
+      B.ITEM_DESCRIPTION
+    from AR_BPA_ITEMS_TL B
+    where B.ITEM_ID = T.ITEM_ID
+    and B.LANGUAGE = T.SOURCE_LANG)
+  where (
+      T.ITEM_ID,
+      T.LANGUAGE
+  ) in (select
+      SUBT.ITEM_ID,
+      SUBT.LANGUAGE
+    from AR_BPA_ITEMS_TL SUBB, AR_BPA_ITEMS_TL SUBT
+    where SUBB.ITEM_ID = SUBT.ITEM_ID
+    and SUBB.LANGUAGE = SUBT.SOURCE_LANG
+    and (SUBB.ITEM_NAME <> SUBT.ITEM_NAME
+      or (SUBB.ITEM_NAME is null and SUBT.ITEM_NAME is not null)
+      or (SUBB.ITEM_NAME is not null and SUBT.ITEM_NAME is null)
+      or SUBB.ITEM_TEXT_VALUE <> SUBT.ITEM_TEXT_VALUE
+      or (SUBB.ITEM_TEXT_VALUE is null and SUBT.ITEM_TEXT_VALUE is not null)
+      or (SUBB.ITEM_TEXT_VALUE is not null and SUBT.ITEM_TEXT_VALUE is null)
+      or SUBB.DISPLAY_PROMPT <> SUBT.DISPLAY_PROMPT
+      or (SUBB.DISPLAY_PROMPT is null and SUBT.DISPLAY_PROMPT is not null)
+      or (SUBB.DISPLAY_PROMPT is not null and SUBT.DISPLAY_PROMPT is null)
+      or SUBB.ITEM_DESCRIPTION <> SUBT.ITEM_DESCRIPTION
+      or (SUBB.ITEM_DESCRIPTION is null and SUBT.ITEM_DESCRIPTION is not null)
+      or (SUBB.ITEM_DESCRIPTION is not null and SUBT.ITEM_DESCRIPTION is null)
+  ));
+
+  insert into AR_BPA_ITEMS_TL (
+    ITEM_ID,
+    ITEM_NAME,
+    ITEM_TEXT_VALUE,
+    DISPLAY_PROMPT,
+    ITEM_DESCRIPTION,
+    LAST_UPDATE_DATE,
+    LAST_UPDATED_BY,
+    CREATION_DATE,
+    CREATED_BY,
+    LAST_UPDATE_LOGIN,
+    LANGUAGE,
+    SOURCE_LANG
+  ) select
+    B.ITEM_ID,
+    B.ITEM_NAME,
+    B.ITEM_TEXT_VALUE,
+    B.DISPLAY_PROMPT,
+    B.ITEM_DESCRIPTION,
+    B.LAST_UPDATE_DATE,
+    B.LAST_UPDATED_BY,
+    B.CREATION_DATE,
+    B.CREATED_BY,
+    B.LAST_UPDATE_LOGIN,
+    L.LANGUAGE_CODE,
+    B.SOURCE_LANG
+  from AR_BPA_ITEMS_TL B, FND_LANGUAGES L
+  where L.INSTALLED_FLAG in ('I', 'B')
+  and B.LANGUAGE = userenv('LANG')
+  and not exists
+    (select NULL
+    from AR_BPA_ITEMS_TL T
+    where T.ITEM_ID = B.ITEM_ID
+    and T.LANGUAGE = L.LANGUAGE_CODE);
+end ADD_LANGUAGE;
+
+procedure TRANSLATE_ROW (
+  X_ITEM_ID in NUMBER,
+  X_ITEM_NAME in VARCHAR2,
+  X_ITEM_TEXT_VALUE in VARCHAR2,
+  X_DISPLAY_PROMPT in VARCHAR2,
+  X_ITEM_DESCRIPTION in VARCHAR2,
+  X_OWNER in VARCHAR2) IS
+begin
+
+    update AR_BPA_ITEMS_TL
+      set ITEM_NAME = X_ITEM_NAME,
+          ITEM_TEXT_VALUE = X_ITEM_TEXT_VALUE,
+          DISPLAY_PROMPT = X_DISPLAY_PROMPT,
+          ITEM_DESCRIPTION = X_ITEM_DESCRIPTION,
+          source_lang = userenv('LANG'),
+          last_update_date = sysdate,
+          last_updated_by = decode(X_OWNER, 'SEED', 1, 0),
+          last_update_login = 0
+    where item_id = X_item_id
+    and   userenv('LANG') in (language, source_lang);
+
+end TRANSLATE_ROW;
+
+procedure LOAD_ROW (
+        X_AMOUNT_ITEM_FLAG IN VARCHAR2,
+        X_ASSIGNMENT_ENABLED_FLAG IN VARCHAR2,
+        X_DATA_SOURCE_ID IN NUMBER,
+        X_DISPLAY_ENABLED_FLAG IN VARCHAR2,
+        X_DISPLAY_LEVEL IN VARCHAR2,
+        X_DISPLAY_PROMPT IN VARCHAR2,
+        X_ITEM_CODE IN VARCHAR2,
+        X_ITEM_DESCRIPTION IN VARCHAR2,
+        X_ITEM_ID IN NUMBER,
+        X_ITEM_IMAGE_FILENAME IN VARCHAR2,
+        X_ITEM_MESSAGE_NAME IN VARCHAR2,
+        X_ITEM_NAME IN VARCHAR2,
+        X_ITEM_SOURCE IN VARCHAR2,
+        X_ITEM_TEXT_VALUE IN VARCHAR2,
+        X_ITEM_TYPE IN VARCHAR2,
+        X_URL_ID IN NUMBER,
+        X_OWNER in VARCHAR2,
+        X_DISPLAYED_MULTI_LEVEL_FLAG  IN VARCHAR2,
+  		X_SEEDED_APPLICATION_ID in NUMBER,
+  		X_TAX_ITEM_FLAG in VARCHAR2,
+  		X_TOTALS_ENABLED_FLAG in VARCHAR2,
+  		X_LINK_ENABLED_FLAG in VARCHAR2,
+  		X_DATA_TYPE in VARCHAR2,
+		X_URLCFG_ENABLED_FLAG in VARCHAR2,
+  		X_FLEXFIELD_ITEM_FLAG in VARCHAR2,
+  		X_COLUMN_NAME in VARCHAR2
+) IS
+  begin
+   declare
+     user_id            number := 0;
+     row_id             varchar2(64);
+   begin
+     if (X_OWNER = 'SEED') then
+        user_id := 1;
+    end if;
+
+    AR_BPA_ITEMS_PKG.UPDATE_ROW (
+        X_AMOUNT_ITEM_FLAG => X_AMOUNT_ITEM_FLAG,
+        X_ASSIGNMENT_ENABLED_FLAG => X_ASSIGNMENT_ENABLED_FLAG,
+        X_DATA_SOURCE_ID => X_DATA_SOURCE_ID,
+        X_DISPLAY_ENABLED_FLAG => X_DISPLAY_ENABLED_FLAG,
+        X_DISPLAY_LEVEL => X_DISPLAY_LEVEL,
+        X_DISPLAY_PROMPT => X_DISPLAY_PROMPT,
+        X_ITEM_CODE => X_ITEM_CODE,
+        X_ITEM_DESCRIPTION => X_ITEM_DESCRIPTION,
+        X_ITEM_ID => X_ITEM_ID,
+        X_ITEM_IMAGE_FILENAME => X_ITEM_IMAGE_FILENAME,
+        X_ITEM_MESSAGE_NAME => X_ITEM_MESSAGE_NAME,
+        X_ITEM_NAME => X_ITEM_NAME,
+        X_ITEM_SOURCE => X_ITEM_SOURCE,
+        X_ITEM_TEXT_VALUE => X_ITEM_TEXT_VALUE,
+        X_ITEM_TYPE => X_ITEM_TYPE,
+        X_URL_ID => X_URL_ID,
+        X_LAST_UPDATE_DATE => sysdate,
+        X_LAST_UPDATED_BY => user_id,
+        X_LAST_UPDATE_LOGIN => 0,
+        X_DISPLAYED_MULTI_LEVEL_FLAG => X_DISPLAYED_MULTI_LEVEL_FLAG,
+        X_SEEDED_APPLICATION_ID => X_SEEDED_APPLICATION_ID,
+        X_TAX_ITEM_FLAG => X_TAX_ITEM_FLAG,
+        X_TOTALS_ENABLED_FLAG => X_TOTALS_ENABLED_FLAG,
+    	X_LINK_ENABLED_FLAG => X_LINK_ENABLED_FLAG,
+    	X_DATA_TYPE => X_DATA_TYPE,
+    	X_URLCFG_ENABLED_FLAG => X_URLCFG_ENABLED_FLAG,
+    	X_FLEXFIELD_ITEM_FLAG => X_FLEXFIELD_ITEM_FLAG,
+    	X_COLUMN_NAME => X_COLUMN_NAME );
+    exception
+       when NO_DATA_FOUND then
+           AR_BPA_ITEMS_PKG.INSERT_ROW (
+                 X_ROWID => row_id,
+                X_AMOUNT_ITEM_FLAG => X_AMOUNT_ITEM_FLAG,
+                X_ASSIGNMENT_ENABLED_FLAG => X_ASSIGNMENT_ENABLED_FLAG,
+                X_DATA_SOURCE_ID => X_DATA_SOURCE_ID,
+                X_DISPLAY_ENABLED_FLAG => X_DISPLAY_ENABLED_FLAG,
+                X_DISPLAY_LEVEL => X_DISPLAY_LEVEL,
+                X_DISPLAY_PROMPT => X_DISPLAY_PROMPT,
+                X_ITEM_CODE => X_ITEM_CODE,
+                X_ITEM_DESCRIPTION => X_ITEM_DESCRIPTION,
+                X_ITEM_ID => X_ITEM_ID,
+                X_ITEM_IMAGE_FILENAME => X_ITEM_IMAGE_FILENAME,
+                X_ITEM_MESSAGE_NAME => X_ITEM_MESSAGE_NAME,
+                X_ITEM_NAME => X_ITEM_NAME,
+                X_ITEM_SOURCE => X_ITEM_SOURCE,
+                X_ITEM_TEXT_VALUE => X_ITEM_TEXT_VALUE,
+                X_ITEM_TYPE => X_ITEM_TYPE,
+                X_URL_ID => X_URL_ID,
+                X_CREATION_DATE => sysdate,
+                X_CREATED_BY => user_id,
+                X_LAST_UPDATE_DATE => sysdate,
+                X_LAST_UPDATED_BY => user_id,
+                X_LAST_UPDATE_LOGIN => 0,
+				X_DISPLAYED_MULTI_LEVEL_FLAG => X_DISPLAYED_MULTI_LEVEL_FLAG,
+        		X_SEEDED_APPLICATION_ID => X_SEEDED_APPLICATION_ID,
+        		X_TAX_ITEM_FLAG => X_TAX_ITEM_FLAG,
+		        X_TOTALS_ENABLED_FLAG => X_TOTALS_ENABLED_FLAG,
+		    	X_LINK_ENABLED_FLAG => X_LINK_ENABLED_FLAG,
+		    	X_DATA_TYPE => X_DATA_TYPE,
+		    	X_URLCFG_ENABLED_FLAG => X_URLCFG_ENABLED_FLAG,
+    			X_FLEXFIELD_ITEM_FLAG => X_FLEXFIELD_ITEM_FLAG,
+    			X_COLUMN_NAME => X_COLUMN_NAME );
+    end;
+end LOAD_ROW;
+
+end AR_BPA_ITEMS_PKG;
+
+/

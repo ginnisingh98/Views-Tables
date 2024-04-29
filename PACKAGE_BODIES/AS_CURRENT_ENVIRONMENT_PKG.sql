@@ -1,0 +1,562 @@
+--------------------------------------------------------
+--  DDL for Package Body AS_CURRENT_ENVIRONMENT_PKG
+--------------------------------------------------------
+
+  CREATE OR REPLACE EDITIONABLE PACKAGE BODY "APPS"."AS_CURRENT_ENVIRONMENT_PKG" as
+/* $Header: asxcuceb.pls 115.5 2002/02/05 16:27:19 pkm ship    $ */
+procedure INSERT_ROW (
+  X_ROWID in out VARCHAR2,
+  X_CURRENT_ENVIRONMENT_ID in out NUMBER,
+  X_ADDRESS_ID in NUMBER,
+  X_CUSTOMER_ID in NUMBER,
+  X_ENABLED_FLAG in VARCHAR2,
+  X_INTEREST_TYPE_ID in NUMBER,
+  X_PRIMARY_INTEREST_CODE_ID in NUMBER,
+  X_SECONDARY_INTEREST_CODE_ID in NUMBER,
+  X_DESCRIPTION in VARCHAR2,
+  X_SOURCE      in VARCHAR2,
+  X_SOURCE_ID   in NUMBER,
+  X_INVENTORY_ITEM_ID in NUMBER,
+  X_QUANTITY in NUMBER,
+  X_PRICE in NUMBER,
+  X_AMOUNT in NUMBER,
+  X_COMMENTS in VARCHAR2,
+  X_USER_DEF_NUM1 in NUMBER,
+  X_USER_DEF_NUM2 in NUMBER,
+  X_USER_DEF_NUM3 in NUMBER,
+  X_USER_DEF_TEXT1 in VARCHAR2,
+  X_USER_DEF_TEXT2 in VARCHAR2,
+  X_USER_DEF_TEXT3 in VARCHAR2,
+  X_INSTALLATION_DATE in DATE,
+  X_USER_DEF_DATE in DATE,
+  X_REEVALUATION_DATE in DATE,
+  X_ATTRIBUTE_CATEGORY in VARCHAR2,
+  X_ATTRIBUTE1 in VARCHAR2,
+  X_ATTRIBUTE2 in VARCHAR2,
+  X_ATTRIBUTE3 in VARCHAR2,
+  X_ATTRIBUTE4 in VARCHAR2,
+  X_ATTRIBUTE5 in VARCHAR2,
+  X_ATTRIBUTE6 in VARCHAR2,
+  X_ATTRIBUTE7 in VARCHAR2,
+  X_ATTRIBUTE8 in VARCHAR2,
+  X_ATTRIBUTE9 in VARCHAR2,
+  X_ATTRIBUTE10 in VARCHAR2,
+  X_ATTRIBUTE11 in VARCHAR2,
+  X_ATTRIBUTE12 in VARCHAR2,
+  X_ATTRIBUTE13 in VARCHAR2,
+  X_ATTRIBUTE14 in VARCHAR2,
+  X_ATTRIBUTE15 in VARCHAR2,
+  X_LAST_UPDATE_DATE  DATE,
+  X_LAST_UPDATED_BY   NUMBER,
+  X_LAST_UPDATE_LOGIN NUMBER,
+  X_CREATION_DATE     DATE,
+  X_CREATED_BY        NUMBER,
+  X_MODE in VARCHAR2 default 'R'
+  ) is
+    cursor C is select ROWID from AS_CURRENT_ENVIRONMENT
+      where CURRENT_ENVIRONMENT_ID = X_CURRENT_ENVIRONMENT_ID;
+
+    CURSOR  C_Curr_Env_Id IS
+      SELECT  AS_Current_Environment_S.nextval
+      FROM sys.dual;
+
+
+begin
+
+
+  OPEN   C_Curr_Env_Id;
+  FETCH  C_Curr_Env_Id INTO X_Current_Environment_Id;
+  CLOSE  C_Curr_Env_Id;
+
+
+
+  insert into AS_CURRENT_ENVIRONMENT (
+
+    CURRENT_ENVIRONMENT_ID,
+    ADDRESS_ID,
+    CUSTOMER_ID,
+    ENABLED_FLAG,
+    INTEREST_TYPE_ID,
+    PRIMARY_INTEREST_CODE_ID,
+    SECONDARY_INTEREST_CODE_ID,
+    DESCRIPTION,
+    SOURCE,
+    SOURCE_ID,
+    INVENTORY_ITEM_ID,
+    QUANTITY,
+    PRICE,
+    AMOUNT,
+    COMMENTS,
+    USER_DEF_NUM1,
+    USER_DEF_NUM2,
+    USER_DEF_NUM3,
+    USER_DEF_TEXT1,
+    USER_DEF_TEXT2,
+    USER_DEF_TEXT3,
+    INSTALLATION_DATE,
+    USER_DEF_DATE,
+    REEVALUATION_DATE,
+    ATTRIBUTE_CATEGORY,
+    ATTRIBUTE1,
+    ATTRIBUTE2,
+    ATTRIBUTE3,
+    ATTRIBUTE4,
+    ATTRIBUTE5,
+    ATTRIBUTE6,
+    ATTRIBUTE7,
+    ATTRIBUTE8,
+    ATTRIBUTE9,
+    ATTRIBUTE10,
+    ATTRIBUTE11,
+    ATTRIBUTE12,
+    ATTRIBUTE13,
+    ATTRIBUTE14,
+    ATTRIBUTE15,
+    CREATION_DATE,
+    CREATED_BY,
+    LAST_UPDATE_DATE,
+    LAST_UPDATED_BY,
+    LAST_UPDATE_LOGIN
+  ) values (
+
+    X_CURRENT_ENVIRONMENT_ID,
+    X_ADDRESS_ID,
+    X_CUSTOMER_ID,
+    X_ENABLED_FLAG,
+    X_INTEREST_TYPE_ID,
+    X_PRIMARY_INTEREST_CODE_ID,
+    X_SECONDARY_INTEREST_CODE_ID,
+    X_DESCRIPTION,
+    X_SOURCE,
+    X_SOURCE_ID,
+    X_INVENTORY_ITEM_ID,
+    X_QUANTITY,
+    X_PRICE,
+    X_AMOUNT,
+    X_COMMENTS,
+    X_USER_DEF_NUM1,
+    X_USER_DEF_NUM2,
+    X_USER_DEF_NUM3,
+    X_USER_DEF_TEXT1,
+    X_USER_DEF_TEXT2,
+    X_USER_DEF_TEXT3,
+    X_INSTALLATION_DATE,
+    X_USER_DEF_DATE,
+    X_REEVALUATION_DATE,
+    X_ATTRIBUTE_CATEGORY,
+    X_ATTRIBUTE1,
+    X_ATTRIBUTE2,
+    X_ATTRIBUTE3,
+    X_ATTRIBUTE4,
+    X_ATTRIBUTE5,
+    X_ATTRIBUTE6,
+    X_ATTRIBUTE7,
+    X_ATTRIBUTE8,
+    X_ATTRIBUTE9,
+    X_ATTRIBUTE10,
+    X_ATTRIBUTE11,
+    X_ATTRIBUTE12,
+    X_ATTRIBUTE13,
+    X_ATTRIBUTE14,
+    X_ATTRIBUTE15,
+    X_CREATION_DATE,
+    X_CREATED_BY,
+    X_LAST_UPDATE_DATE,
+    X_LAST_UPDATED_BY,
+    X_LAST_UPDATE_LOGIN
+  );
+
+  open c;
+  fetch c into X_ROWID;
+  if (c%notfound) then
+    close c;
+    raise no_data_found;
+  end if;
+  close c;
+
+end INSERT_ROW;
+
+procedure LOCK_ROW (
+  X_CURRENT_ENVIRONMENT_ID in NUMBER,
+  X_ADDRESS_ID in NUMBER,
+  X_CUSTOMER_ID in NUMBER,
+  X_ENABLED_FLAG in VARCHAR2,
+  X_INTEREST_TYPE_ID in NUMBER,
+  X_PRIMARY_INTEREST_CODE_ID in NUMBER,
+  X_SECONDARY_INTEREST_CODE_ID in NUMBER,
+  X_DESCRIPTION in VARCHAR2,
+  X_SOURCE      in VARCHAR2,
+  X_SOURCE_ID   in NUMBER,
+  X_INVENTORY_ITEM_ID in NUMBER,
+  X_QUANTITY in NUMBER,
+  X_PRICE in NUMBER,
+  X_AMOUNT in NUMBER,
+  X_COMMENTS in VARCHAR2,
+  X_USER_DEF_NUM1 in NUMBER,
+  X_USER_DEF_NUM2 in NUMBER,
+  X_USER_DEF_NUM3 in NUMBER,
+  X_USER_DEF_TEXT1 in VARCHAR2,
+  X_USER_DEF_TEXT2 in VARCHAR2,
+  X_USER_DEF_TEXT3 in VARCHAR2,
+  X_INSTALLATION_DATE in DATE,
+  X_USER_DEF_DATE in DATE,
+  X_REEVALUATION_DATE in DATE,
+  X_ATTRIBUTE_CATEGORY in VARCHAR2,
+  X_ATTRIBUTE1 in VARCHAR2,
+  X_ATTRIBUTE2 in VARCHAR2,
+  X_ATTRIBUTE3 in VARCHAR2,
+  X_ATTRIBUTE4 in VARCHAR2,
+  X_ATTRIBUTE5 in VARCHAR2,
+  X_ATTRIBUTE6 in VARCHAR2,
+  X_ATTRIBUTE7 in VARCHAR2,
+  X_ATTRIBUTE8 in VARCHAR2,
+  X_ATTRIBUTE9 in VARCHAR2,
+  X_ATTRIBUTE10 in VARCHAR2,
+  X_ATTRIBUTE11 in VARCHAR2,
+  X_ATTRIBUTE12 in VARCHAR2,
+  X_ATTRIBUTE13 in VARCHAR2,
+  X_ATTRIBUTE14 in VARCHAR2,
+  X_ATTRIBUTE15 in VARCHAR2,
+  X_LAST_UPDATE_DATE  DATE,
+  X_LAST_UPDATED_BY   NUMBER,
+  X_LAST_UPDATE_LOGIN NUMBER,
+  X_CREATION_DATE     DATE,
+  X_CREATED_BY        NUMBER
+) is
+  cursor c is select
+
+      ADDRESS_ID,
+      CUSTOMER_ID,
+      ENABLED_FLAG,
+      INTEREST_TYPE_ID,
+      PRIMARY_INTEREST_CODE_ID,
+      SECONDARY_INTEREST_CODE_ID,
+      DESCRIPTION,
+      SOURCE,
+      SOURCE_ID,
+      INVENTORY_ITEM_ID,
+      QUANTITY,
+      PRICE,
+      AMOUNT,
+      COMMENTS,
+      USER_DEF_NUM1,
+      USER_DEF_NUM2,
+      USER_DEF_NUM3,
+      USER_DEF_TEXT1,
+      USER_DEF_TEXT2,
+      USER_DEF_TEXT3,
+      INSTALLATION_DATE,
+      USER_DEF_DATE,
+      REEVALUATION_DATE,
+      ATTRIBUTE_CATEGORY,
+      ATTRIBUTE1,
+      ATTRIBUTE2,
+      ATTRIBUTE3,
+      ATTRIBUTE4,
+      ATTRIBUTE5,
+      ATTRIBUTE6,
+      ATTRIBUTE7,
+      ATTRIBUTE8,
+      ATTRIBUTE9,
+      ATTRIBUTE10,
+      ATTRIBUTE11,
+      ATTRIBUTE12,
+      ATTRIBUTE13,
+      ATTRIBUTE14,
+      ATTRIBUTE15,
+      LAST_UPDATE_DATE,
+      LAST_UPDATED_BY,
+      LAST_UPDATE_LOGIN,
+      CREATION_DATE,
+      CREATED_BY
+    from AS_CURRENT_ENVIRONMENT
+    where CURRENT_ENVIRONMENT_ID = X_CURRENT_ENVIRONMENT_ID
+    for update  nowait;
+  recinfo c%rowtype;
+
+begin
+  open c;
+  fetch c into recinfo;
+  if (c%notfound) then
+    close c;
+    fnd_message.set_name('FND', 'FORM_RECORD_DELETED');
+    app_exception.raise_exception;
+  end if;
+  close c;
+      if ( ((recinfo.ATTRIBUTE9 = X_ATTRIBUTE9)
+           OR ((recinfo.ATTRIBUTE9 is null)
+               AND (X_ATTRIBUTE9 is null)))
+      AND ((recinfo.ATTRIBUTE10 = X_ATTRIBUTE10)
+           OR ((recinfo.ATTRIBUTE10 is null)
+               AND (X_ATTRIBUTE10 is null)))
+      AND ((recinfo.ATTRIBUTE11 = X_ATTRIBUTE11)
+           OR ((recinfo.ATTRIBUTE11 is null)
+               AND (X_ATTRIBUTE11 is null)))
+      AND ((recinfo.ATTRIBUTE12 = X_ATTRIBUTE12)
+           OR ((recinfo.ATTRIBUTE12 is null)
+               AND (X_ATTRIBUTE12 is null)))
+      AND ((recinfo.ATTRIBUTE13 = X_ATTRIBUTE13)
+           OR ((recinfo.ATTRIBUTE13 is null)
+               AND (X_ATTRIBUTE13 is null)))
+      AND ((recinfo.ATTRIBUTE14 = X_ATTRIBUTE14)
+           OR ((recinfo.ATTRIBUTE14 is null)
+               AND (X_ATTRIBUTE14 is null)))
+      AND ((recinfo.ATTRIBUTE15 = X_ATTRIBUTE15)
+           OR ((recinfo.ATTRIBUTE15 is null)
+               AND (X_ATTRIBUTE15 is null)))
+      AND (recinfo.ADDRESS_ID = X_ADDRESS_ID)
+      AND (recinfo.CUSTOMER_ID = X_CUSTOMER_ID)
+      AND (recinfo.ENABLED_FLAG = X_ENABLED_FLAG)
+      AND ((recinfo.INTEREST_TYPE_ID = X_INTEREST_TYPE_ID)
+           OR ((recinfo.INTEREST_TYPE_ID is null)
+               AND (X_INTEREST_TYPE_ID is null)))
+      AND ((recinfo.PRIMARY_INTEREST_CODE_ID = X_PRIMARY_INTEREST_CODE_ID)
+           OR ((recinfo.PRIMARY_INTEREST_CODE_ID is null)
+               AND (X_PRIMARY_INTEREST_CODE_ID is null)))
+      AND ((recinfo.SECONDARY_INTEREST_CODE_ID = X_SECONDARY_INTEREST_CODE_ID)
+           OR ((recinfo.SECONDARY_INTEREST_CODE_ID is null)
+               AND (X_SECONDARY_INTEREST_CODE_ID is null)))
+      AND ((recinfo.DESCRIPTION = X_DESCRIPTION)
+           OR ((recinfo.DESCRIPTION is null)
+               AND (X_DESCRIPTION is null)))
+      AND ((recinfo.SOURCE = X_SOURCE)
+           OR ((recinfo.SOURCE is null)
+               AND (X_SOURCE is null)))
+      AND ((recinfo.SOURCE_ID = X_SOURCE_ID)
+           OR ((recinfo.SOURCE_ID is null)
+               AND (X_SOURCE_ID is null)))
+      AND ((recinfo.INVENTORY_ITEM_ID = X_INVENTORY_ITEM_ID)
+           OR ((recinfo.INVENTORY_ITEM_ID is null)
+               AND (X_INVENTORY_ITEM_ID is null)))
+      AND ((recinfo.QUANTITY = X_QUANTITY)
+           OR ((recinfo.QUANTITY is null)
+               AND (X_QUANTITY is null)))
+      AND ((recinfo.PRICE = X_PRICE)
+           OR ((recinfo.PRICE is null)
+               AND (X_PRICE is null)))
+      AND ((recinfo.AMOUNT = X_AMOUNT)
+           OR ((recinfo.AMOUNT is null)
+               AND (X_AMOUNT is null)))
+      AND ((recinfo.COMMENTS = X_COMMENTS)
+           OR ((recinfo.COMMENTS is null)
+               AND (X_COMMENTS is null)))
+      AND ((recinfo.USER_DEF_NUM1 = X_USER_DEF_NUM1)
+           OR ((recinfo.USER_DEF_NUM1 is null)
+               AND (X_USER_DEF_NUM1 is null)))
+      AND ((recinfo.USER_DEF_NUM2 = X_USER_DEF_NUM2)
+           OR ((recinfo.USER_DEF_NUM2 is null)
+               AND (X_USER_DEF_NUM2 is null)))
+      AND ((recinfo.USER_DEF_NUM3 = X_USER_DEF_NUM3)
+           OR ((recinfo.USER_DEF_NUM3 is null)
+               AND (X_USER_DEF_NUM3 is null)))
+      AND ((recinfo.USER_DEF_TEXT1 = X_USER_DEF_TEXT1)
+           OR ((recinfo.USER_DEF_TEXT1 is null)
+               AND (X_USER_DEF_TEXT1 is null)))
+      AND ((recinfo.USER_DEF_TEXT2 = X_USER_DEF_TEXT2)
+           OR ((recinfo.USER_DEF_TEXT2 is null)
+               AND (X_USER_DEF_TEXT2 is null)))
+      AND ((recinfo.USER_DEF_TEXT3 = X_USER_DEF_TEXT3)
+           OR ((recinfo.USER_DEF_TEXT3 is null)
+               AND (X_USER_DEF_TEXT3 is null)))
+      AND ((recinfo.INSTALLATION_DATE = X_INSTALLATION_DATE)
+           OR ((recinfo.INSTALLATION_DATE is null)
+               AND (X_INSTALLATION_DATE is null)))
+      AND ((recinfo.USER_DEF_DATE = X_USER_DEF_DATE)
+           OR ((recinfo.USER_DEF_DATE is null)
+               AND (X_USER_DEF_DATE is null)))
+      AND ((recinfo.REEVALUATION_DATE = X_REEVALUATION_DATE)
+           OR ((recinfo.REEVALUATION_DATE is null)
+               AND (X_REEVALUATION_DATE is null)))
+      AND ((recinfo.ATTRIBUTE_CATEGORY = X_ATTRIBUTE_CATEGORY)
+           OR ((recinfo.ATTRIBUTE_CATEGORY is null)
+               AND (X_ATTRIBUTE_CATEGORY is null)))
+      AND ((recinfo.ATTRIBUTE1 = X_ATTRIBUTE1)
+           OR ((recinfo.ATTRIBUTE1 is null)
+               AND (X_ATTRIBUTE1 is null)))
+      AND ((recinfo.ATTRIBUTE2 = X_ATTRIBUTE2)
+           OR ((recinfo.ATTRIBUTE2 is null)
+               AND (X_ATTRIBUTE2 is null)))
+      AND ((recinfo.ATTRIBUTE3 = X_ATTRIBUTE3)
+           OR ((recinfo.ATTRIBUTE3 is null)
+               AND (X_ATTRIBUTE3 is null)))
+      AND ((recinfo.ATTRIBUTE4 = X_ATTRIBUTE4)
+           OR ((recinfo.ATTRIBUTE4 is null)
+               AND (X_ATTRIBUTE4 is null)))
+      AND ((recinfo.ATTRIBUTE5 = X_ATTRIBUTE5)
+           OR ((recinfo.ATTRIBUTE5 is null)
+               AND (X_ATTRIBUTE5 is null)))
+      AND ((recinfo.ATTRIBUTE6 = X_ATTRIBUTE6)
+           OR ((recinfo.ATTRIBUTE6 is null)
+               AND (X_ATTRIBUTE6 is null)))
+      AND ((recinfo.ATTRIBUTE7 = X_ATTRIBUTE7)
+           OR ((recinfo.ATTRIBUTE7 is null)
+               AND (X_ATTRIBUTE7 is null)))
+      AND ((recinfo.ATTRIBUTE8 = X_ATTRIBUTE8)
+           OR ((recinfo.ATTRIBUTE8 is null)
+               AND (X_ATTRIBUTE8 is null)))
+      AND (recinfo.LAST_UPDATE_DATE = X_LAST_UPDATE_DATE)
+      AND (recinfo.LAST_UPDATED_BY = X_LAST_UPDATED_BY)
+      AND (recinfo.LAST_UPDATE_LOGIN = X_LAST_UPDATE_LOGIN)
+      AND (recinfo.CREATION_DATE = X_CREATION_DATE)
+      AND (recinfo.CREATED_BY = X_CREATED_BY)
+  ) then
+    null;
+  else
+    fnd_message.set_name('FND', 'FORM_RECORD_CHANGED');
+    app_exception.raise_exception;
+  end if;
+  return;
+end LOCK_ROW;
+
+procedure UPDATE_ROW (
+  X_CURRENT_ENVIRONMENT_ID in NUMBER,
+  X_ADDRESS_ID in NUMBER,
+  X_CUSTOMER_ID in NUMBER,
+  X_ENABLED_FLAG in VARCHAR2,
+  X_INTEREST_TYPE_ID in NUMBER,
+  X_PRIMARY_INTEREST_CODE_ID in NUMBER,
+  X_SECONDARY_INTEREST_CODE_ID in NUMBER,
+  X_DESCRIPTION in VARCHAR2,
+  X_SOURCE      in VARCHAR2,
+  X_SOURCE_ID   in NUMBER,
+  X_INVENTORY_ITEM_ID in NUMBER,
+  X_QUANTITY in NUMBER,
+  X_PRICE in NUMBER,
+  X_AMOUNT in NUMBER,
+  X_COMMENTS in VARCHAR2,
+  X_USER_DEF_NUM1 in NUMBER,
+  X_USER_DEF_NUM2 in NUMBER,
+  X_USER_DEF_NUM3 in NUMBER,
+  X_USER_DEF_TEXT1 in VARCHAR2,
+  X_USER_DEF_TEXT2 in VARCHAR2,
+  X_USER_DEF_TEXT3 in VARCHAR2,
+  X_INSTALLATION_DATE in DATE,
+  X_USER_DEF_DATE in DATE,
+  X_REEVALUATION_DATE in DATE,
+  X_ATTRIBUTE_CATEGORY in VARCHAR2,
+  X_ATTRIBUTE1 in VARCHAR2,
+  X_ATTRIBUTE2 in VARCHAR2,
+  X_ATTRIBUTE3 in VARCHAR2,
+  X_ATTRIBUTE4 in VARCHAR2,
+  X_ATTRIBUTE5 in VARCHAR2,
+  X_ATTRIBUTE6 in VARCHAR2,
+  X_ATTRIBUTE7 in VARCHAR2,
+  X_ATTRIBUTE8 in VARCHAR2,
+  X_ATTRIBUTE9 in VARCHAR2,
+  X_ATTRIBUTE10 in VARCHAR2,
+  X_ATTRIBUTE11 in VARCHAR2,
+  X_ATTRIBUTE12 in VARCHAR2,
+  X_ATTRIBUTE13 in VARCHAR2,
+  X_ATTRIBUTE14 in VARCHAR2,
+  X_ATTRIBUTE15 in VARCHAR2,
+  X_LAST_UPDATE_DATE  DATE,
+  X_LAST_UPDATED_BY   NUMBER,
+  X_LAST_UPDATE_LOGIN NUMBER,
+  X_MODE in VARCHAR2 default 'R'
+  ) is
+
+begin
+
+
+    update AS_CURRENT_ENVIRONMENT set
+      CURRENT_ENVIRONMENT_ID = X_CURRENT_ENVIRONMENT_ID,
+      ADDRESS_ID = X_ADDRESS_ID,
+      CUSTOMER_ID = X_CUSTOMER_ID,
+      ENABLED_FLAG = X_ENABLED_FLAG,
+      INTEREST_TYPE_ID = X_INTEREST_TYPE_ID,
+      PRIMARY_INTEREST_CODE_ID = X_PRIMARY_INTEREST_CODE_ID,
+      SECONDARY_INTEREST_CODE_ID = X_SECONDARY_INTEREST_CODE_ID,
+      DESCRIPTION = X_DESCRIPTION,
+      SOURCE      = X_SOURCE,
+      SOURCE_ID   = X_SOURCE_ID,
+      INVENTORY_ITEM_ID = X_INVENTORY_ITEM_ID,
+      QUANTITY = X_QUANTITY,
+      PRICE = X_PRICE,
+      AMOUNT = X_AMOUNT,
+      COMMENTS = X_COMMENTS,
+      USER_DEF_NUM1 = X_USER_DEF_NUM1,
+      USER_DEF_NUM2 = X_USER_DEF_NUM2,
+      USER_DEF_NUM3 = X_USER_DEF_NUM3,
+      USER_DEF_TEXT1 = X_USER_DEF_TEXT1,
+      USER_DEF_TEXT2 = X_USER_DEF_TEXT2,
+      USER_DEF_TEXT3 = X_USER_DEF_TEXT3,
+      INSTALLATION_DATE = X_INSTALLATION_DATE,
+      USER_DEF_DATE = X_USER_DEF_DATE,
+      REEVALUATION_DATE = X_REEVALUATION_DATE,
+      ATTRIBUTE_CATEGORY = X_ATTRIBUTE_CATEGORY,
+      ATTRIBUTE1 = X_ATTRIBUTE1,
+      ATTRIBUTE2 = X_ATTRIBUTE2,
+      ATTRIBUTE3 = X_ATTRIBUTE3,
+      ATTRIBUTE4 = X_ATTRIBUTE4,
+      ATTRIBUTE5 = X_ATTRIBUTE5,
+      ATTRIBUTE6 = X_ATTRIBUTE6,
+      ATTRIBUTE7 = X_ATTRIBUTE7,
+      ATTRIBUTE8 = X_ATTRIBUTE8,
+      ATTRIBUTE9 = X_ATTRIBUTE9,
+      ATTRIBUTE10 = X_ATTRIBUTE10,
+      ATTRIBUTE11 = X_ATTRIBUTE11,
+      ATTRIBUTE12 = X_ATTRIBUTE12,
+      ATTRIBUTE13 = X_ATTRIBUTE13,
+      ATTRIBUTE14 = X_ATTRIBUTE14,
+      ATTRIBUTE15 = X_ATTRIBUTE15,
+      LAST_UPDATE_DATE = X_LAST_UPDATE_DATE,
+      LAST_UPDATED_BY = X_LAST_UPDATED_BY,
+      LAST_UPDATE_LOGIN = X_LAST_UPDATE_LOGIN
+    where CURRENT_ENVIRONMENT_ID = X_CURRENT_ENVIRONMENT_ID;
+  if (sql%notfound) then
+    raise no_data_found;
+  end if;
+
+end UPDATE_ROW;
+
+procedure DELETE_ROW (
+  X_CURRENT_ENVIRONMENT_ID in NUMBER
+) is
+begin
+  delete from AS_CURRENT_ENVIRONMENT
+  where CURRENT_ENVIRONMENT_ID = X_CURRENT_ENVIRONMENT_ID;
+
+  if (sql%notfound) then
+    raise no_data_found;
+  end if;
+
+end DELETE_ROW;
+
+
+PROCEDURE  SELECT_TOTAL_AMOUNT(X_CUSTOMER_ID IN NUMBER,
+                               X_ADDRESS_ID  IN NUMBER,
+                               X_TOTAL       IN OUT NUMBER,
+                               X_TOTAL_RTOT_DB  IN OUT NUMBER) IS
+
+BEGIN
+     SELECT   NVL(SUM(Amount),0)
+     INTO  X_TOTAL
+     FROM  AS_CURRENT_ENVIRONMENT
+     WHERE X_CUSTOMER_ID = Customer_Id AND
+           X_ADDRESS_ID  = Address_Id;
+
+     X_TOTAL_RTOT_DB := X_TOTAL;
+
+END  SELECT_TOTAL_AMOUNT;
+
+
+PROCEDURE  SELECT_TOTAL_USER_DEF_NUM1(X_CUSTOMER_ID IN NUMBER,
+                               X_ADDRESS_ID  IN NUMBER,
+                               X_TOTAL       IN OUT NUMBER,
+                               X_TOTAL_RTOT_DB  IN OUT NUMBER) IS
+
+BEGIN
+     SELECT   NVL(SUM(User_Def_Num1),0)
+     INTO  X_TOTAL
+     FROM  AS_CURRENT_ENVIRONMENT
+     WHERE X_CUSTOMER_ID = Customer_Id AND
+           X_ADDRESS_ID  = Address_Id;
+
+     X_TOTAL_RTOT_DB := X_TOTAL;
+
+END  SELECT_TOTAL_USER_DEF_NUM1;
+
+
+end AS_CURRENT_ENVIRONMENT_PKG;
+
+/

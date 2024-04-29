@@ -1,0 +1,1081 @@
+--------------------------------------------------------
+--  DDL for Package HR_MULTI_MESSAGE
+--------------------------------------------------------
+
+  CREATE OR REPLACE EDITIONABLE PACKAGE "APPS"."HR_MULTI_MESSAGE" AUTHID CURRENT_USER AS
+/* $Header: hrmulmes.pkh 115.1 2002/01/03 01:38:48 pkm ship      $ */
+--
+-- Global Constants
+--
+-- Message Types
+   G_ERROR_MSG       constant varchar2(1) := 'E';
+   G_WARNING_MSG     constant varchar2(1) := 'W';
+   G_INFORMATION_MSG constant varchar2(1) := 'I';
+   G_DEPENDENCY_MSG  constant varchar2(1) := 'D';
+--
+-- Exceptions
+--
+-- Used to indicate to calling code that at least one
+-- message exists in the Multiple Message List.
+   Error_Message_Exist Exception;
+--
+-- ----------------------------------------------------------------------------
+-- |-------------------------< enable_message_list >--------------------------|
+-- ----------------------------------------------------------------------------
+-- {Start Of Comments}
+--
+-- Description:
+--   Switches on the Multiple Message Detection feature. Initialises this
+--   feature and any existing list entries are cleared. Should be called by
+--   interfaces which require Multiple Message Detection, instead of stop at
+--   first error found, behaviour prior to calling the PL/SQL API.
+--
+-- Prerequisites:
+--   Should not be called by the API or row handler validation procedures.
+--
+-- In Parameters:
+--   None
+--
+-- Post Success:
+--   The Multiple Error Message Detection feature will be initialised and
+--   switched on. Messages, if any, still in the list from a previous API call
+--   will be cleared.
+--
+-- Post Failure:
+--   None expected. An ORA or PL/SQL exception will be raised.
+--
+-- Access Status:
+--   Internal Development Use Only.
+--
+-- {End Of Comments}
+--
+procedure enable_message_list;
+--
+-- ----------------------------------------------------------------------------
+-- |-------------------------< disable_message_list >-------------------------|
+-- ----------------------------------------------------------------------------
+-- {Start Of Comments}
+--
+-- Description:
+--   Switches off the Multiple Error Message Detection feature. Disabling
+--   the list prevents new messages from being added to the list and the
+--   "verify" functions (no_all_inclusive_error, no_exclusive_error and
+--   no_error_message) from returning FALSE.
+--
+--   The current contents of the message list will not be cleared until the
+--   list is enabled again. Thus allowing the current message list contents
+--   to be retrieved by user interface programs.
+--
+-- Prerequisites:
+--   The program which enabled the Multiple Message Detection should call
+--   this function after the PL/SQL APIs.
+--
+-- In Parameters:
+--   None
+--
+-- Post Success:
+--   The Multiple Message Detection feature will be switched off.
+--
+-- Post Failure:
+--   None expected. An ORA or PL/SQL exception will be raised.
+--
+-- Access Status:
+--   Internal Development Use Only.
+--
+-- {End Of Comments}
+--
+procedure disable_message_list;
+--
+-- ----------------------------------------------------------------------------
+-- |------------------------< is_message_list_enabled >-----------------------|
+-- ----------------------------------------------------------------------------
+-- {Start Of Comments}
+--
+-- Description:
+--   Returns the current status of the Multiple Message Detection feature.
+--
+-- Prerequisites:
+--   None.
+--
+-- In Parameters:
+--   None
+--
+-- Post Success:
+--   Returns TRUE if the Multiple Message Detection is currently enabled.
+--   Otherwise FALSE is returned and caller can assume that stop at first
+--   error found behaviour is required.
+--
+-- Post Failure:
+--   None expected. An ORA or PL/SQL exception will be raised.
+--
+-- Access Status:
+--   Internal Development Use Only.
+--
+-- {End Of Comments}
+--
+function is_message_list_enabled
+  return boolean;
+--
+-- ----------------------------------------------------------------------------
+-- |------------------------< no_all_inclusive_error >------------------------|
+-- ----------------------------------------------------------------------------
+-- {Start Of Comments}
+--
+-- Description:
+--   When row handler data validation procedures have prerequisites this
+--   function can be used to decided if the checks should proceed. Useful
+--   for ensuring dependent validation is only executed when the previous
+--   individual or combination column validation has actually passed.
+--   Looks for error message which includes any reference to the check
+--   column.
+--
+--   When Multiple Message Detection is disabled:
+--     Always returns TRUE.
+--
+--   When Multiple Message Detection is enabled:
+--     Returns TRUE when there are no errors in the Multiple Message List
+--     matching any of the given check TABLE.COLUMN names or API control
+--     parameter names. Each individual p_check_column1 to 5 parameter
+--     value is checked, not the set of column names.
+--
+--     FALSE is returned when an entry already exists in the message list
+--     which is associated with at least one of the check column names.
+--     Returning FALSE indicates to the current data validation procedure
+--     that validation should not be attempted because a more serious
+--     error has already been found.
+--
+--     For example, say the message list contains two entries:
+--       Message_1  associated with TABLE_A.COLUMN_1
+--       Message_2  associated with TABLE_A.COLUMN_2 and TABLE_A.COLUMN_3
+--
+--       Calls to this function and results:
+--       a) p_check_column1 parameter set to 'TABLE_A.COLUMN_4'
+--          TRUE will be returned.
+--       b) p_check_column1 parameter set to 'TABLE_A.COLUMN_1'
+--          FALSE will be returned.
+--       c) p_check_column1 parameter set to 'TABLE_A.COLUMN_2'
+--          FALSE will be returned.
+--       d) p_check_column1 parameter set to 'TABLE_A.COLUMN_1' and
+--          p_check_column2 parameter set to 'TABLE_A.COLUMN_2'
+--          FALSE will be returned.
+--       e) p_check_column1 parameter set to 'TABLE_A.COLUMN_2' and
+--          p_check_column2 parameter set to 'TABLE_A.COLUMN_3'
+--          FALSE will be returned.
+--       f) p_check_column1 parameter set to 'TABLE_A.COLUMN_2' and
+--          p_check_column2 parameter set to 'TABLE_A.COLUMN_4'
+--          FALSE will be returned.
+--
+--     This function is one of the Multiple Message list "verify" functions.
+--     All of the "verify" functions can also handle validation dependency
+--     chains. When a matching message is found then any additional
+--     internal/dummy message can be added to the list, using the
+--     p_associated_column1 to 5 parameter values. Therefore following data
+--     attribute validation only needs to perform prerequisite verification
+--     for the most adjacent columns in any validation dependency chain.
+--
+--     So when calling this function set the p_associated_column1 to 5
+--     parameters to the list of TABLE.COLUMN or API parameter names
+--     which would have been validated by your data validation if no
+--     matching error message had been found.
+--
+-- Prerequisites:
+--   None.
+--
+-- In Parameters:
+--   Name                           Reqd Type     Description
+--   p_check_column1                Yes  varchar2 Column or API control
+--                                                parameter name to
+--                                                verify in the message
+--                                                list.
+--   p_check_column2                No   varchar2 Column or API control
+--                                                parameter name to
+--                                                verify in the message
+--                                                list.
+--   p_check_column3                No   varchar2 Column or API control
+--                                                parameter name to
+--                                                verify in the message
+--                                                list.
+--   p_check_column4                No   varchar2 Column or API control
+--                                                parameter name to
+--                                                verify in the message
+--                                                list.
+--   p_check_column5                No   varchar2 Column or API control
+--                                                parameter name to
+--                                                verify in the message
+--                                                list.
+--   p_associated_column1           No   varchar2 Dependent database
+--                                                column or API
+--                                                control parameter
+--                                                name. Only used if
+--                                                an existing message
+--                                                is found.
+--   p_associated_column2           No   varchar2 Dependent database
+--                                                column or API
+--                                                control parameter
+--                                                name. Only used if
+--                                                an existing message
+--                                                is found.
+--   p_associated_column3           No   varchar2 Dependent database
+--                                                column or API
+--                                                control parameter
+--                                                name. Only used if
+--                                                an existing message
+--                                                is found.
+--   p_associated_column4           No   varchar2 Dependent database
+--                                                column or API
+--                                                control parameter
+--                                                name. Only used if
+--                                                an existing message
+--                                                is found.
+--   p_associated_column5           No   varchar2 Dependent database
+--                                                column or API
+--                                                control parameter
+--                                                name. Only used if
+--                                                an existing message
+--                                                is found.
+--
+-- Post Success:
+--   Returns TRUE when Multiple Error Detection is disabled or
+--   when all of p_check_column1 to 5 parameter values are NOT
+--   associated with an existing message in the list. A TRUE
+--   value indicates the API validation should be performed.
+--
+--   Returns FALSE when at least one of the columns ARE matched
+--   with an existing message in the list. If the
+--   p_assoicated_column1 to 5 parameters have also been set then
+--   a dummy message will be added to the list and will be
+--   associated with the p_assoicated_column1 to 5 values.
+--   A FALSE value indicates then API validation should not
+--   be performed.
+--
+-- Post Failure:
+--   None expected. An ORA or PL/SQL exception will be raised.
+--
+-- Access Status:
+--   Internal Development Use Only.
+--
+-- {End Of Comments}
+--
+function no_all_inclusive_error
+  (p_check_column1                 in     varchar2
+  ,p_check_column2                 in     varchar2 default null
+  ,p_check_column3                 in     varchar2 default null
+  ,p_check_column4                 in     varchar2 default null
+  ,p_check_column5                 in     varchar2 default null
+  ,p_associated_column1            in     varchar2 default null
+  ,p_associated_column2            in     varchar2 default null
+  ,p_associated_column3            in     varchar2 default null
+  ,p_associated_column4            in     varchar2 default null
+  ,p_associated_column5            in     varchar2 default null
+  ) return boolean;
+--
+-- ----------------------------------------------------------------------------
+-- |--------------------------< no_exclusive_error >--------------------------|
+-- ----------------------------------------------------------------------------
+-- {Start Of Comments}
+--
+-- Description:
+--   When row handler data validation procedures have prerequisites this
+--   function can be used to decided if the checks should proceed. Useful
+--   for ensuring dependent combination column validation is only executed
+--   when the individual columns are valid and other combination errors can
+--   be ignored.
+--
+--   When Multiple Message Detection is disabled:
+--     Always returns TRUE.
+--
+--   When Multiple Message Detection is enabled:
+--     Returns TRUE when there are no errors in the Multiple Message List
+--     exclusively matching any of the given check TABLE.COLUMN names or
+--     API control parameter names.
+--
+--     FALSE is returned when an entry already exists in the message list
+--     which is exclusively associated with one of the check column names. Each
+--     individual p_check_column1 to 5 parameter value is checked, not the set
+--     of column names. This means that messages in the list which are
+--     associated with more than one column will be ignored by this function
+--     and cannot lead to a FALSE value being returned. Only messages
+--     associated with a single column name, or API control parameter name,
+--     can lead to a FALSE value being returned. Returning FALSE indicates to
+--     the current data validation procedure that validation should not be
+--     attempted because a more serious individual column error has already
+--     been found.
+--
+--     For example, say the message list contains two entries:
+--       Message_1  associated with TABLE_A.COLUMN_1
+--       Message_2  associated with TABLE_A.COLUMN_2 and TABLE_A.COLUMN_3
+--
+--       Calls to this function and results:
+--       a) p_check_column1 parameter set to 'TABLE_A.COLUMN_4'
+--          TRUE will be returned.
+--       b) p_check_column1 parameter set to 'TABLE_A.COLUMN_1'
+--          FALSE will be returned.
+--       c) p_check_column1 parameter set to 'TABLE_A.COLUMN_2'
+--          TRUE will be returned.
+--       d) p_check_column1 parameter set to 'TABLE_A.COLUMN_1' and
+--          p_check_column2 parameter set to 'TABLE_A.COLUMN_2'
+--          FALSE will be returned.
+--       e) p_check_column1 parameter set to 'TABLE_A.COLUMN_2' and
+--          p_check_column2 parameter set to 'TABLE_A.COLUMN_3'
+--          TRUE will be returned.
+--       f) p_check_column1 parameter set to 'TABLE_A.COLUMN_2' and
+--          p_check_column2 parameter set to 'TABLE_A.COLUMN_4'
+--          TRUE will be returned.
+--
+--     This function is one of the Multiple Message list "verify" functions.
+--     All of the "verify" functions can also handle validation dependency
+--     chains. When a matching message is found then any additional
+--     internal/dummy message can be added to the list, using the
+--     p_associated_column1 to 5 parameter values. Therefore following data
+--     attribute validation only needs to perform prerequisite verification
+--     for the most adjacent columns in any validation dependency chain.
+--
+--     So when calling this function set the p_associated_column1 to 5
+--     parameters to the list of TABLE.COLUMN or API parameter names
+--     which would have been validated by your data validation if no
+--     matching error message had been found.
+--
+-- Prerequisites:
+--   None.
+--
+-- In Parameters:
+--   Name                           Reqd Type     Description
+--   p_check_column1                Yes  varchar2 Column or API control
+--                                                parameter name to
+--                                                verify in the message
+--                                                list.
+--   p_check_column2                No   varchar2 Column or API control
+--                                                parameter name to
+--                                                verify in the message
+--                                                list.
+--   p_check_column3                No   varchar2 Column or API control
+--                                                parameter name to
+--                                                verify in the message
+--                                                list.
+--   p_check_column4                No   varchar2 Column or API control
+--                                                parameter name to
+--                                                verify in the message
+--                                                list.
+--   p_check_column5                No   varchar2 Column or API control
+--                                                parameter name to
+--                                                verify in the message
+--                                                list.
+--   p_associated_column1           No   varchar2 Dependent database
+--                                                column or API
+--                                                control parameter
+--                                                name. Only used if
+--                                                an existing message
+--                                                is found.
+--   p_associated_column2           No   varchar2 Dependent database
+--                                                column or API
+--                                                control parameter
+--                                                name. Only used if
+--                                                an existing message
+--                                                is found.
+--   p_associated_column3           No   varchar2 Dependent database
+--                                                column or API
+--                                                control parameter
+--                                                name. Only used if
+--                                                an existing message
+--                                                is found.
+--   p_associated_column4           No   varchar2 Dependent database
+--                                                column or API
+--                                                control parameter
+--                                                name. Only used if
+--                                                an existing message
+--                                                is found.
+--   p_associated_column5           No   varchar2 Dependent database
+--                                                column or API
+--                                                control parameter
+--                                                name. Only used if
+--                                                an existing message
+--                                                is found.
+--
+-- Post Success:
+--   Returns TRUE when Multiple Error Detection is disabled or
+--   when all of p_check_column1 to 5 parameter values are NOT
+--   exclusively associated with an existing message in the list.
+--   A TRUE value indicates the API validation should be performed.
+--
+--   Returns FALSE when at least one of the columns IS exclusively
+--   matched with an existing message in the list. If the
+--   p_assoicated_column1 to 5 parameters have also been set then
+--   a dummy message will be added to the list and will be
+--   associated with the p_assoicated_column1 to 5 values.
+--   A FALSE value indicates then API validation should not
+--   be performed.
+--
+-- Post Failure:
+--   None expected. An ORA or PL/SQL exception will be raised.
+--
+-- Access Status:
+--   Internal Development Use Only.
+--
+-- {End Of Comments}
+--
+function no_exclusive_error
+  (p_check_column1                 in     varchar2
+  ,p_check_column2                 in     varchar2 default null
+  ,p_check_column3                 in     varchar2 default null
+  ,p_check_column4                 in     varchar2 default null
+  ,p_check_column5                 in     varchar2 default null
+  ,p_associated_column1            in     varchar2 default null
+  ,p_associated_column2            in     varchar2 default null
+  ,p_associated_column3            in     varchar2 default null
+  ,p_associated_column4            in     varchar2 default null
+  ,p_associated_column5            in     varchar2 default null
+  ) return boolean;
+--
+-- ----------------------------------------------------------------------------
+-- |---------------------------< no_error_message >---------------------------|
+-- ----------------------------------------------------------------------------
+-- {Start Of Comments}
+--
+-- Description:
+--   When row handler data validation procedures have prerequisites this
+--   function can be used to decided if the checks should proceed. Useful for
+--   ensuring dependent validation is only executed when previous validation
+--   has not already identified an particular error.
+--
+--   The preferred way of verifying prerequisites is to call the
+--   no_all_inclusive_error or no_exclusive_error functions. As they check
+--   the Multiple Message List using TABLE.COLUMN names or API control
+--   parameter names. Those searches are preferred because some columns can
+--   be associated with many different error messages and the exact validation
+--   message names can change over time.
+--
+--   When Multiple Message Detection is disabled:
+--     Always returns TRUE.
+--
+--   When Multiple Message Detection is enabled:
+--     Returns TRUE when there are no errors in the Multiple Message List
+--     matching any of the given check message names.
+--
+--     FALSE is returned when at least one of the check message names has
+--     a matching entry in the message list. Returning FALSE indicates to
+--     the current data validation procedure that validation should not be
+--     attempted because a more serious error has already been found.
+--
+--     For example, say the message list contains two entries:
+--       Message_1  associated with TABLE_A.COLUMN_1
+--       Message_2  associated with TABLE_A.COLUMN_2 and TABLE_A.COLUMN_3
+--
+--       Calls to this function and results:
+--       a) p_check_message_name1 parameter set to 'Message_3'
+--          TRUE will be returned.
+--       b) p_check_message_name1 parameter set to 'Message_1'
+--          FALSE will be returned.
+--       c) p_check_message_name1 parameter set to 'Message_1' and
+--          p_check_message_name2 parameter set to 'Message_2'
+--          FALSE will be returned.
+--       d) p_check_message_name1 parameter set to 'Message_2' and
+--          p_check_message_name2 parameter set to 'Message_3'
+--          FALSE will be returned.
+--
+--     This function is one of the Multiple Message list "verify" functions.
+--     All of the "verify" functions can also handle validation dependency
+--     chains. When a matching message is found then any additional
+--     internal/dummy message can be added to the list, using the
+--     p_associated_column1 to 5 parameter values. Therefore following data
+--     attribute validation only needs to perform prerequisite verification
+--     for the most adjacent columns in any validation dependency chain.
+--
+--     So when calling this function set the p_associated_column1 to 5
+--     parameters to the list of TABLE.COLUMN or API parameter names
+--     which would have been validated by your data validation if no
+--     matching error message had been found.
+--
+-- Prerequisites:
+--   None.
+--
+-- In Parameters:
+--   Name                           Reqd Type     Description
+--   p_check_message_name1          Yes  varchar2 Application Error
+--                                                Message Name to
+--                                                verify in the list.
+--   p_check_message_name2          No   varchar2 Application Error
+--                                                Message Name to
+--                                                verify in the list.
+--   p_check_message_name3          No   varchar2 Application Error
+--                                                Message Name to
+--                                                verify in the list.
+--   p_check_message_name4          No   varchar2 Application Error
+--                                                Message Name to
+--                                                verify in the list.
+--   p_check_message_name5          No   varchar2 Application Error
+--                                                Message Name to
+--                                                verify in the list.
+--   p_associated_column1           No   varchar2 Dependent database
+--                                                column or API
+--                                                control parameter
+--                                                name. Only used if
+--                                                an existing error
+--                                                is found.
+--   p_associated_column2           No   varchar2 Dependent database
+--                                                column or API
+--                                                control parameter
+--                                                name. Only used if
+--                                                an existing error
+--                                                is found.
+--   p_associated_column3           No   varchar2 Dependent database
+--                                                column or API
+--                                                control parameter
+--                                                name. Only used if
+--                                                an existing error
+--                                                is found.
+--   p_associated_column4           No   varchar2 Dependent database
+--                                                column or API
+--                                                control parameter
+--                                                name. Only used if
+--                                                an existing error
+--                                                is found.
+--   p_associated_column5           No   varchar2 Dependent database
+--                                                column or API
+--                                                control parameter
+--                                                name. Only used if
+--                                                an existing error
+--                                                is found.
+--
+-- Post Success:
+--   Returns TRUE when Multiple Error Detection is disabled or when
+--   none of p_check_message_name1 to 5 parameter values match any
+--   existing error message in the list. A TRUE value indicates the
+--   API validation should be performed.
+--
+--   Returns FALSE when at least one of the message names does match
+--   an existing error message in the list. If the p_assoicated_column1
+--   to 5 parameters have also been set then a dummy message will be
+--   added to the list and will be associated with the
+--   p_assoicated_column1 to 5 values. A FALSE value indicates the API
+--   validation should not be performed.
+--
+-- Post Failure:
+--   None expected. An ORA or PL/SQL exception will be raised.
+--
+-- Access Status:
+--   Internal Development Use Only.
+--
+-- {End Of Comments}
+--
+function no_error_message
+  (p_check_message_name1           in     varchar2
+  ,p_check_message_name2           in     varchar2 default null
+  ,p_check_message_name3           in     varchar2 default null
+  ,p_check_message_name4           in     varchar2 default null
+  ,p_check_message_name5           in     varchar2 default null
+  ,p_associated_column1            in     varchar2 default null
+  ,p_associated_column2            in     varchar2 default null
+  ,p_associated_column3            in     varchar2 default null
+  ,p_associated_column4            in     varchar2 default null
+  ,p_associated_column5            in     varchar2 default null
+  ) return boolean;
+--
+-- ----------------------------------------------------------------------------
+-- |------------------------------< exception_add >---------------------------|
+-- ----------------------------------------------------------------------------
+-- {Start Of Comments}
+--
+-- Description:
+--   When row handler data validation procedures have raised an Application
+--   specific exception this function can be used to decide if the message
+--   should be added to the Multiple Message List or raised as an individual
+--   exception. Designed for use from an exception handler which has only
+--   caught Application specific exceptions.
+--
+--   When Multiple Message Detection is disabled:
+--     Always returns TRUE.
+--
+--   When Multiple Message Detection is enabled:
+--     Returns FALSE and the error message has been added to FND_MSG_PUB
+--     package, by copying the current message name and token details from
+--     the FND_MESSAGE package.
+--
+--     When the error can be associated with specific database column, or API
+--     control parameter, name(s) then either the p_associated_column1 to 5
+--     parameters should be populated or the p_same_associated_columns
+--     parameter should be explicitly set to 'Y'.
+--
+--     The p_same_associated_columns parameter is defaulted to 'N' indicating
+--     the p_associated_column1 to 5 parameter set in this function call
+--     should be used. To use the p_associated_column1 to 5 parameter values
+--     past into the most recent "verify" function call
+--     (no_all_inclusive_error, no_exclusive_error and no_error_message)
+--     then explicitly set p_same_associated_columns to 'Y'. Where a "verify"
+--     function has been called, setting p_same_associated_columns to 'Y'
+--     will avoid having to maintain the associated column information more
+--     than once.
+--
+--     No error will be raised if p_same_associated_columns is 'Y' and
+--     p_associated_column1 to 5 parameters have also been set. The
+--     p_associated_column1 to 5 values will just be ignored in this scenario.
+--
+-- Prerequisites:
+--   An Application specific exception has been raised, by calling
+--   FND_MESSAGE.RAISE_ERROR, and details of an error message have been set
+--   in the FND_MESSAGE package. Where possible the p_same_associated_columns
+--   parameter should be set to 'Y'. When set to 'N' then the associated
+--   column values should be provided by setting the p_associated_column1 to 5
+--   parameters.
+--
+-- In Parameters:
+--   Name                           Reqd Type     Description
+--   p_associated_column1           No   varchar2 Database column or
+--                                                API control parameter
+--                                                name.
+--   p_associated_column2           No   varchar2 Database column or
+--                                                API control parameter
+--                                                name.
+--   p_associated_column3           No   varchar2 Database column or
+--                                                API control parameter
+--                                                name.
+--   p_associated_column4           No   varchar2 Database column or
+--                                                API control parameter
+--                                                name.
+--   p_associated_column5           No   varchar2 Database column or
+--                                                API control parameter
+--                                                name.
+--   p_same_associated_columns      No   varchar2 Must be 'Y' or 'N'.
+--
+-- Post Success:
+--   Returns TRUE when Multiple Message Detection is disabled. Indicating
+--   the exception handler should not catch the exception. The exception
+--   handler should raise the exception providing stop at first error
+--   found behaviour.
+--
+--   Returns FALSE when Multiple Message Detection is enabled. An error
+--   message will have been added to FND_MSG_PUB package by copying the
+--   current message name and token details from the FND_MESSAGE package.
+--   The FND_MESSAGE package will be cleared to allow for the next message
+--   to be set. If no message details had been registered with FND_MESSAGE
+--   no message will be added to the FND_MSG_PUB package.
+--
+-- Post Failure:
+--   None expected. An ORA or PL/SQL exception will be raised.
+--
+-- Access Status:
+--   Internal Development Use Only.
+--
+-- {End Of Comments}
+--
+function exception_add
+  (p_associated_column1            in     varchar2 default null
+  ,p_associated_column2            in     varchar2 default null
+  ,p_associated_column3            in     varchar2 default null
+  ,p_associated_column4            in     varchar2 default null
+  ,p_associated_column5            in     varchar2 default null
+  ,p_same_associated_columns       in     varchar2 default 'N'
+  ) return boolean;
+--
+-- ----------------------------------------------------------------------------
+-- |-----------------------------------< add >--------------------------------|
+-- ----------------------------------------------------------------------------
+-- {Start Of Comments}
+--
+-- Description:
+--   When row handler data validation procedures are about to raise a message
+--   this procedure can be called to decide how the message should be
+--   processed. This procedure will either add the message to the Multiple
+--   Message List or raise an individual Application Specific exception.
+--
+--   Usually data checks in the same row handler validation procedure are
+--   dependent on each other. Hence the preferred mechanism for processing
+--   messages is to use the exception_add function. Calls to this add
+--   procedure should only be made from validation procedures which
+--   perform multiple independent checks or associated column information
+--   can vary depending on the raised error message. Can also be used by
+--   WEB wrapper procedures to add warning and information messages to the
+--   message list.
+--
+--   This add procedure provides similar behaviour to the exception_add
+--   function, except program control should not be inside an exception
+--   handler. This procedure can be called from the procedure body as a
+--   replacement to calling FND_MESSAGE.RAISE_ERROR. By default this procedure
+--   assumes the message is an error message. When Multiple Message Detection
+--   is enabled it can also be used to add warning and information type
+--   messages.
+--
+--   When Multiple Message Detection is disabled:
+--     For error messages calls FND_MESSAGE.RAISE_ERROR causing a PL/SQL
+--     Application Specific exception to be raised. Thus aborting any
+--     following processing in row handler validation procedure. Any warning
+--     or information messages will be ignored and the contents of FND_MESSAGE
+--     package cleared. So program control will continue with the next line in
+--     the row handler validation procedure.
+--
+--   When Multiple Message Detection is enabled:
+--     All message types will be added to the FND_MSG_PUB package, by copying
+--     the current message name and token details from the FND_MESSAGE package.
+--     No exception will be raised, so program control will continue with
+--     the next line in the row handler validation procedure.
+--
+--     When an error can be associated with specific database column, or API
+--     control parameter, name(s) then either the p_associated_column1 to 5
+--     parameters should be populated or the p_same_associated_columns
+--     parameter should be explicitly set to 'Y'.
+--
+--     The p_same_associated_columns parameter is defaulted to 'N' indicating
+--     the p_associated_column1 to 5 parameter set in this procedure call
+--     should be used. To use the p_associated_column1 to 5 parameter values
+--     past into the most recent "verify" function call
+--     (no_all_inclusive_error, no_exclusive_error and no_error_message)
+--     then explicitly set p_same_associated_columns to 'Y'. Where a "verify"
+--     function has been called, setting p_same_associated_columns to 'Y'
+--     will avoid having to maintain the associated column information more
+--     than once.
+--
+--     No error will be raised if p_same_associated_columns is 'Y' and
+--     p_associated_column1 to 5 parameters have also been set. The
+--     p_associated_column1 to 5 values will just be ignored in this scenario.
+--
+--     When the message type is not error no associated column information
+--     is set. The p_same_associated_columns and p_associated_column1 to 5
+--     parameters values are ignored.
+--
+-- Prerequisites:
+--   Details of a message have been set in the FND_MESSAGE package. Where
+--   possible the p_same_associated_columns parameter should be set to 'Y'.
+--   When set to 'N' then the associated column values should be provided by
+--   setting the p_associated_column1 to 5 parameters.
+--
+-- In Parameters:
+--   Name                           Reqd Type     Description
+--   p_associated_column1           No   varchar2 Database column or
+--                                                API control parameter
+--                                                name.
+--   p_associated_column2           No   varchar2 Database column or
+--                                                API control parameter
+--                                                name.
+--   p_associated_column3           No   varchar2 Database column or
+--                                                API control parameter
+--                                                name.
+--   p_associated_column4           No   varchar2 Database column or
+--                                                API control parameter
+--                                                name.
+--   p_associated_column5           No   varchar2 Database column or
+--                                                API control parameter
+--                                                name.
+--   p_same_associated_columns      No   varchar2 Must be 'Y' or 'N'.
+--   p_message_type                 No   varhcar2 Set to one of the
+--                                                HR_MULTI_MESSAGE package
+--                                                message type constants.
+--
+-- Post Success:
+--   When Multiple Message Detection is disabled and the message type is error
+--   then FND_MESSAGE.RAISE_ERROR is called to raise an Application specific
+--   exception. Thus providing stop at first error found behaviour. Other
+--   message types are ignored and the FND_MESSAGE package will be cleared to
+--   allow for the next message to be set.
+--
+--   When Multiple Message Detection is enabled. A message will have been
+--   added to FND_MSG_PUB package by copying the current message name and
+--   token details from the FND_MESSAGE package. The FND_MESSAGE package will
+--   be cleared to allow for the next message to be set. If no message details
+--   had been registered with FND_MESSAGE no message will be added to the
+--   FND_MSG_PUB package. Associated column information will only be set for
+--   error messages.
+--
+-- Post Failure:
+--   None expected. An ORA or PL/SQL exception will be raised.
+--
+-- Access Status:
+--   Internal Development Use Only.
+--
+-- {End Of Comments}
+--
+procedure add
+  (p_associated_column1            in     varchar2 default null
+  ,p_associated_column2            in     varchar2 default null
+  ,p_associated_column3            in     varchar2 default null
+  ,p_associated_column4            in     varchar2 default null
+  ,p_associated_column5            in     varchar2 default null
+  ,p_same_associated_columns       in     varchar2 default 'N'
+  ,p_message_type                  in     varchar2 default
+                                                   hr_multi_message.g_error_msg
+  );
+--
+-- ----------------------------------------------------------------------------
+-- |-------------------------< unexpected_error_add >-------------------------|
+-- ----------------------------------------------------------------------------
+-- {Start Of Comments}
+--
+-- Description:
+--   Allows Application specific and unexpected exceptions to be added to the
+--   Multiple Message List. For use from PL/SQL WEB wrapper procedures which
+--   need to catch any Application specific or other RDBMS exceptions, such
+--   as ORA- or PLS- errors,  prior the procedure call ending.
+--
+--   Handles the following scenarios:
+--     (1) Application specific exception raised and message details exist in
+--         the FND_MESSAGE package.
+--     (2) Application specific exception raised and message details do not
+--         exist in the FND_MESSAGE package.
+--     (3) Other ORA or PLS exceptions.
+--
+--   When Multiple Message Detection is disabled:
+--     Always returns TRUE.
+--
+--   When Multiple Message Detection is enabled:
+--     Returns FALSE and an error message is added to Multiple Message List
+--     held in the FND_MSG_PUB package.
+--
+-- Prerequisites:
+--   None.
+--
+-- In Parameters:
+--   Name                           Reqd Type     Description
+--   p_procedure_name               Yes  varchar2 Name of the calling
+--                                                package and procedure.
+--
+-- Post Success:
+--   Returns TRUE when Multiple Message Detection is disabled. Indicating
+--   the exception handler should not catch the exception. The exception
+--   handler should raise the exception.
+--
+--   Returns FALSE when Multiple Message Detection is enabled. For scenario
+--   (1) details of the message are read and cleared from the FND_MESSAGE
+--   package and an error message will be created in the Multiple Message
+--   list. For scenarios (2) and (3) an 'FND_AS_UNEXPECTED_ERROR' application
+--   error message with SQLERRM details will have been added to the Multiple
+--   Message List.
+--
+-- Post Failure:
+--   None expected. An ORA or PL/SQL exception will be raised.
+--
+-- Access Status:
+--   Internal Development Use Only.
+--
+-- {End Of Comments}
+--
+function unexpected_error_add
+  (p_procedure_name                in     varchar2
+  ) return boolean;
+--
+-- ----------------------------------------------------------------------------
+-- |--------------------------< end_validation_set >--------------------------|
+-- ----------------------------------------------------------------------------
+-- {Start Of Comments}
+--
+-- Description:
+--   Raises the Hr_Multi_Message.Error_Message_Exist exception when Multiple
+--   Message Detection is enabled and at least one error message exists in the
+--   list.
+--
+--   This procedure has no affect when Multiple Message Detection is disabled
+--   or when non-error messages exist in the list.
+--
+--   Should be called when all independent row handler data validation checks
+--   have been completed and it not safe to continue processing to the next
+--   stage inside the row handler, such as DML.
+--
+--   On some tables there can be a small set of important attributes. When
+--   those attributes are invalid they can affect the ability to perform any
+--   other attribute validation. For example, when the BUSINESS_GROUP_ID
+--   column is invalid then often it is not worth attempting further validation
+--   as so many other attributes depend on it. Hence this procedure call also
+--   be called after important attributes have been validated to abort
+--   further validation.
+--
+-- Prerequisites:
+--   None.
+--
+-- In Parameters:
+--   None.
+--
+-- Post Success:
+--   When Multiple Message Detection is disabled or only non-error messages
+--   exist in the list this procedure will end normally. Allowing the calling
+--   program to continue it's normal program flow.
+--
+-- Post Failure:
+--   When Multiple Message Detection is enabled and at least one error message
+--   exists in the list then the Hr_Multi_Message.Error_Message_Exist
+--   exception is raised.
+--
+-- Access Status:
+--   Internal Development Use Only.
+--
+-- {End Of Comments}
+--
+procedure end_validation_set;
+--
+-- ----------------------------------------------------------------------------
+-- |---------------------------< get_return_status >--------------------------|
+-- ----------------------------------------------------------------------------
+-- {Start Of Comments}
+--
+-- Description:
+--   Returns a status value which indicates when messages of any type exist in
+--   the Message List. The WEB Wrapper can pass this value to the middle-tier,
+--   indicating to the OAFramework Exception Helper classes when it is
+--   necessary to retrieve messages from the list.
+--
+--   This function performs the same behaviour regardless of whether the
+--   Multiple Message Detection is disabled or enabled.
+--
+-- Prerequisites:
+--   None.
+--
+-- In Parameters:
+--   None.
+--
+-- Post Success:
+--   When the Multiple Message List is empty this function returns the value
+--   'S' (same as FND_API.G_RET_STS_SUCCESS). If any messages of any type
+--   exist then 'E' (same as FND_API.G_RET_STS_ERROR) is returned.
+--
+-- Post Failure:
+--   None expected. An ORA or PL/SQL exception will be raised.
+--
+-- Developer/Implementation Notes:
+--   Currently it is unnecessary for this function to make a distinction
+--   between error and just warning/information messages existing. The
+--   returned status is just used by the OAFramework Exception Helper
+--   classes to workout when it is necessary to obtain messages from the
+--   FND_MSG_PUB package. A separate internal Java row_status is derived in
+--   the middle-tier from the retrieved message types.
+--
+-- Access Status:
+--   Internal Development Use Only.
+--
+-- {End Of Comments}
+--
+function get_return_status return varchar2;
+--
+-- ----------------------------------------------------------------------------
+-- |-----------------------< get_return_status_disable >----------------------|
+-- ----------------------------------------------------------------------------
+-- {Start Of Comments}
+--
+-- Description:
+--   Disables Multiple Message Detection and returns a status value which
+--   indicates when messages of any type exist in the Message List. The WEB
+--   Wrapper can pass this value to the middle-tier, indicating to the
+--   OAFramework Exception Helper classes when it is necessary to retrieve
+--   messages from the list.
+--
+--   When Multiple Message Detection is disabled:
+--     Returns a status to indicate if any messages, of any type, exist
+--     in the message list.
+--
+--   When Multiple Message Detection is enabled:
+--     Provides the same functionality as disable_message_list and also
+--     returns a status to indicate if any messages, of any type, exist
+--     in the message list.
+--
+--   Calling this function provides the same behaviour as calling the
+--   get_return_status function and disable_message_list procedure separately.
+--
+-- Prerequisites:
+--   None.
+--
+-- In Parameters:
+--   None.
+--
+-- Post Success:
+--   When the Multiple Message List is empty this function returns the value
+--   'S' (same as FND_API.G_RET_STS_SUCCESS). If any messages of any type
+--   exist then 'E' (same as FND_API.G_RET_STS_ERROR) is returned.
+--
+-- Post Failure:
+--   None expected. An ORA or PL/SQL exception will be raised.
+--
+-- Developer/Implementation Notes:
+--   Currently it is unnecessary for this function to make a distinction
+--   between error and just warning/information messages existing. The
+--   returned status is just used by the OAFramework Exception Helper
+--   classes to workout when it is necessary to obtain messages from the
+--   FND_MSG_PUB package. A separate internal Java row_status is derived in
+--   the middle-tier from the retrieved message types.
+--
+-- Access Status:
+--   Internal Development Use Only.
+--
+-- {End Of Comments}
+--
+function get_return_status_disable return varchar2;
+--
+-- ----------------------------------------------------------------------------
+-- |---------------------< Detailed Package Description >---------------------|
+-- ----------------------------------------------------------------------------
+--
+--  Diagram of HRMS API Code Calling for Error Messages
+--  ===================================================
+--
+--                  -----------------        ---------------------
+--                  | BC4J style VO |        | OAExceptionHelper |
+--                  | or EO         |        |   Java Class      |
+--                  -----------------        ---------------------
+--    Middle tier           ^                            ^
+--    - - - - - - - - - - - | - - - - - - - - - - - - - -|- - - - -
+--    Server tier           V                            |
+--                  ------------------                   |
+--                  | HRMS PL/SQL    |                   |
+--                  | Self-S Wrapper |                   |
+--                  ------------------                   |
+--                          |                            |
+--                          V                            |
+--                  -----------------                    |
+--                  |  HRMS PL/SQL  |                    |
+--                  |  API and      |                    |
+--                  |  row handler  |                    |
+--                  -----------------                    |
+--                     |        |                        |
+--                     |        V                        |
+--              Always |     ---------------------       |
+--           set error |     | HRMS Specific     |       |
+--          details in |     | Infrastructure to |       |
+--         fnd_message |     | decide single or  |       |
+--                     |     | Multiple Error    |       |
+--                     |     ---------------------       |
+--                     |   single |    multiple |        |
+--                     V          V             V        V
+--                  -----------------        -----------------
+--                  |  FND_MESSAGE  |        |  FND_MSG_PUB  |
+--                  |    Package    |        |   Package     |
+--                  -----------------        -----------------
+--
+--  This package provides the HRMS Specific Infrastructure to decide how
+--  an individual data validation message should be processed. Either:
+--    a) "Stop at First Error Found"
+--       Behaviour required by existing batch data upload programs and
+--       Form style user interfaces.
+--    b) "Multiple Message Detection"
+--       Behaviour required by OAFramework style user interfaces where
+--       for a single API call multiple validation messages can be
+--       returned, for independent validation checks.
+--
+--  When a HRMS API or row handler PL/SQL code raises an error message
+--  it should be set by calling the FND_MESSAGE package and raising a
+--  PL/SQL exception. Then the HR_MULTI_MESSAGE package can be called
+--  to decide how the message should be processed.
+--
+--  The assumption is that "Stop at First Error Found" behaviour is
+--  required. The HR_MULTI_MESSAGE package will not catch the
+--  PL/SQL exception. The error will be left to propagate back to the
+--  program which called the PL/SQL API.
+--
+--  If "Multiple Message Detection" has been explicitly enabled then
+--  the HR_MULTI_MESSAGE package will catch the PL/SQL exception and
+--  copy the message details from the FND_MESSAGE to FND_MSG_PUB package.
+--  Details of which table columns or API control parameters the message
+--  is associated with should be provided. As the exception has been caught
+--  the row handler data validation procedure will complete normally,
+--  allowing the program flow to continue to the next validation procedure.
+--
+--  Row handler data validation procedures should call the
+--  HR_MULTI_MESSAGE package to find out if previous attributes in a
+--  dependency chain are already known to be in error. Otherwise there
+--  is a risk of generating a meaningless list of messages, where the
+--  end user can only trust the first message to be accurate. If multiple
+--  messages are raised for the same root cause then this will be more
+--  confusing to the end user than receiving messages one at a time.
+--
+--  The HR_MULTI_MESSAGE package can also be thought of as a cover to
+--  the FND_MSG_PUB package. FND_MSG_PUB always provides Multiple Message
+--  Detection behaviour.
+--
+END HR_MULTI_MESSAGE;
+
+ 
+
+/

@@ -1,0 +1,142 @@
+--------------------------------------------------------
+--  DDL for Package IEX_LITIGATIONS_PKG
+--------------------------------------------------------
+
+  CREATE OR REPLACE EDITIONABLE PACKAGE "APPS"."IEX_LITIGATIONS_PKG" AUTHID CURRENT_USER as
+/* $Header: iextltgs.pls 120.1 2007/12/20 09:42:00 gnramasa ship $ */
+-- Start of Comments
+-- Package name     : IEX_LITIGATIONS_PKG
+-- Purpose          :
+-- History          :
+-- NOTE             :
+-- End of Comments
+
+PROCEDURE Insert_Row(
+          px_LITIGATION_ID   IN OUT NOCOPY NUMBER
+         ,p_DELINQUENCY_ID    NUMBER
+         ,p_PARTY_ID    NUMBER
+         ,p_UNPAID_REASON_CODE    VARCHAR2
+         ,p_JUDGEMENT_DATE    DATE
+         ,p_DISPOSITION_CODE    VARCHAR2
+         ,p_REQUEST_ID    NUMBER
+         ,p_PROGRAM_APPLICATION_ID    NUMBER
+         ,p_PROGRAM_ID    NUMBER
+         ,p_PROGRAM_UPDATE_DATE    DATE
+         ,p_ATTRIBUTE_CATEGORY    VARCHAR2
+         ,p_ATTRIBUTE1    VARCHAR2
+         ,p_ATTRIBUTE2    VARCHAR2
+         ,p_ATTRIBUTE3    VARCHAR2
+         ,p_ATTRIBUTE4    VARCHAR2
+         ,p_ATTRIBUTE5    VARCHAR2
+         ,p_ATTRIBUTE6    VARCHAR2
+         ,p_ATTRIBUTE7    VARCHAR2
+         ,p_ATTRIBUTE8    VARCHAR2
+         ,p_ATTRIBUTE9    VARCHAR2
+         ,p_ATTRIBUTE10    VARCHAR2
+         ,p_ATTRIBUTE11    VARCHAR2
+         ,p_ATTRIBUTE12    VARCHAR2
+         ,p_ATTRIBUTE13    VARCHAR2
+         ,p_ATTRIBUTE14    VARCHAR2
+         ,p_ATTRIBUTE15    VARCHAR2
+         ,p_CREATED_BY    NUMBER
+         ,p_CREATION_DATE    DATE
+         ,p_LAST_UPDATED_BY    NUMBER
+         ,p_LAST_UPDATE_DATE    DATE
+         ,p_LAST_UPDATE_LOGIN    NUMBER
+         ,p_CREDIT_HOLD_REQUEST_FLAG    VARCHAR2
+         ,p_CREDIT_HOLD_APPROVED_FLAG    VARCHAR2
+         ,p_SERVICE_HOLD_REQUEST_FLAG    VARCHAR2
+         ,p_SERVICE_HOLD_APPROVED_FLAG    VARCHAR2
+         ,p_SUGGESTION_APPROVED_FLAG    VARCHAR2
+	 ,p_CUST_ACCOUNT_ID         NUMBER
+	 ,p_CUSTOMER_SITE_USE_ID    NUMBER
+	 ,p_ORG_ID                  NUMBER
+	 ,p_CONTRACT_ID             NUMBER
+	 ,p_CONTRACT_NUMBER         VARCHAR2);
+
+PROCEDURE Update_Row(
+          p_LITIGATION_ID    NUMBER
+         ,p_DELINQUENCY_ID    NUMBER
+         ,p_PARTY_ID    NUMBER
+         ,p_UNPAID_REASON_CODE    VARCHAR2
+         ,p_JUDGEMENT_DATE    DATE
+         ,p_DISPOSITION_CODE    VARCHAR2
+         ,p_REQUEST_ID    NUMBER
+         ,p_PROGRAM_APPLICATION_ID    NUMBER
+         ,p_PROGRAM_ID    NUMBER
+         ,p_PROGRAM_UPDATE_DATE    DATE
+         ,p_ATTRIBUTE_CATEGORY    VARCHAR2
+         ,p_ATTRIBUTE1    VARCHAR2
+         ,p_ATTRIBUTE2    VARCHAR2
+         ,p_ATTRIBUTE3    VARCHAR2
+         ,p_ATTRIBUTE4    VARCHAR2
+         ,p_ATTRIBUTE5    VARCHAR2
+         ,p_ATTRIBUTE6    VARCHAR2
+         ,p_ATTRIBUTE7    VARCHAR2
+         ,p_ATTRIBUTE8    VARCHAR2
+         ,p_ATTRIBUTE9    VARCHAR2
+         ,p_ATTRIBUTE10    VARCHAR2
+         ,p_ATTRIBUTE11    VARCHAR2
+         ,p_ATTRIBUTE12    VARCHAR2
+         ,p_ATTRIBUTE13    VARCHAR2
+         ,p_ATTRIBUTE14    VARCHAR2
+         ,p_ATTRIBUTE15    VARCHAR2
+         ,p_CREATED_BY    NUMBER
+         ,p_CREATION_DATE    DATE
+         ,p_LAST_UPDATED_BY    NUMBER
+         ,p_LAST_UPDATE_DATE    DATE
+         ,p_LAST_UPDATE_LOGIN    NUMBER
+         ,p_CREDIT_HOLD_REQUEST_FLAG    VARCHAR2
+         ,p_CREDIT_HOLD_APPROVED_FLAG    VARCHAR2
+         ,p_SERVICE_HOLD_REQUEST_FLAG    VARCHAR2
+         ,p_SERVICE_HOLD_APPROVED_FLAG    VARCHAR2
+         ,p_SUGGESTION_APPROVED_FLAG    VARCHAR2
+	 ,p_CUST_ACCOUNT_ID         NUMBER
+	 ,p_CUSTOMER_SITE_USE_ID    NUMBER
+	 ,p_ORG_ID                  NUMBER
+	 ,p_CONTRACT_ID             NUMBER
+	 ,p_CONTRACT_NUMBER         VARCHAR2);
+
+PROCEDURE Lock_Row(
+          p_LITIGATION_ID    NUMBER
+         ,p_DELINQUENCY_ID    NUMBER
+         ,p_PARTY_ID    NUMBER
+         ,p_UNPAID_REASON_CODE    VARCHAR2
+         ,p_JUDGEMENT_DATE    DATE
+         ,p_DISPOSITION_CODE    VARCHAR2
+         ,p_REQUEST_ID    NUMBER
+         ,p_PROGRAM_APPLICATION_ID    NUMBER
+         ,p_PROGRAM_ID    NUMBER
+         ,p_PROGRAM_UPDATE_DATE    DATE
+         ,p_ATTRIBUTE_CATEGORY    VARCHAR2
+         ,p_ATTRIBUTE1    VARCHAR2
+         ,p_ATTRIBUTE2    VARCHAR2
+         ,p_ATTRIBUTE3    VARCHAR2
+         ,p_ATTRIBUTE4    VARCHAR2
+         ,p_ATTRIBUTE5    VARCHAR2
+         ,p_ATTRIBUTE6    VARCHAR2
+         ,p_ATTRIBUTE7    VARCHAR2
+         ,p_ATTRIBUTE8    VARCHAR2
+         ,p_ATTRIBUTE9    VARCHAR2
+         ,p_ATTRIBUTE10    VARCHAR2
+         ,p_ATTRIBUTE11    VARCHAR2
+         ,p_ATTRIBUTE12    VARCHAR2
+         ,p_ATTRIBUTE13    VARCHAR2
+         ,p_ATTRIBUTE14    VARCHAR2
+         ,p_ATTRIBUTE15    VARCHAR2
+         ,p_CREATED_BY    NUMBER
+         ,p_CREATION_DATE    DATE
+         ,p_LAST_UPDATED_BY    NUMBER
+         ,p_LAST_UPDATE_DATE    DATE
+         ,p_LAST_UPDATE_LOGIN    NUMBER
+         ,p_CREDIT_HOLD_REQUEST_FLAG    VARCHAR2
+         ,p_CREDIT_HOLD_APPROVED_FLAG    VARCHAR2
+         ,p_SERVICE_HOLD_REQUEST_FLAG    VARCHAR2
+         ,p_SERVICE_HOLD_APPROVED_FLAG    VARCHAR2
+         ,p_SUGGESTION_APPROVED_FLAG    VARCHAR2);
+
+PROCEDURE Delete_Row(
+    p_LITIGATION_ID  NUMBER);
+End IEX_LITIGATIONS_PKG;
+
+/

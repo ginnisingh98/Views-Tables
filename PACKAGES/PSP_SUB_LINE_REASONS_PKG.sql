@@ -1,0 +1,40 @@
+--------------------------------------------------------
+--  DDL for Package PSP_SUB_LINE_REASONS_PKG
+--------------------------------------------------------
+
+  CREATE OR REPLACE EDITIONABLE PACKAGE "APPS"."PSP_SUB_LINE_REASONS_PKG" AUTHID CURRENT_USER as
+ /* $Header: PSPPITRS.pls 115.6 2002/11/18 11:02:23 ddubey ship $ */
+procedure INSERT_ROW (
+  X_ROWID in out NOCOPY VARCHAR2,
+  X_PAYROLL_SUB_LINE_ID in NUMBER,
+  X_REASON_CODE in VARCHAR2,
+  X_PARENT_LINE_ID in NUMBER,
+  X_MODE in VARCHAR2 default 'R'
+  );
+procedure LOCK_ROW (
+  X_PAYROLL_SUB_LINE_ID in NUMBER,
+  X_REASON_CODE in VARCHAR2,
+  X_PARENT_LINE_ID in NUMBER
+);
+procedure UPDATE_ROW (
+  X_PAYROLL_SUB_LINE_ID in NUMBER,
+  X_REASON_CODE in VARCHAR2,
+  X_PARENT_LINE_ID in NUMBER,
+  X_MODE in VARCHAR2 default 'R'
+  );
+procedure ADD_ROW (
+  X_ROWID in out NOCOPY VARCHAR2,
+  X_PAYROLL_SUB_LINE_ID in NUMBER,
+  X_REASON_CODE in VARCHAR2,
+  X_PARENT_LINE_ID in NUMBER,
+  X_MODE in VARCHAR2 default 'R'
+  );
+procedure DELETE_ROW (
+  X_PAYROLL_SUB_LINE_ID in NUMBER,
+  X_REASON_CODE in VARCHAR2
+);
+end PSP_SUB_LINE_REASONS_PKG;
+
+ 
+
+/

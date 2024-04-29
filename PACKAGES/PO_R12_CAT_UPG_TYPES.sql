@@ -1,0 +1,42 @@
+--------------------------------------------------------
+--  DDL for Package PO_R12_CAT_UPG_TYPES
+--------------------------------------------------------
+
+  CREATE OR REPLACE EDITIONABLE PACKAGE "APPS"."PO_R12_CAT_UPG_TYPES" AUTHID CURRENT_USER AS
+/* $Header: PO_R12_CAT_UPG_TYPES.pls 120.1 2006/01/30 23:16:08 pthapliy noship $ */
+
+TYPE PO_TBL_NUMBER IS TABLE OF NUMBER INDEX BY binary_integer;
+TYPE PO_TBL_DATE IS TABLE OF DATE INDEX BY binary_integer;
+
+-- extra in prcmntni
+TYPE PO_TBL_VARCHAR1 IS TABLE OF VARCHAR2(1) INDEX BY binary_integer; -- extra in prcmntni
+TYPE PO_TBL_VARCHAR3 IS TABLE OF VARCHAR2(3) INDEX BY binary_integer; -- extra in prcmntni
+TYPE PO_TBL_VARCHAR15 IS TABLE OF VARCHAR2(15) INDEX BY binary_integer; -- extra in prcmntni
+TYPE PO_TBL_VARCHAR20 IS TABLE OF VARCHAR2(20) INDEX BY binary_integer; -- extra in prcmntni
+TYPE PO_TBL_VARCHAR25 IS TABLE OF VARCHAR2(25) INDEX BY binary_integer; -- extra in prcmntni
+TYPE PO_TBL_VARCHAR30 IS TABLE OF VARCHAR2(30) INDEX BY binary_integer; -- extra in prcmntni
+TYPE PO_TBL_VARCHAR40 IS TABLE OF VARCHAR2(40) INDEX BY binary_integer; -- extra in prcmntni
+TYPE PO_TBL_VARCHAR60 IS TABLE OF VARCHAR2(60) INDEX BY binary_integer; -- extra in prcmntni
+TYPE PO_TBL_VARCHAR240 IS TABLE OF VARCHAR2(240) INDEX BY binary_integer; -- extra in prcmntni
+TYPE PO_TBL_VARCHAR700 IS TABLE OF VARCHAR2(700) INDEX BY binary_integer; -- extra in prcmntni
+TYPE PO_TBL_VARCHAR2000 IS TABLE OF VARCHAR2(2000) INDEX BY binary_integer; -- extra in prcmntni
+
+-- Header
+TYPE PO_TBL_VARCHAR4 IS TABLE OF VARCHAR2(4) INDEX BY binary_integer;
+TYPE PO_TBL_VARCHAR50 IS TABLE OF VARCHAR2(50) INDEX BY binary_integer;
+TYPE PO_TBL_VARCHAR150 IS TABLE OF VARCHAR2(150) INDEX BY binary_integer;
+TYPE PO_TBL_VARCHAR480 IS TABLE OF VARCHAR2(480) INDEX BY binary_integer;
+
+-- Lines
+TYPE PO_TBL_VARCHAR10 IS TABLE OF VARCHAR2(10) INDEX BY binary_integer;
+TYPE PO_TBL_VARCHAR80 IS TABLE OF VARCHAR2(80) INDEX BY binary_integer;
+TYPE PO_TBL_VARCHAR120 IS TABLE OF VARCHAR2(120) INDEX BY binary_integer;
+TYPE PO_TBL_VARCHAR250 IS TABLE OF VARCHAR2(250) INDEX BY binary_integer;
+TYPE PO_TBL_VARCHAR255 IS TABLE OF VARCHAR2(255) INDEX BY binary_integer;
+TYPE PO_TBL_VARCHAR1000 IS TABLE OF VARCHAR2(1000) INDEX BY binary_integer;
+
+END PO_R12_CAT_UPG_TYPES;
+
+ 
+
+/

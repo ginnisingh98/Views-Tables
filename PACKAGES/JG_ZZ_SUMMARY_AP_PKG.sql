@@ -1,0 +1,59 @@
+--------------------------------------------------------
+--  DDL for Package JG_ZZ_SUMMARY_AP_PKG
+--------------------------------------------------------
+
+  CREATE OR REPLACE EDITIONABLE PACKAGE "APPS"."JG_ZZ_SUMMARY_AP_PKG" AUTHID CURRENT_USER
+/*  $Header: jgzzsummaryaps.pls 120.4.12010000.3 2009/12/10 07:40:49 pakumare ship $ */
+
+
+AS
+P_VAT_REPORTING_ENTITY_ID   NUMBER(15);
+P_TAX_CALENDAR_PERIOD       VARCHAR2(10);
+P_VAT_TRX_TYPE              VARCHAR2(200);
+P_EX_VAT_TRX_TYPE           VARCHAR2(200);
+P_INC_PREPAYMENTS           VARCHAR2(1);
+P_CALLING_REPORT            VARCHAR2(100);
+P_WHERE_CLAUSE              VARCHAR2(4000);  /* UT TEST. increased the size of P_WHERE_CLAUSE */
+G_VAT_TRX_TYPE_MEANING      VARCHAR2(100);
+G_EX_VAT_TRX_TYPE_MEANING   VARCHAR2(100);
+G_INC_PREPAYMENTS           VARCHAR2(100);
+G_FUNCTIONAL_CURRENCY       VARCHAR2(3);
+G_COMPANY_NAME              VARCHAR2(70);
+G_SEQ_NO                    NUMBER(15) := 0;
+G_EX_VAT_TRX_TYPE_DESC      VARCHAR2(100);
+G_VAT_TRX_TYPE_DESC         VARCHAR2(100);
+G_PRECISION                 NUMBER;
+
+FUNCTION before_report
+RETURN BOOLEAN;
+
+FUNCTION get_vat_trx_type_meaning
+RETURN VARCHAR2;
+
+FUNCTION get_ex_vat_trx_type_meaning
+RETURN VARCHAR2;
+
+FUNCTION get_vat_trx_type_desc
+RETURN VARCHAR2;
+
+FUNCTION get_ex_vat_trx_type_desc
+RETURN VARCHAR2;
+
+FUNCTION get_prepayments_meaning
+RETURN VARCHAR2;
+
+FUNCTION get_functional_currency
+RETURN VARCHAR2;
+
+FUNCTION CF_Tax_Code_Type_Code (TAX_CODE_TYPE_CODE IN VARCHAR2)
+  RETURN NUMBER;
+
+FUNCTION get_trn
+  RETURN VARCHAR2;
+
+FUNCTION CF_seq_no
+  RETURN NUMBER;
+
+END JG_ZZ_SUMMARY_AP_PKG;
+
+/

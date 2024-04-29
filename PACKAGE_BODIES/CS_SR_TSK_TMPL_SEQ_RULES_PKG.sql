@@ -1,0 +1,196 @@
+--------------------------------------------------------
+--  DDL for Package Body CS_SR_TSK_TMPL_SEQ_RULES_PKG
+--------------------------------------------------------
+
+  CREATE OR REPLACE EDITIONABLE PACKAGE BODY "APPS"."CS_SR_TSK_TMPL_SEQ_RULES_PKG" AS
+/* $Header: cstskrlb.pls 120.0 2006/03/07 18:40:06 jngeorge noship $ */
+
+procedure INSERT_ROW (
+  X_ROWID in out NOCOPY VARCHAR2,
+  P_SEARCH_RULE_ID in NUMBER,
+  P_ACTIVE_FLAG in VARCHAR2,
+  P_OBJECT_VERSION_NUMBER in NUMBER,
+  P_SECURITY_GROUP_ID in NUMBER,
+  P_SEARCH_RULE_CODE in VARCHAR2,
+  P_SEARCH_SEQUENCE in NUMBER,
+  P_CREATION_DATE in DATE,
+  P_CREATED_BY in NUMBER,
+  P_LAST_UPDATE_DATE in DATE,
+  P_LAST_UPDATED_BY in NUMBER,
+  P_LAST_UPDATE_LOGIN in NUMBER
+) IS
+
+BEGIN
+  INSERT INTO CS_SR_TSK_TMPL_SEQ_RULES (
+    ACTIVE_FLAG,
+    CREATION_DATE,
+    CREATED_BY,
+    LAST_UPDATE_DATE,
+    LAST_UPDATED_BY,
+    LAST_UPDATE_LOGIN,
+    OBJECT_VERSION_NUMBER,
+    SECURITY_GROUP_ID,
+    SEARCH_RULE_ID,
+    SEARCH_RULE_CODE,
+    SEARCH_SEQUENCE
+  )
+  VALUES
+  (
+    P_ACTIVE_FLAG,
+    P_CREATION_DATE,
+    P_CREATED_BY,
+    P_LAST_UPDATE_DATE,
+    P_LAST_UPDATED_BY,
+    P_LAST_UPDATE_LOGIN,
+    P_OBJECT_VERSION_NUMBER,
+    P_SECURITY_GROUP_ID,
+    P_SEARCH_RULE_ID,
+    P_SEARCH_RULE_CODE,
+    P_SEARCH_SEQUENCE
+  ) RETURNING rowid INTO X_ROWID;
+
+END INSERT_ROW;
+
+PROCEDURE LOCK_ROW (
+  P_SEARCH_RULE_ID in NUMBER,
+  P_ACTIVE_FLAG in VARCHAR2,
+  P_OBJECT_VERSION_NUMBER in NUMBER,
+  P_SECURITY_GROUP_ID in NUMBER,
+  P_SEARCH_RULE_CODE in VARCHAR2,
+  P_SEARCH_SEQUENCE in NUMBER
+) is
+  cursor c1 is select
+      ACTIVE_FLAG,
+      OBJECT_VERSION_NUMBER,
+      SECURITY_GROUP_ID,
+      SEARCH_RULE_CODE,
+      SEARCH_SEQUENCE,
+      SEARCH_RULE_ID
+    from CS_SR_TSK_TMPL_SEQ_RULES
+    where SEARCH_RULE_ID = P_SEARCH_RULE_ID
+      and OBJECT_VERSION_NUMBER = P_OBJECT_VERSION_NUMBER
+    for update of SEARCH_RULE_ID nowait;
+begin
+  for tlinfo in c1 loop
+      if (    (tlinfo.SEARCH_RULE_ID = P_SEARCH_RULE_ID)
+          AND ((tlinfo.ACTIVE_FLAG = P_ACTIVE_FLAG)
+               OR ((tlinfo.ACTIVE_FLAG is null) AND (P_ACTIVE_FLAG is null)))
+          AND (tlinfo.OBJECT_VERSION_NUMBER = P_OBJECT_VERSION_NUMBER)
+          AND ((tlinfo.SECURITY_GROUP_ID = P_SECURITY_GROUP_ID)
+               OR ((tlinfo.SECURITY_GROUP_ID is null) AND (P_SECURITY_GROUP_ID is null)))
+          AND (tlinfo.SEARCH_RULE_CODE = P_SEARCH_RULE_CODE)
+          AND ((tlinfo.SEARCH_SEQUENCE = P_SEARCH_SEQUENCE)
+               OR ((tlinfo.SEARCH_SEQUENCE is null) AND (P_SEARCH_SEQUENCE is null)))
+      ) then
+        null;
+      else
+        fnd_message.set_name('FND', 'FORM_RECORD_CHANGED');
+        app_exception.raise_exception;
+      end if;
+  end loop;
+  return;
+end LOCK_ROW;
+
+procedure UPDATE_ROW (
+  P_SEARCH_RULE_ID in NUMBER,
+  P_ACTIVE_FLAG in VARCHAR2,
+  P_OBJECT_VERSION_NUMBER in NUMBER,
+  P_SECURITY_GROUP_ID in NUMBER,
+  P_SEARCH_RULE_CODE in VARCHAR2,
+  P_SEARCH_SEQUENCE in NUMBER,
+  P_LAST_UPDATE_DATE in DATE,
+  P_LAST_UPDATED_BY in NUMBER,
+  P_LAST_UPDATE_LOGIN in NUMBER
+) is
+begin
+  update CS_SR_TSK_TMPL_SEQ_RULES set
+    ACTIVE_FLAG = P_ACTIVE_FLAG,
+    OBJECT_VERSION_NUMBER = P_OBJECT_VERSION_NUMBER,
+    SECURITY_GROUP_ID = P_SECURITY_GROUP_ID,
+    SEARCH_RULE_CODE = P_SEARCH_RULE_CODE,
+    SEARCH_SEQUENCE = P_SEARCH_SEQUENCE,
+    SEARCH_RULE_ID = P_SEARCH_RULE_ID,
+    LAST_UPDATE_DATE = P_LAST_UPDATE_DATE,
+    LAST_UPDATED_BY = P_LAST_UPDATED_BY,
+    LAST_UPDATE_LOGIN = P_LAST_UPDATE_LOGIN
+  where SEARCH_RULE_ID = P_SEARCH_RULE_ID ;
+
+  if (sql%notfound) then
+    raise no_data_found;
+  end if;
+end UPDATE_ROW;
+
+procedure DELETE_ROW (
+  P_SEARCH_RULE_ID in NUMBER) is
+begin
+  delete from CS_SR_TSK_TMPL_SEQ_RULES
+  where SEARCH_RULE_ID = P_SEARCH_RULE_ID;
+
+  if (sql%notfound) then
+    raise no_data_found;
+  end if;
+
+end DELETE_ROW;
+
+
+procedure LOAD_ROW (
+  X_ROWID                  IN out NOCOPY VARCHAR2,
+  P_SEARCH_RULE_ID         IN NUMBER,
+  P_ACTIVE_FLAG            IN VARCHAR2,
+  P_OBJECT_VERSION_NUMBER  IN NUMBER,
+  P_SECURITY_GROUP_ID      IN NUMBER,
+  P_SEARCH_RULE_CODE       IN VARCHAR2,
+  P_SEARCH_SEQUENCE        IN NUMBER,
+  P_CREATION_DATE          IN DATE,
+  P_CREATED_BY             IN NUMBER,
+  P_LAST_UPDATE_DATE       IN DATE,
+  P_LAST_UPDATED_BY        IN NUMBER,
+  P_LAST_UPDATE_LOGIN      IN NUMBER,
+  P_OWNER                  IN VARCHAR2
+) IS
+
+l_user_id   NUMBER := 0 ;
+l_row_id    VARCHAR2(4000) ;
+
+BEGIN
+
+   IF (p_owner = 'SEED') THEN
+      l_user_id := 1 ;
+   END IF ;
+
+
+   UPDATE_ROW (
+     P_SEARCH_RULE_ID        => P_SEARCH_RULE_ID ,
+     P_ACTIVE_FLAG           => P_ACTIVE_FLAG ,
+     P_OBJECT_VERSION_NUMBER => P_OBJECT_VERSION_NUMBER ,
+     P_SECURITY_GROUP_ID     => P_SECURITY_GROUP_ID ,
+     P_SEARCH_RULE_CODE      => P_SEARCH_RULE_CODE ,
+     P_SEARCH_SEQUENCE       => P_SEARCH_SEQUENCE ,
+     P_LAST_UPDATE_DATE      => NVL(P_LAST_UPDATE_DATE,sysdate) ,
+     P_LAST_UPDATED_BY       => l_user_id  ,
+     P_LAST_UPDATE_LOGIN     => 0
+    );
+
+EXCEPTION
+     WHEN no_data_found THEN
+          INSERT_ROW
+          (
+          X_ROWID                  => l_ROW_ID ,
+          P_SEARCH_RULE_ID         => P_SEARCH_RULE_ID ,
+          P_ACTIVE_FLAG            => P_ACTIVE_FLAG ,
+          P_OBJECT_VERSION_NUMBER  => P_OBJECT_VERSION_NUMBER ,
+          P_SECURITY_GROUP_ID      => P_SECURITY_GROUP_ID ,
+          P_SEARCH_RULE_CODE       => P_SEARCH_RULE_CODE ,
+          P_SEARCH_SEQUENCE        => P_SEARCH_SEQUENCE ,
+          P_CREATION_DATE          => NVL(P_CREATION_DATE,sysdate),
+          P_CREATED_BY             => l_user_id ,
+          P_LAST_UPDATE_DATE       => NVL(P_LAST_UPDATE_DATE,sysdate) ,
+          P_LAST_UPDATED_BY        => l_user_id ,
+          P_LAST_UPDATE_LOGIN      => l_user_id
+          ) ;
+
+END LOAD_ROW ;
+
+END CS_SR_TSK_TMPL_SEQ_RULES_PKG;
+
+/

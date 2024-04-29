@@ -1,0 +1,25 @@
+--------------------------------------------------------
+--  DDL for Package Body MRP_MRPRUSUR_XMLP_PKG
+--------------------------------------------------------
+
+  CREATE OR REPLACE EDITIONABLE PACKAGE BODY "APPS"."MRP_MRPRUSUR_XMLP_PKG" AS
+/* $Header: MRPRUSURB.pls 120.2 2007/12/25 08:35:40 nchinnam noship $ */
+  FUNCTION BEFOREREPORT RETURN BOOLEAN IS
+  BEGIN
+    P_CONC_REQUEST_ID := FND_GLOBAL.CONC_REQUEST_ID;
+    /*SRW.USER_EXIT('FND SRWINIT')*/NULL;
+    RETURN (TRUE);
+  END BEFOREREPORT;
+
+  FUNCTION AFTERREPORT RETURN BOOLEAN IS
+  BEGIN
+    BEGIN
+      /*SRW.USER_EXIT('FND SRWEXIT')*/NULL;
+    END;
+    RETURN (TRUE);
+  END AFTERREPORT;
+
+END MRP_MRPRUSUR_XMLP_PKG;
+
+
+/

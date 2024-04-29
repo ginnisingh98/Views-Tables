@@ -1,0 +1,190 @@
+--------------------------------------------------------
+--  DDL for Package Body INV_INVARPIA_XMLP_PKG
+--------------------------------------------------------
+
+  CREATE OR REPLACE EDITIONABLE PACKAGE BODY "APPS"."INV_INVARPIA_XMLP_PKG" AS
+/* $Header: INVARPIAB.pls 120.2 2008/01/08 06:23:14 dwkrishn noship $ */
+  FUNCTION BEFOREREPORT RETURN BOOLEAN IS
+  BEGIN
+    BEGIN
+      P_CONC_REQUEST_ID := FND_GLOBAL.CONC_REQUEST_ID;
+      /*SRW.USER_EXIT('FND SRWINIT')*/NULL;
+    EXCEPTION
+      WHEN /*SRW.USER_EXIT_FAILURE*/OTHERS THEN
+        /*SRW.MESSAGE(1
+                   ,'Failed in before report trigger:SRWINIT')*/NULL;
+        RAISE;
+    END;
+    BEGIN
+      SELECT
+        MEANING
+      INTO P_REJ_OPT_TITLE
+      FROM
+        MFG_LOOKUPS
+      WHERE LOOKUP_TYPE = 'SYS_YES_NO'
+        AND LOOKUP_CODE = NVL(P_INCLUDE_REJ_ITEMS
+         ,1);
+    EXCEPTION
+      WHEN OTHERS THEN
+        NULL;
+    END;
+    IF NVL(P_INCLUDE_REJ_ITEMS
+       ,1) = 1 THEN
+      P_INCLUDE_REJ_ITEMS_OPT := ' ';
+    ELSE
+      P_INCLUDE_REJ_ITEMS_OPT := 'and nvl(mpav.approval_status,1) <> 2 ';
+    END IF;
+    BEGIN
+      NULL;
+    EXCEPTION
+      WHEN /*SRW.USER_EXIT_FAILURE*/OTHERS THEN
+        /*SRW.MESSAGE(1
+                   ,'Failed in before report trigger:MSTK/select')*/NULL;
+        RAISE;
+    END;
+    BEGIN
+      NULL;
+    EXCEPTION
+      WHEN /*SRW.USER_EXIT_FAILURE*/OTHERS THEN
+        /*SRW.MESSAGE(1
+                   ,'Failed in before report trigger:MSTK/order')*/NULL;
+        RAISE;
+    END;
+    BEGIN
+      NULL;
+    EXCEPTION
+      WHEN /*SRW.USER_EXIT_FAILURE*/OTHERS THEN
+        /*SRW.MESSAGE(1
+                   ,'Failed in before report trigger:MCAT/select')*/NULL;
+        RAISE;
+    END;
+    BEGIN
+      NULL;
+    EXCEPTION
+      WHEN /*SRW.USER_EXIT_FAILURE*/OTHERS THEN
+        /*SRW.MESSAGE(1
+                   ,'Failed in before report trigger:MTLL')*/NULL;
+        RAISE;
+    END;
+    RETURN (TRUE);
+  END BEFOREREPORT;
+
+  FUNCTION AFTERREPORT RETURN BOOLEAN IS
+  BEGIN
+    BEGIN
+      /*SRW.USER_EXIT('FND SRWEXIT')*/NULL;
+    EXCEPTION
+      WHEN /*SRW.USER_EXIT_FAILURE*/OTHERS THEN
+        /*SRW.MESSAGE(1
+                   ,'SRWEXIT failed')*/NULL;
+    END;
+    RETURN (TRUE);
+  END AFTERREPORT;
+
+  FUNCTION AFTERPFORM RETURN BOOLEAN IS
+  BEGIN
+    RETURN (TRUE);
+  END AFTERPFORM;
+
+  FUNCTION C_PHYS_INV_NAMEFORMULA RETURN VARCHAR2 IS
+  BEGIN
+    DECLARE
+      NAME VARCHAR2(50);
+    BEGIN
+      SELECT
+        PHYSICAL_INVENTORY_NAME
+      INTO NAME
+      FROM
+        MTL_PHYSICAL_INVENTORIES
+      WHERE ORGANIZATION_ID = P_ORG_ID
+        AND PHYSICAL_INVENTORY_ID = P_PHYS_INV_ID;
+      RETURN (NAME);
+    EXCEPTION
+      WHEN NO_DATA_FOUND THEN
+        RETURN ('');
+    END;
+    RETURN NULL;
+  END C_PHYS_INV_NAMEFORMULA;
+
+  FUNCTION C_CAT_SET_NAMEFORMULA RETURN VARCHAR2 IS
+  BEGIN
+    DECLARE
+      NAME VARCHAR2(50);
+    BEGIN
+      SELECT
+        CATEGORY_SET_NAME
+      INTO NAME
+      FROM
+        MTL_CATEGORY_SETS
+      WHERE CATEGORY_SET_ID = P_CATEGORY_SET_ID;
+      RETURN (NAME);
+    EXCEPTION
+      WHEN NO_DATA_FOUND THEN
+        RETURN ('');
+    END;
+    RETURN NULL;
+  END C_CAT_SET_NAMEFORMULA;
+
+  FUNCTION C_CURRENCY_CODEFORMULA(R_CURRENCY_CODE IN VARCHAR2) RETURN VARCHAR2 IS
+  BEGIN
+    RETURN ('(' || R_CURRENCY_CODE || ')');
+  END C_CURRENCY_CODEFORMULA;
+
+  FUNCTION C_ADJ_PER_CATFORMULA(C_CNT_VAL_CAT IN NUMBER,C_ADJ_VAL_CAT IN NUMBER,C_STD_PREC IN NUMBER) RETURN NUMBER IS
+  BEGIN
+    BEGIN
+      IF (C_CNT_VAL_CAT = 0) THEN
+        IF (C_ADJ_VAL_CAT = 0) THEN
+          RETURN (0);
+        ELSE
+          RETURN (100);
+        END IF;
+      ELSE
+        RETURN (ROUND((C_ADJ_VAL_CAT / C_CNT_VAL_CAT) * 100 ,C_STD_PREC));
+      END IF;
+    EXCEPTION WHEN OTHERS THEN RETURN NULL;
+    END;
+    RETURN NULL;
+  END C_ADJ_PER_CATFORMULA;
+
+  FUNCTION C_ADJ_PER_TOTFORMULA(C_CNT_VAL_SUM IN NUMBER
+                               ,C_ADJ_VAL_SUM IN NUMBER
+                               ,C_STD_PREC IN NUMBER) RETURN NUMBER IS
+  BEGIN
+    BEGIN
+      IF (C_CNT_VAL_SUM = 0) THEN
+        IF (C_ADJ_VAL_SUM = 0) THEN
+          RETURN (0);
+        ELSE
+          RETURN (100);
+        END IF;
+      ELSE
+        RETURN (ROUND((C_ADJ_VAL_SUM / C_CNT_VAL_SUM) * 100
+                    ,C_STD_PREC));
+      END IF;
+    EXCEPTION
+      WHEN OTHERS THEN
+        RETURN NULL;
+    END;
+    RETURN NULL;
+  END C_ADJ_PER_TOTFORMULA;
+
+  FUNCTION C_SORTFORMULA RETURN VARCHAR2 IS
+  BEGIN
+    IF P_SORT_ID = 1 THEN
+      RETURN ('ASC');
+    ELSE
+      RETURN ('DESC');
+    END IF;
+    RETURN NULL;
+  END C_SORTFORMULA;
+
+  FUNCTION C_CAT_PADFORMULA(C_CAT_PAD IN VARCHAR2) RETURN VARCHAR2 IS
+  BEGIN
+    RETURN (C_CAT_PAD);
+  END C_CAT_PADFORMULA;
+
+END INV_INVARPIA_XMLP_PKG;
+
+
+/

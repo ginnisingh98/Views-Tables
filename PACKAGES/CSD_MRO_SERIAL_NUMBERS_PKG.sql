@@ -1,0 +1,78 @@
+--------------------------------------------------------
+--  DDL for Package CSD_MRO_SERIAL_NUMBERS_PKG
+--------------------------------------------------------
+
+  CREATE OR REPLACE EDITIONABLE PACKAGE "APPS"."CSD_MRO_SERIAL_NUMBERS_PKG" AUTHID CURRENT_USER as
+/* $Header: csdtsrls.pls 115.4 2002/11/08 20:21:28 swai noship $ */
+
+PROCEDURE Insert_Row(
+          px_MRO_SERIAL_NUMBER_ID   IN OUT NOCOPY NUMBER
+         ,p_REPAIR_GROUP_ID    NUMBER
+         ,p_SERIAL_NUMBER    VARCHAR2
+         ,p_VALIDATE_LEVEL    VARCHAR2
+         ,p_CREATED_BY    NUMBER
+         ,p_CREATION_DATE    DATE
+         ,p_LAST_UPDATED_BY    NUMBER
+         ,p_LAST_UPDATE_DATE    DATE
+         ,p_LAST_UPDATE_LOGIN    NUMBER
+         ,p_CONTEXT    VARCHAR2
+         ,p_ATTRIBUTE1    VARCHAR2
+         ,p_ATTRIBUTE2    VARCHAR2
+         ,p_ATTRIBUTE3    VARCHAR2
+         ,p_ATTRIBUTE4    VARCHAR2
+         ,p_ATTRIBUTE5    VARCHAR2
+         ,p_ATTRIBUTE6    VARCHAR2
+         ,p_ATTRIBUTE7    VARCHAR2
+         ,p_ATTRIBUTE8    VARCHAR2
+         ,p_ATTRIBUTE9    VARCHAR2
+         ,p_ATTRIBUTE10    VARCHAR2
+         ,p_ATTRIBUTE11    VARCHAR2
+         ,p_ATTRIBUTE12    VARCHAR2
+         ,p_ATTRIBUTE13    VARCHAR2
+         ,p_ATTRIBUTE14    VARCHAR2
+         ,p_ATTRIBUTE15    VARCHAR2
+         ,p_OBJECT_VERSION_NUMBER    NUMBER
+         ,p_CUSTOMER_PRODUCT_ID     NUMBER
+         ,p_REFERENCE_NUMBER VARCHAR2);
+
+PROCEDURE Update_Row(
+          p_MRO_SERIAL_NUMBER_ID    NUMBER
+         ,p_REPAIR_GROUP_ID    NUMBER
+         ,p_SERIAL_NUMBER    VARCHAR2
+         ,p_VALIDATE_LEVEL    VARCHAR2
+         ,p_CREATED_BY    NUMBER
+         ,p_CREATION_DATE    DATE
+         ,p_LAST_UPDATED_BY    NUMBER
+         ,p_LAST_UPDATE_DATE    DATE
+         ,p_LAST_UPDATE_LOGIN    NUMBER
+         ,p_CONTEXT    VARCHAR2
+         ,p_ATTRIBUTE1    VARCHAR2
+         ,p_ATTRIBUTE2    VARCHAR2
+         ,p_ATTRIBUTE3    VARCHAR2
+         ,p_ATTRIBUTE4    VARCHAR2
+         ,p_ATTRIBUTE5    VARCHAR2
+         ,p_ATTRIBUTE6    VARCHAR2
+         ,p_ATTRIBUTE7    VARCHAR2
+         ,p_ATTRIBUTE8    VARCHAR2
+         ,p_ATTRIBUTE9    VARCHAR2
+         ,p_ATTRIBUTE10    VARCHAR2
+         ,p_ATTRIBUTE11    VARCHAR2
+         ,p_ATTRIBUTE12    VARCHAR2
+         ,p_ATTRIBUTE13    VARCHAR2
+         ,p_ATTRIBUTE14    VARCHAR2
+         ,p_ATTRIBUTE15    VARCHAR2
+         ,p_OBJECT_VERSION_NUMBER    NUMBER
+         ,p_CUSTOMER_PRODUCT_ID     NUMBER
+         ,p_REFERENCE_NUMBER VARCHAR2);
+
+PROCEDURE Lock_Row(
+          p_MRO_SERIAL_NUMBER_ID    NUMBER
+         ,p_OBJECT_VERSION_NUMBER    NUMBER);
+
+PROCEDURE Delete_Row(
+    p_MRO_SERIAL_NUMBER_ID  NUMBER);
+End CSD_MRO_SERIAL_NUMBERS_PKG;
+
+ 
+
+/

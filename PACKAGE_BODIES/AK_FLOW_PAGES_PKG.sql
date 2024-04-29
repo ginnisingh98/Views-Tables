@@ -1,0 +1,516 @@
+--------------------------------------------------------
+--  DDL for Package Body AK_FLOW_PAGES_PKG
+--------------------------------------------------------
+
+  CREATE OR REPLACE EDITIONABLE PACKAGE BODY "APPS"."AK_FLOW_PAGES_PKG" as
+/* $Header: AKDFPAGB.pls 120.3 2006/01/25 15:57:01 tshort ship $ */
+procedure INSERT_ROW (
+  X_ROWID in out NOCOPY VARCHAR2,
+  X_FLOW_APPLICATION_ID in NUMBER,
+  X_FLOW_CODE in VARCHAR2,
+  X_PAGE_APPLICATION_ID in NUMBER,
+  X_PAGE_CODE in VARCHAR2,
+  X_PRIMARY_REGION_APPL_ID in NUMBER,
+  X_PRIMARY_REGION_CODE in VARCHAR2,
+  X_NAME in VARCHAR2,
+  X_DESCRIPTION in VARCHAR2,
+  X_CREATION_DATE in DATE,
+  X_CREATED_BY in NUMBER,
+  X_LAST_UPDATE_DATE in DATE,
+  X_LAST_UPDATED_BY in NUMBER,
+  X_LAST_UPDATE_LOGIN in NUMBER,
+  X_ATTRIBUTE_CATEGORY in VARCHAR2,
+  X_ATTRIBUTE1 in VARCHAR2,
+  X_ATTRIBUTE2 in VARCHAR2,
+  X_ATTRIBUTE3 in VARCHAR2,
+  X_ATTRIBUTE4 in VARCHAR2,
+  X_ATTRIBUTE5 in VARCHAR2,
+  X_ATTRIBUTE6 in VARCHAR2,
+  X_ATTRIBUTE7 in VARCHAR2,
+  X_ATTRIBUTE8 in VARCHAR2,
+  X_ATTRIBUTE9 in VARCHAR2,
+  X_ATTRIBUTE10 in VARCHAR2,
+  X_ATTRIBUTE11 in VARCHAR2,
+  X_ATTRIBUTE12 in VARCHAR2,
+  X_ATTRIBUTE13 in VARCHAR2,
+  X_ATTRIBUTE14 in VARCHAR2,
+  X_ATTRIBUTE15 in VARCHAR2
+) is
+  cursor C is select ROWID from AK_FLOW_PAGES
+    where FLOW_APPLICATION_ID = X_FLOW_APPLICATION_ID
+    and FLOW_CODE = X_FLOW_CODE
+    and PAGE_APPLICATION_ID = X_PAGE_APPLICATION_ID
+    and PAGE_CODE = X_PAGE_CODE;
+begin
+  insert into AK_FLOW_PAGES (
+    FLOW_APPLICATION_ID,
+    FLOW_CODE,
+    PAGE_APPLICATION_ID,
+    PAGE_CODE,
+    PRIMARY_REGION_APPL_ID,
+    PRIMARY_REGION_CODE,
+    CREATION_DATE,
+    CREATED_BY,
+    LAST_UPDATE_DATE,
+    LAST_UPDATED_BY,
+    LAST_UPDATE_LOGIN,
+    ATTRIBUTE_CATEGORY,
+    ATTRIBUTE1,
+    ATTRIBUTE2,
+    ATTRIBUTE3,
+    ATTRIBUTE4,
+    ATTRIBUTE5,
+    ATTRIBUTE6,
+    ATTRIBUTE7,
+    ATTRIBUTE8,
+    ATTRIBUTE9,
+    ATTRIBUTE10,
+    ATTRIBUTE11,
+    ATTRIBUTE12,
+    ATTRIBUTE13,
+    ATTRIBUTE14,
+    ATTRIBUTE15
+  ) values (
+    X_FLOW_APPLICATION_ID,
+    X_FLOW_CODE,
+    X_PAGE_APPLICATION_ID,
+    X_PAGE_CODE,
+    X_PRIMARY_REGION_APPL_ID,
+    X_PRIMARY_REGION_CODE,
+    X_CREATION_DATE,
+    X_CREATED_BY,
+    X_LAST_UPDATE_DATE,
+    X_LAST_UPDATED_BY,
+    X_LAST_UPDATE_LOGIN,
+    X_ATTRIBUTE_CATEGORY,
+    X_ATTRIBUTE1,
+    X_ATTRIBUTE2,
+    X_ATTRIBUTE3,
+    X_ATTRIBUTE4,
+    X_ATTRIBUTE5,
+    X_ATTRIBUTE6,
+    X_ATTRIBUTE7,
+    X_ATTRIBUTE8,
+    X_ATTRIBUTE9,
+    X_ATTRIBUTE10,
+    X_ATTRIBUTE11,
+    X_ATTRIBUTE12,
+    X_ATTRIBUTE13,
+    X_ATTRIBUTE14,
+    X_ATTRIBUTE15
+  );
+
+  open c;
+  fetch c into X_ROWID;
+  if (c%notfound) then
+    close c;
+    raise no_data_found;
+  end if;
+  close c;
+
+  insert into AK_FLOW_PAGES_TL (
+    FLOW_APPLICATION_ID,
+    FLOW_CODE,
+    PAGE_APPLICATION_ID,
+    PAGE_CODE,
+    LANGUAGE,
+    NAME,
+    DESCRIPTION,
+    SOURCE_LANG,
+    CREATED_BY,
+    CREATION_DATE,
+    LAST_UPDATED_BY,
+    LAST_UPDATE_DATE,
+    LAST_UPDATE_LOGIN
+  ) select
+    X_FLOW_APPLICATION_ID,
+    X_FLOW_CODE,
+    X_PAGE_APPLICATION_ID,
+    X_PAGE_CODE,
+    L.LANGUAGE_CODE,
+    X_NAME,
+    X_DESCRIPTION,
+    userenv('LANG'),
+    X_CREATED_BY,
+    X_CREATION_DATE,
+    X_LAST_UPDATED_BY,
+    X_LAST_UPDATE_DATE,
+    X_LAST_UPDATE_LOGIN
+  from FND_LANGUAGES L
+  where L.INSTALLED_FLAG in ('I', 'B')
+  and not exists
+    (select NULL
+    from AK_FLOW_PAGES_TL T
+    where T.FLOW_APPLICATION_ID = X_FLOW_APPLICATION_ID
+    and T.FLOW_CODE = X_FLOW_CODE
+    and T.PAGE_APPLICATION_ID = X_PAGE_APPLICATION_ID
+    and T.PAGE_CODE = X_PAGE_CODE
+    and T.LANGUAGE = L.LANGUAGE_CODE);
+end INSERT_ROW;
+
+procedure LOCK_ROW (
+  X_FLOW_APPLICATION_ID in NUMBER,
+  X_FLOW_CODE in VARCHAR2,
+  X_PAGE_APPLICATION_ID in NUMBER,
+  X_PAGE_CODE in VARCHAR2,
+  X_ATTRIBUTE4 in VARCHAR2,
+  X_ATTRIBUTE5 in VARCHAR2,
+  X_ATTRIBUTE6 in VARCHAR2,
+  X_ATTRIBUTE7 in VARCHAR2,
+  X_ATTRIBUTE8 in VARCHAR2,
+  X_ATTRIBUTE9 in VARCHAR2,
+  X_ATTRIBUTE10 in VARCHAR2,
+  X_ATTRIBUTE11 in VARCHAR2,
+  X_ATTRIBUTE12 in VARCHAR2,
+  X_ATTRIBUTE13 in VARCHAR2,
+  X_ATTRIBUTE14 in VARCHAR2,
+  X_ATTRIBUTE15 in VARCHAR2,
+  X_PRIMARY_REGION_APPL_ID in NUMBER,
+  X_PRIMARY_REGION_CODE in VARCHAR2,
+  X_ATTRIBUTE_CATEGORY in VARCHAR2,
+  X_ATTRIBUTE1 in VARCHAR2,
+  X_ATTRIBUTE2 in VARCHAR2,
+  X_ATTRIBUTE3 in VARCHAR2,
+  X_NAME in VARCHAR2,
+  X_DESCRIPTION in VARCHAR2
+) is
+  cursor c is select
+      ATTRIBUTE4,
+      ATTRIBUTE5,
+      ATTRIBUTE6,
+      ATTRIBUTE7,
+      ATTRIBUTE8,
+      ATTRIBUTE9,
+      ATTRIBUTE10,
+      ATTRIBUTE11,
+      ATTRIBUTE12,
+      ATTRIBUTE13,
+      ATTRIBUTE14,
+      ATTRIBUTE15,
+      PRIMARY_REGION_APPL_ID,
+      PRIMARY_REGION_CODE,
+      ATTRIBUTE_CATEGORY,
+      ATTRIBUTE1,
+      ATTRIBUTE2,
+      ATTRIBUTE3
+    from AK_FLOW_PAGES
+    where FLOW_APPLICATION_ID = X_FLOW_APPLICATION_ID
+    and FLOW_CODE = X_FLOW_CODE
+    and PAGE_APPLICATION_ID = X_PAGE_APPLICATION_ID
+    and PAGE_CODE = X_PAGE_CODE
+    for update of FLOW_CODE nowait;
+  recinfo c%rowtype;
+
+  cursor c1 is select
+      NAME,
+      DESCRIPTION
+    from AK_FLOW_PAGES_TL
+    where FLOW_APPLICATION_ID = X_FLOW_APPLICATION_ID
+    and FLOW_CODE = X_FLOW_CODE
+    and PAGE_APPLICATION_ID = X_PAGE_APPLICATION_ID
+    and PAGE_CODE = X_PAGE_CODE
+    and LANGUAGE = userenv('LANG')
+    for update of FLOW_CODE nowait;
+  tlinfo c1%rowtype;
+
+begin
+  open c;
+  fetch c into recinfo;
+  if (c%notfound) then
+    close c;
+    fnd_message.set_name('FND', 'FORM_RECORD_DELETED');
+    app_exception.raise_exception;
+  end if;
+  close c;
+      if ( ((recinfo.ATTRIBUTE4 = X_ATTRIBUTE4)
+           OR ((recinfo.ATTRIBUTE4 is null)
+               AND (X_ATTRIBUTE4 is null)))
+      AND ((recinfo.ATTRIBUTE5 = X_ATTRIBUTE5)
+           OR ((recinfo.ATTRIBUTE5 is null)
+               AND (X_ATTRIBUTE5 is null)))
+      AND ((recinfo.ATTRIBUTE6 = X_ATTRIBUTE6)
+           OR ((recinfo.ATTRIBUTE6 is null)
+               AND (X_ATTRIBUTE6 is null)))
+      AND ((recinfo.ATTRIBUTE7 = X_ATTRIBUTE7)
+           OR ((recinfo.ATTRIBUTE7 is null)
+               AND (X_ATTRIBUTE7 is null)))
+      AND ((recinfo.ATTRIBUTE8 = X_ATTRIBUTE8)
+           OR ((recinfo.ATTRIBUTE8 is null)
+               AND (X_ATTRIBUTE8 is null)))
+      AND ((recinfo.ATTRIBUTE9 = X_ATTRIBUTE9)
+           OR ((recinfo.ATTRIBUTE9 is null)
+               AND (X_ATTRIBUTE9 is null)))
+      AND ((recinfo.ATTRIBUTE10 = X_ATTRIBUTE10)
+           OR ((recinfo.ATTRIBUTE10 is null)
+               AND (X_ATTRIBUTE10 is null)))
+      AND ((recinfo.ATTRIBUTE11 = X_ATTRIBUTE11)
+           OR ((recinfo.ATTRIBUTE11 is null)
+               AND (X_ATTRIBUTE11 is null)))
+      AND ((recinfo.ATTRIBUTE12 = X_ATTRIBUTE12)
+           OR ((recinfo.ATTRIBUTE12 is null)
+               AND (X_ATTRIBUTE12 is null)))
+      AND ((recinfo.ATTRIBUTE13 = X_ATTRIBUTE13)
+           OR ((recinfo.ATTRIBUTE13 is null)
+               AND (X_ATTRIBUTE13 is null)))
+      AND ((recinfo.ATTRIBUTE14 = X_ATTRIBUTE14)
+           OR ((recinfo.ATTRIBUTE14 is null)
+               AND (X_ATTRIBUTE14 is null)))
+      AND ((recinfo.ATTRIBUTE15 = X_ATTRIBUTE15)
+           OR ((recinfo.ATTRIBUTE15 is null)
+               AND (X_ATTRIBUTE15 is null)))
+      AND (recinfo.PRIMARY_REGION_APPL_ID = X_PRIMARY_REGION_APPL_ID)
+      AND (recinfo.PRIMARY_REGION_CODE = X_PRIMARY_REGION_CODE)
+      AND ((recinfo.ATTRIBUTE_CATEGORY = X_ATTRIBUTE_CATEGORY)
+           OR ((recinfo.ATTRIBUTE_CATEGORY is null)
+               AND (X_ATTRIBUTE_CATEGORY is null)))
+      AND ((recinfo.ATTRIBUTE1 = X_ATTRIBUTE1)
+           OR ((recinfo.ATTRIBUTE1 is null)
+               AND (X_ATTRIBUTE1 is null)))
+      AND ((recinfo.ATTRIBUTE2 = X_ATTRIBUTE2)
+           OR ((recinfo.ATTRIBUTE2 is null)
+               AND (X_ATTRIBUTE2 is null)))
+      AND ((recinfo.ATTRIBUTE3 = X_ATTRIBUTE3)
+           OR ((recinfo.ATTRIBUTE3 is null)
+               AND (X_ATTRIBUTE3 is null)))
+  ) then
+    null;
+  else
+    fnd_message.set_name('FND', 'FORM_RECORD_CHANGED');
+    app_exception.raise_exception;
+  end if;
+
+  open c1;
+  fetch c1 into tlinfo;
+  if (c1%notfound) then
+    close c1;
+    return;
+  end if;
+  close c1;
+
+  if ( (tlinfo.NAME = X_NAME)
+      AND ((tlinfo.DESCRIPTION = X_DESCRIPTION)
+           OR ((tlinfo.DESCRIPTION is null)
+               AND (X_DESCRIPTION is null)))
+  ) then
+    null;
+  else
+    fnd_message.set_name('FND', 'FORM_RECORD_CHANGED');
+    app_exception.raise_exception;
+  end if;
+  return;
+end LOCK_ROW;
+
+
+procedure UPDATE_ROW (
+  X_FLOW_APPLICATION_ID in NUMBER,
+  X_FLOW_CODE in VARCHAR2,
+  X_PAGE_APPLICATION_ID in NUMBER,
+  X_PAGE_CODE in VARCHAR2,
+  X_PRIMARY_REGION_APPL_ID in NUMBER,
+  X_PRIMARY_REGION_CODE in VARCHAR2,
+  X_NAME in VARCHAR2,
+  X_DESCRIPTION in VARCHAR2,
+  X_LAST_UPDATE_DATE in DATE,
+  X_LAST_UPDATED_BY in NUMBER,
+  X_LAST_UPDATE_LOGIN in NUMBER,
+  X_ATTRIBUTE_CATEGORY in VARCHAR2,
+  X_ATTRIBUTE1 in VARCHAR2,
+  X_ATTRIBUTE2 in VARCHAR2,
+  X_ATTRIBUTE3 in VARCHAR2,
+  X_ATTRIBUTE4 in VARCHAR2,
+  X_ATTRIBUTE5 in VARCHAR2,
+  X_ATTRIBUTE6 in VARCHAR2,
+  X_ATTRIBUTE7 in VARCHAR2,
+  X_ATTRIBUTE8 in VARCHAR2,
+  X_ATTRIBUTE9 in VARCHAR2,
+  X_ATTRIBUTE10 in VARCHAR2,
+  X_ATTRIBUTE11 in VARCHAR2,
+  X_ATTRIBUTE12 in VARCHAR2,
+  X_ATTRIBUTE13 in VARCHAR2,
+  X_ATTRIBUTE14 in VARCHAR2,
+  X_ATTRIBUTE15 in VARCHAR2
+) is
+begin
+    update AK_FLOW_PAGES set
+      FLOW_APPLICATION_ID = X_FLOW_APPLICATION_ID,
+      FLOW_CODE = X_FLOW_CODE,
+      PAGE_APPLICATION_ID = X_PAGE_APPLICATION_ID,
+      PAGE_CODE = X_PAGE_CODE,
+      PRIMARY_REGION_APPL_ID = X_PRIMARY_REGION_APPL_ID,
+      PRIMARY_REGION_CODE = X_PRIMARY_REGION_CODE,
+      LAST_UPDATE_DATE = X_LAST_UPDATE_DATE,
+      LAST_UPDATED_BY = X_LAST_UPDATED_BY,
+      LAST_UPDATE_LOGIN = X_LAST_UPDATE_LOGIN,
+      ATTRIBUTE_CATEGORY = X_ATTRIBUTE_CATEGORY,
+      ATTRIBUTE1 = X_ATTRIBUTE1,
+      ATTRIBUTE2 = X_ATTRIBUTE2,
+      ATTRIBUTE3 = X_ATTRIBUTE3,
+      ATTRIBUTE4 = X_ATTRIBUTE4,
+      ATTRIBUTE5 = X_ATTRIBUTE5,
+      ATTRIBUTE6 = X_ATTRIBUTE6,
+      ATTRIBUTE7 = X_ATTRIBUTE7,
+      ATTRIBUTE8 = X_ATTRIBUTE8,
+      ATTRIBUTE9 = X_ATTRIBUTE9,
+      ATTRIBUTE10 = X_ATTRIBUTE10,
+      ATTRIBUTE11 = X_ATTRIBUTE11,
+      ATTRIBUTE12 = X_ATTRIBUTE12,
+      ATTRIBUTE13 = X_ATTRIBUTE13,
+      ATTRIBUTE14 = X_ATTRIBUTE14,
+      ATTRIBUTE15 = X_ATTRIBUTE15
+    where FLOW_APPLICATION_ID = X_FLOW_APPLICATION_ID
+    and FLOW_CODE = X_FLOW_CODE
+    and PAGE_APPLICATION_ID = X_PAGE_APPLICATION_ID
+    and PAGE_CODE = X_PAGE_CODE;
+  if (sql%notfound) then
+    raise no_data_found;
+  end if;
+
+  update AK_FLOW_PAGES_TL set
+    NAME = X_NAME,
+    DESCRIPTION = X_DESCRIPTION,
+    LAST_UPDATE_DATE = X_LAST_UPDATE_DATE,
+    LAST_UPDATED_BY = X_LAST_UPDATED_BY,
+    LAST_UPDATE_LOGIN = X_LAST_UPDATE_LOGIN,
+    SOURCE_LANG = userenv('LANG')
+  where FLOW_CODE = X_FLOW_CODE
+  and FLOW_APPLICATION_ID = X_FLOW_APPLICATION_ID
+  and PAGE_CODE = X_PAGE_CODE
+  and PAGE_APPLICATION_ID = X_PAGE_APPLICATION_ID
+  and userenv('LANG') in (LANGUAGE, SOURCE_LANG);
+  if (sql%notfound) then
+    raise no_data_found;
+  end if;
+end UPDATE_ROW;
+
+procedure DELETE_ROW (
+  X_FLOW_APPLICATION_ID in NUMBER,
+  X_FLOW_CODE in VARCHAR2,
+  X_PAGE_APPLICATION_ID in NUMBER,
+  X_PAGE_CODE in VARCHAR2
+) is
+begin
+  delete from AK_FLOW_PAGES
+  where FLOW_APPLICATION_ID = X_FLOW_APPLICATION_ID
+  and FLOW_CODE = X_FLOW_CODE
+  and PAGE_APPLICATION_ID = X_PAGE_APPLICATION_ID
+  and PAGE_CODE = X_PAGE_CODE;
+
+  if (sql%notfound) then
+    raise no_data_found;
+  end if;
+
+  delete from AK_FLOW_PAGES_TL
+  where FLOW_APPLICATION_ID = X_FLOW_APPLICATION_ID
+  and FLOW_CODE = X_FLOW_CODE
+  and PAGE_APPLICATION_ID = X_PAGE_APPLICATION_ID
+  and PAGE_CODE = X_PAGE_CODE;
+  if (sql%notfound) then
+    raise no_data_found;
+  end if;
+end DELETE_ROW;
+
+procedure ADD_LANGUAGE
+is
+begin
+/* Mar/19/03 requested by Ric Ginsberg */
+/* The following delete and update statements are commented out */
+/* as a quick workaround to fix the time-consuming table handler issue */
+/* Eventually we'll need to turn them into a separate fix_language procedure */
+/*
+
+  delete from AK_FLOW_PAGES_TL T
+  where not exists
+    (select NULL
+    from AK_FLOW_PAGES B
+    where B.FLOW_CODE = T.FLOW_CODE
+    and B.FLOW_APPLICATION_ID = T.FLOW_APPLICATION_ID
+    and B.PAGE_CODE = T.PAGE_CODE
+    and B.PAGE_APPLICATION_ID = T.PAGE_APPLICATION_ID
+    );
+
+  update AK_FLOW_PAGES_TL T set (
+      NAME,
+      DESCRIPTION
+    ) = (select
+      B.NAME,
+      B.DESCRIPTION
+    from AK_FLOW_PAGES_TL B
+    where B.FLOW_CODE = T.FLOW_CODE
+    and B.FLOW_APPLICATION_ID = T.FLOW_APPLICATION_ID
+    and B.PAGE_CODE = T.PAGE_CODE
+    and B.PAGE_APPLICATION_ID = T.PAGE_APPLICATION_ID
+    and B.LANGUAGE = T.SOURCE_LANG)
+  where (
+      T.FLOW_CODE,
+      T.FLOW_APPLICATION_ID,
+      T.PAGE_CODE,
+      T.PAGE_APPLICATION_ID,
+      T.LANGUAGE
+  ) in (select
+      SUBT.FLOW_CODE,
+      SUBT.FLOW_APPLICATION_ID,
+      SUBT.PAGE_CODE,
+      SUBT.PAGE_APPLICATION_ID,
+      SUBT.LANGUAGE
+    from AK_FLOW_PAGES_TL SUBB, AK_FLOW_PAGES_TL SUBT
+    where SUBB.FLOW_CODE = SUBT.FLOW_CODE
+    and SUBB.FLOW_APPLICATION_ID = SUBT.FLOW_APPLICATION_ID
+    and SUBB.PAGE_CODE = SUBT.PAGE_CODE
+    and SUBB.PAGE_APPLICATION_ID = SUBT.PAGE_APPLICATION_ID
+    and SUBB.LANGUAGE = SUBT.SOURCE_LANG
+    and (SUBB.NAME <> SUBT.NAME
+      or SUBB.DESCRIPTION <> SUBT.DESCRIPTION
+      or (SUBB.DESCRIPTION is null and SUBT.DESCRIPTION is not null)
+      or (SUBB.DESCRIPTION is not null and SUBT.DESCRIPTION is null)
+  ));
+
+*/
+
+  insert /*+ append parallel(tt) */ into AK_FLOW_PAGES_TL tt (
+    FLOW_APPLICATION_ID,
+    FLOW_CODE,
+    PAGE_APPLICATION_ID,
+    PAGE_CODE,
+    NAME,
+    DESCRIPTION,
+    CREATED_BY,
+    CREATION_DATE,
+    LAST_UPDATED_BY,
+    LAST_UPDATE_DATE,
+    LAST_UPDATE_LOGIN,
+    LANGUAGE,
+    SOURCE_LANG
+  ) select /*+ parallel(v) parallel(t) use_nl(t)  */ v.* from
+(select /*+ no_merge ordered parallel(b) */
+    B.FLOW_APPLICATION_ID,
+    B.FLOW_CODE,
+    B.PAGE_APPLICATION_ID,
+    B.PAGE_CODE,
+    B.NAME,
+    B.DESCRIPTION,
+    B.CREATED_BY,
+    B.CREATION_DATE,
+    B.LAST_UPDATED_BY,
+    B.LAST_UPDATE_DATE,
+    B.LAST_UPDATE_LOGIN,
+    L.LANGUAGE_CODE,
+    B.SOURCE_LANG
+  from AK_FLOW_PAGES_TL B, FND_LANGUAGES L
+  where L.INSTALLED_FLAG in ('I', 'B')
+  and B.LANGUAGE = userenv('LANG')
+) v, AK_FLOW_PAGES_TL T
+    where T.FLOW_CODE(+) = v.FLOW_CODE
+    and T.FLOW_APPLICATION_ID(+) = v.FLOW_APPLICATION_ID
+    and T.PAGE_CODE(+) = v.PAGE_CODE
+    and T.PAGE_APPLICATION_ID(+) = v.PAGE_APPLICATION_ID
+    and T.LANGUAGE(+) = v.LANGUAGE_CODE
+and T.FLOW_CODE is NULL
+and T.FLOW_APPLICATION_ID is NULL
+and T.PAGE_CODE is NULL
+and T.PAGE_APPLICATION_ID is NULL;
+
+end ADD_LANGUAGE;
+
+end AK_FLOW_PAGES_PKG;
+
+/

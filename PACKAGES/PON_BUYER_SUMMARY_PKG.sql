@@ -1,0 +1,22 @@
+--------------------------------------------------------
+--  DDL for Package PON_BUYER_SUMMARY_PKG
+--------------------------------------------------------
+
+  CREATE OR REPLACE EDITIONABLE PACKAGE "APPS"."PON_BUYER_SUMMARY_PKG" AUTHID CURRENT_USER AS
+-- $Header: PONBUSUS.pls 120.0 2005/06/01 15:20:35 appldev noship $
+
+PROCEDURE calculate_summary ( P_AUCTION_ID IN NUMBER, P_BATCH_ID OUT NOCOPY	NUMBER);
+
+PROCEDURE bid_count_info (P_AUCTION_ID 		IN 	NUMBER,
+			  P_NO_BID_OPEN		OUT	NOCOPY	NUMBER,
+			  P_NO_BID_CLOSED	OUT  	NOCOPY	NUMBER,
+			  P_PART_BID_OPEN	OUT	NOCOPY	NUMBER,
+			  P_PART_BID_CLOSED	OUT  	NOCOPY	NUMBER,
+			  P_FULL_BID_OPEN	OUT	NOCOPY	NUMBER,
+			  P_FULL_BID_CLOSED	OUT  	NOCOPY	NUMBER);
+
+END PON_BUYER_SUMMARY_PKG;
+
+ 
+
+/

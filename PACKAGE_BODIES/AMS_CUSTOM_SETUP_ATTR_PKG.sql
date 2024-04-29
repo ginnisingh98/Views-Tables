@@ -1,0 +1,328 @@
+--------------------------------------------------------
+--  DDL for Package Body AMS_CUSTOM_SETUP_ATTR_PKG
+--------------------------------------------------------
+
+  CREATE OR REPLACE EDITIONABLE PACKAGE BODY "APPS"."AMS_CUSTOM_SETUP_ATTR_PKG" as
+/* $Header: amslattb.pls 115.12 2004/04/08 22:51:09 asaha ship $ */
+PROCEDURE INSERT_ROW (
+  X_ROWID in OUT NOCOPY VARCHAR2,
+  X_SETUP_ATTRIBUTE_ID in NUMBER,
+  X_OBJECT_VERSION_NUMBER in NUMBER,
+  X_CUSTOM_SETUP_ID in NUMBER,
+  X_DISPLAY_SEQUENCE_NO in NUMBER,
+  X_OBJECT_ATTRIBUTE in VARCHAR2,
+  X_ATTR_MANDATORY_FLAG in VARCHAR2,
+  X_ATTR_AVAILABLE_FLAG in VARCHAR2,
+  X_PARENT_FUNCTION_NAME in VARCHAR2,
+  X_FUNCTION_NAME in VARCHAR2,
+  X_PARENT_SETUP_ATTRIBUTE in VARCHAR2,
+  X_PARENT_DISPLAY_SEQUENCE in NUMBER,
+  X_SHOW_IN_REPORT in VARCHAR2,
+  X_SHOW_IN_CUE_CARD in VARCHAR2,
+  X_COPY_ALLOWED_FLAG in VARCHAR2,
+  X_RELATED_AK_ATTRIBUTE in VARCHAR2,
+  X_CREATION_DATE in DATE,
+  X_CREATED_BY in NUMBER,
+  X_LAST_UPDATE_DATE in DATE,
+  X_LAST_UPDATED_BY in NUMBER,
+  X_LAST_UPDATE_LOGIN in NUMBER,
+  X_ESSENTIAL_SEQ_NUM in NUMBER
+)
+IS
+  CURSOR c IS select ROWID FROM AMS_CUSTOM_SETUP_ATTR
+    WHERE SETUP_ATTRIBUTE_ID = X_SETUP_ATTRIBUTE_ID
+    ;
+BEGIN
+  INSERT into AMS_CUSTOM_SETUP_ATTR (
+    SETUP_ATTRIBUTE_ID,
+    OBJECT_VERSION_NUMBER,
+    CUSTOM_SETUP_ID,
+    DISPLAY_SEQUENCE_NO,
+    OBJECT_ATTRIBUTE,
+    ATTR_MANDATORY_FLAG,
+    ATTR_AVAILABLE_FLAG,
+    PARENT_FUNCTION_NAME,
+    FUNCTION_NAME,
+    PARENT_SETUP_ATTRIBUTE,
+    PARENT_DISPLAY_SEQUENCE,
+    SHOW_IN_REPORT,
+    SHOW_IN_CUE_CARD,
+    COPY_ALLOWED_FLAG,
+    RELATED_AK_ATTRIBUTE,
+    CREATION_DATE,
+    CREATED_BY,
+    LAST_UPDATE_DATE,
+    LAST_UPDATED_BY,
+    LAST_UPDATE_LOGIN,
+    ESSENTIAL_SEQ_NUM
+  ) values (
+    X_SETUP_ATTRIBUTE_ID,
+    X_OBJECT_VERSION_NUMBER,
+    X_CUSTOM_SETUP_ID,
+    X_DISPLAY_SEQUENCE_NO,
+    X_OBJECT_ATTRIBUTE,
+    X_ATTR_MANDATORY_FLAG,
+    X_ATTR_AVAILABLE_FLAG,
+    X_PARENT_FUNCTION_NAME ,
+    X_FUNCTION_NAME,
+    X_PARENT_SETUP_ATTRIBUTE,
+    X_PARENT_DISPLAY_SEQUENCE,
+    X_SHOW_IN_REPORT ,
+    X_SHOW_IN_CUE_CARD ,
+    X_COPY_ALLOWED_FLAG,
+    X_RELATED_AK_ATTRIBUTE,
+    X_CREATION_DATE,
+    X_CREATED_BY,
+    X_LAST_UPDATE_DATE,
+    X_LAST_UPDATED_BY,
+    X_LAST_UPDATE_LOGIN,
+    X_ESSENTIAL_SEQ_NUM
+  );
+
+  OPEN c;
+  FETCH c into X_ROWID;
+  IF (c%NOTFOUND) THEN
+    CLOSE c;
+    RAISE no_data_found;
+  END IF;
+  CLOSE c;
+END INSERT_ROW;
+
+PROCEDURE UPDATE_ROW (
+  X_SETUP_ATTRIBUTE_ID in NUMBER,
+  X_OBJECT_VERSION_NUMBER in NUMBER,
+  X_CUSTOM_SETUP_ID in NUMBER,
+  X_DISPLAY_SEQUENCE_NO in NUMBER,
+  X_OBJECT_ATTRIBUTE in VARCHAR2,
+  X_ATTR_MANDATORY_FLAG in VARCHAR2,
+  X_ATTR_AVAILABLE_FLAG in VARCHAR2,
+  X_PARENT_FUNCTION_NAME in VARCHAR2,
+  X_FUNCTION_NAME in VARCHAR2,
+  X_PARENT_SETUP_ATTRIBUTE in VARCHAR2,
+  X_PARENT_DISPLAY_SEQUENCE in NUMBER,
+  X_SHOW_IN_REPORT in VARCHAR2,
+  X_SHOW_IN_CUE_CARD in VARCHAR2,
+  X_COPY_ALLOWED_FLAG in VARCHAR2,
+  X_RELATED_AK_ATTRIBUTE in VARCHAR2,
+  X_LAST_UPDATE_DATE in DATE,
+  X_LAST_UPDATED_BY in NUMBER,
+  X_LAST_UPDATE_LOGIN in NUMBER,
+  X_ESSENTIAL_SEQ_NUM in NUMBER
+)
+IS
+BEGIN
+  UPDATE AMS_CUSTOM_SETUP_ATTR SET
+    OBJECT_VERSION_NUMBER   = X_OBJECT_VERSION_NUMBER,
+    DISPLAY_SEQUENCE_NO     = X_DISPLAY_SEQUENCE_NO,
+    ATTR_MANDATORY_FLAG     = X_ATTR_MANDATORY_FLAG,
+    ATTR_AVAILABLE_FLAG     = X_ATTR_AVAILABLE_FLAG,
+    PARENT_FUNCTION_NAME    = X_PARENT_FUNCTION_NAME,
+    FUNCTION_NAME           = X_FUNCTION_NAME,
+    PARENT_SETUP_ATTRIBUTE  = X_PARENT_SETUP_ATTRIBUTE,
+    PARENT_DISPLAY_SEQUENCE = X_PARENT_DISPLAY_SEQUENCE,
+    SHOW_IN_REPORT          = X_SHOW_IN_REPORT,
+    SHOW_IN_CUE_CARD        = X_SHOW_IN_CUE_CARD,
+    COPY_ALLOWED_FLAG       = X_COPY_ALLOWED_FLAG,
+    RELATED_AK_ATTRIBUTE    = X_RELATED_AK_ATTRIBUTE,
+    LAST_UPDATE_DATE        = X_LAST_UPDATE_DATE,
+    LAST_UPDATED_BY         = X_LAST_UPDATED_BY,
+    LAST_UPDATE_LOGIN       = X_LAST_UPDATE_LOGIN,
+    ESSENTIAL_SEQ_NUM       = X_ESSENTIAL_SEQ_NUM
+  WHERE OBJECT_ATTRIBUTE  = X_OBJECT_ATTRIBUTE
+   AND CUSTOM_SETUP_ID   = X_CUSTOM_SETUP_ID;
+
+  IF (sql%NOTFOUND) THEN
+    RAISE no_data_found;
+  END IF;
+END UPDATE_ROW;
+
+PROCEDURE DELETE_ROW (
+  X_SETUP_ATTRIBUTE_ID in NUMBER
+)
+IS
+BEGIN
+  DELETE FROM AMS_CUSTOM_SETUP_ATTR
+  WHERE SETUP_ATTRIBUTE_ID = X_SETUP_ATTRIBUTE_ID;
+
+  IF (sql%NOTFOUND) THEN
+    RAISE no_data_found;
+  END IF;
+END DELETE_ROW;
+
+/* This procedure is used to load the data from flat file to customer's database.
+  If there is no row existing for the data from flat file then create the data.
+  else
+    1) modify the whole data when data in db is not modified by customer which can be found
+      by comparing last updated by value to be
+          SEED/DATAMERGE(1), or
+          INITIAL SETUP/ORACLE (2), or
+          SYSTEM ADMINISTRATOR (0).or
+    2) modify the whole data when custom_mode is 'FORCE'
+    3) if the data in db is modified by customer, which can be found by
+      by comparing last updated by value to be not of 0,1,2, then
+        in that case modify only the user unexposed data with last updated by as 3 to
+        distinguish that data is updated by patch.
+*/
+
+PROCEDURE  LOAD_ROW(
+  X_SETUP_ATTRIBUTE_ID in NUMBER,
+  X_CUSTOM_SETUP_ID in NUMBER,
+  X_DISPLAY_SEQUENCE_NO in NUMBER,
+  X_OBJECT_ATTRIBUTE in VARCHAR2,
+  X_ATTR_MANDATORY_FLAG in VARCHAR2,
+  X_ATTR_AVAILABLE_FLAG in VARCHAR2,
+  X_PARENT_FUNCTION_NAME in VARCHAR2,
+  X_FUNCTION_NAME in VARCHAR2,
+  X_PARENT_SETUP_ATTRIBUTE in VARCHAR2,
+  X_PARENT_DISPLAY_SEQUENCE in NUMBER,
+  X_SHOW_IN_REPORT in VARCHAR2,
+  X_SHOW_IN_CUE_CARD in VARCHAR2,
+  X_COPY_ALLOWED_FLAG in VARCHAR2,
+  X_RELATED_AK_ATTRIBUTE in VARCHAR2,
+  X_ESSENTIAL_SEQ_NUM in NUMBER,
+  X_OWNER in VARCHAR2,
+  x_custom_mode  IN VARCHAR2,
+  X_LAST_UPDATE_DATE   in DATE
+)
+IS
+
+l_user_id   number := 1;
+-- user id to be used in case of exceptions to update the customer modified unexposed data.
+l_excp_user_id number := 3 ;
+
+l_obj_verno  NUMBER;
+l_dummy_number  number;
+l_row_id    VARCHAR2(100);
+l_attr_id   NUMBER;
+l_count     NUMBER;
+l_db_luby_id NUMBER;
+
+cursor  c_db_data_details is
+  select last_updated_by, nvl(object_version_number,1)
+   FROM  AMS_CUSTOM_SETUP_ATTR
+  WHERE  OBJECT_ATTRIBUTE = X_OBJECT_ATTRIBUTE
+    AND  CUSTOM_SETUP_ID  = X_CUSTOM_SETUP_ID;
+
+CURSOR c_chk_code_exists IS
+  select 1
+  FROM   AMS_CUSTOM_SETUP_ATTR
+  WHERE  OBJECT_ATTRIBUTE = X_OBJECT_ATTRIBUTE
+    AND  CUSTOM_SETUP_ID  = X_CUSTOM_SETUP_ID;
+
+CURSOR c_get_attr_id IS
+   select AMS_CUSTOM_SETUP_ATTR_S.NEXTVAL
+   FROM DUAL;
+
+CURSOR c_check_attr_id(attr_id IN NUMBER) IS
+   SELECT COUNT(*)
+   FROM AMS_CUSTOM_SETUP_ATTR
+   WHERE setup_attribute_id = attr_id;
+
+BEGIN
+
+  -- set the last_updated_by to be used while updating the data in customer data.
+  if X_OWNER = 'SEED' then
+    l_user_id := 1;
+  elsif X_OWNER = 'ORACLE' THEN
+    l_user_id := 2;
+  elsif X_OWNER = 'SYSADMIN' THEN
+    l_user_id := 0;
+  end if ;
+
+  OPEN c_chk_code_exists;
+  FETCH c_chk_code_exists into l_dummy_number;
+  IF c_chk_code_exists%NOTFOUND
+  THEN
+    -- data does not exist in customer, and hence create the data.
+    CLOSE c_chk_code_exists;
+      -- get unused sequence number
+    LOOP
+      OPEN c_get_attr_id;
+      FETCH c_get_attr_id into l_attr_id;
+      CLOSE c_get_attr_id;
+
+      OPEN c_check_attr_id(l_attr_id);
+      FETCH c_check_attr_id INTO l_count;
+      CLOSE c_check_attr_id;
+
+      EXIT WHEN l_count = 0;
+    END LOOP;
+
+    l_obj_verno := 1;
+    AMS_CUSTOM_SETUP_ATTR_PKG.INSERT_ROW    (
+      X_ROWID               => l_row_id,
+      X_SETUP_ATTRIBUTE_ID      => l_attr_id,
+      X_OBJECT_VERSION_NUMBER   => l_obj_verno,
+      X_CUSTOM_SETUP_ID         => X_CUSTOM_SETUP_ID,
+      X_DISPLAY_SEQUENCE_NO     => X_DISPLAY_SEQUENCE_NO,
+      X_OBJECT_ATTRIBUTE        => X_OBJECT_ATTRIBUTE,
+      X_ATTR_MANDATORY_FLAG     => X_ATTR_MANDATORY_FLAG,
+      X_ATTR_AVAILABLE_FLAG     => X_ATTR_AVAILABLE_FLAG,
+      X_PARENT_FUNCTION_NAME    => X_PARENT_FUNCTION_NAME,
+      X_FUNCTION_NAME           => X_FUNCTION_NAME,
+      X_PARENT_SETUP_ATTRIBUTE  => X_PARENT_SETUP_ATTRIBUTE,
+      X_PARENT_DISPLAY_SEQUENCE => X_PARENT_DISPLAY_SEQUENCE,
+      X_SHOW_IN_REPORT          => X_SHOW_IN_REPORT,
+      X_SHOW_IN_CUE_CARD        => X_SHOW_IN_CUE_CARD,
+      X_COPY_ALLOWED_FLAG       => X_COPY_ALLOWED_FLAG,
+      X_RELATED_AK_ATTRIBUTE    => X_RELATED_AK_ATTRIBUTE,
+      X_CREATION_DATE           => X_LAST_UPDATE_DATE,
+      X_CREATED_BY              => l_user_id,
+      X_LAST_UPDATE_DATE        => X_LAST_UPDATE_DATE,
+      X_LAST_UPDATED_BY         => l_user_id,
+      X_LAST_UPDATE_LOGIN       => 0,
+      X_ESSENTIAL_SEQ_NUM       => X_ESSENTIAL_SEQ_NUM
+      );
+  ELSE
+    -- Update the data as per above rules.
+    CLOSE c_chk_code_exists;
+    open c_db_data_details;
+    fetch c_db_data_details into l_db_luby_id, l_obj_verno;
+    close c_db_data_details;
+    if ( l_db_luby_id IN (1, 2, 0)
+      OR NVL(x_custom_mode,'PRESERVE') = 'FORCE') THEN
+      AMS_CUSTOM_SETUP_ATTR_PKG.UPDATE_ROW (
+        X_SETUP_ATTRIBUTE_ID      =>  X_SETUP_ATTRIBUTE_ID,
+        X_OBJECT_VERSION_NUMBER   => l_obj_verno + 1,
+        X_CUSTOM_SETUP_ID         => X_CUSTOM_SETUP_ID,
+        X_DISPLAY_SEQUENCE_NO     => X_DISPLAY_SEQUENCE_NO,
+        X_OBJECT_ATTRIBUTE        => X_OBJECT_ATTRIBUTE,
+        X_ATTR_MANDATORY_FLAG     => X_ATTR_MANDATORY_FLAG,
+        X_ATTR_AVAILABLE_FLAG     => X_ATTR_AVAILABLE_FLAG,
+        X_PARENT_FUNCTION_NAME    => X_PARENT_FUNCTION_NAME,
+        X_FUNCTION_NAME           => X_FUNCTION_NAME,
+        X_PARENT_SETUP_ATTRIBUTE  => X_PARENT_SETUP_ATTRIBUTE,
+        X_PARENT_DISPLAY_SEQUENCE => X_PARENT_DISPLAY_SEQUENCE,
+        X_SHOW_IN_REPORT          => X_SHOW_IN_REPORT,
+        X_SHOW_IN_CUE_CARD        => X_SHOW_IN_CUE_CARD,
+        X_COPY_ALLOWED_FLAG       => X_COPY_ALLOWED_FLAG,
+        X_RELATED_AK_ATTRIBUTE    => X_RELATED_AK_ATTRIBUTE,
+        X_LAST_UPDATE_DATE        => X_LAST_UPDATE_DATE,
+        X_LAST_UPDATED_BY         => l_user_id,
+        X_LAST_UPDATE_LOGIN       => 0,
+	X_ESSENTIAL_SEQ_NUM       => X_ESSENTIAL_SEQ_NUM
+      );
+    ELSE
+      UPDATE AMS_CUSTOM_SETUP_ATTR SET
+        OBJECT_VERSION_NUMBER = l_obj_verno + 1,
+        OBJECT_ATTRIBUTE        = X_OBJECT_ATTRIBUTE,
+        PARENT_FUNCTION_NAME    = X_PARENT_FUNCTION_NAME,
+        FUNCTION_NAME           = X_FUNCTION_NAME,
+        PARENT_SETUP_ATTRIBUTE  = X_PARENT_SETUP_ATTRIBUTE,
+        PARENT_DISPLAY_SEQUENCE = X_PARENT_DISPLAY_SEQUENCE,
+        SHOW_IN_CUE_CARD        = X_SHOW_IN_CUE_CARD,
+        COPY_ALLOWED_FLAG       = X_COPY_ALLOWED_FLAG,
+        RELATED_AK_ATTRIBUTE    = X_RELATED_AK_ATTRIBUTE,
+        LAST_UPDATE_DATE        = X_LAST_UPDATE_DATE,
+        LAST_UPDATED_BY         = l_excp_user_id,
+        LAST_UPDATE_LOGIN       = 0,
+	ESSENTIAL_SEQ_NUM       = X_ESSENTIAL_SEQ_NUM
+      WHERE OBJECT_ATTRIBUTE  = X_OBJECT_ATTRIBUTE
+        AND CUSTOM_SETUP_ID   = X_CUSTOM_SETUP_ID;
+    end if;
+  end if;
+END LOAD_ROW;
+
+END AMS_CUSTOM_SETUP_ATTR_PKG;
+
+/

@@ -1,0 +1,95 @@
+--------------------------------------------------------
+--  DDL for Package Body GMF_CUSTOMER_SYNC
+--------------------------------------------------------
+
+  CREATE OR REPLACE EDITIONABLE PACKAGE BODY "APPS"."GMF_CUSTOMER_SYNC" AS
+/* $Header: gmfcsynb.pls 120.1 2005/09/08 09:08:19 sschinch noship $ */
+
+PROCEDURE RUN(
+	errbuf 			OUT	NOCOPY VARCHAR2,
+	retcode			OUT	NOCOPY VARCHAR2,
+	pco_code		IN 	VARCHAR2,
+	pcustomer_number	IN	VARCHAR2,
+	psync_all		IN 	VARCHAR2,
+	phot_sync		IN	VARCHAR2)
+IS
+BEGIN
+  null;
+END;
+
+PROCEDURE INSERT_UPDATE_CUSTOMER (
+	r		IN OUT	NOCOPY opm_customers%ROWTYPE) IS
+BEGIN
+ NULL;
+END;
+
+PROCEDURE INSERT_CUSTOMER_SHIPPER (
+	r		IN OUT	NOCOPY opm_customers%ROWTYPE) IS
+BEGIN
+	NULL;
+END;
+
+PROCEDURE INSERT_CUSTOMER_ASSOCIATIONS (
+	r		IN OUT	NOCOPY opm_customers%ROWTYPE) IS
+BEGIN
+ NULL;
+END;
+
+PROCEDURE INSERT_INTERFACE_ROW (
+	r		IN OUT	NOCOPY opm_customers%ROWTYPE) IS
+
+BEGIN
+	NULL;
+END;
+
+PROCEDURE DELETE_INTERFACE_ROW (
+	r		IN OUT	NOCOPY opm_customers%ROWTYPE) IS
+
+BEGIN
+  NULL;
+
+END;
+
+PROCEDURE INSERT_CUSTOMER_CONTACTS(
+	pco_code	IN VARCHAR2,
+	psync_all	IN VARCHAR2,
+	pcustomer_id	IN NUMBER) IS
+BEGIN
+	  NULL;
+END;
+
+PROCEDURE DISPLAY_CUSTOMER_DATA(
+	r               IN OUT  NOCOPY opm_customers%ROWTYPE) IS
+BEGIN
+  NULL;
+END;
+
+PROCEDURE DISPLAY_CONTACT_DATA IS
+BEGIN
+	NULL;
+END;
+
+PROCEDURE PRINT_LINE
+	(line_text	IN	VARCHAR2) IS
+BEGIN
+  NULL;
+END;
+PROCEDURE PRINT
+	(line_text	IN	VARCHAR2) IS
+BEGIN
+	NULL;
+END;
+PROCEDURE INITIALIZE_LABELS IS
+BEGIN
+	NULL;
+END;
+
+PROCEDURE HOT_SYNCHRONIZE(
+	porg_id                 IN      NUMBER,
+	pcustomer_number        IN      VARCHAR2) IS
+BEGIN
+	NULL;
+END;
+END;
+
+/

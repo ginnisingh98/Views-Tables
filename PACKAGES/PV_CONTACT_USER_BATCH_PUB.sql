@@ -1,0 +1,204 @@
+--------------------------------------------------------
+--  DDL for Package PV_CONTACT_USER_BATCH_PUB
+--------------------------------------------------------
+
+  CREATE OR REPLACE EDITIONABLE PACKAGE "APPS"."PV_CONTACT_USER_BATCH_PUB" AUTHID CURRENT_USER AS
+/* $Header: pvxpldcs.pls 120.8 2006/05/12 10:42 dhii noship $ */
+/*#
+ * This public interface can be utilized to insert/update a set of Partner contacts into the PRM application.
+ * As a prerequisite, each contact should already exist as a Person Party in TCA.
+ * The interface can also be used to create user accounts for the Contacts.
+ * @rep:scope public
+ * @rep:product PV
+ * @rep:displayname Import Partner Contacts
+ * @rep:lifecycle active
+ * @rep:compatibility S
+ * @rep:category BUSINESS_ENTITY PV_PARTNER_PROFILE
+ */
+
+G_PKG_NAME CONSTANT VARCHAR2(30):= 'PV_CONTACT_USER_BATCH_PUB';
+G_FILE_NAME CONSTANT VARCHAR2(12) := 'pvxvcnts.pls';
+
+g_commit_size        CONSTANT NUMBER := 50 ;
+
+
+/*-----------------------------------------------------------------------------
+-- Declaration of attribute_details_rec_type
+------------------------------------------------------------------------------*/
+
+ TYPE attribute_details_rec_type IS RECORD
+    (
+        attribute_id		  number,
+	    attr_values_tbl		  PV_ENTY_ATTR_VALUE_PUB.attr_value_tbl_type,
+	    message_data		  varchar2(8000)
+
+    );
+ g_miss_attribute_details_rec    attribute_details_rec_type;
+ TYPE  attr_details_tbl_type  IS TABLE OF attribute_details_rec_type INDEX BY BINARY_INTEGER;
+ g_miss_attr_details_tbl          attr_details_tbl_type;
+
+
+
+/*-----------------------------------------------------------------------------
+-- Declaration of CONTACT_DETAILS_REC_TYPE
+------------------------------------------------------------------------------*/
+
+
+TYPE CONTACT_DETAILS_REC_TYPE IS RECORD(
+	Prtnr_orig_system	     VARCHAR2(30)
+	,Prtnr_orig_system_reference  VARCHAR2(250)
+	,partner_party_id             NUMBER
+	,Cnt_orig_system	      VARCHAR2(30)
+	,Cnt_orig_system_reference    VARCHAR2(250)
+	,person_party_id              NUMBER
+	,Contact_name		     VARCHAR2(360)
+	,location_rec	 	     HZ_LOCATION_V2PUB.LOCATION_REC_TYPE
+	,phone_contact_point_rec     HZ_CONTACT_POINT_V2PUB.CONTACT_POINT_REC_TYPE
+	,business_phone_rec		     HZ_CONTACT_POINT_V2PUB. PHONE_REC_TYPE
+        ,email_contact_point_rec     HZ_CONTACT_POINT_V2PUB.CONTACT_POINT_REC_TYPE
+	,Email_rec		     HZ_CONTACT_POINT_V2PUB. EMAIL_REC_TYPE
+	,User_name		     VARCHAR2(100)
+	,User_type		     VARCHAR2(100)
+	,Password		     VARCHAR2(100)
+	,attribute_details_tbl	     ATTR_DETAILS_TBL_TYPE
+	,update_if_exists	     VARCHAR2(1)
+);
+
+
+/*-----------------------------------------------------------------------------
+-- Declaration of CONTACT_OUTPUT_REC_TYPE
+------------------------------------------------------------------------------*/
+
+TYPE CONTACT_OUTPUT_REC_TYPE IS RECORD(
+	     Prtnr_orig_system		 VARCHAR2(30)
+	    ,Prtnr_orig_system_reference	 VARCHAR2(250)
+	    ,Partner_party_id		 NUMBER
+	    ,Cnt_orig_system		 VARCHAR2(30)
+	    ,Cnt_orig_system_reference	 VARCHAR2(250)
+	    ,Person_party_id		 NUMBER
+	    ,Contact_rel_party_id	 NUMBER
+	    ,user_name                   VARCHAR2(100)
+	    ,password                    VARCHAR2(100)
+	    ,Return_Status		 VARCHAR2(100)
+);
+
+
+TYPE  CONTACT_DETAILS_TBL_TYPE   IS TABLE OF CONTACT_DETAILS_REC_TYPE INDEX BY BINARY_INTEGER;
+TYPE  CONTACT_OUTPUT_TBL_TYPE   IS TABLE OF  CONTACT_OUTPUT_REC_TYPE INDEX BY BINARY_INTEGER;
+TYPE  LOG_MESSAGE_TBL_TYPE IS TABLE OF VARCHAR2(1000) INDEX BY BINARY_INTEGER;
+
+
+
+
+/*#
+* A public API to insert and/or update attribute information of Partner Contacts in the Oracle PRM application.
+* Prior to insert/update, the API performs all the necessary business validations to ensure data integrity.
+* @param p_api_version_number Version of the API
+* @param p_init_msg_list Indicator whether to initialize the message stack
+* @param p_mode A parameter that indicates if the API should be executed in an experimental mode.  A value of "EVALUATION" indicates that the execution is experimental and no changes are committed.  "EXECUTION" indicates that changes are to be committed.
+* @param p_validation_level Indicator of FND validation levels
+* @param x_return_status Status of the program
+* @param x_msg_count Number of the messages returned by the program.
+* @param x_msg_data Return message by the program
+* @param p_contact_details_tbl A table that contains details about the Partner contacts that were processed by the API.
+* @param p_update_if_exists A Boolean parameter to indicate whether or not an update should be performed if a record already exists for the Partner Contact.  True indicates that the record should be updated with the supplied data.
+* @param p_data_block_size A numerical parameter that indicates the number of Partner Contact records to be processed per commit.
+* @param x_contact_output_tbl Table of output records
+* @param x_file_name Path and Name of the log file generated by the API.
+* @rep:displayname Load Contacts
+* @rep:scope public
+* @rep:lifecycle active
+* @rep:compatibility S
+*/
+
+PROCEDURE Load_Contacts (
+     p_api_version_number  IN  NUMBER
+    ,p_init_msg_list      IN  VARCHAR2 := FND_API.G_FALSE
+    ,p_mode               IN  VARCHAR2 := 'EVALUATION'
+    ,p_validation_level   IN  NUMBER   := FND_API.G_VALID_LEVEL_FULL
+    ,x_return_status      OUT NOCOPY  VARCHAR2
+    ,x_msg_data           OUT NOCOPY  VARCHAR2
+    ,x_msg_count          OUT NOCOPY  NUMBER
+    ,p_contact_details_tbl		IN	CONTACT_DETAILS_TBL_TYPE
+    ,p_update_if_exists			IN 	VARCHAR2
+    ,p_data_block_size			IN	NUMBER
+    ,x_contact_output_tbl               OUT NOCOPY    CONTACT_OUTPUT_TBL_TYPE
+    ,x_file_name			OUT NOCOPY	VARCHAR2
+    ) ;
+
+
+
+/*#
+* A public API to create a User account of a specific PRM User Type for a Partner Contact.
+* While creating a User account, a random password is generated if none is supplied.
+* A User account will be created only if delegated user management is supported.
+* @param p_api_version_number Version of the API
+* @param p_init_msg_list Indicator whether to initialize the message stack
+* @param p_commit Indicator whether to commit within the program
+* @param p_validation_level Indicator of FND validation levels
+* @param p_user_name User name to be created
+* @param p_password password for the user
+* @param p_user_type_key User type for the user
+* @param p_contact_rel_id party id of relationship between partner org and person contact
+* @param x_return_status Status of the program
+* @param x_msg_count Number of the messages returned by the program
+* @param x_msg_data Return message by the program
+* @rep:displayname User Create
+* @rep:scope public
+* @rep:lifecycle active
+* @rep:compatibility S
+*/
+
+PROCEDURE user_create (
+     p_api_version_number  IN  NUMBER
+    ,p_init_msg_list      IN  VARCHAR2 := FND_API.G_FALSE
+    ,p_commit             IN  VARCHAR2 := FND_API.G_FALSE
+    ,p_validation_level   IN  NUMBER   := FND_API.G_VALID_LEVEL_FULL
+    ,p_user_name IN VARCHAR2
+    ,p_password IN OUT NOCOPY VARCHAR2
+    ,p_user_type_key IN VARCHAR2
+    ,p_contact_rel_id IN NUMBER
+    ,x_return_status      OUT NOCOPY  VARCHAR2
+    ,x_msg_data           OUT NOCOPY  VARCHAR2
+    ,x_msg_count          OUT NOCOPY  NUMBER
+    );
+
+
+/*#
+* A public API to upgrade an existing Oracle FND user account to a PRM user account.
+* Appropriate PRM permissions are assigned based on the passed user type .
+* @param p_api_version_number Version of the API
+* @param p_init_msg_list Indicator whether to initialize the message stack
+* @param p_commit Indicator whether to commit within the program
+* @param p_validation_level Indicator of FND validation levels
+* @param p_user_name User name to be updated
+* @param p_user_type_key User type for the user
+* @param p_contact_rel_id party id of relationship between partner org and person contact
+* @param x_return_status Status of the program
+* @param x_msg_count Number of the messages returned by the program.
+* @param x_msg_data Return message by the program
+* @rep:displayname User Update
+* @rep:scope public
+* @rep:lifecycle active
+* @rep:compatibility S
+*/
+
+
+PROCEDURE user_update (
+     p_api_version_number  IN  NUMBER
+    ,p_init_msg_list      IN  VARCHAR2 := FND_API.G_FALSE
+    ,p_commit             IN  VARCHAR2 := FND_API.G_FALSE
+    ,p_validation_level   IN  NUMBER   := FND_API.G_VALID_LEVEL_FULL
+    ,p_user_name IN VARCHAR2
+    ,p_user_type_key IN VARCHAR2
+    ,p_contact_rel_id IN NUMBER
+    ,x_return_status      OUT NOCOPY  VARCHAR2
+    ,x_msg_data           OUT NOCOPY  VARCHAR2
+    ,x_msg_count          OUT NOCOPY  NUMBER
+    );
+
+END PV_CONTACT_USER_BATCH_PUB;
+
+ 
+
+/

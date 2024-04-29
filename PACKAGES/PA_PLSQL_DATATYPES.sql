@@ -1,0 +1,122 @@
+--------------------------------------------------------
+--  DDL for Package PA_PLSQL_DATATYPES
+--------------------------------------------------------
+
+  CREATE OR REPLACE EDITIONABLE PACKAGE "APPS"."PA_PLSQL_DATATYPES" AUTHID CURRENT_USER as
+/* $Header: PAICTYPS.pls 120.1.12010000.2 2009/06/23 08:43:58 rthumma ship $ */
+
+TYPE  Char1TabTyp   IS TABLE OF VARCHAR2(1)
+  INDEX BY BINARY_INTEGER;
+
+TYPE  Char2TabTyp   IS TABLE OF VARCHAR2(2)
+  INDEX BY BINARY_INTEGER;
+
+TYPE  Char3TabTyp   IS TABLE OF VARCHAR2(3)
+  INDEX BY BINARY_INTEGER;
+
+TYPE  Char5TabTyp   IS TABLE OF VARCHAR2(5)
+  INDEX BY BINARY_INTEGER;
+
+TYPE  Char10TabTyp  IS TABLE OF VARCHAR2(10)
+  INDEX BY BINARY_INTEGER;
+
+TYPE  Char15TabTyp  IS TABLE OF VARCHAR2(15)
+  INDEX BY BINARY_INTEGER;
+
+TYPE  Char20TabTyp  IS TABLE OF VARCHAR2(20)
+  INDEX BY BINARY_INTEGER;
+
+TYPE  Char25TabTyp  IS TABLE OF VARCHAR2(25)
+  INDEX BY BINARY_INTEGER;
+
+TYPE  Char30TabTyp  IS TABLE OF VARCHAR2(30)
+  INDEX BY BINARY_INTEGER;
+
+TYPE  Char38TabTyp  IS TABLE OF VARCHAR2(38)
+  INDEX BY BINARY_INTEGER;
+
+TYPE  Char50TabTyp  IS TABLE OF VARCHAR2(50)
+  INDEX BY BINARY_INTEGER;
+
+TYPE  Char60TabTyp  IS TABLE OF VARCHAR2(60)
+  INDEX BY BINARY_INTEGER;
+
+TYPE  Char80TabTyp  IS TABLE OF VARCHAR2(80)
+  INDEX BY BINARY_INTEGER;
+
+TYPE  Char100TabTyp  IS TABLE OF VARCHAR2(100)
+  INDEX BY BINARY_INTEGER;
+
+TYPE  Char150TabTyp IS TABLE OF VARCHAR2(150)
+  INDEX BY BINARY_INTEGER;
+
+TYPE  Char240TabTyp IS TABLE OF VARCHAR2(240)
+  INDEX BY BINARY_INTEGER;
+
+TYPE  Char1000TabTyp IS TABLE OF VARCHAR2(1000)
+  INDEX BY BINARY_INTEGER;
+
+TYPE  Char2000TabTyp IS TABLE OF VARCHAR2(2000)
+  INDEX BY BINARY_INTEGER;
+
+TYPE  DateTabTyp    IS TABLE OF DATE
+  INDEX BY BINARY_INTEGER;
+
+TYPE  Char250TabTyp IS TABLE OF VARCHAR2(250)
+  INDEX BY BINARY_INTEGER;
+
+TYPE  IdTabTyp      IS TABLE OF NUMBER
+  INDEX BY BINARY_INTEGER;
+
+TYPE  NumTabTyp     IS TABLE OF NUMBER
+  INDEX BY BINARY_INTEGER;
+
+TYPE  Num15TabTyp     IS TABLE OF NUMBER(15)
+  INDEX BY BINARY_INTEGER;
+
+TYPE NewAmtTabTyp  IS TABLE OF NUMBER
+    INDEX BY BINARY_INTEGER;
+
+/* Modified Precision from 2 to 5 for Bug#3625063 */
+TYPE  QtyTabTyp     IS TABLE OF NUMBER(22,8) --Bug 6854114
+    INDEX BY BINARY_INTEGER;
+
+/* Modified the length from 22 to 30 for Bug#6126964 */
+TYPE  AmtTabTyp     IS TABLE OF NUMBER(30,5)
+    INDEX BY BINARY_INTEGER;
+
+TYPE  RowidTabTyp   IS TABLE OF ROWID
+    INDEX BY BINARY_INTEGER;
+
+-- Define empty tab variables
+
+EmptyNumTab        NumTabTyp;
+EmptyIdTab         IdTabTyp;
+EmptyDateTab       DateTabTyp;
+EmptyChar1Tab      Char1TabTyp;
+EmptyChar2Tab      Char2TabTyp;
+EmptyChar3Tab      Char3TabTyp;
+EmptyChar5Tab      Char5TabTyp;
+EmptyChar10Tab     Char10TabTyp;
+EmptyChar30Tab     Char30TabTyp;
+EmptyChar38Tab     Char38TabTyp;
+EmptyChar15Tab     Char15TabTyp;
+EmptyChar20Tab     Char20TabTyp;
+EmptyChar50Tab     Char50TabTyp;
+EmptyChar60Tab     Char60TabTyp;
+EmptyChar80Tab     Char80TabTyp;
+EmptyChar100Tab    Char100TabTyp;
+EmptyChar150Tab    Char150TabTyp;
+EmptyChar240Tab    Char240TabTyp;
+EmptyChar1000Tab   Char1000TabTyp;
+EmptyChar2000Tab   Char2000TabTyp;
+EmptyRowidTab	   RowidTabTyp;
+EmtpyQtyTab	   QtyTabTyp;
+EmptyNum15Tab      Num15TabTyp;
+EmtpyNumTab        NumTabTyp;
+EmptyAmtTab        AmtTabTyp;
+EmptyNewAmtTab     NewAmtTabTyp;
+
+END PA_PLSQL_DATATYPES;
+
+/

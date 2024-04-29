@@ -1,0 +1,140 @@
+--------------------------------------------------------
+--  DDL for Package AP_RECURRING_INVOICES_PKG
+--------------------------------------------------------
+
+  CREATE OR REPLACE EDITIONABLE PACKAGE "APPS"."AP_RECURRING_INVOICES_PKG" AUTHID CURRENT_USER AS
+/*$Header: aprecins.pls 120.10.12010000.3 2010/12/20 12:24:15 sbonala ship $*/
+
+PROCEDURE ap_create_recurring_invoices(
+    P_batch_name                  IN            VARCHAR2 DEFAULT NULL,
+    P_last_update_date            IN            DATE,
+    P_last_updated_by             IN            NUMBER,
+    P_invoice_currency_code       IN            VARCHAR2,
+    P_payment_currency_code       IN            VARCHAR2,
+    P_invoice_num                 IN            VARCHAR2,
+    P_invoice_amount              IN OUT NOCOPY NUMBER,
+    P_vendor_id                   IN            NUMBER,
+    P_vendor_site_id              IN            NUMBER   Default NULL,
+    P_invoice_date                IN            DATE     Default NULL,
+    P_description                 IN            VARCHAR2 DEFAULT NULL,
+    P_terms_id                    IN            NUMBER   Default NULL,
+    P_pay_group_lookup_code       IN            VARCHAR2 DEFAULT NULL,
+    P_set_of_books_id             IN            NUMBER,
+    P_accts_pay_ccid              IN            NUMBER   Default NULL,
+    P_payment_cross_rate          IN            NUMBER,
+    P_exchange_date               IN            DATE     Default NULL,
+    P_exchange_rate_type          IN            VARCHAR2 DEFAULT NULL,
+    P_exchange_rate               IN            NUMBER   Default NULL,
+    P_invoice_base_amount         IN            NUMBER   Default NULL,
+    P_base_currency_code          IN            VARCHAR2 DEFAULT NULL,
+    P_recurring_payment_id        IN            NUMBER   Default NULL,
+    P_doc_sequence_id             IN            NUMBER   Default NULL,
+    P_doc_sequence_value          IN            NUMBER   Default NULL,
+    P_doc_category_code           IN            VARCHAR2 DEFAULT NULL,
+    P_exclusive_payment_flag      IN            VARCHAR2 DEFAULT NULL,
+    P_awt_group_id                IN            NUMBER   Default NULL,
+    P_pay_awt_group_id            IN            NUMBER   Default NULL,--bug6639866
+    P_distribution_set_id         IN            NUMBER   Default NULL,
+    P_accounting_date             IN            DATE,
+    P_po_shipment_id              IN            NUMBER   Default NULL,
+    P_batch_control_flag          IN            VARCHAR2 DEFAULT NULL,
+    P_multi_currency_flag         IN            VARCHAR2 Default NULL,
+    P_po_match_flag               IN            VARCHAR2 Default NULL,
+ -- Removed for bug 4277744
+ -- P_ussgl_txn_code              IN            VARCHAR2 Default NULL,
+    P_attribute1                  IN            VARCHAR2 DEFAULT NULL,
+    P_attribute2                  IN            VARCHAR2 DEFAULT NULL,
+    P_attribute3                  IN            VARCHAR2 Default NULL,
+    P_attribute4                  IN            VARCHAR2 DEFAULT NULL,
+    P_attribute5                  IN            VARCHAR2 DEFAULT NULL,
+    P_attribute6                  IN            VARCHAR2 DEFAULT NULL,
+    P_attribute7                  IN            VARCHAR2 DEFAULT NULL,
+    P_attribute8                  IN            VARCHAR2 DEFAULT NULL,
+    P_attribute9                  IN            VARCHAR2 DEFAULT NULL,
+    P_attribute10                 IN            VARCHAR2 DEFAULT NULL,
+    P_attribute11                 IN            VARCHAR2 DEFAULT NULL,
+    P_attribute12                 IN            VARCHAR2 DEFAULT NULL,
+    P_attribute13                 IN            VARCHAR2 DEFAULT NULL,
+    P_attribute14                 IN            VARCHAR2 DEFAULT NULL,
+    P_attribute15                 IN            VARCHAR2 DEFAULT NULL,
+    P_attribute_category          IN            VARCHAR2 DEFAULT NULL,
+    P_calling_sequence            IN            VARCHAR2 DEFAULT NULL,
+    P_invoice_id                  OUT NOCOPY NUMBER,
+    P_Org_Id                      IN  NUMBER Default mo_global.get_current_org_id,
+    P_Requester_Id                IN            NUMBER Default NULL,
+    P_Po_Release_Id               IN            NUMBER DEFAULT NULL,
+    P_Item_Description            IN            VARCHAR2 DEFAULT NULL,
+    P_Manufacturer                IN            VARCHAR2 DEFAULT NULL,
+    P_Model_Number                IN            VARCHAR2 DEFAULT NULL,
+    P_Tax_Control_Amount	  IN		NUMBER   DEFAULT NULL,
+    P_Trx_Business_Category	  IN		VARCHAR2 DEFAULT NULL,
+    P_User_Defined_Fisc_Class	  IN	  	VARCHAR2 DEFAULT NULL,
+    P_Taxation_Country		  IN		VARCHAR2 DEFAULT NULL,
+    P_Primary_Intended_Use	  IN		VARCHAR2 DEFAULT NULL,
+    P_Product_Fisc_Classification IN		VARCHAR2 DEFAULT NULL,
+    P_Tax_Amount		  IN		NUMBER   DEFAULT NULL,
+    P_Tax_Amt_Exclusive		  IN		VARCHAR2 DEFAULT NULL,
+    P_Legal_Entity_Id		  IN		NUMBER   DEFAULT NULL,
+    p_PAYMENT_METHOD_CODE          in            varchar2 default null,
+    p_PAYMENT_REASON_CODE          in            varchar2 default null,
+    p_remittance_message1          in            varchar2 default null,
+    p_remittance_message2          in            varchar2 default null,
+    p_remittance_message3          in            varchar2 default null,
+    p_bank_charge_bearer           in            varchar2 default null,
+    p_settlement_priority          in            varchar2 default null,
+    p_payment_reason_comments      in            varchar2 default null,
+    p_delivery_channel_code        in            varchar2 default null,
+    p_external_bank_account_id     in            number default null,
+    p_party_id			   in		 number default null,
+    p_party_site_id		   in		 number default null,
+    /* bug 4931755. Exclude Tax From Discount */
+    p_disc_is_inv_less_tax_flag    in            varchar2 default null,
+    p_exclude_freight_from_disc    in            varchar2 default null,
+    p_tax_classification_code	   in		 varchar2 default null,
+    P_REMIT_TO_SUPPLIER_NAME         VARCHAR2 DEFAULT NULL,
+    P_REMIT_TO_SUPPLIER_ID           NUMBER DEFAULT NULL,
+    P_REMIT_TO_SUPPLIER_SITE         VARCHAR2 DEFAULT NULL,
+    P_REMIT_TO_SUPPLIER_SITE_ID      NUMBER DEFAULT NULL,
+    P_RELATIONSHIP_ID                NUMBER DEFAULT NULL,
+    P_PRODUCT_TYPE		     VARCHAR2 DEFAULT NULL,   --Bug#8640313
+    P_PRODUCT_CATEGORY		     VARCHAR2 DEFAULT NULL);  --Bug#8640313
+
+PROCEDURE ap_get_next_period(
+    P_period_type         IN            VARCHAR2,
+    P_current_period_name IN            VARCHAR2,
+    P_next_period_name       OUT NOCOPY VARCHAR2,
+    P_next_period_num        OUT NOCOPY NUMBER,
+    P_next_period_year       OUT NOCOPY NUMBER,
+    P_calling_sequence    IN            VARCHAR2);
+
+PROCEDURE ap_get_next_payment(
+    P_next_period_name            IN            VARCHAR2,
+    P_special_period_name1        IN            VARCHAR2,
+    P_special_payment_amount1     IN            NUMBER,
+    P_special_period_name2        IN            VARCHAR2,
+    P_special_payment_amount2     IN            NUMBER,
+    P_increment_percent           IN            NUMBER,
+    P_currency_code               IN            VARCHAR2,
+    P_current_amount              IN            NUMBER,
+    P_next_amount                    OUT NOCOPY NUMBER,
+    P_next_amount_exclude_special    OUT NOCOPY NUMBER,
+    P_calling_sequence            IN            VARCHAR2);
+
+PROCEDURE ap_get_first_amount(
+    P_first_period_name         IN            VARCHAR2,
+    P_special_period_name1      IN            VARCHAR2,
+    P_special_payment_amount1   IN            NUMBER,
+    P_special_period_name2      IN            VARCHAR2,
+    P_special_payment_amount2   IN            NUMBER,
+    P_number_of_regular_periods IN            NUMBER,
+    P_amount_source_flag        IN            VARCHAR2,
+    P_increment_percent         IN            NUMBER,
+    P_currency_code             IN            VARCHAR2,
+    P_first_amount              IN OUT NOCOPY NUMBER,
+    P_control_total             IN OUT NOCOPY NUMBER,
+    P_calling_sequence          IN            VARCHAR2);
+
+
+END AP_RECURRING_INVOICES_PKG;
+
+/

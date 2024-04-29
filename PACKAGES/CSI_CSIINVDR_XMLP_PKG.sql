@@ -1,0 +1,25 @@
+--------------------------------------------------------
+--  DDL for Package CSI_CSIINVDR_XMLP_PKG
+--------------------------------------------------------
+
+  CREATE OR REPLACE EDITIONABLE PACKAGE "APPS"."CSI_CSIINVDR_XMLP_PKG" AUTHID CURRENT_USER AS
+/* $Header: CSIINVDRS.pls 120.0 2007/12/24 13:00:13 nchinnam noship $ */
+  P_CONC_REQUEST_ID NUMBER;
+
+  CP_REPORT_NAME VARCHAR2(100) := 'IB - INV Discrepancy Report';
+
+  CP_COMPANY_NAME VARCHAR2(102) := 'Vision Operations';
+
+  FUNCTION BEFOREREPORT RETURN BOOLEAN;
+
+  FUNCTION AFTERREPORT RETURN BOOLEAN;
+
+  FUNCTION CP_REPORT_NAME_P RETURN VARCHAR2;
+
+  FUNCTION CP_COMPANY_NAME_P RETURN VARCHAR2;
+
+END CSI_CSIINVDR_XMLP_PKG;
+
+
+
+/

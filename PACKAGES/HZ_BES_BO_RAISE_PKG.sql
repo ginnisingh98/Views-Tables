@@ -1,0 +1,49 @@
+--------------------------------------------------------
+--  DDL for Package HZ_BES_BO_RAISE_PKG
+--------------------------------------------------------
+
+  CREATE OR REPLACE EDITIONABLE PACKAGE "APPS"."HZ_BES_BO_RAISE_PKG" AUTHID CURRENT_USER AS
+/*$Header: ARHBESRS.pls 120.0 2005/08/31 21:54:11 smattegu noship $ */
+
+-- Purpose: This is the main package that holds the conc program etc., code
+-- for TCA business events.
+--
+-- Global variables
+
+-- To hold the HZ_EXECUTE_API_CALLOUTS profile value
+   G_PROF_VAL  VARCHAR2(30)	;
+
+--  TO hold the object version numbers of the business objects
+G_ORG_BO_VER      HZ_BUS_OBJ_DEFINITIONS.BO_VERSION_NUMBER%TYPE;
+G_PER_BO_VER      HZ_BUS_OBJ_DEFINITIONS.BO_VERSION_NUMBER%TYPE;
+G_ORG_CUST_BO_VER HZ_BUS_OBJ_DEFINITIONS.BO_VERSION_NUMBER%TYPE;
+G_PER_CUST_BO_VER HZ_BUS_OBJ_DEFINITIONS.BO_VERSION_NUMBER%TYPE;
+
+-- to hold the object lookup codes that must be processed.
+G_PER_BO_CODE CONSTANT HZ_BUS_OBJ_DEFINITIONS.BUSINESS_OBJECT_CODE%TYPE := 'PERSON';
+G_ORG_BO_CODE CONSTANT HZ_BUS_OBJ_DEFINITIONS.BUSINESS_OBJECT_CODE%TYPE := 'ORG';
+G_PER_CUST_BO_CODE CONSTANT HZ_BUS_OBJ_DEFINITIONS.BUSINESS_OBJECT_CODE%TYPE := 'PERSON_CUST';
+G_ORG_CUST_BO_CODE CONSTANT HZ_BUS_OBJ_DEFINITIONS.BUSINESS_OBJECT_CODE%TYPE := 'ORG_CUST';
+
+
+-- to hold the enabled BOs
+G_ORG_BO      BOOLEAN;
+G_PER_BO      BOOLEAN;
+G_ORG_CUST_BO BOOLEAN;
+G_PER_CUST_BO BOOLEAN;
+
+-- defining the collections to hold the data from BOT table
+TYPE DATE_TBLTYPE         IS TABLE OF DATE         INDEX BY PLS_INTEGER;
+TYPE NUMBER_TBLTYPE       IS TABLE OF NUMBER       INDEX BY PLS_INTEGER;
+TYPE VCHAR2_30_TBLTYPE    IS TABLE OF VARCHAR2(30) INDEX BY PLS_INTEGER;
+TYPE VCHAR2_1_TBLTYPE    IS TABLE OF VARCHAR2(1) INDEX BY PLS_INTEGER;
+
+PROCEDURE bes_main (
+   errbuf     OUT NOCOPY    VARCHAR2,
+   retcode    OUT NOCOPY    VARCHAR2);
+
+END HZ_BES_BO_RAISE_PKG; -- Package spec
+
+ 
+
+/

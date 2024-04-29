@@ -1,0 +1,110 @@
+--------------------------------------------------------
+--  DDL for Package EAM_ATTR_ASSIGN_PVT
+--------------------------------------------------------
+
+  CREATE OR REPLACE EDITIONABLE PACKAGE "APPS"."EAM_ATTR_ASSIGN_PVT" AUTHID CURRENT_USER as
+/* $Header: EAMVATAS.pls 115.5 2003/10/23 23:27:16 sraval ship $ */
+ -- Start of comments
+ -- API name    : EAM_ATTR_ASSIGN_PVT
+ -- Type     : Private
+ -- Function :
+ -- Pre-reqs : None.
+ -- Parameters  :
+ -- IN       P_API_VERSION                 IN NUMBER       REQUIRED
+ --          P_INIT_MSG_LIST               IN VARCHAR2     OPTIONAL
+ --             DEFAULT = FND_API.G_FALSE
+ --          P_COMMIT                      IN VARCHAR2     OPTIONAL
+ --             DEFAULT = FND_API.G_FALSE
+ --          P_VALIDATION_LEVEL            IN NUMBER       OPTIONAL
+ --             DEFAULT = FND_API.G_VALID_LEVEL_FULL
+ --          P_ROWID                       IN OUT VARCHAR2 REQUIRED
+ --          P_ATTRIBUTE_ASSOCIATION_ID    IN  NUMBER      REQUIRED
+ --          P_APPLICATION_ID              IN  NUMBER      REQUIRED
+ --          P_FLEXFIELD_NAME  IN  VARCHAR2(40)  REQUIRED
+ --          P_FLEX_CONTEXT_CODE IN VARCHAR2(30) REQUIRED
+ --          P_ORGANIZATION_ID             IN  NUMBER      REQUIRED
+ --          P_INVENTORY_ITEM_ID           IN  NUMBER      REQUIRED
+ --          P_ENABLED_FLAG                IN  VARCHAR2(1) REQUIRED
+ --          P_LAST_UPDATE_DATE            IN  DATE        REQUIRED
+ --          P_LAST_UPDATED_BY             IN  NUMBER      REQUIRED
+ --          P_CREATION_DATE               IN  DATE        REQUIRED
+ --          P_CREATED_BY                  IN  NUMBER      REQUIRED
+ --          P_LAST_UPDATE_LOGIN           IN  NUMBER      REQUIRED
+ --          P_REQUEST_ID                  IN  NUMBER DEFAULT NULL OPTIONAL
+ --          P_PROGRAM_APPLICATION_ID      IN  NUMBER DEFAULT NULL OPTIONAL
+ --          P_PROGRAM_ID                  IN  NUMBER DEFAULT NULL OPTIONAL
+ --          P_PROGRAM_UPDATE_DATE         IN  DATE DEFAULT NULL
+ -- OUT      X_RETURN_STATUS               OUT VARCHAR2(1)
+ --          X_MSG_COUNT                   OUT NUMBER
+ --          X_MSG_DATA                    OUT VARCHAR2(2000)
+ --
+ -- Version  Current version 115.0
+ --
+ -- Notes    : Note text
+ --
+ -- End of comments
+
+
+PROCEDURE INSERT_ROW(
+  P_API_VERSION IN NUMBER,
+  P_INIT_MSG_LIST IN VARCHAR2 := FND_API.G_FALSE,
+  P_COMMIT IN VARCHAR2 := FND_API.G_FALSE,
+  P_VALIDATION_LEVEL IN NUMBER := FND_API.G_VALID_LEVEL_FULL,
+  P_ROWID                         IN OUT NOCOPY VARCHAR2,
+  P_ATTRIBUTE_ASSOCIATION_ID      IN OUT NOCOPY NUMBER,
+  P_APPLICATION_ID                NUMBER,
+  P_FLEXFIELD_NAME                VARCHAR2,
+  P_FLEX_CONTEXT_CODE             VARCHAR2,
+  P_ORGANIZATION_ID               NUMBER,
+  P_INVENTORY_ITEM_ID             NUMBER,
+  P_ENABLED_FLAG                  VARCHAR2,
+  P_LAST_UPDATE_DATE              DATE,
+  P_LAST_UPDATED_BY               NUMBER,
+  P_CREATION_DATE                 DATE,
+  P_CREATED_BY                    NUMBER,
+  P_LAST_UPDATE_LOGIN             NUMBER,
+  P_CREATION_ORGANIZATION_ID	  NUMBER,
+  X_RETURN_STATUS OUT NOCOPY VARCHAR2,
+  X_MSG_COUNT OUT NOCOPY NUMBER,
+  X_MSG_DATA OUT NOCOPY VARCHAR2);
+
+
+
+PROCEDURE LOCK_ROW(
+  P_API_VERSION IN NUMBER,
+  P_INIT_MSG_LIST IN VARCHAR2 := FND_API.G_FALSE,
+  P_COMMIT IN VARCHAR2 := FND_API.G_FALSE,
+  P_VALIDATION_LEVEL IN NUMBER := FND_API.G_VALID_LEVEL_FULL,
+  P_ROWID                           VARCHAR2,
+  P_ATTRIBUTE_ASSOCIATION_ID      IN OUT NOCOPY NUMBER,
+  P_APPLICATION_ID                NUMBER,
+  P_FLEXFIELD_NAME                VARCHAR2,
+  P_FLEX_CONTEXT_CODE             VARCHAR2,
+  P_ORGANIZATION_ID               NUMBER,
+  P_INVENTORY_ITEM_ID             NUMBER,
+  P_ENABLED_FLAG                  VARCHAR2,
+  X_RETURN_STATUS OUT NOCOPY VARCHAR2,
+  X_MSG_COUNT OUT NOCOPY NUMBER,
+  X_MSG_DATA OUT NOCOPY VARCHAR2);
+
+
+PROCEDURE UPDATE_ROW(
+  P_API_VERSION IN NUMBER,
+  P_INIT_MSG_LIST IN VARCHAR2 := FND_API.G_FALSE,
+  P_COMMIT IN VARCHAR2 := FND_API.G_FALSE,
+  P_VALIDATION_LEVEL IN NUMBER := FND_API.G_VALID_LEVEL_FULL,
+  P_ROWID                         VARCHAR2,
+  P_ENABLED_FLAG                  VARCHAR2,
+  P_LAST_UPDATE_DATE              DATE,
+  P_LAST_UPDATED_BY               NUMBER,
+  P_LAST_UPDATE_LOGIN             NUMBER,
+  X_RETURN_STATUS OUT NOCOPY VARCHAR2,
+  X_MSG_COUNT OUT NOCOPY NUMBER,
+  X_MSG_DATA OUT NOCOPY VARCHAR2);
+
+
+END EAM_ATTR_ASSIGN_PVT;
+
+ 
+
+/

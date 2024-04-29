@@ -1,0 +1,1206 @@
+--------------------------------------------------------
+--  DDL for Package Body JL_JLARPPFF_XMLP_PKG
+--------------------------------------------------------
+
+  CREATE OR REPLACE EDITIONABLE PACKAGE BODY "APPS"."JL_JLARPPFF_XMLP_PKG" AS
+/* $Header: JLARPPFFB.pls 120.2 2008/01/11 07:52:01 abraghun noship $ */
+  PROCEDURE GET_BASE_CURR_DATA IS
+    BASE_CURR AP_SYSTEM_PARAMETERS.BASE_CURRENCY_CODE%TYPE;
+    PREC FND_CURRENCIES.PRECISION%TYPE;
+    MIN_AU FND_CURRENCIES.MINIMUM_ACCOUNTABLE_UNIT%TYPE;
+    DESCR FND_CURRENCIES.DESCRIPTION%TYPE;
+    ORG_NAME GL_SETS_OF_BOOKS.NAME%TYPE;
+  BEGIN
+    BASE_CURR := '';
+    PREC := 0;
+    MIN_AU := 0;
+    DESCR := '';
+    ORG_NAME := '';
+    SELECT
+      FCURR.CURRENCY_CODE,
+      FCURR.PRECISION,
+      FCURR.MINIMUM_ACCOUNTABLE_UNIT,
+      FCURR.DESCRIPTION,
+      GSBKS.NAME
+    INTO BASE_CURR,PREC,MIN_AU,DESCR,ORG_NAME
+    FROM
+      AR_SYSTEM_PARAMETERS ASP,
+      FND_CURRENCIES_VL FCURR,
+      GL_SETS_OF_BOOKS GSBKS
+    WHERE ASP.SET_OF_BOOKS_ID = GSBKS.SET_OF_BOOKS_ID
+      AND GSBKS.CURRENCY_CODE = FCURR.CURRENCY_CODE;
+  EXCEPTION
+    WHEN NO_DATA_FOUND THEN
+      NULL;
+    WHEN OTHERS THEN
+      C_BASE_CURRENCY_CODE := BASE_CURR;
+      C_BASE_PRECISION := PREC;
+      C_BASE_MIN_ACCT_UNIT := MIN_AU;
+      C_BASE_DESCRIPTION := DESCR;
+  END GET_BASE_CURR_DATA;
+
+  FUNCTION CUSTOM_INIT RETURN BOOLEAN IS
+  BEGIN
+    RETURN (TRUE);
+    RETURN NULL;
+  EXCEPTION
+    WHEN OTHERS THEN
+      RETURN (FALSE);
+  END CUSTOM_INIT;
+
+  FUNCTION AFTERREPORT RETURN BOOLEAN IS
+  BEGIN
+    BEGIN
+      ZX_EXTRACT_PKG.PURGE(P_CONC_REQUEST_ID);
+    EXCEPTION
+      WHEN OTHERS THEN
+        NULL;
+    END;
+    /*SRW.USER_EXIT('FND SRWEXIT')*/NULL;
+    RETURN (TRUE);
+  EXCEPTION
+    WHEN OTHERS THEN
+      /*RAISE SRW.PROGRAM_ABORT*/RAISE_APPLICATION_ERROR(-20101,null);
+  END AFTERREPORT;
+
+  FUNCTION FORMAT_CURRENCY(P_AMOUNT IN NUMBER) RETURN VARCHAR2 IS
+    FORMAT_STRING VARCHAR2(16);
+    FORMATED_AMOUNT VARCHAR2(15);
+  BEGIN
+    FORMAT_STRING := RPAD('0.'
+                         ,4
+                         ,'0');
+    FORMAT_STRING := LPAD(FORMAT_STRING
+                         ,16
+                         ,'0');
+    FORMATED_AMOUNT := LPAD(REPLACE(LTRIM(RTRIM(TO_CHAR(ABS(P_AMOUNT)
+                                                       ,FORMAT_STRING)))
+                                   ,'.'
+                                   ,'')
+                           ,15
+                           ,'0');
+    RETURN (FORMATED_AMOUNT);
+  EXCEPTION
+    WHEN OTHERS THEN
+      FORMATED_AMOUNT := LPAD(REPLACE(TO_CHAR(ABS(ROUND(P_AMOUNT
+                                                       ,2)))
+                                     ,'.'
+                                     ,'')
+                             ,15
+                             ,'0');
+      RETURN FORMATED_AMOUNT;
+  END FORMAT_CURRENCY;
+
+  FUNCTION CF_TOT_DOC_FFORMULA(CS_TOT_DOC_AMT IN NUMBER) RETURN VARCHAR2 IS
+    L_CHAR_OPERATION_AMT VARCHAR2(15);
+  BEGIN
+    L_CHAR_OPERATION_AMT := FORMAT_CURRENCY(CS_TOT_DOC_AMT);
+    RETURN (L_CHAR_OPERATION_AMT);
+  EXCEPTION
+    WHEN OTHERS THEN
+      RETURN ('000000000000000');
+  END CF_TOT_DOC_FFORMULA;
+
+  FUNCTION CF_TOT_NON_TAXABLE_AMTFORMULA(CS_NON_TAXABLE_AMT IN NUMBER) RETURN VARCHAR2 IS
+    L_CHAR_NON_TAXABLE_AMT VARCHAR2(15);
+  BEGIN
+    L_CHAR_NON_TAXABLE_AMT := FORMAT_CURRENCY(CS_NON_TAXABLE_AMT);
+    RETURN (L_CHAR_NON_TAXABLE_AMT);
+  EXCEPTION
+    WHEN OTHERS THEN
+      RETURN ('000000000000000');
+  END CF_TOT_NON_TAXABLE_AMTFORMULA;
+
+  FUNCTION CF_TOT_TAXABLE_AMTFORMULA(CS_TAXABLE_AMT IN NUMBER) RETURN CHAR IS
+    L_CHAR_TAXABLE_AMT VARCHAR2(15);
+  BEGIN
+    L_CHAR_TAXABLE_AMT := FORMAT_CURRENCY(CS_TAXABLE_AMT);
+    RETURN (L_CHAR_TAXABLE_AMT);
+  EXCEPTION
+    WHEN OTHERS THEN
+      RETURN ('000000000000000');
+  END CF_TOT_TAXABLE_AMTFORMULA;
+
+  FUNCTION CF_TOT_VAT_TAX_AMTFORMULA(CS_VAT_TAX_AMT IN NUMBER) RETURN VARCHAR2 IS
+    L_VAT_TAX_AMT VARCHAR2(15);
+  BEGIN
+    L_VAT_TAX_AMT := FORMAT_CURRENCY(CS_VAT_TAX_AMT);
+    RETURN (L_VAT_TAX_AMT);
+  EXCEPTION
+    WHEN OTHERS THEN
+      RETURN ('000000000000000');
+  END CF_TOT_VAT_TAX_AMTFORMULA;
+
+  FUNCTION CF_TOT_VAT_PER_AMTFORMULA(CS_VAT_PER_AMT IN NUMBER) RETURN VARCHAR2 IS
+    L_CHAR_VAT_PER_AMT VARCHAR2(15);
+  BEGIN
+    L_CHAR_VAT_PER_AMT := FORMAT_CURRENCY(CS_VAT_PER_AMT);
+    RETURN (L_CHAR_VAT_PER_AMT);
+  EXCEPTION
+    WHEN OTHERS THEN
+      RETURN ('000000000000000');
+  END CF_TOT_VAT_PER_AMTFORMULA;
+
+  FUNCTION CF_TOT_PRO_PER_AMTFORMULA(CS_PRO_PER_AMT IN NUMBER) RETURN CHAR IS
+    L_CHAR_PRO_PER_AMT VARCHAR2(15);
+  BEGIN
+    L_CHAR_PRO_PER_AMT := FORMAT_CURRENCY(CS_PRO_PER_AMT);
+    RETURN (L_CHAR_PRO_PER_AMT);
+  EXCEPTION
+    WHEN OTHERS THEN
+      RETURN ('000000000000000');
+  END CF_TOT_PRO_PER_AMTFORMULA;
+
+  FUNCTION CF_TOT_EXMPT_AMTFORMULA(CS_EXMPT_AMT IN NUMBER) RETURN VARCHAR2 IS
+    L_CHAR_EXMPT_AMT VARCHAR2(15);
+  BEGIN
+    L_CHAR_EXMPT_AMT := FORMAT_CURRENCY(CS_EXMPT_AMT);
+    RETURN (L_CHAR_EXMPT_AMT);
+  EXCEPTION
+    WHEN OTHERS THEN
+      RETURN ('000000000000000');
+  END CF_TOT_EXMPT_AMTFORMULA;
+
+  FUNCTION CF_TOT_MUN_PER_AMTFORMULA(CS_MUN_PER_AMT IN NUMBER) RETURN VARCHAR2 IS
+    L_CHAR_MUN_PER_AMT VARCHAR2(15);
+  BEGIN
+    L_CHAR_MUN_PER_AMT := FORMAT_CURRENCY(CS_MUN_PER_AMT);
+    RETURN (L_CHAR_MUN_PER_AMT);
+  EXCEPTION
+    WHEN OTHERS THEN
+      RETURN ('000000000000000');
+  END CF_TOT_MUN_PER_AMTFORMULA;
+
+  FUNCTION CF_TOT_EXC_AMTFORMULA(CS_EXC_AMT IN NUMBER) RETURN VARCHAR2 IS
+    L_CHAR_EXC_AMT VARCHAR2(15);
+  BEGIN
+    L_CHAR_EXC_AMT := FORMAT_CURRENCY(CS_EXC_AMT);
+    RETURN (L_CHAR_EXC_AMT);
+  EXCEPTION
+    WHEN OTHERS THEN
+      RETURN ('000000000000000');
+  END CF_TOT_EXC_AMTFORMULA;
+
+  FUNCTION CF_REC_TYPE_2FORMULA(CF_TOT_REC IN NUMBER
+                               ,CF_TOT_DOC_F IN VARCHAR2
+                               ,CF_TOT_NON_TAXABLE_AMT IN VARCHAR2
+                               ,CF_TOT_TAXABLE_AMT IN VARCHAR2
+                               ,CF_TOT_VAT_TAX_AMT IN VARCHAR2
+                               ,CF_TOT_EXMPT_AMT IN VARCHAR2
+                               ,CF_TOT_VAT_PER_AMT IN VARCHAR2
+                               ,CF_TOT_FED_PER_AMT IN VARCHAR2
+                               ,CF_TOT_PRO_PER_AMT IN VARCHAR2
+                               ,CF_TOT_MUN_PER_AMT IN VARCHAR2
+                               ,CF_TOT_EXC_AMT IN VARCHAR2) RETURN VARCHAR2 IS
+    L_REC_TYPE_2 VARCHAR2(369);
+  BEGIN
+    RETURN (RPAD('2' || TO_CHAR(P_GL_DATE_FROM
+                       ,'YYYYMM') || RPAD(' '
+                    ,10
+                    ,' ') || LPAD(TO_CHAR(CF_TOT_REC)
+                    ,12
+                    ,'0') || RPAD(' '
+                    ,31
+                    ,' ') || CP_COMP_TAX_ID || RPAD(' '
+                    ,30
+                    ,' ') || CF_TOT_DOC_F || CF_TOT_NON_TAXABLE_AMT || CF_TOT_TAXABLE_AMT || RPAD(' '
+                    ,4
+                    ,' ') || CF_TOT_VAT_TAX_AMT || CF_TOT_EXMPT_AMT || CF_TOT_VAT_PER_AMT || CF_TOT_FED_PER_AMT || CF_TOT_PRO_PER_AMT ||
+		    CF_TOT_MUN_PER_AMT || CF_TOT_EXC_AMT
+               ,369
+               ,' '));
+  END CF_REC_TYPE_2FORMULA;
+
+  FUNCTION CF_BLANK_SUMFORMULA RETURN CHAR IS
+  BEGIN
+    RETURN (' ');
+  END CF_BLANK_SUMFORMULA;
+
+  FUNCTION CF_TOT_DOC_AMT_NUMFORMULA(STATUS IN VARCHAR2
+                                    ,DOC_AMT_NON1 IN NUMBER) RETURN NUMBER IS
+    L_TOT_DOC_AMT NUMBER;
+  BEGIN
+    L_TOT_DOC_AMT := 0;
+    BEGIN
+      IF STATUS <> 'CANCELLED' THEN
+        L_TOT_DOC_AMT := DOC_AMT_NON1;
+      END IF;
+    END;
+    RETURN (L_TOT_DOC_AMT);
+  END CF_TOT_DOC_AMT_NUMFORMULA;
+
+  FUNCTION CF_EXMPT_AMT_NUMFORMULA(STATUS IN VARCHAR2
+                                  ,EXMPT_AMT IN NUMBER) RETURN NUMBER IS
+    L_EXMPT_AMOUNT NUMBER;
+  BEGIN
+    L_EXMPT_AMOUNT := 0;
+    IF STATUS <> 'CANCELLED' THEN
+      L_EXMPT_AMOUNT := EXMPT_AMT;
+    END IF;
+    BEGIN
+      /*SRW.MESSAGE('01'
+                 ,'Exempt Amt :' || TO_CHAR(L_EXMPT_AMOUNT))*/NULL;
+    EXCEPTION
+      WHEN OTHERS THEN
+        L_EXMPT_AMOUNT := 0;
+    END;
+    RETURN (L_EXMPT_AMOUNT);
+  END CF_EXMPT_AMT_NUMFORMULA;
+
+  FUNCTION CF_TAXABLE_AMT_NUMFORMULA(STATUS IN VARCHAR2
+                                    ,TAXABLE_AMT IN NUMBER) RETURN NUMBER IS
+    L_TAXABLE_AMT NUMBER;
+  BEGIN
+    L_TAXABLE_AMT := 0;
+    BEGIN
+      IF STATUS <> 'CANCELLED' THEN
+        L_TAXABLE_AMT := TAXABLE_AMT;
+        /*SRW.MESSAGE('01'
+                   ,'Taxable Amount :' || TO_CHAR(L_TAXABLE_AMT))*/NULL;
+      END IF;
+    EXCEPTION
+      WHEN OTHERS THEN
+        L_TAXABLE_AMT := 0;
+    END;
+    RETURN (L_TAXABLE_AMT);
+  END CF_TAXABLE_AMT_NUMFORMULA;
+
+  FUNCTION CF_VAT_PER_AMT_NUMFORMULA(STATUS IN VARCHAR2
+                                    ,VAT_PER_AMT IN NUMBER) RETURN NUMBER IS
+    L_VAT_PER_AMOUNT NUMBER;
+  BEGIN
+    L_VAT_PER_AMOUNT := 0;
+    BEGIN
+      IF STATUS <> 'CANCELLED' THEN
+        L_VAT_PER_AMOUNT := VAT_PER_AMT;
+      END IF;
+    EXCEPTION
+      WHEN OTHERS THEN
+        L_VAT_PER_AMOUNT := 0;
+    END;
+    RETURN (L_VAT_PER_AMOUNT);
+  END CF_VAT_PER_AMT_NUMFORMULA;
+
+  FUNCTION CF_PRO_PER_AMT_NUMFORMULA(STATUS IN VARCHAR2
+                                    ,PRO_AMT IN NUMBER) RETURN NUMBER IS
+    L_PRO_PER_AMT NUMBER;
+  BEGIN
+    L_PRO_PER_AMT := 0;
+    BEGIN
+      IF STATUS <> 'CANCELLED' THEN
+        L_PRO_PER_AMT := PRO_AMT;
+      END IF;
+      /*SRW.MESSAGE('01'
+                 ,'Pro Perception Amt :' || TO_CHAR(L_PRO_PER_AMT))*/NULL;
+    EXCEPTION
+      WHEN OTHERS THEN
+        L_PRO_PER_AMT := 0;
+    END;
+    RETURN (L_PRO_PER_AMT);
+  END CF_PRO_PER_AMT_NUMFORMULA;
+
+  FUNCTION CF_MUN_PER_AMT_NUMFORMULA(STATUS IN VARCHAR2
+                                    ,MUN_AMT1 IN NUMBER) RETURN NUMBER IS
+    L_MUN_PER_AMT NUMBER;
+  BEGIN
+    L_MUN_PER_AMT := 0;
+    BEGIN
+      IF STATUS <> 'CANCELLED' THEN
+        L_MUN_PER_AMT := MUN_AMT1;
+      END IF;
+    EXCEPTION
+      WHEN OTHERS THEN
+        L_MUN_PER_AMT := 0;
+    END;
+    RETURN (L_MUN_PER_AMT);
+  END CF_MUN_PER_AMT_NUMFORMULA;
+
+  FUNCTION CF_EXC_AMT_NUMFORMULA(STATUS IN VARCHAR2
+                                ,EXCS_AMT IN NUMBER) RETURN NUMBER IS
+    L_EXC_AMT NUMBER;
+  BEGIN
+    L_EXC_AMT := 0;
+    BEGIN
+      IF STATUS <> 'CANCELLED' THEN
+        L_EXC_AMT := EXCS_AMT;
+      END IF;
+    EXCEPTION
+      WHEN OTHERS THEN
+        L_EXC_AMT := 0;
+    END;
+    RETURN (L_EXC_AMT);
+  END CF_EXC_AMT_NUMFORMULA;
+
+  FUNCTION CF_TOT_DOC_AMTFORMULA(CF_TOT_DOC_AMT_NUM IN NUMBER) RETURN VARCHAR2 IS
+    L_CHAR_OPERATION_AMT VARCHAR2(15);
+  BEGIN
+    L_CHAR_OPERATION_AMT := FORMAT_CURRENCY(CF_TOT_DOC_AMT_NUM);
+    RETURN (L_CHAR_OPERATION_AMT);
+  END CF_TOT_DOC_AMTFORMULA;
+
+  FUNCTION CF_TAXABLE_AMTFORMULA(CF_TAXABLE_AMT_NUM IN NUMBER) RETURN VARCHAR2 IS
+    L_CHAR_TAXABLE_AMT VARCHAR2(15);
+  BEGIN
+    L_CHAR_TAXABLE_AMT := FORMAT_CURRENCY(CF_TAXABLE_AMT_NUM);
+    RETURN (L_CHAR_TAXABLE_AMT);
+  END CF_TAXABLE_AMTFORMULA;
+
+  FUNCTION CF_VAT_TAX_AMT_NUMFORMULA(STATUS IN VARCHAR2
+                                    ,VAT_TAX_AMT1 IN NUMBER) RETURN NUMBER IS
+  BEGIN
+    IF STATUS <> 'CANCELLED' THEN
+      RETURN (VAT_TAX_AMT1);
+    ELSE
+      RETURN (0);
+    END IF;
+  END CF_VAT_TAX_AMT_NUMFORMULA;
+
+  FUNCTION CF_VAT_TAX_AMTFORMULA(CF_VAT_TAX_AMT_NUM IN NUMBER) RETURN VARCHAR2 IS
+    L_VAT_TAX_AMT VARCHAR2(15);
+  BEGIN
+    L_VAT_TAX_AMT := FORMAT_CURRENCY(CF_VAT_TAX_AMT_NUM);
+    RETURN (L_VAT_TAX_AMT);
+  END CF_VAT_TAX_AMTFORMULA;
+
+  FUNCTION CF_EXMPT_AMTFORMULA(CF_EXMPT_AMT_NUM IN NUMBER) RETURN VARCHAR2 IS
+    L_CHAR_EXMPT_AMT VARCHAR2(15);
+  BEGIN
+    L_CHAR_EXMPT_AMT := FORMAT_CURRENCY(CF_EXMPT_AMT_NUM);
+    RETURN (L_CHAR_EXMPT_AMT);
+  END CF_EXMPT_AMTFORMULA;
+
+  FUNCTION CF_FED_PER_AMTFORMULA(CF_VAT_PER_AMT_NUM IN NUMBER) RETURN VARCHAR2 IS
+    L_CHAR_VAT_PER_AMT VARCHAR2(15);
+  BEGIN
+    L_CHAR_VAT_PER_AMT := FORMAT_CURRENCY(CF_VAT_PER_AMT_NUM);
+    RETURN (L_CHAR_VAT_PER_AMT);
+  END CF_FED_PER_AMTFORMULA;
+
+  FUNCTION CF_PRO_PER_AMTFORMULA(CF_PRO_PER_AMT_NUM IN NUMBER) RETURN VARCHAR2 IS
+    L_CHAR_PRO_PER_AMT VARCHAR2(15);
+  BEGIN
+    L_CHAR_PRO_PER_AMT := FORMAT_CURRENCY(CF_PRO_PER_AMT_NUM);
+    RETURN (L_CHAR_PRO_PER_AMT);
+  END CF_PRO_PER_AMTFORMULA;
+
+  FUNCTION CF_MUN_PER_AMTFORMULA(CF_MUN_PER_AMT_NUM IN NUMBER) RETURN VARCHAR2 IS
+    L_CHAR_MUN_PER_AMT VARCHAR2(15);
+  BEGIN
+    L_CHAR_MUN_PER_AMT := FORMAT_CURRENCY(CF_MUN_PER_AMT_NUM);
+    RETURN (L_CHAR_MUN_PER_AMT);
+  END CF_MUN_PER_AMTFORMULA;
+
+  FUNCTION CF_VAT_RATEFORMULA(TAX_RATE IN NUMBER) RETURN VARCHAR2 IS
+    L_RATE_CHAR VARCHAR2(4);
+    FORMAT_STRING VARCHAR2(5);
+    FORMATED_RATE VARCHAR2(4);
+  BEGIN
+    FORMAT_STRING := RPAD('0.'
+                         ,4
+                         ,'0');
+    FORMAT_STRING := LPAD(FORMAT_STRING
+                         ,5
+                         ,'0');
+    FORMATED_RATE := LPAD(REPLACE(LTRIM(RTRIM(TO_CHAR(ABS(TAX_RATE)
+                                                     ,FORMAT_STRING)))
+                                 ,'.'
+                                 ,'')
+                         ,4
+                         ,'0');
+    RETURN (FORMATED_RATE);
+  EXCEPTION
+    WHEN OTHERS THEN
+      FORMATED_RATE := LPAD(REPLACE(TO_CHAR(ABS(ROUND(TAX_RATE
+                                                     ,2)))
+                                   ,'.'
+                                   ,'')
+                           ,4
+                           ,'0');
+      RETURN (FORMATED_RATE);
+  END CF_VAT_RATEFORMULA;
+
+  FUNCTION CF_VAT_RATE_QTYFORMULA(TRX_ID IN NUMBER) RETURN VARCHAR2 IS
+    L_VAT_RATE_QTY NUMBER;
+  BEGIN
+    L_VAT_RATE_QTY := 1;
+    BEGIN
+      SELECT
+        COUNT(DET.TAX_RATE_ID)
+      INTO L_VAT_RATE_QTY
+      FROM
+        ZX_REP_TRX_DETAIL_T DET
+      WHERE DET.TRX_ID = CF_VAT_RATE_QTYFORMULA.TRX_ID
+        AND DET.TAX_TYPE_CODE in ( P_VAT_TAX_TYPE , P_NON_TAXABLE_TAX_TYPE );
+    EXCEPTION
+      WHEN OTHERS THEN
+        L_VAT_RATE_QTY := 1;
+    END;
+    RETURN (TO_CHAR(L_VAT_RATE_QTY));
+  END CF_VAT_RATE_QTYFORMULA;
+
+  FUNCTION CF_BLANK_CHRFORMULA RETURN VARCHAR2 IS
+  BEGIN
+    RETURN (' ');
+  END CF_BLANK_CHRFORMULA;
+
+  FUNCTION CF_REC_TYPE1FORMULA(NON_TAXABLE_AMOUNT1 IN NUMBER
+                              ,CF_REC_COUNT IN NUMBER
+                              ,STATUS IN VARCHAR2
+                              ,DOC_DATE1 IN VARCHAR2
+                              ,DGI_DOC_TYPE_CODE1 IN VARCHAR2
+                              ,FISC_PRN1 IN VARCHAR2
+                              ,CF_POINT_OF_SALE IN VARCHAR2
+                              ,CF_DOC_NUM IN VARCHAR2
+                              ,CUST_ISSUE_DTL1 IN VARCHAR2
+                              ,CF_CUST_NUM_VALDIGIT IN VARCHAR2
+                              ,SUPPLIER_DTL1 IN VARCHAR2
+                              ,CAI_INFO1 IN VARCHAR2
+                              ,TAX_RATE IN NUMBER
+                              ,CF_TOT_DOC_AMT IN VARCHAR2
+                              ,CF_EXMPT_AMT IN VARCHAR2
+                              ,CF_VAT_PER_AMT IN VARCHAR2
+                              ,CF_FED_PER_AMT IN VARCHAR2
+                              ,CF_PRO_PER_AMT IN VARCHAR2
+                              ,CF_MUN_PER_AMT IN VARCHAR2
+                              ,CF_EXC_AMT IN VARCHAR2
+                              ,SUP_VAT_REGN_STATUS_CODE1 IN VARCHAR2
+                              ,CURRENCY_CODE1 IN VARCHAR2
+                              ,CF_EXCHANGE_RATE IN VARCHAR2
+                              ,CF_VAT_RATE_QTY IN VARCHAR2
+                              ,DGI_TRANSACTION_CODE IN VARCHAR2
+                              ,CF_TAXABLE_AMT IN VARCHAR2
+                              ,CF_VAT_RATE IN VARCHAR2
+                              ,CF_VAT_TAX_AMT IN VARCHAR2
+                              ,CF_VAT_COUNT IN NUMBER
+                              ,CF_DOC_AMT_CHR IN VARCHAR2
+                              ,CF_NON_AMT_CHR IN VARCHAR2
+                              ,CF_RATE_QTY IN VARCHAR2
+                              ,CF_DGI_TRAN_CODE IN VARCHAR2) RETURN VARCHAR2 IS
+    L_REC_TYPE_1 VARCHAR2(369);
+  BEGIN
+    IF NVL(NON_TAXABLE_AMOUNT1
+       ,0) = 0 THEN
+      IF CF_REC_COUNT = CP_REC_COUNT THEN
+        BEGIN
+          IF STATUS = 'Y' THEN
+            L_REC_TYPE_1 := RPAD('1' || DOC_DATE1 || DGI_DOC_TYPE_CODE1 || FISC_PRN1 || CF_POINT_OF_SALE || CF_DOC_NUM || CUST_ISSUE_DTL1 ||
+	    CF_CUST_NUM_VALDIGIT || SUPPLIER_DTL1 || '000000000000000' || '000000000000000' || '000000000000000' || '0000' || '000000000000000' ||
+	    '000000000000000' || '000000000000000' || '000000000000000' || '000000000000000' || '000000000000000' || '000000000000000' || '00' || '   ' || '0000000000' || '0' || ' ' || CAI_INFO1
+                                ,369
+                                ,' ');
+          ELSE
+            BEGIN
+              IF TAX_RATE = 0 THEN
+                L_REC_TYPE_1 := RPAD('1' || DOC_DATE1 || DGI_DOC_TYPE_CODE1 || FISC_PRN1 || CF_POINT_OF_SALE || CF_DOC_NUM || CUST_ISSUE_DTL1 || CF_CUST_NUM_VALDIGIT || SUPPLIER_DTL1 || CF_TOT_DOC_AMT || '000000000000000' ||
+		'000000000000000' || '0000' || '000000000000000' || CF_EXMPT_AMT || CF_VAT_PER_AMT || CF_FED_PER_AMT || CF_PRO_PER_AMT || CF_MUN_PER_AMT || CF_EXC_AMT || SUP_VAT_REGN_STATUS_CODE1 || CURRENCY_CODE1
+		|| CF_EXCHANGE_RATE || CF_VAT_RATE_QTY || DGI_TRANSACTION_CODE || CAI_INFO1
+                                    ,369
+                                    ,' ');
+              ELSE
+                L_REC_TYPE_1 := RPAD('1' || DOC_DATE1 || DGI_DOC_TYPE_CODE1 || FISC_PRN1 || CF_POINT_OF_SALE || CF_DOC_NUM || CUST_ISSUE_DTL1 || CF_CUST_NUM_VALDIGIT || SUPPLIER_DTL1 || CF_TOT_DOC_AMT || '000000000000000' ||
+		CF_TAXABLE_AMT || CF_VAT_RATE || CF_VAT_TAX_AMT || '000000000000000' || CF_VAT_PER_AMT || CF_FED_PER_AMT || CF_PRO_PER_AMT || CF_MUN_PER_AMT || CF_EXC_AMT || SUP_VAT_REGN_STATUS_CODE1 || CURRENCY_CODE1
+		|| CF_EXCHANGE_RATE || CF_VAT_RATE_QTY || DGI_TRANSACTION_CODE || CAI_INFO1
+                                    ,369
+                                    ,' ');
+              END IF;
+            END;
+          END IF;
+          CP_TOT_REC := NVL(CP_TOT_REC
+                           ,0) + 1;
+          CP_REC_COUNT := 1;
+        END;
+      ELSE
+        BEGIN
+          IF STATUS = 'Y' THEN
+            L_REC_TYPE_1 := RPAD('1' || DOC_DATE1 || DGI_DOC_TYPE_CODE1 || FISC_PRN1 || CF_POINT_OF_SALE || CF_DOC_NUM || CUST_ISSUE_DTL1 || CF_CUST_NUM_VALDIGIT || SUPPLIER_DTL1 || '000000000000000' || '000000000000000' ||
+	    '000000000000000' || '0000' || '000000000000000' || '000000000000000' || '000000000000000' || '000000000000000' || '000000000000000' || '000000000000000' || '000000000000000' || '00' || '   ' || '0000000000' ||
+	    '0' || ' ' || CAI_INFO1
+                                ,369
+                                ,' ');
+          ELSE
+            BEGIN
+              IF TAX_RATE = 0 THEN
+                L_REC_TYPE_1 := RPAD('1' || DOC_DATE1 || DGI_DOC_TYPE_CODE1 || FISC_PRN1 || CF_POINT_OF_SALE || CF_DOC_NUM || CUST_ISSUE_DTL1 ||
+		CF_CUST_NUM_VALDIGIT || SUPPLIER_DTL1 || '000000000000000' || '000000000000000' || '000000000000000' || '0000' || '000000000000000'
+		|| CF_EXMPT_AMT || '000000000000000' || '000000000000000' || '000000000000000' || '000000000000000' || '000000000000000' ||
+		SUP_VAT_REGN_STATUS_CODE1 || CURRENCY_CODE1 || CF_EXCHANGE_RATE || CF_VAT_RATE_QTY || DGI_TRANSACTION_CODE || CAI_INFO1
+                                    ,369
+                                    ,' ');
+              ELSE
+                L_REC_TYPE_1 := RPAD('1' || DOC_DATE1 || DGI_DOC_TYPE_CODE1 || FISC_PRN1 || CF_POINT_OF_SALE || CF_DOC_NUM || CUST_ISSUE_DTL1 ||
+		CF_CUST_NUM_VALDIGIT || SUPPLIER_DTL1 || '000000000000000' || '000000000000000' || CF_TAXABLE_AMT || CF_VAT_RATE || CF_VAT_TAX_AMT ||
+		'000000000000000' || '000000000000000' || '000000000000000' || '000000000000000' || '000000000000000' || '000000000000000' ||
+		SUP_VAT_REGN_STATUS_CODE1 || CURRENCY_CODE1 || CF_EXCHANGE_RATE || CF_VAT_RATE_QTY || DGI_TRANSACTION_CODE || CAI_INFO1
+                                    ,369
+                                    ,' ');
+              END IF;
+            END;
+          END IF;
+          CP_REC_COUNT := NVL(CP_REC_COUNT
+                             ,1) + 1;
+          CP_TOT_REC := NVL(CP_TOT_REC
+                           ,0) + 1;
+        END;
+      END IF;
+    ELSE
+      IF STATUS = 'Y' THEN
+        L_REC_TYPE_1 := '1' || DOC_DATE1 || DGI_DOC_TYPE_CODE1 || FISC_PRN1 || CF_POINT_OF_SALE || CF_DOC_NUM || CUST_ISSUE_DTL1 ||
+	CF_CUST_NUM_VALDIGIT || SUPPLIER_DTL1 || '000000000000000' || '000000000000000' || '000000000000000' || '0000' || '000000000000000' ||
+	'000000000000000' || '000000000000000' || '000000000000000' || '000000000000000' || '000000000000000' || '000000000000000' || '00' ||
+	'   ' || '0000000000' || '0' || ' ' || CAI_INFO1 || RPAD(' '
+                            ,75);
+      ELSE
+        BEGIN
+          IF CF_VAT_COUNT = 0 THEN
+            L_REC_TYPE_1 := '1' || DOC_DATE1 || DGI_DOC_TYPE_CODE1 || FISC_PRN1 || CF_POINT_OF_SALE || CF_DOC_NUM || CUST_ISSUE_DTL1 ||
+	    CF_CUST_NUM_VALDIGIT || SUPPLIER_DTL1 || CF_DOC_AMT_CHR || CF_NON_AMT_CHR || '000000000000000' || '0000' || '000000000000000' ||
+	    '000000000000000' || '000000000000000' || '000000000000000' || '000000000000000' || '000000000000000' || '000000000000000' ||
+	    SUP_VAT_REGN_STATUS_CODE1 || CURRENCY_CODE1 || CF_EXCHANGE_RATE || CF_RATE_QTY || CF_DGI_TRAN_CODE || CAI_INFO1 || RPAD(' '
+                                ,75);
+          ELSE
+            L_REC_TYPE_1 := '1' || DOC_DATE1 || DGI_DOC_TYPE_CODE1 || FISC_PRN1 || CF_POINT_OF_SALE || CF_DOC_NUM || CUST_ISSUE_DTL1 ||
+	    CF_CUST_NUM_VALDIGIT || SUPPLIER_DTL1 || '000000000000000' || CF_NON_AMT_CHR || '000000000000000' || '0000' || '000000000000000' ||
+	    '000000000000000' || '000000000000000' || '000000000000000' || '000000000000000' || '000000000000000' || '000000000000000' ||
+	    SUP_VAT_REGN_STATUS_CODE1 || CURRENCY_CODE1 || CF_EXCHANGE_RATE || CF_RATE_QTY || CF_DGI_TRAN_CODE || CAI_INFO1 || RPAD(' '
+                                ,75);
+          END IF;
+        END;
+      END IF;
+      CP_NON_COUNT := NVL(CP_NON_COUNT
+                         ,0) + 1;
+    END IF;
+    RETURN (L_REC_TYPE_1);
+  END CF_REC_TYPE1FORMULA;
+
+  FUNCTION CF_EXC_AMTFORMULA(CF_EXC_AMT_NUM IN NUMBER) RETURN CHAR IS
+    L_CHAR_EXC_AMT VARCHAR2(15);
+  BEGIN
+    L_CHAR_EXC_AMT := FORMAT_CURRENCY(CF_EXC_AMT_NUM);
+    RETURN (L_CHAR_EXC_AMT);
+  END CF_EXC_AMTFORMULA;
+
+  FUNCTION BEFOREREPORT RETURN BOOLEAN IS
+    L_TAX_ID VARCHAR2(11);
+  BEGIN
+    P_CONC_REQUEST_ID := FND_GLOBAL.CONC_REQUEST_ID;
+    /*SRW.USER_EXIT('FND SRWINIT')*/NULL;
+    BEGIN
+      P_LOCATION_ID := JG_ZZ_COMPANY_INFO.GET_LOCATION_ID;
+    EXCEPTION
+      WHEN OTHERS THEN
+        /*SRW.MESSAGE(02
+                   ,'ERROR unknown Location ID')*/NULL;
+        RAISE;
+    END;
+    BEGIN
+      SELECT
+        RPAD(DECODE(HR.GLOBAL_ATTRIBUTE11
+                   ,NULL
+                   ,'           '
+                   ,SUBSTR(HR.GLOBAL_ATTRIBUTE11
+                         ,1
+                         ,10) || SUBSTR(HR.GLOBAL_ATTRIBUTE12
+                         ,1
+                         ,1))
+            ,11
+            ,' ')
+      INTO L_TAX_ID
+      FROM
+        HR_LOCATIONS_ALL HR
+      WHERE HR.LOCATION_ID = P_LOCATION_ID;
+    EXCEPTION
+      WHEN OTHERS THEN
+        L_TAX_ID := '           ';
+    END;
+    CP_COMP_TAX_ID := L_TAX_ID;
+    IF POPULATE_TRL <> TRUE THEN
+      NULL;
+    END IF;
+    RETURN (TRUE);
+  END BEFOREREPORT;
+
+  FUNCTION CF_REC_COUNTFORMULA RETURN NUMBER IS
+    L_COUNT NUMBER;
+  BEGIN
+    L_COUNT := 1;
+    RETURN (L_COUNT);
+  END CF_REC_COUNTFORMULA;
+
+  FUNCTION CF_TOT_RECFORMULA RETURN NUMBER IS
+    L_TOT NUMBER;
+  BEGIN
+    L_TOT := NVL(CP_TOT_REC
+                ,0) + NVL(CP_NON_COUNT
+                ,0);
+    RETURN (L_TOT);
+  END CF_TOT_RECFORMULA;
+
+  FUNCTION CF_VAT_AMTFORMULA(STATUS IN VARCHAR2
+                            ,VAT_TAX_AMT1 IN NUMBER) RETURN NUMBER IS
+    L_VAT_AMT NUMBER;
+  BEGIN
+    L_VAT_AMT := 0;
+    IF STATUS <> 'CANCELLED' THEN
+      L_VAT_AMT := VAT_TAX_AMT1;
+    END IF;
+    RETURN (L_VAT_AMT);
+  END CF_VAT_AMTFORMULA;
+
+  FUNCTION CF_FED_PER_AMT_NUMFORMULA0004(STATUS IN VARCHAR2
+                                        ,FED_PER_AMT IN NUMBER) RETURN NUMBER IS
+    L_FED_PER_AMOUNT NUMBER;
+  BEGIN
+    L_FED_PER_AMOUNT := 0;
+    BEGIN
+      IF STATUS <> 'CANCELLED' THEN
+        L_FED_PER_AMOUNT := FED_PER_AMT;
+      ELSE
+        L_FED_PER_AMOUNT := 0;
+      END IF;
+    EXCEPTION
+      WHEN OTHERS THEN
+        L_FED_PER_AMOUNT := 0;
+    END;
+    RETURN (L_FED_PER_AMOUNT);
+  END CF_FED_PER_AMT_NUMFORMULA0004;
+
+  FUNCTION CF_FED_PER_AMTFORMULA0006(CF_FED_PER_AMT_NUM IN NUMBER) RETURN CHAR IS
+    L_CHAR_FED_PER_AMT VARCHAR2(15);
+  BEGIN
+    L_CHAR_FED_PER_AMT := FORMAT_CURRENCY(CF_FED_PER_AMT_NUM);
+    RETURN (L_CHAR_FED_PER_AMT);
+  END CF_FED_PER_AMTFORMULA0006;
+
+  FUNCTION CF_TOT_FED_PER_AMTFORMULA(CS_FED_PER_AMOUNT IN NUMBER) RETURN CHAR IS
+    L_CHAR_FED_PER_AMT VARCHAR2(15);
+  BEGIN
+    L_CHAR_FED_PER_AMT := FORMAT_CURRENCY(CS_FED_PER_AMOUNT);
+    RETURN (L_CHAR_FED_PER_AMT);
+  EXCEPTION
+    WHEN OTHERS THEN
+      RETURN ('000000000000000');
+  END CF_TOT_FED_PER_AMTFORMULA;
+
+  FUNCTION POPULATE_TRL RETURN BOOLEAN IS
+  BEGIN
+    /*SRW.MESSAGE('01'
+               ,'Call to TRL API : zx_extract_pkg.populate_tax_data')*/NULL;
+    ZX_EXTRACT_PKG.POPULATE_TAX_DATA(P_REPORTING_LEVEL => P_REPORTING_LEVEL
+                                    ,P_REPORTING_CONTEXT => P_REPORTING_ENTITY_ID
+                                    ,P_LEGAL_ENTITY_ID => P_LEGAL_ENTITY_ID
+                                    ,P_SUMMARY_LEVEL => 'TRANSACTION_LINE'
+                                    ,P_LEDGER_ID => P_SET_OF_BOOKS_ID
+                                    ,P_REGISTER_TYPE => 'TAX'
+                                    ,P_PRODUCT => 'AP'
+                                    ,P_MATRIX_REPORT => 'N'
+                                    ,P_CURRENCY_CODE_LOW => NULL
+                                    ,P_CURRENCY_CODE_HIGH => NULL
+                                    ,P_INCLUDE_AP_STD_TRX_CLASS => 'Y'
+                                    ,P_INCLUDE_AP_DM_TRX_CLASS => 'Y'
+                                    ,P_INCLUDE_AP_CM_TRX_CLASS => 'Y'
+                                    ,P_INCLUDE_AP_PREP_TRX_CLASS => 'Y'
+                                    ,P_INCLUDE_AP_MIX_TRX_CLASS => 'N'
+                                    ,P_INCLUDE_AP_EXP_TRX_CLASS => 'N'
+                                    ,P_INCLUDE_AP_INT_TRX_CLASS => 'N'
+                                    ,P_INCLUDE_AR_INV_TRX_CLASS => 'N'
+                                    ,P_INCLUDE_AR_APPL_TRX_CLASS => 'N'
+                                    ,P_INCLUDE_AR_ADJ_TRX_CLASS => 'N'
+                                    ,P_INCLUDE_AR_MISC_TRX_CLASS => 'N'
+                                    ,P_INCLUDE_AR_BR_TRX_CLASS => 'N'
+                                    ,P_INCLUDE_GL_MANUAL_LINES => 'N'
+                                    ,P_TRX_NUMBER_LOW => NULL
+                                    ,P_TRX_NUMBER_HIGH => NULL
+                                    ,P_EXTRACT_REPORT_LINE_NUMBER => NULL
+                                    ,P_AR_TRX_PRINTING_STATUS => NULL
+                                    ,P_AR_EXEMPTION_STATUS => NULL
+                                    ,P_GL_DATE_LOW => P_GL_DATE_FROM
+                                    ,P_GL_DATE_HIGH => P_GL_DATE_TO
+                                    ,P_TRX_DATE_LOW => NULL
+                                    ,P_TRX_DATE_HIGH => NULL
+                                    ,P_ACCOUNTING_STATUS => 'ACCOUNTED'
+                                    ,P_GL_PERIOD_NAME_LOW => NULL
+                                    ,P_GL_PERIOD_NAME_HIGH => NULL
+                                    ,P_TRX_DATE_PERIOD_NAME_LOW => NULL
+                                    ,P_TRX_DATE_PERIOD_NAME_HIGH => NULL
+                                    ,P_TAX_REGIME_CODE => NULL
+                                    ,P_TAX => NULL
+                                    ,P_TAX_STATUS_CODE => NULL
+                                    ,P_TAX_RATE_CODE_LOW => NULL
+                                    ,P_TAX_RATE_CODE_HIGH => NULL
+                                    ,P_TAX_TYPE_CODE_LOW => NULL
+                                    ,P_TAX_TYPE_CODE_HIGH => NULL
+                                    ,P_DOCUMENT_SUB_TYPE => NULL
+                                    ,P_TRX_BUSINESS_CATEGORY => NULL
+                                    ,P_TAX_INVOICE_DATE_LOW => NULL
+                                    ,P_TAX_INVOICE_DATE_HIGH => NULL
+                                    ,P_POSTING_STATUS => NULL
+                                    ,P_EXTRACT_ACCTED_TAX_LINES => NULL
+                                    ,P_INCLUDE_ACCOUNTING_SEGMENTS => NULL
+                                    ,P_BALANCING_SEGMENT_LOW => NULL
+                                    ,P_BALANCING_SEGMENT_HIGH => NULL
+                                    ,P_INCLUDE_DISCOUNTS => NULL
+                                    ,P_EXTRACT_STARTING_LINE_NUM => NULL
+                                    ,P_REQUEST_ID => P_CONC_REQUEST_ID
+                                    ,P_REPORT_NAME => 'JLARPPFF'
+                                    ,P_VAT_TRANSACTION_TYPE_CODE => NULL
+                                    ,P_INCLUDE_FULLY_NR_TAX_FLAG => 'Y'
+                                    ,P_MUNICIPAL_TAX_TYPE_CODE_LOW => P_MUN_TAX_TYPE_FROM
+                                    ,P_MUNICIPAL_TAX_TYPE_CODE_HIGH => P_MUN_TAX_TYPE_TO
+                                    ,P_PROV_TAX_TYPE_CODE_LOW => P_PRO_TAX_TYPE_FROM
+                                    ,P_PROV_TAX_TYPE_CODE_HIGH => P_PRO_TAX_TYPE_TO
+                                    ,P_EXCISE_TAX_TYPE_CODE_LOW => P_EXC_TAX_TYPE_FROM
+                                    ,P_EXCISE_TAX_TYPE_CODE_HIGH => P_EXC_TAX_TYPE_TO
+                                    ,P_NON_TAXABLE_TAX_TYPE_CODE => P_NON_TAXABLE_TAX_TYPE
+                                    ,P_PER_TAX_TYPE_CODE_LOW => P_PER_TAX_TYPE_FROM
+                                    ,P_PER_TAX_TYPE_CODE_HIGH => P_PER_TAX_TYPE_TO
+                                    ,P_VAT_TAX_TYPE_CODE => P_VAT_TAX_TYPE
+                                    ,P_EXCISE_TAX => NULL
+                                    ,P_VAT_ADDITIONAL_TAX => NULL
+                                    ,P_VAT_NON_TAXABLE_TAX => NULL
+                                    ,P_VAT_NOT_TAX => NULL
+                                    ,P_VAT_PERCEPTION_TAX => NULL
+                                    ,P_VAT_TAX => NULL
+                                    ,P_INC_SELF_WD_TAX => NULL
+                                    ,P_EXCLUDING_TRX_LETTER => P_EXCLUDED_TRX_LETTER
+                                    ,P_TRX_LETTER_LOW => NULL
+                                    ,P_TRX_LETTER_HIGH => NULL
+                                    ,P_INCLUDE_REFERENCED_SOURCE => NULL
+                                    ,P_PARTY_NAME => NULL
+                                    ,P_BATCH_NAME => NULL
+                                    ,P_BATCH_DATE_LOW => NULL
+                                    ,P_BATCH_DATE_HIGH => NULL
+                                    ,P_BATCH_SOURCE_ID => NULL
+                                    ,P_ADJUSTED_DOC_FROM => NULL
+                                    ,P_ADJUSTED_DOC_TO => NULL
+                                    ,P_STANDARD_VAT_TAX_RATE => NULL
+                                    ,P_MUNICIPAL_TAX => NULL
+                                    ,P_PROVINCIAL_TAX => NULL
+                                    ,P_TAX_ACCOUNT_LOW => NULL
+                                    ,P_TAX_ACCOUNT_HIGH => NULL
+                                    ,P_EXP_CERT_DATE_FROM => NULL
+                                    ,P_EXP_CERT_DATE_TO => NULL
+                                    ,P_EXP_METHOD => NULL
+                                    ,P_PRINT_COMPANY_INFO => 'Y'
+                                    ,P_REPRINT => 'N'
+                                    ,P_ERRBUF => P_ERRBUF
+                                    ,P_RETCODE => P_RETCODE);
+    IF P_RETCODE <> 0 THEN
+      /*SRW.MESSAGE('100'
+                 ,'TRL: Return Code : ' || P_RETCODE)*/NULL;
+      /*SRW.MESSAGE('101'
+                 ,'TRL: Error Buffer : ' || P_ERRBUF)*/NULL;
+      RETURN (FALSE);
+    ELSE
+      RETURN (TRUE);
+    END IF;
+  EXCEPTION
+    WHEN OTHERS THEN
+      /*SRW.MESSAGE('102'
+                 ,SQLERRM)*/NULL;
+      RETURN (FALSE);
+  END POPULATE_TRL;
+
+  FUNCTION CF_DOC_AMT_NONFORMULA(STATUS IN VARCHAR2
+                                ,DOC_AMT_NON1 IN NUMBER) RETURN NUMBER IS
+    L_TOT_DOC_AMT NUMBER;
+  BEGIN
+    L_TOT_DOC_AMT := 0;
+    BEGIN
+      IF STATUS <> 'CANCELLED' THEN
+        L_TOT_DOC_AMT := DOC_AMT_NON1;
+      END IF;
+    EXCEPTION
+      WHEN OTHERS THEN
+        L_TOT_DOC_AMT := 0;
+    END;
+    RETURN (L_TOT_DOC_AMT);
+  END CF_DOC_AMT_NONFORMULA;
+
+  FUNCTION CF_DOC_AMT_CHRFORMULA(CF_DOC_AMT_NON IN NUMBER) RETURN VARCHAR2 IS
+    L_NON_TAXABLE VARCHAR2(15);
+  BEGIN
+    L_NON_TAXABLE := FORMAT_CURRENCY(CF_DOC_AMT_NON);
+    RETURN (L_NON_TAXABLE);
+  END CF_DOC_AMT_CHRFORMULA;
+
+  FUNCTION CF_NON_BLANKFORMULA RETURN CHAR IS
+  BEGIN
+    RETURN (' ');
+  END CF_NON_BLANKFORMULA;
+
+  FUNCTION CF_NON_AMT_CHRFORMULA(NON_TAXABLE_AMOUNT1 IN NUMBER) RETURN CHAR IS
+    L_CHAR_NON_AMT VARCHAR2(15);
+  BEGIN
+    L_CHAR_NON_AMT := FORMAT_CURRENCY(NON_TAXABLE_AMOUNT1);
+    RETURN (L_CHAR_NON_AMT);
+  EXCEPTION
+    WHEN OTHERS THEN
+      RETURN ('000000000000000');
+  END CF_NON_AMT_CHRFORMULA;
+
+  FUNCTION CF_DGI_TRAN_CODEFORMULA(INVOICE_ID IN VARCHAR2) RETURN VARCHAR2 IS
+    L_DGI_CODE VARCHAR2(1);
+  BEGIN
+    L_DGI_CODE := ' ';
+    BEGIN
+      SELECT
+        NVL(SUBSTR(ATC.GLOBAL_ATTRIBUTE4
+                  ,1
+                  ,1)
+           ,' ')
+      INTO L_DGI_CODE
+      FROM
+        AP_TAX_CODES ATC,
+        AP_INVOICE_DISTRIBUTIONS AID
+      WHERE AID.INVOICE_ID = CF_DGI_TRAN_CODEFORMULA.INVOICE_ID
+        AND AID.LINE_TYPE_LOOKUP_CODE = 'TAX'
+        AND AID.TAX_CODE_ID = ATC.TAX_ID
+        AND ATC.TAX_TYPE = P_NON_TAXABLE_TAX_TYPE
+        AND ROWNUM = 1;
+    EXCEPTION
+      WHEN OTHERS THEN
+        L_DGI_CODE := ' ';
+    END;
+    RETURN (L_DGI_CODE);
+  END CF_DGI_TRAN_CODEFORMULA;
+
+  FUNCTION CF_VAT_COUNTFORMULA(INVOICE_ID IN VARCHAR2) RETURN NUMBER IS
+    L_COUNT NUMBER;
+  BEGIN
+    L_COUNT := 0;
+    BEGIN
+      SELECT
+        count(ATC.TAX_RATE)
+      INTO L_COUNT
+      FROM
+        AP_INVOICE_DISTRIBUTIONS LINES,
+        AP_TAX_CODES ATC
+      WHERE LINES.TAX_CODE_ID = ATC.TAX_ID
+        AND LINES.INVOICE_ID = CF_VAT_COUNTFORMULA.INVOICE_ID
+        AND ATC.TAX_TYPE = P_VAT_TAX_TYPE
+        AND LINES.LINE_TYPE_LOOKUP_CODE = 'TAX';
+    EXCEPTION
+      WHEN OTHERS THEN
+        L_COUNT := 0;
+    END;
+    RETURN (L_COUNT);
+  END CF_VAT_COUNTFORMULA;
+
+  FUNCTION CF_RATE_QTYFORMULA(INVOICE_ID IN VARCHAR2) RETURN VARCHAR2 IS
+    L_VAT_RATE_QTY NUMBER;
+  BEGIN
+    L_VAT_RATE_QTY := 1;
+    BEGIN
+      SELECT
+        COUNT(ATC.TAX_ID)
+      INTO L_VAT_RATE_QTY
+      FROM
+        AP_TAX_CODES ATC,
+        AP_INVOICE_DISTRIBUTIONS AID
+      WHERE AID.INVOICE_ID = CF_RATE_QTYFORMULA.INVOICE_ID
+        AND ATC.TAX_ID = AID.TAX_CODE_ID
+        AND AID.LINE_TYPE_LOOKUP_CODE = 'TAX'
+        AND ATC.TAX_TYPE in ( P_VAT_TAX_TYPE , P_NON_TAXABLE_TAX_TYPE );
+    EXCEPTION
+      WHEN OTHERS THEN
+        L_VAT_RATE_QTY := 1;
+    END;
+    RETURN (TO_CHAR(L_VAT_RATE_QTY));
+  END CF_RATE_QTYFORMULA;
+
+  FUNCTION CF_EXEMPT_AMOUNTFORMULA(EXMPT_AMT IN NUMBER) RETURN NUMBER IS
+    L_EXMPT_AMOUNT NUMBER;
+    L_COUNT NUMBER;
+  BEGIN
+    L_EXMPT_AMOUNT := 0;
+    L_COUNT := 0;
+    BEGIN
+      L_EXMPT_AMOUNT := EXMPT_AMT;
+    EXCEPTION
+      WHEN OTHERS THEN
+        L_EXMPT_AMOUNT := 0;
+    END;
+    RETURN (L_EXMPT_AMOUNT);
+  END CF_EXEMPT_AMOUNTFORMULA;
+
+  FUNCTION CF_VAT_PER_AMOUNTFORMULA(STATUS IN VARCHAR2
+                                   ,VAT_PER_AMT IN NUMBER) RETURN NUMBER IS
+    L_VAT_PER_AMOUNT NUMBER;
+  BEGIN
+    L_VAT_PER_AMOUNT := 0;
+    BEGIN
+      IF STATUS <> 'CANCELLED' THEN
+        L_VAT_PER_AMOUNT := VAT_PER_AMT;
+      END IF;
+    EXCEPTION
+      WHEN OTHERS THEN
+        L_VAT_PER_AMOUNT := 0;
+    END;
+    RETURN (L_VAT_PER_AMOUNT);
+  END CF_VAT_PER_AMOUNTFORMULA;
+
+  FUNCTION CF_FED_PER_AMOUNTFORMULA(STATUS IN VARCHAR2
+                                   ,FED_PER_AMT IN NUMBER) RETURN NUMBER IS
+    L_FED_PER_AMOUNT NUMBER;
+  BEGIN
+    L_FED_PER_AMOUNT := 0;
+    BEGIN
+      IF STATUS <> 'CANCELLED' THEN
+        L_FED_PER_AMOUNT := FED_PER_AMT;
+      ELSE
+        L_FED_PER_AMOUNT := 0;
+      END IF;
+    EXCEPTION
+      WHEN OTHERS THEN
+        L_FED_PER_AMOUNT := 0;
+    END;
+    RETURN (L_FED_PER_AMOUNT);
+  END CF_FED_PER_AMOUNTFORMULA;
+
+  FUNCTION CF_MUN_AMOUNTFORMULA(STATUS IN VARCHAR2
+                               ,MUN_AMT1 IN NUMBER) RETURN NUMBER IS
+    L_MUN_AMT NUMBER;
+  BEGIN
+    L_MUN_AMT := 0;
+    BEGIN
+      IF STATUS <> 'CANCELLED' THEN
+        L_MUN_AMT := MUN_AMT1;
+      ELSE
+        L_MUN_AMT := 0;
+      END IF;
+    EXCEPTION
+      WHEN OTHERS THEN
+        L_MUN_AMT := 0;
+    END;
+    RETURN (L_MUN_AMT);
+  END CF_MUN_AMOUNTFORMULA;
+
+  FUNCTION CF_PRO_AMOUNTFORMULA(STATUS IN VARCHAR2
+                               ,PRO_AMT IN NUMBER) RETURN NUMBER IS
+    L_PRO_PER_AMT NUMBER;
+  BEGIN
+    L_PRO_PER_AMT := 0;
+    BEGIN
+      IF STATUS <> 'CANCELLED' THEN
+        L_PRO_PER_AMT := PRO_AMT;
+      END IF;
+    EXCEPTION
+      WHEN OTHERS THEN
+        L_PRO_PER_AMT := 0;
+    END;
+    RETURN (L_PRO_PER_AMT);
+  END CF_PRO_AMOUNTFORMULA;
+
+  FUNCTION CF_EXCISE_AMOUNTFORMULA(STATUS IN VARCHAR2
+                                  ,EXCS_AMT IN NUMBER) RETURN NUMBER IS
+    L_EXC_AMT NUMBER;
+  BEGIN
+    L_EXC_AMT := 0;
+    BEGIN
+      IF STATUS <> 'CANCELLED' THEN
+        L_EXC_AMT := EXCS_AMT;
+      END IF;
+    EXCEPTION
+      WHEN OTHERS THEN
+        L_EXC_AMT := 0;
+    END;
+    RETURN (L_EXC_AMT);
+  END CF_EXCISE_AMOUNTFORMULA;
+
+  FUNCTION CF_NON_AMOUNTFORMULA(STATUS IN VARCHAR2
+                               ,NON_TAXABLE_AMOUNT1 IN NUMBER) RETURN NUMBER IS
+    L_NON_TAXABLE_AMT NUMBER;
+  BEGIN
+    L_NON_TAXABLE_AMT := 0;
+    BEGIN
+      IF STATUS <> 'CANCELLED' THEN
+        L_NON_TAXABLE_AMT := NON_TAXABLE_AMOUNT1;
+      ELSE
+        L_NON_TAXABLE_AMT := 0;
+      END IF;
+    EXCEPTION
+      WHEN NO_DATA_FOUND THEN
+        L_NON_TAXABLE_AMT := 0;
+    END;
+    RETURN (L_NON_TAXABLE_AMT);
+  END CF_NON_AMOUNTFORMULA;
+
+  FUNCTION CF_TOT_VAT_AMOUNTFORMULA(STATUS IN VARCHAR2
+                                   ,TOT_VAT1 IN NUMBER) RETURN NUMBER IS
+    L_TOT_VAT NUMBER;
+  BEGIN
+    IF STATUS <> 'CANCELLED' THEN
+      L_TOT_VAT := TOT_VAT1;
+    END IF;
+    RETURN (L_TOT_VAT);
+  END CF_TOT_VAT_AMOUNTFORMULA;
+
+  FUNCTION CF_CUST_NUM_VALDIGITFORMULA(CUSTOM_ISSUE_NUM1 IN VARCHAR2) RETURN VARCHAR2 IS
+    L_VALIDATION_DIGIT VARCHAR2(1);
+    L_CUST_NUM VARCHAR2(6);
+  BEGIN
+    IF CUSTOM_ISSUE_NUM1 IS NULL THEN
+      L_CUST_NUM := '000000';
+    ELSE
+      L_CUST_NUM := LPAD(SUBSTR(CUSTOM_ISSUE_NUM1
+                               ,1
+                               ,6)
+                        ,6
+                        ,'0');
+    END IF;
+    L_VALIDATION_DIGIT := NVL(SUBSTR(CUSTOM_ISSUE_NUM1
+                                    ,7
+                                    ,1)
+                             ,' ');
+    RETURN (L_CUST_NUM || L_VALIDATION_DIGIT);
+  END CF_CUST_NUM_VALDIGITFORMULA;
+
+  FUNCTION CF_FISCAL_PRINTERFORMULA RETURN CHAR IS
+    L_PRINTER VARCHAR2(1);
+  BEGIN
+    RETURN (' ');
+  END CF_FISCAL_PRINTERFORMULA;
+
+  FUNCTION CF_DOC_NUMFORMULA(INVOICE_ID IN VARCHAR2) RETURN CHAR IS
+    L_DOC_NUM VARCHAR2(20);
+    L_DOC_NUM1 VARCHAR2(20);
+    L_SEPARATOR NUMBER;
+  BEGIN
+    L_SEPARATOR := INSTR(INVOICE_ID
+                        ,'-'
+                        ,1
+                        ,1);
+    IF L_SEPARATOR = 0 THEN
+      L_DOC_NUM := SUBSTR(RTRIM(LTRIM(INVOICE_ID))
+                         ,1
+                         ,20);
+    ELSE
+      L_DOC_NUM := SUBSTR(LTRIM(RTRIM(INVOICE_ID))
+                         ,L_SEPARATOR + 1
+                         ,20);
+    END IF;
+    L_DOC_NUM1 := TRANSLATE(UPPER(L_DOC_NUM)
+                           ,'0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ-'
+                           ,'0123456789');
+    RETURN (LPAD(L_DOC_NUM1
+               ,20
+               ,'0'));
+  END CF_DOC_NUMFORMULA;
+
+  FUNCTION CF_EXCHANGE_RATEFORMULA(EXCHANGE_RATE1 IN NUMBER) RETURN CHAR IS
+    L_FORMATED_EXCHG_RATE VARCHAR2(10);
+    FORMAT_STRING VARCHAR2(11);
+  BEGIN
+    FORMAT_STRING := RPAD('0.'
+                         ,8
+                         ,'0');
+    FORMAT_STRING := LPAD(FORMAT_STRING
+                         ,11
+                         ,'9');
+    L_FORMATED_EXCHG_RATE := LPAD(REPLACE(LTRIM(RTRIM(TO_CHAR(ABS(EXCHANGE_RATE1)
+                                                             ,FORMAT_STRING)))
+                                         ,'.'
+                                         ,'')
+                                 ,10
+                                 ,'0');
+    RETURN (L_FORMATED_EXCHG_RATE);
+  END CF_EXCHANGE_RATEFORMULA;
+
+  FUNCTION CF_POINT_OF_SALEFORMULA(INVOICE_ID IN VARCHAR2) RETURN CHAR IS
+    L_POS VARCHAR2(4);
+    L_SEPARATOR NUMBER;
+    L_DOC_NUM VARCHAR2(50);
+  BEGIN
+    L_DOC_NUM := TRANSLATE(UPPER(INVOICE_ID)
+                          ,'0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ'
+                          ,'0123456789');
+    L_SEPARATOR := INSTR(INVOICE_ID
+                        ,'-'
+                        ,1
+                        ,1);
+    IF L_SEPARATOR = 0 THEN
+      L_POS := '0000';
+    ELSE
+      L_POS := LPAD(NVL(REPLACE(SUBSTR(L_DOC_NUM
+                                      ,1
+                                      ,L_SEPARATOR - 1)
+                               ,'-'
+                               ,'')
+                       ,'0')
+                   ,4
+                   ,'0');
+    END IF;
+    RETURN (L_POS);
+  EXCEPTION
+    WHEN OTHERS THEN
+      RETURN ('0000');
+  END CF_POINT_OF_SALEFORMULA;
+
+  FUNCTION CF_TOT_DOC_AMOUNTFORMULA RETURN NUMBER IS
+    L_TOT_DOC_AMOUNT NUMBER;
+  BEGIN
+    L_TOT_DOC_AMOUNT := 0;
+    RETURN L_TOT_DOC_AMOUNT;
+  END CF_TOT_DOC_AMOUNTFORMULA;
+
+  FUNCTION CP_TOT_RECFORMULA RETURN NUMBER IS
+  BEGIN
+    NULL;
+  END CP_TOT_RECFORMULA;
+
+  FUNCTION C_COMPANY_NAME_HEADER_P RETURN VARCHAR2 IS
+  BEGIN
+    RETURN C_COMPANY_NAME_HEADER;
+  END C_COMPANY_NAME_HEADER_P;
+
+  FUNCTION C_BASE_CURRENCY_CODE_P RETURN VARCHAR2 IS
+  BEGIN
+    RETURN C_BASE_CURRENCY_CODE;
+  END C_BASE_CURRENCY_CODE_P;
+
+  FUNCTION C_BASE_PRECISION_P RETURN NUMBER IS
+  BEGIN
+    RETURN C_BASE_PRECISION;
+  END C_BASE_PRECISION_P;
+
+  FUNCTION C_BASE_MIN_ACCT_UNIT_P RETURN NUMBER IS
+  BEGIN
+    RETURN C_BASE_MIN_ACCT_UNIT;
+  END C_BASE_MIN_ACCT_UNIT_P;
+
+  FUNCTION C_BASE_DESCRIPTION_P RETURN VARCHAR2 IS
+  BEGIN
+    RETURN C_BASE_DESCRIPTION;
+  END C_BASE_DESCRIPTION_P;
+
+  FUNCTION CP_COMP_TAX_ID_P RETURN VARCHAR2 IS
+  BEGIN
+    RETURN CP_COMP_TAX_ID;
+  END CP_COMP_TAX_ID_P;
+
+  FUNCTION CP_REC_COUNT_P RETURN NUMBER IS
+  BEGIN
+    RETURN CP_REC_COUNT;
+  END CP_REC_COUNT_P;
+
+  FUNCTION P_LOCATION_ID_P RETURN NUMBER IS
+  BEGIN
+    RETURN P_LOCATION_ID;
+  END P_LOCATION_ID_P;
+
+  FUNCTION CP_TOT_REC_P RETURN NUMBER IS
+  BEGIN
+    RETURN CP_TOT_REC;
+  END CP_TOT_REC_P;
+
+  FUNCTION CP_NON_COUNT_P RETURN NUMBER IS
+  BEGIN
+    RETURN CP_NON_COUNT;
+  END CP_NON_COUNT_P;
+
+END JL_JLARPPFF_XMLP_PKG;
+
+
+
+
+/

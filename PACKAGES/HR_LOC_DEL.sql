@@ -1,0 +1,211 @@
+--------------------------------------------------------
+--  DDL for Package HR_LOC_DEL
+--------------------------------------------------------
+
+  CREATE OR REPLACE EDITIONABLE PACKAGE "APPS"."HR_LOC_DEL" AUTHID CURRENT_USER AS
+/* $Header: hrlocrhi.pkh 120.1 2005/07/18 06:20:20 bshukla noship $ */
+--
+-- ----------------------------------------------------------------------------
+-- |------------------------------< delete_dml >------------------------------|
+-- ----------------------------------------------------------------------------
+-- {Start Of Comments}
+--
+-- Description:
+--   This procedure controls the actual dml delete logic. The functions of
+--   this procedure are as follows:
+--   1) To set and unset the g_api_dml status as required (as we are about to
+--      perform dml).
+--   2) To delete the specified row from the schema using the primary key in
+--      the predicates.
+--   3) To trap any constraint violations that may have occurred.
+--   4) To raise any other errors.
+--
+-- Pre Conditions:
+--   This is an internal private procedure which must be called from the del
+--   procedure.
+--
+-- In Parameters:
+--   A Pl/Sql record structre.
+--
+-- Post Success:
+--   The specified row will be delete from the schema.
+--
+-- Post Failure:
+--   On the delete dml failure it is important to note that we always reset the
+--   g_api_dml status to false.
+--   If a child integrity constraint violation is raised the
+--   constraint_error procedure will be called.
+--   If any other error is reported, the error will be raised after the
+--   g_api_dml status is reset.
+--
+-- Developer Implementation Notes:
+--   None.
+--
+-- Access Status:
+--   Internal Table Handler Use Only.
+--
+-- {End Of Comments}
+-- ----------------------------------------------------------------------------
+PROCEDURE delete_dml(p_rec IN hr_loc_shd.g_rec_type);
+--
+-- ----------------------------------------------------------------------------
+-- |------------------------------< pre_delete >------------------------------|
+-- ----------------------------------------------------------------------------
+-- {Start Of Comments}
+--
+-- Description:
+--   This private procedure contains any processing which is required before
+--   the delete dml.
+--
+-- Pre Conditions:
+--   This is an internal procedure which is called from the del procedure.
+--
+-- In Parameters:
+--   A Pl/Sql record structre.
+--
+-- Post Success:
+--   Processing continues.
+--
+-- Post Failure:
+--   If an error has occurred, an error message and exception will be raised
+--   but not handled.
+--
+-- Developer Implementation Notes:
+--   Any pre-processing required before the delete dml is issued should be
+--   coded within this procedure. It is important to note that any 3rd party
+--   maintenance should be reviewed before placing in this procedure.
+--
+-- Access Status:
+--   Internal Table Handler Use Only.
+--
+-- {End Of Comments}
+-- ----------------------------------------------------------------------------
+PROCEDURE pre_delete(p_rec IN hr_loc_shd.g_rec_type);
+--
+-- ----------------------------------------------------------------------------
+-- |-----------------------------< post_delete >------------------------------|
+-- ----------------------------------------------------------------------------
+-- {Start Of Comments}
+--
+-- Description:
+--   This private procedure contains any processing which is required after the
+--   delete dml.
+--
+-- Pre Conditions:
+--   This is an internal procedure which is called from the del procedure.
+--
+-- In Parameters:
+--   A Pl/Sql record structre.
+--
+-- Post Success:
+--   Processing continues.
+--
+-- Post Failure:
+--   If an error has occurred, an error message and exception will be raised
+--   but not handled.
+--
+-- Developer Implementation Notes:
+--   Any post-processing required after the delete dml is issued should be
+--   coded within this procedure. It is important to note that any 3rd party
+--   maintenance should be reviewed before placing in this procedure.
+--
+-- Access Status:
+--   Internal table Handler Use Only.
+--
+-- {End Of Comments}
+-- ----------------------------------------------------------------------------
+PROCEDURE post_delete(p_rec IN hr_loc_shd.g_rec_type);
+--
+-- ----------------------------------------------------------------------------
+-- |---------------------------------< del >----------------------------------|
+-- ----------------------------------------------------------------------------
+-- {Start Of Comments}
+--
+-- Description:
+--   This procedure is the record interface for the delete process
+--   for the specified entity. The role of this process is to delete the
+--   row from the HR schema. This process is the main backbone of the del
+--   business process. The processing of this procedure is as follows:
+--
+--   1) The controlling validation process delete_validate is then executed
+--      which will execute all private and public validation business rule
+--      processes.
+--   2) The pre_delete process is then executed which enables any
+--      logic to be processed before the delete dml process is executed.
+--   3) The delete_dml process will physical perform the delete dml for the
+--      specified row.
+--   4) The post_delete process is then executed which enables any
+--      logic to be processed after the delete dml process.
+--
+-- Pre Conditions:
+--   The main parameters to the business process have to be in the record
+--   format.
+--
+-- In Parameters:
+--
+-- Post Success:
+--   The specified row will be fully validated and deleted for the specified
+--   entity without being committed.
+--
+-- Post Failure:
+--   If an error has occurred, an error message will be supplied with the work
+--   rolled back.
+--
+-- Developer Implementation Notes:
+--   None.
+--
+-- Access Status:
+--   Internal Development Use Only.
+--
+-- {End Of Comments}
+-- ----------------------------------------------------------------------------
+PROCEDURE del
+  (  p_rec                  IN  hr_loc_shd.g_rec_type);
+--
+-- ----------------------------------------------------------------------------
+-- |---------------------------------< del >----------------------------------|
+-- ----------------------------------------------------------------------------
+-- {Start Of Comments}
+--
+-- Description:
+--   This procedure is the attribute interface for the delete
+--   process for the specified entity and is the outermost layer. The role
+--   of this process is to validate and delete the specified row from the
+--   HR schema. The processing of this procedure is as follows:
+--   1) The attributes are converted into a local record structure by
+--      explicitly coding the attribute parameters into the g_rec_type
+--      datatype.
+--   2) After the conversion has taken place, the corresponding record del
+--      interface process is executed.
+--
+-- Pre Conditions:
+--
+-- In Parameters:
+--
+-- Post Success:
+--   The specified row will be fully validated and deleted for the specified
+--   entity without being committed
+--
+-- Post Failure:
+--   If an error has occurred, an error message will be supplied with the work
+--   rolled back.
+--
+-- Developer Implementation Notes:
+--   The attrbute in parameters should be modified as to the business process
+--   requirements.
+--
+-- Access Status:
+--   Internal Development Use Only.
+--
+-- {End Of Comments}
+-- ----------------------------------------------------------------------------
+PROCEDURE del
+  (  p_location_id                        IN NUMBER,
+     p_object_version_number              IN NUMBER);
+--
+--
+END hr_loc_del;
+
+ 
+
+/

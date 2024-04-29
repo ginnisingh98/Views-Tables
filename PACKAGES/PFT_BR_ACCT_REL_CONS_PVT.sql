@@ -1,0 +1,56 @@
+--------------------------------------------------------
+--  DDL for Package PFT_BR_ACCT_REL_CONS_PVT
+--------------------------------------------------------
+
+  CREATE OR REPLACE EDITIONABLE PACKAGE "APPS"."PFT_BR_ACCT_REL_CONS_PVT" AUTHID CURRENT_USER AS
+/* $Header: PFTVACCS.pls 120.0 2005/06/06 18:57:35 appldev noship $ */
+
+--------------------------------------------------------------------------------
+-- PUBLIC CONSTANTS
+--------------------------------------------------------------------------------
+
+--------------------------------------------------------------------------------
+-- PUBLIC SPECIFICATIONS
+--------------------------------------------------------------------------------
+
+
+--
+-- PROCEDURE
+--	 CopyObjectDefinition
+--
+-- DESCRIPTION
+--   Creates all the detail records of a new Account Relationship Consolidation Rule Definition (target)
+--   by copying the detail records of another Account Relationship Consolidation Rule Definition (source).
+--
+-- IN
+--   p_source_obj_def_id    - Source Object Definition ID.
+--   p_target_obj_def_id    - Target Object Definition ID.
+--   p_created_by           - FND User ID (optional).
+--   p_creation_date        - System Date (optional).
+--
+PROCEDURE CopyObjectDefinition(
+   p_source_obj_def_id  IN          NUMBER
+  ,p_target_obj_def_id  IN          NUMBER
+  ,p_created_by         IN          NUMBER
+  ,p_creation_date      IN          DATE
+);
+
+--
+-- PROCEDURE
+--	 DeleteObjectDefinition
+--
+-- DESCRIPTION
+--   Deletes all the details records of a Account Relationship Consolidation Rule Definition.
+--
+-- IN
+--   p_obj_def_id    - Object Definition ID.
+--
+PROCEDURE DeleteObjectDefinition(
+  p_obj_def_id          IN          NUMBER
+);
+
+
+END PFT_BR_ACCT_REL_CONS_PVT;
+ 
+
+/

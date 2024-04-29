@@ -1,0 +1,277 @@
+--------------------------------------------------------
+--  DDL for Package WSH_PICKING_BATCHES_PKG
+--------------------------------------------------------
+
+  CREATE OR REPLACE EDITIONABLE PACKAGE "APPS"."WSH_PICKING_BATCHES_PKG" AUTHID CURRENT_USER as
+/* $Header: WSHPRBTS.pls 120.3.12010000.2 2009/12/03 13:33:50 anvarshn ship $ */
+
+-- Bug 3266659: Added P_Ship_Set_Smc_Flag for the pick release public API
+
+  PROCEDURE Insert_Row(X_Rowid           IN OUT NOCOPY  VARCHAR2,
+             X_Batch_Id       IN OUT NOCOPY  NUMBER,
+             P_Creation_Date          DATE,
+             P_Created_By          NUMBER,
+             P_Last_Update_Date        DATE,
+             P_Last_Updated_By        NUMBER,
+             P_Last_Update_Login        NUMBER,
+	     -- Bug 3266659 : Batch name prefix
+	     p_batch_name_prefix	VARCHAR2 DEFAULT NULL,
+             X_Name         IN OUT NOCOPY  VARCHAR2,
+             P_Backorders_Only_Flag      VARCHAR2,
+             P_Document_Set_Id        NUMBER,
+             P_Existing_Rsvs_Only_Flag    VARCHAR2,
+             P_Shipment_Priority_Code    VARCHAR2,
+             P_Ship_Method_Code        VARCHAR2,
+             P_Customer_Id          NUMBER,
+             P_Order_Header_Id        NUMBER,
+             P_Ship_Set_Number        NUMBER,
+             P_Inventory_Item_Id        NUMBER,
+             P_Order_Type_Id          NUMBER,
+             P_From_Requested_Date      DATE,
+             P_To_Requested_Date        DATE,
+             P_From_Scheduled_Ship_Date    DATE,
+             P_To_Scheduled_Ship_Date    DATE,
+             P_Ship_To_Location_Id      NUMBER,
+             P_Ship_From_Location_Id      NUMBER,
+             P_Trip_Id      NUMBER,
+             P_Delivery_Id      NUMBER,
+             P_Include_Planned_Lines    VARCHAR2,
+             P_Pick_Grouping_Rule_Id    NUMBER,
+             P_Pick_Sequence_Rule_Id    NUMBER,
+             P_Autocreate_Delivery_Flag VARCHAR2,
+             P_Attribute_Category      VARCHAR2,
+             P_Attribute1          VARCHAR2,
+             P_Attribute2          VARCHAR2,
+             P_Attribute3          VARCHAR2,
+             P_Attribute4          VARCHAR2,
+             P_Attribute5          VARCHAR2,
+             P_Attribute6          VARCHAR2,
+             P_Attribute7          VARCHAR2,
+             P_Attribute8          VARCHAR2,
+             P_Attribute9          VARCHAR2,
+             P_Attribute10          VARCHAR2,
+             P_Attribute11          VARCHAR2,
+             P_Attribute12          VARCHAR2,
+             P_Attribute13          VARCHAR2,
+             P_Attribute14          VARCHAR2,
+             P_Attribute15          VARCHAR2,
+             P_Autodetail_Pr_Flag    VARCHAR2,
+             P_Carrier_Id            NUMBER,
+             P_Trip_Stop_Id          NUMBER,
+             P_Default_Stage_Subinventory  VARCHAR2,
+             P_Default_Stage_Locator_Id NUMBER,
+             P_Pick_From_Subinventory VARCHAR2,
+             P_Pick_From_locator_Id   NUMBER,
+             P_Auto_Pick_Confirm_Flag VARCHAR2,
+             P_Delivery_Detail_Id    NUMBER,
+             P_Project_Id            NUMBER,
+             P_Task_Id               NUMBER,
+             P_Organization_Id       NUMBER,
+             P_Ship_Confirm_Rule_Id  NUMBER,
+             P_Autopack_Flag         VARCHAR2,
+             P_Autopack_Level        NUMBER,
+             P_Task_Planning_Flag    VARCHAR2,
+             P_Dynamic_replenishment_Flag      VARCHAR2 DEFAULT NULL, --bug# 6689448 (replenishment project)
+             P_Non_Picking_flag      VARCHAR2 DEFAULT NULL,
+             p_regionID		     NUMBER,
+             p_zoneId		     NUMBER,
+             p_categoryID	     NUMBER,
+             p_categorySetID	     NUMBER,
+             p_acDelivCriteria	     VARCHAR2,
+	     p_RelSubinventory	     VARCHAR2,
+	     p_append_flag           VARCHAR2,
+             p_task_priority         NUMBER,
+	     P_Ship_Set_Smc_Flag     VARCHAR2        DEFAULT NULL,   --- Added for pick release Public API
+             p_actual_departure_date DATE DEFAULT NULL,
+             p_allocation_method     VARCHAR2,  -- X-dock
+             p_crossdock_criteria_id NUMBER,    --  X-dock
+             -- bug 5117876, following 14 attributes are added
+             p_Delivery_Name_Lo      VARCHAR2        DEFAULT NULL,
+             p_Delivery_Name_Hi      VARCHAR2        DEFAULT NULL,
+             p_Bol_Number_Lo         VARCHAR2        DEFAULT NULL,
+             p_Bol_Number_Hi         VARCHAR2        DEFAULT NULL,
+             p_Intmed_Ship_To_Loc_Id NUMBER        DEFAULT NULL,
+             p_Pooled_Ship_To_Loc_Id NUMBER        DEFAULT NULL,
+             p_Fob_Code              VARCHAR2        DEFAULT NULL,
+             p_Freight_Terms_Code    VARCHAR2        DEFAULT NULL,
+             p_Pickup_Date_Lo        DATE        DEFAULT NULL,
+             p_Pickup_Date_Hi        DATE        DEFAULT NULL,
+             p_Dropoff_Date_Lo       DATE        DEFAULT NULL,
+             p_Dropoff_Date_Hi       DATE        DEFAULT NULL,
+             p_Planned_Flag          VARCHAR2        DEFAULT NULL,
+             p_Selected_Batch_Id     NUMBER        DEFAULT NULL,
+		 p_client_Id             NUMBER      DEFAULT NULL --Modified R12.1.1 LSP PROJECT
+            );
+
+  PROCEDURE Lock_Row(X_Rowid              IN OUT NOCOPY  VARCHAR2,
+           P_Batch_Id            NUMBER,
+           P_Name              VARCHAR2,
+           P_Backorders_Only_Flag      VARCHAR2,
+           P_Document_Set_Id          NUMBER,
+           P_Existing_Rsvs_Only_Flag      VARCHAR2,
+           P_Shipment_Priority_Code      VARCHAR2,
+           P_Ship_Method_Code        VARCHAR2,
+           P_Customer_Id            NUMBER,
+           P_Order_Header_Id          NUMBER,
+           P_Ship_Set_Number          NUMBER,
+           P_Inventory_Item_Id        NUMBER,
+           P_Order_Type_Id          NUMBER,
+           P_From_Requested_Date        DATE,
+           P_To_Requested_Date        DATE,
+           P_From_Scheduled_Ship_Date    DATE,
+           P_To_Scheduled_Ship_Date      DATE,
+           P_Ship_To_Location_Id        NUMBER,
+           P_Ship_From_Location_Id      NUMBER,
+           P_Trip_Id             NUMBER,
+           P_Delivery_Id         NUMBER,
+           P_Include_Planned_Lines     VARCHAR2,
+           P_Pick_Grouping_Rule_Id       NUMBER,
+           P_Pick_Sequence_Rule_Id      NUMBER,
+           P_Autocreate_Delivery_Flag   VARCHAR2,
+           P_Attribute_Category        VARCHAR2,
+           P_Attribute1            VARCHAR2,
+           P_Attribute2            VARCHAR2,
+           P_Attribute3            VARCHAR2,
+           P_Attribute4            VARCHAR2,
+           P_Attribute5            VARCHAR2,
+           P_Attribute6            VARCHAR2,
+           P_Attribute7            VARCHAR2,
+           P_Attribute8            VARCHAR2,
+           P_Attribute9            VARCHAR2,
+           P_Attribute10            VARCHAR2,
+           P_Attribute11            VARCHAR2,
+           P_Attribute12            VARCHAR2,
+           P_Attribute13            VARCHAR2,
+           P_Attribute14            VARCHAR2,
+           P_Attribute15            VARCHAR2,
+           P_Autodetail_Pr_Flag        VARCHAR2,
+           P_Carrier_Id            NUMBER,
+           P_Trip_Stop_Id          NUMBER,
+           P_Default_Stage_Subinventory    VARCHAR2,
+           P_Default_Stage_Locator_Id    NUMBER,
+           P_Pick_From_Subinventory      VARCHAR2,
+           P_Pick_From_locator_Id      NUMBER,
+           P_Auto_Pick_Confirm_Flag      VARCHAR2,
+           P_Delivery_Detail_Id     NUMBER,
+           P_Project_Id            NUMBER,
+           P_Task_Id              NUMBER,
+           P_Organization_Id        NUMBER,
+           P_Ship_Confirm_Rule_Id      NUMBER,
+           P_Autopack_Flag          VARCHAR2,
+           P_Autopack_Level        NUMBER,
+           P_Task_Planning_Flag      VARCHAR2,
+           P_Dynamic_replenishment_Flag      VARCHAR2 DEFAULT NULL, --bug# 6689448 (replenishment project)
+           P_Non_Picking_flag      VARCHAR2 DEFAULT NULL,
+           p_regionID		     NUMBER,
+           p_zoneId		     NUMBER,
+           p_categoryID	     	     NUMBER,
+           p_categorySetID	     NUMBER,
+           p_acDelivCriteria	     VARCHAR2,
+	   p_RelSubinventory	     VARCHAR2,
+	   p_append_flag             VARCHAR2,
+           p_task_priority           NUMBER,
+           p_actual_departure_date   DATE DEFAULT NULL,
+           p_allocation_method     VARCHAR2, -- X-dock
+           p_crossdock_criteria_id NUMBER, -- X-dock
+	     p_client_Id             NUMBER      DEFAULT NULL --Modified R12.1.1 LSP PROJECT
+		);
+
+
+
+  PROCEDURE Update_Row(X_Rowid              IN OUT NOCOPY  VARCHAR2,
+             P_Batch_Id            NUMBER,
+             P_Last_Update_Date        DATE,
+             P_Last_Updated_By        NUMBER,
+             P_Last_Update_Login        NUMBER,
+             P_Name              VARCHAR2,
+             P_Backorders_Only_Flag      VARCHAR2,
+             P_Document_Set_Id        NUMBER,
+             P_Existing_Rsvs_Only_Flag    VARCHAR2,
+             P_Shipment_Priority_Code    VARCHAR2,
+             P_Ship_Method_Code        VARCHAR2,
+             P_Customer_Id          NUMBER,
+             P_Order_Header_Id        NUMBER,
+             P_Ship_Set_Number        NUMBER,
+             P_Inventory_Item_Id        NUMBER,
+             P_Order_Type_Id          NUMBER,
+             P_From_Requested_Date      DATE,
+             P_To_Requested_Date        DATE,
+             P_From_Scheduled_Ship_Date    DATE,
+             P_To_Scheduled_Ship_Date    DATE,
+             P_Ship_To_Location_Id      NUMBER,
+             P_Ship_From_Location_Id      NUMBER,
+             P_Attribute_Category      VARCHAR2,
+             P_Attribute1          VARCHAR2,
+             P_Attribute2          VARCHAR2,
+             P_Attribute3          VARCHAR2,
+             P_Attribute4          VARCHAR2,
+             P_Attribute5          VARCHAR2,
+             P_Attribute6          VARCHAR2,
+             P_Attribute7          VARCHAR2,
+             P_Attribute8          VARCHAR2,
+             P_Attribute9          VARCHAR2,
+             P_Attribute10          VARCHAR2,
+             P_Attribute11          VARCHAR2,
+             P_Attribute12          VARCHAR2,
+             P_Attribute13          VARCHAR2,
+             P_Attribute14          VARCHAR2,
+             P_Attribute15          VARCHAR2,
+             P_Autodetail_Pr_Flag      VARCHAR2,
+             P_Carrier_Id          NUMBER,
+             P_Trip_Stop_Id          NUMBER,
+             P_Default_Stage_Subinventory  VARCHAR2,
+             P_Default_Stage_Locator_Id    NUMBER,
+             P_Pick_From_Subinventory    VARCHAR2,
+             P_Pick_From_locator_Id      NUMBER,
+             P_Auto_Pick_Confirm_Flag    VARCHAR2,
+             P_Delivery_Detail_Id      NUMBER,
+             P_Project_Id          NUMBER,
+             P_Task_Id            NUMBER,
+             P_Organization_Id          NUMBER,
+             P_Ship_Confirm_Rule_Id      NUMBER,
+             P_Autopack_Flag          VARCHAR2,
+             P_Autopack_Level        NUMBER,
+             P_Task_Planning_Flag      VARCHAR2,
+             P_Dynamic_replenishment_Flag      VARCHAR2 DEFAULT NULL, --bug# 6689448 (replenishment project)
+             P_Non_Picking_flag      VARCHAR2 DEFAULT NULL,
+             p_regionID		     NUMBER,
+             p_zoneId		     NUMBER,
+             p_categoryID	     NUMBER,
+             p_categorySetID	     NUMBER,
+             p_acDelivCriteria	     VARCHAR2,
+	     p_RelSubinventory	     VARCHAR2,
+	     p_append_flag           VARCHAR2,
+             p_task_priority         NUMBER,
+             p_actual_departure_date DATE DEFAULT NULL,
+             p_allocation_method     VARCHAR2, --  X-dock
+             p_crossdock_criteria_id NUMBER, -- X-dock
+		 p_client_Id             NUMBER      DEFAULT NULL --Modified R12.1.1 LSP PROJECT
+            );
+
+
+  PROCEDURE Delete_Row(X_Rowid IN OUT NOCOPY  VARCHAR2);
+
+
+  PROCEDURE Delete_And_Commit(X_Rowid IN OUT NOCOPY  VARCHAR2);
+
+
+  PROCEDURE Commit_Work;
+
+  --
+  -- Bug # 2231365 : Defaulted the parameter p_log_level to 0
+  --
+  FUNCTION Submit_Release_Request(P_Batch_Id NUMBER,
+				  P_Log_Level NUMBER DEFAULT 0,
+				  P_Num_Workers NUMBER DEFAULT 1,
+				  P_Commit VARCHAR2 DEFAULT NULL)
+  RETURN NUMBER;
+
+
+  PROCEDURE Get_Printer (p_report IN VARCHAR2,
+              		 x_report_printer OUT NOCOPY  VARCHAR2,
+              		 p_default_report IN VARCHAR2 default 'OEXSHPIK');
+
+
+END WSH_PICKING_BATCHES_PKG;
+
+/

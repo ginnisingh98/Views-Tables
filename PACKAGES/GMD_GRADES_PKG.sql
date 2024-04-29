@@ -1,0 +1,44 @@
+--------------------------------------------------------
+--  DDL for Package GMD_GRADES_PKG
+--------------------------------------------------------
+
+  CREATE OR REPLACE EDITIONABLE PACKAGE "APPS"."GMD_GRADES_PKG" AUTHID CURRENT_USER as
+/* $Header: GMDGIGRS.pls 115.0 2002/03/12 12:58:14 pkm ship        $ */
+procedure INSERT_ROW (
+  X_ROWID in out VARCHAR2,
+  X_QC_GRADE in VARCHAR2,
+  X_DELETE_MARK in NUMBER,
+  X_TEXT_CODE in NUMBER,
+  X_TRANS_CNT in NUMBER,
+  X_QC_GRADE_DESC in VARCHAR2,
+  X_CREATION_DATE in DATE,
+  X_CREATED_BY in NUMBER,
+  X_LAST_UPDATE_DATE in DATE,
+  X_LAST_UPDATED_BY in NUMBER,
+  X_LAST_UPDATE_LOGIN in NUMBER);
+procedure LOCK_ROW (
+  X_QC_GRADE in VARCHAR2,
+  X_DELETE_MARK in NUMBER,
+  X_TEXT_CODE in NUMBER,
+  X_TRANS_CNT in NUMBER,
+  X_QC_GRADE_DESC in VARCHAR2
+);
+procedure UPDATE_ROW (
+  X_QC_GRADE in VARCHAR2,
+  X_DELETE_MARK in NUMBER,
+  X_TEXT_CODE in NUMBER,
+  X_TRANS_CNT in NUMBER,
+  X_QC_GRADE_DESC in VARCHAR2,
+  X_LAST_UPDATE_DATE in DATE,
+  X_LAST_UPDATED_BY in NUMBER,
+  X_LAST_UPDATE_LOGIN in NUMBER
+);
+procedure DELETE_ROW (
+  X_QC_GRADE in VARCHAR2
+);
+procedure ADD_LANGUAGE;
+end GMD_GRADES_PKG;
+
+ 
+
+/

@@ -1,0 +1,60 @@
+--------------------------------------------------------
+--  DDL for Package CAC_SR_PERIOD_DTL_TYPES_PKG
+--------------------------------------------------------
+
+  CREATE OR REPLACE EDITIONABLE PACKAGE "APPS"."CAC_SR_PERIOD_DTL_TYPES_PKG" AUTHID CURRENT_USER as
+/* $Header: cacsrprddtltyps.pls 120.1 2006/03/01 02:04:43 sbarat noship $ */
+
+procedure INSERT_ROW (
+  X_ROWID in out nocopy VARCHAR2,
+  X_PERIOD_DTL_TYPE_ID in NUMBER,
+  X_DISPLAY_COLOR in VARCHAR2,
+  X_PERIOD_DTL_TYPE_NAME in VARCHAR2,
+  X_PERIOD_DTL_TYPE_DESC in VARCHAR2,
+  X_CREATION_DATE in DATE,
+  X_CREATED_BY in NUMBER,
+  X_LAST_UPDATE_DATE in DATE,
+  X_LAST_UPDATED_BY in NUMBER,
+  X_LAST_UPDATE_LOGIN in NUMBER);
+procedure LOCK_ROW (
+  X_PERIOD_DTL_TYPE_ID in NUMBER,
+  X_DISPLAY_COLOR in VARCHAR2,
+  X_PERIOD_DTL_TYPE_NAME in VARCHAR2,
+  X_PERIOD_DTL_TYPE_DESC in VARCHAR2
+);
+procedure UPDATE_ROW (
+  X_PERIOD_DTL_TYPE_ID in NUMBER,
+  X_DISPLAY_COLOR in VARCHAR2,
+  X_PERIOD_DTL_TYPE_NAME in VARCHAR2,
+  X_PERIOD_DTL_TYPE_DESC in VARCHAR2,
+  X_LAST_UPDATE_DATE in DATE,
+  X_LAST_UPDATED_BY in NUMBER,
+  X_LAST_UPDATE_LOGIN in NUMBER
+);
+procedure DELETE_ROW (
+  X_PERIOD_DTL_TYPE_ID in NUMBER
+);
+procedure ADD_LANGUAGE;
+
+/************ Start of addition by SBARAT on 01/03/2006 for bug# 5031486 ***********/
+PROCEDURE TRANSLATE_ROW(
+  X_PERIOD_DTL_TYPE_ID    IN NUMBER,
+  X_PERIOD_DTL_TYPE_NAME  IN VARCHAR2,
+  X_PERIOD_DTL_TYPE_DESC  IN VARCHAR2,
+  X_OWNER                 IN VARCHAR2
+);
+
+PROCEDURE LOAD_ROW (
+    X_PERIOD_DTL_TYPE_ID              IN NUMBER,
+    X_DISPLAY_COLOR                   IN VARCHAR2,
+    X_PERIOD_DTL_TYPE_NAME            IN VARCHAR2,
+    X_PERIOD_DTL_TYPE_DESC            IN VARCHAR2,
+    X_OWNER                           IN VARCHAR2
+);
+/************ End of addition by SBARAT on 01/03/2006 for bug# 5031486 ***********/
+
+end CAC_SR_PERIOD_DTL_TYPES_PKG;
+
+ 
+
+/

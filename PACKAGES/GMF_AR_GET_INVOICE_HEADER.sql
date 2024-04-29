@@ -1,0 +1,99 @@
+--------------------------------------------------------
+--  DDL for Package GMF_AR_GET_INVOICE_HEADER
+--------------------------------------------------------
+
+  CREATE OR REPLACE EDITIONABLE PACKAGE "APPS"."GMF_AR_GET_INVOICE_HEADER" AUTHID CURRENT_USER AS
+/* $Header: gmfinrhs.pls 115.2 2002/11/11 00:38:45 rseshadr ship $ */
+PROCEDURE get_invoice_header
+	(invoice_id			IN	OUT 	NOCOPY NUMBER, /* Invoice Id*/
+	t_start_date			IN 	OUT	NOCOPY DATE,
+	t_end_date			IN 	OUT	NOCOPY DATE,
+	t_created_by				OUT	NOCOPY NUMBER,
+	t_creation_date				OUT	NOCOPY DATE,
+	t_last_updated_by			OUT	NOCOPY NUMBER,
+	t_last_update_date			OUT	NOCOPY DATE,
+	t_trx_number                 		OUT   	NOCOPY VARCHAR2, /* Inv Number*/
+	t_invoice_amount			OUT	NOCOPY NUMBER,   /* Inv amount */
+	t_balance_amount			OUT	NOCOPY NUMBER,   /* Bal amount*/
+	t_trx_date    	            		OUT	NOCOPY DATE,     /* Inv date*/
+	t_cust_trx_type_id           		OUT   	NOCOPY NUMBER,   /* Tran type*/
+   	t_invoice_currency_code          	OUT   	NOCOPY VARCHAR2, /* Curncy code*/
+   	t_term_id                        	OUT   	NOCOPY NUMBER,   /* Terms Id*/
+	t_customer_trx_id			OUT 	NOCOPY NUMBER,
+	t_last_update_login          		OUT	NOCOPY NUMBER,
+   	t_set_of_books_id            		OUT   	NOCOPY NUMBER,
+	t_bill_to_contact_id         		OUT   	NOCOPY NUMBER,
+   	t_batch_id                   		OUT   	NOCOPY NUMBER,
+   	t_batch_source_id            		OUT   	NOCOPY NUMBER,
+   	t_reason_code                		OUT   	NOCOPY VARCHAR2,
+   	t_sold_to_customer_id        		OUT   	NOCOPY NUMBER,
+   	t_sold_to_contact_id         		OUT   	NOCOPY NUMBER,
+   	t_sold_to_site_use_id        		OUT   	NOCOPY NUMBER,
+   	t_bill_to_customer_id        		OUT   	NOCOPY NUMBER,
+   	t_bill_to_site_use_id        		OUT   	NOCOPY NUMBER,
+   	t_ship_to_customer_id        		OUT   	NOCOPY NUMBER,
+   	t_ship_to_contact_id         		OUT   	NOCOPY NUMBER,
+   	t_ship_to_site_use_id        		OUT   	NOCOPY NUMBER,
+   	t_remit_to_address_id        		OUT   	NOCOPY NUMBER,
+   	t_term_due_date                  	OUT   	NOCOPY DATE,
+   	t_previous_customer_trx_id       	OUT   	NOCOPY NUMBER,
+   	t_primary_salesrep_id            	OUT   	NOCOPY NUMBER,
+   	t_printing_original_date         	OUT   	NOCOPY DATE,
+   	t_printing_last_printed          	OUT   	NOCOPY DATE,
+   	t_printing_option                	OUT   	NOCOPY VARCHAR2,
+   	t_printing_count                 	OUT   	NOCOPY NUMBER,
+   	t_printing_pending               	OUT   	NOCOPY VARCHAR2,
+   	t_purchase_order                 	OUT   	NOCOPY VARCHAR2,
+   	t_purchase_order_revision        	OUT   	NOCOPY VARCHAR2,
+   	t_purchase_order_date            	OUT   	NOCOPY DATE,
+   	t_customer_reference             	OUT   	NOCOPY VARCHAR2,
+   	t_internal_notes                 	OUT   	NOCOPY VARCHAR2,
+   	t_exchange_rate_type             	OUT   	NOCOPY VARCHAR2,
+   	t_exchange_date                  	OUT   	NOCOPY DATE,
+   	t_exchange_rate                  	OUT   	NOCOPY NUMBER,
+   	t_territory_id                   	OUT   	NOCOPY NUMBER,
+   	t_initial_customer_trx_id        	OUT   	NOCOPY NUMBER,
+   	t_agreement_id                   	OUT   	NOCOPY NUMBER,
+   	t_end_date_commitment            	OUT   	NOCOPY DATE,
+   	t_start_date_commitment          	OUT   	NOCOPY DATE,
+   	t_last_printed_sequence_num      	OUT   	NOCOPY NUMBER,
+   	t_orig_system_batch_name         	OUT   	NOCOPY VARCHAR2,
+   	t_post_request_id                	OUT   	NOCOPY NUMBER,
+   	t_request_id                     	OUT   	NOCOPY NUMBER,
+   	t_program_application_id         	OUT   	NOCOPY NUMBER,
+   	t_program_id                     	OUT   	NOCOPY NUMBER,
+   	t_program_update_date            	OUT   	NOCOPY DATE,
+   	t_finance_charges                	OUT   	NOCOPY VARCHAR2,
+   	t_complete_flag                  	OUT   	NOCOPY VARCHAR2,
+   	t_posting_control_id             	OUT   	NOCOPY NUMBER,
+   	t_bill_to_address_id             	OUT   	NOCOPY NUMBER,
+   	t_ra_post_loop_number            	OUT   	NOCOPY NUMBER,
+   	t_ship_to_address_id             	OUT   	NOCOPY NUMBER,
+   	t_credit_method_for_rules        	OUT   	NOCOPY VARCHAR2,
+   	t_cr_method_for_installments     	OUT   	NOCOPY VARCHAR2,
+   	t_receipt_method_id              	OUT   	NOCOPY NUMBER,
+   	t_related_customer_trx_id        	OUT   	NOCOPY NUMBER,
+   	t_invoicing_rule_id              	OUT   	NOCOPY NUMBER,
+   	t_ship_via                       	OUT   	NOCOPY VARCHAR2,
+   	t_ship_date_actual               	OUT   	NOCOPY DATE,
+   	t_waybill_number                 	OUT   	NOCOPY VARCHAR2,
+   	t_fob_point                      	OUT   	NOCOPY VARCHAR2,
+   	t_customer_bank_account_id       	OUT   	NOCOPY NUMBER,
+   	t_status_trx                     	OUT   	NOCOPY VARCHAR2,
+   	t_doc_sequence_id                	OUT   	NOCOPY NUMBER,
+   	t_doc_sequence_value             	OUT   	NOCOPY NUMBER,
+   	t_paying_customer_id             	OUT   	NOCOPY NUMBER,
+   	t_paying_site_use_id             	OUT   	NOCOPY NUMBER,
+   	t_related_batch_source_id        	OUT   	NOCOPY NUMBER,
+   	t_default_tax_exempt_flag        	OUT   	NOCOPY VARCHAR2,
+   	t_created_from                   	OUT   	NOCOPY VARCHAR2,
+	row_to_fetch			IN 	OUT	NOCOPY NUMBER,
+	error_status				OUT	NOCOPY NUMBER,
+	t_term_name				OUT	NOCOPY VARCHAR2,
+	t_trx_name				OUT	NOCOPY VARCHAR2,
+	t_type					OUT     NOCOPY VARCHAR2);
+END GMF_AR_GET_INVOICE_HEADER;
+
+ 
+
+/

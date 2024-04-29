@@ -1,0 +1,160 @@
+--------------------------------------------------------
+--  DDL for Package Body WIP_WIPDJDSP_XMLP_PKG
+--------------------------------------------------------
+
+  CREATE OR REPLACE EDITIONABLE PACKAGE BODY "APPS"."WIP_WIPDJDSP_XMLP_PKG" AS
+/* $Header: WIPDJDSPB.pls 120.1 2008/01/31 12:14:53 npannamp noship $ */
+  FUNCTION BEFOREREPORT RETURN BOOLEAN IS
+  BEGIN
+    P_CONC_REQUEST_ID := FND_GLOBAL.CONC_REQUEST_ID;
+    QTY_PRECISION := wip_common_xmlp_pkg.get_precision(p_qty_precision);
+
+          select id_flex_num_cl
+          into item_id_flex_num
+          from(
+          SELECT fifst.id_flex_num id_flex_num_cl
+          FROM fnd_id_flex_structures fifst
+          WHERE fifst.application_id = 401
+          AND fifst.id_flex_code = 'MSTK'
+          AND fifst.enabled_flag = 'Y'
+          AND fifst.freeze_flex_definition_flag = 'Y'
+          ORDER BY fifst.id_flex_num)
+          where rownum<2;
+    /*SRW.USER_EXIT('FND SRWINIT')*/NULL;
+    /*SRW.USER_EXIT('FND FLEXSQL CODE="MSTK"
+                                APPL_SHORT_NAME="INV" OUTPUT=":P_ITEM_DATA"
+                                MODE="SELECT" DISPLAY="ALL" TABLEALIAS="SI"')*/NULL;
+    RETURN (TRUE);
+  END BEFOREREPORT;
+
+  FUNCTION AFTERREPORT RETURN BOOLEAN IS
+  BEGIN
+    /*SRW.USER_EXIT('FND SRWEXIT')*/NULL;
+    RETURN (TRUE);
+  END AFTERREPORT;
+
+  FUNCTION DYNAMIC_ORDER_BY RETURN CHARACTER IS
+    ORDER_BY_CLAUSE VARCHAR2(500);
+  BEGIN
+    IF (SORT_CODE = 7) THEN
+      ORDER_BY_CLAUSE := 'ORDER BY 5 ASC,6 ASC , WO.FIRST_UNIT_START_DATE';
+    ELSIF (SORT_CODE = 8) THEN
+      ORDER_BY_CLAUSE := 'ORDER BY 5 ASC,6 ASC ,WO.LAST_UNIT_COMPLETION_DATE';
+    END IF;
+    ORDER_BY_CLAUSE := ORDER_BY_CLAUSE || ', WE.WIP_ENTITY_NAME, WO.OPERATION_SEQ_NUM, WE.WIP_ENTITY_ID';
+    RETURN (ORDER_BY_CLAUSE);
+  END DYNAMIC_ORDER_BY;
+
+  FUNCTION DATE_LIMITER RETURN CHARACTER IS
+    LIMIT_DATES VARCHAR2(200);
+  BEGIN
+    IF (FROM_DATE IS NOT NULL) THEN
+      IF (TO_DATE IS NOT NULL) THEN
+        LIMIT_DATES := ' AND DECODE(' || TO_CHAR(SORT_CODE) || ',7,trunc(WO.FIRST_UNIT_START_DATE),8, trunc(WO.LAST_UNIT_COMPLETION_DATE)) BETWEEN TO_DATE(''' || TO_CHAR(FROM_DATE
+                              ,'YYYYMMDD') || ''',''YYYYMMDD'') AND TO_DATE(''' || TO_CHAR(TO_DATE
+                              ,'YYYYMMDD') || ''',''YYYYMMDD'')';
+      ELSE
+        LIMIT_DATES := ' AND DECODE(' || TO_CHAR(SORT_CODE) || ',7,trunc(WO.FIRST_UNIT_START_DATE),8, trunc(WO.LAST_UNIT_COMPLETION_DATE)) >= TO_DATE(''' || TO_CHAR(FROM_DATE
+                              ,'YYYYMMDD') || ''',''YYYYMMDD'')';
+      END IF;
+    ELSE
+      IF (TO_DATE IS NOT NULL) THEN
+        LIMIT_DATES := ' AND DECODE(' || TO_CHAR(SORT_CODE) || ',7,trunc(WO.FIRST_UNIT_START_DATE),8,trunc(WO.LAST_UNIT_COMPLETION_DATE)) <= TO_DATE(''' || TO_CHAR(TO_DATE
+                              ,'YYYYMMDD') || ''',''YYYYMMDD'')';
+      ELSE
+        LIMIT_DATES := ' ';
+      END IF;
+    END IF;
+    RETURN (LIMIT_DATES);
+  END DATE_LIMITER;
+
+  FUNCTION DEPARTMENT_LIMITER RETURN CHARACTER IS
+    LIMIT_DEPT VARCHAR2(80);
+  BEGIN
+    IF (P_FROM_DEPT IS NOT NULL) THEN
+      IF (P_TO_DEPT IS NOT NULL) THEN
+        LIMIT_DEPT := ' AND BD.DEPARTMENT_CODE BETWEEN ''' || P_FROM_DEPT || ''' AND ''' || P_TO_DEPT || '''';
+      ELSE
+        LIMIT_DEPT := ' AND BD.DEPARTMENT_CODE >= ''' || P_FROM_DEPT || '''';
+      END IF;
+    ELSE
+      IF (P_TO_DEPT IS NOT NULL) THEN
+        LIMIT_DEPT := ' AND BD.DEPARTMENT_CODE <= ''' || P_TO_DEPT || '''';
+      ELSE
+        LIMIT_DEPT := ' ';
+      END IF;
+    END IF;
+    RETURN (LIMIT_DEPT);
+  END DEPARTMENT_LIMITER;
+
+  FUNCTION C_QUANTITY_IN_PREVFORMULA(WE_ID_p IN NUMBER ,OP_SEQ_p IN NUMBER) RETURN NUMBER IS
+  BEGIN
+    /*SRW.REFERENCE(WE_ID)*/NULL;
+    /*SRW.REFERENCE(ORG_ID)*/NULL;
+    /*SRW.REFERENCE(OP_SEQ)*/NULL;
+
+      SELECT (SUM(QUANTITY_IN_QUEUE)
+                  + SUM(QUANTITY_RUNNING)
+                  + SUM(QUANTITY_REJECTED)
+                  + SUM(QUANTITY_WAITING_TO_MOVE))
+                  INTO QUANTITY_REM_IN_PREV
+                  FROM WIP_OPERATIONS
+                  WHERE WIP_ENTITY_ID = WE_ID_p
+                  AND ORGANIZATION_ID = org_id
+                  AND OPERATION_SEQ_NUM < OP_SEQ_p;
+      RETURN (QUANTITY_REM_IN_PREV);
+  END C_QUANTITY_IN_PREVFORMULA;
+
+  FUNCTION QUANTITY_REMAININGFORMULA(STATUS_TYPE IN NUMBER
+                                    ,QUANTITY_SCHEDULED IN NUMBER
+                                    ,QUANTITY_IN_QUEUE IN NUMBER
+                                    ,QUANTITY_RUNNING IN NUMBER
+                                    ,C_QUANTITY_IN_PREV IN NUMBER) RETURN NUMBER IS
+  BEGIN
+    IF (STATUS_TYPE = 1) THEN
+      RETURN QUANTITY_SCHEDULED;
+    ELSE
+      RETURN (QUANTITY_IN_QUEUE + QUANTITY_RUNNING + C_QUANTITY_IN_PREV);
+    END IF;
+    RETURN NULL;
+  END QUANTITY_REMAININGFORMULA;
+
+  FUNCTION STATUS_LIMITER RETURN CHARACTER IS
+    STATUS VARCHAR2(3000);
+  BEGIN
+    IF (P_INCLUDE_UNRELEASE = 1) THEN
+      STATUS := 'AND    DJ.STATUS_TYPE IN (1,3,4,6)';
+    ELSE
+      STATUS := 'AND    DJ.STATUS_TYPE IN (3,4,6)';
+    END IF;
+    RETURN (STATUS);
+  END STATUS_LIMITER;
+
+  FUNCTION AFTERPFORM RETURN BOOLEAN IS
+  BEGIN
+    IF P_SCHEDULE_GROUP IS NOT NULL THEN
+      P_SG_OUTER := ' ';
+    END IF;
+    RETURN (TRUE);
+  END AFTERPFORM;
+
+  FUNCTION C_LIMITER RETURN VARCHAR2 IS
+    C_OUT VARCHAR2(200);
+  BEGIN
+    IF P_SCHEDULE_GROUP IS NOT NULL THEN
+      C_OUT := ' AND SG.SCHEDULE_GROUP_NAME = ''' || P_SCHEDULE_GROUP || '''';
+    ELSE
+      C_OUT := ' ';
+    END IF;
+    RETURN (C_OUT);
+  END C_LIMITER;
+
+  FUNCTION QUANTITY_REM_IN_PREV_P RETURN NUMBER IS
+  BEGIN
+    RETURN QUANTITY_REM_IN_PREV;
+  END QUANTITY_REM_IN_PREV_P;
+
+END WIP_WIPDJDSP_XMLP_PKG;
+
+
+/

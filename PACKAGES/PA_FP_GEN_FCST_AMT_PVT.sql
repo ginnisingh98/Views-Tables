@@ -1,0 +1,74 @@
+--------------------------------------------------------
+--  DDL for Package PA_FP_GEN_FCST_AMT_PVT
+--------------------------------------------------------
+
+  CREATE OR REPLACE EDITIONABLE PACKAGE "APPS"."PA_FP_GEN_FCST_AMT_PVT" AUTHID CURRENT_USER as
+/* $Header: PAFPFGVS.pls 120.0 2005/05/30 08:39:20 appldev noship $ */
+
+PROCEDURE GET_TOTAL_PLAN_TXN_AMTS
+          (P_PROJECT_ID                IN          PA_PROJECTS_ALL.PROJECT_ID%TYPE,
+           P_BUDGET_VERSION_ID         IN          PA_BUDGET_VERSIONS.BUDGET_VERSION_ID%TYPE,
+           P_BV_ID_ETC_WP              IN          PA_BUDGET_VERSIONS.BUDGET_VERSION_ID%TYPE,
+           P_BV_ID_ETC_FP              IN          PA_BUDGET_VERSIONS.BUDGET_VERSION_ID%TYPE,
+           P_FP_COLS_REC_ETC_WP        IN          PA_FP_GEN_AMOUNT_UTILS.FP_COLS,
+           P_FP_COLS_REC_ETC_FP        IN          PA_FP_GEN_AMOUNT_UTILS.FP_COLS,
+           P_FP_COLS_REC               IN          PA_FP_GEN_AMOUNT_UTILS.FP_COLS,
+           P_TASK_ID                   IN          PA_RESOURCE_ASSIGNMENTS.TASK_ID%TYPE,
+           P_LATEST_PUBLISH_FP_WBS_ID  IN          NUMBER,
+           P_CALLING_CONTEXT           IN          VARCHAR2,
+           X_TXN_AMT_REC               OUT  NOCOPY PA_FP_GEN_FCST_AMT_PUB.TXN_AMT_REC_TYP,
+           X_RETURN_STATUS             OUT  NOCOPY VARCHAR2,
+           X_MSG_COUNT                 OUT  NOCOPY NUMBER,
+           X_MSG_DATA                  OUT  NOCOPY VARCHAR2);
+
+PROCEDURE UPDATE_TOTAL_PLAN_AMTS
+          (P_BUDGET_VERSION_ID       IN          PA_BUDGET_VERSIONS.BUDGET_VERSION_ID%TYPE,
+           X_RETURN_STATUS           OUT  NOCOPY VARCHAR2,
+           X_MSG_COUNT               OUT  NOCOPY NUMBER,
+           X_MSG_DATA                OUT  NOCOPY VARCHAR2);
+
+PROCEDURE GET_ACTUAL_TXN_AMOUNT
+          (P_BUDGET_VERSION_ID       IN          PA_BUDGET_VERSIONS.BUDGET_VERSION_ID%TYPE,
+           P_TASK_ID                 IN          PA_RESOURCE_ASSIGNMENTS.TASK_ID%TYPE,
+           P_RES_LIST_MEMBER_ID      IN          PA_RESOURCE_ASSIGNMENTS.RESOURCE_LIST_MEMBER_ID%TYPE,
+           P_RES_ASG_ID              IN          PA_RESOURCE_ASSIGNMENTS.RESOURCE_ASSIGNMENT_ID%TYPE,
+           P_TXN_CURRENCY_CODE       IN          PA_BUDGET_LINES.TXN_CURRENCY_CODE%TYPE,
+           P_CURRENCY_FLAG           IN          VARCHAR2,
+           P_FP_COLS_REC             IN          PA_FP_GEN_AMOUNT_UTILS.FP_COLS,
+           P_ACTUAL_FROM_DATE        IN          PA_PERIODS_ALL.START_DATE%TYPE,
+           P_ACTUAL_TO_DATE          IN          PA_PERIODS_ALL.START_DATE%TYPE,
+           X_TXN_AMT_REC             OUT  NOCOPY PA_FP_GEN_FCST_AMT_PUB.TXN_AMT_REC_TYP,
+           X_RETURN_STATUS           OUT  NOCOPY VARCHAR2,
+           X_MSG_COUNT               OUT  NOCOPY NUMBER,
+           X_MSG_DATA                OUT  NOCOPY VARCHAR2);
+
+PROCEDURE GEN_AVERAGE_OF_ACTUALS
+          (P_BUDGET_VERSION_ID       IN          PA_BUDGET_VERSIONS.BUDGET_VERSION_ID%TYPE,
+           P_TASK_ID                 IN          PA_RESOURCE_ASSIGNMENTS.TASK_ID%TYPE,
+           P_RES_LIST_MEMBER_ID      IN          PA_RESOURCE_ASSIGNMENTS.RESOURCE_LIST_MEMBER_ID%TYPE,
+           P_TXN_CURRENCY_CODE       IN          PA_BUDGET_LINES.TXN_CURRENCY_CODE%TYPE,
+           P_CURRENCY_FLAG           IN          VARCHAR2,
+           P_PLANNING_START_DATE     IN          PA_BUDGET_LINES.START_DATE%TYPE,
+           P_PLANNING_END_DATE       IN          PA_BUDGET_LINES.END_DATE%TYPE,
+           P_ACTUALS_THRU_DATE       IN          DATE,
+           P_FP_COLS_REC             IN          PA_FP_GEN_AMOUNT_UTILS.FP_COLS,
+           P_ACTUAL_FROM_PERIOD      IN          PA_PERIODS_ALL.PERIOD_NAME%TYPE DEFAULT null,
+           P_ACTUAL_TO_PERIOD        IN          PA_PERIODS_ALL.PERIOD_NAME%TYPE DEFAULT null,
+           P_ETC_FROM_PERIOD         IN          PA_PERIODS_ALL.PERIOD_NAME%TYPE DEFAULT null,
+           P_ETC_TO_PERIOD           IN          PA_PERIODS_ALL.PERIOD_NAME%TYPE DEFAULT null,
+           P_RESOURCE_ASSIGNMENT_ID  IN          PA_RESOURCE_ASSIGNMENTS.RESOURCE_ASSIGNMENT_ID%TYPE,
+           X_RETURN_STATUS           OUT  NOCOPY VARCHAR2,
+           X_MSG_COUNT               OUT  NOCOPY NUMBER,
+           X_MSG_DATA                OUT  NOCOPY VARCHAR2);
+
+PROCEDURE UPD_TGT_RATE_BASED_FLAG
+          (P_FP_COLS_REC             IN   PA_FP_GEN_AMOUNT_UTILS.FP_COLS,
+           X_RETURN_STATUS           OUT  NOCOPY VARCHAR2,
+           X_MSG_COUNT               OUT  NOCOPY NUMBER,
+           X_MSG_DATA                OUT  NOCOPY VARCHAR2);
+
+END PA_FP_GEN_FCST_AMT_PVT;
+
+ 
+
+/

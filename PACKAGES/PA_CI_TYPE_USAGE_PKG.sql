@@ -1,0 +1,41 @@
+--------------------------------------------------------
+--  DDL for Package PA_CI_TYPE_USAGE_PKG
+--------------------------------------------------------
+
+  CREATE OR REPLACE EDITIONABLE PACKAGE "APPS"."PA_CI_TYPE_USAGE_PKG" AUTHID CURRENT_USER as
+/* $Header: PACITUTS.pls 120.1 2005/08/19 16:18:58 mwasowic noship $ */
+procedure INSERT_ROW (
+  X_ROWID out NOCOPY VARCHAR2, --File.Sql.39 bug 4440895
+  X_CI_TYPE_USAGE_ID out NOCOPY NUMBER, --File.Sql.39 bug 4440895
+  X_PROJECT_TYPE_ID in NUMBER,
+  X_CI_TYPE_ID in NUMBER,
+  X_CREATION_DATE in DATE,
+  X_CREATED_BY in NUMBER,
+  X_LAST_UPDATE_DATE in DATE,
+  X_LAST_UPDATED_BY in NUMBER,
+  X_LAST_UPDATE_LOGIN in NUMBER
+);
+
+procedure UPDATE_ROW (
+  X_CI_TYPE_USAGE_ID in NUMBER,
+  X_PROJECT_TYPE_ID in NUMBER,
+  X_CI_TYPE_ID in NUMBER,
+  X_LAST_UPDATE_DATE in DATE,
+  X_LAST_UPDATED_BY in NUMBER,
+  X_LAST_UPDATE_LOGIN in NUMBER
+);
+
+procedure LOCK_ROW (
+  X_CI_TYPE_USAGE_ID in NUMBER,
+  X_PROJECT_TYPE_ID in NUMBER,
+  X_CI_TYPE_ID in NUMBER
+);
+
+procedure DELETE_ROW (
+  X_CI_TYPE_USAGE_ID in NUMBER
+);
+
+end PA_CI_TYPE_USAGE_PKG;
+ 
+
+/

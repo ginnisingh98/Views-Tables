@@ -1,0 +1,46 @@
+--------------------------------------------------------
+--  DDL for Package HXC_ENTITY_GROUPS_UPLOAD_PKG
+--------------------------------------------------------
+
+  CREATE OR REPLACE EDITIONABLE PACKAGE "APPS"."HXC_ENTITY_GROUPS_UPLOAD_PKG" AUTHID CURRENT_USER AS
+/* $Header: hxcetgupl.pkh 115.1 2004/05/13 02:18:24 dragarwa noship $ */
+
+PROCEDURE LOAD_ENTITY_GROUP_ROW(
+ 	P_NAME                            IN VARCHAR2,
+ 	P_ENTITY_TYPE                     IN VARCHAR2,
+ 	P_OWNER			   	  IN VARCHAR2,
+ 	P_CUSTOM_MODE               	  IN VARCHAR2 DEFAULT NULL) ;
+
+ PROCEDURE LOAD_ENTITY_GROUP_COMPS_ROW(
+	 P_ENTITY_TYPE 			IN VARCHAR2,
+	 P_NAME				IN VARCHAR2,
+	 P_ATTRIBUTE_CATEGORY 		IN VARCHAR2,
+	 P_ATTRIBUTE1 			IN VARCHAR2,
+	 P_ATTRIBUTE2 			IN VARCHAR2,
+	 P_ATTRIBUTE3 IN VARCHAR2,
+ 	 P_OWNER	  	        IN VARCHAR2,
+	 P_CUSTOM_MODE            IN VARCHAR2 DEFAULT NULL);
+
+	 PROCEDURE LOAD_ENTITY_GROUP_ROW(
+ 	P_NAME                            IN VARCHAR2,
+ 	P_ENTITY_TYPE                     IN VARCHAR2,
+ 	P_OWNER			   	  IN VARCHAR2,
+ 	P_CUSTOM_MODE               	  IN VARCHAR2 DEFAULT NULL
+	,p_last_update_date         IN VARCHAR2) ;
+
+ PROCEDURE LOAD_ENTITY_GROUP_COMPS_ROW(
+	 P_ENTITY_TYPE 			IN VARCHAR2,
+	 P_NAME				IN VARCHAR2,
+	 P_ATTRIBUTE_CATEGORY 		IN VARCHAR2,
+	 P_ATTRIBUTE1 			IN VARCHAR2,
+	 P_ATTRIBUTE2 			IN VARCHAR2,
+	 P_ATTRIBUTE3 IN VARCHAR2,
+ 	 P_OWNER	  	        IN VARCHAR2,
+	 P_CUSTOM_MODE            IN VARCHAR2 DEFAULT NULL
+	 ,p_last_update_date         IN VARCHAR2);
+
+END hxc_entity_groups_upload_pkg;
+
+ 
+
+/

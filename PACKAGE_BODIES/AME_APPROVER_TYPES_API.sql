@@ -1,0 +1,350 @@
+--------------------------------------------------------
+--  DDL for Package Body AME_APPROVER_TYPES_API
+--------------------------------------------------------
+
+  CREATE OR REPLACE EDITIONABLE PACKAGE BODY "APPS"."AME_APPROVER_TYPES_API" AS
+/* $Header: ameapapi.pkb 120.2 2005/10/14 04:10:58 ubhat noship $ */
+procedure OWNER_TO_WHO (
+  X_OWNER in VARCHAR2,
+  X_CREATED_BY out nocopy NUMBER,
+  X_LAST_UPDATED_BY out nocopy NUMBER,
+  X_LAST_UPDATE_LOGIN out nocopy NUMBER
+) is
+begin
+  X_CREATED_BY := AME_SEED_UTILITY.OWNER_AS_INTEGER(X_OWNER);
+  X_LAST_UPDATED_BY := AME_SEED_UTILITY.OWNER_AS_INTEGER(X_OWNER);
+  X_LAST_UPDATE_LOGIN := 0;
+end OWNER_TO_WHO;
+
+procedure KEY_TO_IDS (
+  X_ORIG_SYSTEM              in VARCHAR2,
+  X_APPROVER_TYPE_ROWID      out nocopy VARCHAR2,
+  X_APPROVER_TYPE_ID         out nocopy VARCHAR2,
+  X_CURRENT_OWNER            out nocopy NUMBER,
+  X_CURRENT_LAST_UPDATE_DATE out nocopy VARCHAR2,
+  X_CURRENT_OVN              out nocopy NUMBER
+) is
+  cursor CSR_GET_CURRENT_APPROVER_TYPE
+  (
+    X_ORIG_SYSTEM            in VARCHAR2
+  ) is
+   select ROWID, APPROVER_TYPE_ID,
+          LAST_UPDATED_BY,
+          to_char(LAST_UPDATE_DATE,'YYYY/MM/DD HH24:MI:SS'),
+          nvl(OBJECT_VERSION_NUMBER,1)
+   from   AME_APPROVER_TYPES
+   where  ORIG_SYSTEM = X_ORIG_SYSTEM
+	    and sysdate between START_DATE
+			 and nvl(END_DATE  - (1/86400), sysdate);
+begin
+  X_CURRENT_OVN := 1;
+  open CSR_GET_CURRENT_APPROVER_TYPE (
+    X_ORIG_SYSTEM
+  );
+fetch CSR_GET_CURRENT_APPROVER_TYPE into
+X_APPROVER_TYPE_ROWID,
+X_APPROVER_TYPE_ID,
+X_CURRENT_OWNER,
+X_CURRENT_LAST_UPDATE_DATE,
+X_CURRENT_OVN;
+  if (CSR_GET_CURRENT_APPROVER_TYPE%notfound) then
+     X_APPROVER_TYPE_ID := null;
+  end if;
+  close CSR_GET_CURRENT_APPROVER_TYPE;
+end KEY_TO_IDS;
+function DO_UPDATE_INSERT(X_OWNER in NUMBER,
+                   X_CURRENT_OWNER in NUMBER,
+                   X_LAST_UPDATE_DATE in VARCHAR2,
+                   X_CURRENT_LAST_UPDATE_DATE in VARCHAR2,
+                   X_CUSTOM_MODE in VARCHAR2 default null)
+return boolean as
+begin
+  return AME_SEED_UTILITY.MERGE_ROW_TEST
+    (X_OWNER                     => X_OWNER
+    ,X_CURRENT_OWNER             => X_CURRENT_OWNER
+    ,X_LAST_UPDATE_DATE          => X_LAST_UPDATE_DATE
+    ,X_CURRENT_LAST_UPDATE_DATE  => X_CURRENT_LAST_UPDATE_DATE
+    ,X_CUSTOM_MODE               => X_CUSTOM_MODE
+    );
+end DO_UPDATE_INSERT;
+
+procedure INSERT_ROW (
+ X_APPROVER_TYPE_ID                in NUMBER,
+ X_ORIG_SYSTEM                     in VARCHAR2,
+ X_QUERY_VARIABLE_1_LABEL          in VARCHAR2,
+ X_QUERY_VARIABLE_2_LABEL          in VARCHAR2,
+ X_QUERY_VARIABLE_3_LABEL          in VARCHAR2,
+ X_QUERY_VARIABLE_4_LABEL          in VARCHAR2,
+ X_QUERY_VARIABLE_5_LABEL          in VARCHAR2,
+ X_VARIABLE_1_LOV_QUERY            in VARCHAR2,
+ X_VARIABLE_2_LOV_QUERY            in VARCHAR2,
+ X_VARIABLE_3_LOV_QUERY            in VARCHAR2,
+ X_VARIABLE_4_LOV_QUERY            in VARCHAR2,
+ X_VARIABLE_5_LOV_QUERY            in VARCHAR2,
+ X_QUERY_PROCEDURE                 in VARCHAR2,
+ X_CREATED_BY                      in NUMBER,
+ X_CREATION_DATE                   in DATE,
+ X_LAST_UPDATED_BY                 in NUMBER,
+ X_LAST_UPDATE_DATE                in DATE,
+ X_LAST_UPDATE_LOGIN               in NUMBER,
+ X_START_DATE                      in DATE,
+ X_OBJECT_VERSION_NUMBER           in NUMBER)
+ is
+begin
+  insert into AME_APPROVER_TYPES
+  (
+   APPROVER_TYPE_ID,
+   ORIG_SYSTEM,
+   QUERY_VARIABLE_1_LABEL,
+   QUERY_VARIABLE_2_LABEL,
+   QUERY_VARIABLE_3_LABEL,
+   QUERY_VARIABLE_4_LABEL,
+   QUERY_VARIABLE_5_LABEL,
+   VARIABLE_1_LOV_QUERY,
+   VARIABLE_2_LOV_QUERY,
+   VARIABLE_3_LOV_QUERY,
+   VARIABLE_4_LOV_QUERY,
+   VARIABLE_5_LOV_QUERY,
+   QUERY_PROCEDURE,
+   CREATED_BY,
+   CREATION_DATE,
+   LAST_UPDATED_BY,
+   LAST_UPDATE_DATE,
+   LAST_UPDATE_LOGIN,
+   START_DATE,
+   END_DATE,
+   OBJECT_VERSION_NUMBER
+  ) values (
+   X_APPROVER_TYPE_ID,
+   X_ORIG_SYSTEM,
+   X_QUERY_VARIABLE_1_LABEL,
+   X_QUERY_VARIABLE_2_LABEL,
+   X_QUERY_VARIABLE_3_LABEL,
+   X_QUERY_VARIABLE_4_LABEL,
+   X_QUERY_VARIABLE_5_LABEL,
+   X_VARIABLE_1_LOV_QUERY,
+   X_VARIABLE_2_LOV_QUERY,
+   X_VARIABLE_3_LOV_QUERY,
+   X_VARIABLE_4_LOV_QUERY,
+   X_VARIABLE_5_LOV_QUERY,
+   X_QUERY_PROCEDURE,
+   X_CREATED_BY,
+   X_CREATION_DATE,
+   X_LAST_UPDATED_BY,
+   X_LAST_UPDATE_DATE,
+   X_LAST_UPDATE_LOGIN,
+   X_START_DATE,
+   AME_SEED_UTILITY.GET_DEFAULT_END_DATE,
+   X_OBJECT_VERSION_NUMBER);
+
+end INSERT_ROW;
+
+procedure UPDATE_ROW (
+ X_APPROVER_TYPE_ROWID             in VARCHAR2,
+ X_END_DATE                        in DATE)
+ is
+begin
+  update AME_APPROVER_TYPES set
+   END_DATE             = X_END_DATE
+  where ROWID           = X_APPROVER_TYPE_ROWID;
+end UPDATE_ROW;
+
+procedure FORCE_UPDATE_ROW (
+  X_ROWID                      in VARCHAR2,
+  X_QUERY_VARIABLE_1_LABEL     in VARCHAR2,
+  X_QUERY_VARIABLE_2_LABEL     in VARCHAR2,
+  X_QUERY_VARIABLE_3_LABEL     in VARCHAR2,
+  X_QUERY_VARIABLE_4_LABEL     in VARCHAR2,
+  X_QUERY_VARIABLE_5_LABEL     in VARCHAR2,
+  X_VARIABLE_1_LOV_QUERY       in VARCHAR2,
+  X_VARIABLE_2_LOV_QUERY       in VARCHAR2,
+  X_VARIABLE_3_LOV_QUERY       in VARCHAR2,
+  X_VARIABLE_4_LOV_QUERY       in VARCHAR2,
+  X_VARIABLE_5_LOV_QUERY       in VARCHAR2,
+  X_QUERY_PROCEDURE            in VARCHAR2,
+  X_CREATED_BY                 in NUMBER,
+  X_CREATION_DATE              in DATE,
+  X_LAST_UPDATED_BY            in NUMBER,
+  X_LAST_UPDATE_DATE           in DATE,
+  X_LAST_UPDATE_LOGIN          in NUMBER,
+  X_START_DATE                 in DATE,
+  X_END_DATE                   in DATE,
+  X_OBJECT_VERSION_NUMBER      in NUMBER
+) is
+begin
+  update AME_APPROVER_TYPES
+     set QUERY_VARIABLE_1_LABEL = X_QUERY_VARIABLE_1_LABEL,
+         QUERY_VARIABLE_2_LABEL = X_QUERY_VARIABLE_2_LABEL,
+         QUERY_VARIABLE_3_LABEL = X_QUERY_VARIABLE_3_LABEL,
+         QUERY_VARIABLE_4_LABEL = X_QUERY_VARIABLE_4_LABEL,
+         QUERY_VARIABLE_5_LABEL = X_QUERY_VARIABLE_5_LABEL,
+         VARIABLE_1_LOV_QUERY = X_QUERY_VARIABLE_1_LABEL,
+         VARIABLE_2_LOV_QUERY = X_QUERY_VARIABLE_2_LABEL,
+         VARIABLE_3_LOV_QUERY = X_QUERY_VARIABLE_3_LABEL,
+         VARIABLE_4_LOV_QUERY = X_QUERY_VARIABLE_4_LABEL,
+         VARIABLE_5_LOV_QUERY = X_QUERY_VARIABLE_5_LABEL,
+         QUERY_PROCEDURE = X_QUERY_PROCEDURE,
+         CREATED_BY = X_CREATED_BY,
+         CREATION_DATE = X_CREATION_DATE,
+         LAST_UPDATED_BY = X_LAST_UPDATED_BY,
+         LAST_UPDATE_DATE = X_LAST_UPDATE_DATE,
+         LAST_UPDATE_LOGIN = X_LAST_UPDATE_LOGIN,
+         START_DATE = X_START_DATE,
+         END_DATE = X_END_DATE,
+         OBJECT_VERSION_NUMBER = X_OBJECT_VERSION_NUMBER
+   where ROWID = X_ROWID;
+end FORCE_UPDATE_ROW;
+
+procedure DELETE_ROW (
+  X_APPROVER_TYPE_ID in NUMBER
+) is
+begin
+  delete from AME_APPROVER_TYPES
+  where APPROVER_TYPE_ID = X_APPROVER_TYPE_ID;
+
+  if (sql%notfound) then
+    raise no_data_found;
+  end if;
+end DELETE_ROW;
+procedure LOAD_ROW (
+          X_ORIG_SYSTEM in VARCHAR2,
+          X_QUERY_VARIABLE_1_LABEL in VARCHAR2,
+          X_QUERY_VARIABLE_2_LABEL in VARCHAR2,
+          X_QUERY_VARIABLE_3_LABEL in VARCHAR2,
+          X_QUERY_VARIABLE_4_LABEL in VARCHAR2,
+          X_QUERY_VARIABLE_5_LABEL in VARCHAR2,
+          X_VARIABLE_1_LOV_QUERY in VARCHAR2,
+          X_VARIABLE_2_LOV_QUERY in VARCHAR2,
+          X_VARIABLE_3_LOV_QUERY in VARCHAR2,
+          X_VARIABLE_4_LOV_QUERY in VARCHAR2,
+          X_VARIABLE_5_LOV_QUERY in VARCHAR2,
+          X_QUERY_PROCEDURE  in VARCHAR2,
+          X_OWNER            in VARCHAR2,
+          X_LAST_UPDATE_DATE in VARCHAR2,
+          X_CUSTOM_MODE      in VARCHAR2
+)
+is
+  X_APPROVER_TYPE_ROWID ROWID;
+  X_APPROVER_TYPE_ID NUMBER;
+  X_CREATED_BY NUMBER;
+  X_CURRENT_LAST_UPDATE_DATE VARCHAR2(19);
+  X_CURRENT_OWNER NUMBER;
+  X_LAST_UPDATED_BY NUMBER;
+  X_LAST_UPDATE_LOGIN NUMBER;
+  X_CURRENT_OVN NUMBER;
+begin
+ if X_ORIG_SYSTEM <> 'ALL' then
+-- retrieve information for the current row
+  KEY_TO_IDS (
+    X_ORIG_SYSTEM,
+    X_APPROVER_TYPE_ROWID,
+    X_APPROVER_TYPE_ID,
+    X_CURRENT_OWNER,
+    X_CURRENT_LAST_UPDATE_DATE,
+    X_CURRENT_OVN
+  );
+-- obtain who column details
+  OWNER_TO_WHO (
+    X_OWNER,
+    X_CREATED_BY,
+    X_LAST_UPDATED_BY,
+    X_LAST_UPDATE_LOGIN
+  );
+-- the current row was not found insert a new row
+   if X_APPROVER_TYPE_ID is null then
+       select nvl(max(APPROVER_TYPE_ID)+1, 0)
+         into X_APPROVER_TYPE_ID
+         from AME_APPROVER_TYPES;
+       INSERT_ROW (
+         X_APPROVER_TYPE_ID,
+         X_ORIG_SYSTEM,
+         X_QUERY_VARIABLE_1_LABEL,
+         X_QUERY_VARIABLE_2_LABEL,
+         X_QUERY_VARIABLE_3_LABEL,
+         X_QUERY_VARIABLE_4_LABEL,
+         X_QUERY_VARIABLE_5_LABEL,
+         X_VARIABLE_1_LOV_QUERY,
+         X_VARIABLE_2_LOV_QUERY,
+         X_VARIABLE_3_LOV_QUERY,
+         X_VARIABLE_4_LOV_QUERY,
+         X_VARIABLE_5_LOV_QUERY,
+         X_QUERY_PROCEDURE,
+         X_CREATED_BY,
+         to_date(X_LAST_UPDATE_DATE,'YYYY/MM/DD HH24:MI:SS'),
+         X_LAST_UPDATED_BY,
+         to_date(X_LAST_UPDATE_DATE,'YYYY/MM/DD HH24:MI:SS'),
+         X_LAST_UPDATE_LOGIN,
+         to_date(X_LAST_UPDATE_DATE,'YYYY/MM/DD HH24:MI:SS'),
+         1);
+
+  -- the current row was found end date the current row
+  -- insert a row with the same action type id
+   else
+     if X_CUSTOM_MODE = 'FORCE' then
+      FORCE_UPDATE_ROW (
+        X_APPROVER_TYPE_ROWID,
+        X_QUERY_VARIABLE_1_LABEL,
+        X_QUERY_VARIABLE_2_LABEL,
+        X_QUERY_VARIABLE_3_LABEL,
+        X_QUERY_VARIABLE_4_LABEL,
+        X_QUERY_VARIABLE_5_LABEL,
+        X_VARIABLE_1_LOV_QUERY,
+        X_VARIABLE_2_LOV_QUERY,
+        X_VARIABLE_3_LOV_QUERY,
+        X_VARIABLE_4_LOV_QUERY,
+        X_VARIABLE_5_LOV_QUERY,
+        X_QUERY_PROCEDURE,
+        X_CREATED_BY,
+        to_date(X_LAST_UPDATE_DATE,'YYYY/MM/DD HH24:MI:SS'),
+        X_LAST_UPDATED_BY,
+        to_date(X_LAST_UPDATE_DATE,'YYYY/MM/DD HH24:MI:SS'),
+        X_LAST_UPDATE_LOGIN,
+        to_date(X_LAST_UPDATE_DATE,'YYYY/MM/DD HH24:MI:SS'),
+        AME_SEED_UTILITY.GET_DEFAULT_END_DATE,
+        X_CURRENT_OVN + 1);
+     else
+        if DO_UPDATE_INSERT
+              (AME_SEED_UTILITY.OWNER_AS_INTEGER(X_OWNER),
+               X_CURRENT_OWNER,
+               X_LAST_UPDATE_DATE,
+               X_CURRENT_LAST_UPDATE_DATE) then
+          UPDATE_ROW (
+            X_APPROVER_TYPE_ROWID,
+            to_date(X_LAST_UPDATE_DATE,'YYYY/MM/DD HH24:MI:SS')-(1/86400));
+          INSERT_ROW (
+            X_APPROVER_TYPE_ID,
+            X_ORIG_SYSTEM,
+            X_QUERY_VARIABLE_1_LABEL,
+            X_QUERY_VARIABLE_2_LABEL,
+            X_QUERY_VARIABLE_3_LABEL,
+            X_QUERY_VARIABLE_4_LABEL,
+            X_QUERY_VARIABLE_5_LABEL,
+            X_VARIABLE_1_LOV_QUERY,
+            X_VARIABLE_2_LOV_QUERY,
+            X_VARIABLE_3_LOV_QUERY,
+            X_VARIABLE_4_LOV_QUERY,
+            X_VARIABLE_5_LOV_QUERY,
+            X_QUERY_PROCEDURE,
+            X_CREATED_BY,
+            to_date(X_LAST_UPDATE_DATE,'YYYY/MM/DD HH24:MI:SS'),
+            X_LAST_UPDATED_BY,
+            to_date(X_LAST_UPDATE_DATE,'YYYY/MM/DD HH24:MI:SS'),
+            X_LAST_UPDATE_LOGIN,
+            to_date(X_LAST_UPDATE_DATE,'YYYY/MM/DD HH24:MI:SS'),
+            X_CURRENT_OVN + 1);
+         end if;
+      end if;
+   end if;
+end if;
+exception
+    when others then
+    ame_util.runtimeException('ame_approver_types_api',
+                         'load_row',
+                         sqlcode,
+                         sqlerrm);
+        raise;
+end LOAD_ROW;
+
+END AME_APPROVER_TYPES_API;
+
+/

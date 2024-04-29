@@ -1,0 +1,159 @@
+--------------------------------------------------------
+--  DDL for Package Body PA_RESOURCE_FORMATS_PKG
+--------------------------------------------------------
+
+  CREATE OR REPLACE EDITIONABLE PACKAGE BODY "APPS"."PA_RESOURCE_FORMATS_PKG" as
+/* $Header: PAREPRFB.pls 120.0 2005/05/29 11:17:45 appldev noship $ */
+procedure INSERT_ROW (
+  X_RESOURCE_FORMAT_ID               in NUMBER,
+  X_PERSON_ID_FLAG                   in VARCHAR2,
+  X_JOB_ID_FLAG                      in VARCHAR2,
+  X_ORGANIZATION_ID_FLAG             in VARCHAR2,
+  X_VENDOR_ID_FLAG                   in VARCHAR2,
+  X_EXPENDITURE_TYPE_FLAG            in VARCHAR2,
+  X_EVENT_TYPE_FLAG                  in VARCHAR2,
+  X_NON_LABOR_RESOURCE_FLAG          in VARCHAR2,
+  X_EXPENDITURE_CATEGORY_FLAG        in VARCHAR2,
+  X_REVENUE_CATEGORY_FLAG            in VARCHAR2,
+  X_NON_LABOR_RESOURCE_ORG_FLAG      in VARCHAR2,
+  X_EVENT_CLASSIFICATION_FLAG        in VARCHAR2,
+  X_SYSTEM_LINKAGE_FUNCTION_FLAG     in VARCHAR2,
+  X_DESCRIPTION                      in VARCHAR2,
+  X_PROJECT_ROLE_ID_FLAG             in VARCHAR2,
+  X_CREATION_DATE                    in DATE,
+  X_CREATED_BY                       in NUMBER,
+  X_LAST_UPDATE_DATE                 in DATE,
+  X_LAST_UPDATED_BY                  in NUMBER,
+  X_LAST_UPDATE_LOGIN                in NUMBER
+) is
+begin
+  insert into PA_RESOURCE_FORMATS (
+    RESOURCE_FORMAT_ID,
+    PERSON_ID_FLAG,
+    JOB_ID_FLAG,
+    ORGANIZATION_ID_FLAG,
+    VENDOR_ID_FLAG,
+    EXPENDITURE_TYPE_FLAG,
+    EVENT_TYPE_FLAG,
+    NON_LABOR_RESOURCE_FLAG,
+    EXPENDITURE_CATEGORY_FLAG,
+    REVENUE_CATEGORY_FLAG,
+    NON_LABOR_RESOURCE_ORG_ID_FLAG,
+    EVENT_TYPE_CLASSIFICATION_FLAG,
+    SYSTEM_LINKAGE_FUNCTION_FLAG,
+    DESCRIPTION,
+    PROJECT_ROLE_ID_FLAG,
+    CREATION_DATE,
+    CREATED_BY,
+    LAST_UPDATE_DATE,
+    LAST_UPDATED_BY,
+    LAST_UPDATE_LOGIN
+  ) values (
+    X_RESOURCE_FORMAT_ID,
+    X_PERSON_ID_FLAG,
+    X_JOB_ID_FLAG,
+    X_ORGANIZATION_ID_FLAG,
+    X_VENDOR_ID_FLAG,
+    X_EXPENDITURE_TYPE_FLAG,
+    X_EVENT_TYPE_FLAG,
+    X_NON_LABOR_RESOURCE_FLAG,
+    X_EXPENDITURE_CATEGORY_FLAG,
+    X_REVENUE_CATEGORY_FLAG,
+    X_NON_LABOR_RESOURCE_ORG_FLAG,
+    X_EVENT_CLASSIFICATION_FLAG,
+    X_SYSTEM_LINKAGE_FUNCTION_FLAG,
+    X_DESCRIPTION,
+    X_PROJECT_ROLE_ID_FLAG,
+    X_CREATION_DATE,
+    X_CREATED_BY,
+    X_LAST_UPDATE_DATE,
+    X_LAST_UPDATED_BY,
+    X_LAST_UPDATE_LOGIN
+  );
+
+  exception
+    when others then
+      raise;
+
+end INSERT_ROW;
+
+procedure TRANSLATE_ROW (
+  X_RESOURCE_FORMAT_ID       in NUMBER,
+  X_OWNER                    in VARCHAR2,
+  X_DESCRIPTION              in VARCHAR2) is
+begin
+
+  update PA_RESOURCE_FORMATS set
+    DESCRIPTION       = X_DESCRIPTION,
+    LAST_UPDATE_DATE  = sysdate,
+    LAST_UPDATED_BY   = decode(X_OWNER, 'SEED', 1, 0),
+    LAST_UPDATE_LOGIN = 0
+  where RESOURCE_FORMAT_ID  = X_RESOURCE_FORMAT_ID
+  and userenv('LANG') in
+         (select LANGUAGE_CODE from FND_LANGUAGES where INSTALLED_FLAG in ('B', 'I') );
+
+  if (sql%notfound) then
+    raise no_data_found;
+  end if;
+
+  exception
+    when others then
+      raise;
+
+end TRANSLATE_ROW;
+
+
+procedure UPDATE_ROW (
+  X_RESOURCE_FORMAT_ID               in NUMBER,
+  X_PERSON_ID_FLAG                   in VARCHAR2,
+  X_JOB_ID_FLAG                      in VARCHAR2,
+  X_ORGANIZATION_ID_FLAG             in VARCHAR2,
+  X_VENDOR_ID_FLAG                   in VARCHAR2,
+  X_EXPENDITURE_TYPE_FLAG            in VARCHAR2,
+  X_EVENT_TYPE_FLAG                  in VARCHAR2,
+  X_NON_LABOR_RESOURCE_FLAG          in VARCHAR2,
+  X_EXPENDITURE_CATEGORY_FLAG        in VARCHAR2,
+  X_REVENUE_CATEGORY_FLAG            in VARCHAR2,
+  X_NON_LABOR_RESOURCE_ORG_FLAG      in VARCHAR2,
+  X_EVENT_CLASSIFICATION_FLAG        in VARCHAR2,
+  X_SYSTEM_LINKAGE_FUNCTION_FLAG     in VARCHAR2,
+  X_DESCRIPTION                      in VARCHAR2,
+  X_PROJECT_ROLE_ID_FLAG             in VARCHAR2,
+  X_LAST_UPDATE_DATE                 in DATE,
+  X_LAST_UPDATED_BY                  in NUMBER,
+  X_LAST_UPDATE_LOGIN                in NUMBER
+) is
+begin
+  update PA_RESOURCE_FORMATS set
+    PERSON_ID_FLAG                  = X_PERSON_ID_FLAG,
+    JOB_ID_FLAG                     = X_JOB_ID_FLAG,
+    ORGANIZATION_ID_FLAG            = X_ORGANIZATION_ID_FLAG,
+    VENDOR_ID_FLAG                  = X_VENDOR_ID_FLAG,
+    EXPENDITURE_TYPE_FLAG           = X_EXPENDITURE_TYPE_FLAG,
+    EVENT_TYPE_FLAG                 = X_EVENT_TYPE_FLAG,
+    NON_LABOR_RESOURCE_FLAG         = X_NON_LABOR_RESOURCE_FLAG,
+    EXPENDITURE_CATEGORY_FLAG       = X_EXPENDITURE_CATEGORY_FLAG,
+    REVENUE_CATEGORY_FLAG           = X_REVENUE_CATEGORY_FLAG,
+    NON_LABOR_RESOURCE_ORG_ID_FLAG  = X_NON_LABOR_RESOURCE_ORG_FLAG,
+    EVENT_TYPE_CLASSIFICATION_FLAG  = X_EVENT_CLASSIFICATION_FLAG,
+    SYSTEM_LINKAGE_FUNCTION_FLAG    = X_SYSTEM_LINKAGE_FUNCTION_FLAG,
+    DESCRIPTION                     = X_DESCRIPTION,
+    PROJECT_ROLE_ID_FLAG            = X_PROJECT_ROLE_ID_FLAG,
+    LAST_UPDATE_DATE                = X_LAST_UPDATE_DATE,
+    LAST_UPDATED_BY                 = X_LAST_UPDATED_BY,
+    LAST_UPDATE_LOGIN               = X_LAST_UPDATE_LOGIN
+  where RESOURCE_FORMAT_ID          = X_RESOURCE_FORMAT_ID;
+
+  if (sql%notfound) then
+    raise no_data_found;
+  end if;
+
+  exception
+    when others then
+      raise;
+
+end UPDATE_ROW;
+
+end PA_RESOURCE_FORMATS_PKG;
+
+/

@@ -1,0 +1,103 @@
+--------------------------------------------------------
+--  DDL for Package IEB_SVC_PLANS_PKG
+--------------------------------------------------------
+
+  CREATE OR REPLACE EDITIONABLE PACKAGE "APPS"."IEB_SVC_PLANS_PKG" AUTHID CURRENT_USER as
+/* $Header: IEBSVCPS.pls 120.2 2005/09/29 06:14:11 appldev noship $ */
+
+procedure INSERT_ROW_B (
+  P_SVCPLN_ID             IN NUMBER,
+  P_SERVICE_PLAN_NAME     IN VARCHAR2,
+  P_DIRECTION             IN VARCHAR2,
+  P_TREATMENT             IN VARCHAR2,
+  P_PLAN_NAME             IN VARCHAR2,
+  P_DESCRIPTION           IN VARCHAR2,
+  P_OBJECT_VERSION_NUMBER IN NUMBER,
+  P_MEDIA_TYPE_ID         IN NUMBER,
+  P_OWNER_ID			 IN NUMBER,
+  X_ROWID                 IN OUT NOCOPY VARCHAR2
+);
+
+procedure INSERT_ROW_TL (
+  P_SVCPLN_ID             IN NUMBER,
+  P_PLAN_NAME             IN VARCHAR2,
+  P_DESCRIPTION           IN VARCHAR2,
+  P_OBJECT_VERSION_NUMBER IN NUMBER,
+  P_OWNER_ID              IN NUMBER,
+  X_ROWID                 IN OUT NOCOPY VARCHAR2
+);
+
+procedure LOCK_ROW (
+  P_SVCPLN_ID             IN NUMBER,
+  P_SERVICE_PLAN_NAME     IN VARCHAR2,
+  P_DIRECTION             IN VARCHAR2,
+  P_TREATMENT             IN VARCHAR2,
+  P_PLAN_NAME             IN VARCHAR2,
+  P_DESCRIPTION           IN VARCHAR2,
+  P_OBJECT_VERSION_NUMBER IN NUMBER,
+  P_MEDIA_TYPE_ID         IN NUMBER
+) ;
+
+procedure UPDATE_ROW_B (
+  P_SVCPLN_ID             IN NUMBER,
+  P_SERVICE_PLAN_NAME     IN VARCHAR2,
+  P_DIRECTION             IN VARCHAR2,
+  P_TREATMENT             IN VARCHAR2,
+  P_PLAN_NAME             IN VARCHAR2,
+  P_DESCRIPTION           IN VARCHAR2,
+  P_OBJECT_VERSION_NUMBER IN NUMBER,
+  P_MEDIA_TYPE_ID         IN NUMBER,
+  P_OWNER_ID              IN NUMBER
+) ;
+
+procedure UPDATE_ROW_TL (
+  P_SVCPLN_ID             IN NUMBER,
+  P_PLAN_NAME             IN VARCHAR2,
+  P_DESCRIPTION           IN VARCHAR2,
+  P_OBJECT_VERSION_NUMBER IN NUMBER,
+  P_OWNER_ID              IN NUMBER
+) ;
+
+procedure DELETE_ROW (
+  P_SVCPLN_ID in NUMBER
+) ;
+
+procedure ADD_LANGUAGE;
+
+procedure TRANSLATE_ROW (
+  P_SVCPLN_ID   IN NUMBER,
+  P_PLAN_NAME        IN VARCHAR2,
+  P_DESCRIPTION IN VARCHAR2,
+  P_OWNER       IN VARCHAR2
+) ;
+
+procedure LOAD_ROW (
+  P_SVCPLN_ID             IN NUMBER,
+  P_SERVICE_PLAN_NAME     IN VARCHAR2,
+  P_DIRECTION             IN VARCHAR2,
+  P_TREATMENT             IN VARCHAR2,
+  P_PLAN_NAME             IN VARCHAR2,
+  P_DESCRIPTION           IN VARCHAR2,
+  P_OBJECT_VERSION_NUMBER IN NUMBER,
+  P_MEDIA_TYPE_ID         IN NUMBER,
+  P_OWNER                 IN VARCHAR2
+) ;
+
+procedure LOAD_SEED_ROW (
+  P_SVCPLN_ID             IN NUMBER,
+  P_SERVICE_PLAN_NAME     IN VARCHAR2,
+  P_DIRECTION             IN VARCHAR2,
+  P_TREATMENT             IN VARCHAR2,
+  P_PLAN_NAME             IN VARCHAR2,
+  P_DESCRIPTION           IN VARCHAR2,
+  P_OBJECT_VERSION_NUMBER IN NUMBER,
+  P_MEDIA_TYPE_ID         IN NUMBER,
+  P_OWNER                 IN VARCHAR2,
+  P_UPLOAD_MODE		 IN VARCHAR2
+  ) ;
+
+
+end IEB_SVC_PLANS_PKG;
+ 
+
+/

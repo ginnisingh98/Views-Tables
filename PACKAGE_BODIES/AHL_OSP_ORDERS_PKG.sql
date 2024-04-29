@@ -1,0 +1,563 @@
+--------------------------------------------------------
+--  DDL for Package Body AHL_OSP_ORDERS_PKG
+--------------------------------------------------------
+
+  CREATE OR REPLACE EDITIONABLE PACKAGE BODY "APPS"."AHL_OSP_ORDERS_PKG" as
+/* $Header: AHLLOSOB.pls 120.2 2008/01/30 22:23:55 jaramana ship $ */
+procedure INSERT_ROW (
+  X_ROWID in out nocopy VARCHAR2,
+  X_OSP_ORDER_ID in NUMBER,
+  X_VENDOR_CONTACT_ID in NUMBER,
+  X_OBJECT_VERSION_NUMBER in NUMBER,
+  X_OSP_ORDER_NUMBER in NUMBER,
+  X_ORDER_TYPE_CODE in VARCHAR2,
+  X_STATUS_CODE in VARCHAR2,
+  X_SINGLE_INSTANCE_FLAG in VARCHAR2,
+  X_ORDER_DATE in DATE,
+  X_OPERATING_UNIT_ID in NUMBER,
+  X_VENDOR_ID in NUMBER,
+  X_VENDOR_SITE_ID in NUMBER,
+  X_CUSTOMER_ID in NUMBER,
+  X_CONTRACT_ID in NUMBER,
+  X_CONTRACT_TERMS in VARCHAR2,
+  X_PO_HEADER_ID in NUMBER,
+  X_PO_SYNCH_FLAG in VARCHAR2,
+  X_PO_BATCH_ID in NUMBER,
+  X_PO_REQUEST_ID in NUMBER,
+  X_PO_INTERFACE_HEADER_ID in NUMBER,
+  X_PO_REQ_HEADER_ID in NUMBER,  -- Added by jaramana on January 14, 2008 for the Requisition ER 6034236
+  X_PO_AGENT_ID in NUMBER,
+  X_OE_HEADER_ID in NUMBER,
+  X_ATTRIBUTE_CATEGORY in VARCHAR2,
+  X_ATTRIBUTE1 in VARCHAR2,
+  X_ATTRIBUTE2 in VARCHAR2,
+  X_ATTRIBUTE3 in VARCHAR2,
+  X_ATTRIBUTE4 in VARCHAR2,
+  X_ATTRIBUTE5 in VARCHAR2,
+  X_ATTRIBUTE6 in VARCHAR2,
+  X_ATTRIBUTE7 in VARCHAR2,
+  X_ATTRIBUTE8 in VARCHAR2,
+  X_ATTRIBUTE9 in VARCHAR2,
+  X_ATTRIBUTE10 in VARCHAR2,
+  X_ATTRIBUTE11 in VARCHAR2,
+  X_ATTRIBUTE12 in VARCHAR2,
+  X_ATTRIBUTE13 in VARCHAR2,
+  X_ATTRIBUTE14 in VARCHAR2,
+  X_ATTRIBUTE15 in VARCHAR2,
+  X_DESCRIPTION in VARCHAR2,
+  X_CREATION_DATE in DATE,
+  X_CREATED_BY in NUMBER,
+  X_LAST_UPDATE_DATE in DATE,
+  X_LAST_UPDATED_BY in NUMBER,
+  X_LAST_UPDATE_LOGIN in NUMBER
+) is
+  cursor C is select ROWID from AHL_OSP_ORDERS_B
+    where OSP_ORDER_ID = X_OSP_ORDER_ID
+    ;
+begin
+  insert into AHL_OSP_ORDERS_B (
+    VENDOR_CONTACT_ID,
+    OSP_ORDER_ID,
+    OBJECT_VERSION_NUMBER,
+    OSP_ORDER_NUMBER,
+    ORDER_TYPE_CODE,
+    STATUS_CODE,
+    SINGLE_INSTANCE_FLAG,
+    ORDER_DATE,
+    OPERATING_UNIT_ID,
+    VENDOR_ID,
+    VENDOR_SITE_ID,
+    CUSTOMER_ID,
+    CONTRACT_ID,
+    CONTRACT_TERMS,
+    PO_HEADER_ID,
+    PO_SYNCH_FLAG,
+    PO_BATCH_ID,
+    PO_REQUEST_ID,
+    PO_INTERFACE_HEADER_ID,
+    PO_REQ_HEADER_ID,  -- Added by jaramana on January 14, 2008 for the Requisition ER 6034236
+    PO_AGENT_ID,
+    OE_HEADER_ID,
+    ATTRIBUTE_CATEGORY,
+    ATTRIBUTE1,
+    ATTRIBUTE2,
+    ATTRIBUTE3,
+    ATTRIBUTE4,
+    ATTRIBUTE5,
+    ATTRIBUTE6,
+    ATTRIBUTE7,
+    ATTRIBUTE8,
+    ATTRIBUTE9,
+    ATTRIBUTE10,
+    ATTRIBUTE11,
+    ATTRIBUTE12,
+    ATTRIBUTE13,
+    ATTRIBUTE14,
+    ATTRIBUTE15,
+    CREATION_DATE,
+    CREATED_BY,
+    LAST_UPDATE_DATE,
+    LAST_UPDATED_BY,
+    LAST_UPDATE_LOGIN
+  ) values (
+    X_VENDOR_CONTACT_ID,
+    X_OSP_ORDER_ID,
+    X_OBJECT_VERSION_NUMBER,
+    X_OSP_ORDER_NUMBER,
+    X_ORDER_TYPE_CODE,
+    X_STATUS_CODE,
+    X_SINGLE_INSTANCE_FLAG,
+    X_ORDER_DATE,
+    X_OPERATING_UNIT_ID,
+    X_VENDOR_ID,
+    X_VENDOR_SITE_ID,
+    X_CUSTOMER_ID,
+    X_CONTRACT_ID,
+    X_CONTRACT_TERMS,
+    X_PO_HEADER_ID,
+    X_PO_SYNCH_FLAG,
+    X_PO_BATCH_ID,
+    X_PO_REQUEST_ID,
+    X_PO_INTERFACE_HEADER_ID,
+    X_PO_REQ_HEADER_ID,  -- Added by jaramana on January 14, 2008 for the Requisition ER 6034236
+    X_PO_AGENT_ID,
+    X_OE_HEADER_ID,
+    X_ATTRIBUTE_CATEGORY,
+    X_ATTRIBUTE1,
+    X_ATTRIBUTE2,
+    X_ATTRIBUTE3,
+    X_ATTRIBUTE4,
+    X_ATTRIBUTE5,
+    X_ATTRIBUTE6,
+    X_ATTRIBUTE7,
+    X_ATTRIBUTE8,
+    X_ATTRIBUTE9,
+    X_ATTRIBUTE10,
+    X_ATTRIBUTE11,
+    X_ATTRIBUTE12,
+    X_ATTRIBUTE13,
+    X_ATTRIBUTE14,
+    X_ATTRIBUTE15,
+    X_CREATION_DATE,
+    X_CREATED_BY,
+    X_LAST_UPDATE_DATE,
+    X_LAST_UPDATED_BY,
+    X_LAST_UPDATE_LOGIN
+  );
+
+  insert into AHL_OSP_ORDERS_TL (
+    OSP_ORDER_ID,
+    LAST_UPDATE_DATE,
+    LAST_UPDATED_BY,
+    CREATION_DATE,
+    CREATED_BY,
+    LAST_UPDATE_LOGIN,
+    DESCRIPTION,
+    LANGUAGE,
+    SOURCE_LANG
+  ) select
+    X_OSP_ORDER_ID,
+    X_LAST_UPDATE_DATE,
+    X_LAST_UPDATED_BY,
+    X_CREATION_DATE,
+    X_CREATED_BY,
+    X_LAST_UPDATE_LOGIN,
+    X_DESCRIPTION,
+    L.LANGUAGE_CODE,
+    userenv('LANG')
+  from FND_LANGUAGES L
+  where L.INSTALLED_FLAG in ('I', 'B')
+  and not exists
+    (select NULL
+    from AHL_OSP_ORDERS_TL T
+    where T.OSP_ORDER_ID = X_OSP_ORDER_ID
+    and T.LANGUAGE = L.LANGUAGE_CODE);
+
+  open c;
+  fetch c into X_ROWID;
+  if (c%notfound) then
+    close c;
+    raise no_data_found;
+  end if;
+  close c;
+
+end INSERT_ROW;
+
+procedure LOCK_ROW (
+  X_OSP_ORDER_ID in NUMBER,
+  X_VENDOR_CONTACT_ID in NUMBER,
+  X_OBJECT_VERSION_NUMBER in NUMBER,
+  X_OSP_ORDER_NUMBER in NUMBER,
+  X_ORDER_TYPE_CODE in VARCHAR2,
+  X_STATUS_CODE in VARCHAR2,
+  X_SINGLE_INSTANCE_FLAG in VARCHAR2,
+  X_ORDER_DATE in DATE,
+  X_OPERATING_UNIT_ID in NUMBER,
+  X_VENDOR_ID in NUMBER,
+  X_VENDOR_SITE_ID in NUMBER,
+  X_CUSTOMER_ID in NUMBER,
+  X_CONTRACT_ID in NUMBER,
+  X_CONTRACT_TERMS in VARCHAR2,
+  X_PO_HEADER_ID in NUMBER,
+  X_PO_SYNCH_FLAG in VARCHAR2,
+  X_PO_BATCH_ID in NUMBER,
+  X_PO_REQUEST_ID in NUMBER,
+  X_PO_INTERFACE_HEADER_ID in NUMBER,
+  X_PO_REQ_HEADER_ID in NUMBER,  -- Added by jaramana on January 14, 2008 for the Requisition ER 6034236
+  X_PO_AGENT_ID in NUMBER,
+  X_OE_HEADER_ID in NUMBER,
+  X_ATTRIBUTE_CATEGORY in VARCHAR2,
+  X_ATTRIBUTE1 in VARCHAR2,
+  X_ATTRIBUTE2 in VARCHAR2,
+  X_ATTRIBUTE3 in VARCHAR2,
+  X_ATTRIBUTE4 in VARCHAR2,
+  X_ATTRIBUTE5 in VARCHAR2,
+  X_ATTRIBUTE6 in VARCHAR2,
+  X_ATTRIBUTE7 in VARCHAR2,
+  X_ATTRIBUTE8 in VARCHAR2,
+  X_ATTRIBUTE9 in VARCHAR2,
+  X_ATTRIBUTE10 in VARCHAR2,
+  X_ATTRIBUTE11 in VARCHAR2,
+  X_ATTRIBUTE12 in VARCHAR2,
+  X_ATTRIBUTE13 in VARCHAR2,
+  X_ATTRIBUTE14 in VARCHAR2,
+  X_ATTRIBUTE15 in VARCHAR2,
+  X_DESCRIPTION in VARCHAR2
+) is
+  cursor c is select
+      VENDOR_CONTACT_ID,
+      OBJECT_VERSION_NUMBER,
+      OSP_ORDER_NUMBER,
+      ORDER_TYPE_CODE,
+      STATUS_CODE,
+      SINGLE_INSTANCE_FLAG,
+      ORDER_DATE,
+      OPERATING_UNIT_ID,
+      VENDOR_ID,
+      VENDOR_SITE_ID,
+      CUSTOMER_ID,
+      CONTRACT_ID,
+      CONTRACT_TERMS,
+      PO_HEADER_ID,
+      PO_SYNCH_FLAG,
+      PO_BATCH_ID,
+      PO_REQUEST_ID,
+      PO_INTERFACE_HEADER_ID,
+      PO_REQ_HEADER_ID,  -- Added by jaramana on January 14, 2008 for the Requisition ER 6034236
+      PO_AGENT_ID,
+      OE_HEADER_ID,
+      ATTRIBUTE_CATEGORY,
+      ATTRIBUTE1,
+      ATTRIBUTE2,
+      ATTRIBUTE3,
+      ATTRIBUTE4,
+      ATTRIBUTE5,
+      ATTRIBUTE6,
+      ATTRIBUTE7,
+      ATTRIBUTE8,
+      ATTRIBUTE9,
+      ATTRIBUTE10,
+      ATTRIBUTE11,
+      ATTRIBUTE12,
+      ATTRIBUTE13,
+      ATTRIBUTE14,
+      ATTRIBUTE15
+    from AHL_OSP_ORDERS_B
+    where OSP_ORDER_ID = X_OSP_ORDER_ID
+    for update of OSP_ORDER_ID nowait;
+  recinfo c%rowtype;
+
+  cursor c1 is select
+      DESCRIPTION,
+      decode(LANGUAGE, userenv('LANG'), 'Y', 'N') BASELANG
+    from AHL_OSP_ORDERS_TL
+    where OSP_ORDER_ID = X_OSP_ORDER_ID
+    and userenv('LANG') in (LANGUAGE, SOURCE_LANG)
+    for update of OSP_ORDER_ID nowait;
+begin
+  open c;
+  fetch c into recinfo;
+  if (c%notfound) then
+    close c;
+    fnd_message.set_name('FND', 'FORM_RECORD_DELETED');
+    app_exception.raise_exception;
+  end if;
+  close c;
+  if (    ((recinfo.VENDOR_CONTACT_ID = X_VENDOR_CONTACT_ID)
+           OR ((recinfo.VENDOR_CONTACT_ID is null) AND (X_VENDOR_CONTACT_ID is null)))
+      AND (recinfo.OBJECT_VERSION_NUMBER = X_OBJECT_VERSION_NUMBER)
+      AND (recinfo.OSP_ORDER_NUMBER = X_OSP_ORDER_NUMBER)
+      AND (recinfo.ORDER_TYPE_CODE = X_ORDER_TYPE_CODE)
+      AND (recinfo.STATUS_CODE = X_STATUS_CODE)
+      AND (recinfo.SINGLE_INSTANCE_FLAG = X_SINGLE_INSTANCE_FLAG)
+      AND (recinfo.ORDER_DATE = X_ORDER_DATE)
+      AND (recinfo.OPERATING_UNIT_ID = X_OPERATING_UNIT_ID)
+      AND ((recinfo.VENDOR_ID = X_VENDOR_ID)
+           OR ((recinfo.VENDOR_ID is null) AND (X_VENDOR_ID is null)))
+      AND ((recinfo.VENDOR_SITE_ID = X_VENDOR_SITE_ID)
+           OR ((recinfo.VENDOR_SITE_ID is null) AND (X_VENDOR_SITE_ID is null)))
+      AND ((recinfo.CUSTOMER_ID = X_CUSTOMER_ID)
+           OR ((recinfo.CUSTOMER_ID is null) AND (X_CUSTOMER_ID is null)))
+      AND ((recinfo.CONTRACT_ID = X_CONTRACT_ID)
+           OR ((recinfo.CONTRACT_ID is null) AND (X_CONTRACT_ID is null)))
+      AND ((recinfo.CONTRACT_TERMS = X_CONTRACT_TERMS)
+           OR ((recinfo.CONTRACT_TERMS is null) AND (X_CONTRACT_TERMS is null)))
+      AND ((recinfo.PO_HEADER_ID = X_PO_HEADER_ID)
+           OR ((recinfo.PO_HEADER_ID is null) AND (X_PO_HEADER_ID is null)))
+      AND ((recinfo.PO_SYNCH_FLAG = X_PO_SYNCH_FLAG)
+           OR ((recinfo.PO_SYNCH_FLAG is null) AND (X_PO_SYNCH_FLAG is null)))
+      AND ((recinfo.PO_BATCH_ID = X_PO_BATCH_ID)
+           OR ((recinfo.PO_BATCH_ID is null) AND (X_PO_BATCH_ID is null)))
+      AND ((recinfo.PO_REQUEST_ID = X_PO_REQUEST_ID)
+           OR ((recinfo.PO_REQUEST_ID is null) AND (X_PO_REQUEST_ID is null)))
+      AND ((recinfo.PO_INTERFACE_HEADER_ID = X_PO_INTERFACE_HEADER_ID)
+           OR ((recinfo.PO_INTERFACE_HEADER_ID is null) AND (X_PO_INTERFACE_HEADER_ID is null)))
+      AND ((recinfo.PO_REQ_HEADER_ID = X_PO_REQ_HEADER_ID)
+           OR ((recinfo.PO_REQ_HEADER_ID is null) AND (X_PO_REQ_HEADER_ID is null)))
+      AND ((recinfo.PO_AGENT_ID = X_PO_AGENT_ID)
+           OR ((recinfo.PO_AGENT_ID is null) AND (X_PO_AGENT_ID is null)))
+      AND ((recinfo.OE_HEADER_ID = X_OE_HEADER_ID)
+           OR ((recinfo.OE_HEADER_ID is null) AND (X_OE_HEADER_ID is null)))
+      AND ((recinfo.ATTRIBUTE_CATEGORY = X_ATTRIBUTE_CATEGORY)
+           OR ((recinfo.ATTRIBUTE_CATEGORY is null) AND (X_ATTRIBUTE_CATEGORY is null)))
+      AND ((recinfo.ATTRIBUTE1 = X_ATTRIBUTE1)
+           OR ((recinfo.ATTRIBUTE1 is null) AND (X_ATTRIBUTE1 is null)))
+      AND ((recinfo.ATTRIBUTE2 = X_ATTRIBUTE2)
+           OR ((recinfo.ATTRIBUTE2 is null) AND (X_ATTRIBUTE2 is null)))
+      AND ((recinfo.ATTRIBUTE3 = X_ATTRIBUTE3)
+           OR ((recinfo.ATTRIBUTE3 is null) AND (X_ATTRIBUTE3 is null)))
+      AND ((recinfo.ATTRIBUTE4 = X_ATTRIBUTE4)
+           OR ((recinfo.ATTRIBUTE4 is null) AND (X_ATTRIBUTE4 is null)))
+      AND ((recinfo.ATTRIBUTE5 = X_ATTRIBUTE5)
+           OR ((recinfo.ATTRIBUTE5 is null) AND (X_ATTRIBUTE5 is null)))
+      AND ((recinfo.ATTRIBUTE6 = X_ATTRIBUTE6)
+           OR ((recinfo.ATTRIBUTE6 is null) AND (X_ATTRIBUTE6 is null)))
+      AND ((recinfo.ATTRIBUTE7 = X_ATTRIBUTE7)
+           OR ((recinfo.ATTRIBUTE7 is null) AND (X_ATTRIBUTE7 is null)))
+      AND ((recinfo.ATTRIBUTE8 = X_ATTRIBUTE8)
+           OR ((recinfo.ATTRIBUTE8 is null) AND (X_ATTRIBUTE8 is null)))
+      AND ((recinfo.ATTRIBUTE9 = X_ATTRIBUTE9)
+           OR ((recinfo.ATTRIBUTE9 is null) AND (X_ATTRIBUTE9 is null)))
+      AND ((recinfo.ATTRIBUTE10 = X_ATTRIBUTE10)
+           OR ((recinfo.ATTRIBUTE10 is null) AND (X_ATTRIBUTE10 is null)))
+      AND ((recinfo.ATTRIBUTE11 = X_ATTRIBUTE11)
+           OR ((recinfo.ATTRIBUTE11 is null) AND (X_ATTRIBUTE11 is null)))
+      AND ((recinfo.ATTRIBUTE12 = X_ATTRIBUTE12)
+           OR ((recinfo.ATTRIBUTE12 is null) AND (X_ATTRIBUTE12 is null)))
+      AND ((recinfo.ATTRIBUTE13 = X_ATTRIBUTE13)
+           OR ((recinfo.ATTRIBUTE13 is null) AND (X_ATTRIBUTE13 is null)))
+      AND ((recinfo.ATTRIBUTE14 = X_ATTRIBUTE14)
+           OR ((recinfo.ATTRIBUTE14 is null) AND (X_ATTRIBUTE14 is null)))
+      AND ((recinfo.ATTRIBUTE15 = X_ATTRIBUTE15)
+           OR ((recinfo.ATTRIBUTE15 is null) AND (X_ATTRIBUTE15 is null)))
+  ) then
+    null;
+  else
+    fnd_message.set_name('FND', 'FORM_RECORD_CHANGED');
+    app_exception.raise_exception;
+  end if;
+
+  for tlinfo in c1 loop
+    if (tlinfo.BASELANG = 'Y') then
+      if (    ((tlinfo.DESCRIPTION = X_DESCRIPTION)
+               OR ((tlinfo.DESCRIPTION is null) AND (X_DESCRIPTION is null)))
+      ) then
+        null;
+      else
+        fnd_message.set_name('FND', 'FORM_RECORD_CHANGED');
+        app_exception.raise_exception;
+      end if;
+    end if;
+  end loop;
+  return;
+end LOCK_ROW;
+
+procedure UPDATE_ROW (
+  X_OSP_ORDER_ID in NUMBER,
+  X_VENDOR_CONTACT_ID in NUMBER,
+  X_OBJECT_VERSION_NUMBER in NUMBER,
+  X_OSP_ORDER_NUMBER in NUMBER,
+  X_ORDER_TYPE_CODE in VARCHAR2,
+  X_STATUS_CODE in VARCHAR2,
+  X_SINGLE_INSTANCE_FLAG in VARCHAR2,
+  X_ORDER_DATE in DATE,
+  X_OPERATING_UNIT_ID in NUMBER,
+  X_VENDOR_ID in NUMBER,
+  X_VENDOR_SITE_ID in NUMBER,
+  X_CUSTOMER_ID in NUMBER,
+  X_CONTRACT_ID in NUMBER,
+  X_CONTRACT_TERMS in VARCHAR2,
+  X_PO_HEADER_ID in NUMBER,
+  X_PO_SYNCH_FLAG in VARCHAR2,
+  X_PO_BATCH_ID in NUMBER,
+  X_PO_REQUEST_ID in NUMBER,
+  X_PO_INTERFACE_HEADER_ID in NUMBER,
+  X_PO_REQ_HEADER_ID in NUMBER,  -- Added by jaramana on January 14, 2008 for the Requisition ER 6034236
+  X_PO_AGENT_ID in NUMBER,
+  X_OE_HEADER_ID in NUMBER,
+  X_ATTRIBUTE_CATEGORY in VARCHAR2,
+  X_ATTRIBUTE1 in VARCHAR2,
+  X_ATTRIBUTE2 in VARCHAR2,
+  X_ATTRIBUTE3 in VARCHAR2,
+  X_ATTRIBUTE4 in VARCHAR2,
+  X_ATTRIBUTE5 in VARCHAR2,
+  X_ATTRIBUTE6 in VARCHAR2,
+  X_ATTRIBUTE7 in VARCHAR2,
+  X_ATTRIBUTE8 in VARCHAR2,
+  X_ATTRIBUTE9 in VARCHAR2,
+  X_ATTRIBUTE10 in VARCHAR2,
+  X_ATTRIBUTE11 in VARCHAR2,
+  X_ATTRIBUTE12 in VARCHAR2,
+  X_ATTRIBUTE13 in VARCHAR2,
+  X_ATTRIBUTE14 in VARCHAR2,
+  X_ATTRIBUTE15 in VARCHAR2,
+  X_DESCRIPTION in VARCHAR2,
+  X_LAST_UPDATE_DATE in DATE,
+  X_LAST_UPDATED_BY in NUMBER,
+  X_LAST_UPDATE_LOGIN in NUMBER
+) is
+begin
+  update AHL_OSP_ORDERS_B set
+    VENDOR_CONTACT_ID = X_VENDOR_CONTACT_ID,
+    OBJECT_VERSION_NUMBER = X_OBJECT_VERSION_NUMBER,
+    OSP_ORDER_NUMBER = X_OSP_ORDER_NUMBER,
+    ORDER_TYPE_CODE = X_ORDER_TYPE_CODE,
+    STATUS_CODE = X_STATUS_CODE,
+    SINGLE_INSTANCE_FLAG = X_SINGLE_INSTANCE_FLAG,
+    ORDER_DATE = X_ORDER_DATE,
+    OPERATING_UNIT_ID = X_OPERATING_UNIT_ID,
+    VENDOR_ID = X_VENDOR_ID,
+    VENDOR_SITE_ID = X_VENDOR_SITE_ID,
+    CUSTOMER_ID = X_CUSTOMER_ID,
+    CONTRACT_ID = X_CONTRACT_ID,
+    CONTRACT_TERMS = X_CONTRACT_TERMS,
+    PO_HEADER_ID = X_PO_HEADER_ID,
+    PO_SYNCH_FLAG = X_PO_SYNCH_FLAG,
+    PO_BATCH_ID = X_PO_BATCH_ID,
+    PO_REQUEST_ID = X_PO_REQUEST_ID,
+    PO_INTERFACE_HEADER_ID = X_PO_INTERFACE_HEADER_ID,
+    PO_REQ_HEADER_ID = X_PO_REQ_HEADER_ID,  -- Added by jaramana on January 14, 2008 for the Requisition ER 6034236
+    PO_AGENT_ID = X_PO_AGENT_ID,
+    OE_HEADER_ID = X_OE_HEADER_ID,
+    ATTRIBUTE_CATEGORY = X_ATTRIBUTE_CATEGORY,
+    ATTRIBUTE1 = X_ATTRIBUTE1,
+    ATTRIBUTE2 = X_ATTRIBUTE2,
+    ATTRIBUTE3 = X_ATTRIBUTE3,
+    ATTRIBUTE4 = X_ATTRIBUTE4,
+    ATTRIBUTE5 = X_ATTRIBUTE5,
+    ATTRIBUTE6 = X_ATTRIBUTE6,
+    ATTRIBUTE7 = X_ATTRIBUTE7,
+    ATTRIBUTE8 = X_ATTRIBUTE8,
+    ATTRIBUTE9 = X_ATTRIBUTE9,
+    ATTRIBUTE10 = X_ATTRIBUTE10,
+    ATTRIBUTE11 = X_ATTRIBUTE11,
+    ATTRIBUTE12 = X_ATTRIBUTE12,
+    ATTRIBUTE13 = X_ATTRIBUTE13,
+    ATTRIBUTE14 = X_ATTRIBUTE14,
+    ATTRIBUTE15 = X_ATTRIBUTE15,
+    LAST_UPDATE_DATE = X_LAST_UPDATE_DATE,
+    LAST_UPDATED_BY = X_LAST_UPDATED_BY,
+    LAST_UPDATE_LOGIN = X_LAST_UPDATE_LOGIN
+  where OSP_ORDER_ID = X_OSP_ORDER_ID;
+
+  if (sql%notfound) then
+    raise no_data_found;
+  end if;
+
+  update AHL_OSP_ORDERS_TL set
+    DESCRIPTION = X_DESCRIPTION,
+    LAST_UPDATE_DATE = X_LAST_UPDATE_DATE,
+    LAST_UPDATED_BY = X_LAST_UPDATED_BY,
+    LAST_UPDATE_LOGIN = X_LAST_UPDATE_LOGIN,
+    SOURCE_LANG = userenv('LANG')
+  where OSP_ORDER_ID = X_OSP_ORDER_ID
+  and userenv('LANG') in (LANGUAGE, SOURCE_LANG);
+
+  if (sql%notfound) then
+    raise no_data_found;
+  end if;
+end UPDATE_ROW;
+
+procedure DELETE_ROW (
+  X_OSP_ORDER_ID in NUMBER
+) is
+begin
+  delete from AHL_OSP_ORDERS_TL
+  where OSP_ORDER_ID = X_OSP_ORDER_ID;
+
+  if (sql%notfound) then
+    raise no_data_found;
+  end if;
+
+  delete from AHL_OSP_ORDERS_B
+  where OSP_ORDER_ID = X_OSP_ORDER_ID;
+
+  if (sql%notfound) then
+    raise no_data_found;
+  end if;
+end DELETE_ROW;
+
+procedure ADD_LANGUAGE
+is
+begin
+  delete from AHL_OSP_ORDERS_TL T
+  where not exists
+    (select NULL
+    from AHL_OSP_ORDERS_B B
+    where B.OSP_ORDER_ID = T.OSP_ORDER_ID
+    );
+
+  update AHL_OSP_ORDERS_TL T set (
+      DESCRIPTION
+    ) = (select
+      B.DESCRIPTION
+    from AHL_OSP_ORDERS_TL B
+    where B.OSP_ORDER_ID = T.OSP_ORDER_ID
+    and B.LANGUAGE = T.SOURCE_LANG)
+  where (
+      T.OSP_ORDER_ID,
+      T.LANGUAGE
+  ) in (select
+      SUBT.OSP_ORDER_ID,
+      SUBT.LANGUAGE
+    from AHL_OSP_ORDERS_TL SUBB, AHL_OSP_ORDERS_TL SUBT
+    where SUBB.OSP_ORDER_ID = SUBT.OSP_ORDER_ID
+    and SUBB.LANGUAGE = SUBT.SOURCE_LANG
+    and (SUBB.DESCRIPTION <> SUBT.DESCRIPTION
+      or (SUBB.DESCRIPTION is null and SUBT.DESCRIPTION is not null)
+      or (SUBB.DESCRIPTION is not null and SUBT.DESCRIPTION is null)
+  ));
+
+  insert into AHL_OSP_ORDERS_TL (
+    OSP_ORDER_ID,
+    LAST_UPDATE_DATE,
+    LAST_UPDATED_BY,
+    CREATION_DATE,
+    CREATED_BY,
+    LAST_UPDATE_LOGIN,
+    DESCRIPTION,
+    LANGUAGE,
+    SOURCE_LANG
+  ) select /*+ ORDERED */
+    B.OSP_ORDER_ID,
+    B.LAST_UPDATE_DATE,
+    B.LAST_UPDATED_BY,
+    B.CREATION_DATE,
+    B.CREATED_BY,
+    B.LAST_UPDATE_LOGIN,
+    B.DESCRIPTION,
+    L.LANGUAGE_CODE,
+    B.SOURCE_LANG
+  from AHL_OSP_ORDERS_TL B, FND_LANGUAGES L
+  where L.INSTALLED_FLAG in ('I', 'B')
+  and B.LANGUAGE = userenv('LANG')
+  and not exists
+    (select NULL
+    from AHL_OSP_ORDERS_TL T
+    where T.OSP_ORDER_ID = B.OSP_ORDER_ID
+    and T.LANGUAGE = L.LANGUAGE_CODE);
+end ADD_LANGUAGE;
+
+end AHL_OSP_ORDERS_PKG;
+
+/

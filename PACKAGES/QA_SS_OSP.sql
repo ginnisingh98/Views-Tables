@@ -1,0 +1,94 @@
+--------------------------------------------------------
+--  DDL for Package QA_SS_OSP
+--------------------------------------------------------
+
+  CREATE OR REPLACE EDITIONABLE PACKAGE "APPS"."QA_SS_OSP" AUTHID CURRENT_USER as
+/* $Header: qltssopb.pls 115.12 2002/11/27 19:33:49 jezheng ship $ */
+
+function are_osp_plans_applicable (
+		P_Item_Number IN VARCHAR2 DEFAULT NULL,
+		P_Supplier IN VARCHAR2 DEFAULT NULL,
+		P_Wip_Entity_Name IN VARCHAR2 DEFAULT NULL,
+		P_Po_Number IN VARCHAR2 DEFAULT NULL,
+		P_Vendor_Item_Number IN VARCHAR2 DEFAULT NULL,
+		P_Wip_Operation_Seq_Num IN NUMBER DEFAULT NULL,
+		P_UOM_Name IN VARCHAR2 DEFAULT NULL,
+		P_Production_Line IN VARCHAR2 DEFAULT NULL,
+		P_Quantity_Ordered IN NUMBER DEFAULT NULL,
+		P_Item_Revision IN VARCHAR2 DEFAULT NULL,
+		P_Po_Release_Number IN NUMBER DEFAULT NULL,
+		P_Organization_Id IN NUMBER DEFAULT NULL,
+        	P_Wip_Entity_Type IN NUMBER DEFAULT NULL)
+
+	Return VARCHAR2;
+
+
+procedure osp_to_quality (
+			PK1 IN VARCHAR2 DEFAULT NULL,
+			PK2 IN VARCHAR2 DEFAULT NULL,
+			PK3 IN VARCHAR2 DEFAULT NULL,
+			PK4 IN VARCHAR2 DEFAULT NULL,
+			PK5 IN VARCHAR2 DEFAULT NULL,
+			PK6 IN VARCHAR2 DEFAULT NULL,
+			PK7 IN VARCHAR2 DEFAULT NULL,
+			PK8 IN VARCHAR2 DEFAULT NULL,
+			PK9 IN VARCHAR2 DEFAULT NULL,
+			PK10 IN VARCHAR2 DEFAULT NULL,
+			c_outputs1 OUT NOCOPY VARCHAR2,
+			c_outputs2 OUT NOCOPY VARCHAR2,
+			c_outputs3 OUT NOCOPY VARCHAR2,
+			c_outputs4 OUT NOCOPY VARCHAR2,
+			c_outputs5 OUT NOCOPY VARCHAR2,
+			c_outputs6 OUT NOCOPY VARCHAR2,
+			c_outputs7 OUT NOCOPY VARCHAR2,
+			c_outputs8 OUT NOCOPY VARCHAR2,
+			c_outputs9 OUT NOCOPY VARCHAR2,
+			c_outputs10 OUT NOCOPY VARCHAR2);
+
+
+
+procedure default_osp_values (Ctx IN OUT NOCOPY qa_ss_const.Ctx_Table,
+			Txn_Num IN NUMBER DEFAULT NULL,
+			PK1 IN VARCHAR2 DEFAULT NULL,
+			PK2 IN VARCHAR2 DEFAULT NULL,
+			PK3 IN VARCHAR2 DEFAULT NULL,
+			PK4 IN VARCHAR2 DEFAULT NULL,
+			PK5 IN VARCHAR2 DEFAULT NULL,
+			PK6 IN VARCHAR2 DEFAULT NULL,
+			PK7 IN VARCHAR2 DEFAULT NULL,
+			PK8 IN VARCHAR2 DEFAULT NULL,
+			PK9 IN VARCHAR2 DEFAULT NULL,
+			PK10 IN VARCHAR2 DEFAULT NULL,
+			X_PO_AGENT_ID OUT NOCOPY NUMBER,
+            X_Item_Id OUT NOCOPY NUMBER,
+            X_PO_HEADER_ID OUT NOCOPY NUMBER,
+            X_Wip_Entity_Type OUT NOCOPY NUMBER,
+            X_Wip_Rep_Sch_Id OUT NOCOPY NUMBER,
+            X_Po_Release_Id OUT NOCOPY NUMBER,
+            X_Po_Line_Id OUT NOCOPY NUMBER,
+            X_Line_Location_Id OUT NOCOPY NUMBER,
+            X_Po_Distribution_Id OUT NOCOPY NUMBER,
+            X_Wip_Entity_Id OUT NOCOPY NUMBER,
+            X_Wip_Line_Id OUT NOCOPY NUMBER,
+            X_Po_Shipment_Id OUT NOCOPY NUMBER,
+	    X_Organization_Id OUT NOCOPY NUMBER);
+
+-- Below procedure to be called from qa_ss_core.plan_list_frames
+procedure osp_plans (
+            PK1 IN VARCHAR2 DEFAULT NULL,
+			PK2 IN VARCHAR2 DEFAULT NULL,
+			PK3 IN VARCHAR2 DEFAULT NULL,
+			PK4 IN VARCHAR2 DEFAULT NULL,
+			PK5 IN VARCHAR2 DEFAULT NULL,
+			PK6 IN VARCHAR2 DEFAULT NULL,
+			PK7 IN VARCHAR2 DEFAULT NULL,
+			PK8 IN VARCHAR2 DEFAULT NULL,
+			PK9 IN VARCHAR2 DEFAULT NULL,
+			PK10 IN VARCHAR2 DEFAULT NULL );
+
+end qa_ss_osp;
+
+
+ 
+
+/

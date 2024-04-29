@@ -1,0 +1,145 @@
+--------------------------------------------------------
+--  DDL for Package IGS_OR_CONTACTS_PKG
+--------------------------------------------------------
+
+  CREATE OR REPLACE EDITIONABLE PACKAGE "APPS"."IGS_OR_CONTACTS_PKG" AUTHID CURRENT_USER AS
+/* $Header: IGSOI24S.pls 115.5 2003/05/06 09:26:14 ssawhney ship $ */
+/* Change History
+|   who                  when                           what
+|   npalanis           15-feb-2002                 Bug ID - 2225917 : SWCR008   Removed  parameters
+|                                                               Customer_Id ,Address_Id,Contact_Id, in
+|                                                               Insert_row and  cust_acct_role_id is removed
+|                                                               from Update Row Procedure  .Org_contact_role_id is added
+|                                                               in both insert_row and update_row
+|   ssawhney           30-apr-2003                 V2API OVN changes
+*/
+
+  g_varchar2       CONSTANT   VARCHAR2(10) := '$Sys_Def$';
+  PROCEDURE Insert_Row(x_last_name                     VARCHAR2,
+                       x_orig_system_reference  IN OUT NOCOPY VARCHAR2,
+                       x_status                        VARCHAR2,
+                       x_contact_key                   VARCHAR2,
+                       x_first_name                    VARCHAR2,
+                       x_job_title                     VARCHAR2,
+                       x_mail_stop                     VARCHAR2,
+                       x_title                         VARCHAR2,
+                       x_attribute_category            VARCHAR2 DEFAULT NULL,
+                       x_attribute1                    VARCHAR2 DEFAULT NULL,
+                       x_attribute2                    VARCHAR2 DEFAULT NULL,
+                       x_attribute3                    VARCHAR2 DEFAULT NULL,
+                       x_attribute4                    VARCHAR2 DEFAULT NULL,
+                       x_attribute5                    VARCHAR2 DEFAULT NULL,
+                       x_attribute6                    VARCHAR2 DEFAULT NULL,
+                       x_attribute7                    VARCHAR2 DEFAULT NULL,
+                       x_attribute8                    VARCHAR2 DEFAULT NULL,
+                       x_attribute9                    VARCHAR2 DEFAULT NULL,
+                       x_attribute10                   VARCHAR2 DEFAULT NULL,
+                       x_attribute11                   VARCHAR2 DEFAULT NULL,
+                       x_attribute12                   VARCHAR2 DEFAULT NULL,
+                       x_attribute13                   VARCHAR2 DEFAULT NULL,
+                       x_attribute14                   VARCHAR2 DEFAULT NULL,
+                       x_attribute15                   VARCHAR2 DEFAULT NULL,
+                       x_attribute16                   VARCHAR2 DEFAULT NULL,
+                       x_attribute17                   VARCHAR2 DEFAULT NULL,
+                       x_attribute18                   VARCHAR2 DEFAULT NULL,
+                       x_attribute19                   VARCHAR2 DEFAULT NULL,
+                       x_attribute20                   VARCHAR2 DEFAULT NULL,
+                       x_attribute21                   VARCHAR2 DEFAULT NULL,
+                       x_attribute22                   VARCHAR2 DEFAULT NULL,
+                       x_attribute23                   VARCHAR2 DEFAULT NULL,
+                       x_attribute24                   VARCHAR2 DEFAULT NULL,
+                       x_attribute25                   VARCHAR2 DEFAULT NULL,
+                       x_email_address                 VARCHAR2,
+                       x_last_name_alt                 VARCHAR2 DEFAULT NULL,
+                       x_first_name_alt                VARCHAR2 DEFAULT NULL,
+                       x_contact_number         IN OUT NOCOPY VARCHAR2 ,
+                       x_party_id                      NUMBER ,
+                       x_party_site_id                 NUMBER ,
+                       x_contact_party_id       IN OUT NOCOPY NUMBER ,
+                       x_org_contact_id         IN OUT NOCOPY NUMBER ,
+                       x_contact_point_id       IN OUT NOCOPY NUMBER ,
+                        x_rel_party_id               IN OUT NOCOPY     NUMBER,
+                       x_created_by                    NUMBER,
+                       x_creation_date                 DATE ,
+                       x_updated_by                    NUMBER ,
+                       x_update_date                   DATE ,
+                       x_last_update_login             NUMBER ,
+                       x_return_status             OUT NOCOPY VARCHAR2 ,
+                       x_msg_count                 OUT NOCOPY NUMBER,
+                       x_msg_data                  OUT NOCOPY VARCHAR2,
+                       x_org_contact_role_id       IN OUT NOCOPY NUMBER,
+		       P_ORG_ROLE_OVN             IN OUT NOCOPY NUMBER,
+		       P_REL_OVN                  IN OUT NOCOPY NUMBER,
+		       P_REL_PARTY_OVN            IN OUT NOCOPY NUMBER,
+		       P_ORG_CONT_OVN             IN OUT NOCOPY NUMBER,
+		       P_CONTACT_POINT_OVN        IN OUT NOCOPY NUMBER
+                       );
+
+PROCEDURE Update_Row( x_Last_Name                               VARCHAR2,
+                     x_Last_Updated_By                         NUMBER,
+                     x_Last_Update_Date               IN OUT NOCOPY   DATE,
+                     x_party_Last_Update_Date         IN OUT NOCOPY   DATE,
+                     x_org_cont_Last_Update_Date      IN OUT NOCOPY   DATE,
+                     x_cont_point_Last_Update_Date    IN OUT NOCOPY   DATE,
+                     x_prel_Last_Update_Date          IN OUT NOCOPY   DATE,
+                     x_rel_party_Last_Update_Date     IN OUT NOCOPY   DATE,
+                     x_Status                                  VARCHAR2,
+                     x_Contact_Key                             VARCHAR2,
+                     x_First_Name                              VARCHAR2,
+                     x_Job_Title                               VARCHAR2,
+                     x_Last_Update_Login                       NUMBER,
+                     x_Mail_Stop                               VARCHAR2,
+                     x_Title                                   VARCHAR2,
+                     x_Attribute_Category                      VARCHAR2,
+                     x_Attribute1                              VARCHAR2,
+                     x_Attribute2                              VARCHAR2,
+                     x_Attribute3                              VARCHAR2,
+                     x_Attribute4                              VARCHAR2,
+                     x_Attribute5                              VARCHAR2,
+                     x_Attribute6                              VARCHAR2,
+                     x_Attribute7                              VARCHAR2,
+                     x_Attribute8                              VARCHAR2,
+                     x_Attribute9                              VARCHAR2,
+                     x_Attribute10                             VARCHAR2,
+                     x_Attribute11                             VARCHAR2,
+                     x_Attribute12                             VARCHAR2,
+                     x_Attribute13                             VARCHAR2,
+                     x_Attribute14                             VARCHAR2,
+                     x_Attribute15                             VARCHAR2,
+                     x_Attribute16                             VARCHAR2,
+                     x_Attribute17                             VARCHAR2,
+                     x_Attribute18                             VARCHAR2,
+                     x_Attribute19                             VARCHAR2,
+                     x_Attribute20                             VARCHAR2,
+                     x_Attribute21                             VARCHAR2,
+                     x_Attribute22                             VARCHAR2,
+                     x_Attribute23                             VARCHAR2,
+                     x_Attribute24                             VARCHAR2,
+                     x_Attribute25                             VARCHAR2,
+                     x_Email_Address                           VARCHAR2,
+                     x_Last_Name_Alt                           VARCHAR2 DEFAULT g_varchar2,
+                     x_First_Name_Alt                          VARCHAR2 DEFAULT g_varchar2,
+                     x_contact_number                          VARCHAR2,
+                     x_party_id                                NUMBER,
+                     x_party_site_id                           NUMBER,
+                     x_contact_party_id                        NUMBER,
+                     x_org_contact_id                          NUMBER,
+                     x_contact_point_id                  IN OUT NOCOPY   NUMBER,
+                     x_party_relationship_id                   NUMBER,
+                     x_return_status                     OUT NOCOPY   VARCHAR2,
+                     x_msg_count                         OUT NOCOPY   NUMBER,
+                     x_msg_data                          OUT NOCOPY   VARCHAR2,
+                     x_rel_party_id                            NUMBER DEFAULT NULL,
+                     x_org_contact_role_id               IN OUT NOCOPY NUMBER,
+		     P_ORG_ROLE_OVN             IN OUT NOCOPY NUMBER,
+		     P_REL_OVN                  IN OUT NOCOPY NUMBER,
+		     P_REL_PARTY_OVN            IN OUT NOCOPY NUMBER,
+		     P_ORG_CONT_OVN             IN OUT NOCOPY NUMBER,
+		     P_CONTACT_POINT_OVN        IN OUT NOCOPY NUMBER
+                    );
+
+END igs_or_contacts_pkg;
+
+ 
+
+/

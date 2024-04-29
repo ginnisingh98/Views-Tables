@@ -1,0 +1,329 @@
+--------------------------------------------------------
+--  DDL for Package Body BSC_USER_PARAMETERS_PKG
+--------------------------------------------------------
+
+  CREATE OR REPLACE EDITIONABLE PACKAGE BODY "APPS"."BSC_USER_PARAMETERS_PKG" as
+/* $Header: BSCUVIWB.pls 115.7 2003/05/08 23:14:33 hcamacho ship $ */
+procedure INSERT_ROW (
+  X_PARAM_LIST_ID out NOCOPY NUMBER,
+  X_TITLE in VARCHAR2,
+  X_APPLICATION_ID in NUMBER,
+  X_INDICATOR in NUMBER,
+  X_VIEW_TYPE in NUMBER,
+  X_VALID_FLAG in NUMBER,
+  X_ANALYSIS_MEASURES in VARCHAR2,
+  X_DIMENSION1 in VARCHAR2,
+  X_DIMENSION2 in VARCHAR2,
+  X_DIMENSION3 in VARCHAR2,
+  X_DIMENSION4 in VARCHAR2,
+  X_DIMENSION5 in VARCHAR2,
+  X_DIMENSION6 in VARCHAR2,
+  X_DIMENSION7 in VARCHAR2,
+  X_DIMENSION8 in VARCHAR2,
+  X_DIMENSION9 in VARCHAR2,
+  X_DIMENSION10 in VARCHAR2,
+  X_TIME_PERIOD in VARCHAR2,
+  X_DATA_SERIES in VARCHAR2,
+  X_CALCULATIONS in VARCHAR2,
+  X_BENCHMARKS in VARCHAR2,
+  X_CREATION_DATE in DATE,
+  X_CREATED_BY in NUMBER,
+  X_LAST_UPDATE_DATE in DATE,
+  X_LAST_UPDATED_BY in NUMBER,
+  X_LAST_UPDATE_LOGIN in NUMBER
+) is
+
+  l_param_list_id number;
+  cursor C is select PARAM_LIST_ID from BSC_USER_PARAMETERS_B
+    where PARAM_LIST_ID = l_param_list_id;
+begin
+
+  select BSC_USER_PARAM_LIST_ID_S.nextval
+        into l_param_list_id
+        from sys.dual;
+--dbms_output.put_line('PARAM_LIST_ID =' || l_param_list_id);
+--        decode(X_VIEW_TYPE, 1, 1, 0),
+--        decode(X_VALID_FLAG, 1, 1, 0),
+
+  insert into BSC_USER_PARAMETERS_B (
+  	PARAM_LIST_ID,
+	APPLICATION_ID,
+	INDICATOR,
+	VIEW_TYPE,
+	VALID_FLAG,
+	ANALYSIS_MEASURES,
+	DIMENSION1,
+	DIMENSION2,
+	DIMENSION3,
+	DIMENSION4,
+	DIMENSION5,
+	DIMENSION6,
+	DIMENSION7,
+	DIMENSION8,
+	DIMENSION9,
+	DIMENSION10,
+	TIME_PERIOD,
+	DATA_SERIES,
+	CALCULATIONS,
+	BENCHMARKS,
+	CREATION_DATE,
+	CREATED_BY,
+	LAST_UPDATE_DATE,
+	LAST_UPDATED_BY,
+	LAST_UPDATE_LOGIN
+  ) values (
+	l_param_list_id,
+	X_APPLICATION_ID,
+        X_INDICATOR,
+        X_VIEW_TYPE,
+        X_VALID_FLAG,
+        X_ANALYSIS_MEASURES,
+        X_DIMENSION1,
+        X_DIMENSION2,
+        X_DIMENSION3,
+        X_DIMENSION4,
+        X_DIMENSION5,
+        X_DIMENSION6,
+        X_DIMENSION7,
+        X_DIMENSION8,
+        X_DIMENSION9,
+        X_DIMENSION10,
+        X_TIME_PERIOD,
+        X_DATA_SERIES,
+        X_CALCULATIONS,
+        X_BENCHMARKS,
+        X_CREATION_DATE,
+    	X_CREATED_BY,
+	X_LAST_UPDATE_DATE,
+	X_LAST_UPDATED_BY,
+	X_LAST_UPDATE_LOGIN
+  );
+
+  insert into BSC_USER_PARAMETERS_TL (
+    PARAM_LIST_ID,
+    TITLE,
+    CREATION_DATE,
+    CREATED_BY,
+    LAST_UPDATE_DATE,
+    LAST_UPDATED_BY,
+    LAST_UPDATE_LOGIN,
+    LANGUAGE,
+    SOURCE_LANG
+  ) select
+    l_param_list_id,
+    X_TITLE,
+    X_CREATION_DATE,
+    X_CREATED_BY,
+    X_LAST_UPDATE_DATE,
+    X_LAST_UPDATED_BY,
+    X_LAST_UPDATE_LOGIN,
+    L.LANGUAGE_CODE,
+    userenv('LANG')
+  from FND_LANGUAGES L
+  where L.INSTALLED_FLAG in ('I', 'B')
+  and not exists
+    (select NULL
+    from BSC_USER_PARAMETERS_TL T
+    where T.PARAM_LIST_ID = l_param_list_id
+    and T.LANGUAGE = L.LANGUAGE_CODE);
+
+  open c;
+  fetch c into X_PARAM_LIST_ID;
+  if (c%notfound) then
+    close c;
+    raise no_data_found;
+  end if;
+  close c;
+
+end INSERT_ROW;
+
+
+
+procedure UPDATE_ROW (
+  X_PARAM_LIST_ID in NUMBER,
+  X_TITLE in VARCHAR2,
+  X_APPLICATION_ID in NUMBER,
+  X_INDICATOR in NUMBER,
+  X_VIEW_TYPE in NUMBER,
+  X_VALID_FLAG in NUMBER,
+  X_ANALYSIS_MEASURES in VARCHAR2,
+  X_DIMENSION1 in VARCHAR2,
+  X_DIMENSION2 in VARCHAR2,
+  X_DIMENSION3 in VARCHAR2,
+  X_DIMENSION4 in VARCHAR2,
+  X_DIMENSION5 in VARCHAR2,
+  X_DIMENSION6 in VARCHAR2,
+  X_DIMENSION7 in VARCHAR2,
+  X_DIMENSION8 in VARCHAR2,
+  X_DIMENSION9 in VARCHAR2,
+  X_DIMENSION10 in VARCHAR2,
+  X_TIME_PERIOD in VARCHAR2,
+  X_DATA_SERIES in VARCHAR2,
+  X_CALCULATIONS in VARCHAR2,
+  X_BENCHMARKS in VARCHAR2,
+  X_LAST_UPDATE_DATE in DATE,
+  X_LAST_UPDATED_BY in NUMBER,
+  X_LAST_UPDATE_LOGIN in NUMBER
+ ) is
+begin
+  update BSC_USER_PARAMETERS_B set
+      APPLICATION_ID = X_APPLICATION_ID,
+      INDICATOR = X_INDICATOR,
+      VIEW_TYPE = X_VIEW_TYPE,
+      VALID_FLAG = X_VALID_FLAG,
+      ANALYSIS_MEASURES = X_ANALYSIS_MEASURES,
+      DIMENSION1 = X_DIMENSION1,
+      DIMENSION2 = X_DIMENSION2,
+      DIMENSION3 = X_DIMENSION3,
+      DIMENSION4 = X_DIMENSION4,
+      DIMENSION5 = X_DIMENSION5,
+      DIMENSION6 = X_DIMENSION6,
+      DIMENSION7 = X_DIMENSION7,
+      DIMENSION8 = X_DIMENSION8,
+      DIMENSION9 =  X_DIMENSION9,
+      DIMENSION10 = X_DIMENSION10,
+      TIME_PERIOD = X_TIME_PERIOD,
+      DATA_SERIES = X_DATA_SERIES,
+      CALCULATIONS = X_CALCULATIONS,
+      LAST_UPDATE_DATE = X_LAST_UPDATE_DATE,
+      LAST_UPDATED_BY = X_LAST_UPDATED_BY,
+      LAST_UPDATE_LOGIN = X_LAST_UPDATE_LOGIN
+  where PARAM_LIST_ID = X_PARAM_LIST_ID;
+
+  if (sql%notfound) then
+    raise no_data_found;
+  end if;
+
+  update BSC_USER_PARAMETERS_TL set
+    TITLE = X_TITLE,
+    LAST_UPDATE_DATE = X_LAST_UPDATE_DATE,
+    LAST_UPDATED_BY = X_LAST_UPDATED_BY,
+    LAST_UPDATE_LOGIN = X_LAST_UPDATE_LOGIN,
+    SOURCE_LANG = userenv('LANG')
+  where PARAM_LIST_ID = X_PARAM_LIST_ID
+  and userenv('LANG') in (LANGUAGE, SOURCE_LANG);
+
+  if (sql%notfound) then
+    raise no_data_found;
+  end if;
+end UPDATE_ROW;
+
+
+
+procedure DELETE_ROW (
+  X_PARAM_LIST_ID in NUMBER
+) is
+begin
+  delete from BSC_USER_PARAMETERS_B
+  where PARAM_LIST_ID = X_PARAM_LIST_ID;
+
+  if (sql%notfound) then
+    raise no_data_found;
+  end if;
+
+  delete from BSC_USER_PARAMETERS_TL
+  where PARAM_LIST_ID = X_PARAM_LIST_ID;
+
+  if (sql%notfound) then
+    raise no_data_found;
+  end if;
+end DELETE_ROW;
+
+
+procedure ADD_LANGUAGE
+is
+begin
+  delete from BSC_USER_PARAMETERS_TL T
+  where not exists
+    (select NULL
+    from BSC_USER_PARAMETERS_B B
+    where B.PARAM_LIST_ID = T.PARAM_LIST_ID
+    );
+
+  update BSC_USER_PARAMETERS_TL T set (
+      TITLE
+    ) = (select
+      B.TITLE
+      from BSC_USER_PARAMETERS_TL B
+      where B.PARAM_LIST_ID = T.PARAM_LIST_ID
+      and B.LANGUAGE = T.SOURCE_LANG)
+  where (
+      T.PARAM_LIST_ID,
+      T.LANGUAGE
+  ) in (select
+      SUBT.PARAM_LIST_ID,
+      SUBT.LANGUAGE
+    from BSC_USER_PARAMETERS_TL SUBB, BSC_USER_PARAMETERS_TL SUBT
+    where SUBB.PARAM_LIST_ID = SUBT.PARAM_LIST_ID
+    and SUBB.LANGUAGE = SUBT.SOURCE_LANG
+    and (SUBB.TITLE <> SUBT.TITLE)
+  );
+
+  insert into BSC_USER_PARAMETERS_TL (
+    PARAM_LIST_ID,
+    TITLE,
+    CREATION_DATE,
+    CREATED_BY,
+    LAST_UPDATE_DATE,
+    LAST_UPDATED_BY,
+    LAST_UPDATE_LOGIN,
+    LANGUAGE,
+    SOURCE_LANG
+  ) select
+    B.PARAM_LIST_ID,
+    B.TITLE,
+    B.CREATION_DATE,
+    B.CREATED_BY,
+    B.LAST_UPDATE_DATE,
+    B.LAST_UPDATED_BY,
+    B.LAST_UPDATE_LOGIN,
+    L.LANGUAGE_CODE,
+    B.SOURCE_LANG
+  from BSC_USER_PARAMETERS_TL B, FND_LANGUAGES L
+  where L.INSTALLED_FLAG in ('I', 'B')
+  and B.LANGUAGE = userenv('LANG')
+  and not exists
+    (select NULL
+    from BSC_USER_PARAMETERS_TL T
+    where T.PARAM_LIST_ID = B.PARAM_LIST_ID
+    and T.LANGUAGE = L.LANGUAGE_CODE);
+end ADD_LANGUAGE;
+
+
+procedure TRANSLATE_ROW (
+  X_PARAM_LIST_ID in NUMBER,
+  X_TITLE in VARCHAR2,
+  X_OWNER in VARCHAR2,
+  X_CUSTOM_MODE in VARCHAR2
+) is
+begin
+  if (X_CUSTOM_MODE = 'FORCE') then
+      update BSC_USER_PARAMETERS_TL set
+	TITLE = X_TITLE,
+	LAST_UPDATE_DATE = sysdate,
+	LAST_UPDATED_BY = decode(X_OWNER, 'SEED', 1, 0),
+	LAST_UPDATE_LOGIN = 0,
+	SOURCE_LANG = userenv('LANG')
+      where PARAM_LIST_ID = X_PARAM_LIST_ID
+      and userenv('LANG') in (LANGUAGE, SOURCE_LANG);
+  else
+      update BSC_USER_PARAMETERS_TL set
+	TITLE = X_TITLE,
+	LAST_UPDATE_DATE = sysdate,
+	LAST_UPDATED_BY = decode(X_OWNER, 'SEED', 1, 0),
+	LAST_UPDATE_LOGIN = 0,
+	SOURCE_LANG = userenv('LANG')
+      where PARAM_LIST_ID = X_PARAM_LIST_ID
+      and LAST_UPDATED_BY = 1
+      and userenv('LANG') in (LANGUAGE, SOURCE_LANG);
+
+  end if;
+
+  if (sql%notfound) then
+    raise no_data_found;
+  end if;
+end TRANSLATE_ROW;
+
+end BSC_USER_PARAMETERS_PKG;
+
+/

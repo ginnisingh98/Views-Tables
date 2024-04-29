@@ -1,0 +1,179 @@
+--------------------------------------------------------
+--  DDL for Package Body INV_INVKBCPR_XMLP_PKG
+--------------------------------------------------------
+
+  CREATE OR REPLACE EDITIONABLE PACKAGE BODY "APPS"."INV_INVKBCPR_XMLP_PKG" AS
+/* $Header: INVKBCPRB.pls 120.1 2007/12/25 10:38:41 dwkrishn noship $ */
+  FUNCTION BEFOREREPORT RETURN BOOLEAN IS
+  BEGIN
+    BEGIN
+      P_CONC_REQUEST_ID := FND_GLOBAL.CONC_REQUEST_ID;
+      /*SRW.USER_EXIT('FND SRWINIT')*/NULL;
+    EXCEPTION
+      WHEN /*SRW.USER_EXIT_FAILURE*/OTHERS THEN
+        /*SRW.MESSAGE(010
+                   ,'Failed in before report trigger, srwinit. ')*/NULL;
+        RAISE;
+    END;
+    DECLARE
+      P_ORG_ID_CHAR VARCHAR2(100) := TO_CHAR(P_ORG_ID);
+    BEGIN
+      /*SRW.USER_EXIT('FND PUTPROFILE NAME="' || 'MFG_ORGANIZATION_ID' || '" FIELD="' || P_ORG_ID_CHAR || '"')*/NULL;
+    EXCEPTION
+      WHEN /*SRW.USER_EXIT_FAILURE*/OTHERS THEN
+        /*SRW.MESSAGE(020
+                   ,'Failed in before report trigger, setting org profile ')*/NULL;
+        RAISE;
+    END;
+    BEGIN
+      NULL;
+    EXCEPTION
+      WHEN /*SRW.USER_EXIT_FAILURE*/OTHERS THEN
+        /*SRW.MESSAGE(020
+                   ,'Failed in before report trigger, item select. ')*/NULL;
+        RAISE;
+    END;
+    BEGIN
+      NULL;
+    EXCEPTION
+      WHEN /*SRW.USER_EXIT_FAILURE*/OTHERS THEN
+        /*SRW.MESSAGE(030
+                   ,'Failed in before report trigger, locator select. ')*/NULL;
+        RAISE;
+    END;
+    BEGIN
+      NULL;
+    EXCEPTION
+      WHEN /*SRW.USER_EXIT_FAILURE*/OTHERS THEN
+        /*SRW.MESSAGE(030
+                   ,'Failed in before report trigger, source locator select. ')*/NULL;
+        RAISE;
+    END;
+    BEGIN
+      IF P_ITEM_HIGH IS NOT NULL OR P_ITEM_LOW IS NOT NULL THEN
+        NULL;
+      END IF;
+    EXCEPTION
+      WHEN /*SRW.USER_EXIT_FAILURE*/OTHERS THEN
+        /*SRW.MESSAGE(1
+                   ,'Failed in before report trigger:Item/where')*/NULL;
+        RAISE;
+    END;
+    BEGIN
+      IF P_LOCATOR_HI IS NOT NULL OR P_LOCATOR_LOW IS NOT NULL THEN
+        NULL;
+      END IF;
+    EXCEPTION
+      WHEN /*SRW.USER_EXIT_FAILURE*/OTHERS THEN
+        /*SRW.MESSAGE(1
+                   ,'Failed in before report trigger:Loc/where')*/NULL;
+        RAISE;
+    END;
+    IF P_CALL_FROM = 1 THEN
+      IF P_DATE_CREATED_LOW IS NOT NULL THEN
+        P_CALL_WHERE := P_CALL_WHERE || ' AND TO_CHAR(MKC.CREATION_DATE,''YYYY-MM-DD'' ) >= ''' || TO_CHAR(P_DATE_CREATED_LOW
+                               ,'YYYY-MM-DD') || '''';
+      END IF;
+      IF P_DATE_CREATED_HIGH IS NOT NULL THEN
+        P_CALL_WHERE := P_CALL_WHERE || ' AND TO_CHAR(MKC.CREATION_DATE,''YYYY-MM-DD'' ) <= ''' || TO_CHAR(P_DATE_CREATED_HIGH
+                               ,'YYYY-MM-DD') || '''';
+      END IF;
+      IF P_ORG_ID IS NOT NULL THEN
+        P_CALL_WHERE := P_CALL_WHERE || ' AND MKC.ORGANIZATION_ID = ' || TO_CHAR(P_ORG_ID);
+      END IF;
+      IF P_SOURCE_TYPE IS NOT NULL THEN
+        P_CALL_WHERE := P_CALL_WHERE || ' AND MKC.SOURCE_TYPE = ' || TO_CHAR(P_SOURCE_TYPE);
+      END IF;
+      IF P_SOURCE_ORG_ID IS NOT NULL THEN
+        P_CALL_WHERE := P_CALL_WHERE || ' AND	MKC.SOURCE_ORGANIZATION_ID = ' || TO_CHAR(P_SOURCE_ORG_ID);
+      END IF;
+      IF P_SOURCE_SUBINV IS NOT NULL THEN
+        P_CALL_WHERE := P_CALL_WHERE || ' AND	MKC.SOURCE_SUBINVENTORY = ''' || P_SOURCE_SUBINV || '''';
+      END IF;
+      IF P_SOURCE_LOC_ID IS NOT NULL THEN
+        P_CALL_WHERE := P_CALL_WHERE || ' AND	MKC.SOURCE_LOCATOR_ID = ' || TO_CHAR(P_SOURCE_LOC_ID);
+      END IF;
+      IF P_KANBAN_CARD_NUMBER_LOW IS NOT NULL THEN
+        P_CALL_WHERE := P_CALL_WHERE || ' AND	MKC.KANBAN_CARD_NUMBER >= ''' || P_KANBAN_CARD_NUMBER_LOW || '''';
+      END IF;
+      IF P_KANBAN_CARD_NUMBER_HIGH IS NOT NULL THEN
+        P_CALL_WHERE := P_CALL_WHERE || ' AND	MKC.KANBAN_CARD_NUMBER <= ''' || P_KANBAN_CARD_NUMBER_HIGH || '''';
+      END IF;
+      IF P_SUPPLIER_ID IS NOT NULL THEN
+        P_CALL_WHERE := P_CALL_WHERE || ' AND	MKC.SUPPLIER_ID = ' || TO_CHAR(P_SUPPLIER_ID);
+      END IF;
+      IF P_SUPPLIER_SITE_ID IS NOT NULL THEN
+        P_CALL_WHERE := P_CALL_WHERE || ' AND	MKC.SUPPLIER_SITE_ID = ' || TO_CHAR(P_SUPPLIER_SITE_ID);
+      END IF;
+      IF P_SUBINV IS NOT NULL THEN
+        P_CALL_WHERE := P_CALL_WHERE || ' AND	MKC.SUBINVENTORY_NAME = ''' || P_SUBINV || '''';
+      END IF;
+      IF P_KANBAN_CARD_TYPE IS NOT NULL THEN
+        P_CALL_WHERE := P_CALL_WHERE || ' AND	MKC.KANBAN_CARD_TYPE = ' || TO_CHAR(P_KANBAN_CARD_TYPE);
+      END IF;
+      IF P_ITEM_LOW IS NOT NULL OR P_ITEM_HIGH IS NOT NULL THEN
+        P_CALL_WHERE := P_CALL_WHERE || '  AND  ' || P_ITEM_WHERE;
+      END IF;
+      IF P_LOCATOR_LOW IS NOT NULL OR P_LOCATOR_HI IS NOT NULL THEN
+        P_CALL_WHERE := P_CALL_WHERE || ' AND	' || P_LOC_WHERE;
+      END IF;
+    ELSIF P_CALL_FROM = 2 THEN
+      IF P_REPORT_ID IS NOT NULL THEN
+        P_CALL_WHERE := P_CALL_WHERE || ' AND (MKC.KANBAN_CARD_ID IN ( SELECT MKBNT.KANBAN_CARD_ID FROM MTL_KANBAN_CARD_PRINT_TEMP MKBNT
+                        			WHERE MKBNT.REPORT_ID = ' || TO_CHAR(P_REPORT_ID) || ')
+                        		  OR MKC.KANBAN_CARD_ID IN ( SELECT MKC.KANBAN_CARD_ID FROM MTL_KANBAN_CARDS MKC WHERE
+                        			MKC.PULL_SEQUENCE_ID IN ( SELECT MKBNT.PULL_SEQUENCE_ID
+                        				 FROM MTL_KANBAN_CARD_PRINT_TEMP MKBNT
+                        				WHERE MKBNT.REPORT_ID = ' || TO_CHAR(P_REPORT_ID) || ')))';
+      END IF;
+    ELSIF P_CALL_FROM = 3 THEN
+      IF P_KANBAN_CARD_ID IS NOT NULL THEN
+        P_CALL_WHERE := P_CALL_WHERE || ' AND MKC.KANBAN_CARD_ID = ' || TO_CHAR(P_KANBAN_CARD_ID);
+      END IF;
+    END IF;
+    IF P_SORT_BY = 1 THEN
+      P_ORDER_BY := 'MKC.KANBAN_CARD_NUMBER';
+    ELSIF P_SORT_BY = 2 THEN
+      P_ORDER_BY := 'MKC.SUBINVENTORY_NAME';
+    ELSIF P_SORT_BY = 3 THEN
+      P_ORDER_BY := 'MKC.SUBINVENTORY_NAME , ' || P_LOC_FLEXDATA;
+    ELSIF P_SORT_BY = 4 THEN
+      P_ORDER_BY := 'PSV.VENDOR_NAME , MSS.VENDOR_SITE_CODE ';
+    ELSIF P_SORT_BY = 5 THEN
+      P_ORDER_BY := 'MKC.SOURCE_ORGANIZATION_ID,
+                                      MKC.SOURCE_SUBINVENTORY, ' || P_SOURCE_LOC_FLEXDATA;
+    END IF;
+    RETURN (TRUE);
+  END BEFOREREPORT;
+
+  FUNCTION AFTERREPORT RETURN BOOLEAN IS
+  BEGIN
+    IF P_CALL_FROM = 2 THEN
+      BEGIN
+        DELETE FROM MTL_KANBAN_CARD_PRINT_TEMP
+         WHERE REPORT_ID = P_REPORT_ID;
+      EXCEPTION
+        WHEN NO_DATA_FOUND THEN
+          NULL;
+        WHEN OTHERS THEN
+          NULL;
+      END;
+    END IF;
+    /*SRW.USER_EXIT('FND SRWEXIT')*/NULL;
+    COMMIT;
+    RETURN (TRUE);
+  END AFTERREPORT;
+
+  FUNCTION AFTERPFORM RETURN BOOLEAN IS
+  BEGIN
+    IF P_TRACE_FLAG = 1 THEN
+      EXECUTE IMMEDIATE
+        ' alter session set sql_trace = true ';
+    END IF;
+    RETURN (TRUE);
+  END AFTERPFORM;
+
+END INV_INVKBCPR_XMLP_PKG;
+
+
+/

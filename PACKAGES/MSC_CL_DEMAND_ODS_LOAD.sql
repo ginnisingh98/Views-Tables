@@ -1,0 +1,28 @@
+--------------------------------------------------------
+--  DDL for Package MSC_CL_DEMAND_ODS_LOAD
+--------------------------------------------------------
+
+  CREATE OR REPLACE EDITIONABLE PACKAGE "APPS"."MSC_CL_DEMAND_ODS_LOAD" AUTHID CURRENT_USER AS -- specification
+/* $Header: MSCLDEMS.pls 120.1 2007/10/08 06:38:52 rsyadav noship $ */
+
+PROCEDURE LINK_SUPP_SO_DEMAND_EXT ;
+PROCEDURE LINK_SUPP_SO_DEMAND_110;
+PROCEDURE LINK_SUPP_SO_DEMAND_11I2;
+FUNCTION  drop_demands_tmp_ind 	RETURN boolean;
+FUNCTION  drop_sales_orders_tmp_ind	RETURN boolean;
+FUNCTION LINK_PARENT_SALES_ORDERS RETURN BOOLEAN;
+FUNCTION LINK_PARENT_SALES_ORDERS_MDS		RETURN BOOLEAN;
+PROCEDURE LOAD_ITEM_FORECASTS;  --  called by load_supply
+PROCEDURE LOAD_FORECASTS;
+PROCEDURE LOAD_DEMAND;     -- called by load_supply
+PROCEDURE LOAD_SALES_ORDER; -- called from load_supply
+PROCEDURE LOAD_HARD_RESERVATION;
+PROCEDURE LOAD_DESIGNATOR;
+PROCEDURE LOAD_ODS_DEMAND;
+-- Load Demand information from ODS table into
+-- the demand temp table.
+PROCEDURE LOAD_PAYBACK_DEMANDS;
+
+END MSC_CL_DEMAND_ODS_LOAD;
+
+/

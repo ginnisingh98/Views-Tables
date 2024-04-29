@@ -1,0 +1,113 @@
+--------------------------------------------------------
+--  DDL for Package AR_ARXINREV_XMLP_PKG
+--------------------------------------------------------
+
+  CREATE OR REPLACE EDITIONABLE PACKAGE "APPS"."AR_ARXINREV_XMLP_PKG" AUTHID CURRENT_USER AS
+/* $Header: ARXINREVS.pls 120.0 2007/12/27 13:53:26 abraghun noship $ */
+	P_CONC_REQUEST_ID	number;
+	P_CHART_OF_ACCOUNTS_ID	number;
+	P_SQL_TRACE	varchar2(32767);
+	P_TEST_LAYOUT	varchar2(30);
+	P_DEBUG_MODE	varchar2(32767);
+	P_CURRENCY	varchar2(15);
+	P_PRECISION	number;
+	P_MIN_ACCOUNTABLE_UNIT	number;
+	P_NAME	varchar2(30);
+	P_SET_OF_BOOKS_ID	number;
+	P_FLEXDATA	varchar2(2100);
+	P_REVALUATION_PERIOD	varchar2(50);
+	P_END_DATE	date;
+	/*ADDED AS FIX*/LP_END_DATE DATE; LP_UP_TO_DUE_DATE DATE;
+	P_UP_TO_DUE_DATE	date;
+	P_DUE_DATE_DISP	date;
+	--lp_bal_segment_low	varchar2(200);
+	lp_bal_segment_low	varchar2(200):=' ';
+	--lp_bal_segment_high	varchar2(200);
+	lp_bal_segment_high	varchar2(200):=' ';
+	P_BAL_SEGMENT_LOW	varchar2(100);
+	P_BAL_SEGMENT_HIGH	varchar2(100);
+	P_DEBUG_SWITCH	varchar2(1);
+	--LP_POSTED	varchar2(100);
+	LP_POSTED	varchar2(100):=' ';
+	--LP_CLEARED	varchar2(100);
+	LP_CLEARED	varchar2(100):=' ';
+	P_STATED_REPORTING_DATE	date;
+	P_RATE_DATE1 varchar2(10);
+	P_REVALUATION_DATE	date;
+	--lp_dates	varchar2(100);
+	lp_dates	varchar2(200):=' ';
+	P_POSTED	varchar2(1);
+	P_CLEARED	varchar2(1);
+	P_RATE_TYPE	varchar2(30);
+	--lp_posted_receipts	varchar2(100);
+	lp_posted_receipts	varchar2(100):=' ';
+	--LP_POSTED_RECEIPT	varchar2(40);
+	LP_POSTED_RECEIPT	varchar2(40):=' ';
+	--LP_CLEARED_NEW	varchar2(1000);
+	LP_CLEARED_NEW	varchar2(1000):=' ';
+	P_DAILY_RATE_TYPE	varchar2(30);
+	P_RATE_DATE	date;
+	P_RATE_TYPE_LOOKUP	varchar2(30);
+	CP_TOT_TMP	number := 0 ;
+	CP_TMP	number;
+	RP_DATA_FOUND	varchar2(300);
+	RP_SUB_TITLE	varchar2(80);
+	REVALUATION_DATE	number;
+	CP_TEMP	number;
+	CP_1	varchar2(40);
+	C_DAILY_RATE_LOOKUP_ERROR	varchar2(20) :=  'N' ;
+	CP_ACC_MESSAGE	varchar2(2000);
+	function BeforeReport return boolean  ;
+	function AfterReport return boolean  ;
+	function aol_round( n in number, precision in number, mac in number) return number  ;
+	function c_eop_rateformula(C_CURR in varchar2, C_TYPE in varchar2, C_EXCHANGE_RATE in number) return number  ;
+	function c_open_funcformula(C_OPEN_ORIG in number, C_EXCHANGE_RATE in number) return number  ;
+	function c_open_revformula(C_EOP_RATE in number, C_EXCHANGE_RATE in number, C_OPEN_ORIG in number, C_OPEN_FUNC in number) return number  ;
+	function c_diffformula(C_OPEN_REV in number, C_OPEN_FUNC in number) return number  ;
+	function c_receiptsformula(C_PAY_ID in number) return number  ;
+	function c_open_origformula(C_PAY_AMOUNT in number, C_RECEIPTS in number, C_ADJUST in number, C_CM in number, C_CM1 in number) return number  ;
+	function calc_open_funcformula(C_OPEN_FUNC in number) return number  ;
+	function calc_open_revformula(C_OPEN_REV in number) return number  ;
+	function calc_eop_amountformula(C_EOP_AMOUNT in number) return number  ;
+	function c_adjustformula(C_PAY_ID in number) return number  ;
+	function c_eop_amountformula(C_EOP_RATE in number, C_OPEN_ORIG in number) return number  ;
+	function c_eop_diffformula(C_SUM_EOP_AMOUNT in number, C_SUM_OPEN_FUNC in number) return number  ;
+	function c_rev_diffformula(C_SUM_OPEN_REV in number, C_SUM_OPEN_FUNC in number) return number  ;
+	function c_sum_eop_diffformula(C_SUM_EOP_AMOUNT in number, C_SUM_OPEN_FUNC in number) return number  ;
+	function c_sum_rev_diffformula(C_SUM_OPEN_REV in number, C_SUM_OPEN_FUNC in number) return number  ;
+	function c_flagformula(C_EOP_RATE in number, C_OPEN_ORIG in number) return number  ;
+	function c_cmformula(C_PAY_ID in number) return number  ;
+	function c_tot_eop_diffformula(C_TOT_EOP_AMOUNT in number, C_TOT_OPEN_FUNC in number) return number  ;
+	function c_tot_rev_diffformula(C_TOT_OPEN_REV in number, C_TOT_OPEN_FUNC in number) return number  ;
+	function cf_eop_reval_amountformula(Cf_EOP_EXCH_RATE in number, C_TYPE in varchar2, c_exchange_rate in number, C_REVALUATE_YES_NO in varchar2, C_OPEN_ORIG in number, c_previous_cust_trx_id in number) return number  ;
+	function cf_total_adjustmentsformula(C_PAY_ID in number, C_OPEN_ORIG in number) return number  ;
+	function AfterPForm return boolean  ;
+	function cf_curr_to_func_exch_rateformu(C_EXCHANGE_RATE in number) return number  ;
+	function cf_eop_exch_rateformula(c_revaluate_yes_no in varchar2, c_exchange_rate in number, c_curr in varchar2) return number  ;
+	FUNCTION total (a number, b number) RETURN number  ;
+	function CF_todayFormula return char  ;
+	function CF_Revaluation_dateFormula return char  ;
+	function CF_due_date_dispFormula return Char  ;
+	function c_2(cs_2 in number) return boolean  ;
+	--procedure set_last_cust  ;
+	procedure set_last_cust(c_balancing IN VARCHAR2 , cs_2 IN NUMBER);
+	function c_cm1formula(C_PAY_ID in number) return number  ;
+	function CF_RATE_TYPE_LOOKUPFormula return Char  ;
+	function CF_USER_DAILY_RATE_TYPEFormula return Char  ;
+	function CF_TRANS_TO_GLFormula return Char  ;
+	function CF_CLEARED_ONLYFormula return Char  ;
+	function P_NAMEValidTrigger return boolean  ;
+	Function CP_TOT_TMP_p return number;
+	Function CP_TMP_p return number;
+	Function RP_DATA_FOUND_p return varchar2;
+	Function RP_SUB_TITLE_p return varchar2;
+	Function REVALUATION_DATE_p return number;
+	Function CP_TEMP_p return number;
+	Function CP_1_p return varchar2;
+	Function C_DAILY_RATE_LOOKUP_ERROR_p return varchar2;
+	Function CP_ACC_MESSAGE_p return varchar2;
+END AR_ARXINREV_XMLP_PKG;
+
+
+
+/

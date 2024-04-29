@@ -1,0 +1,45 @@
+--------------------------------------------------------
+--  DDL for Package PSP_ER_APPROVALS_PKG
+--------------------------------------------------------
+
+  CREATE OR REPLACE EDITIONABLE PACKAGE "APPS"."PSP_ER_APPROVALS_PKG" AUTHID CURRENT_USER as
+ /* $Header: PSPERAPS.pls 115.5 2002/11/18 12:24:52 lveerubh ship $ */
+procedure INSERT_ROW (
+  X_ROWID in out NOCOPY VARCHAR2,
+  X_EFFORT_REPORT_ID in NUMBER,
+  X_VERSION_NUM in NUMBER,
+  X_APPROVING_PERSON_ID in NUMBER,
+  X_APPROVED_DATE in DATE,
+  X_MODE in VARCHAR2 default 'R'
+  );
+procedure LOCK_ROW (
+  X_EFFORT_REPORT_ID in NUMBER,
+  X_VERSION_NUM in NUMBER,
+  X_APPROVING_PERSON_ID in NUMBER,
+  X_APPROVED_DATE in DATE
+);
+procedure UPDATE_ROW (
+  X_EFFORT_REPORT_ID in NUMBER,
+  X_VERSION_NUM in NUMBER,
+  X_APPROVING_PERSON_ID in NUMBER,
+  X_APPROVED_DATE in DATE,
+  X_MODE in VARCHAR2 default 'R'
+  );
+procedure ADD_ROW (
+  X_ROWID in out NOCOPY VARCHAR2,
+  X_EFFORT_REPORT_ID in NUMBER,
+  X_VERSION_NUM in NUMBER,
+  X_APPROVING_PERSON_ID in NUMBER,
+  X_APPROVED_DATE in DATE,
+  X_MODE in VARCHAR2 default 'R'
+  );
+procedure DELETE_ROW (
+  X_EFFORT_REPORT_ID in NUMBER,
+  X_VERSION_NUM in NUMBER,
+  X_APPROVING_PERSON_ID in NUMBER
+);
+end PSP_ER_APPROVALS_PKG;
+
+ 
+
+/

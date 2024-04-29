@@ -1,0 +1,107 @@
+--------------------------------------------------------
+--  DDL for Package CN_ROLE_QUOTA_RATES_PKG
+--------------------------------------------------------
+
+  CREATE OR REPLACE EDITIONABLE PACKAGE "APPS"."CN_ROLE_QUOTA_RATES_PKG" AUTHID CURRENT_USER as
+/* $Header: cntpqrs.pls 115.4 2002/11/21 21:10:13 hlchen ship $ */
+
+procedure INSERT_ROW
+  (X_ROWID              IN OUT NOCOPY VARCHAR2,
+   X_ROLE_QUOTA_RATE_ID IN OUT NOCOPY NUMBER,
+   X_ROLE_QUOTA_CATE_ID IN     NUMBER,
+   X_RATE_TIER_ID       IN     NUMBER,
+   X_RATE_SCHEDULE_ID   IN     NUMBER,
+   X_MIN_RATE           IN     NUMBER := NULL,
+   X_MAX_RATE           IN     NUMBER := NULL,
+   X_COMM_RATE          IN     NUMBER := NULL,
+   X_ATTRIBUTE_CATEGORY IN     VARCHAR2 := NULL,
+   X_ATTRIBUTE1         IN     VARCHAR2 := NULL,
+   X_ATTRIBUTE2         IN     VARCHAR2 := NULL,
+   X_ATTRIBUTE3         IN     VARCHAR2 := NULL,
+   X_ATTRIBUTE4         IN     VARCHAR2 := NULL,
+   X_ATTRIBUTE5         IN     VARCHAR2 := NULL,
+   X_ATTRIBUTE6         IN     VARCHAR2 := NULL,
+   X_ATTRIBUTE7         IN     VARCHAR2 := NULL,
+   X_ATTRIBUTE8         IN     VARCHAR2 := NULL,
+   X_ATTRIBUTE9         IN     VARCHAR2 := NULL,
+   X_ATTRIBUTE10        IN     VARCHAR2 := NULL,
+   X_ATTRIBUTE11        IN     VARCHAR2 := NULL,
+   X_ATTRIBUTE12        IN     VARCHAR2 := NULL,
+   X_ATTRIBUTE13        IN     VARCHAR2 := NULL,
+   X_ATTRIBUTE14        IN     VARCHAR2 := NULL,
+   X_ATTRIBUTE15        IN     VARCHAR2 := NULL,
+   X_CREATION_DATE      IN     DATE,
+   X_CREATED_BY         IN     NUMBER,
+   X_LAST_UPDATE_DATE   IN     DATE,
+   X_LAST_UPDATED_BY    IN     NUMBER,
+   X_LAST_UPDATE_LOGIN  IN     NUMBER,
+   X_OBJECT_VERSION_NUMBER   IN   NUMBER
+   );
+
+procedure LOCK_ROW
+  (X_ROLE_QUOTA_RATE_ID IN     NUMBER,
+   X_ROLE_QUOTA_CATE_ID IN     NUMBER,
+   X_RATE_TIER_ID       IN     NUMBER,
+   X_RATE_SCHEDULE_ID   IN     NUMBER,
+   X_MIN_RATE           IN     NUMBER,
+   X_MAX_RATE           IN     NUMBER,
+   X_COMM_RATE          IN     NUMBER := NULL,
+   X_ATTRIBUTE_CATEGORY IN     VARCHAR2,
+   X_ATTRIBUTE1         IN     VARCHAR2,
+   X_ATTRIBUTE2         IN     VARCHAR2,
+   X_ATTRIBUTE3         IN     VARCHAR2,
+   X_ATTRIBUTE4         IN     VARCHAR2,
+   X_ATTRIBUTE5         IN     VARCHAR2,
+   X_ATTRIBUTE6         IN     VARCHAR2,
+   X_ATTRIBUTE7         IN     VARCHAR2,
+   X_ATTRIBUTE8         IN     VARCHAR2,
+   X_ATTRIBUTE9         IN     VARCHAR2,
+   X_ATTRIBUTE10        IN     VARCHAR2,
+   X_ATTRIBUTE11        IN     VARCHAR2,
+   X_ATTRIBUTE12        IN     VARCHAR2,
+   X_ATTRIBUTE13        IN     VARCHAR2,
+   X_ATTRIBUTE14        IN     VARCHAR2,
+   X_ATTRIBUTE15        IN     VARCHAR2,
+   X_OBJECT_VERSION_NUMBER   IN   NUMBER
+   );
+
+procedure UPDATE_ROW
+  (X_ROLE_QUOTA_RATE_ID IN     NUMBER,
+   X_ROLE_QUOTA_CATE_ID IN     NUMBER,
+   X_RATE_TIER_ID       IN     NUMBER,
+   X_RATE_SCHEDULE_ID   IN     NUMBER,
+   X_MIN_RATE           IN     NUMBER,
+   X_MAX_RATE           IN     NUMBER,
+   X_COMM_RATE          IN     NUMBER := NULL,
+   X_ATTRIBUTE_CATEGORY IN     VARCHAR2,
+   X_ATTRIBUTE1         IN     VARCHAR2,
+   X_ATTRIBUTE2         IN     VARCHAR2,
+   X_ATTRIBUTE3         IN     VARCHAR2,
+   X_ATTRIBUTE4         IN     VARCHAR2,
+   X_ATTRIBUTE5         IN     VARCHAR2,
+   X_ATTRIBUTE6         IN     VARCHAR2,
+   X_ATTRIBUTE7         IN     VARCHAR2,
+   X_ATTRIBUTE8         IN     VARCHAR2,
+   X_ATTRIBUTE9         IN     VARCHAR2,
+   X_ATTRIBUTE10        IN     VARCHAR2,
+   X_ATTRIBUTE11        IN     VARCHAR2,
+   X_ATTRIBUTE12        IN     VARCHAR2,
+   X_ATTRIBUTE13        IN     VARCHAR2,
+   X_ATTRIBUTE14        IN     VARCHAR2,
+   X_ATTRIBUTE15        IN     VARCHAR2,
+   X_LAST_UPDATE_DATE   IN     DATE,
+   X_LAST_UPDATED_BY    IN     NUMBER,
+   X_LAST_UPDATE_LOGIN  IN     NUMBER,
+   X_OBJECT_VERSION_NUMBER   IN   NUMBER
+   );
+
+procedure DELETE_ROW
+  (
+  X_ROLE_QUOTA_RATE_ID  IN     NUMBER
+   );
+
+end CN_ROLE_QUOTA_RATES_PKG;
+
+ 
+
+/

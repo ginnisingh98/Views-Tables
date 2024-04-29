@@ -1,0 +1,19 @@
+--------------------------------------------------------
+--  DDL for Package ENG_ENGRECOT_XMLP_PKG
+--------------------------------------------------------
+
+  CREATE OR REPLACE EDITIONABLE PACKAGE "APPS"."ENG_ENGRECOT_XMLP_PKG" AUTHID CURRENT_USER AS
+/* $Header: ENGRECOTS.pls 120.0 2007/12/24 13:46:44 krreddy noship $ */
+  P_ORG_ID VARCHAR2(40);
+
+  P_CONC_REQUEST_ID NUMBER;
+
+  FUNCTION BEFOREREPORT RETURN BOOLEAN;
+
+  FUNCTION AFTERREPORT RETURN BOOLEAN;
+
+END ENG_ENGRECOT_XMLP_PKG;
+
+
+
+/

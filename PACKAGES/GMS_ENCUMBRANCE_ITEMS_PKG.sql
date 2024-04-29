@@ -1,0 +1,137 @@
+--------------------------------------------------------
+--  DDL for Package GMS_ENCUMBRANCE_ITEMS_PKG
+--------------------------------------------------------
+
+  CREATE OR REPLACE EDITIONABLE PACKAGE "APPS"."GMS_ENCUMBRANCE_ITEMS_PKG" AUTHID CURRENT_USER as
+/* $Header: GMSTITMS.pls 115.8 2002/11/28 07:10:01 mmalhotr ship $ */
+
+
+ procedure insert_row (x_rowid                        in out NOCOPY VARCHAR2	,
+                       x_encumbrance_item_id          in out NOCOPY NUMBER,
+                       x_last_update_date             in DATE,
+                       x_last_updated_by              in NUMBER,
+                       x_creation_date                in DATE,
+                       x_created_by                   in NUMBER,
+                       x_encumbrance_id               in NUMBER,
+                       x_task_id                      in NUMBER,
+                       x_encumbrance_item_date        in DATE,
+                       x_encumbrance_type             in VARCHAR2,
+                       x_enc_distributed_flag         in VARCHAR2,
+                       x_amount  	              in NUMBER         DEFAULT NULL,
+                       x_override_to_organization_id  in NUMBER		DEFAULT NULL,
+                       x_adjusted_encumbrance_item_id in NUMBER		DEFAULT NULL,
+                       x_net_zero_adjustment_flag     in VARCHAR2	DEFAULT NULL,
+                       x_transferred_from_enc_item_id in NUMBER		DEFAULT NULL,
+                       x_last_update_login            in NUMBER		DEFAULT NULL,
+                       x_request_id                   in NUMBER         DEFAULT NULL,
+                       x_attribute_category           in VARCHAR2	DEFAULT NULL,
+                       x_attribute1                   in VARCHAR2	DEFAULT NULL,
+                       x_attribute2                   in VARCHAR2	DEFAULT NULL,
+                       x_attribute3                   in VARCHAR2	DEFAULT NULL,
+                       x_attribute4                   in VARCHAR2	DEFAULT NULL,
+                       x_attribute5                   in VARCHAR2	DEFAULT NULL,
+                       x_attribute6                   in VARCHAR2	DEFAULT NULL,
+                       x_attribute7                   in VARCHAR2	DEFAULT NULL,
+                       x_attribute8                   in VARCHAR2	DEFAULT NULL,
+                       x_attribute9                   in VARCHAR2	DEFAULT NULL,
+                       x_attribute10                  in VARCHAR2	DEFAULT NULL,
+                       x_orig_transaction_reference   in VARCHAR2	DEFAULT NULL,
+                       x_transaction_source           in VARCHAR2	DEFAULT NULL,
+                       x_project_id                   in NUMBER		DEFAULT NULL,
+                       x_source_encumbrance_item_id   in NUMBER		DEFAULT NULL,
+                       x_job_id                       in NUMBER		DEFAULT NULL,
+                       x_system_linkage_function      in VARCHAR2,
+                       x_denom_currency_code          in VARCHAR2	DEFAULT NULL,
+                       x_denom_raw_amount             in NUMBER         DEFAULT NULL,
+                       x_acct_exchange_rounding_limit in NUMBER		DEFAULT NULL,
+                       x_acct_currency_code           in VARCHAR2	DEFAULT NULL,
+                       x_acct_rate_date               in DATE		DEFAULT NULL,
+                       x_acct_rate_type               in VARCHAR2	DEFAULT NULL,
+                       x_acct_exchange_rate           in NUMBER		DEFAULT NULL,
+                       x_acct_raw_cost                in NUMBER         DEFAULT NULL,
+                       x_project_currency_code        in VARCHAR2	DEFAULT NULL,
+                       x_project_rate_date            in DATE		DEFAULT NULL,
+                       x_project_rate_type            in VARCHAR2	DEFAULT NULL,
+                       x_project_exchange_rate        in NUMBER		DEFAULT NULL,
+                       x_encumbrance_comment          in VARCHAR2       DEFAULT NULL,
+                       x_org_id                       in NUMBER          ,
+                       x_denom_tp_currency_code       in VARCHAR2       DEFAULT NULL,
+                       x_denom_transfer_price         in NUMBER         DEFAULT NULL,
+ 		       x_person_id                    in NUMBER         DEFAULT NULL,
+                       x_incurred_by_person_id        in NUMBER         DEFAULT NULL,
+                       x_ind_compiled_set_id          in NUMBER         DEFAULT NULL,
+                       x_pa_date                      in DATE           DEFAULT NULL,
+                       x_gl_date                      in DATE           DEFAULT NULL,
+                       x_line_num                     in NUMBER         DEFAULT 1,
+                       x_burden_sum_dest_run_id       in NUMBER         DEFAULT NULL,
+                       x_burden_sum_source_run_id     in NUMBER         DEFAULT NULL) ;
+
+
+ procedure update_row (x_rowid				in VARCHAR2,
+                       x_encumbrance_item_id		in NUMBER,
+                       x_last_update_date		in DATE,
+                       x_last_updated_by		in NUMBER,
+                       x_encumbrance_id			in NUMBER,
+                       x_task_id			in NUMBER,
+                       x_encumbrance_item_date		in DATE,
+                       x_encumbrance_type		in VARCHAR2,
+                       x_enc_distributed_flag		in VARCHAR2,
+                       x_amount		    	 	in NUMBER,
+                       x_override_to_organization_id	in NUMBER,
+                       x_adjusted_encumbrance_item_id	in NUMBER,
+                       x_net_zero_adjustment_flag	in VARCHAR2,
+                       x_transferred_from_enc_item_id	in NUMBER,
+                       x_last_update_login		in NUMBER,
+                       x_attribute_category		in VARCHAR2,
+                       x_attribute1			in VARCHAR2,
+                       x_attribute2			in VARCHAR2,
+                       x_attribute3			in VARCHAR2,
+                       x_attribute4			in VARCHAR2,
+                       x_attribute5			in VARCHAR2,
+                       x_attribute6			in VARCHAR2,
+                       x_attribute7			in VARCHAR2,
+                       x_attribute8			in VARCHAR2,
+                       x_attribute9			in VARCHAR2,
+                       x_attribute10			in VARCHAR2,
+                       x_orig_transaction_reference	in VARCHAR2,
+                       x_transaction_source		in VARCHAR2,
+                       x_project_id			in NUMBER,
+                       x_source_encumbrance_item_id	in NUMBER,
+                       x_job_id				in NUMBER,
+                       x_system_linkage_function        in VARCHAR2,
+ 		       x_denom_currency_code            in VARCHAR2,
+                       x_denom_raw_amount               in NUMBER ,
+   		       x_acct_exchange_rounding_limit   in NUMBER,
+ 		       x_acct_currency_code             in VARCHAR2,
+ 		       x_acct_rate_date                 in DATE,
+ 		       x_acct_rate_type                 in VARCHAR2,
+ 		       x_acct_exchange_rate             in NUMBER,
+                       x_acct_raw_cost                  in NUMBER,
+ 		       x_project_currency_code          in VARCHAR2,
+ 	       	       x_project_rate_date              in DATE,
+ 		       x_project_rate_type              in VARCHAR2,
+ 		       x_project_exchange_rate          in NUMBER ,
+                       x_encumbrance_comment            in VARCHAR2,
+                       x_pa_date                        in DATE,
+                       x_gl_date                        in DATE );
+/*
+                       x_denom_tp_currency_code         in VARCHAR2,
+                       x_denom_transfer_price           in NUMBER   ,
+ 		       x_person_id                      in NUMBER,
+                       x_incurred_by_person_id          in NUMBER,
+                       x_ind_compiled_set_id            in NUMBER,
+                       x_line_num                       in NUMBER,
+                       x_burden_sum_dest_run_id         in NUMBER,
+                       x_burden_sum_source_run_id       in NUMBER) ;
+*/
+ -- overload delete_row to tkae both rowid or enc_id as arguments
+ procedure delete_row (x_encumbrance_item_id	in NUMBER);
+ procedure delete_row (x_rowid			in VARCHAR2);
+
+ procedure lock_row (x_rowid	in VARCHAR2);
+
+END gms_encumbrance_items_pkg;
+
+ 
+
+/

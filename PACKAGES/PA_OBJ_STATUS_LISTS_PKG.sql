@@ -1,0 +1,43 @@
+--------------------------------------------------------
+--  DDL for Package PA_OBJ_STATUS_LISTS_PKG
+--------------------------------------------------------
+
+  CREATE OR REPLACE EDITIONABLE PACKAGE "APPS"."PA_OBJ_STATUS_LISTS_PKG" AUTHID CURRENT_USER as
+/* $Header: PAOBSLTS.pls 120.1 2005/08/19 16:36:57 mwasowic noship $ */
+procedure INSERT_ROW (
+  X_ROWID in out NOCOPY VARCHAR2, --File.Sql.39 bug 4440895
+  X_OBJ_STATUS_LIST_ID in NUMBER,
+  X_OBJECT_TYPE in VARCHAR2,
+  X_OBJECT_ID in NUMBER,
+  X_STATUS_LIST_ID in NUMBER,
+  X_STATUS_TYPE in VARCHAR2,
+  X_CREATION_DATE in DATE default null,
+  X_CREATED_BY in NUMBER default null,
+  X_LAST_UPDATE_DATE in DATE default null,
+  X_LAST_UPDATED_BY in NUMBER default null,
+  X_LAST_UPDATE_LOGIN in NUMBER default null);
+procedure LOCK_ROW (
+  X_OBJ_STATUS_LIST_ID in NUMBER,
+  X_OBJECT_TYPE in VARCHAR2,
+  X_OBJECT_ID in NUMBER,
+  X_STATUS_LIST_ID in NUMBER,
+  X_STATUS_TYPE in VARCHAR2
+);
+procedure UPDATE_ROW (
+  X_OBJ_STATUS_LIST_ID in NUMBER,
+  X_OBJECT_TYPE in VARCHAR2,
+  X_OBJECT_ID in NUMBER,
+  X_STATUS_LIST_ID in NUMBER,
+  X_STATUS_TYPE in VARCHAR2,
+  X_LAST_UPDATE_DATE in DATE,
+  X_LAST_UPDATED_BY in NUMBER,
+  X_LAST_UPDATE_LOGIN in NUMBER
+);
+procedure DELETE_ROW (
+  X_OBJ_STATUS_LIST_ID in NUMBER
+);
+end PA_OBJ_STATUS_LISTS_PKG;
+
+ 
+
+/

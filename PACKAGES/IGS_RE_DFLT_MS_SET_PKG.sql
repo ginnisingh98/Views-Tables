@@ -1,0 +1,111 @@
+--------------------------------------------------------
+--  DDL for Package IGS_RE_DFLT_MS_SET_PKG
+--------------------------------------------------------
+
+  CREATE OR REPLACE EDITIONABLE PACKAGE "APPS"."IGS_RE_DFLT_MS_SET_PKG" AUTHID CURRENT_USER as
+/* $Header: IGSRI06S.pls 115.5 2002/11/29 03:32:45 nsidana ship $ */
+procedure INSERT_ROW (
+  X_ROWID in out NOCOPY VARCHAR2,
+  X_COURSE_CD in VARCHAR2,
+  X_VERSION_NUMBER in NUMBER,
+  X_MILESTONE_TYPE in VARCHAR2,
+  X_ATTENDANCE_TYPE in VARCHAR2,
+  X_ATTENDANCE_MODE in VARCHAR2,
+  X_SEQUENCE_NUMBER in NUMBER,
+  X_OFFSET_DAYS in NUMBER,
+  X_COMMENTS in VARCHAR2,
+  X_MODE in VARCHAR2 default 'R' ,
+  X_ORG_ID in NUMBER
+  );
+procedure LOCK_ROW (
+  X_ROWID in VARCHAR2,
+  X_COURSE_CD in VARCHAR2,
+  X_VERSION_NUMBER in NUMBER,
+  X_MILESTONE_TYPE in VARCHAR2,
+  X_ATTENDANCE_TYPE in VARCHAR2,
+  X_ATTENDANCE_MODE in VARCHAR2,
+  X_SEQUENCE_NUMBER in NUMBER,
+  X_OFFSET_DAYS in NUMBER,
+  X_COMMENTS in VARCHAR2
+);
+procedure UPDATE_ROW (
+  X_ROWID in VARCHAR2,
+  X_COURSE_CD in VARCHAR2,
+  X_VERSION_NUMBER in NUMBER,
+  X_MILESTONE_TYPE in VARCHAR2,
+  X_ATTENDANCE_TYPE in VARCHAR2,
+  X_ATTENDANCE_MODE in VARCHAR2,
+  X_SEQUENCE_NUMBER in NUMBER,
+  X_OFFSET_DAYS in NUMBER,
+  X_COMMENTS in VARCHAR2,
+  X_MODE in VARCHAR2 default 'R'
+  );
+procedure ADD_ROW (
+  X_ROWID in out NOCOPY VARCHAR2,
+  X_COURSE_CD in VARCHAR2,
+  X_VERSION_NUMBER in NUMBER,
+  X_MILESTONE_TYPE in VARCHAR2,
+  X_ATTENDANCE_TYPE in VARCHAR2,
+  X_ATTENDANCE_MODE in VARCHAR2,
+  X_SEQUENCE_NUMBER in NUMBER,
+  X_OFFSET_DAYS in NUMBER,
+  X_COMMENTS in VARCHAR2,
+  X_MODE in VARCHAR2 default 'R',
+  X_ORG_ID in NUMBER
+  );
+procedure DELETE_ROW (
+  X_ROWID in VARCHAR2
+);
+
+  FUNCTION Get_PK_For_Validation (
+    x_course_cd IN VARCHAR2,
+    x_version_number IN NUMBER,
+    x_milestone_type IN VARCHAR2,
+    x_attendance_type IN VARCHAR2,
+    x_sequence_number IN NUMBER
+    )
+    RETURN BOOLEAN;
+
+  PROCEDURE GET_FK_IGS_EN_ATD_TYPE (
+    x_attendance_type IN VARCHAR2
+    );
+
+  PROCEDURE GET_FK_IGS_PS_VER (
+    x_course_cd IN VARCHAR2,
+    x_version_number IN NUMBER
+    );
+
+  PROCEDURE GET_FK_IGS_PR_MILESTONE_TYP (
+    x_milestone_type IN VARCHAR2
+    );
+
+  PROCEDURE Check_Constraints (
+    Column_Name in VARCHAR2 DEFAULT NULL ,
+    Column_Value in VARCHAR2 DEFAULT NULL
+  );
+
+  PROCEDURE Before_DML (
+    p_action IN VARCHAR2,
+    x_rowid IN VARCHAR2 DEFAULT NULL,
+    x_course_cd IN VARCHAR2 DEFAULT NULL,
+    x_version_number IN NUMBER DEFAULT NULL,
+    x_milestone_type IN VARCHAR2 DEFAULT NULL,
+    x_attendance_type IN VARCHAR2 DEFAULT NULL,
+    x_attendance_mode IN VARCHAR2 DEFAULT NULL,
+    x_sequence_number IN NUMBER DEFAULT NULL,
+    x_offset_days IN NUMBER DEFAULT NULL,
+    x_comments IN VARCHAR2 DEFAULT NULL,
+    x_creation_date IN DATE DEFAULT NULL,
+    x_created_by IN NUMBER DEFAULT NULL,
+    x_last_update_date IN DATE DEFAULT NULL,
+    x_last_updated_by IN NUMBER DEFAULT NULL,
+    x_last_update_login IN NUMBER DEFAULT NULL,
+    X_ORG_ID in NUMBER DEFAULT NULL
+  );
+
+
+end IGS_RE_DFLT_MS_SET_PKG;
+
+ 
+
+/

@@ -1,0 +1,106 @@
+--------------------------------------------------------
+--  DDL for Package FND_ID_FLEX_STRUCTURES_PKG
+--------------------------------------------------------
+
+  CREATE OR REPLACE EDITIONABLE PACKAGE "APPS"."FND_ID_FLEX_STRUCTURES_PKG" AUTHID CURRENT_USER as
+/* $Header: AFFFSTRS.pls 120.2.12010000.1 2008/07/25 14:14:23 appldev ship $ */
+
+procedure INSERT_ROW (
+  X_ROWID IN OUT NOCOPY VARCHAR2,
+  X_APPLICATION_ID in NUMBER,
+  X_ID_FLEX_CODE in VARCHAR2,
+  X_ID_FLEX_NUM in NUMBER,
+  X_ID_FLEX_STRUCTURE_CODE in VARCHAR2,
+  X_CONCATENATED_SEGMENT_DELIMIT in VARCHAR2,
+  X_CROSS_SEGMENT_VALIDATION_FLA in VARCHAR2,
+  X_DYNAMIC_INSERTS_ALLOWED_FLAG in VARCHAR2,
+  X_ENABLED_FLAG in VARCHAR2,
+  X_FREEZE_FLEX_DEFINITION_FLAG in VARCHAR2,
+  X_FREEZE_STRUCTURED_HIER_FLAG in VARCHAR2,
+  X_SHORTHAND_ENABLED_FLAG in VARCHAR2,
+  X_SHORTHAND_LENGTH in NUMBER,
+  X_STRUCTURE_VIEW_NAME in VARCHAR2,
+  X_ID_FLEX_STRUCTURE_NAME in VARCHAR2,
+  X_DESCRIPTION in VARCHAR2,
+  X_SHORTHAND_PROMPT in VARCHAR2,
+  X_CREATION_DATE in DATE,
+  X_CREATED_BY in NUMBER,
+  X_LAST_UPDATE_DATE in DATE,
+  X_LAST_UPDATED_BY in NUMBER,
+  X_LAST_UPDATE_LOGIN in NUMBER);
+procedure LOCK_ROW (
+  X_APPLICATION_ID in NUMBER,
+  X_ID_FLEX_CODE in VARCHAR2,
+  X_ID_FLEX_NUM in NUMBER,
+  X_ID_FLEX_STRUCTURE_CODE in VARCHAR2,
+  X_CONCATENATED_SEGMENT_DELIMIT in VARCHAR2,
+  X_CROSS_SEGMENT_VALIDATION_FLA in VARCHAR2,
+  X_DYNAMIC_INSERTS_ALLOWED_FLAG in VARCHAR2,
+  X_ENABLED_FLAG in VARCHAR2,
+  X_FREEZE_FLEX_DEFINITION_FLAG in VARCHAR2,
+  X_FREEZE_STRUCTURED_HIER_FLAG in VARCHAR2,
+  X_SHORTHAND_ENABLED_FLAG in VARCHAR2,
+  X_SHORTHAND_LENGTH in NUMBER,
+  X_STRUCTURE_VIEW_NAME in VARCHAR2,
+  X_ID_FLEX_STRUCTURE_NAME in VARCHAR2,
+  X_DESCRIPTION in VARCHAR2,
+  X_SHORTHAND_PROMPT in VARCHAR2
+);
+procedure UPDATE_ROW (
+  X_APPLICATION_ID in NUMBER,
+  X_ID_FLEX_CODE in VARCHAR2,
+  X_ID_FLEX_NUM in NUMBER,
+  X_ID_FLEX_STRUCTURE_CODE in VARCHAR2,
+  X_CONCATENATED_SEGMENT_DELIMIT in VARCHAR2,
+  X_CROSS_SEGMENT_VALIDATION_FLA in VARCHAR2,
+  X_DYNAMIC_INSERTS_ALLOWED_FLAG in VARCHAR2,
+  X_ENABLED_FLAG in VARCHAR2,
+  X_FREEZE_FLEX_DEFINITION_FLAG in VARCHAR2,
+  X_FREEZE_STRUCTURED_HIER_FLAG in VARCHAR2,
+  X_SHORTHAND_ENABLED_FLAG in VARCHAR2,
+  X_SHORTHAND_LENGTH in NUMBER,
+  X_STRUCTURE_VIEW_NAME in VARCHAR2,
+  X_ID_FLEX_STRUCTURE_NAME in VARCHAR2,
+  X_DESCRIPTION in VARCHAR2,
+  X_SHORTHAND_PROMPT in VARCHAR2,
+  X_LAST_UPDATE_DATE in DATE,
+  X_LAST_UPDATED_BY in NUMBER,
+  X_LAST_UPDATE_LOGIN in NUMBER
+);
+procedure DELETE_ROW (
+  X_APPLICATION_ID in NUMBER,
+  X_ID_FLEX_CODE in VARCHAR2,
+  X_ID_FLEX_NUM in NUMBER
+);
+procedure ADD_LANGUAGE;
+
+PROCEDURE load_row
+  (x_application_short_name       IN VARCHAR2,
+   x_id_flex_code                 IN VARCHAR2,
+   x_id_flex_structure_code       IN VARCHAR2,
+   x_who                          IN fnd_flex_loader_apis.who_type,
+   x_concatenated_segment_delimit IN VARCHAR2,
+   x_cross_segment_validation_fla IN VARCHAR2,
+   x_dynamic_inserts_allowed_flag IN VARCHAR2,
+   x_enabled_flag                 IN VARCHAR2,
+   x_freeze_flex_definition_flag  IN VARCHAR2,
+   x_freeze_structured_hier_flag  IN VARCHAR2,
+   x_shorthand_enabled_flag       IN VARCHAR2,
+   x_shorthand_length             IN NUMBER,
+   x_structure_view_name          IN VARCHAR2,
+   x_id_flex_structure_name       IN VARCHAR2,
+   x_description                  IN VARCHAR2,
+   x_shorthand_prompt             IN VARCHAR2);
+
+PROCEDURE translate_row
+  (x_application_short_name       IN VARCHAR2,
+   x_id_flex_code                 IN VARCHAR2,
+   x_id_flex_structure_code       IN VARCHAR2,
+   x_who                          IN fnd_flex_loader_apis.who_type,
+   x_id_flex_structure_name       IN VARCHAR2,
+   x_description                  IN VARCHAR2,
+   x_shorthand_prompt             IN VARCHAR2);
+
+end FND_ID_FLEX_STRUCTURES_PKG;
+
+/

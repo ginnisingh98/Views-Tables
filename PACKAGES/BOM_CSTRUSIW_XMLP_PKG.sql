@@ -1,0 +1,153 @@
+--------------------------------------------------------
+--  DDL for Package BOM_CSTRUSIW_XMLP_PKG
+--------------------------------------------------------
+
+  CREATE OR REPLACE EDITIONABLE PACKAGE "APPS"."BOM_CSTRUSIW_XMLP_PKG" AUTHID CURRENT_USER AS
+/* $Header: CSTRUSIWS.pls 120.0 2007/12/24 10:22:03 dwkrishn noship $ */
+  P_CONC_REQUEST_ID VARCHAR2(32767) := '0';
+
+  P_ORG_ID NUMBER;
+
+  P_CURRENCY_CODE VARCHAR2(15);
+
+  P_SORT_OPTION NUMBER;
+
+  P_ITEM_FROM VARCHAR2(1350);
+
+  P_ITEM_TO VARCHAR2(1350);
+
+  P_CATEGORY_SET NUMBER;
+
+  P_CAT_NUM NUMBER;
+
+  P_ORGANIZATION VARCHAR2(240);
+
+  LP_ORGANIZATION VARCHAR2(240);
+
+  ROUND_UNIT NUMBER;
+
+  P_ITEM_SEG VARCHAR2(2400);
+
+  P_CAT_SEG VARCHAR2(2400);
+
+  P_SORT_BY VARCHAR2(80);
+
+  LP_SORT_BY VARCHAR2(80);
+
+  P_CAT_SET_NAME VARCHAR2(40);
+
+  LP_CAT_SET_NAME VARCHAR2(40);
+
+  P_ACCT_SEG1 VARCHAR2(2400);
+
+  P_ACCT_SEG2 VARCHAR2(2400);
+
+  P_ACCT_SEG3 VARCHAR2(2400);
+
+  P_ACCT_SEG4 VARCHAR2(2400);
+
+  P_ACCT_SEG5 VARCHAR2(2400);
+
+  P_GL_NUM NUMBER;
+
+  LP_GL_NUM NUMBER;
+
+  P_ITEM_RANGE VARCHAR2(80);
+
+  LP_ITEM_RANGE VARCHAR2(80);
+
+  P_RANGE_OPTION NUMBER;
+
+  LP_RANGE_OPTION NUMBER;
+
+  EXT_PREC NUMBER;
+
+  P_RPT_ONLY NUMBER;
+
+  P_DEL_SNAPSHOT NUMBER;
+
+  P_UPDATE_ID NUMBER;
+
+  P_ADJ_ACCOUNT NUMBER;
+
+  P_ACCT_SEG6 VARCHAR2(2400);
+
+  P_ITEM NUMBER;
+
+  P_CAT NUMBER;
+
+  P_QTY_PRECISION NUMBER;
+
+  P_UPDATE_DATE DATE;
+
+  P_UPDATE_DESC VARCHAR2(240);
+
+  P_COST_TYPE VARCHAR2(10);
+
+  P_COST_TYPE_ID NUMBER;
+
+  P_TRACE VARCHAR2(1);
+
+  FUNCTION dummy1 return boolean;
+
+  FUNCTION dummy2 return boolean;
+
+  FUNCTION dummy3 return boolean;
+
+  FUNCTION dummy4 return boolean;
+
+  FUNCTION BEFOREREPORT RETURN BOOLEAN;
+
+  FUNCTION AFTERREPORT RETURN BOOLEAN;
+
+  FUNCTION CG_CG_ADJFORMULA(CG_CG_MTL IN NUMBER
+                           ,CG_CG_MOH IN NUMBER
+                           ,CG_CG_RES IN NUMBER
+                           ,CG_CG_OSP IN NUMBER
+                           ,CG_CG_OVH IN NUMBER) RETURN NUMBER;
+
+  FUNCTION ORG_ADJFORMULA(CG_ORG_MTL IN NUMBER
+                         ,CG_ORG_MOH IN NUMBER
+                         ,CG_ORG_RES IN NUMBER
+                         ,CG_ORG_OSP IN NUMBER
+                         ,CG_ORG_OVH IN NUMBER
+                         ,IC_ORG_MTL IN NUMBER
+                         ,IC_ORG_MOH IN NUMBER
+                         ,IC_ORG_RES IN NUMBER
+                         ,IC_ORG_OSP IN NUMBER
+                         ,IC_ORG_OVH IN NUMBER) RETURN NUMBER;
+
+  FUNCTION REP_ADJFORMULA(CG_REP_MTL IN NUMBER
+                         ,CG_REP_MOH IN NUMBER
+                         ,CG_REP_RES IN NUMBER
+                         ,CG_REP_OSP IN NUMBER
+                         ,CG_REP_OVH IN NUMBER
+                         ,IC_REP_MTL IN NUMBER
+                         ,IC_REP_MOH IN NUMBER
+                         ,IC_REP_RES IN NUMBER
+                         ,IC_REP_OSP IN NUMBER
+                         ,IC_REP_OVH IN NUMBER) RETURN NUMBER;
+
+  FUNCTION IC_ORDERFORMULA(IC_ITEM_NUMBER IN VARCHAR2
+                          ,IC_CATEGORY IN VARCHAR2
+                          ,IC_ITEM_SEG IN VARCHAR2
+                          ,IC_CAT_SEG IN VARCHAR2
+                          ,IC_ITEM_PSEG IN VARCHAR2
+                          ,IC_CAT_PSEG IN VARCHAR2) RETURN VARCHAR2;
+
+  FUNCTION IC_CAT_PSEGFORMULA(IC_CATEGORY IN VARCHAR2
+                             ,IC_CAT_SEG IN VARCHAR2
+                             ,IC_CAT_PSEG IN VARCHAR2) RETURN VARCHAR2;
+
+  FUNCTION IC_ITEM_PSEGFORMULA(IC_ITEM_NUMBER IN VARCHAR2
+                              ,IC_ITEM_SEG IN VARCHAR2
+                              ,IC_ITEM_PSEG IN VARCHAR2) RETURN VARCHAR2;
+
+  FUNCTION CG_ITEM_PSEGFORMULA(CG_ITEM_NUMBER IN VARCHAR2
+                              ,CG_ITEM_SEG IN VARCHAR2
+                              ,CG_ITEM_PSEG IN VARCHAR2) RETURN VARCHAR2;
+
+END BOM_CSTRUSIW_XMLP_PKG;
+
+
+/

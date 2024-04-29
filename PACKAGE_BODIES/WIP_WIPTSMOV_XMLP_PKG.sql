@@ -1,0 +1,174 @@
+--------------------------------------------------------
+--  DDL for Package Body WIP_WIPTSMOV_XMLP_PKG
+--------------------------------------------------------
+
+  CREATE OR REPLACE EDITIONABLE PACKAGE BODY "APPS"."WIP_WIPTSMOV_XMLP_PKG" AS
+/* $Header: WIPTSMOVB.pls 120.1 2008/01/31 13:12:02 npannamp noship $ */
+  FUNCTION BEFOREREPORT RETURN BOOLEAN IS
+  BEGIN
+    BEGIN
+    P_FROM_DATE1 := TO_CHAR(P_FROM_DATE,'DD-MON-YY');
+    P_TO_DATE1 := TO_CHAR(P_TO_DATE,'DD-MON-YY');
+      P_CONC_REQUEST_ID := FND_GLOBAL.CONC_REQUEST_ID;
+      QTY_PRECISION:=wip_common_xmlp_pkg.get_precision(P_QTY_PRECISION);
+      /*SRW.USER_EXIT('FND SRWINIT')*/NULL;
+      /*SRW.USER_EXIT('FND FLEXSQL CODE="MSTK"
+                    APPL_SHORT_NAME="INV" OUTPUT=":P_FLEXDATA"
+                    MODE="SELECT" DISPLAY="ALL" TABLEALIAS="MSI"')*/NULL;
+      IF (P_FROM_ASSEMBLY IS NOT NULL) THEN
+        IF (P_TO_ASSEMBLY IS NOT NULL) THEN
+          NULL;
+        ELSE
+          NULL;
+        END IF;
+      ELSE
+        IF (P_TO_ASSEMBLY IS NOT NULL) THEN
+          NULL;
+        END IF;
+      END IF;
+      RETURN TRUE;
+    END;
+    RETURN (TRUE);
+  END BEFOREREPORT;
+
+  FUNCTION LIMIT_DATES RETURN CHARACTER IS
+    LIMIT_DATES VARCHAR2(150);
+  BEGIN
+    IF (P_FROM_DATE IS NOT NULL) THEN
+      IF (P_TO_DATE IS NOT NULL) THEN
+        LIMIT_DATES := ' AND WT.transaction_date >= TO_DATE(''' || TO_CHAR(P_FROM_DATE
+                              ,'YYYYMMDD') || ''',''YYYYMMDD'')' || ' AND WT.transaction_date < TO_DATE(''' || TO_CHAR(P_TO_DATE + 1
+                              ,'YYYYMMDD') || ''',''YYYYMMDD'')';
+      ELSE
+        LIMIT_DATES := ' AND WT.transaction_date >= TO_DATE(''' || TO_CHAR(P_FROM_DATE
+                              ,'YYYYMMDD') || ''',''YYYYMMDD'')';
+      END IF;
+    ELSE
+      IF (P_TO_DATE IS NOT NULL) THEN
+        LIMIT_DATES := ' AND WT.transaction_date < TO_DATE(''' || TO_CHAR(P_TO_DATE + 1
+                              ,'YYYYMMDD') || ''',''YYYYMMDD'')';
+      ELSE
+        LIMIT_DATES := ' ';
+      END IF;
+    END IF;
+    RETURN (LIMIT_DATES);
+  END LIMIT_DATES;
+
+  FUNCTION LIMIT_JOBS RETURN CHARACTER IS
+    LIMIT_JOBS VARCHAR2(500);
+  BEGIN
+    IF (P_FROM_JOB IS NOT NULL) THEN
+      IF (P_TO_JOB IS NOT NULL) THEN
+        LIMIT_JOBS := ' AND WE.WIP_ENTITY_NAME BETWEEN ''' || REPLACE(P_FROM_JOB
+                             ,''''
+                             ,'''''') || ''' AND ''' || REPLACE(P_TO_JOB
+                             ,''''
+                             ,'''''') || '''';
+      ELSE
+        LIMIT_JOBS := ' AND WE.WIP_ENTITY_NAME  >= ''' || REPLACE(P_FROM_JOB
+                             ,''''
+                             ,'''''') || '''';
+      END IF;
+    ELSE
+      IF (P_TO_JOB IS NOT NULL) THEN
+        LIMIT_JOBS := ' AND WE.WIP_ENTITY_NAME <= ''' || REPLACE(P_TO_JOB
+                             ,''''
+                             ,'''''') || '''';
+      ELSE
+        LIMIT_JOBS := ' ';
+      END IF;
+    END IF;
+    RETURN (LIMIT_JOBS);
+  END LIMIT_JOBS;
+
+  FUNCTION LIMIT_LINES RETURN CHARACTER IS
+    LIMIT_LINES VARCHAR2(80);
+  BEGIN
+    IF (P_FROM_LINE IS NOT NULL) THEN
+      IF (P_TO_LINE IS NOT NULL) THEN
+        LIMIT_LINES := ' AND WL.LINE_CODE BETWEEN ''' || P_FROM_LINE || ''' AND ''' || P_TO_LINE || ''' ';
+      ELSE
+        LIMIT_LINES := ' AND WL.LINE_CODE  >= ''' || P_FROM_LINE || ''' ';
+      END IF;
+    ELSE
+      IF (P_TO_LINE IS NOT NULL) THEN
+        LIMIT_LINES := ' AND WL.LINE_CODE  <= ''' || P_TO_LINE || ''' ';
+      ELSE
+        LIMIT_LINES := ' ';
+      END IF;
+    END IF;
+    RETURN (LIMIT_LINES);
+  END LIMIT_LINES;
+
+  FUNCTION LIMIT_REASONS RETURN CHARACTER IS
+    LIMIT_REASONS VARCHAR2(120);
+  BEGIN
+    IF (P_FROM_REASON IS NOT NULL) THEN
+      IF (P_TO_REASON IS NOT NULL) THEN
+        LIMIT_REASONS := ' AND MTR.REASON_NAME BETWEEN ''' || P_FROM_REASON || ''' AND ''' || P_TO_REASON || ''' ';
+      ELSE
+        LIMIT_REASONS := ' AND MTR.REASON_NAME >= ''' || P_FROM_REASON || ''' ';
+      END IF;
+    ELSE
+      IF (P_TO_REASON IS NOT NULL) THEN
+        LIMIT_REASONS := ' AND MTR.REASON_NAME <= ''' || P_TO_REASON || ''' ';
+      ELSE
+        LIMIT_REASONS := ' ';
+      END IF;
+    END IF;
+    RETURN (LIMIT_REASONS);
+  END LIMIT_REASONS;
+
+  FUNCTION C_LIMIT_DATESFORMULA RETURN VARCHAR2 IS
+  BEGIN
+    RETURN (LIMIT_DATES);
+  END C_LIMIT_DATESFORMULA;
+
+  FUNCTION C_LIMIT_REASONSFORMULA RETURN VARCHAR2 IS
+  BEGIN
+    RETURN (LIMIT_REASONS);
+  END C_LIMIT_REASONSFORMULA;
+
+  FUNCTION C_LIMIT_LINESFORMULA RETURN VARCHAR2 IS
+  BEGIN
+    RETURN (LIMIT_LINES);
+  END C_LIMIT_LINESFORMULA;
+
+  FUNCTION C_LIMIT_JOBSFORMULA RETURN VARCHAR2 IS
+  BEGIN
+    RETURN (LIMIT_JOBS);
+  END C_LIMIT_JOBSFORMULA;
+
+  FUNCTION C_LIMIT_ASSEMBLIESFORMULA RETURN VARCHAR2 IS
+  BEGIN
+    BEGIN
+      IF (P_FLEXWHERE IS NOT NULL) THEN
+        RETURN ('AND ');
+      ELSE
+        RETURN ('  ');
+      END IF;
+    END;
+    RETURN NULL;
+  END C_LIMIT_ASSEMBLIESFORMULA;
+
+  FUNCTION AFTERREPORT RETURN BOOLEAN IS
+  BEGIN
+    /*SRW.USER_EXIT('FND SRWEXIT')*/NULL;
+    RETURN (TRUE);
+  END AFTERREPORT;
+
+  FUNCTION C_FLEX_SORTFORMULA(C_FLEX_SORT IN VARCHAR2) RETURN VARCHAR2 IS
+  BEGIN
+    RETURN (C_FLEX_SORT);
+  END C_FLEX_SORTFORMULA;
+
+  FUNCTION AFTERPFORM RETURN BOOLEAN IS
+  BEGIN
+    RETURN (TRUE);
+  END AFTERPFORM;
+
+END WIP_WIPTSMOV_XMLP_PKG;
+
+
+
+/

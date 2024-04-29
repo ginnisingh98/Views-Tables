@@ -1,0 +1,779 @@
+--------------------------------------------------------
+--  DDL for Package Body HR_FORM_PROPERTIES_PKG
+--------------------------------------------------------
+
+  CREATE OR REPLACE EDITIONABLE PACKAGE BODY "APPS"."HR_FORM_PROPERTIES_PKG" as
+/* $Header: hrfmplct.pkb 115.4 2002/12/10 11:18:10 hjonnala noship $ */
+-- -----------------------------------------------------------------------------
+-- |-----------------------------< update_copies >-----------------------------|
+-- -----------------------------------------------------------------------------
+procedure UPDATE_COPIES (
+  X_FORM_PROPERTY_ID in NUMBER,
+  X_APPLICATION_ID in NUMBER,
+  X_FORM_ID in NUMBER,
+  X_FORM_TEMPLATE_ID in NUMBER,
+  X_HELP_TARGET in VARCHAR2,
+  X_INFORMATION_CATEGORY in VARCHAR2,
+  X_INFORMATION1 in VARCHAR2,
+  X_INFORMATION2 in VARCHAR2,
+  X_INFORMATION3 in VARCHAR2,
+  X_INFORMATION4 in VARCHAR2,
+  X_INFORMATION5 in VARCHAR2,
+  X_INFORMATION6 in VARCHAR2,
+  X_INFORMATION7 in VARCHAR2,
+  X_INFORMATION8 in VARCHAR2,
+  X_INFORMATION9 in VARCHAR2,
+  X_INFORMATION10 in VARCHAR2,
+  X_INFORMATION11 in VARCHAR2,
+  X_INFORMATION12 in VARCHAR2,
+  X_INFORMATION13 in VARCHAR2,
+  X_INFORMATION14 in VARCHAR2,
+  X_INFORMATION15 in VARCHAR2,
+  X_INFORMATION16 in VARCHAR2,
+  X_INFORMATION17 in VARCHAR2,
+  X_INFORMATION18 in VARCHAR2,
+  X_INFORMATION19 in VARCHAR2,
+  X_INFORMATION20 in VARCHAR2,
+  X_INFORMATION21 in VARCHAR2,
+  X_INFORMATION22 in VARCHAR2,
+  X_INFORMATION23 in VARCHAR2,
+  X_INFORMATION24 in VARCHAR2,
+  X_INFORMATION25 in VARCHAR2,
+  X_INFORMATION26 in VARCHAR2,
+  X_INFORMATION27 in VARCHAR2,
+  X_INFORMATION28 in VARCHAR2,
+  X_INFORMATION29 in VARCHAR2,
+  X_INFORMATION30 in VARCHAR2,
+  X_LAST_UPDATE_DATE in DATE,
+  X_LAST_UPDATED_BY in NUMBER,
+  X_LAST_UPDATE_LOGIN in NUMBER
+) is
+  cursor csr_original is
+    select *
+      from HR_FORM_PROPERTIES
+     where FORM_PROPERTY_ID = X_FORM_PROPERTY_ID;
+  l_original csr_original%rowtype;
+  cursor csr_copies is
+    select fmp.form_property_id
+      from HR_FORM_PROPERTIES fmp
+     where fmp.FORM_TEMPLATE_ID in (select sft.FORM_TEMPLATE_ID_TO
+                                      from HR_SOURCE_FORM_TEMPLATES sft
+                                start with sft.FORM_TEMPLATE_ID_FROM = X_FORM_TEMPLATE_ID
+                                connect by sft.FORM_TEMPLATE_ID_FROM = prior sft.FORM_TEMPLATE_ID_TO);
+begin
+  if (X_FORM_TEMPLATE_ID is not null) then
+    open csr_original;
+    fetch csr_original into l_original;
+    if csr_original%found then
+      close csr_original;
+      for l_copy in csr_copies loop
+        update HR_FORM_PROPERTIES set
+          HELP_TARGET = decode(nvl(HELP_TARGET,hr_api.g_varchar2),nvl(l_original.HELP_TARGET,hr_api.g_varchar2),X_HELP_TARGET,HELP_TARGET),
+          INFORMATION_CATEGORY = decode(nvl(INFORMATION_CATEGORY,hr_api.g_varchar2),nvl(l_original.INFORMATION_CATEGORY,hr_api.g_varchar2),X_INFORMATION_CATEGORY,INFORMATION_CATEGORY),
+          INFORMATION1  = decode(nvl(INFORMATION1 ,hr_api.g_varchar2),nvl(l_original.INFORMATION1 ,hr_api.g_varchar2),X_INFORMATION1 ,INFORMATION1 ),
+          INFORMATION2  = decode(nvl(INFORMATION2 ,hr_api.g_varchar2),nvl(l_original.INFORMATION2 ,hr_api.g_varchar2),X_INFORMATION2 ,INFORMATION2 ),
+          INFORMATION3  = decode(nvl(INFORMATION3 ,hr_api.g_varchar2),nvl(l_original.INFORMATION3 ,hr_api.g_varchar2),X_INFORMATION3 ,INFORMATION3 ),
+          INFORMATION4  = decode(nvl(INFORMATION4 ,hr_api.g_varchar2),nvl(l_original.INFORMATION4 ,hr_api.g_varchar2),X_INFORMATION4 ,INFORMATION4 ),
+          INFORMATION5  = decode(nvl(INFORMATION5 ,hr_api.g_varchar2),nvl(l_original.INFORMATION5 ,hr_api.g_varchar2),X_INFORMATION5 ,INFORMATION5 ),
+          INFORMATION6  = decode(nvl(INFORMATION6 ,hr_api.g_varchar2),nvl(l_original.INFORMATION6 ,hr_api.g_varchar2),X_INFORMATION6 ,INFORMATION6 ),
+          INFORMATION7  = decode(nvl(INFORMATION7 ,hr_api.g_varchar2),nvl(l_original.INFORMATION7 ,hr_api.g_varchar2),X_INFORMATION7 ,INFORMATION7 ),
+          INFORMATION8  = decode(nvl(INFORMATION8 ,hr_api.g_varchar2),nvl(l_original.INFORMATION8 ,hr_api.g_varchar2),X_INFORMATION8 ,INFORMATION8 ),
+          INFORMATION9  = decode(nvl(INFORMATION9 ,hr_api.g_varchar2),nvl(l_original.INFORMATION9 ,hr_api.g_varchar2),X_INFORMATION9 ,INFORMATION9 ),
+          INFORMATION10 = decode(nvl(INFORMATION10,hr_api.g_varchar2),nvl(l_original.INFORMATION10,hr_api.g_varchar2),X_INFORMATION10,INFORMATION10),
+          INFORMATION11 = decode(nvl(INFORMATION11,hr_api.g_varchar2),nvl(l_original.INFORMATION11,hr_api.g_varchar2),X_INFORMATION11,INFORMATION11),
+          INFORMATION12 = decode(nvl(INFORMATION12,hr_api.g_varchar2),nvl(l_original.INFORMATION12,hr_api.g_varchar2),X_INFORMATION12,INFORMATION12),
+          INFORMATION13 = decode(nvl(INFORMATION13,hr_api.g_varchar2),nvl(l_original.INFORMATION13,hr_api.g_varchar2),X_INFORMATION13,INFORMATION13),
+          INFORMATION14 = decode(nvl(INFORMATION14,hr_api.g_varchar2),nvl(l_original.INFORMATION14,hr_api.g_varchar2),X_INFORMATION14,INFORMATION14),
+          INFORMATION15 = decode(nvl(INFORMATION15,hr_api.g_varchar2),nvl(l_original.INFORMATION15,hr_api.g_varchar2),X_INFORMATION15,INFORMATION15),
+          INFORMATION16 = decode(nvl(INFORMATION16,hr_api.g_varchar2),nvl(l_original.INFORMATION16,hr_api.g_varchar2),X_INFORMATION16,INFORMATION16),
+          INFORMATION17 = decode(nvl(INFORMATION17,hr_api.g_varchar2),nvl(l_original.INFORMATION17,hr_api.g_varchar2),X_INFORMATION17,INFORMATION17),
+          INFORMATION18 = decode(nvl(INFORMATION18,hr_api.g_varchar2),nvl(l_original.INFORMATION18,hr_api.g_varchar2),X_INFORMATION18,INFORMATION18),
+          INFORMATION19 = decode(nvl(INFORMATION19,hr_api.g_varchar2),nvl(l_original.INFORMATION19,hr_api.g_varchar2),X_INFORMATION19,INFORMATION19),
+          INFORMATION20 = decode(nvl(INFORMATION20,hr_api.g_varchar2),nvl(l_original.INFORMATION20,hr_api.g_varchar2),X_INFORMATION20,INFORMATION20),
+          INFORMATION21 = decode(nvl(INFORMATION21,hr_api.g_varchar2),nvl(l_original.INFORMATION21,hr_api.g_varchar2),X_INFORMATION21,INFORMATION21),
+          INFORMATION22 = decode(nvl(INFORMATION22,hr_api.g_varchar2),nvl(l_original.INFORMATION22,hr_api.g_varchar2),X_INFORMATION22,INFORMATION22),
+          INFORMATION23 = decode(nvl(INFORMATION23,hr_api.g_varchar2),nvl(l_original.INFORMATION23,hr_api.g_varchar2),X_INFORMATION23,INFORMATION23),
+          INFORMATION24 = decode(nvl(INFORMATION24,hr_api.g_varchar2),nvl(l_original.INFORMATION24,hr_api.g_varchar2),X_INFORMATION24,INFORMATION24),
+          INFORMATION25 = decode(nvl(INFORMATION25,hr_api.g_varchar2),nvl(l_original.INFORMATION25,hr_api.g_varchar2),X_INFORMATION25,INFORMATION25),
+          INFORMATION26 = decode(nvl(INFORMATION26,hr_api.g_varchar2),nvl(l_original.INFORMATION26,hr_api.g_varchar2),X_INFORMATION26,INFORMATION26),
+          INFORMATION27 = decode(nvl(INFORMATION27,hr_api.g_varchar2),nvl(l_original.INFORMATION27,hr_api.g_varchar2),X_INFORMATION27,INFORMATION27),
+          INFORMATION28 = decode(nvl(INFORMATION28,hr_api.g_varchar2),nvl(l_original.INFORMATION28,hr_api.g_varchar2),X_INFORMATION28,INFORMATION28),
+          INFORMATION29 = decode(nvl(INFORMATION29,hr_api.g_varchar2),nvl(l_original.INFORMATION29,hr_api.g_varchar2),X_INFORMATION29,INFORMATION29),
+          INFORMATION30 = decode(nvl(INFORMATION30,hr_api.g_varchar2),nvl(l_original.INFORMATION30,hr_api.g_varchar2),X_INFORMATION30,INFORMATION30),
+          LAST_UPDATE_DATE = X_LAST_UPDATE_DATE,
+          LAST_UPDATED_BY = X_LAST_UPDATED_BY,
+          LAST_UPDATE_LOGIN = X_LAST_UPDATE_LOGIN
+        where FORM_PROPERTY_ID = l_copy.FORM_PROPERTY_ID;
+        if (sql%notfound) then
+          raise no_data_found;
+        end if;
+      end loop;
+    else
+      close csr_original;
+    end if;
+  end if;
+end UPDATE_COPIES;
+--
+procedure OWNER_TO_WHO (
+  X_OWNER in VARCHAR2,
+  X_CREATION_DATE out nocopy DATE,
+  X_CREATED_BY out nocopy NUMBER,
+  X_LAST_UPDATE_DATE out nocopy DATE,
+  X_LAST_UPDATED_BY out nocopy NUMBER,
+  X_LAST_UPDATE_LOGIN out nocopy NUMBER
+) is
+begin
+  if X_OWNER = 'SEED' then
+    X_CREATED_BY := 1;
+    X_LAST_UPDATED_BY := 1;
+  else
+    X_CREATED_BY := 0;
+    X_LAST_UPDATED_BY := 0;
+  end if;
+  X_CREATION_DATE := sysdate;
+  X_LAST_UPDATE_DATE := sysdate;
+  X_LAST_UPDATE_LOGIN := 0;
+end OWNER_TO_WHO;
+
+procedure INSERT_ROW (
+  X_ROWID in out nocopy VARCHAR2,
+  X_FORM_PROPERTY_ID in NUMBER,
+  X_INFORMATION29 in VARCHAR2,
+  X_INFORMATION16 in VARCHAR2,
+  X_INFORMATION17 in VARCHAR2,
+  X_INFORMATION18 in VARCHAR2,
+  X_INFORMATION19 in VARCHAR2,
+  X_INFORMATION20 in VARCHAR2,
+  X_INFORMATION21 in VARCHAR2,
+  X_INFORMATION22 in VARCHAR2,
+  X_INFORMATION23 in VARCHAR2,
+  X_INFORMATION24 in VARCHAR2,
+  X_INFORMATION25 in VARCHAR2,
+  X_INFORMATION26 in VARCHAR2,
+  X_INFORMATION27 in VARCHAR2,
+  X_INFORMATION28 in VARCHAR2,
+  X_APPLICATION_ID in NUMBER,
+  X_FORM_ID in NUMBER,
+  X_FORM_TEMPLATE_ID in NUMBER,
+  X_HELP_TARGET in VARCHAR2,
+  X_INFORMATION_CATEGORY in VARCHAR2,
+  X_INFORMATION1 in VARCHAR2,
+  X_INFORMATION2 in VARCHAR2,
+  X_INFORMATION3 in VARCHAR2,
+  X_INFORMATION4 in VARCHAR2,
+  X_INFORMATION5 in VARCHAR2,
+  X_INFORMATION6 in VARCHAR2,
+  X_INFORMATION7 in VARCHAR2,
+  X_INFORMATION8 in VARCHAR2,
+  X_INFORMATION9 in VARCHAR2,
+  X_INFORMATION10 in VARCHAR2,
+  X_INFORMATION11 in VARCHAR2,
+  X_INFORMATION12 in VARCHAR2,
+  X_INFORMATION13 in VARCHAR2,
+  X_INFORMATION14 in VARCHAR2,
+  X_INFORMATION15 in VARCHAR2,
+  X_INFORMATION30 in VARCHAR2,
+  X_CREATION_DATE in DATE,
+  X_CREATED_BY in NUMBER,
+  X_LAST_UPDATE_DATE in DATE,
+  X_LAST_UPDATED_BY in NUMBER,
+  X_LAST_UPDATE_LOGIN in NUMBER
+) is
+  cursor C is select ROWID from HR_FORM_PROPERTIES
+    where FORM_PROPERTY_ID = X_FORM_PROPERTY_ID
+    ;
+begin
+  insert into HR_FORM_PROPERTIES (
+    INFORMATION30,
+    LAST_UPDATE_DATE,
+    LAST_UPDATED_BY,
+    LAST_UPDATE_LOGIN,
+    CREATED_BY,
+    CREATION_DATE,
+    INFORMATION29,
+    INFORMATION16,
+    INFORMATION17,
+    INFORMATION18,
+    INFORMATION19,
+    INFORMATION20,
+    INFORMATION21,
+    INFORMATION22,
+    INFORMATION23,
+    INFORMATION24,
+    INFORMATION25,
+    INFORMATION26,
+    INFORMATION27,
+    INFORMATION28,
+    FORM_PROPERTY_ID,
+    APPLICATION_ID,
+    FORM_ID,
+    FORM_TEMPLATE_ID,
+    HELP_TARGET,
+    INFORMATION_CATEGORY,
+    INFORMATION1,
+    INFORMATION2,
+    INFORMATION3,
+    INFORMATION4,
+    INFORMATION5,
+    INFORMATION6,
+    INFORMATION7,
+    INFORMATION8,
+    INFORMATION9,
+    INFORMATION10,
+    INFORMATION11,
+    INFORMATION12,
+    INFORMATION13,
+    INFORMATION14,
+    INFORMATION15
+  )
+    VALUES( X_INFORMATION30,
+    X_LAST_UPDATE_DATE,
+    X_LAST_UPDATED_BY,
+    X_LAST_UPDATE_LOGIN,
+    X_CREATED_BY,
+    X_CREATION_DATE,
+    X_INFORMATION29,
+    X_INFORMATION16,
+    X_INFORMATION17,
+    X_INFORMATION18,
+    X_INFORMATION19,
+    X_INFORMATION20,
+    X_INFORMATION21,
+    X_INFORMATION22,
+    X_INFORMATION23,
+    X_INFORMATION24,
+    X_INFORMATION25,
+    X_INFORMATION26,
+    X_INFORMATION27,
+    X_INFORMATION28,
+    X_FORM_PROPERTY_ID,
+    X_APPLICATION_ID,
+    X_FORM_ID,
+    X_FORM_TEMPLATE_ID,
+    X_HELP_TARGET,
+    X_INFORMATION_CATEGORY,
+    X_INFORMATION1,
+    X_INFORMATION2,
+    X_INFORMATION3,
+    X_INFORMATION4,
+    X_INFORMATION5,
+    X_INFORMATION6,
+    X_INFORMATION7,
+    X_INFORMATION8,
+    X_INFORMATION9,
+    X_INFORMATION10,
+    X_INFORMATION11,
+    X_INFORMATION12,
+    X_INFORMATION13,
+    X_INFORMATION14,
+    X_INFORMATION15);
+
+  open c;
+  fetch c into X_ROWID;
+  if (c%notfound) then
+    close c;
+    raise no_data_found;
+  end if;
+  close c;
+
+end INSERT_ROW;
+
+procedure LOCK_ROW (
+  X_FORM_PROPERTY_ID in NUMBER,
+  X_INFORMATION29 in VARCHAR2,
+  X_INFORMATION16 in VARCHAR2,
+  X_INFORMATION17 in VARCHAR2,
+  X_INFORMATION18 in VARCHAR2,
+  X_INFORMATION19 in VARCHAR2,
+  X_INFORMATION20 in VARCHAR2,
+  X_INFORMATION21 in VARCHAR2,
+  X_INFORMATION22 in VARCHAR2,
+  X_INFORMATION23 in VARCHAR2,
+  X_INFORMATION24 in VARCHAR2,
+  X_INFORMATION25 in VARCHAR2,
+  X_INFORMATION26 in VARCHAR2,
+  X_INFORMATION27 in VARCHAR2,
+  X_INFORMATION28 in VARCHAR2,
+  X_APPLICATION_ID in NUMBER,
+  X_FORM_ID in NUMBER,
+  X_FORM_TEMPLATE_ID in NUMBER,
+  X_HELP_TARGET in VARCHAR2,
+  X_INFORMATION_CATEGORY in VARCHAR2,
+  X_INFORMATION1 in VARCHAR2,
+  X_INFORMATION2 in VARCHAR2,
+  X_INFORMATION3 in VARCHAR2,
+  X_INFORMATION4 in VARCHAR2,
+  X_INFORMATION5 in VARCHAR2,
+  X_INFORMATION6 in VARCHAR2,
+  X_INFORMATION7 in VARCHAR2,
+  X_INFORMATION8 in VARCHAR2,
+  X_INFORMATION9 in VARCHAR2,
+  X_INFORMATION10 in VARCHAR2,
+  X_INFORMATION11 in VARCHAR2,
+  X_INFORMATION12 in VARCHAR2,
+  X_INFORMATION13 in VARCHAR2,
+  X_INFORMATION14 in VARCHAR2,
+  X_INFORMATION15 in VARCHAR2,
+  X_INFORMATION30 in VARCHAR2
+) is
+  cursor c1 is select
+      INFORMATION29,
+      INFORMATION16,
+      INFORMATION17,
+      INFORMATION18,
+      INFORMATION19,
+      INFORMATION20,
+      INFORMATION21,
+      INFORMATION22,
+      INFORMATION23,
+      INFORMATION24,
+      INFORMATION25,
+      INFORMATION26,
+      INFORMATION27,
+      INFORMATION28,
+      APPLICATION_ID,
+      FORM_ID,
+      FORM_TEMPLATE_ID,
+      HELP_TARGET,
+      INFORMATION_CATEGORY,
+      INFORMATION1,
+      INFORMATION2,
+      INFORMATION3,
+      INFORMATION4,
+      INFORMATION5,
+      INFORMATION6,
+      INFORMATION7,
+      INFORMATION8,
+      INFORMATION9,
+      INFORMATION10,
+      INFORMATION11,
+      INFORMATION12,
+      INFORMATION13,
+      INFORMATION14,
+      INFORMATION15,
+      INFORMATION30
+    from HR_FORM_PROPERTIES
+    where FORM_PROPERTY_ID = X_FORM_PROPERTY_ID
+    for update of FORM_PROPERTY_ID nowait;
+begin
+  for tlinfo in c1 loop
+      if (    ((tlinfo.INFORMATION30 = X_INFORMATION30)
+               OR ((tlinfo.INFORMATION30 is null) AND (X_INFORMATION30 is null)))
+          AND ((tlinfo.INFORMATION29 = X_INFORMATION29)
+               OR ((tlinfo.INFORMATION29 is null) AND (X_INFORMATION29 is null)))
+          AND ((tlinfo.INFORMATION16 = X_INFORMATION16)
+               OR ((tlinfo.INFORMATION16 is null) AND (X_INFORMATION16 is null)))
+          AND ((tlinfo.INFORMATION17 = X_INFORMATION17)
+               OR ((tlinfo.INFORMATION17 is null) AND (X_INFORMATION17 is null)))
+          AND ((tlinfo.INFORMATION18 = X_INFORMATION18)
+               OR ((tlinfo.INFORMATION18 is null) AND (X_INFORMATION18 is null)))
+          AND ((tlinfo.INFORMATION19 = X_INFORMATION19)
+               OR ((tlinfo.INFORMATION19 is null) AND (X_INFORMATION19 is null)))
+          AND ((tlinfo.INFORMATION20 = X_INFORMATION20)
+               OR ((tlinfo.INFORMATION20 is null) AND (X_INFORMATION20 is null)))
+          AND ((tlinfo.INFORMATION21 = X_INFORMATION21)
+               OR ((tlinfo.INFORMATION21 is null) AND (X_INFORMATION21 is null)))
+          AND ((tlinfo.INFORMATION22 = X_INFORMATION22)
+               OR ((tlinfo.INFORMATION22 is null) AND (X_INFORMATION22 is null)))
+          AND ((tlinfo.INFORMATION23 = X_INFORMATION23)
+               OR ((tlinfo.INFORMATION23 is null) AND (X_INFORMATION23 is null)))
+          AND ((tlinfo.INFORMATION24 = X_INFORMATION24)
+               OR ((tlinfo.INFORMATION24 is null) AND (X_INFORMATION24 is null)))
+          AND ((tlinfo.INFORMATION25 = X_INFORMATION25)
+               OR ((tlinfo.INFORMATION25 is null) AND (X_INFORMATION25 is null)))
+          AND ((tlinfo.INFORMATION26 = X_INFORMATION26)
+               OR ((tlinfo.INFORMATION26 is null) AND (X_INFORMATION26 is null)))
+          AND ((tlinfo.INFORMATION27 = X_INFORMATION27)
+               OR ((tlinfo.INFORMATION27 is null) AND (X_INFORMATION27 is null)))
+          AND ((tlinfo.INFORMATION28 = X_INFORMATION28)
+               OR ((tlinfo.INFORMATION28 is null) AND (X_INFORMATION28 is null)))
+          AND ((tlinfo.APPLICATION_ID = X_APPLICATION_ID)
+               OR ((tlinfo.APPLICATION_ID is null) AND (X_APPLICATION_ID is null)))
+          AND ((tlinfo.FORM_ID = X_FORM_ID)
+               OR ((tlinfo.FORM_ID is null) AND (X_FORM_ID is null)))
+          AND ((tlinfo.FORM_TEMPLATE_ID = X_FORM_TEMPLATE_ID)
+               OR ((tlinfo.FORM_TEMPLATE_ID is null) AND (X_FORM_TEMPLATE_ID is null)))
+          AND ((tlinfo.HELP_TARGET = X_HELP_TARGET)
+               OR ((tlinfo.HELP_TARGET is null) AND (X_HELP_TARGET is null)))
+          AND ((tlinfo.INFORMATION_CATEGORY = X_INFORMATION_CATEGORY)
+               OR ((tlinfo.INFORMATION_CATEGORY is null) AND (X_INFORMATION_CATEGORY is null)))
+          AND ((tlinfo.INFORMATION1 = X_INFORMATION1)
+               OR ((tlinfo.INFORMATION1 is null) AND (X_INFORMATION1 is null)))
+          AND ((tlinfo.INFORMATION2 = X_INFORMATION2)
+               OR ((tlinfo.INFORMATION2 is null) AND (X_INFORMATION2 is null)))
+          AND ((tlinfo.INFORMATION3 = X_INFORMATION3)
+               OR ((tlinfo.INFORMATION3 is null) AND (X_INFORMATION3 is null)))
+          AND ((tlinfo.INFORMATION4 = X_INFORMATION4)
+               OR ((tlinfo.INFORMATION4 is null) AND (X_INFORMATION4 is null)))
+          AND ((tlinfo.INFORMATION5 = X_INFORMATION5)
+               OR ((tlinfo.INFORMATION5 is null) AND (X_INFORMATION5 is null)))
+          AND ((tlinfo.INFORMATION6 = X_INFORMATION6)
+               OR ((tlinfo.INFORMATION6 is null) AND (X_INFORMATION6 is null)))
+          AND ((tlinfo.INFORMATION7 = X_INFORMATION7)
+               OR ((tlinfo.INFORMATION7 is null) AND (X_INFORMATION7 is null)))
+          AND ((tlinfo.INFORMATION8 = X_INFORMATION8)
+               OR ((tlinfo.INFORMATION8 is null) AND (X_INFORMATION8 is null)))
+          AND ((tlinfo.INFORMATION9 = X_INFORMATION9)
+               OR ((tlinfo.INFORMATION9 is null) AND (X_INFORMATION9 is null)))
+          AND ((tlinfo.INFORMATION10 = X_INFORMATION10)
+               OR ((tlinfo.INFORMATION10 is null) AND (X_INFORMATION10 is null)))
+          AND ((tlinfo.INFORMATION11 = X_INFORMATION11)
+               OR ((tlinfo.INFORMATION11 is null) AND (X_INFORMATION11 is null)))
+          AND ((tlinfo.INFORMATION12 = X_INFORMATION12)
+               OR ((tlinfo.INFORMATION12 is null) AND (X_INFORMATION12 is null)))
+          AND ((tlinfo.INFORMATION13 = X_INFORMATION13)
+               OR ((tlinfo.INFORMATION13 is null) AND (X_INFORMATION13 is null)))
+          AND ((tlinfo.INFORMATION14 = X_INFORMATION14)
+               OR ((tlinfo.INFORMATION14 is null) AND (X_INFORMATION14 is null)))
+          AND ((tlinfo.INFORMATION15 = X_INFORMATION15)
+               OR ((tlinfo.INFORMATION15 is null) AND (X_INFORMATION15 is null)))
+      ) then
+        null;
+      else
+        fnd_message.set_name('FND', 'FORM_RECORD_CHANGED');
+        app_exception.raise_exception;
+      end if;
+  end loop;
+  return;
+end LOCK_ROW;
+
+procedure UPDATE_ROW (
+  X_FORM_PROPERTY_ID in NUMBER,
+  X_INFORMATION29 in VARCHAR2,
+  X_INFORMATION16 in VARCHAR2,
+  X_INFORMATION17 in VARCHAR2,
+  X_INFORMATION18 in VARCHAR2,
+  X_INFORMATION19 in VARCHAR2,
+  X_INFORMATION20 in VARCHAR2,
+  X_INFORMATION21 in VARCHAR2,
+  X_INFORMATION22 in VARCHAR2,
+  X_INFORMATION23 in VARCHAR2,
+  X_INFORMATION24 in VARCHAR2,
+  X_INFORMATION25 in VARCHAR2,
+  X_INFORMATION26 in VARCHAR2,
+  X_INFORMATION27 in VARCHAR2,
+  X_INFORMATION28 in VARCHAR2,
+  X_APPLICATION_ID in NUMBER,
+  X_FORM_ID in NUMBER,
+  X_FORM_TEMPLATE_ID in NUMBER,
+  X_HELP_TARGET in VARCHAR2,
+  X_INFORMATION_CATEGORY in VARCHAR2,
+  X_INFORMATION1 in VARCHAR2,
+  X_INFORMATION2 in VARCHAR2,
+  X_INFORMATION3 in VARCHAR2,
+  X_INFORMATION4 in VARCHAR2,
+  X_INFORMATION5 in VARCHAR2,
+  X_INFORMATION6 in VARCHAR2,
+  X_INFORMATION7 in VARCHAR2,
+  X_INFORMATION8 in VARCHAR2,
+  X_INFORMATION9 in VARCHAR2,
+  X_INFORMATION10 in VARCHAR2,
+  X_INFORMATION11 in VARCHAR2,
+  X_INFORMATION12 in VARCHAR2,
+  X_INFORMATION13 in VARCHAR2,
+  X_INFORMATION14 in VARCHAR2,
+  X_INFORMATION15 in VARCHAR2,
+  X_INFORMATION30 in VARCHAR2,
+  X_LAST_UPDATE_DATE in DATE,
+  X_LAST_UPDATED_BY in NUMBER,
+  X_LAST_UPDATE_LOGIN in NUMBER
+) is
+begin
+  update HR_FORM_PROPERTIES set
+    INFORMATION29 = X_INFORMATION29,
+    INFORMATION16 = X_INFORMATION16,
+    INFORMATION17 = X_INFORMATION17,
+    INFORMATION18 = X_INFORMATION18,
+    INFORMATION19 = X_INFORMATION19,
+    INFORMATION20 = X_INFORMATION20,
+    INFORMATION21 = X_INFORMATION21,
+    INFORMATION22 = X_INFORMATION22,
+    INFORMATION23 = X_INFORMATION23,
+    INFORMATION24 = X_INFORMATION24,
+    INFORMATION25 = X_INFORMATION25,
+    INFORMATION26 = X_INFORMATION26,
+    INFORMATION27 = X_INFORMATION27,
+    INFORMATION28 = X_INFORMATION28,
+    APPLICATION_ID = X_APPLICATION_ID,
+    FORM_ID = X_FORM_ID,
+    FORM_TEMPLATE_ID = X_FORM_TEMPLATE_ID,
+    HELP_TARGET = X_HELP_TARGET,
+    INFORMATION_CATEGORY = X_INFORMATION_CATEGORY,
+    INFORMATION1 = X_INFORMATION1,
+    INFORMATION2 = X_INFORMATION2,
+    INFORMATION3 = X_INFORMATION3,
+    INFORMATION4 = X_INFORMATION4,
+    INFORMATION5 = X_INFORMATION5,
+    INFORMATION6 = X_INFORMATION6,
+    INFORMATION7 = X_INFORMATION7,
+    INFORMATION8 = X_INFORMATION8,
+    INFORMATION9 = X_INFORMATION9,
+    INFORMATION10 = X_INFORMATION10,
+    INFORMATION11 = X_INFORMATION11,
+    INFORMATION12 = X_INFORMATION12,
+    INFORMATION13 = X_INFORMATION13,
+    INFORMATION14 = X_INFORMATION14,
+    INFORMATION15 = X_INFORMATION15,
+    INFORMATION30 = X_INFORMATION30,
+    LAST_UPDATE_DATE = X_LAST_UPDATE_DATE,
+    LAST_UPDATED_BY = X_LAST_UPDATED_BY,
+    LAST_UPDATE_LOGIN = X_LAST_UPDATE_LOGIN
+  where FORM_PROPERTY_ID = X_FORM_PROPERTY_ID;
+
+  if (sql%notfound) then
+    raise no_data_found;
+  end if;
+end UPDATE_ROW;
+
+procedure DELETE_ROW (
+  X_FORM_PROPERTY_ID in NUMBER
+) is
+begin
+  delete from HR_FORM_PROPERTIES
+  where FORM_PROPERTY_ID = X_FORM_PROPERTY_ID;
+
+  if (sql%notfound) then
+    raise no_data_found;
+  end if;
+
+end DELETE_ROW;
+
+procedure LOAD_ROW (
+            X_APPLICATION_SHORT_NAME  IN VARCHAR2,
+            X_FORM_NAME            IN VARCHAR2,
+            X_TEMPLATE_NAME        IN VARCHAR2,
+            X_TERRITORY_SHORT_NAME IN VARCHAR2,
+            X_OWNER                IN VARCHAR2,
+            X_HELP_TARGET          IN VARCHAR2,
+            X_INFORMATION_CATEGORY IN VARCHAR2,
+            X_INFORMATION1         IN VARCHAR2,
+            X_INFORMATION2         IN VARCHAR2,
+            X_INFORMATION3         IN VARCHAR2,
+            X_INFORMATION4         IN VARCHAR2,
+            X_INFORMATION5         IN VARCHAR2,
+            X_INFORMATION6         IN VARCHAR2,
+            X_INFORMATION7         IN VARCHAR2,
+            X_INFORMATION8         IN VARCHAR2,
+            X_INFORMATION9         IN VARCHAR2,
+            X_INFORMATION10        IN VARCHAR2,
+            X_INFORMATION11        IN VARCHAR2,
+            X_INFORMATION12        IN VARCHAR2,
+            X_INFORMATION13        IN VARCHAR2,
+            X_INFORMATION14        IN VARCHAR2,
+            X_INFORMATION15        IN VARCHAR2,
+            X_INFORMATION16        IN VARCHAR2,
+            X_INFORMATION17        IN VARCHAR2,
+            X_INFORMATION18        IN VARCHAR2,
+            X_INFORMATION19        IN VARCHAR2,
+            X_INFORMATION20        IN VARCHAR2,
+            X_INFORMATION21        IN VARCHAR2,
+            X_INFORMATION22        IN VARCHAR2,
+            X_INFORMATION23        IN VARCHAR2,
+            X_INFORMATION24        IN VARCHAR2,
+            X_INFORMATION25        IN VARCHAR2,
+            X_INFORMATION26        IN VARCHAR2,
+            X_INFORMATION27        IN VARCHAR2,
+            X_INFORMATION28        IN VARCHAR2,
+            X_INFORMATION29        IN VARCHAR2,
+            X_INFORMATION30        IN VARCHAR2
+) is
+  X_ROWID ROWID;
+  X_CREATION_DATE DATE;
+  X_CREATED_BY NUMBER;
+  X_LAST_UPDATE_DATE DATE;
+  X_LAST_UPDATED_BY NUMBER;
+  X_LAST_UPDATE_LOGIN NUMBER;
+  X_FORM_ID NUMBER;
+  X_APPLICATION_ID NUMBER;
+  X_FORM_TEMPLATE_ID NUMBER;
+  X_FORM_PROPERTY_ID NUMBER;
+begin
+  OWNER_TO_WHO (
+    X_OWNER,
+    X_CREATION_DATE,
+    X_CREATED_BY,
+    X_LAST_UPDATE_DATE,
+    X_LAST_UPDATED_BY,
+    X_LAST_UPDATE_LOGIN
+  );
+
+ select application_id
+ into X_APPLICATION_ID
+ from fnd_application
+ where application_short_name = X_APPLICATION_SHORT_NAME;
+
+ select form_id
+ into X_FORM_ID
+ from fnd_form
+ where form_name = x_form_name
+ and application_id = x_application_id;
+
+ IF ltrim(rtrim(x_template_name)) is not null then
+
+ select form_template_id
+ into x_form_template_id
+ from hr_form_templates_b
+ where application_id = X_APPLICATION_ID
+ and form_id = X_FORM_ID
+ and template_name = X_TEMPLATE_NAME
+ and (  (legislation_code is null and x_territory_short_name is null)
+     or (legislation_code = x_territory_short_name) );
+ x_application_id := null;
+ x_form_id := null;
+
+ ELSE
+
+ x_form_template_id := null;
+
+ END IF;
+
+ begin
+
+   select form_property_id
+   into x_form_property_id
+   from hr_form_properties
+   where nvl(form_id,hr_api.g_number) = nvl(x_form_id,hr_api.g_number)
+   and nvl(application_id,hr_api.g_number) = nvl(x_application_id,hr_api.g_number)
+   and nvl(form_template_id,hr_api.g_number) = nvl(x_form_template_id,hr_api.g_number);
+
+ exception
+  when no_data_found then
+     select hr_form_properties_s.nextval
+     into x_form_property_id
+     from dual;
+  end;
+
+  begin
+
+  UPDATE_COPIES (
+  X_FORM_PROPERTY_ID,
+  X_APPLICATION_ID,
+  X_FORM_ID,
+  X_FORM_TEMPLATE_ID,
+  X_HELP_TARGET,
+  X_INFORMATION_CATEGORY,
+  X_INFORMATION1,
+  X_INFORMATION2,
+  X_INFORMATION3,
+  X_INFORMATION4,
+  X_INFORMATION5,
+  X_INFORMATION6,
+  X_INFORMATION7,
+  X_INFORMATION8,
+  X_INFORMATION9,
+  X_INFORMATION10,
+  X_INFORMATION11,
+  X_INFORMATION12,
+  X_INFORMATION13,
+  X_INFORMATION14,
+  X_INFORMATION15,
+  X_INFORMATION16,
+  X_INFORMATION17,
+  X_INFORMATION18,
+  X_INFORMATION19,
+  X_INFORMATION20,
+  X_INFORMATION21,
+  X_INFORMATION22,
+  X_INFORMATION23,
+  X_INFORMATION24,
+  X_INFORMATION25,
+  X_INFORMATION26,
+  X_INFORMATION27,
+  X_INFORMATION28,
+  X_INFORMATION29,
+  X_INFORMATION30,
+  X_LAST_UPDATE_DATE,
+  X_LAST_UPDATED_BY,
+  X_LAST_UPDATE_LOGIN
+  );
+
+  UPDATE_ROW (
+  X_FORM_PROPERTY_ID,
+  X_INFORMATION29,
+  X_INFORMATION16,
+  X_INFORMATION17,
+  X_INFORMATION18,
+  X_INFORMATION19,
+  X_INFORMATION20,
+  X_INFORMATION21,
+  X_INFORMATION22,
+  X_INFORMATION23,
+  X_INFORMATION24,
+  X_INFORMATION25,
+  X_INFORMATION26,
+  X_INFORMATION27,
+  X_INFORMATION28,
+  X_APPLICATION_ID,
+  X_FORM_ID,
+  X_FORM_TEMPLATE_ID,
+  X_HELP_TARGET,
+  X_INFORMATION_CATEGORY,
+  X_INFORMATION1,
+  X_INFORMATION2,
+  X_INFORMATION3,
+  X_INFORMATION4,
+  X_INFORMATION5,
+  X_INFORMATION6,
+  X_INFORMATION7,
+  X_INFORMATION8,
+  X_INFORMATION9,
+  X_INFORMATION10,
+  X_INFORMATION11,
+  X_INFORMATION12,
+  X_INFORMATION13,
+  X_INFORMATION14,
+  X_INFORMATION15,
+  X_INFORMATION30,
+  X_LAST_UPDATE_DATE,
+  X_LAST_UPDATED_BY,
+  X_LAST_UPDATE_LOGIN);
+  exception
+    when no_data_found then
+     INSERT_ROW (
+       X_ROWID,
+       X_FORM_PROPERTY_ID,
+       X_INFORMATION29,
+       X_INFORMATION16,
+       X_INFORMATION17,
+       X_INFORMATION18,
+       X_INFORMATION19,
+       X_INFORMATION20,
+       X_INFORMATION21,
+       X_INFORMATION22,
+       X_INFORMATION23,
+       X_INFORMATION24,
+       X_INFORMATION25,
+       X_INFORMATION26,
+       X_INFORMATION27,
+       X_INFORMATION28,
+       X_APPLICATION_ID,
+       X_FORM_ID,
+       X_FORM_TEMPLATE_ID,
+       X_HELP_TARGET,
+       X_INFORMATION_CATEGORY,
+       X_INFORMATION1,
+       X_INFORMATION2,
+       X_INFORMATION3,
+       X_INFORMATION4,
+       X_INFORMATION5,
+       X_INFORMATION6,
+       X_INFORMATION7,
+       X_INFORMATION8,
+       X_INFORMATION9,
+       X_INFORMATION10,
+       X_INFORMATION11,
+       X_INFORMATION12,
+       X_INFORMATION13,
+       X_INFORMATION14,
+       X_INFORMATION15,
+       X_INFORMATION30,
+       X_CREATION_DATE,
+       X_CREATED_BY,
+       X_LAST_UPDATE_DATE,
+       X_LAST_UPDATED_BY,
+       X_LAST_UPDATE_LOGIN);
+  end;
+end LOAD_ROW;
+end HR_FORM_PROPERTIES_PKG;
+
+/

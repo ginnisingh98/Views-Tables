@@ -1,0 +1,22 @@
+--------------------------------------------------------
+--  DDL for Package INV_INVSRUOM_XMLP_PKG
+--------------------------------------------------------
+
+  CREATE OR REPLACE EDITIONABLE PACKAGE "APPS"."INV_INVSRUOM_XMLP_PKG" AUTHID CURRENT_USER AS
+/* $Header: INVSRUOMS.pls 120.1 2007/12/25 11:00:37 dwkrishn noship $ */
+  P_CONC_REQUEST_ID VARCHAR2(15) := '0';
+
+  P_TRACE_FLAG NUMBER;
+
+  P_OPTIMIZER_CODE NUMBER;
+
+  P_ORGANIZATION_ID NUMBER;
+
+  FUNCTION BEFOREREPORT RETURN BOOLEAN;
+
+  FUNCTION AFTERPFORM RETURN BOOLEAN;
+
+END INV_INVSRUOM_XMLP_PKG;
+
+
+/

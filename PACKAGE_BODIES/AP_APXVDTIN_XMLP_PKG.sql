@@ -1,0 +1,315 @@
+--------------------------------------------------------
+--  DDL for Package Body AP_APXVDTIN_XMLP_PKG
+--------------------------------------------------------
+
+  CREATE OR REPLACE EDITIONABLE PACKAGE BODY "APPS"."AP_APXVDTIN_XMLP_PKG" AS
+/* $Header: APXVDTINB.pls 120.0 2007/12/27 08:49:12 vjaganat noship $ */
+  FUNCTION BEFOREREPORT RETURN BOOLEAN IS
+  BEGIN
+    DECLARE
+      FROM_ADDRESS_LINE1 HR_LOCATIONS.ADDRESS_LINE_1%TYPE;
+      FROM_ADDRESS_LINE2 HR_LOCATIONS.ADDRESS_LINE_2%TYPE;
+      FROM_ADDRESS_LINE3 HR_LOCATIONS.ADDRESS_LINE_3%TYPE;
+      FROM_ADDRESS_LINE4 HR_LOCATIONS.ADDRESS_LINE_3%TYPE;
+      FROM_CITY HR_LOCATIONS.TOWN_OR_CITY%TYPE;
+      FROM_STATE HR_LOCATIONS.REGION_3%TYPE;
+      FROM_ZIP HR_LOCATIONS.POSTAL_CODE%TYPE;
+      LOCATION_ID HR_LOCATIONS.LOCATION_ID%TYPE;
+      DISP_RETURN_DATE VARCHAR2(30);
+      FROM_ATTENTION_LINE AP_LOOKUP_CODES.DISPLAYED_FIELD%TYPE;
+      INIT_FAILURE EXCEPTION;
+    BEGIN
+      P_CONC_REQUEST_ID := FND_GLOBAL.CONC_REQUEST_ID;
+      /*SRW.USER_EXIT('FND SRWINIT')*/NULL;
+      SELECT
+        DECODE(P_ADDR_CHOICE
+              ,'ADDRESS1'
+              ,SUBSTR(L.ADDRESS_LINE_1
+                    ,1
+                    ,35)
+              ,'LOCATION'
+              ,LOCATION_CODE
+              ,'REP_ENTITY'
+              ,R.ENTITY_NAME
+              ,SUBSTR(L.ADDRESS_LINE_1
+                    ,1
+                    ,35)),
+        DECODE(P_ADDR_CHOICE
+              ,'ADDRESS1'
+              ,SUBSTR(L.ADDRESS_LINE_2
+                    ,1
+                    ,35)
+              ,'LOCATION'
+              ,SUBSTR(L.ADDRESS_LINE_1
+                    ,1
+                    ,35)
+              ,'REP_ENTITY'
+              ,SUBSTR(L.ADDRESS_LINE_1
+                    ,1
+                    ,35)
+              ,SUBSTR(L.ADDRESS_LINE_2
+                    ,1
+                    ,35)),
+        DECODE(P_ADDR_CHOICE
+              ,'ADDRESS1'
+              ,SUBSTR(L.ADDRESS_LINE_3
+                    ,1
+                    ,35)
+              ,'LOCATION'
+              ,SUBSTR(L.ADDRESS_LINE_2
+                    ,1
+                    ,35)
+              ,'REP_ENTITY'
+              ,SUBSTR(L.ADDRESS_LINE_2
+                    ,1
+                    ,35)
+              ,SUBSTR(L.ADDRESS_LINE_3
+                    ,1
+                    ,35)),
+        DECODE(P_ADDR_CHOICE
+              ,'ADDRESS1'
+              ,NULL
+              ,'LOCATION'
+              ,SUBSTR(L.ADDRESS_LINE_3
+                    ,1
+                    ,35)
+              ,'REP_ENTITY'
+              ,SUBSTR(L.ADDRESS_LINE_3
+                    ,1
+                    ,35)
+              ,SUBSTR(L.ADDRESS_LINE_3
+                    ,1
+                    ,35)),
+        SUBSTR(L.TOWN_OR_CITY
+              ,1
+              ,30),
+        SUBSTR(NVL(L.REGION_3
+                  ,L.REGION_2)
+              ,1
+              ,30),
+        SUBSTR(L.POSTAL_CODE
+              ,1
+              ,20),
+        L.LOCATION_ID,
+        TO_CHAR(P_RETURN_BY_DATE
+               ,'fmMonth DD, YYYY'),
+        APL.DISPLAYED_FIELD
+      INTO FROM_ADDRESS_LINE1,FROM_ADDRESS_LINE2,FROM_ADDRESS_LINE3,FROM_ADDRESS_LINE4,FROM_CITY,FROM_STATE,FROM_ZIP,LOCATION_ID,DISP_RETURN_DATE,FROM_ATTENTION_LINE
+      FROM
+        HR_LOCATIONS L,
+        AP_REPORTING_ENTITIES R,
+        AP_LOOKUP_CODES APL
+      WHERE L.LOCATION_ID = R.LOCATION_ID
+        AND R.TAX_ENTITY_ID = P_TAX_ENTITY_ID
+        AND APL.LOOKUP_CODE = P_ATTENTION_LINE
+        AND APL.LOOKUP_TYPE = 'ATTENTION';
+      C_FROM_ADD_LINE_1 := FROM_ADDRESS_LINE1;
+      C_FROM_ADD_LINE_2 := FROM_ADDRESS_LINE2;
+      C_FROM_ADD_LINE_3 := FROM_ADDRESS_LINE3;
+      C_FROM_ADD_LINE_4 := FROM_ADDRESS_LINE4;
+      C_FROM_CITY := FROM_CITY;
+      C_FROM_STATE := FROM_STATE;
+      C_FROM_ZIP := FROM_ZIP;
+      C_LOCATION_ID := LOCATION_ID;
+      C_DISP_RETURN_BY_DATE := DISP_RETURN_DATE;
+      C_ATTENTION_LINE := FROM_ATTENTION_LINE;
+      IF (GET_APP_COLUMN_NAME <> TRUE) THEN
+        RAISE INIT_FAILURE;
+      END IF;
+      /*SRW.BREAK*/NULL;
+      RETURN (TRUE);
+    EXCEPTION
+      WHEN NO_DATA_FOUND THEN
+        /*SRW.MESSAGE('999'
+                   ,'Cancelled -- Location/address not set up for company')*/NULL;
+        RETURN (FALSE);
+      WHEN OTHERS THEN
+        /*SRW.MESSAGE('992'
+                   ,'Cancelled -- Error occurred in Before Report Trigger.')*/NULL;
+        RETURN (FALSE);
+    END;
+    RETURN (TRUE);
+  END BEFOREREPORT;
+
+  FUNCTION C_RETURN_BY_DATEFORMULA RETURN VARCHAR2 IS
+  BEGIN
+    RETURN (TO_CHAR(P_RETURN_BY_DATE
+                  ,'fmMonth DD,YYYY'));
+  END C_RETURN_BY_DATEFORMULA;
+
+  FUNCTION AFTERREPORT RETURN BOOLEAN IS
+  BEGIN
+    BEGIN
+      /*SRW.USER_EXIT('FND SRWEXIT')*/NULL;
+    EXCEPTION
+      WHEN OTHERS THEN
+        /*RAISE SRW.PROGRAM_ABORT*/RAISE_APPLICATION_ERROR(-20101,null);
+    END;
+    RETURN (TRUE);
+  END AFTERREPORT;
+
+  FUNCTION GET_APP_COLUMN_NAME RETURN BOOLEAN IS
+    CHART_OF_ACCOUNTS_ID NUMBER(15);
+    APPLICATION_COLUMN_NAME VARCHAR2(30);
+  BEGIN
+    SELECT
+      FND.APPLICATION_COLUMN_NAME,
+      GL.CHART_OF_ACCOUNTS_ID
+    INTO APPLICATION_COLUMN_NAME,CHART_OF_ACCOUNTS_ID
+    FROM
+      FND_SEGMENT_ATTRIBUTE_VALUES FND,
+      GL_SETS_OF_BOOKS GL
+    WHERE SEGMENT_ATTRIBUTE_TYPE = 'GL_BALANCING'
+      AND FND.ATTRIBUTE_VALUE = 'Y'
+      AND FND.ID_FLEX_NUM = GL.CHART_OF_ACCOUNTS_ID
+      AND GL.SET_OF_BOOKS_ID = P_SET_OF_BOOKS_ID
+      AND ID_FLEX_CODE = 'GL#';
+    C_APP_COLUMN_NAME := APPLICATION_COLUMN_NAME;
+    C_CHART_ACCTS_ID := CHART_OF_ACCOUNTS_ID;
+    C_DYNAMIC_SQL := '';
+    IF (C_APP_COLUMN_NAME like 'SEGMENT1') THEN
+      C_DYNAMIC_SQL := C_DYNAMIC_SQL || 'AND CC.segment1 = REL.balancing_segment_value';
+    ELSIF (C_APP_COLUMN_NAME like 'SEGMENT2') THEN
+      C_DYNAMIC_SQL := C_DYNAMIC_SQL || 'AND CC.segment2 = REL.balancing_segment_value';
+    ELSIF (C_APP_COLUMN_NAME like 'SEGMENT3') THEN
+      C_DYNAMIC_SQL := C_DYNAMIC_SQL || 'AND CC.segment3 = REL.balancing_segment_value';
+    ELSIF (C_APP_COLUMN_NAME like 'SEGMENT4') THEN
+      C_DYNAMIC_SQL := C_DYNAMIC_SQL || 'AND CC.segment4 = REL.balancing_segment_value';
+    ELSIF (C_APP_COLUMN_NAME like 'SEGMENT5') THEN
+      C_DYNAMIC_SQL := C_DYNAMIC_SQL || 'AND CC.segment5 = REL.balancing_segment_value';
+    ELSIF (C_APP_COLUMN_NAME like 'SEGMENT6') THEN
+      C_DYNAMIC_SQL := C_DYNAMIC_SQL || 'AND CC.segment6 = REL.balancing_segment_value';
+    ELSIF (C_APP_COLUMN_NAME like 'SEGMENT7') THEN
+      C_DYNAMIC_SQL := C_DYNAMIC_SQL || 'AND CC.segment7 = REL.balancing_segment_value';
+    ELSIF (C_APP_COLUMN_NAME like 'SEGMENT8') THEN
+      C_DYNAMIC_SQL := C_DYNAMIC_SQL || 'AND CC.segment8 = REL.balancing_segment_value';
+    ELSIF (C_APP_COLUMN_NAME like 'SEGMENT9') THEN
+      C_DYNAMIC_SQL := C_DYNAMIC_SQL || 'AND CC.segment9 = REL.balancing_segment_value';
+    ELSIF (C_APP_COLUMN_NAME like 'SEGMENT10') THEN
+      C_DYNAMIC_SQL := C_DYNAMIC_SQL || 'AND CC.segment10 = REL.balancing_segment_value';
+    ELSIF (C_APP_COLUMN_NAME like 'SEGMENT11') THEN
+      C_DYNAMIC_SQL := C_DYNAMIC_SQL || 'AND CC.segment11 = REL.balancing_segment_value';
+    ELSIF (C_APP_COLUMN_NAME like 'SEGMENT12') THEN
+      C_DYNAMIC_SQL := C_DYNAMIC_SQL || 'AND CC.segment12 = REL.balancing_segment_value';
+    ELSIF (C_APP_COLUMN_NAME like 'SEGMENT13') THEN
+      C_DYNAMIC_SQL := C_DYNAMIC_SQL || 'AND CC.segment13 = REL.balancing_segment_value';
+    ELSIF (C_APP_COLUMN_NAME like 'SEGMENT14') THEN
+      C_DYNAMIC_SQL := C_DYNAMIC_SQL || 'AND CC.segment14 = REL.balancing_segment_value';
+    ELSIF (C_APP_COLUMN_NAME like 'SEGMENT15') THEN
+      C_DYNAMIC_SQL := C_DYNAMIC_SQL || 'AND CC.segment15 = REL.balancing_segment_value';
+    ELSIF (C_APP_COLUMN_NAME like 'SEGMENT16') THEN
+      C_DYNAMIC_SQL := C_DYNAMIC_SQL || 'AND CC.segment16 = REL.balancing_segment_value';
+    ELSIF (C_APP_COLUMN_NAME like 'SEGMENT17') THEN
+      C_DYNAMIC_SQL := C_DYNAMIC_SQL || 'AND CC.segment17 = REL.balancing_segment_value';
+    ELSIF (C_APP_COLUMN_NAME like 'SEGMENT18') THEN
+      C_DYNAMIC_SQL := C_DYNAMIC_SQL || 'AND CC.segment18 = REL.balancing_segment_value';
+    ELSIF (C_APP_COLUMN_NAME like 'SEGMENT19') THEN
+      C_DYNAMIC_SQL := C_DYNAMIC_SQL || 'AND CC.segment19 = REL.balancing_segment_value';
+    ELSIF (C_APP_COLUMN_NAME like 'SEGMENT20') THEN
+      C_DYNAMIC_SQL := C_DYNAMIC_SQL || 'AND CC.segment20 = REL.balancing_segment_value';
+    ELSIF (C_APP_COLUMN_NAME like 'SEGMENT21') THEN
+      C_DYNAMIC_SQL := C_DYNAMIC_SQL || 'AND CC.segment21 = REL.balancing_segment_value';
+    ELSIF (C_APP_COLUMN_NAME like 'SEGMENT22') THEN
+      C_DYNAMIC_SQL := C_DYNAMIC_SQL || 'AND CC.segment22 = REL.balancing_segment_value';
+    ELSIF (C_APP_COLUMN_NAME like 'SEGMENT23') THEN
+      C_DYNAMIC_SQL := C_DYNAMIC_SQL || 'AND CC.segment23 = REL.balancing_segment_value';
+    ELSIF (C_APP_COLUMN_NAME like 'SEGMENT24') THEN
+      C_DYNAMIC_SQL := C_DYNAMIC_SQL || 'AND CC.segment24 = REL.balancing_segment_value';
+    ELSIF (C_APP_COLUMN_NAME like 'SEGMENT25') THEN
+      C_DYNAMIC_SQL := C_DYNAMIC_SQL || 'AND CC.segment25 = REL.balancing_segment_value';
+    ELSIF (C_APP_COLUMN_NAME like 'SEGMENT26') THEN
+      C_DYNAMIC_SQL := C_DYNAMIC_SQL || 'AND CC.segment26 = REL.balancing_segment_value';
+    ELSIF (C_APP_COLUMN_NAME like 'SEGMENT27') THEN
+      C_DYNAMIC_SQL := C_DYNAMIC_SQL || 'AND CC.segment27 = REL.balancing_segment_value';
+    ELSIF (C_APP_COLUMN_NAME like 'SEGMENT28') THEN
+      C_DYNAMIC_SQL := C_DYNAMIC_SQL || 'AND CC.segment28 = REL.balancing_segment_value';
+    ELSIF (C_APP_COLUMN_NAME like 'SEGMENT29') THEN
+      C_DYNAMIC_SQL := C_DYNAMIC_SQL || 'AND CC.segment29 = REL.balancing_segment_value';
+    ELSIF (C_APP_COLUMN_NAME like 'SEGMENT30') THEN
+      C_DYNAMIC_SQL := C_DYNAMIC_SQL || 'AND CC.segment30 = REL.balancing_segment_value';
+    END IF;
+    RETURN (TRUE);
+  EXCEPTION
+    WHEN OTHERS THEN
+      RETURN (FALSE);
+  END GET_APP_COLUMN_NAME;
+
+  FUNCTION C_CURDATE_P RETURN VARCHAR2 IS
+  BEGIN
+    RETURN C_CURDATE;
+  END C_CURDATE_P;
+
+  FUNCTION C_CURR_DATE_P RETURN VARCHAR2 IS
+  BEGIN
+    RETURN C_CURR_DATE;
+  END C_CURR_DATE_P;
+
+  FUNCTION C_FROM_ADD_LINE_1_P RETURN VARCHAR2 IS
+  BEGIN
+    RETURN C_FROM_ADD_LINE_1;
+  END C_FROM_ADD_LINE_1_P;
+
+  FUNCTION C_FROM_ADD_LINE_2_P RETURN VARCHAR2 IS
+  BEGIN
+    RETURN C_FROM_ADD_LINE_2;
+  END C_FROM_ADD_LINE_2_P;
+
+  FUNCTION C_FROM_CITY_P RETURN VARCHAR2 IS
+  BEGIN
+    RETURN C_FROM_CITY;
+  END C_FROM_CITY_P;
+
+  FUNCTION C_FROM_ADD_LINE_3_P RETURN VARCHAR2 IS
+  BEGIN
+    RETURN C_FROM_ADD_LINE_3;
+  END C_FROM_ADD_LINE_3_P;
+
+  FUNCTION C_FROM_STATE_P RETURN VARCHAR2 IS
+  BEGIN
+    RETURN C_FROM_STATE;
+  END C_FROM_STATE_P;
+
+  FUNCTION C_FROM_ZIP_P RETURN VARCHAR2 IS
+  BEGIN
+    RETURN C_FROM_ZIP;
+  END C_FROM_ZIP_P;
+
+  FUNCTION C_LOCATION_ID_P RETURN NUMBER IS
+  BEGIN
+    RETURN C_LOCATION_ID;
+  END C_LOCATION_ID_P;
+
+  FUNCTION C_DISP_RETURN_BY_DATE_P RETURN VARCHAR2 IS
+  BEGIN
+    RETURN C_DISP_RETURN_BY_DATE;
+  END C_DISP_RETURN_BY_DATE_P;
+
+  FUNCTION C_FROM_ADD_LINE_4_P RETURN VARCHAR2 IS
+  BEGIN
+    RETURN C_FROM_ADD_LINE_4;
+  END C_FROM_ADD_LINE_4_P;
+
+  FUNCTION C_ATTENTION_LINE_P RETURN VARCHAR2 IS
+  BEGIN
+    RETURN C_ATTENTION_LINE;
+  END C_ATTENTION_LINE_P;
+
+  FUNCTION C_APP_COLUMN_NAME_P RETURN VARCHAR2 IS
+  BEGIN
+    RETURN C_APP_COLUMN_NAME;
+  END C_APP_COLUMN_NAME_P;
+
+  FUNCTION C_CHART_ACCTS_ID_P RETURN NUMBER IS
+  BEGIN
+    RETURN C_CHART_ACCTS_ID;
+  END C_CHART_ACCTS_ID_P;
+
+  FUNCTION C_DYNAMIC_SQL_P RETURN VARCHAR2 IS
+  BEGIN
+    RETURN C_DYNAMIC_SQL;
+  END C_DYNAMIC_SQL_P;
+
+END AP_APXVDTIN_XMLP_PKG;
+
+
+/

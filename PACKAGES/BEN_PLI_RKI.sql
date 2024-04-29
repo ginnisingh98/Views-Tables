@@ -1,0 +1,77 @@
+--------------------------------------------------------
+--  DDL for Package BEN_PLI_RKI
+--------------------------------------------------------
+
+  CREATE OR REPLACE EDITIONABLE PACKAGE "APPS"."BEN_PLI_RKI" AUTHID CURRENT_USER as
+/* $Header: beplirhi.pkh 120.0.12010000.1 2008/07/29 12:50:44 appldev ship $ */
+-- ----------------------------------------------------------------------------
+-- |---------------------------------< after_insert >----------------------------------|
+-- ----------------------------------------------------------------------------
+--
+-- This procedure is for the row handpl user hook. The package body is generated.
+Procedure after_insert
+	(
+		p_pl_extra_info_id		in	number	,
+		p_information_type		in	varchar2	,
+		p_pl_id				in	number	,
+		p_request_id			in	number	,
+		p_program_application_id	in	number	,
+		p_program_id			in	number	,
+		p_program_update_date		in	date		,
+		p_pli_attribute_category	in	varchar2	,
+		p_pli_attribute1			in	varchar2	,
+		p_pli_attribute2			in	varchar2	,
+		p_pli_attribute3			in	varchar2	,
+		p_pli_attribute4			in	varchar2	,
+		p_pli_attribute5			in	varchar2	,
+		p_pli_attribute6			in	varchar2	,
+		p_pli_attribute7			in	varchar2	,
+		p_pli_attribute8			in	varchar2	,
+		p_pli_attribute9			in	varchar2	,
+		p_pli_attribute10			in	varchar2	,
+		p_pli_attribute11			in	varchar2	,
+		p_pli_attribute12			in	varchar2	,
+		p_pli_attribute13			in	varchar2	,
+		p_pli_attribute14			in	varchar2	,
+		p_pli_attribute15			in	varchar2	,
+		p_pli_attribute16			in	varchar2	,
+		p_pli_attribute17			in	varchar2	,
+		p_pli_attribute18			in	varchar2	,
+		p_pli_attribute19			in	varchar2	,
+		p_pli_attribute20			in	varchar2	,
+		p_pli_information_category	in	varchar2	,
+		p_pli_information1		in	varchar2	,
+		p_pli_information2		in	varchar2	,
+		p_pli_information3		in	varchar2	,
+		p_pli_information4		in	varchar2	,
+		p_pli_information5		in	varchar2	,
+		p_pli_information6		in	varchar2	,
+		p_pli_information7		in	varchar2	,
+		p_pli_information8		in	varchar2	,
+		p_pli_information9		in	varchar2	,
+		p_pli_information10		in	varchar2	,
+		p_pli_information11		in	varchar2	,
+		p_pli_information12		in	varchar2	,
+		p_pli_information13		in	varchar2	,
+		p_pli_information14		in	varchar2	,
+		p_pli_information15		in	varchar2	,
+		p_pli_information16		in	varchar2	,
+		p_pli_information17		in	varchar2	,
+		p_pli_information18		in	varchar2	,
+		p_pli_information19		in	varchar2	,
+		p_pli_information20		in	varchar2	,
+		p_pli_information21		in	varchar2	,
+		p_pli_information22		in	varchar2	,
+		p_pli_information23		in	varchar2	,
+		p_pli_information24		in	varchar2	,
+		p_pli_information25		in	varchar2	,
+		p_pli_information26		in	varchar2	,
+		p_pli_information27		in	varchar2	,
+		p_pli_information28		in	varchar2	,
+		p_pli_information29		in	varchar2	,
+		p_pli_information30		in	varchar2
+	);
+
+end ben_pli_rki;
+
+/

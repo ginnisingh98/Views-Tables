@@ -1,0 +1,98 @@
+--------------------------------------------------------
+--  DDL for Package IGS_AD_PRCS_CAT_STEP_PKG
+--------------------------------------------------------
+
+  CREATE OR REPLACE EDITIONABLE PACKAGE "APPS"."IGS_AD_PRCS_CAT_STEP_PKG" AUTHID CURRENT_USER AS
+/* $Header: IGSAI37S.pls 115.9 2003/02/19 12:33:01 kpadiyar ship $ */
+procedure INSERT_ROW (
+  X_ROWID in out NOCOPY VARCHAR2,
+  X_ORG_ID IN NUMBER,
+  X_ADMISSION_CAT in VARCHAR2,
+  X_S_ADMISSION_PROCESS_TYPE in VARCHAR2,
+  X_S_ADMISSION_STEP_TYPE in VARCHAR2,
+  X_MANDATORY_STEP_IND in VARCHAR2,
+  X_STEP_TYPE_RESTRICTION_NUM in NUMBER,
+  X_STEP_ORDER_NUM in NUMBER,
+  X_STEP_GROUP_TYPE in VARCHAR2,
+  X_MODE in VARCHAR2 default 'R'
+  );
+procedure LOCK_ROW (
+  X_ROWID in VARCHAR2,
+  X_ADMISSION_CAT in VARCHAR2,
+  X_S_ADMISSION_PROCESS_TYPE in VARCHAR2,
+  X_S_ADMISSION_STEP_TYPE in VARCHAR2,
+  X_MANDATORY_STEP_IND in VARCHAR2,
+  X_STEP_TYPE_RESTRICTION_NUM in NUMBER,
+  X_STEP_ORDER_NUM in NUMBER,
+  X_STEP_GROUP_TYPE in VARCHAR2
+);
+procedure UPDATE_ROW (
+  X_ROWID in VARCHAR2,
+  X_ADMISSION_CAT in VARCHAR2,
+  X_S_ADMISSION_PROCESS_TYPE in VARCHAR2,
+  X_S_ADMISSION_STEP_TYPE in VARCHAR2,
+  X_MANDATORY_STEP_IND in VARCHAR2,
+  X_STEP_TYPE_RESTRICTION_NUM in NUMBER,
+  X_STEP_ORDER_NUM in NUMBER,
+    X_STEP_GROUP_TYPE in VARCHAR2,
+  X_MODE in VARCHAR2 default 'R'
+  );
+procedure ADD_ROW (
+  X_ROWID in out NOCOPY VARCHAR2,
+  X_ORG_ID IN NUMBER,
+  X_ADMISSION_CAT in VARCHAR2,
+  X_S_ADMISSION_PROCESS_TYPE in VARCHAR2,
+  X_S_ADMISSION_STEP_TYPE in VARCHAR2,
+  X_MANDATORY_STEP_IND in VARCHAR2,
+  X_STEP_TYPE_RESTRICTION_NUM in NUMBER,
+  X_STEP_ORDER_NUM in NUMBER,
+  X_STEP_GROUP_TYPE in VARCHAR2,
+  X_MODE in VARCHAR2 default 'R'
+  );
+procedure DELETE_ROW (
+  X_ROWID in VARCHAR2
+);
+FUNCTION Get_PK_For_Validation (
+    x_admission_cat IN VARCHAR2,
+    x_s_admission_process_type IN VARCHAR2,
+    x_s_admission_step_type IN VARCHAR2,
+    x_step_group_type IN VARCHAR2
+    )
+RETURN BOOLEAN;
+
+PROCEDURE Check_constraints(
+  	Column_Name 	IN	VARCHAR2 DEFAULT NULL,
+	Column_Value 	IN	VARCHAR2 DEFAULT NULL
+	);
+  PROCEDURE Before_DML (
+    p_action IN VARCHAR2,
+    x_rowid IN VARCHAR2 DEFAULT NULL,
+    X_ORG_ID IN NUMBER,
+    x_admission_cat IN VARCHAR2 DEFAULT NULL,
+    x_s_admission_process_type IN VARCHAR2 DEFAULT NULL,
+    x_s_admission_step_type IN VARCHAR2 DEFAULT NULL,
+    x_mandatory_step_ind IN VARCHAR2 DEFAULT NULL,
+    x_step_type_restriction_num IN NUMBER DEFAULT NULL,
+    x_step_order_num IN NUMBER DEFAULT NULL,
+    X_STEP_GROUP_TYPE in VARCHAR2 DEFAULT NULL,
+    x_creation_date IN DATE DEFAULT NULL,
+    x_created_by IN NUMBER DEFAULT NULL,
+    x_last_update_date IN DATE DEFAULT NULL,
+    x_last_updated_by IN NUMBER DEFAULT NULL,
+    x_last_update_login IN NUMBER DEFAULT NULL
+  );
+
+  PROCEDURE GET_FK_IGS_AD_PRCS_CAT (
+    x_admission_cat IN VARCHAR2,
+    x_s_admission_process_type IN VARCHAR2
+    );
+
+  PROCEDURE GET_FK_IGS_LOOKUPS_VIEW(
+    x_s_admission_step_type IN VARCHAR2
+    );
+
+end IGS_AD_PRCS_CAT_STEP_PKG;
+
+ 
+
+/

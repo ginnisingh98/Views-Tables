@@ -1,0 +1,212 @@
+--------------------------------------------------------
+--  DDL for Package Body PSP_PSPENORG_XMLP_PKG
+--------------------------------------------------------
+
+  CREATE OR REPLACE EDITIONABLE PACKAGE BODY "APPS"."PSP_PSPENORG_XMLP_PKG" AS
+/* $Header: PSPENORGB.pls 120.3 2007/10/29 07:23:09 amakrish noship $ */
+  FUNCTION AFTERPFORM RETURN BOOLEAN IS
+    CURSOR C1(P_LOOKUP_CODE IN VARCHAR2,P_TEMPLATE_ID IN NUMBER) IS
+      SELECT
+        COUNT(1)
+      FROM
+        PSP_REPORT_TEMPLATE_DETAILS
+      WHERE TEMPLATE_ID = P_TEMPLATE_ID
+        AND CRITERIA_LOOKUP_TYPE = 'PSP_SELECTION_CRITERIA'
+        AND CRITERIA_LOOKUP_CODE = P_LOOKUP_CODE;
+    L_NUM NUMBER;
+    L_NUM2 NUMBER;
+  BEGIN
+    IF P_ORG_TEMPLATE_ID IS NULL THEN
+      P_ORGANIZATION_ID := ' and 1 = 1 ';
+    ELSE
+      OPEN C1('ORG',P_ORG_TEMPLATE_ID);
+      FETCH C1
+       INTO L_NUM;
+      CLOSE C1;
+      IF L_NUM <> 0 THEN
+        P_ORGANIZATION_ID := ' and hrou.organization_id  IN (select criteria_value1 from psp_report_template_details
+                                   where template_id = ' || P_ORG_TEMPLATE_ID || '
+                                   and   criteria_lookup_type = ''PSP_SELECTION_CRITERIA''
+                                   and   criteria_lookup_code = ''ORG'' ' || ' ) ';
+      ELSE
+        P_ORGANIZATION_ID := ' and 1 = 1 ';
+      END IF;
+    END IF;
+    IF P_PAY_TEMPLATE_ID IS NULL THEN
+      P_PAYROLL_ID := ' and 1 = 1 ';
+    ELSE
+      OPEN C1('PAY',P_PAY_TEMPLATE_ID);
+      FETCH C1
+       INTO L_NUM2;
+      CLOSE C1;
+      IF L_NUM2 <> 0 THEN
+        P_PAYROLL_ID := ' and pelh.payroll_id IN (select criteria_value1 from psp_report_template_details
+                              where template_id = ' || P_PAY_TEMPLATE_ID || '
+                              and   criteria_lookup_type = ''PSP_SELECTION_CRITERIA''
+                              and   criteria_lookup_code = ''PAY'' ' || ' ) ';
+      ELSE
+        P_PAYROLL_ID := ' and 1 = 1 ';
+      END IF;
+    END IF;
+    RETURN (TRUE);
+  END AFTERPFORM;
+
+  FUNCTION CF_CHARGING_INSTFORMULA(GL_CODE_COMBINATION_ID IN NUMBER
+                                  ,PROJECT_ID1 IN NUMBER
+                                  ,TASK_ID1 IN NUMBER
+                                  ,AWARD_ID1 IN NUMBER
+                                  ,EXPENDITURE_ORGANIZATION_ID IN NUMBER
+                                  ,EXPENDITURE_TYPE IN VARCHAR2) RETURN CHAR IS
+    V_RETCODE NUMBER;
+    L_CHART_OF_ACCTS VARCHAR2(20);
+    GL_FLEX_VALUES VARCHAR2(2000);
+    L_PROJECT_NAME VARCHAR2(30);
+    L_AWARD_NUMBER VARCHAR2(15);
+    L_TASK_NUMBER VARCHAR2(25);
+    L_ORG_NAME HR_ALL_ORGANIZATION_UNITS_TL.NAME%TYPE;
+  BEGIN
+    IF GL_CODE_COMBINATION_ID IS NOT NULL THEN
+      V_RETCODE := PSP_GENERAL.FIND_CHART_OF_ACCTS(TO_NUMBER(P_SET_OF_BOOKS_ID)
+                                                  ,L_CHART_OF_ACCTS);
+      GL_FLEX_VALUES := FND_FLEX_EXT.GET_SEGS(APPLICATION_SHORT_NAME => 'SQLGL'
+                                             ,KEY_FLEX_CODE => 'GL#'
+                                             ,STRUCTURE_NUMBER => TO_NUMBER(L_CHART_OF_ACCTS)
+                                             ,COMBINATION_ID => GL_CODE_COMBINATION_ID);
+      RETURN (GL_FLEX_VALUES);
+    ELSE
+      SELECT
+        NAME
+      INTO L_PROJECT_NAME
+      FROM
+        PA_PROJECTS_ALL
+      WHERE PROJECT_ID = PROJECT_ID1;
+      SELECT
+        TASK_NUMBER
+      INTO L_TASK_NUMBER
+      FROM
+        PA_TASKS
+      WHERE TASK_ID = TASK_ID1;
+      SELECT
+        AWARD_NUMBER
+      INTO L_AWARD_NUMBER
+      FROM
+        GMS_AWARDS_ALL
+      WHERE AWARD_ID = AWARD_ID1;
+      SELECT
+        NAME
+      INTO L_ORG_NAME
+      FROM
+        HR_ALL_ORGANIZATION_UNITS
+      WHERE ORGANIZATION_ID = EXPENDITURE_ORGANIZATION_ID;
+      RETURN (L_PROJECT_NAME || ' ' || L_TASK_NUMBER || ' ' || L_AWARD_NUMBER || ' ' || L_ORG_NAME || ' ' || EXPENDITURE_TYPE);
+    END IF;
+  EXCEPTION
+    WHEN NO_DATA_FOUND THEN
+      RETURN ('No Data Found');
+    WHEN OTHERS THEN
+      RETURN ('Other Error');
+  END CF_CHARGING_INSTFORMULA;
+
+  FUNCTION CF_AWD_END_DTFORMULA(AWARD_ID1 IN NUMBER) RETURN DATE IS
+    CURSOR C_AWD_END IS
+      SELECT
+        GA.END_DATE_ACTIVE
+      FROM
+        GMS_AWARDS GA
+      WHERE GA.AWARD_ID = AWARD_ID1;
+    V_AWD_END_DATE DATE;
+  BEGIN
+    IF (AWARD_ID1 IS NOT NULL) THEN
+      OPEN C_AWD_END;
+      FETCH C_AWD_END
+       INTO V_AWD_END_DATE;
+      CLOSE C_AWD_END;
+    END IF;
+    RETURN (V_AWD_END_DATE);
+  EXCEPTION
+    WHEN NO_DATA_FOUND THEN
+      RETURN (NULL);
+    WHEN OTHERS THEN
+      RETURN (NULL);
+  END CF_AWD_END_DTFORMULA;
+
+  FUNCTION CF_DATE_CHECKFORMULA(CF_AWD_END_DT IN DATE
+                               ,ENC_END_DATE IN DATE) RETURN CHAR IS
+  BEGIN
+    IF CF_AWD_END_DT > ENC_END_DATE THEN
+      RETURN ('*');
+    END IF;
+    RETURN (NULL);
+  END CF_DATE_CHECKFORMULA;
+
+  FUNCTION BEFOREREPORT RETURN BOOLEAN IS
+  BEGIN
+--    HR_STANDARD.EVENT('BEFORE REPORT');
+  CP_BEGIN_DATE := TO_CHAR(P_BEGIN_DATE,'DD-MON-YYYY');
+  CP_END_DATE := TO_CHAR(P_END_DATE,'DD-MON-YYYY');
+    RETURN (TRUE);
+  END BEFOREREPORT;
+
+  FUNCTION CF_ENC_DATE_RANGEFORMULA(ENC_BEGIN_DATE IN DATE
+                                   ,ENC_END_DATE IN DATE) RETURN CHAR IS
+    V_DATE_RANGE VARCHAR2(22);
+  BEGIN
+    V_DATE_RANGE := TO_CHAR(ENC_BEGIN_DATE
+                           ,'DD-MON-YY') || ' To ' || TO_CHAR(ENC_END_DATE
+                           ,'DD-MON-YY');
+    RETURN (V_DATE_RANGE);
+  END CF_ENC_DATE_RANGEFORMULA;
+
+  FUNCTION CF_ENC_AMOUNT_DSPFORMULA(ENC_AMOUNT IN NUMBER
+                                   ,CF_CURRENCY_FORMAT IN VARCHAR2) RETURN CHAR IS
+  BEGIN
+    /*SRW.REFERENCE(ENC_AMOUNT)*/NULL;
+    /*SRW.REFERENCE(CF_CURRENCY_FORMAT)*/NULL;
+    RETURN (TO_CHAR(ENC_AMOUNT
+                  ,CF_CURRENCY_FORMAT));
+  END CF_ENC_AMOUNT_DSPFORMULA;
+
+  FUNCTION CF_ORG_TOTAL_DSPFORMULA(CS_ORG_TOTAL IN NUMBER
+                                  ,CF_CURRENCY_FORMAT IN VARCHAR2) RETURN CHAR IS
+  BEGIN
+    /*SRW.REFERENCE(CS_ORG_TOTAL)*/NULL;
+    /*SRW.REFERENCE(CF_CURRENCY_FORMAT)*/NULL;
+    RETURN (TO_CHAR(CS_ORG_TOTAL
+                  ,CF_CURRENCY_FORMAT));
+  END CF_ORG_TOTAL_DSPFORMULA;
+
+  FUNCTION AFTERREPORT RETURN BOOLEAN IS
+  BEGIN
+--    HR_STANDARD.EVENT('AFTER REPORT');
+    RETURN (TRUE);
+  END AFTERREPORT;
+
+  FUNCTION CF_PAY_TOTAL_DISPFORMULA(CS_PAY_TOTAL IN NUMBER
+                                   ,CF_CURRENCY_FORMAT IN VARCHAR2) RETURN CHAR IS
+  BEGIN
+    /*SRW.REFERENCE(CS_PAY_TOTAL)*/NULL;
+    /*SRW.REFERENCE(CF_CURRENCY_FORMAT)*/NULL;
+    RETURN (TO_CHAR(CS_PAY_TOTAL
+                  ,CF_CURRENCY_FORMAT));
+  END CF_PAY_TOTAL_DISPFORMULA;
+
+  FUNCTION CF_CURRENCY_FORMATFORMULA(CURRENCY_CODE IN VARCHAR2) RETURN CHAR IS
+  BEGIN
+    /*SRW.REFERENCE(CURRENCY_CODE)*/NULL;
+    RETURN (FND_CURRENCY.GET_FORMAT_MASK(CURRENCY_CODE
+                                       ,30));
+  END CF_CURRENCY_FORMATFORMULA;
+
+  FUNCTION CF_CURRENCY_TOTAL_DSPFORMULA(CURRENCY_CODE IN VARCHAR2
+                                       ,CF_CURRENCY_FORMAT IN VARCHAR2
+                                       ,CS_CURRENCY_TOTAL IN NUMBER) RETURN CHAR IS
+  BEGIN
+    /*SRW.REFERENCE(CURRENCY_CODE)*/NULL;
+    /*SRW.REFERENCE(CF_CURRENCY_FORMAT)*/NULL;
+    RETURN (TO_CHAR(CS_CURRENCY_TOTAL
+                  ,CF_CURRENCY_FORMAT));
+  END CF_CURRENCY_TOTAL_DSPFORMULA;
+
+END PSP_PSPENORG_XMLP_PKG;
+
+/

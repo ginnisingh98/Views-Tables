@@ -1,0 +1,1038 @@
+--------------------------------------------------------
+--  DDL for Package QP_PREQ_GRP
+--------------------------------------------------------
+
+  CREATE OR REPLACE EDITIONABLE PACKAGE "APPS"."QP_PREQ_GRP" AUTHID CURRENT_USER AS
+/* $Header: QPXGPRES.pls 120.5.12010000.7 2009/09/08 10:15:43 dnema ship $ */
+
+--Processing status
+G_STATUS_NEW                      CONSTANT VARCHAR2(30):='N';
+G_STATUS_DELETED                  CONSTANT VARCHAR2(30):='D';
+G_STATUS_UNCHANGED                CONSTANT VARCHAR2(30):='X';
+G_STATUS_TRANSIENT                CONSTANT VARCHAR2(30):='T';
+G_STATUS_GROUPING                 CONSTANT VARCHAR2(30):='G';
+G_STATUS_UPDATED                  CONSTANT VARCHAR2(30):='UPDATED';
+G_STATUS_INVALID_PRICE_LIST       CONSTANT VARCHAR2(30):='IPL';
+G_STATUS_GSA_VIOLATION            CONSTANT VARCHAR2(30):='GSA';
+G_STS_LHS_NOT_FOUND               CONSTANT VARCHAR2(30):='NMS';
+G_STATUS_FORMULA_ERROR            CONSTANT VARCHAR2(30):='FER';
+G_STATUS_OTHER_ERRORS             CONSTANT VARCHAR2(30):='OER';
+G_STATUS_SYSTEM_GENERATED         CONSTANT VARCHAR2(30):='S';
+G_STATUS_BEST_PRICE_EVAL          CONSTANT VARCHAR2(30):= 'B';
+G_STATUS_INCOMP_LOGIC             CONSTANT VARCHAR2(30):= 'I';
+G_STATUS_CALC_ERROR		  CONSTANT VARCHAR2(30):='CALC';
+G_STATUS_UOM_FAILURE              CONSTANT VARCHAR2(30):='UOM';
+G_STATUS_PRIMARY_UOM_FLAG   	  CONSTANT VARCHAR2(30):='P_UOM_FLAG';
+G_STATUS_OTHER_ITEM_BENEFITS      CONSTANT VARCHAR2(30):='OTHER_ITEM_BENEFITS';
+G_STATUS_INVALID_UOM              CONSTANT VARCHAR2(30) := 'INVALID_UOM';
+G_STATUS_DUP_PRICE_LIST           CONSTANT VARCHAR2(30) := 'DUPLICATE_PRICE_LIST';
+G_STATUS_INVALID_UOM_CONV         CONSTANT VARCHAR2(30) := 'INVALID_UOM_CONV';
+G_STATUS_INVALID_INCOMP           CONSTANT VARCHAR2(30) := 'INVALID_INCOMP';
+G_STATUS_BEST_PRICE_EVAL_ERROR    CONSTANT VARCHAR2(30) := 'INVALID_BEST_PRICE';
+G_STATUS_LIMIT_HOLD               CONSTANT VARCHAR2(30) := 'LIMIT';
+G_STATUS_LIMIT_EXCEEDED           CONSTANT VARCHAR2(30) := 'EXCEEDED';
+G_STATUS_LIMIT_ADJUSTED           CONSTANT VARCHAR2(30) := 'ADJUSTED';
+G_STATUS_LIMIT_CONSUMED           CONSTANT VARCHAR2(30) := 'CONSUMED';
+G_STATUS_MC_DIFFERENT_CURR        CONSTANT VARCHAR2(30) := 'DIFFERENT_CURR';
+G_STATUS_MC_RATE_NOT_FOUND        CONSTANT VARCHAR2(30) := 'RATE_NOT_FOUND';
+G_STATUS_MC_INVALID_CURR          CONSTANT VARCHAR2(30) := 'INVALID_CURR';
+G_STATUS_MC_NO_USER_CONVTYPE      CONSTANT VARCHAR2(30) := 'NO_USER_CONVTYPE';
+G_STATUS_MC_FORMULA_FAILURE       CONSTANT VARCHAR2(30) := 'FORMULA_FAILURE';
+
+--KDURGASI
+G_STAGE_CACHE_MOD_LIN		  CONSTANT VARCHAR2(30) := 'MOD_LINE_CACHE';
+G_STAGE_CACHE_MOD_LIN2		  CONSTANT VARCHAR2(30) := 'MOD_LINE_CACHE2';
+G_STAGE_CACHE_MOD_HDR		  CONSTANT VARCHAR2(30) := 'MOD_HEADER_CACHE';
+
+G_STAGE_CACHE_PL_LIN		  CONSTANT VARCHAR2(30) := 'PL_LINE_CACHE';
+G_STAGE_CACHE_PL_HDR		  CONSTANT VARCHAR2(30) := 'PL_HEADER_CACHE';
+
+G_STAGE_CACHE_PL_LIN2		  CONSTANT VARCHAR2(30) := 'PL_LINE_CACHE2';
+
+G_STAGE_CACHE_SEC_PL_HDR_SRCH	  CONSTANT VARCHAR2(30) := 'SEC_PL_SRCH_HDR_CACHE';
+G_STAGE_CACHE_SEC_PL_LIN_SRCH	  CONSTANT VARCHAR2(30) := 'SEC_PL_SRCH_LIN_CACHE';
+
+G_STAGE_CACHE_SEC_PL_LIN_SRCH2	  CONSTANT VARCHAR2(30) := 'SEC_PL_SRCH_LIN_CACHE2';
+
+G_STAGE_CACHE_LST_HDR_LIN_SRCH	  CONSTANT VARCHAR2(30) := 'LIST_HDR_SRCH_LIN_CACHE';
+
+G_LIN_QTY_ATTR_SRCD		  VARCHAR2(1) := 'N';
+
+--KDURGASI
+
+
+-- Global Currency Code Variable
+  G_CURRENCY_CODE                  VARCHAR2(30);
+  G_ANY_CURRENCY_CODE              CONSTANT VARCHAR2(30) := '<ALL>';
+  G_MIN_PRICING_DATE               DATE;
+  G_MAX_PRICING_DATE               DATE;
+
+--Processed code
+G_NO_LIST_PASSED             	  CONSTANT   VARCHAR2(30):='NLP';
+G_STATUS_NOT_IN_MINI_SEARCH       CONSTANT   VARCHAR2(30) := 'NMS';
+G_STATUS_MINI_SEARCH_NOT_EXEC     CONSTANT  VARCHAR2(30) := 'NMSE';
+G_BY_ENGINE                       CONSTANT  VARCHAR2(30) :='ENGINE';
+
+--DELETED BY STATUS CODE
+G_DELETED_PBH                    CONSTANT VARCHAR2(30):='D_PBH';
+G_DELETED_GRP                    CONSTANT VARCHAR2(30):='D_GRP';
+G_DELETED_EXCLUDER               CONSTANT VARCHAR2(30):='D_EXCL';
+G_DELETED_NULL_PRICE             CONSTANT VARCHAR2(30):='D_NULL_PRICE';
+G_DELETED_CAL_ERROR              CONSTANT VARCHAR2(30):='D_CAL_ERROR';
+G_DELETED_BETWEEN                CONSTANT VARCHAR2(30):='D_BETWEEN';
+G_DELETED_PARENT_FAILS           CONSTANT VARCHAR2(30):='D_PBH_PARENT_FAILS';
+
+--Pattern Status Codes
+G_DELETED_LINE		         CONSTANT VARCHAR2(30):='D_LINE';
+G_DELETED_HDR		         CONSTANT VARCHAR2(30):='D_HDR';
+G_DELETED_TCA	                 CONSTANT VARCHAR2(30):='D_TCA';
+G_DEL_ATTR_NOT_SRCD_CMN_GRP      CONSTANT VARCHAR2(30):='D_ATTR_NOT_SRCD_CMN_GRP ';
+G_DEL_ATTR_NOT_SRCD_GRP          CONSTANT VARCHAR2(30):='D_ATTR_NOT_SRCD_GRP ';
+G_DEL_OTHR_OPR_CMN_GRP           CONSTANT VARCHAR2(30):='D_OTHR_OPR_CMN_GRP';
+G_DEL_OTHR_OPR_GRP               CONSTANT VARCHAR2(30):='D_OTHR_OPR_GRP';
+--Pattern Status Codes
+
+--PROCESSED FLAG for internal used only
+G_NOT_PROCESSED             	  CONSTANT VARCHAR2(30):='N';
+G_PROCESSED                 	  CONSTANT VARCHAR2(30):='Y';
+G_BY_PBH                    	  CONSTANT VARCHAR2(30):='PBH';
+
+--VALIDATED_CODE
+G_NOT_VALIDATED  			 CONSTANT VARCHAR2(30):='N';
+G_VALIDATED      			 CONSTANT VARCHAR2(30):='Y';
+
+-- AG Change
+TYPE PLS_INTEGER_TYPE   IS TABLE OF PLS_INTEGER INDEX BY BINARY_INTEGER;
+TYPE NUMBER_TYPE        IS TABLE OF NUMBER INDEX BY BINARY_INTEGER;
+TYPE VARCHAR_TYPE       IS TABLE OF VARCHAR2(240) INDEX BY BINARY_INTEGER;
+TYPE VARCHAR_30_TYPE       IS TABLE OF VARCHAR2(30) INDEX BY BINARY_INTEGER;
+TYPE FLAG_TYPE          IS TABLE OF VARCHAR2(1)   INDEX BY BINARY_INTEGER;
+TYPE ROWID_TYPE         IS TABLE OF ROWID INDEX BY BINARY_INTEGER;
+TYPE DATE_TYPE          IS TABLE OF DATE INDEX BY BINARY_INTEGER;
+TYPE VARCHAR_3_TYPE     IS TABLE OF VARCHAR2(3) INDEX BY BINARY_INTEGER;
+
+--APPLIED_FLAG
+G_LIST_APPLIED     			 CONSTANT VARCHAR2(30):='Y';
+G_LIST_NOT_APPLIED 			 CONSTANT VARCHAR2(30):='N';
+
+--Line Type Code
+G_PRICE_BREAK_TYPE     CONSTANT VARCHAR2(30):= 'PBH';
+G_RECURRING_BREAK      CONSTANT VARCHAR2(30):= 'RECURRING';
+G_OTHER_ITEM_DISCOUNT  CONSTANT VARCHAR2(30):= 'OID';
+G_ITEM_UPGRADE	        CONSTANT VARCHAR2(30) :='IUE';
+G_TERMS_SUBSTITUTION   CONSTANT VARCHAR2(30) := 'TSN';
+G_COUPON_ISSUE         CONSTANT VARCHAR2(30) := 'CIE';
+G_COUPON               CONSTANT VARCHAR2(30) := 'COUPON';
+G_DISCOUNT             CONSTANT VARCHAR2(30) := 'DIS';
+G_SURCHARGE            CONSTANT VARCHAR2(30) := 'SUR';
+G_PROMO_GOODS_DISCOUNT CONSTANT VARCHAR2(30) := 'PRG';
+G_FREIGHT_CHARGE       CONSTANT VARCHAR2(30) := 'FREIGHT_CHARGE';
+
+-- Operand Calculation Codes
+G_PERCENT_DISCOUNT	   CONSTANT VARCHAR2(30) := '%';
+G_AMOUNT_DISCOUNT      CONSTANT VARCHAR2(30) := 'AMT';
+G_NEWPRICE_DISCOUNT    CONSTANT VARCHAR2(30) := 'NEWPRICE';
+G_LUMPSUM_DISCOUNT 	   CONSTANT VARCHAR2(30) := 'LUMPSUM';
+
+-- Price List Types
+G_UNIT_PRICE 		   CONSTANT  VARCHAR2(30) := 'UNIT_PRICE';
+G_PERCENT_PRICE        CONSTANT  VARCHAR2(30) := 'PERCENT_PRICE';
+G_BLOCK_PRICE          CONSTANT  VARCHAR2(30) := 'BLOCK_PRICE';
+G_BREAKUNIT_PRICE      CONSTANT  VARCHAR2(30) := 'BREAKUNIT_PRICE';
+
+--Attribute type
+G_QUALIFIER_TYPE       CONSTANT VARCHAR2(30):='QUALIFIER';
+G_PRICING_TYPE         CONSTANT VARCHAR2(30):='PRICING';
+G_PRODUCT_TYPE         CONSTANT VARCHAR2(30):='PRODUCT';
+G_BENEFIT_TYPE         CONSTANT VARCHAR2(30):='BENEFIT';
+G_QUANTITY             CONSTANT VARCHAR2(1):='Q';
+G_AMOUNT               CONSTANT VARCHAR2(1):='A';
+G_ORDER_LINE_TYPE      CONSTANT VARCHAR2(30):='ORDER_LINE';
+G_ADJUSTMENT_LINE_TYPE CONSTANT VARCHAR2(30):='ADJUSTMENT_LINE';
+G_CHILD_DETAIL_TYPE    CONSTANT VARCHAR2(30):='CHILD_DETAIL_LINE';
+G_PRICE_LIST_TYPE      CONSTANT VARCHAR2(30):='PLL';
+
+--Line level
+G_LINE_LEVEL              CONSTANT VARCHAR2(30):='LINE';
+G_DETAIL_LEVEL            CONSTANT VARCHAR2(30):='DETAIL';
+G_ORDER_LEVEL             CONSTANT VARCHAR2(30):='ORDER';
+
+G_LINE_GROUP              CONSTANT VARCHAR2(30):='LINEGROUP';
+
+--PROCESSED_CODE
+G_LINE_GROUP_PROCESSED    CONSTANT VARCHAR2(30):='LGP';
+G_DISCOUNT_MODE           CONSTANT VARCHAR2(3):='DIS';
+G_PRICELIST_MODE          CONSTANT VARCHAR2(3):='PLL';
+
+--COMPARISON OPERATOR TYPE CODE
+G_OPERATOR_BETWEEN CONSTANT VARCHAR2(30):='BETWEEN';
+
+--KDURGASI
+G_OPERATOR_NOT_EQL CONSTANT VARCHAR2(30):='NOT =';
+--KDURGASI
+
+--Context for list header and list line as qualifiers
+G_LIST_HEADER_CONTEXT 			CONSTANT VARCHAR2(30):= 'MODLIST';
+G_OLD_LIST_HEADER_CONTEXT 		CONSTANT VARCHAR2(30):='ORDER';
+G_LIST_LINE_CONTEXT   			CONSTANT VARCHAR2(30):= 'LISTLINE';
+G_PRIC_VOLUME_CONTEXT   	        CONSTANT VARCHAR2(30):= 'VOLUME';
+G_PRIC_ITEM_CONTEXT   			CONSTANT VARCHAR2(30):= 'ITEM';
+G_CUSTOMER_CONTEXT    			CONSTANT VARCHAR2(30) := 'CUSTOMER';
+
+-- Attributes
+G_QUAL_ATTRIBUTE1    CONSTANT VARCHAR2(30) := 'QUALIFIER_ATTRIBUTE1'; -- Promotion
+G_QUAL_ATTRIBUTE2    CONSTANT VARCHAR2(30) := 'QUALIFIER_ATTRIBUTE2'; -- List Line Id
+G_QUAL_ATTRIBUTE6    CONSTANT VARCHAR2(30) := 'QUALIFIER_ATTRIBUTE6';  -- Discount Id
+G_PRIC_ATTRIBUTE1    CONSTANT VARCHAR2(30)  := 'PRICING_ATTRIBUTE1';
+G_PRIC_ATTRIBUTE10   CONSTANT VARCHAR2(30) := 'PRICING_ATTRIBUTE10';
+G_PRIC_ATTRIBUTE12   CONSTANT VARCHAR2(30) := 'PRICING_ATTRIBUTE12';
+G_GSA_ATTRIBUTE      CONSTANT VARCHAR2(30) :='QUALIFIER_ATTRIBUTE15';
+G_DISCOUNT_ATTRIBUTE CONSTANT VARCHAR2(30) :='QUALIFIER_ATTRIBUTE6';
+G_PROMOTION_ATTRIBUTE CONSTANT VARCHAR2(30):='QUALIFIER_ATTRIBUTE1';
+G_PRICELIST_ATTRIBUTE CONSTANT VARCHAR2(30):='QUALIFIER_ATTRIBUTE4';
+G_QUANTITY_ATTRIBUTE CONSTANT VARCHAR2(30):='PRICING_ATTRIBUTE10';
+G_LINE_AMT_ATTRIBUTE CONSTANT VARCHAR2(30):='PRICING_ATTRIBUTE12';
+G_ORDER_AMOUNT_ATTRIBUTE CONSTANT VARCHAR2(30):='QUALIFIER_ATTRIBUTE10';
+
+--attributes for ignore_pricing 8203956
+G_IGN_PRIC_ATTRIBUTE CONSTANT VARCHAR2(30):='QUALIFIER_ATTRIBUTE40';
+G_DEF_PL_HDR_ID_ATTRIBUTE CONSTANT VARCHAR2(30):='QUALIFIER_ATTRIBUTE41';
+-- ignore_pricing end
+
+--Need to change! these both may not be same
+G_LINEGRP_QUANTITY_ATTRIBUTE CONSTANT VARCHAR2(30):='PRICING_ATTRIBUTE12';
+G_LINEGRP_AMOUNT_ATTRIBUTE CONSTANT VARCHAR2(30):='PRICING_ATTRIBUTE12';
+
+-- Yes/No/Phase/Debug Flags
+G_YES CONSTANT VARCHAR2(20) := 'Y';
+G_NO CONSTANT VARCHAR2(20) := 'N';
+G_DONT_WRITE_TO_DEBUG CONSTANT VARCHAR2(20) := 'V';
+G_ENGINE_TIME_TRACE_ON CONSTANT VARCHAR2(20) := 'T';    --3085171
+G_TIME_LOG_DBG_LEVEL CONSTANT VARCHAR2(1) := 'M'; -- Bug 8459818
+
+G_PHASE CONSTANT VARCHAR2(20):='P';
+-- Best Price Evaluation Constants
+G_DISCOUNT_PROCESSING   CONSTANT VARCHAR2(30) := 'DISCOUNT';
+G_PRICELIST_PROCESSING  CONSTANT VARCHAR2(30) := 'PRICE_LIST';
+
+-- Incompatibility Processing
+G_INCOMP_EXCLUSIVE CONSTANT VARCHAR2(30) := 'EXCL';
+
+--Incompatibility Resolve Codes
+G_INCOMP_PRECEDENCE CONSTANT VARCHAR2(30) := 'PRECEDENCE';
+G_INCOMP_BEST_PRICE CONSTANT VARCHAR2(30) := 'BEST_PRICE';
+
+-- Header/Line Qualifiers
+G_HEADER_QUALIFIER CONSTANT VARCHAR2(30) := 'HQ';
+G_LINE_QUALIFIER CONSTANT VARCHAR2(30) := 'LQ';
+
+-- Search Flags
+G_NO_SEARCH CONSTANT VARCHAR2(30):='N';
+G_YES_SEARCH  CONSTANT VARCHAR2(30):='Y';
+
+--Context for Product ITEN
+G_ITEM_CONTEXT CONSTANT VARCHAR2(30):='ITEM';
+
+--INDICATE IF there is a pricing attribute passed in
+G_PRICING_YES CONSTANT VARCHAR2(30):='Y';
+G_PRICING_NO  CONSTANT VARCHAR2(30):='N';
+
+--EVENT CONSTANT
+G_PRICE_LINE_EVENT CONSTANT VARCHAR2(30):='PRICE_LINE';
+G_PRICE_ORDER_EVENT CONSTANT VARCHAR2(30):='PRICE_ORDER';
+
+--PRICE BREAK TYPE
+G_RANGE_BREAK  CONSTANT VARCHAR2(30):='RANGE';
+G_POINT_BREAK  CONSTANT VARCHAR2(30):='POINT';
+
+--G_RELATIONSHIP TYPE CODE
+G_LINE_TO_LINE       CONSTANT VARCHAR2(30):='LINE_TO_LINE';
+G_LINE_TO_DETAIL     CONSTANT VARCHAR2(30):='LINE_TO_DETAIL';
+G_DETAIL_TO_DETAIL   CONSTANT VARCHAR2(30):='DETAIL_TO_DETAIL';
+G_ORDER_TO_LINE      CONSTANT VARCHAR2(30):='ORDER_TO_LINE';
+G_RELATED_ITEM_PRICE CONSTANT VARCHAR2(30):='RELATED_ITEM_PRICE';
+G_PBH_LINE           CONSTANT VARCHAR2(30):='PBH_LINE';
+G_SERVICE_LINE       CONSTANT VARCHAR2(30):='SERVICE_LINE';
+G_GENERATED_LINE     CONSTANT VARCHAR2(30):='GENERATED_LINE';
+
+--List Header Type Code
+G_DISCOUNT_LIST_HEADER  CONSTANT VARCHAR2(30):='DLT';
+G_PRICE_LIST_HEADER     CONSTANT VARCHAR2(30):='PRL';
+G_AGR_LIST_HEADER       CONSTANT VARCHAR2(30):='AGR';
+G_CHARGES_HEADER        CONSTANT VARCHAR2(30):='CHARGES';
+
+--Profile Option Constants
+--GSA
+G_GSA_Max_Discount_Enabled CONSTANT VARCHAR2(30) := 'QP_VERIFY_GSA';
+G_BYPASS_PRICING CONSTANT VARCHAR2(30) := 'QP_BYPASS_PRICING';
+G_RETURN_MANUAL_DISCOUNTS CONSTANT VARCHAR2(30) := 'QP_RETURN_MANUAL_DISCOUNTS';
+G_BLIND_DISCOUNT CONSTANT VARCHAR2(30) := 'QP_BLIND_DISCOUNT';
+G_MULTI_CURRENCY CONSTANT VARCHAR2(30) := 'QP_MULTI_CURRENCY_INSTALLED'; -- vivek
+
+--DATA_TYPE
+G_NUMERIC CONSTANT VARCHAR2(1):= 'N';
+G_VARCHAR CONSTANT VARCHAR2(1):= 'C';
+G_DATE    CONSTANT VARCHAR2(1):= 'D';
+G_DATE_X  CONSTANT VARCHAR2(1):= 'X';
+G_DATE_Y  CONSTANT VARCHAR2(1):= 'Y';
+
+--CONTROL RECORD constants
+G_CALCULATE_ONLY      CONSTANT VARCHAR2(30):='C';
+G_SEARCH_ONLY         CONSTANT VARCHAR2(30):='N';
+G_SEARCH_N_CALCULATE  CONSTANT VARCHAR2(30):='Y';
+G_MANUAL_DISCOUNT_FLAG     VARCHAR2(1);
+G_GSA_CHECK_FLAG           VARCHAR2(1);
+G_GSA_DUP_CHECK_FLAG       VARCHAR2(1);
+G_TEMP_TABLE_INSERT_FLAG   VARCHAR2(1);
+G_REQUEST_TYPE_CODE        VARCHAR2(30); -- rounding, 2457629, shu
+G_ROUNDING_FLAG            VARCHAR2(1); -- rounding, 2457629, shu
+G_PUBLIC_API_CALL_FLAG     VARCHAR2(1);
+G_MANUAL_ADJUSTMENTS_CALL_FLAG VARCHAR2(1);
+G_QUALIFY_SECONDARY        VARCHAR2(1); --secondary price list qualifiers
+G_BLIND_DISCOUNT_PROFILE   VARCHAR2(1);
+G_MULTI_CURRENCY_PROFILE   VARCHAR2(1); -- vivek
+G_USE_MULTI_CURRENCY       VARCHAR2(1); -- vivek, for handle_break() as p_control_rec is not available
+G_MCURR_INSTALLED_USED	   VARCHAR2(1); -- shulin
+G_AM_INSTALLED_PROFILE VARCHAR2(1); -- yangli
+
+--KDURGASI changes for pattern based select modifiers
+  G_PAT_SEARCH_PATH	NUMBER(1);
+  G_QP_PATTERN_SEARCH   VARCHAR2(30);
+  G_QP_PATTERN_MOD_SEARCH CONSTANT VARCHAR2(1) := 'M';
+  G_QP_PATTERN_PRL_SEARCH CONSTANT VARCHAR2(1) := 'P';
+  G_QP_PATTERN_BOTH_SEARCH CONSTANT VARCHAR2(1) := 'B';
+--KDURGASI changes for pattern based select modifiers
+
+G_YES_PROD_HDR_QUAL_IND           CONSTANT NUMBER :=6; -- Has Header Qualifiers,Products
+G_YES_PROD_PRIC_HDR_QUAL_IND      CONSTANT NUMBER :=22;-- Has Header Qualifiers,Products and Pricing Attrs
+G_YES_PROD_LINE_QUAL_IND          CONSTANT NUMBER :=12;-- Has Line Qualifiers,Products
+G_YES_PROD_PRIC_LINE_QUAL_IND     CONSTANT NUMBER :=28;-- Has Line Qualifiers,Products and Pricing Attrs
+G_YES_PROD_HDR_LINE_QUAL_IND      CONSTANT NUMBER :=14;-- Has Header, Line Qualifiers,Products
+G_YES_PRIC_HDR_LINE_QUAL_IND      CONSTANT NUMBER :=30;-- Has Header, Line Qualifiers,Products,Pricing Attrs
+G_YES_PROD_IND                    CONSTANT NUMBER :=4; -- Has Products
+G_YES_PROD_PRIC_IND               CONSTANT NUMBER :=20;-- Has Products and Pricing Attrs
+G_YES_HDR_QUAL_IND                CONSTANT NUMBER :=2; -- Has (Header Level) Qualifiers
+G_YES_LINE_QUAL_IND               CONSTANT NUMBER :=8; -- Has (Line Level) Qualifiers
+G_YES_HDR_LINE_QUAL_IND           CONSTANT NUMBER :=10;-- Has (Header+Line Level) Qualifiers
+G_BLIND_DISCOUNT_IND              CONSTANT NUMBER :=0; -- Blind Discount
+
+G_NO_QUAL_IND         CONSTANT NUMBER := 2;
+G_NO_PRIC_IND         CONSTANT NUMBER := 4;
+G_NO_QUAL_PRIC_IND    CONSTANT NUMBER := 6;
+
+G_LINE_DETAIL_INDEX         PLS_INTEGER :=1;
+G_REQUEST_ID                NUMBER ;
+G_ORDER_PRICE_REQUEST_CODE  VARCHAR2(200); -- Limits
+G_DEBUG_ENGINE                VARCHAR2(3);
+G_INSERT_FORMULA_STEP_VALUES  VARCHAR2(1); --POSCO Performance
+G_LIMITS_CODE_EXECUTED  VARCHAR2(1);
+
+--Usage_pricing_types
+G_REGULAR_USAGE_TYPE CONSTANT VARCHAR2(30) := 'REGULAR';
+G_AUTHORING_TYPE CONSTANT VARCHAR2(30) := 'AUTHORING';
+G_BILLING_TYPE CONSTANT VARCHAR2(30) := 'BILLING';
+
+-- QP Debug Profile
+G_QP_DEBUG_PROFILE_VALUE   VARCHAR2(1);
+
+-- accum range break
+G_ORDER_ID NUMBER;       -- order header ID
+G_LINE_ID NUMBER;        -- cached line ID; necessarily the current line ID!
+G_PRICE_EFF_DATE DATE;   -- cached price effective date; also not necessarily current
+
+-- java engine performance
+G_INT_LINES_NO NUMBER; -- number of lines in int table for current request
+G_INT_LDETS_NO NUMBER; -- number of ldets in int table for current request
+G_INT_ATTRS_NO NUMBER; -- number of attrs in int table for current request
+G_INT_RELS_NO NUMBER; -- number of rellines in int table for current request
+
+--Begin: pattern_engine variables for create_pattern - SMUHAMME
+G_PATRNS_TWO_THREE_INSERTED VARCHAR2(2);
+--End:  pattern_engine variables for create_pattern - SMUHAMME
+
+-- part of security, but moved to spec for partial period pricing in R12
+G_CURRENT_USER_OP_UNIT   NUMBER := NULL; -- security
+
+-- moved to spec for continuous breaks (4687551) in R12
+G_BREAK_UOM_PRORATION     VARCHAR2(30);
+
+--added for bug 4900095
+G_service_line_ind_tbl NUMBER_TYPE;
+G_service_line_qty_tbl NUMBER_TYPE;
+G_service_ldet_qty_tbl NUMBER_TYPE;
+
+TYPE duplicate_list_type IS RECORD
+(list_line_id      NUMBER,
+ line_index        PLS_INTEGER,
+ line_detail_index PLS_INTEGER);
+
+TYPE duplicate_list_tbl_type IS TABLE OF duplicate_list_type INDEX BY BINARY_INTEGER;
+l_dup_index              PLS_INTEGER:=0;
+dup_tbl                  DUPLICATE_LIST_TBL_TYPE;
+
+TYPE LINE_REC_TYPE IS RECORD
+(REQUEST_TYPE_CODE       VARCHAR2(30):=NULL,
+ PRICING_EVENT           VARCHAR2(30):=NULL,
+ HEADER_ID               NUMBER      :=NULL,
+ LINE_INDEX              NUMBER      :=NULL,
+ LINE_ID                 NUMBER      :=NULL,
+ LINE_TYPE_CODE          VARCHAR2(30):=NULL,
+ PRICING_EFFECTIVE_DATE  DATE        :=NULL,
+ ACTIVE_DATE_FIRST       DATE        :=NULL,
+ ACTIVE_DATE_FIRST_TYPE  VARCHAR2(30):=NULL,
+ ACTIVE_DATE_SECOND      DATE        :=NULL,
+ ACTIVE_DATE_SECOND_TYPE VARCHAR2(30):=NULL,
+ LINE_QUANTITY           NUMBER      :=NULL,
+ LINE_UOM_CODE           VARCHAR2(30):=NULL,
+ UOM_QUANTITY            NUMBER      :=NULL,
+ PRICED_QUANTITY         NUMBER      :=NULL,
+ PRICED_UOM_CODE         VARCHAR2(30):=NULL,
+ CURRENCY_CODE           VARCHAR2(30):=NULL,
+ UNIT_PRICE              NUMBER      :=NULL,
+ PERCENT_PRICE           NUMBER      :=NULL,
+ ADJUSTED_UNIT_PRICE     NUMBER      :=NULL,
+ UPDATED_ADJUSTED_UNIT_PRICE     NUMBER      :=NULL,
+ PARENT_PRICE            NUMBER      :=NULL,
+ PARENT_QUANTITY         NUMBER      :=NULL,
+ ROUNDING_FACTOR         NUMBER      :=NULL,
+ PARENT_UOM_CODE         VARCHAR2(30):=NULL,
+ PRICING_PHASE_ID        NUMBER      :=NULL,
+ PRICE_FLAG              VARCHAR2(1) :=NULL,
+ PROCESSED_CODE          VARCHAR2(240) :=NULL,
+ PRICE_REQUEST_CODE      VARCHAR2(240) :=NULL,
+ HOLD_CODE               VARCHAR2(240) := NULL,
+ HOLD_TEXT               VARCHAR2(2000) := NULL,
+ STATUS_CODE             VARCHAR2(30):=NULL,
+ STATUS_TEXT             VARCHAR2(2000):=NULL,
+ USAGE_PRICING_TYPE      VARCHAR2(30) := NULL,
+ LINE_CATEGORY           VARCHAR2(30) := NULL,
+ CONTRACT_START_DATE 	DATE := NULL, /* shulin */
+ CONTRACT_END_DATE 	DATE := NULL,  /* shulin */
+ LINE_UNIT_PRICE 	NUMBER := NULL,  /* shu_latest */
+ EXTENDED_PRICE          NUMBER := NULL, /* block pricing */
+ LIST_PRICE_OVERRIDE_FLAG VARCHAR2(1) := NULL, /* po integration */
+ CHARGE_PERIODICITY_CODE VARCHAR2(3) := NULL
+ --ADJUSTED_UNIT_PRICE_UR     NUMBER := NULL, --[prarasto:Post Round]Added three fields for unrounded values, [julin/postround] redesign
+ --EXTENDED_SELLING_PRICE_UR  NUMBER := NULL, --[prarasto:Post Round]
+ --ORDER_UOM_SELLING_PRICE_UR NUMBER := NULL  --[prarasto:Post Round]
+);
+
+TYPE LINE_TBL_TYPE IS TABLE OF LINE_REC_TYPE INDEX BY BINARY_INTEGER;
+
+
+TYPE QUAL_REC_TYPE IS RECORD
+(LINE_INDEX		       NUMBER       ,
+ QUALIFIER_CONTEXT             VARCHAR2(30) ,
+ QUALIFIER_ATTRIBUTE           VARCHAR2(30) ,
+ QUALIFIER_ATTR_VALUE_FROM     VARCHAR2(240) ,
+ QUALIFIER_ATTR_VALUE_TO       VARCHAR2(240) ,
+ COMPARISON_OPERATOR_CODE      VARCHAR2(30) ,
+ VALIDATED_FLAG                VARCHAR2(1)  ,
+ STATUS_CODE                   VARCHAR2(30):=NULL,
+ STATUS_TEXT                   VARCHAR2(240):=NULL
+);
+
+
+TYPE QUAL_TBL_TYPE IS TABLE OF QUAL_REC_TYPE INDEX BY BINARY_INTEGER;
+
+TYPE LINE_ATTR_REC_TYPE IS RECORD
+(LINE_INDEX         NUMBER      :=NULL,
+ PRICING_CONTEXT    VARCHAR2(30):=NULL,
+ PRICING_ATTRIBUTE  VARCHAR2(30):=NULL,
+ PRICING_ATTR_VALUE_FROM VARCHAR2(240):=NULL,
+ PRICING_ATTR_VALUE_TO   VARCHAR2(240):=NULL,
+ VALIDATED_FLAG     VARCHAR2(1):=NULL,
+ STATUS_CODE             VARCHAR2(30):=NULL,
+ STATUS_TEXT             VARCHAR2(240):=NULL
+);
+
+TYPE LINE_ATTR_TBL_TYPE IS TABLE OF LINE_ATTR_REC_TYPE INDEX BY BINARY_INTEGER;
+
+/*+-------------------------------------------------------------
+  |PRICING REQUEST LINE DETAIL
+  +------------------------------------------------------------
+*/
+
+TYPE LINE_DETAIL_REC_TYPE IS RECORD
+(LINE_DETAIL_INDEX      NUMBER,
+ LINE_DETAIL_ID         NUMBER,
+ LINE_DETAIL_TYPE_CODE  VARCHAR2(30),
+ LINE_INDEX             NUMBER,
+ LIST_HEADER_ID         NUMBER,
+ LIST_LINE_ID           NUMBER,
+ LIST_LINE_TYPE_CODE    VARCHAR2(30),
+ SUBSTITUTION_TYPE_CODE VARCHAR2(30),  --obsoleting
+ SUBSTITUTION_FROM      VARCHAR2(240), --obsoleting
+ SUBSTITUTION_TO        VARCHAR2(240),
+ AUTOMATIC_FLAG         VARCHAR2(1),
+ OPERAND_CALCULATION_CODE VARCHAR2(30),  --added for pricing engine internal use only
+ OPERAND_VALUE          NUMBER,          --added for pricing engine internal use only
+ PRICING_GROUP_SEQUENCE NUMBER,          --added for pricing engine internal use only
+ PRICE_BREAK_TYPE_CODE  VARCHAR2(30),    --added for pricing engine internal use only
+ CREATED_FROM_LIST_TYPE_CODE   VARCHAR2(30),
+ PRICING_PHASE_ID       NUMBER,
+ LIST_PRICE             NUMBER,
+ LINE_QUANTITY          NUMBER,
+ ADJUSTMENT_AMOUNT      NUMBER,
+ APPLIED_FLAG           VARCHAR2(1),
+ MODIFIER_LEVEL_CODE    VARCHAR2(30),
+ STATUS_CODE            VARCHAR2(30):=NULL,
+ STATUS_TEXT            VARCHAR2(2000):=NULL,
+--new addition might need to add
+ SUBSTITUTION_ATTRIBUTE VARCHAR2(240),
+ ACCRUAL_FLAG           VARCHAR2(1),
+ LIST_LINE_NO           VARCHAR2(240),
+ ESTIM_GL_VALUE          NUMBER,
+ ACCRUAL_CONVERSION_RATE NUMBER,
+--Pass throuh components
+ OVERRIDE_FLAG          VARCHAR2(1),
+ PRINT_ON_INVOICE_FLAG  VARCHAR2(1),
+ INVENTORY_ITEM_ID      NUMBER,
+ ORGANIZATION_ID        NUMBER,
+ RELATED_ITEM_ID        NUMBER,
+ RELATIONSHIP_TYPE_ID   NUMBER,
+ --ACCRUAL_QTY                NUMBER,
+ --ACCRUAL_UOM_CODE           VARCHAR2(3),
+ ESTIM_ACCRUAL_RATE           NUMBER,
+ EXPIRATION_DATE              DATE,
+ BENEFIT_PRICE_LIST_LINE_ID  NUMBER,
+ RECURRING_FLAG               VARCHAR2(1),
+ RECURRING_VALUE              NUMBER, -- block pricing
+ BENEFIT_LIMIT                NUMBER,
+ CHARGE_TYPE_CODE             VARCHAR2(30),
+ CHARGE_SUBTYPE_CODE          VARCHAR2(30),
+ INCLUDE_ON_RETURNS_FLAG      VARCHAR2(1),
+ BENEFIT_QTY                  NUMBER,
+ BENEFIT_UOM_CODE             VARCHAR2(3),
+ PRORATION_TYPE_CODE          VARCHAR2(30),
+ SOURCE_SYSTEM_CODE           VARCHAR2(30),
+ REBATE_TRANSACTION_TYPE_CODE VARCHAR2(30),
+ SECONDARY_PRICELIST_IND      VARCHAR2(1),
+ GROUP_VALUE                  NUMBER, -- This is used for LUMPSUM calculation for LINEGRP kind of modifiers
+ COMMENTS                     VARCHAR2(2000),
+ UPDATED_FLAG                 VARCHAR2(1),
+ PROCESS_CODE                 VARCHAR2(30),
+ LIMIT_CODE                   VARCHAR2(30),
+ LIMIT_TEXT                   VARCHAR2(240),
+ FORMULA_ID                   NUMBER,
+ CALCULATION_CODE             VARCHAR2(30) --This indicates if it is back_calcadj
+ ,ROUNDING_FACTOR              NUMBER, /* Vivek */
+ currency_detail_id        NUMBER, /* Vivek */
+ currency_header_id        NUMBER, /* Vivek */
+ selling_rounding_factor   NUMBER, /* Vivek */
+ order_currency            VARCHAR2(30), /* Vivek */
+ pricing_effective_date    DATE, /* Vivek */
+ base_currency_code        VARCHAR2(30), /* Vivek */
+--added for aso
+ change_reason_code		VARCHAR2(30),
+ change_reason_text		VARCHAR2(2000),
+ break_uom_code            VARCHAR2(3),  /* Proration*/
+ break_uom_context         VARCHAR2(30), /* Proration*/
+ break_uom_attribute       VARCHAR2(30)  /* Proration*/
+ );
+
+TYPE LINE_DETAIL_TBL_TYPE IS TABLE OF LINE_DETAIL_REC_TYPE INDEX BY BINARY_INTEGER;
+
+
+/*+------------------------------------------------------------
+  |PRICING REQUEST LINE DETAIL QUALIFIERS
+  +------------------------------------------------------------
+*/
+TYPE LINE_DETAIL_QUAL_REC_TYPE IS RECORD
+(LINE_DETAIL_INDEX          NUMBER,
+ QUALIFIER_CONTEXT          VARCHAR2(30),
+ QUALIFIER_ATTRIBUTE        VARCHAR2(30),
+ QUALIFIER_ATTR_VALUE_FROM  VARCHAR2(240),
+ QUALIFIER_ATTR_VALUE_TO    VARCHAR2(240),
+ COMPARISON_OPERATOR_CODE   VARCHAR2(30),
+ VALIDATED_FLAG             VARCHAR2(1),
+ STATUS_CODE             VARCHAR2(30):=NULL,
+ STATUS_TEXT             VARCHAR2(240):=NULL
+);
+
+TYPE LINE_DETAIL_QUAL_TBL_TYPE IS TABLE OF LINE_DETAIL_QUAL_REC_TYPE INDEX BY BINARY_INTEGER;
+
+/*+------------------------------------------------------------
+  |PRICING REQUEST LINE DETAIL ATTRIBUTES
+  +------------------------------------------------------------
+*/
+TYPE LINE_DETAIL_ATTR_REC_TYPE IS RECORD
+(LINE_DETAIL_INDEX      NUMBER,
+--added for usage pricing as line_index is a not null column in tmp table
+ LINE_INDEX		NUMBER,
+ PRICING_CONTEXT     VARCHAR2(30),
+ PRICING_ATTRIBUTE   VARCHAR2(30),
+ PRICING_ATTR_VALUE_FROM  VARCHAR2(240),
+ PRICING_ATTR_VALUE_TO  VARCHAR2(240),
+ VALIDATED_FLAG      VARCHAR2(1),
+ STATUS_CODE             VARCHAR2(30):=NULL,
+ STATUS_TEXT             VARCHAR2(240):=NULL
+);
+
+TYPE LINE_DETAIL_ATTR_TBL_TYPE IS TABLE OF LINE_DETAIL_ATTR_REC_TYPE INDEX BY BINARY_INTEGER;
+
+
+/*+------------------------------------------------------------
+  |PRICING REQUEST RELATED LINES
+  +------------------------------------------------------------
+*/
+TYPE RELATED_LINES_REC_TYPE IS RECORD
+(LINE_INDEX              NUMBER,
+ LINE_DETAIL_INDEX          NUMBER,
+ RELATIONSHIP_TYPE_CODE  VARCHAR2(30),
+ RELATED_LINE_INDEX         NUMBER,
+ RELATED_LINE_DETAIL_INDEX     NUMBER,
+ STATUS_CODE             VARCHAR2(30):=NULL,
+ STATUS_TEXT             VARCHAR2(240):=NULL);
+
+TYPE RELATED_LINES_TBL_TYPE IS TABLE OF RELATED_LINES_REC_TYPE INDEX BY BINARY_INTEGER;
+
+/*+--------------------------------------------------------------
+  |CONTROL RECORD
+  +--------------------------------------------------------------
+*/
+TYPE CONTROL_RECORD_TYPE IS RECORD
+(PRICING_EVENT   VARCHAR2(30),
+ CALCULATE_FLAG  VARCHAR2(30),
+ SIMULATION_FLAG VARCHAR2(1),
+ ROUNDING_FLAG    VARCHAR2(1),
+ GSA_CHECK_FLAG   VARCHAR2(1),
+ GSA_DUP_CHECK_FLAG VARCHAR2(1),
+ TEMP_TABLE_INSERT_FLAG VARCHAR2(1),
+ MANUAL_DISCOUNT_FLAG VARCHAR2(1),
+ DEBUG_FLAG           VARCHAR2(1),          --'Y' to turn on debugging
+ SOURCE_ORDER_AMOUNT_FLAG VARCHAR2(1),
+ PUBLIC_API_CALL_FLAG VARCHAR2(1),
+ MANUAL_ADJUSTMENTS_CALL_FLAG VARCHAR2(1),
+ GET_FREIGHT_FLAG VARCHAR2(1),
+--cleanup changes
+   REQUEST_TYPE_CODE VARCHAR2(30),
+   VIEW_CODE VARCHAR2(50),
+   CHECK_CUST_VIEW_FLAG VARCHAR2(1),
+--changed lines call changes
+   FULL_PRICING_CALL VARCHAR2(1), -- to indicate if passing all/changed lines
+   USE_MULTI_CURRENCY VARCHAR2(1) default 'N' -- vivek, 'Y' to use multi currency
+   ,USER_CONVERSION_RATE NUMBER default NULL -- vivek
+   ,USER_CONVERSION_TYPE VARCHAR2(30) default NULL -- vivek
+   ,FUNCTION_CURRENCY VARCHAR2(30) default NULL -- vivek
+   ,ORG_ID NUMBER default NULL -- added by prarasto for MOAC
+);
+
+--CALCULATE_FLAG can be G_CALCULATE_ONLY, G_SEARCH_ONLY, G_SEARCH_N_CALCULATE
+
+PROCEDURE PRICE_REQUEST
+(p_line_tbl               IN   LINE_TBL_TYPE,
+ p_qual_tbl               IN   QUAL_TBL_TYPE,
+ p_line_attr_tbl          IN   LINE_ATTR_TBL_TYPE,
+ p_line_detail_tbl        IN   LINE_DETAIL_TBL_TYPE,
+ p_line_detail_qual_tbl   IN   LINE_DETAIL_QUAL_TBL_TYPE,
+ p_line_detail_attr_tbl   IN   LINE_DETAIL_ATTR_TBL_TYPE,
+ p_related_lines_tbl      IN   RELATED_LINES_TBL_TYPE,
+ p_control_rec            IN   CONTROL_RECORD_TYPE,
+ x_line_tbl               OUT  NOCOPY LINE_TBL_TYPE,
+ x_line_qual              OUT  NOCOPY QUAL_TBL_TYPE,
+ x_line_attr_tbl          OUT  NOCOPY LINE_ATTR_TBL_TYPE,
+ x_line_detail_tbl        OUT  NOCOPY  LINE_DETAIL_TBL_TYPE,
+ x_line_detail_qual_tbl   OUT  NOCOPY  LINE_DETAIL_QUAL_TBL_TYPE,
+ x_line_detail_attr_tbl   OUT NOCOPY  LINE_DETAIL_ATTR_TBL_TYPE,
+ x_related_lines_tbl      OUT NOCOPY  RELATED_LINES_TBL_TYPE,
+ x_return_status          OUT NOCOPY  VARCHAR2,
+ x_return_status_text     OUT NOCOPY  VARCHAR2
+ );
+
+PROCEDURE Populate_Output
+(x_line_tbl             OUT NOCOPY LINE_TBL_TYPE,
+ x_line_qual_tbl        OUT NOCOPY QUAL_TBL_TYPE,
+ x_line_attr_tbl        OUT NOCOPY LINE_ATTR_TBL_TYPE,
+ x_line_detail_tbl      OUT NOCOPY LINE_DETAIL_TBL_TYPE,
+ x_line_detail_qual_tbl OUT NOCOPY LINE_DETAIL_QUAL_TBL_TYPE,
+ x_line_detail_attr_tbl OUT NOCOPY LINE_DETAIL_ATTR_TBL_TYPE,
+ x_related_lines_tbl    OUT NOCOPY RELATED_LINES_TBL_TYPE);
+
+PROCEDURE ENGINE_DEBUG(p_text IN VARCHAR2);
+FUNCTION GET_VERSION RETURN VARCHAR2;
+FUNCTION GET_LINE_DETAIL_INDEX RETURN PLS_INTEGER;
+
+G_LINE_CATEGORY_DEF_tbl	 varchar_type;
+G_CURRENCY_HEADER_ID_DEF_TBL	number_type; /* vivek */
+G_SELLING_ROUNDING_DEF_TBL	number_type; /* vivek */
+G_ORDER_CURRENCY_DEF_TBL	varchar_type; /* vivek */
+G_PRICING_EFF_DATE_DEF_TBL	date_type; /* vivek */
+G_BASE_CURRENCY_DEF_TBL	        varchar_type; /* vivek */
+G_CONTRACT_START_DATE_DEF_TBL	date_type;	/* shulin */
+G_CONTRACT_END_DATE_DEF_TBL	date_type;	/* shulin */
+G_LINE_UNIT_PRICE_DEF_TBL	number_type;	/* shu_latest */
+G_CATCHWEIGHT_QTY_DEF_TBL	number_type;
+G_ACTUAL_ORDER_QTY_DEF_TBL	number_type;
+G_CURRENCY_DETAIL_ID_DEF_TBL	number_type; /* sunilpandey */
+G_LDET_LINE_QUANTITY_TBL        NUMBER_TYPE;
+G_UPDATED_FLAG_DEF_TBL          VARCHAR_TYPE; -- begin shu, fix bug 2599822
+G_CALCULATION_CODE_DEF_TBL      VARCHAR_TYPE;
+G_CHANGE_REASON_CODE_DEF_TBL    VARCHAR_TYPE;
+G_CHANGE_REASON_TEXT_DEF_TBL    VARCHAR_TYPE; -- end shu
+G_LIST_LINE_ID_DEF_TBL	        number_type; /* bug 3020816 */
+G_RLTD_LIST_LINE_ID_DEF_TBL	number_type; /* bug 3020816 */
+G_REQUEST_TYPE_CODE_DEF_TBL     VARCHAR_TYPE; -- 3215497
+G_PRICING_STATUS_CODE_DEF_TBL   VARCHAR_TYPE; -- 3215497
+G_PRICING_STATUS_TEXT_DEF_TBL	varchar_type; --added by yangli for Java Engine change
+G_PROCESS_CODE_DEF_TBL          VARCHAR_TYPE; -- 3125497
+
+G_ACCUM_CONTEXT_DEF_TBL         VARCHAR_TYPE; -- accum range break
+G_ACCUM_ATTRIBUTE_DEF_TBL       VARCHAR_TYPE; -- accum range break
+G_ACCUM_FLAG_DEF_TBL            VARCHAR_TYPE; -- accum range break
+G_BREAK_UOM_CODE_DEF_TBL        VARCHAR_TYPE; /* Proration */
+G_BREAK_UOM_CONTEXT_DEF_TBL     VARCHAR_TYPE; /* Proration */
+G_BREAK_UOM_ATTRIBUTE_DEF_TBL   VARCHAR_TYPE; /* Proration */
+G_LIST_PRICE_OVERRIDE_DEF_TBL   VARCHAR_TYPE; --po integration
+G_PRICE_ADJUSTMENT_ID_DEF_TBL   NUMBER_TYPE; -- bug 3099847
+G_CHARGE_PERIODICITY_DEF_TBL    VARCHAR_3_TYPE;
+
+/*+----------------------------------------------------------------------
+  |Procedure Group INSERT_LINES2
+  +----------------------------------------------------------------------
+*/
+PROCEDURE INSERT_LINES2
+                (p_LINE_INDEX              IN NUMBER_TYPE,
+                 p_LINE_TYPE_CODE          IN VARCHAR_TYPE,
+                 p_PRICING_EFFECTIVE_DATE  IN DATE_TYPE   ,
+                 p_ACTIVE_DATE_FIRST       IN DATE_TYPE   ,
+                 p_ACTIVE_DATE_FIRST_TYPE  IN VARCHAR_TYPE,
+                 p_ACTIVE_DATE_SECOND      IN DATE_TYPE   ,
+                 p_ACTIVE_DATE_SECOND_TYPE IN VARCHAR_TYPE ,
+                 p_LINE_QUANTITY           IN NUMBER_TYPE ,
+                 p_LINE_UOM_CODE           IN VARCHAR_TYPE,
+                 p_REQUEST_TYPE_CODE       IN VARCHAR_TYPE,
+                 p_PRICED_QUANTITY         IN NUMBER_TYPE,
+                 p_PRICED_UOM_CODE         IN VARCHAR_TYPE,
+                 p_CURRENCY_CODE           IN VARCHAR_TYPE,
+                 p_UNIT_PRICE              IN NUMBER_TYPE,
+                 p_ADJUSTED_UNIT_PRICE     IN NUMBER_TYPE,
+                 p_UPD_ADJUSTED_UNIT_PRICE IN NUMBER_TYPE,
+                 p_UOM_QUANTITY           IN NUMBER_TYPE,
+                 p_PRICE_FLAG             IN VARCHAR_TYPE,
+                 p_LINE_ID                IN NUMBER_TYPE,
+                 p_ROUNDING_FACTOR        IN PLS_INTEGER_TYPE,
+                 p_PRICE_LIST_ID          IN NUMBER_TYPE,
+                 p_PRICE_REQUEST_CODE     IN VARCHAR_TYPE,
+		 p_USAGE_PRICING_TYPE     IN VARCHAR_TYPE,
+                 p_LINE_CATEGORY          IN VARCHAR_TYPE,
+                 p_CONTRACT_START_DATE	  IN DATE_TYPE,
+                 p_CONTRACT_END_DATE	  IN DATE_TYPE,
+		 p_CATCHWEIGHT_QTY	  IN NUMBER_TYPE,
+		 p_ACTUAL_ORDER_QTY	  IN NUMBER_TYPE,
+		 p_LIST_PRICE_OVERRIDE_FLAG IN VARCHAR_TYPE := G_LIST_PRICE_OVERRIDE_DEF_TBL,
+                 p_charge_periodicity_code  IN VARCHAR_3_TYPE := G_CHARGE_PERIODICITY_DEF_TBL,
+                 x_status_code            OUT NOCOPY VARCHAR2,
+                 x_status_text            OUT NOCOPY VARCHAR2 );
+
+/*+----------------------------------------------------------------------
+  |Procedure Public INSERT_LINES2
+  +----------------------------------------------------------------------
+*/
+
+PROCEDURE INSERT_LINES2
+                (p_LINE_INDEX              IN PLS_INTEGER_TYPE,
+                 p_LINE_TYPE_CODE          IN VARCHAR_TYPE,
+                 p_PRICING_EFFECTIVE_DATE  IN DATE_TYPE   ,
+                 p_ACTIVE_DATE_FIRST       IN DATE_TYPE   ,
+                 p_ACTIVE_DATE_FIRST_TYPE  IN VARCHAR_TYPE,
+                 p_ACTIVE_DATE_SECOND      IN DATE_TYPE   ,
+                 p_ACTIVE_DATE_SECOND_TYPE IN VARCHAR_TYPE ,
+                 p_LINE_QUANTITY           IN NUMBER_TYPE ,
+                 p_LINE_UOM_CODE           IN VARCHAR_TYPE,
+                 p_REQUEST_TYPE_CODE      IN VARCHAR_TYPE,
+                 p_PRICED_QUANTITY        IN NUMBER_TYPE,
+                 p_PRICED_UOM_CODE        IN VARCHAR_TYPE,
+                 p_CURRENCY_CODE          IN VARCHAR_TYPE,
+                 p_UNIT_PRICE             IN NUMBER_TYPE,
+                 p_PERCENT_PRICE          IN NUMBER_TYPE,
+                 p_UOM_QUANTITY           IN NUMBER_TYPE,
+                 p_ADJUSTED_UNIT_PRICE    IN NUMBER_TYPE,
+                 p_UPD_ADJUSTED_UNIT_PRICE    IN NUMBER_TYPE,
+                 p_PROCESSED_FLAG         IN VARCHAR_TYPE,
+                 p_PRICE_FLAG             IN VARCHAR_TYPE,
+                 p_LINE_ID                IN NUMBER_TYPE,
+                 p_PROCESSING_ORDER       IN PLS_INTEGER_TYPE,
+                 p_PRICING_STATUS_CODE    IN VARCHAR_TYPE,
+                 p_PRICING_STATUS_TEXT    IN VARCHAR_TYPE,
+                 p_ROUNDING_FLAG          IN FLAG_TYPE,
+                 p_ROUNDING_FACTOR        IN PLS_INTEGER_TYPE,
+                 p_QUALIFIERS_EXIST_FLAG  IN VARCHAR_TYPE,
+                 p_PRICING_ATTRS_EXIST_FLAG IN VARCHAR_TYPE,
+                 p_PRICE_LIST_ID          IN NUMBER_TYPE,
+                 p_VALIDATED_FLAG         IN VARCHAR_TYPE,
+                 p_PRICE_REQUEST_CODE     IN VARCHAR_TYPE,
+		 p_USAGE_PRICING_TYPE     IN VARCHAR_TYPE,
+                 p_LINE_CATEGORY          IN VARCHAR_TYPE := G_LINE_CATEGORY_DEF_TBL,
+                 p_CONTRACT_START_DATE	  IN DATE_TYPE := G_CONTRACT_START_DATE_DEF_TBL, /* shulin */
+                 p_CONTRACT_END_DATE	  IN DATE_TYPE := G_CONTRACT_END_DATE_DEF_TBL, /* shulin */
+                 p_LINE_UNIT_PRICE	  IN NUMBER_TYPE := G_LINE_UNIT_PRICE_DEF_TBL, /* shu_latest */
+		 p_CATCHWEIGHT_QTY	  IN NUMBER_TYPE := G_CATCHWEIGHT_QTY_DEF_TBL,
+		 p_ACTUAL_ORDER_QTY	  IN NUMBER_TYPE := G_ACTUAL_ORDER_QTY_DEF_TBL,
+		 p_LIST_PRICE_OVERRIDE_FLAG IN VARCHAR_TYPE := G_LIST_PRICE_OVERRIDE_DEF_TBL,
+                 p_charge_periodicity_code IN VARCHAR_3_TYPE := G_CHARGE_PERIODICITY_DEF_TBL,
+                 x_status_code            OUT NOCOPY VARCHAR2,
+                 x_status_text            OUT NOCOPY VARCHAR2 );
+
+/*+----------------------------------------------------------------------
+  |Procedure Group INSERT_LINE_ATTRS2
+  +----------------------------------------------------------------------
+*/
+
+PROCEDURE INSERT_LINE_ATTRS2
+   (    p_LINE_INDEX_tbl                NUMBER_TYPE,
+        p_LINE_DETAIL_INDEX_tbl         pls_integer_type ,
+        p_ATTRIBUTE_TYPE_tbl            varchar_type,
+        p_CONTEXT_tbl                   varchar_type,
+        p_ATTRIBUTE_tbl                 varchar_type,
+        p_VALUE_FROM_tbl                varchar_type,
+        p_VALUE_TO_tbl                  varchar_type,
+        p_VALIDATED_FLAG_tbl            varchar_type,
+        x_status_code                   OUT NOCOPY VARCHAR2,
+        x_status_text                   OUT NOCOPY VARCHAR2);
+
+/*+----------------------------------------------------------------------
+  |Procedure Public INSERT_LINE_ATTRS2
+  +----------------------------------------------------------------------
+*/
+
+PROCEDURE INSERT_LINE_ATTRS2
+   (    p_LINE_INDEX_tbl         pls_integer_type,
+        p_LINE_DETAIL_INDEX_tbl  pls_integer_type ,
+        p_ATTRIBUTE_LEVEL_tbl    varchar_type,
+        p_ATTRIBUTE_TYPE_tbl     varchar_type,
+        p_LIST_HEADER_ID_tbl     number_type,
+        p_LIST_LINE_ID_tbl       number_type,
+        p_CONTEXT_tbl            varchar_type,
+        p_ATTRIBUTE_tbl          varchar_type,
+        p_VALUE_FROM_tbl         varchar_type,
+        p_SETUP_VALUE_FROM_tbl   varchar_type,
+        p_VALUE_TO_tbl           varchar_type,
+        p_SETUP_VALUE_TO_tbl     varchar_type,
+        p_GROUPING_NUMBER_tbl    pls_integer_type,
+        p_NO_QUALIFIERS_IN_GRP_tbl      pls_integer_type,
+        p_COMPARISON_OPERATOR_TYPE_tbl  varchar_type,
+        p_VALIDATED_FLAG_tbl            varchar_type,
+        p_APPLIED_FLAG_tbl              varchar_type,
+        p_PRICING_STATUS_CODE_tbl       varchar_type,
+        p_PRICING_STATUS_TEXT_tbl       varchar_type,
+        p_QUALIFIER_PRECEDENCE_tbl      pls_integer_type,
+        p_DATATYPE_tbl                  varchar_type,
+        p_PRICING_ATTR_FLAG_tbl         varchar_type,
+        p_QUALIFIER_TYPE_tbl            varchar_type,
+        p_PRODUCT_UOM_CODE_TBL          varchar_type,
+        p_EXCLUDER_FLAG_TBL             varchar_type ,
+        p_PRICING_PHASE_ID_TBL          pls_integer_type,
+        p_INCOMPATABILITY_GRP_CODE_TBL  varchar_type,
+        p_LINE_DETAIL_TYPE_CODE_TBL     varchar_type,
+        p_MODIFIER_LEVEL_CODE_TBL       varchar_type,
+        p_PRIMARY_UOM_FLAG_TBL          varchar_type,
+        x_status_code                   OUT NOCOPY VARCHAR2,
+        x_status_text                   OUT NOCOPY VARCHAR2);
+
+/*+----------------------------------------------------------------------
+  |Procedure Group INSERT_LDETS2
+  +----------------------------------------------------------------------
+*/
+
+PROCEDURE INSERT_LDETS2
+                (p_LINE_DETAIL_INDEX           IN PLS_INTEGER_TYPE,
+                 p_LINE_DETAIL_TYPE_CODE       IN VARCHAR_TYPE,
+                 p_PRICE_BREAK_TYPE_CODE       IN VARCHAR_TYPE,
+                 p_LINE_INDEX                  IN NUMBER_TYPE,
+                 p_LIST_HEADER_ID              IN NUMBER_TYPE,
+                 p_LIST_LINE_ID                IN NUMBER_TYPE,
+                 p_LIST_LINE_TYPE_CODE         IN VARCHAR_TYPE,
+                 p_LIST_TYPE_CODE              IN VARCHAR_TYPE,
+                 p_PRICING_GROUP_SEQUENCE      IN PLS_INTEGER_TYPE,
+                 p_PRICING_PHASE_ID            IN PLS_INTEGER_TYPE,
+                 p_OPERAND_CALCULATION_CODE    IN VARCHAR_TYPE,
+                 p_OPERAND_VALUE               IN VARCHAR_TYPE,
+                 p_SUBSTITUTION_TYPE_CODE      IN VARCHAR_TYPE,
+                 p_SUBSTITUTION_VALUE_FROM     IN VARCHAR_TYPE,
+                 p_SUBSTITUTION_VALUE_TO       IN VARCHAR_TYPE,
+                 p_PRICE_FORMULA_ID            IN NUMBER_TYPE,
+                 p_PRODUCT_PRECEDENCE          IN PLS_INTEGER_TYPE,
+                 p_INCOMPATABLILITY_GRP_CODE   IN VARCHAR_TYPE,
+                 p_APPLIED_FLAG                IN VARCHAR_TYPE,
+                 p_AUTOMATIC_FLAG              IN VARCHAR_TYPE,
+                 p_OVERRIDE_FLAG               IN VARCHAR_TYPE,
+                 p_MODIFIER_LEVEL_CODE         IN VARCHAR_TYPE,
+                 p_BENEFIT_QTY                 IN NUMBER_TYPE,
+                 p_BENEFIT_UOM_CODE            IN VARCHAR_TYPE,
+                 p_LIST_LINE_NO                IN VARCHAR_TYPE,
+                 p_ACCRUAL_FLAG                IN VARCHAR_TYPE,
+                 p_ACCRUAL_CONVERSION_RATE     IN NUMBER_TYPE,
+		 p_ESTIM_ACCRUAL_RATE          IN NUMBER_TYPE,
+                 p_CHARGE_TYPE_CODE            IN VARCHAR_TYPE,
+                 p_CHARGE_SUBTYPE_CODE         IN VARCHAR_TYPE,
+		 p_LINE_QUANTITY               IN NUMBER_TYPE,
+		 p_UPDATED_FLAG                IN VARCHAR_TYPE,
+		 p_CALCULATION_CODE            IN VARCHAR_TYPE,
+		 p_CHANGE_REASON_CODE          IN VARCHAR_TYPE,
+		 p_CHANGE_REASON_TEXT          IN VARCHAR_TYPE,
+                 p_ACCUM_CONTEXT               IN VARCHAR_TYPE, -- accum range break
+                 p_ACCUM_ATTRIBUTE             IN VARCHAR_TYPE, -- accum range break
+                 p_ACCUM_FLAG                  IN VARCHAR_TYPE, -- accum range break
+		 p_BREAK_UOM_CODE              IN VARCHAR_TYPE, /* Proration*/
+		 p_BREAK_UOM_CONTEXT           IN VARCHAR_TYPE, /* Proration*/
+		 p_BREAK_UOM_ATTRIBUTE         IN VARCHAR_TYPE, /* Proration*/
+                 x_status_code                 OUT NOCOPY VARCHAR2,
+                 x_status_text                 OUT NOCOPY VARCHAR2);
+
+
+/*+----------------------------------------------------------------------
+  |Procedure Public INSERT_LDETS2
+  +----------------------------------------------------------------------
+*/
+PROCEDURE INSERT_LDETS2
+                (p_LINE_DETAIL_index           IN PLS_INTEGER_TYPE,
+                 p_LINE_DETAIL_TYPE_CODE       IN VARCHAR_TYPE,
+                 p_PRICE_BREAK_TYPE_CODE       IN VARCHAR_TYPE,
+                 p_LIST_PRICE                  IN NUMBER_TYPE,
+                 p_LINE_INDEX                  IN PLS_INTEGER_TYPE,
+                 p_CREATED_FROM_LIST_HEADER_ID IN NUMBER_TYPE,
+                 p_CREATED_FROM_LIST_LINE_ID   IN NUMBER_TYPE,
+                 p_CREATED_FROM_LIST_LINE_TYPE IN VARCHAR_TYPE,
+                 p_CREATED_FROM_LIST_TYPE_CODE IN VARCHAR_TYPE,
+                 p_CREATED_FROM_SQL            IN VARCHAR_TYPE,
+                 p_PRICING_GROUP_SEQUENCE      IN PLS_INTEGER_TYPE,
+                 P_PRICING_PHASE_ID            IN PLS_INTEGER_TYPE,
+                 p_OPERAND_CALCULATION_CODE    IN VARCHAR_TYPE,
+                 p_OPERAND_VALUE               IN VARCHAR_TYPE,
+                 p_SUBSTITUTION_TYPE_CODE      IN VARCHAR_TYPE,
+                 p_SUBSTITUTION_VALUE_FROM     IN VARCHAR_TYPE,
+                 p_SUBSTITUTION_VALUE_TO       IN VARCHAR_TYPE,
+                 p_ASK_FOR_FLAG                IN VARCHAR_TYPE,
+                 p_PRICE_FORMULA_ID            IN NUMBER_TYPE,
+                 p_PRICING_STATUS_CODE         IN VARCHAR_TYPE,
+                 p_PRICING_STATUS_TEXT         IN VARCHAR_TYPE,
+                 p_PRODUCT_PRECEDENCE          IN PLS_INTEGER_TYPE,
+                 p_INCOMPATABLILITY_GRP_CODE   IN VARCHAR_TYPE,
+                 p_PROCESSED_FLAG              IN VARCHAR_TYPE,
+                 p_APPLIED_FLAG                IN VARCHAR_TYPE,
+                 p_AUTOMATIC_FLAG              IN VARCHAR_TYPE,
+                 p_OVERRIDE_FLAG               IN VARCHAR_TYPE,
+                 p_PRIMARY_UOM_FLAG            IN VARCHAR_TYPE,
+                 p_PRINT_ON_INVOICE_FLAG       IN VARCHAR_TYPE,
+                 p_MODIFIER_LEVEL_CODE         IN VARCHAR_TYPE,
+                 p_BENEFIT_QTY                 IN NUMBER_TYPE,
+                 p_BENEFIT_UOM_CODE            IN VARCHAR_TYPE,
+                 p_LIST_LINE_NO                IN VARCHAR_TYPE,
+                 p_ACCRUAL_FLAG                IN VARCHAR_TYPE,
+                 p_ACCRUAL_CONVERSION_RATE     IN NUMBER_TYPE,
+		 p_ESTIM_ACCRUAL_RATE          IN NUMBER_TYPE,
+                 p_RECURRING_FLAG              IN VARCHAR_TYPE,
+                 p_SELECTED_VOLUME_ATTR        IN VARCHAR_TYPE,
+                 p_ROUNDING_FACTOR             IN PLS_INTEGER_TYPE,
+                 p_HEADER_LIMIT_EXISTS         IN VARCHAR_TYPE,
+                 p_LINE_LIMIT_EXISTS           IN VARCHAR_TYPE,
+                 p_CHARGE_TYPE_CODE            IN VARCHAR_TYPE,
+                 p_CHARGE_SUBTYPE_CODE         IN VARCHAR_TYPE,
+                 p_CURRENCY_DETAIL_ID          IN NUMBER_TYPE := G_CURRENCY_DETAIL_ID_DEF_TBL, /*sunilpandey */
+                 p_CURRENCY_HEADER_ID          IN NUMBER_TYPE := G_CURRENCY_HEADER_ID_DEF_TBL, /*vivek */
+                 p_SELLING_ROUNDING_FACTOR     IN NUMBER_TYPE := G_SELLING_ROUNDING_DEF_TBL, /*vivek */
+                 p_ORDER_CURRENCY              IN VARCHAR_TYPE := G_ORDER_CURRENCY_DEF_TBL, /*vivek */
+                 p_PRICING_EFFECTIVE_DATE      IN DATE_TYPE := G_PRICING_EFF_DATE_DEF_TBL,/*vivek */
+                 p_BASE_CURRENCY_CODE          IN VARCHAR_TYPE := G_BASE_CURRENCY_DEF_TBL,/*vivek */
+		 p_LINE_QUANTITY               IN NUMBER_TYPE:=G_LDET_LINE_QUANTITY_TBL,
+		 p_UPDATED_FLAG                IN VARCHAR_TYPE := G_UPDATED_FLAG_DEF_TBL, -- begin shu, fix Bug 2599822
+		 p_CALCULATION_CODE            IN VARCHAR_TYPE := G_CALCULATION_CODE_DEF_TBL,
+		 p_CHANGE_REASON_CODE          IN VARCHAR_TYPE := G_CHANGE_REASON_CODE_DEF_TBL,
+		 p_CHANGE_REASON_TEXT          IN VARCHAR_TYPE := G_CHANGE_REASON_TEXT_DEF_TBL,-- end shu,fix Bug 2599822
+		 p_PRICE_ADJUSTMENT_ID         IN NUMBER_TYPE := G_PRICE_ADJUSTMENT_ID_DEF_TBL, -- 3099847
+                 p_ACCUM_CONTEXT               IN VARCHAR_TYPE := G_ACCUM_CONTEXT_DEF_TBL, -- accum range break
+                 p_ACCUM_ATTRIBUTE             IN VARCHAR_TYPE := G_ACCUM_ATTRIBUTE_DEF_TBL, -- accum range break
+                 p_ACCUM_FLAG                  IN VARCHAR_TYPE := G_ACCUM_FLAG_DEF_TBL, -- accum range break
+		 p_BREAK_UOM_CODE              IN VARCHAR_TYPE := G_BREAK_UOM_CODE_DEF_TBL, /* Proration*/
+		 p_BREAK_UOM_CONTEXT           IN VARCHAR_TYPE := G_BREAK_UOM_CONTEXT_DEF_TBL, /* Proration*/
+		 p_BREAK_UOM_ATTRIBUTE         IN VARCHAR_TYPE := G_BREAK_UOM_ATTRIBUTE_DEF_TBL, /* Proration*/
+                 p_PROCESS_CODE                IN VARCHAR_TYPE := G_PROCESS_CODE_DEF_TBL, -- 3215497
+                 x_status_code                 OUT NOCOPY VARCHAR2,
+                 x_status_text                 OUT NOCOPY VARCHAR2);
+
+/*+----------------------------------------------------------------------
+  |Procedure INSERT_RLTD_LINES2 , API to direct insert relationship table, Bug 2599822
+  +----------------------------------------------------------------------
+*/
+PROCEDURE INSERT_RLTD_LINES2 (
+              p_LINE_INDEX                  IN PLS_INTEGER_TYPE,
+              p_LINE_DETAIL_INDEX           IN PLS_INTEGER_TYPE,
+              p_RELATIONSHIP_TYPE_CODE      IN VARCHAR_TYPE,
+              p_RELATED_LINE_INDEX          IN PLS_INTEGER_TYPE,
+              p_RELATED_LINE_DETAIL_INDEX   IN PLS_INTEGER_TYPE,
+              x_status_code                 OUT NOCOPY VARCHAR2,
+              x_status_text                 OUT NOCOPY VARCHAR2,
+              p_LIST_LINE_ID                IN NUMBER_TYPE := G_LIST_LINE_ID_DEF_TBL,/*bug 3020816*/
+              p_RELATED_LIST_LINE_ID        IN NUMBER_TYPE := G_RLTD_LIST_LINE_ID_DEF_TBL, /*bug 3020816*/
+              p_PRICING_STATUS_TEXT         IN VARCHAR_TYPE := G_PRICING_STATUS_TEXT_DEF_TBL);--added by yangli for Java Engine
+
+-- overloaded version using NUMBER_TYPE instead of PLS_INTEGER_TYPE
+-- for backwards compatibility with pre-11.5.10 code, Bug 3215497
+PROCEDURE INSERT_RLTD_LINES2 (
+              p_LINE_INDEX                  IN NUMBER_TYPE,
+              p_LINE_DETAIL_INDEX           IN NUMBER_TYPE,
+              p_RELATIONSHIP_TYPE_CODE      IN VARCHAR_TYPE,
+              p_RELATED_LINE_INDEX          IN NUMBER_TYPE,
+              p_RELATED_LINE_DETAIL_INDEX   IN NUMBER_TYPE,
+              x_status_code                 OUT NOCOPY VARCHAR2,
+              x_status_text                 OUT NOCOPY VARCHAR2,
+              p_LIST_LINE_ID                IN NUMBER_TYPE := G_LIST_LINE_ID_DEF_TBL,/*bug 3020816*/
+              p_RELATED_LIST_LINE_ID        IN NUMBER_TYPE := G_RLTD_LIST_LINE_ID_DEF_TBL, /*bug 3020816*/
+              p_PRICING_STATUS_TEXT         IN VARCHAR_TYPE := G_PRICING_STATUS_TEXT_DEF_TBL);--added by yangli for Java Engine
+
+-- shu, wrapper to call vivek's rounding API, which update the rounding_factor in qp_preq_lines_tmp table
+PROCEDURE UPDATE_ROUNDING_FACTOR (
+p_mcurr_installed_used_flag	IN  VARCHAR2, -- this is needed by qp_util_pub.get_rounding_factor
+x_status_code                   OUT NOCOPY VARCHAR2,
+x_status_text                   OUT NOCOPY VARCHAR2);
+
+--hw
+-- global flag for new pricing engine call for caching purpose
+G_NEW_PRICING_CALL				varchar2(1) := G_YES;
+
+--hw 7/27/02
+-- session time and redo
+g_total_time			number := 0;
+g_total_redo			number := 0;
+g_start_time			number := 0;
+g_start_redo			number := 0;
+
+PROCEDURE Set_QP_Debug;
+
+--Begin:  pattern_engine procedures for create_pattern - SMUHAMME
+PROCEDURE populate_segment_id(x_status_code OUT NOCOPY VARCHAR2, x_status_text OUT NOCOPY VARCHAR2);
+PROCEDURE create_pattern(p_pricing_phase_id NUMBER, x_status_code OUT NOCOPY VARCHAR2, x_status_text OUT NOCOPY VARCHAR2);
+--End:  pattern_engine procedures for create_pattern - SMUHAMME
+
+-- Start KDURGASI changes for pattern based select modifiers
+PROCEDURE Select_modifiers_patrn(
+				p_pricing_phase_id IN NUMBER,
+				p_freeze_override_flag IN VARCHAR2,
+				p_search_path IN NUMBER,
+				x_status_code OUT NOCOPY VARCHAR2,
+				x_status_text OUT NOCOPY VARCHAR2);
+
+PROCEDURE QP_EVALUATE_OTHER_OPERATORS
+				(p_pricing_phase_id varchar2,
+				p_stage varchar2,
+				x_status_code OUT nocopy VARCHAR2,
+				x_status_text OUT nocopy VARCHAR2);
+
+PROCEDURE Populate_Pat_Temp_Tables(
+    p_pricing_phase_id     IN  NUMBER,
+    p_stage                IN VARCHAR2,
+    x_status_code          OUT NOCOPY VARCHAR2,
+    x_status_text          OUT NOCOPY VARCHAR2);
+
+PROCEDURE Populate_Temp_Tables_NEQ_BTW(
+    p_pricing_phase_id IN  NUMBER,
+    p_stage IN VARCHAR2,
+    x_status_code OUT NOCOPY VARCHAR2,
+    x_status_text OUT NOCOPY VARCHAR2);
+
+-- End KDURGASI changes for pattern based select modifiers
+
+END;
+
+/

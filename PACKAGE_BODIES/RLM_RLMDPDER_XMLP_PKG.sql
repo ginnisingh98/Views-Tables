@@ -1,0 +1,359 @@
+--------------------------------------------------------
+--  DDL for Package Body RLM_RLMDPDER_XMLP_PKG
+--------------------------------------------------------
+
+  CREATE OR REPLACE EDITIONABLE PACKAGE BODY "APPS"."RLM_RLMDPDER_XMLP_PKG" AS
+/* $Header: RLMDPDERB.pls 120.0 2008/01/25 09:40:12 krreddy noship $ */
+  FUNCTION BETWEENPAGE RETURN BOOLEAN IS
+  BEGIN
+    RETURN (TRUE);
+  END BETWEENPAGE;
+
+  FUNCTION BEFOREPFORM RETURN BOOLEAN IS
+  BEGIN
+    RETURN (TRUE);
+  END BEFOREPFORM;
+
+  FUNCTION BEFOREREPORT RETURN BOOLEAN IS
+    P_DATE_FROM VARCHAR2(30) := NULL;
+    P_DATE_TO VARCHAR2(30) := NULL;
+    L_CURRENT_ORG_ID NUMBER;
+    L_OU_NAME VARCHAR2(240);
+  BEGIN
+    BEGIN
+      P_CONC_REQUEST_ID := FND_GLOBAL.CONC_REQUEST_ID;
+      /*SRW.USER_EXIT('FND SRWINIT')*/NULL;
+    EXCEPTION
+      WHEN /*SRW.USER_EXIT_FAILURE*/OTHERS THEN
+        /*SRW.MESSAGE(1000
+                   ,'Failed in BEFORE REPORT trigger')*/NULL;
+        RETURN (FALSE);
+    END;
+    L_CURRENT_ORG_ID := MO_GLOBAL.GET_CURRENT_ORG_ID;
+    IF (L_CURRENT_ORG_ID IS NULL AND P_ORG_ID IS NOT NULL) THEN
+      MO_GLOBAL.SET_POLICY_CONTEXT(P_ACCESS_MODE => 'S'
+                                  ,P_ORG_ID => P_ORG_ID);
+      L_CURRENT_ORG_ID := P_ORG_ID;
+    END IF;
+    L_OU_NAME := FND_ACCESS_CONTROL_UTIL.GET_ORG_NAME(L_CURRENT_ORG_ID);
+    CP_DEFAULT_OU := L_OU_NAME;
+    CP_ORG_ID := L_CURRENT_ORG_ID;
+    BEGIN
+      P_DATE_FROM := TO_CHAR(P_CREATION_DATE
+                            ,'DD-MON-RRRR');
+      P_DATE_TO := TO_CHAR(P_CREATION_DATE_TO
+                          ,'DD-MON-RRRR');
+      IF (P_WHERE_CLAUSE IS  NULL) THEN
+        P_WHERE_CLAUSE := '  ';
+
+      END IF;
+      IF (P_WHERE_CLAUSE1 IS  NULL) THEN
+        P_WHERE_CLAUSE1 := '  ';
+
+      END IF;
+            IF (P_WHERE_CLAUSE2 IS  NULL) THEN
+        P_WHERE_CLAUSE2 := '  ';
+
+      END IF;
+
+      IF (P_REQUEST_ID_FROM IS NOT NULL) THEN
+        P_WHERE_CLAUSE := ' and e.request_id >= ' || TO_CHAR(P_REQUEST_ID_FROM);
+
+      END IF;
+      IF (P_REQUEST_ID_TO IS NOT NULL) THEN
+        P_WHERE_CLAUSE := P_WHERE_CLAUSE || ' and e.request_id <= ' || TO_CHAR(P_REQUEST_ID_TO);
+      END IF;
+      IF (P_SHIP_FROM_ORG IS NOT NULL) THEN
+        P_WHERE_CLAUSE := P_WHERE_CLAUSE || ' and e.cust_ship_from_org_ext like ' || '''' || P_SHIP_FROM_ORG || '''';
+      END IF;
+      IF (P_CUSTOMER_FROM IS NOT NULL) THEN
+        P_WHERE_CLAUSE := P_WHERE_CLAUSE || ' and e.cust_name_ext >= ' || '''' || P_CUSTOMER_FROM || '''';
+      END IF;
+      IF (P_CUSTOMER_TO IS NOT NULL) THEN
+        P_WHERE_CLAUSE := P_WHERE_CLAUSE || ' and e.cust_name_ext <= ' || '''' || P_CUSTOMER_TO || '''';
+      END IF;
+      IF (P_TRADING_PARTNER_FROM IS NOT NULL) THEN
+        P_WHERE_CLAUSE := P_WHERE_CLAUSE || '  and e.ece_tp_translator_code >= ' || '''' || P_TRADING_PARTNER_FROM || '''';
+      END IF;
+      IF (P_TRADING_PARTNER_TO IS NOT NULL) THEN
+        P_WHERE_CLAUSE := P_WHERE_CLAUSE || '  and e.ece_tp_translator_code <= ' || '''' || P_TRADING_PARTNER_TO || '''';
+      END IF;
+      IF (P_TP_LOCATION IS NOT NULL) THEN
+        P_WHERE_CLAUSE := P_WHERE_CLAUSE || ' and e.ece_tp_location_code_ext like ' || '''' || P_TP_LOCATION || '''';
+      END IF;
+      IF (P_CUSTOMER_ITEM_FROM IS NOT NULL) THEN
+        P_WHERE_CLAUSE := P_WHERE_CLAUSE || ' and e.customer_item_ext >= ' || '''' || P_CUSTOMER_ITEM_FROM || '''';
+      END IF;
+      IF (P_CUSTOMER_ITEM_TO IS NOT NULL) THEN
+        P_WHERE_CLAUSE := P_WHERE_CLAUSE || ' and e.customer_item_ext <= ' || '''' || P_CUSTOMER_ITEM_TO || '''';
+      END IF;
+      IF (P_ITEM_FROM IS NOT NULL) THEN
+        P_WHERE_CLAUSE := P_WHERE_CLAUSE || ' and e.inventory_item >= ' || '''' || P_ITEM_FROM || '''';
+      END IF;
+      IF (P_ITEM_TO IS NOT NULL) THEN
+        P_WHERE_CLAUSE := P_WHERE_CLAUSE || ' and e.inventory_item <= ' || '''' || P_ITEM_TO || '''';
+      END IF;
+      IF (P_ORDER_NUMBER_FROM IS NOT NULL) THEN
+        P_WHERE_CLAUSE1 := P_WHERE_CLAUSE1 || ' and oh.order_number >= ' || TO_CHAR(P_ORDER_NUMBER_FROM);
+        P_WHERE_CLAUSE2 := P_WHERE_CLAUSE2 || ' and e.exception_id = -1';
+      END IF;
+      IF (P_ORDER_NUMBER_TO IS NOT NULL) THEN
+        P_WHERE_CLAUSE2 := P_WHERE_CLAUSE2 || ' and e.exception_id = -1';
+        P_WHERE_CLAUSE1 := P_WHERE_CLAUSE1 || ' and oh.order_number <= ' || TO_CHAR(P_ORDER_NUMBER_TO);
+      END IF;
+      IF (P_ORDER_TYPE_FROM IS NOT NULL) THEN
+        P_WHERE_CLAUSE2 := P_WHERE_CLAUSE2 || ' and e.exception_id = -1';
+        P_WHERE_CLAUSE1 := P_WHERE_CLAUSE1 || ' and oh.order_type_id >= ' || TO_CHAR(P_ORDER_TYPE_FROM);
+        SELECT
+          NAME
+        INTO P_ORDER_TYPE_NAME_FROM
+        FROM
+          OE_ORDER_TYPES_V
+        WHERE ORDER_TYPE_ID = P_ORDER_TYPE_FROM;
+      END IF;
+      IF (P_ORDER_TYPE_TO IS NOT NULL) THEN
+        P_WHERE_CLAUSE2 := P_WHERE_CLAUSE2 || ' and e.exception_id = -1';
+        P_WHERE_CLAUSE1 := P_WHERE_CLAUSE1 || ' and oh.order_type_id <= ' || TO_CHAR(P_ORDER_TYPE_TO);
+        SELECT
+          NAME
+        INTO P_ORDER_TYPE_NAME_TO
+        FROM
+          OE_ORDER_TYPES_V
+        WHERE ORDER_TYPE_ID = P_ORDER_TYPE_TO;
+      END IF;
+      IF (P_SCHEDULE_NUMBER_FROM IS NOT NULL) THEN
+        P_WHERE_CLAUSE := P_WHERE_CLAUSE || ' and e.schedule_reference_num >= ' || '''' || P_SCHEDULE_NUMBER_FROM || '''';
+      END IF;
+      IF (P_SCHEDULE_NUMBER_TO IS NOT NULL) THEN
+        P_WHERE_CLAUSE := P_WHERE_CLAUSE || ' and e.schedule_reference_num <= ' || '''' || P_SCHEDULE_NUMBER_TO || '''';
+      END IF;
+      IF (P_CREATION_DATE IS NOT NULL) THEN
+        P_WHERE_CLAUSE := P_WHERE_CLAUSE || ' and trunc(e.creation_date) >= to_date( ' || '''' || P_DATE_FROM || '''' || ',' || ' ''DD-MON-RRRR'' ' || ')';
+      END IF;
+      IF (P_CREATION_DATE_TO IS NOT NULL) THEN
+        P_WHERE_CLAUSE := P_WHERE_CLAUSE || ' and trunc(e.creation_date) <= to_date( ' || '''' || P_DATE_TO || '''' || ',' || ' ''DD-MON-RRRR'' ' || ')';
+      END IF;
+      IF (P_EXCEPTION_SEVERITY IS NOT NULL) THEN
+        P_WHERE_CLAUSE := P_WHERE_CLAUSE || ' and e.exception_level = ' || '''' || P_EXCEPTION_SEVERITY || '''';
+      END IF;
+      IF (P_MESSAGE_CATEGORY_FROM IS NOT NULL) THEN
+        P_WHERE_CLAUSE := P_WHERE_CLAUSE || ' and msg.message_category >= ' || TO_CHAR(P_MESSAGE_CATEGORY_FROM);
+      END IF;
+      IF (P_MESSAGE_CATEGORY_TO IS NOT NULL) THEN
+        P_WHERE_CLAUSE := P_WHERE_CLAUSE || ' and msg.message_category <= ' || TO_CHAR(P_MESSAGE_CATEGORY_TO);
+      END IF;
+      IF (P_SORT_BY IS NOT NULL) THEN
+        IF P_SORT_BY = 'CUSTOMER' THEN
+          P_ORDER_BY := 'order by customer_name';
+        ELSIF P_SORT_BY = 'CUSTOMER_ITEM' THEN
+          P_ORDER_BY := 'order by customer item';
+        ELSIF P_SORT_BY = 'MESSAGE_CATEGORY' THEN
+          P_ORDER_BY := 'order by message_category';
+        ELSIF P_SORT_BY = 'ORDER_NUMBER' THEN
+          P_ORDER_BY := 'order by oe_order_number';
+        ELSIF P_SORT_BY = 'REQUEST_ID' THEN
+          P_ORDER_BY := 'order by request_id';
+        ELSIF P_SORT_BY = 'SCHEDULE_NUMBER' THEN
+          P_ORDER_BY := 'order by schedule_num';
+        ELSIF P_SORT_BY = 'SHIP_FROM' THEN
+          P_ORDER_BY := 'order by ship_from';
+        ELSIF P_SORT_BY = 'SHIP_TO' THEN
+          P_ORDER_BY := 'order by ship_to';
+        ELSIF P_SORT_BY = 'TP_LOCATION' THEN
+          P_ORDER_BY := 'order by tp_location';
+        ELSIF P_SORT_BY = 'TRADING_PARTNER' THEN
+          P_ORDER_BY := 'order by trading_partner';
+        END IF;
+      END IF;
+    END;
+    RETURN (TRUE);
+  END BEFOREREPORT;
+
+  FUNCTION CF_QUANTITY_TYPEFORMULA(QTY_TYPE_CODE IN VARCHAR2) RETURN VARCHAR2 IS
+  BEGIN
+    DECLARE
+      X_QTY_TYPE VARCHAR2(8);
+    BEGIN
+      IF QTY_TYPE_CODE = 'CUMULATIVE' THEN
+        X_QTY_TYPE := 'Yes';
+      ELSE
+        X_QTY_TYPE := 'No';
+      END IF;
+      RETURN X_QTY_TYPE;
+    EXCEPTION
+      WHEN OTHERS THEN
+        RETURN '-1';
+    END;
+    RETURN NULL;
+  END CF_QUANTITY_TYPEFORMULA;
+
+  FUNCTION CF_ITEM_DETAIL_TYPEFORMULA(ITEM_DETAIL_TYPE IN VARCHAR2) RETURN VARCHAR2 IS
+  BEGIN
+    DECLARE
+      X_ITEM_DETAIL_TYPE VARCHAR2(80);
+      CURSOR LOOKUP_CUR IS
+        SELECT
+          MEANING
+        FROM
+          FND_LOOKUPS
+        WHERE LOOKUP_TYPE = 'RLM_DETAIL_TYPE_CODE'
+          AND LOOKUP_CODE = ITEM_DETAIL_TYPE;
+    BEGIN
+      IF LOOKUP_CUR%ISOPEN THEN
+        CLOSE LOOKUP_CUR;
+      END IF;
+      OPEN LOOKUP_CUR;
+      FETCH LOOKUP_CUR
+       INTO X_ITEM_DETAIL_TYPE;
+      CLOSE LOOKUP_CUR;
+      RETURN X_ITEM_DETAIL_TYPE;
+    EXCEPTION
+      WHEN OTHERS THEN
+        RETURN '-1';
+    END;
+    RETURN NULL;
+  END CF_ITEM_DETAIL_TYPEFORMULA;
+
+  FUNCTION CF_ITEM_DETAIL_SUBTYPEFORMULA(ITEM_DETAIL_SUBTYPE IN VARCHAR2) RETURN VARCHAR2 IS
+  BEGIN
+    DECLARE
+      X_ITEM_DETAIL_SUBTYPE VARCHAR2(80);
+      CURSOR LOOKUP_CUR IS
+        SELECT
+          MEANING
+        FROM
+          FND_LOOKUPS
+        WHERE LOOKUP_TYPE = 'RLM_DETAIL_SUBTYPE_CODE'
+          AND LOOKUP_CODE = ITEM_DETAIL_SUBTYPE;
+    BEGIN
+      IF LOOKUP_CUR%ISOPEN THEN
+        CLOSE LOOKUP_CUR;
+      END IF;
+      OPEN LOOKUP_CUR;
+      FETCH LOOKUP_CUR
+       INTO X_ITEM_DETAIL_SUBTYPE;
+      CLOSE LOOKUP_CUR;
+      RETURN X_ITEM_DETAIL_SUBTYPE;
+    EXCEPTION
+      WHEN OTHERS THEN
+        RETURN '-1';
+    END;
+    RETURN NULL;
+  END CF_ITEM_DETAIL_SUBTYPEFORMULA;
+
+  FUNCTION CF_ORDER_TYPEFORMULA(ORDER_TYPE_ID IN NUMBER) RETURN VARCHAR2 IS
+  BEGIN
+    DECLARE
+      X_ORDER_TYPE VARCHAR2(80);
+      CURSOR ORDER_TYPE_CUR IS
+        SELECT
+          NAME
+        FROM
+          OE_ORDER_TYPES_V
+        WHERE ORDER_TYPE_ID = ORDER_TYPE_ID;
+    BEGIN
+      IF ORDER_TYPE_CUR%ISOPEN THEN
+        CLOSE ORDER_TYPE_CUR;
+      END IF;
+      OPEN ORDER_TYPE_CUR;
+      FETCH ORDER_TYPE_CUR
+       INTO X_ORDER_TYPE;
+      CLOSE ORDER_TYPE_CUR;
+      RETURN X_ORDER_TYPE;
+    EXCEPTION
+      WHEN OTHERS THEN
+        RETURN '-1';
+    END;
+    RETURN NULL;
+  END CF_ORDER_TYPEFORMULA;
+
+  FUNCTION AFTERREPORT RETURN BOOLEAN IS
+  BEGIN
+    BEGIN
+      /*SRW.USER_EXIT('FND SRWEXIT')*/NULL;
+    EXCEPTION
+      WHEN /*SRW.USER_EXIT_FAILURE*/OTHERS THEN
+        /*SRW.MESSAGE(1
+                   ,'Failed in AFTER REPORT TRIGGER')*/NULL;
+        RETURN (FALSE);
+    END;
+    RETURN (TRUE);
+  END AFTERREPORT;
+
+  FUNCTION CF_SCHEDULE_TYPEFORMULA(SCHEDULE_TYPE IN VARCHAR2) RETURN VARCHAR2 IS
+  BEGIN
+    DECLARE
+      X_SCHEDULE_TYPE VARCHAR2(80);
+    BEGIN
+      SELECT
+        MEANING
+      INTO X_SCHEDULE_TYPE
+      FROM
+        FND_LOOKUPS
+      WHERE LOOKUP_TYPE = 'RLM_SCHEDULE_TYPE'
+        AND LOOKUP_CODE = SCHEDULE_TYPE;
+      RETURN X_SCHEDULE_TYPE;
+    EXCEPTION
+      WHEN OTHERS THEN
+        RETURN '-1';
+    END;
+    RETURN NULL;
+  END CF_SCHEDULE_TYPEFORMULA;
+
+  FUNCTION CF_SCHEDULE_PURPOSEFORMULA(SCHEDULE_PURPOSE IN VARCHAR2) RETURN VARCHAR2 IS
+  BEGIN
+    DECLARE
+      X_SCHEDULE_PURPOSE VARCHAR2(80);
+    BEGIN
+      SELECT
+        MEANING
+      INTO X_SCHEDULE_PURPOSE
+      FROM
+        FND_LOOKUPS
+      WHERE LOOKUP_TYPE = 'RLM_SCHEDULE_PURPOSE'
+        AND LOOKUP_CODE = SCHEDULE_PURPOSE;
+      RETURN X_SCHEDULE_PURPOSE;
+    EXCEPTION
+      WHEN OTHERS THEN
+        RETURN '-1';
+    END;
+    RETURN NULL;
+  END CF_SCHEDULE_PURPOSEFORMULA;
+
+  FUNCTION CF_SCHEDULE_SOURCEFORMULA(SCHEDULE_SOURCE IN VARCHAR2) RETURN VARCHAR2 IS
+  BEGIN
+    DECLARE
+      X_SCHEDULE_SOURCE VARCHAR2(25);
+    BEGIN
+      IF SCHEDULE_SOURCE = 'MANUAL' THEN
+        SELECT
+          MEANING
+        INTO X_SCHEDULE_SOURCE
+        FROM
+          FND_LOOKUPS
+        WHERE LOOKUP_TYPE = 'RLM_SCHEDULE_SOURCE'
+          AND LOOKUP_CODE = SCHEDULE_SOURCE;
+      ELSE
+        X_SCHEDULE_SOURCE := SCHEDULE_SOURCE;
+      END IF;
+      RETURN X_SCHEDULE_SOURCE;
+    EXCEPTION
+      WHEN OTHERS THEN
+        RETURN '-1';
+    END;
+    RETURN NULL;
+  END CF_SCHEDULE_SOURCEFORMULA;
+
+  FUNCTION CP_DEFAULT_OU_P RETURN VARCHAR2 IS
+  BEGIN
+    RETURN CP_DEFAULT_OU;
+  END CP_DEFAULT_OU_P;
+
+  FUNCTION CP_ORG_ID_P RETURN NUMBER IS
+  BEGIN
+    RETURN CP_ORG_ID;
+  END CP_ORG_ID_P;
+
+END RLM_RLMDPDER_XMLP_PKG;
+
+/

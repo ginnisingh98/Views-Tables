@@ -1,0 +1,28 @@
+--------------------------------------------------------
+--  DDL for Package XNP_PIPE
+--------------------------------------------------------
+
+  CREATE OR REPLACE EDITIONABLE PACKAGE "APPS"."XNP_PIPE" AUTHID CURRENT_USER AS
+/* $Header: XNPPIPES.pls 120.2 2006/02/13 07:54:20 dputhiye ship $ */
+
+-- Reads from the specified pipe
+--
+PROCEDURE READ( P_PIPE_NAME IN VARCHAR2
+        ,X_MSG_TEXT OUT NOCOPY VARCHAR2
+	,X_ERROR_CODE OUT NOCOPY NUMBER
+	,X_ERROR_MESSAGE OUT NOCOPY VARCHAR2
+	,P_TIMEOUT IN NUMBER DEFAULT 0 );
+
+-- Writes to the specified pipe
+--
+PROCEDURE WRITE( P_PIPE_NAME IN VARCHAR2
+        ,P_MSG_TEXT IN VARCHAR2
+	,X_ERROR_CODE OUT NOCOPY NUMBER
+	,X_ERROR_MESSAGE OUT NOCOPY VARCHAR2
+	,P_TIMEOUT IN NUMBER DEFAULT 0 );
+
+END XNP_PIPE ;
+
+ 
+
+/

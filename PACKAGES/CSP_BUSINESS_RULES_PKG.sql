@@ -1,0 +1,173 @@
+--------------------------------------------------------
+--  DDL for Package CSP_BUSINESS_RULES_PKG
+--------------------------------------------------------
+
+  CREATE OR REPLACE EDITIONABLE PACKAGE "APPS"."CSP_BUSINESS_RULES_PKG" AUTHID CURRENT_USER as
+/* $Header: csptbrus.pls 120.2 2007/12/09 20:25:32 hhaugeru ship $ */
+-- Start of Comments
+-- Package name     : CSP_BUSINESS_RULES_PKG
+-- Purpose          :
+-- History          :
+-- NOTE             :
+-- End of Comments
+
+PROCEDURE Insert_Row(
+          px_BUSINESS_RULE_ID   IN OUT NOCOPY NUMBER,
+          p_CREATED_BY            NUMBER,
+          p_CREATION_DATE         DATE,
+          p_LAST_UPDATED_BY       NUMBER,
+          p_LAST_UPDATE_DATE      DATE,
+          p_LAST_UPDATE_LOGIN     NUMBER,
+          p_BUSINESS_RULE_NAME    VARCHAR2,
+          p_DESCRIPTION    	  VARCHAR2,
+          p_BUSINESS_RULE_TYPE    VARCHAR2,
+	  p_BUSINESS_RULE_VALUE1  NUMBER,
+	  p_BUSINESS_RULE_VALUE2  NUMBER,
+	  p_BUSINESS_RULE_VALUE3  NUMBER,
+	  p_BUSINESS_RULE_VALUE4  NUMBER,
+	  p_BUSINESS_RULE_VALUE5  NUMBER,
+	  p_BUSINESS_RULE_VALUE6  NUMBER,
+	  p_BUSINESS_RULE_VALUE7  NUMBER,
+	  p_BUSINESS_RULE_VALUE8  NUMBER,
+	  p_BUSINESS_RULE_VALUE9  NUMBER,
+	  p_BUSINESS_RULE_VALUE10 NUMBER,
+	  p_BUSINESS_RULE_VALUE11 NUMBER,
+	  p_BUSINESS_RULE_VALUE12 NUMBER,
+	  p_BUSINESS_RULE_VALUE13 NUMBER,
+	  p_BUSINESS_RULE_VALUE14 NUMBER,
+	  p_BUSINESS_RULE_VALUE15 NUMBER,
+	  p_BUSINESS_RULE_VALUE16 NUMBER default null,
+	  p_BUSINESS_RULE_VALUE17 NUMBER default null,
+	  p_BUSINESS_RULE_VALUE18 NUMBER default null,
+	  p_BUSINESS_RULE_VALUE19 NUMBER default null,
+	  p_BUSINESS_RULE_VALUE20 NUMBER default null,
+          p_ATTRIBUTE_CATEGORY    VARCHAR2,
+          p_ATTRIBUTE1    VARCHAR2,
+          p_ATTRIBUTE2    VARCHAR2,
+          p_ATTRIBUTE3    VARCHAR2,
+          p_ATTRIBUTE4    VARCHAR2,
+          p_ATTRIBUTE5    VARCHAR2,
+          p_ATTRIBUTE6    VARCHAR2,
+          p_ATTRIBUTE7    VARCHAR2,
+          p_ATTRIBUTE8    VARCHAR2,
+          p_ATTRIBUTE9    VARCHAR2,
+          p_ATTRIBUTE10    VARCHAR2,
+          p_ATTRIBUTE11    VARCHAR2,
+          p_ATTRIBUTE12    VARCHAR2,
+          p_ATTRIBUTE13    VARCHAR2,
+          p_ATTRIBUTE14    VARCHAR2,
+          p_ATTRIBUTE15    VARCHAR2);
+
+PROCEDURE Update_Row(
+          p_BUSINESS_RULE_ID   			NUMBER,
+          p_CREATED_BY   			NUMBER,
+          p_CREATION_DATE    			DATE,
+          p_LAST_UPDATED_BY    			NUMBER,
+          p_LAST_UPDATE_DATE    		DATE,
+          p_LAST_UPDATE_LOGIN    		NUMBER,
+          p_BUSINESS_RULE_NAME    		VARCHAR2,
+          p_DESCRIPTION    			VARCHAR2,
+          p_BUSINESS_RULE_TYPE    		VARCHAR2,
+	  p_BUSINESS_RULE_VALUE1  		NUMBER,
+	  p_BUSINESS_RULE_VALUE2  		NUMBER,
+	  p_BUSINESS_RULE_VALUE3  		NUMBER,
+	  p_BUSINESS_RULE_VALUE4  		NUMBER,
+	  p_BUSINESS_RULE_VALUE5  		NUMBER,
+	  p_BUSINESS_RULE_VALUE6  		NUMBER,
+	  p_BUSINESS_RULE_VALUE7  		NUMBER,
+	  p_BUSINESS_RULE_VALUE8  		NUMBER,
+	  p_BUSINESS_RULE_VALUE9  		NUMBER,
+	  p_BUSINESS_RULE_VALUE10  		NUMBER,
+	  p_BUSINESS_RULE_VALUE11  		NUMBER,
+	  p_BUSINESS_RULE_VALUE12 	 	NUMBER,
+	  p_BUSINESS_RULE_VALUE13 	 	NUMBER,
+	  p_BUSINESS_RULE_VALUE14 	 	NUMBER,
+	  p_BUSINESS_RULE_VALUE15 	 	NUMBER,
+	  p_BUSINESS_RULE_VALUE16 	 	NUMBER default null,
+	  p_BUSINESS_RULE_VALUE17 	 	NUMBER default null,
+	  p_BUSINESS_RULE_VALUE18 	 	NUMBER default null,
+	  p_BUSINESS_RULE_VALUE19 	 	NUMBER default null,
+	  p_BUSINESS_RULE_VALUE20 	 	NUMBER default null,
+          p_ATTRIBUTE_CATEGORY    		VARCHAR2,
+          p_ATTRIBUTE1    			VARCHAR2,
+          p_ATTRIBUTE2    			VARCHAR2,
+          p_ATTRIBUTE3    			VARCHAR2,
+          p_ATTRIBUTE4    			VARCHAR2,
+          p_ATTRIBUTE5    			VARCHAR2,
+          p_ATTRIBUTE6    			VARCHAR2,
+          p_ATTRIBUTE7    			VARCHAR2,
+          p_ATTRIBUTE8    			VARCHAR2,
+          p_ATTRIBUTE9    			VARCHAR2,
+          p_ATTRIBUTE10    			VARCHAR2,
+          p_ATTRIBUTE11    			VARCHAR2,
+          p_ATTRIBUTE12    			VARCHAR2,
+          p_ATTRIBUTE13    			VARCHAR2,
+          p_ATTRIBUTE14    			VARCHAR2,
+          p_ATTRIBUTE15    			VARCHAR2);
+
+PROCEDURE Lock_Row(
+          p_BUSINESS_RULE_ID   			NUMBER,
+          p_CREATED_BY   			NUMBER,
+          p_CREATION_DATE    			DATE,
+          p_LAST_UPDATED_BY    			NUMBER,
+          p_LAST_UPDATE_DATE    		DATE,
+          p_LAST_UPDATE_LOGIN    		NUMBER,
+          p_BUSINESS_RULE_NAME    		VARCHAR2,
+          p_DESCRIPTION    			VARCHAR2,
+          p_BUSINESS_RULE_TYPE    		VARCHAR2,
+	  p_BUSINESS_RULE_VALUE1  		NUMBER,
+	  p_BUSINESS_RULE_VALUE2  		NUMBER,
+	  p_BUSINESS_RULE_VALUE3  		NUMBER,
+	  p_BUSINESS_RULE_VALUE4  		NUMBER,
+	  p_BUSINESS_RULE_VALUE5  		NUMBER,
+	  p_BUSINESS_RULE_VALUE6  		NUMBER,
+	  p_BUSINESS_RULE_VALUE7  		NUMBER,
+	  p_BUSINESS_RULE_VALUE8  		NUMBER,
+	  p_BUSINESS_RULE_VALUE9  		NUMBER,
+	  p_BUSINESS_RULE_VALUE10  		NUMBER,
+	  p_BUSINESS_RULE_VALUE11  		NUMBER,
+	  p_BUSINESS_RULE_VALUE12 	 	NUMBER,
+	  p_BUSINESS_RULE_VALUE13 	 	NUMBER,
+	  p_BUSINESS_RULE_VALUE14 	 	NUMBER,
+	  p_BUSINESS_RULE_VALUE15 	 	NUMBER,
+	  p_BUSINESS_RULE_VALUE16 	 	NUMBER default null,
+	  p_BUSINESS_RULE_VALUE17 	 	NUMBER default null,
+	  p_BUSINESS_RULE_VALUE18 	 	NUMBER default null,
+	  p_BUSINESS_RULE_VALUE19 	 	NUMBER default null,
+	  p_BUSINESS_RULE_VALUE20 	 	NUMBER default null,
+          p_ATTRIBUTE_CATEGORY    		VARCHAR2,
+          p_ATTRIBUTE1    			VARCHAR2,
+          p_ATTRIBUTE2    			VARCHAR2,
+          p_ATTRIBUTE3    			VARCHAR2,
+          p_ATTRIBUTE4    			VARCHAR2,
+          p_ATTRIBUTE5    			VARCHAR2,
+          p_ATTRIBUTE6    			VARCHAR2,
+          p_ATTRIBUTE7    			VARCHAR2,
+          p_ATTRIBUTE8    			VARCHAR2,
+          p_ATTRIBUTE9    			VARCHAR2,
+          p_ATTRIBUTE10    			VARCHAR2,
+          p_ATTRIBUTE11    			VARCHAR2,
+          p_ATTRIBUTE12    			VARCHAR2,
+          p_ATTRIBUTE13    			VARCHAR2,
+          p_ATTRIBUTE14    			VARCHAR2,
+          p_ATTRIBUTE15    			VARCHAR2);
+
+PROCEDURE Delete_Row(
+    p_BUSINESS_RULE_ID  NUMBER);
+
+procedure ADD_LANGUAGE;
+
+PROCEDURE Translate_Row
+( p_business_rule_id IN  NUMBER
+, p_description       IN  VARCHAR2
+, p_owner             IN VARCHAR2
+);
+
+ PROCEDURE Load_Row
+ ( p_business_rule_id IN  NUMBER
+ , p_description       IN  VARCHAR2
+ , p_owner             IN  VARCHAR2
+ );
+End CSP_BUSINESS_RULES_PKG;
+
+/

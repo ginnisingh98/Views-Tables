@@ -1,0 +1,378 @@
+--------------------------------------------------------
+--  DDL for Package Body JA_JAINSTR_XMLP_PKG
+--------------------------------------------------------
+
+  CREATE OR REPLACE EDITIONABLE PACKAGE BODY "APPS"."JA_JAINSTR_XMLP_PKG" AS
+/* $Header: JAINSTRB.pls 120.1 2007/12/25 16:31:53 dwkrishn noship $ */
+  FUNCTION BEFOREREPORT RETURN BOOLEAN IS
+    CURSOR C_PROGRAM_ID(P_REQUEST_ID IN NUMBER) IS
+      SELECT
+        CONCURRENT_PROGRAM_ID,
+        NVL(ENABLE_TRACE
+           ,'N')
+      FROM
+        FND_CONCURRENT_REQUESTS
+      WHERE REQUEST_ID = P_REQUEST_ID;
+    V_ENABLE_TRACE FND_CONCURRENT_PROGRAMS.ENABLE_TRACE%TYPE;
+    V_PROGRAM_ID FND_CONCURRENT_PROGRAMS.CONCURRENT_PROGRAM_ID%TYPE;
+  BEGIN
+    /*SRW.MESSAGE(1275
+               ,'Report Version is 120.4 Last modified date is 02/05/2007')*/NULL;
+    P_CONC_REQUEST_ID := FND_GLOBAL.CONC_REQUEST_ID;
+    /*SRW.USER_EXIT('FND SRWINIT')*/NULL;
+    BEGIN
+      OPEN C_PROGRAM_ID(P_CONC_REQUEST_ID);
+      FETCH C_PROGRAM_ID
+       INTO V_PROGRAM_ID,V_ENABLE_TRACE;
+      CLOSE C_PROGRAM_ID;
+      /*SRW.MESSAGE(1275
+                 ,'v_program_id -> ' || V_PROGRAM_ID || ', v_enable_trace -> ' || V_ENABLE_TRACE || ', request_id -> ' || P_CONC_REQUEST_ID)*/NULL;
+      IF V_ENABLE_TRACE = 'Y' THEN
+        EXECUTE IMMEDIATE
+          'ALTER SESSION SET EVENTS ''10046 trace name context forever, level 4''';
+      END IF;
+    EXCEPTION
+      WHEN OTHERS THEN
+        /*SRW.MESSAGE(1275
+                   ,'Error during enabling the trace. ErrCode -> ' || SQLCODE || ', ErrMesg -> ' || SQLERRM)*/NULL;
+    END;
+    LP_FROM_DATE:=to_char(P_FROM_DATE,'DD-MON-YYYY');
+    LP_TO_DATE:=to_char(P_TO_DATE,'DD-MON-YYYY');
+    RETURN (TRUE);
+  END BEFOREREPORT;
+
+  FUNCTION CF_RECEIPT_AMOUNTFORMULA(INVOICE_ID IN NUMBER) RETURN NUMBER IS
+    CURSOR FETCH_RECEIPT_AMOUNT IS
+      SELECT
+        SUM(AMOUNT_APPLIED)
+      FROM
+        AR_RECEIVABLE_APPLICATIONS_ALL
+      WHERE APPLIED_CUSTOMER_TRX_ID = INVOICE_ID
+        AND APPLICATION_TYPE = 'CASH'
+        AND STATUS in ( 'APP' , 'UNAPP' );
+    LN_RECEIPT_AMOUNT AR_RECEIVABLE_APPLICATIONS_ALL.AMOUNT_APPLIED%TYPE;
+  BEGIN
+    OPEN FETCH_RECEIPT_AMOUNT;
+    FETCH FETCH_RECEIPT_AMOUNT
+     INTO LN_RECEIPT_AMOUNT;
+    CLOSE FETCH_RECEIPT_AMOUNT;
+    IF P_DEBUG_FLAG = 'Y' THEN
+      /*SRW.MESSAGE('106'
+                 ,'Value of customer_trx_id ' || INVOICE_ID)*/NULL;
+      /*SRW.MESSAGE('106'
+                 ,'Value of receipt amount ' || LN_RECEIPT_AMOUNT)*/NULL;
+    END IF;
+    RETURN (ROUND(LN_RECEIPT_AMOUNT
+                ,0));
+  EXCEPTION
+    WHEN OTHERS THEN
+      /*SRW.MESSAGE('106'
+                 ,' Exception in receipt maount' || SQLERRM)*/NULL;
+      RETURN (NULL);
+  END CF_RECEIPT_AMOUNTFORMULA;
+
+  FUNCTION CF_1FORMULA(INVOICE_ID_1 IN NUMBER
+                      ,ORG_ID1 IN NUMBER
+                      ,SERVICE_BASIS IN NUMBER
+                      ,SERVICE_REC_AMOUNT IN NUMBER
+                      ,CESS_REC_AMOUNT IN NUMBER
+                      ,SERVICE_PAYABLE_AMOUNT IN NUMBER
+                      ,CESS_PAYABLE_AMOUNT IN NUMBER) RETURN CHAR IS
+    L_INVOICE_NUMBER VARCHAR2(25);
+    CURSOR FETCH_INV_NUMBER IS
+      SELECT
+        TRX_NUMBER
+      FROM
+        JAI_AR_TRXS
+      WHERE CUSTOMER_TRX_ID = INVOICE_ID_1;
+    CURSOR FETCH_AMT_DETAILS IS
+      SELECT
+        DISTINCT
+        TRX.*
+      FROM
+        RA_CUSTOMER_TRX_ALL TRX,
+        RA_CUST_TRX_TYPES_ALL TRX_TYPE,
+        JAI_AR_TRXS JTRX,
+        JAI_AR_TRX_LINES JTRXL,
+        JAI_AR_TRX_TAX_LINES JTRXTL,
+        JAI_CMN_TAXES_ALL JTC
+      WHERE TRX.ORG_ID = ORG_ID1
+        AND TRX.COMPLETE_FLAG = 'Y'
+        AND TRX.PREVIOUS_CUSTOMER_TRX_ID = INVOICE_ID_1
+        AND TRX.CUSTOMER_TRX_ID = JTRX.CUSTOMER_TRX_ID
+        AND UPPER(TRX_TYPE.TYPE) = 'CM'
+        AND TRX_TYPE.CUST_TRX_TYPE_ID = TRX.CUST_TRX_TYPE_ID
+        AND TRX_TYPE.ORG_ID = TRX.ORG_ID
+        AND JTRX.CUSTOMER_TRX_ID = JTRXL.CUSTOMER_TRX_ID
+        AND JTRXL.CUSTOMER_TRX_LINE_ID = JTRXTL.LINK_TO_CUST_TRX_LINE_ID
+        AND JTRXTL.TAX_ID = JTC.TAX_ID
+        AND UPPER(JTC.TAX_TYPE) IN ( 'SERVICE' , 'SERVICE_EDUCATION_CESS' , 'SERVICE_SH_EDU_CESS' );
+    CURSOR FETCH_INV_AMT IS
+      SELECT
+        SUM(NVL(AMOUNT
+               ,0))
+      FROM
+        RA_CUST_TRX_LINE_GL_DIST_ALL
+      WHERE CUSTOMER_TRX_ID = INVOICE_ID_1
+        AND ACCOUNT_CLASS = 'REC';
+    CURSOR CUR_SH_CESS_REC IS
+      SELECT
+        TAXABLE_BASIS SH_CESS_BASIS,
+        RECOVERABLE_PTG SH_CESS_REC_PERCENT,
+        RECOVERABLE_AMOUNT SH_CESS_REC_AMOUNT,
+        RECOVERED_AMOUNT SH_CESS_PAYABLE_AMOUNT
+      FROM
+        JAI_RGM_TRX_REFS
+      WHERE SOURCE = 'AR'
+        AND INVOICE_ID = INVOICE_ID_1
+        AND TAX_TYPE = 'SERVICE_SH_EDU_CESS';
+    LN_INV_SH_CESS_BASIS JAI_RGM_TRX_REFS.TAXABLE_BASIS%TYPE;
+    LN_INV_SH_CESS_REC_PERCENT JAI_RGM_TRX_REFS.RECOVERABLE_PTG%TYPE;
+    LN_INV_SH_CESS_AMOUNT JAI_RGM_TRX_REFS.RECOVERABLE_AMOUNT%TYPE;
+    LN_INV_SH_CESS_PAYABLE_AMOUNT JAI_RGM_TRX_REFS.RECOVERED_AMOUNT%TYPE;
+    LN_CM_SH_CESS_AMT JAI_RGM_TRX_REFS.RECOVERABLE_AMOUNT%TYPE;
+    LN_INV_GROSS_AMT RA_CUST_TRX_LINE_GL_DIST_ALL.AMOUNT%TYPE;
+    LN_INV_TAXABLE_BASIS JAI_RGM_TRX_REFS.TAXABLE_BASIS%TYPE;
+    LN_INV_SERVICE_AMT JAI_RGM_TRX_REFS.RECOVERABLE_AMOUNT%TYPE;
+    LN_INV_CESS_AMT JAI_RGM_TRX_REFS.RECOVERABLE_AMOUNT%TYPE;
+    LN_INV_SERVICE_PAY JAI_RGM_TRX_REFS.RECOVERABLE_AMOUNT%TYPE;
+    LN_CM_GROSS_AMT RA_CUST_TRX_LINE_GL_DIST_ALL.AMOUNT%TYPE;
+    LN_CM_GROSS_AMT_TMP RA_CUST_TRX_LINE_GL_DIST_ALL.AMOUNT%TYPE;
+    LN_CM_TAXABLE_BASIS JAI_RGM_TRX_REFS.TAXABLE_BASIS%TYPE;
+    LN_CM_SERVICE_AMT JAI_RGM_TRX_REFS.RECOVERABLE_AMOUNT%TYPE;
+    LN_CM_CESS_AMT JAI_RGM_TRX_REFS.RECOVERABLE_AMOUNT%TYPE;
+    LN_CM_SERVICE_PAY JAI_RGM_TRX_REFS.RECOVERABLE_AMOUNT%TYPE;
+  BEGIN
+    OPEN FETCH_INV_NUMBER;
+    FETCH FETCH_INV_NUMBER
+     INTO L_INVOICE_NUMBER;
+    CLOSE FETCH_INV_NUMBER;
+    IF P_DEBUG_FLAG = 'Y' THEN
+      /*SRW.MESSAGE('101'
+                 ,' Customer trx id ' || INVOICE_ID)*/NULL;
+      /*SRW.MESSAGE('101'
+                 ,'Invoice number ' || L_INVOICE_NUMBER)*/NULL;
+    END IF;
+    BEGIN
+      OPEN FETCH_INV_AMT;
+      FETCH FETCH_INV_AMT
+       INTO LN_INV_GROSS_AMT;
+      CLOSE FETCH_INV_AMT;
+      OPEN CUR_SH_CESS_REC;
+      FETCH CUR_SH_CESS_REC
+       INTO LN_INV_SH_CESS_BASIS,LN_INV_SH_CESS_REC_PERCENT,LN_INV_SH_CESS_AMOUNT,LN_INV_SH_CESS_PAYABLE_AMOUNT;
+      CLOSE CUR_SH_CESS_REC;
+      LN_INV_TAXABLE_BASIS := NVL(SERVICE_BASIS
+                                 ,0);
+      LN_INV_SERVICE_AMT := NVL(SERVICE_REC_AMOUNT
+                               ,0);
+      LN_INV_CESS_AMT := NVL(CESS_REC_AMOUNT
+                            ,0);
+      LN_INV_SERVICE_PAY := NVL(SERVICE_PAYABLE_AMOUNT
+                               ,0) + NVL(CESS_PAYABLE_AMOUNT
+                               ,0) + NVL(LN_INV_SH_CESS_PAYABLE_AMOUNT
+                               ,0);
+      IF P_DEBUG_FLAG = 'Y' THEN
+        /*SRW.MESSAGE('101'
+                   ,' Inv - Customer trx id ' || INVOICE_ID)*/NULL;
+        /*SRW.MESSAGE('102'
+                   ,' Inv - gross amt  ' || LN_INV_GROSS_AMT)*/NULL;
+        /*SRW.MESSAGE('103'
+                   ,' Inv - taxable basis ' || LN_INV_TAXABLE_BASIS)*/NULL;
+        /*SRW.MESSAGE('104'
+                   ,' inv - service amt ' || LN_INV_SERVICE_AMT)*/NULL;
+        /*SRW.MESSAGE('105'
+                   ,' inv - cess amt ' || LN_INV_CESS_AMT)*/NULL;
+        /*SRW.MESSAGE('106'
+                   ,' inv - cess pay ' || LN_INV_SERVICE_PAY)*/NULL;
+        /*SRW.MESSAGE('107'
+                   ,' inv - sh cess amt ' || LN_INV_SH_CESS_AMOUNT)*/NULL;
+      END IF;
+      LN_CM_GROSS_AMT := 0;
+      LN_CM_TAXABLE_BASIS := 0;
+      LN_CM_SERVICE_AMT := 0;
+      LN_CM_CESS_AMT := 0;
+      LN_CM_SERVICE_PAY := 0;
+      LN_CM_SH_CESS_AMT := 0;
+      FOR CM_inv IN FETCH_AMT_DETAILS LOOP
+        FOR CM_tot_amt IN (SELECT
+                             SUM(NVL(AMOUNT
+                                    ,0)) AMOUNT
+                           FROM
+                             RA_CUST_TRX_LINE_GL_DIST_ALL
+                           WHERE CUSTOMER_TRX_ID = CM_INV.CUSTOMER_TRX_ID
+                             AND ACCOUNT_CLASS = 'REC') LOOP
+          LN_CM_GROSS_AMT_TMP := CM_TOT_AMT.AMOUNT;
+          /*SRW.MESSAGE('108'
+                     ,' CM - Customer trx id ' || CM_INV.CUSTOMER_TRX_ID)*/NULL;
+        END LOOP;
+        LN_CM_GROSS_AMT := LN_CM_GROSS_AMT + NVL(LN_CM_GROSS_AMT_TMP
+                              ,0);
+        FOR amt_det IN (SELECT
+                          JRTR1.ORGANIZATION_ID ORG_ID1,
+                          JRTR1.INVOICE_ID INVOICE_ID,
+                          JRTR1.TAXABLE_BASIS SERVICE_BASIS,
+                          JRTR1.RECOVERABLE_PTG SERVICE_REC_PERCENT,
+                          JRTR1.RECOVERABLE_AMOUNT SERVICE_REC_AMOUNT,
+                          JRTR1.RECOVERED_AMOUNT SERVICE_PAYABLE_AMOUNT,
+                          JRTR2.TAXABLE_BASIS CESS_BASIS,
+                          JRTR2.RECOVERABLE_PTG CESS_REC_PERCENT,
+                          JRTR2.RECOVERABLE_AMOUNT CESS_REC_AMOUNT,
+                          JRTR2.RECOVERED_AMOUNT CESS_PAYABLE_AMOUNT
+                        FROM
+                          JAI_RGM_TRX_REFS JRTR1,
+                          JAI_RGM_TRX_REFS JRTR2
+                        WHERE JRTR1.SOURCE = 'AR'
+                          AND JRTR1.INVOICE_ID = jrtr2.invoice_id (+)
+                          AND JRTR1.INVOICE_ID = CM_INV.CUSTOMER_TRX_ID
+                          AND JRTR1.TAX_TYPE = 'Service'
+                          AND JRTR2.TAX_TYPE = 'SERVICE_EDUCATION_CESS') LOOP
+          LN_CM_TAXABLE_BASIS := LN_CM_TAXABLE_BASIS + NVL(AMT_DET.SERVICE_BASIS
+                                    ,0);
+          LN_CM_SERVICE_AMT := LN_CM_SERVICE_AMT + NVL(AMT_DET.SERVICE_REC_AMOUNT
+                                  ,0);
+          LN_CM_CESS_AMT := LN_CM_CESS_AMT + NVL(AMT_DET.CESS_REC_AMOUNT
+                               ,0);
+          LN_CM_SERVICE_PAY := LN_CM_SERVICE_PAY + NVL(AMT_DET.SERVICE_PAYABLE_AMOUNT
+                                  ,0) + NVL(AMT_DET.CESS_PAYABLE_AMOUNT
+                                  ,0);
+          IF P_DEBUG_FLAG = 'Y' THEN
+            /*SRW.MESSAGE('109'
+                       ,' CM - gross amt  ' || LN_CM_GROSS_AMT)*/NULL;
+            /*SRW.MESSAGE('110'
+                       ,' CM - Tax basis ' || LN_CM_TAXABLE_BASIS)*/NULL;
+            /*SRW.MESSAGE('111'
+                       ,' CM - Service  ' || LN_CM_SERVICE_AMT)*/NULL;
+            /*SRW.MESSAGE('112'
+                       ,' CM - CESS ' || LN_CM_CESS_AMT)*/NULL;
+            /*SRW.MESSAGE('113'
+                       ,' CM - Service PAY ' || LN_CM_SERVICE_PAY)*/NULL;
+          END IF;
+        END LOOP;
+        FOR sh_amt_det IN CUR_SH_CESS_REC LOOP
+          LN_CM_CESS_AMT := LN_CM_SH_CESS_AMT + NVL(SH_AMT_DET.SH_CESS_REC_AMOUNT
+                               ,0);
+          IF P_DEBUG_FLAG = 'Y' THEN
+            /*SRW.MESSAGE('114'
+                       ,' CM - SH CESS  ' || LN_CM_SH_CESS_AMT)*/NULL;
+          END IF;
+        END LOOP;
+      END LOOP;
+      LN_INV_GROSS_AMT := LN_INV_GROSS_AMT + LN_CM_GROSS_AMT;
+      LN_INV_TAXABLE_BASIS := LN_INV_TAXABLE_BASIS + LN_CM_TAXABLE_BASIS;
+      LN_INV_SERVICE_AMT := LN_INV_SERVICE_AMT + LN_CM_SERVICE_AMT;
+      LN_INV_CESS_AMT := LN_INV_CESS_AMT + LN_CM_CESS_AMT;
+      LN_INV_SERVICE_PAY := LN_INV_SERVICE_PAY + LN_CM_SERVICE_PAY;
+      LN_INV_SH_CESS_AMOUNT := LN_INV_SH_CESS_AMOUNT + LN_CM_CESS_AMT;
+      IF P_DEBUG_FLAG = 'Y' THEN
+        /*SRW.MESSAGE('115'
+                   ,' Inv - Customer trx id ' || INVOICE_ID)*/NULL;
+        /*SRW.MESSAGE('116'
+                   ,' Inv - gross amt  ' || LN_INV_GROSS_AMT)*/NULL;
+        /*SRW.MESSAGE('117'
+                   ,' Inv - Tax basis ' || LN_INV_TAXABLE_BASIS)*/NULL;
+        /*SRW.MESSAGE('118'
+                   ,' Inv - service  ' || LN_INV_SERVICE_AMT)*/NULL;
+        /*SRW.MESSAGE('119'
+                   ,' Inv - cesd ' || LN_INV_CESS_AMT)*/NULL;
+        /*SRW.MESSAGE('120'
+                   ,' Inv - Service pay ' || LN_INV_SERVICE_PAY)*/NULL;
+        /*SRW.MESSAGE('119'
+                   ,' Inv - shcesd ' || LN_INV_SH_CESS_AMOUNT)*/NULL;
+      END IF;
+      CP_GROSS_INVOICE_AMOUNT := ROUND(NVL(LN_INV_GROSS_AMT
+                                          ,0)
+                                      ,2);
+      CP_TAXABLE_BASIS := ROUND(NVL(LN_INV_TAXABLE_BASIS
+                                   ,0)
+                               ,2);
+      CP_SERVICE_TAX_AMOUNT := ROUND(NVL(LN_INV_SERVICE_AMT
+                                        ,0)
+                                    ,2);
+      CP_CESS_AMOUNT := ROUND(NVL(LN_INV_CESS_AMT
+                                 ,0)
+                             ,2);
+      CP_SERVICE_TAX_PAY := ROUND(NVL(LN_INV_SERVICE_PAY
+                                     ,0)
+                                 ,2);
+      CP_SH_CESS_AMOUNT := ROUND(NVL(LN_INV_SH_CESS_AMOUNT
+                                    ,0)
+                                ,2);
+    EXCEPTION
+      WHEN OTHERS THEN
+        /*SRW.MESSAGE('1000'
+                   ,' In exception of amount fields' || SQLERRM)*/NULL;
+    END;
+    RETURN (L_INVOICE_NUMBER);
+  EXCEPTION
+    WHEN OTHERS THEN
+      /*SRW.MESSAGE('101'
+                 ,' Invoice number exception' || SQLERRM)*/NULL;
+      RETURN (NULL);
+  END CF_1FORMULA;
+
+  FUNCTION CF_SERVICE_TYPEFORMULA(SERVICE_REF_ID IN NUMBER) RETURN CHAR IS
+    CURSOR GET_SERVICE_TYPE_CUR(CP_SERVICE_TYPE_CODE IN VARCHAR2) IS
+      SELECT
+        DESCRIPTION
+      FROM
+        JA_LOOKUPS
+      WHERE LOOKUP_TYPE = 'JAI_SERVICE_TYPE'
+        AND LOOKUP_CODE = CP_SERVICE_TYPE_CODE;
+    LV_SERVICE_TYPE_CODE VARCHAR2(30);
+    LV_SERVICE_TYPE VARCHAR2(80);
+  BEGIN
+    LV_SERVICE_TYPE_CODE := JAI_TRX_REPO_EXTRACT_PKG.GET_SERVICE_TYPE_FROM_REF(SERVICE_REF_ID);
+    OPEN GET_SERVICE_TYPE_CUR(LV_SERVICE_TYPE_CODE);
+    FETCH GET_SERVICE_TYPE_CUR
+     INTO LV_SERVICE_TYPE;
+    CLOSE GET_SERVICE_TYPE_CUR;
+    RETURN LV_SERVICE_TYPE;
+  END CF_SERVICE_TYPEFORMULA;
+
+  FUNCTION AFTERREPORT RETURN BOOLEAN IS
+  BEGIN
+    /*SRW.USER_EXIT('FND SRWEXIT')*/NULL;
+    RETURN (TRUE);
+  END AFTERREPORT;
+
+  FUNCTION P_TO_DATEVALIDTRIGGER RETURN BOOLEAN IS
+  BEGIN
+    RETURN (TRUE);
+  END P_TO_DATEVALIDTRIGGER;
+
+  FUNCTION CP_GROSS_INVOICE_AMOUNT_P RETURN NUMBER IS
+  BEGIN
+    RETURN CP_GROSS_INVOICE_AMOUNT;
+  END CP_GROSS_INVOICE_AMOUNT_P;
+
+  FUNCTION CP_TAXABLE_BASIS_P RETURN NUMBER IS
+  BEGIN
+    RETURN CP_TAXABLE_BASIS;
+  END CP_TAXABLE_BASIS_P;
+
+  FUNCTION CP_SERVICE_TAX_AMOUNT_P RETURN NUMBER IS
+  BEGIN
+    RETURN CP_SERVICE_TAX_AMOUNT;
+  END CP_SERVICE_TAX_AMOUNT_P;
+
+  FUNCTION CP_CESS_AMOUNT_P RETURN NUMBER IS
+  BEGIN
+    RETURN CP_CESS_AMOUNT;
+  END CP_CESS_AMOUNT_P;
+
+  FUNCTION CP_SERVICE_TAX_PAY_P RETURN NUMBER IS
+  BEGIN
+    RETURN CP_SERVICE_TAX_PAY;
+  END CP_SERVICE_TAX_PAY_P;
+
+  FUNCTION CP_SH_CESS_AMOUNT_P RETURN NUMBER IS
+  BEGIN
+    RETURN CP_SH_CESS_AMOUNT;
+  END CP_SH_CESS_AMOUNT_P;
+
+END JA_JAINSTR_XMLP_PKG;
+
+
+
+/

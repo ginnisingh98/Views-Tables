@@ -1,0 +1,255 @@
+--------------------------------------------------------
+--  DDL for Package Body GME_GMEBCHPL_XMLP_PKG
+--------------------------------------------------------
+
+  CREATE OR REPLACE EDITIONABLE PACKAGE BODY "APPS"."GME_GMEBCHPL_XMLP_PKG" AS
+/* $Header: GMEBCHPLB.pls 120.1 2008/04/03 06:34:04 dwkrishn noship $ */
+  FUNCTION CF_TRANS_QTYFORMULA(TRANS_QTY IN NUMBER) RETURN NUMBER IS
+    TEMP NUMBER;
+  BEGIN
+    SELECT
+      ABS(TRANS_QTY)
+    INTO TEMP
+    FROM
+      DUAL;
+    RETURN (TEMP);
+  END CF_TRANS_QTYFORMULA;
+
+  FUNCTION CF_SUM_TRANS_QTYFORMULA(SUM_TRANS_QTY IN NUMBER) RETURN NUMBER IS
+    TEMP NUMBER;
+  BEGIN
+    SELECT
+      ABS(SUM_TRANS_QTY)
+    INTO TEMP
+    FROM
+      DUAL;
+    RETURN (TEMP);
+  END CF_SUM_TRANS_QTYFORMULA;
+
+  FUNCTION CF_SUM_TRANS_QTY2FORMULA(SUM_TRANS_QTY2 IN NUMBER) RETURN NUMBER IS
+    TEMP NUMBER;
+  BEGIN
+    SELECT
+      ABS(SUM_TRANS_QTY2)
+    INTO TEMP
+    FROM
+      DUAL;
+    RETURN (TEMP);
+  END CF_SUM_TRANS_QTY2FORMULA;
+
+  FUNCTION CF_BATCHRANGEFORMULA RETURN VARCHAR2 IS
+  BEGIN
+    IF FROMBATCH IS NOT NULL AND TOBATCH IS NOT NULL AND LPAD(FROMBATCH
+        ,32
+        ,'0') = LPAD(TOBATCH
+        ,32
+        ,'0') THEN
+      CP_BATCHRANGE := ' and Lpad(h.batch_no,32,''0'') = ' || '''' || LPAD(FROMBATCH
+                           ,32
+                           ,'0') || '''';
+    ELSIF FROMBATCH IS NOT NULL AND TOBATCH IS NOT NULL THEN
+      CP_BATCHRANGE := ' and Lpad(h.batch_no,32,''0'') between ' || '''' || LPAD(FROMBATCH
+                           ,32
+                           ,'0') || '''' || ' and ' || '''' || LPAD(TOBATCH
+                           ,32
+                           ,'0') || '''';
+    ELSIF FROMBATCH IS NULL AND TOBATCH IS NULL THEN
+      CP_BATCHRANGE := '  ';
+    ELSIF FROMBATCH IS NOT NULL AND TOBATCH IS NULL THEN
+      CP_BATCHRANGE := 'and Lpad(h.batch_no,32,''0'') >= ' || '''' || LPAD(FROMBATCH
+                           ,32
+                           ,'0') || '''';
+    END IF;
+    RETURN (CP_BATCHRANGE);
+  END CF_BATCHRANGEFORMULA;
+
+  FUNCTION CF_WHSERANGEFORMULA RETURN VARCHAR2 IS
+  BEGIN
+    IF FROMWHSE IS NOT NULL AND TOWHSE IS NOT NULL AND FROMWHSE = TOWHSE THEN
+      CP_WHSERANGE := ' and  mr.subinventory_code = ' || '''' || FROMWHSE || '''';
+    ELSIF FROMWHSE IS NOT NULL AND TOWHSE IS NOT NULL THEN
+      CP_WHSERANGE := ' and mr.subinventory_code between ' || '''' || FROMWHSE || ''' and ' || '''' || TOWHSE || '''';
+    ELSIF FROMWHSE IS NULL AND TOWHSE IS NULL THEN
+      CP_WHSERANGE := '  ';
+    ELSIF FROMWHSE IS NOT NULL AND TOWHSE IS NULL THEN
+      CP_WHSERANGE := 'and  mr.subinventory_code >= ' || '''' || FROMWHSE || '''';
+    END IF;
+    RETURN (CP_WHSERANGE);
+  END CF_WHSERANGEFORMULA;
+
+  FUNCTION CF_DATERANGEFORMULA RETURN VARCHAR2 IS
+  BEGIN
+    RETURN NULL;
+  END CF_DATERANGEFORMULA;
+
+  FUNCTION CF_SORTBYFORMULA RETURN VARCHAR2 IS
+  BEGIN
+    IF SORTBY = '1' THEN
+      CP_SORTBY := ' ORDER BY  6 ASC,1 ASC,2 ASC,9 ASC,3 ASC,17 ASC,4 ASC,5 ASC,16 ASC,14 ASC,12 ASC,11 ASC ,h.batch_no, mr.subinventory_code, msik.concatenated_segments, mil.concatenated_segments, mr.lot_number  ASC';
+    ELSIF SORTBY = '2' THEN
+      CP_SORTBY := ' ORDER BY 6 ASC,1 ASC,2 ASC,9 ASC,3 ASC,17 ASC,4 ASC,5 ASC,16 ASC,14 ASC,12 ASC,11 ASC , mr.subinventory_code, msik.concatenated_segments, mil.concatenated_segments,h.batch_no  ASC';
+    END IF;
+    RETURN (CP_SORTBY);
+  END CF_SORTBYFORMULA;
+
+  FUNCTION CF_TRANS_QTY2FORMULA(TRANS_QTY2 IN NUMBER) RETURN NUMBER IS
+    TEMP NUMBER;
+  BEGIN
+    SELECT
+      ABS(TRANS_QTY2)
+    INTO TEMP
+    FROM
+      DUAL;
+    RETURN (TEMP);
+  END CF_TRANS_QTY2FORMULA;
+
+  FUNCTION AFTERPFORM RETURN BOOLEAN IS
+  BEGIN
+    IF FROMBATCH > TOBATCH THEN
+      RAISE_APPLICATION_ERROR(-20101,null);
+    END IF;
+    IF FROMDATE > TODATE THEN
+      RAISE_APPLICATION_ERROR(-20101,null);
+    END IF;
+    IF FROMWHSE > TOWHSE THEN
+      RAISE_APPLICATION_ERROR(-20101,null);
+    END IF;
+    IF FROMBATCH IS NULL THEN
+      IF TOBATCH IS NOT NULL THEN
+        RAISE_APPLICATION_ERROR(-20101,null);
+      END IF;
+    END IF;
+    IF FROMWHSE IS NULL THEN
+      IF TOWHSE IS NOT NULL THEN
+        RAISE_APPLICATION_ERROR(-20101,null);
+      END IF;
+    END IF;
+    RETURN (TRUE);
+  END AFTERPFORM;
+
+  FUNCTION SORTRETCFFORMULA RETURN VARCHAR2 IS
+    X_SORT1 VARCHAR2(80);
+    CURSOR CUR_SELECT IS
+      SELECT
+        MEANING
+      FROM
+        FND_LOOKUP_VALUES_VL
+      WHERE LOOKUP_CODE = SORTBY
+        AND LOOKUP_TYPE = 'PM_RIPMIUSR_SORT';
+  BEGIN
+    OPEN CUR_SELECT;
+    FETCH CUR_SELECT
+     INTO X_SORT1;
+    CLOSE CUR_SELECT;
+    RETURN (X_SORT1);
+  END SORTRETCFFORMULA;
+
+  FUNCTION CF_ACTUAL_START_DATEFORMULA(ACTUAL_START_DATE IN DATE) RETURN DATE IS
+  BEGIN
+    IF ACTUAL_START_DATE <> NULL THEN
+      RETURN (ACTUAL_START_DATE);
+    ELSE
+      RETURN (NULL);
+    END IF;
+    RETURN NULL;
+  END CF_ACTUAL_START_DATEFORMULA;
+
+  FUNCTION BEFOREREPORT RETURN BOOLEAN IS
+  BEGIN
+    P_CONC_REQUEST_ID := FND_GLOBAL.CONC_REQUEST_ID;
+     C_FROMDATE := TO_CHAR(FROMDATE,'DD-MON-YYYY');
+     C_TODATE := TO_CHAR(TODATE,'DD-MON-YYYY');
+    RETURN (TRUE);
+  END BEFOREREPORT;
+
+  PROCEDURE HEADER IS
+  BEGIN
+    NULL;
+  END HEADER;
+
+  FUNCTION CF_PLAN_QTY2FORMULA(ITEM_UM IN VARCHAR2
+                              ,ITEM_UM2 IN VARCHAR2
+                              ,ITEM_ID IN NUMBER
+                              ,PLAN_QTY2 IN NUMBER) RETURN NUMBER IS
+    X_RET NUMBER;
+    V_QTY NUMBER;
+  BEGIN
+    IF ITEM_UM <> ITEM_UM2 THEN
+      V_QTY := INV_CONVERT.INV_UM_CONVERT(ITEM_ID => ITEM_ID
+                                         ,PRECISION => 5
+                                         ,FROM_QUANTITY => NVL(PLAN_QTY2
+                                            ,0)
+                                         ,FROM_UNIT => ITEM_UM
+                                         ,TO_UNIT => ITEM_UM2
+                                         ,FROM_NAME => NULL
+                                         ,TO_NAME => NULL);
+    END IF;
+    RETURN (V_QTY);
+  END CF_PLAN_QTY2FORMULA;
+
+  FUNCTION AFTERREPORT RETURN BOOLEAN IS
+  BEGIN
+    RETURN (TRUE);
+  END AFTERREPORT;
+
+  FUNCTION CF_CONTEXTORGFORMULA RETURN CHAR IS
+    CURSOR C_GET_ORG IS
+      SELECT
+        ORGANIZATION_CODE
+      FROM
+        MTL_PARAMETERS
+      WHERE ORGANIZATION_ID = P_ORG_ID;
+    L_ORG VARCHAR2(6);
+  BEGIN
+    OPEN C_GET_ORG;
+    FETCH C_GET_ORG
+     INTO L_ORG;
+    CLOSE C_GET_ORG;
+    L_ORG := '(' || L_ORG || ')';
+    RETURN L_ORG;
+  END CF_CONTEXTORGFORMULA;
+
+  FUNCTION CF_INV_PLAN_QTYFORMULA(ITEM_UM IN VARCHAR2
+                                 ,ITEM_UM4 IN VARCHAR2
+                                 ,ITEM_ID IN NUMBER
+                                 ,PLAN_QTY2 IN NUMBER) RETURN NUMBER IS
+    V_QTY NUMBER;
+  BEGIN
+    IF ITEM_UM <> ITEM_UM4 THEN
+      V_QTY := INV_CONVERT.INV_UM_CONVERT(ITEM_ID
+                                         ,5
+                                         ,PLAN_QTY2
+                                         ,ITEM_UM
+                                         ,ITEM_UM4
+                                         ,NULL
+                                         ,NULL);
+      RETURN (V_QTY);
+    ELSE
+      RETURN (PLAN_QTY2);
+    END IF;
+  END CF_INV_PLAN_QTYFORMULA;
+
+  FUNCTION CP_BATCHRANGE_P RETURN VARCHAR2 IS
+  BEGIN
+    RETURN CP_BATCHRANGE;
+  END CP_BATCHRANGE_P;
+
+  FUNCTION CP_WHSERANGE_P RETURN VARCHAR2 IS
+  BEGIN
+    RETURN CP_WHSERANGE;
+  END CP_WHSERANGE_P;
+
+  FUNCTION CP_DATERANGE_P RETURN VARCHAR2 IS
+  BEGIN
+    RETURN CP_DATERANGE;
+  END CP_DATERANGE_P;
+
+  FUNCTION CP_SORTBY_P RETURN VARCHAR2 IS
+  BEGIN
+    RETURN CP_SORTBY;
+  END CP_SORTBY_P;
+
+END GME_GMEBCHPL_XMLP_PKG;
+
+
+/

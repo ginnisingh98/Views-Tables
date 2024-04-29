@@ -1,0 +1,326 @@
+--------------------------------------------------------
+--  DDL for Package Body CSD_RO_DIAGNOSTIC_CODES_PKG
+--------------------------------------------------------
+
+  CREATE OR REPLACE EDITIONABLE PACKAGE BODY "APPS"."CSD_RO_DIAGNOSTIC_CODES_PKG" as
+/* $Header: csdtrdcb.pls 120.1 2006/09/20 00:14:31 rfieldma noship $ */
+-- Start of Comments
+-- Package name     : CSD_RO_DIAGNOSTIC_CODES_PKG
+-- Purpose          : To insert, update, delete and lock ro diagnostic codes
+-- History          : 25-Aug-2003    Gilam          created
+-- NOTE             :
+-- End of Comments
+
+
+G_PKG_NAME CONSTANT VARCHAR2(30):= 'CSD_RO_DIAGNOSTIC_CODES_PKG';
+G_FILE_NAME CONSTANT VARCHAR2(12) := 'csdtrdcb.pls';
+
+PROCEDURE Insert_Row(
+          px_RO_DIAGNOSTIC_CODE_ID   IN OUT NOCOPY NUMBER
+         ,p_OBJECT_VERSION_NUMBER    NUMBER
+         ,p_REPAIR_LINE_ID    NUMBER
+         ,p_DIAGNOSTIC_CODE_ID    NUMBER
+         ,p_CREATED_BY    NUMBER
+         ,p_CREATION_DATE    DATE
+         ,p_LAST_UPDATED_BY    NUMBER
+         ,p_LAST_UPDATE_DATE    DATE
+         ,p_LAST_UPDATE_LOGIN    NUMBER
+         ,p_ATTRIBUTE_CATEGORY    VARCHAR2
+         ,p_ATTRIBUTE1    VARCHAR2
+         ,p_ATTRIBUTE2    VARCHAR2
+         ,p_ATTRIBUTE3    VARCHAR2
+         ,p_ATTRIBUTE4    VARCHAR2
+         ,p_ATTRIBUTE5    VARCHAR2
+         ,p_ATTRIBUTE6    VARCHAR2
+         ,p_ATTRIBUTE7    VARCHAR2
+         ,p_ATTRIBUTE8    VARCHAR2
+         ,p_ATTRIBUTE9    VARCHAR2
+         ,p_ATTRIBUTE10    VARCHAR2
+         ,p_ATTRIBUTE11    VARCHAR2
+         ,p_ATTRIBUTE12    VARCHAR2
+         ,p_ATTRIBUTE13    VARCHAR2
+         ,p_ATTRIBUTE14    VARCHAR2
+         ,p_ATTRIBUTE15    VARCHAR2
+	    ,p_DIAGNOSTIC_ITEM_ID	NUMBER  -- rfieldma, 4666403
+	    )
+
+ IS
+   CURSOR C2 IS SELECT CSD_RO_DIAGNOSTIC_CODES_S1.nextval FROM sys.dual;
+BEGIN
+   If (px_RO_DIAGNOSTIC_CODE_ID IS NULL) OR (px_RO_DIAGNOSTIC_CODE_ID = FND_API.G_MISS_NUM) then
+       OPEN C2;
+       FETCH C2 INTO px_RO_DIAGNOSTIC_CODE_ID;
+       CLOSE C2;
+   End If;
+   INSERT INTO CSD_RO_DIAGNOSTIC_CODES(
+           RO_DIAGNOSTIC_CODE_ID
+          ,OBJECT_VERSION_NUMBER
+          ,REPAIR_LINE_ID
+          ,DIAGNOSTIC_CODE_ID
+          ,CREATED_BY
+          ,CREATION_DATE
+          ,LAST_UPDATED_BY
+          ,LAST_UPDATE_DATE
+          ,LAST_UPDATE_LOGIN
+          ,ATTRIBUTE_CATEGORY
+          ,ATTRIBUTE1
+          ,ATTRIBUTE2
+          ,ATTRIBUTE3
+          ,ATTRIBUTE4
+          ,ATTRIBUTE5
+          ,ATTRIBUTE6
+          ,ATTRIBUTE7
+          ,ATTRIBUTE8
+          ,ATTRIBUTE9
+          ,ATTRIBUTE10
+          ,ATTRIBUTE11
+          ,ATTRIBUTE12
+          ,ATTRIBUTE13
+          ,ATTRIBUTE14
+          ,ATTRIBUTE15
+		,DIAGNOSTIC_ITEM_ID -- rfieldma, 4666403
+          ) VALUES (
+           px_RO_DIAGNOSTIC_CODE_ID
+          ,decode( p_OBJECT_VERSION_NUMBER, FND_API.G_MISS_NUM, NULL, p_OBJECT_VERSION_NUMBER)
+          ,decode( p_REPAIR_LINE_ID, FND_API.G_MISS_NUM, NULL, p_REPAIR_LINE_ID)
+          ,decode( p_DIAGNOSTIC_CODE_ID, FND_API.G_MISS_NUM, NULL, p_DIAGNOSTIC_CODE_ID)
+          ,decode( p_CREATED_BY, FND_API.G_MISS_NUM, NULL, p_CREATED_BY)
+          ,decode( p_CREATION_DATE, FND_API.G_MISS_DATE, TO_DATE(NULL), p_CREATION_DATE)
+          ,decode( p_LAST_UPDATED_BY, FND_API.G_MISS_NUM, NULL, p_LAST_UPDATED_BY)
+          ,decode( p_LAST_UPDATE_DATE, FND_API.G_MISS_DATE, TO_DATE(NULL), p_LAST_UPDATE_DATE)
+          ,decode( p_LAST_UPDATE_LOGIN, FND_API.G_MISS_NUM, NULL, p_LAST_UPDATE_LOGIN)
+          ,decode( p_ATTRIBUTE_CATEGORY, FND_API.G_MISS_CHAR, NULL, p_ATTRIBUTE_CATEGORY)
+          ,decode( p_ATTRIBUTE1, FND_API.G_MISS_CHAR, NULL, p_ATTRIBUTE1)
+          ,decode( p_ATTRIBUTE2, FND_API.G_MISS_CHAR, NULL, p_ATTRIBUTE2)
+          ,decode( p_ATTRIBUTE3, FND_API.G_MISS_CHAR, NULL, p_ATTRIBUTE3)
+          ,decode( p_ATTRIBUTE4, FND_API.G_MISS_CHAR, NULL, p_ATTRIBUTE4)
+          ,decode( p_ATTRIBUTE5, FND_API.G_MISS_CHAR, NULL, p_ATTRIBUTE5)
+          ,decode( p_ATTRIBUTE6, FND_API.G_MISS_CHAR, NULL, p_ATTRIBUTE6)
+          ,decode( p_ATTRIBUTE7, FND_API.G_MISS_CHAR, NULL, p_ATTRIBUTE7)
+          ,decode( p_ATTRIBUTE8, FND_API.G_MISS_CHAR, NULL, p_ATTRIBUTE8)
+          ,decode( p_ATTRIBUTE9, FND_API.G_MISS_CHAR, NULL, p_ATTRIBUTE9)
+          ,decode( p_ATTRIBUTE10, FND_API.G_MISS_CHAR, NULL, p_ATTRIBUTE10)
+          ,decode( p_ATTRIBUTE11, FND_API.G_MISS_CHAR, NULL, p_ATTRIBUTE11)
+          ,decode( p_ATTRIBUTE12, FND_API.G_MISS_CHAR, NULL, p_ATTRIBUTE12)
+          ,decode( p_ATTRIBUTE13, FND_API.G_MISS_CHAR, NULL, p_ATTRIBUTE13)
+          ,decode( p_ATTRIBUTE14, FND_API.G_MISS_CHAR, NULL, p_ATTRIBUTE14)
+          ,decode( p_ATTRIBUTE15, FND_API.G_MISS_CHAR, NULL, p_ATTRIBUTE15)
+		,decode( p_DIAGNOSTIC_ITEM_ID, FND_API.G_MISS_NUM, NULL, p_DIAGNOSTIC_ITEM_ID) -- rfieldma, 4666403
+		);
+End Insert_Row;
+
+PROCEDURE Update_Row(
+          p_RO_DIAGNOSTIC_CODE_ID    NUMBER
+         ,p_OBJECT_VERSION_NUMBER    NUMBER
+         ,p_REPAIR_LINE_ID    NUMBER
+         ,p_DIAGNOSTIC_CODE_ID    NUMBER
+         ,p_CREATED_BY    NUMBER
+         ,p_CREATION_DATE    DATE
+         ,p_LAST_UPDATED_BY    NUMBER
+         ,p_LAST_UPDATE_DATE    DATE
+         ,p_LAST_UPDATE_LOGIN    NUMBER
+         ,p_ATTRIBUTE_CATEGORY    VARCHAR2
+         ,p_ATTRIBUTE1    VARCHAR2
+         ,p_ATTRIBUTE2    VARCHAR2
+         ,p_ATTRIBUTE3    VARCHAR2
+         ,p_ATTRIBUTE4    VARCHAR2
+         ,p_ATTRIBUTE5    VARCHAR2
+         ,p_ATTRIBUTE6    VARCHAR2
+         ,p_ATTRIBUTE7    VARCHAR2
+         ,p_ATTRIBUTE8    VARCHAR2
+         ,p_ATTRIBUTE9    VARCHAR2
+         ,p_ATTRIBUTE10    VARCHAR2
+         ,p_ATTRIBUTE11    VARCHAR2
+         ,p_ATTRIBUTE12    VARCHAR2
+         ,p_ATTRIBUTE13    VARCHAR2
+         ,p_ATTRIBUTE14    VARCHAR2
+         ,p_ATTRIBUTE15    VARCHAR2
+	    ,p_DIAGNOSTIC_ITEM_ID	NUMBER -- rfieldma, 4666403
+	    )
+
+IS
+BEGIN
+    Update CSD_RO_DIAGNOSTIC_CODES
+    SET
+        OBJECT_VERSION_NUMBER = decode( p_OBJECT_VERSION_NUMBER, FND_API.G_MISS_NUM, NULL, NULL, OBJECT_VERSION_NUMBER, p_OBJECT_VERSION_NUMBER)
+       ,REPAIR_LINE_ID = decode( p_REPAIR_LINE_ID, FND_API.G_MISS_NUM, NULL, NULL, REPAIR_LINE_ID, p_REPAIR_LINE_ID)
+       ,DIAGNOSTIC_CODE_ID = decode( p_DIAGNOSTIC_CODE_ID, FND_API.G_MISS_NUM, NULL, NULL, DIAGNOSTIC_CODE_ID, p_DIAGNOSTIC_CODE_ID)
+       ,CREATED_BY = decode( p_CREATED_BY, FND_API.G_MISS_NUM, NULL, NULL, CREATED_BY, p_CREATED_BY)
+       ,CREATION_DATE = decode( p_CREATION_DATE, FND_API.G_MISS_DATE, NULL, NULL, CREATION_DATE, p_CREATION_DATE)
+       ,LAST_UPDATED_BY = decode( p_LAST_UPDATED_BY, FND_API.G_MISS_NUM, NULL, NULL, LAST_UPDATED_BY, p_LAST_UPDATED_BY)
+       ,LAST_UPDATE_DATE = decode( p_LAST_UPDATE_DATE, FND_API.G_MISS_DATE, NULL, NULL, LAST_UPDATE_DATE, p_LAST_UPDATE_DATE)
+       ,LAST_UPDATE_LOGIN = decode( p_LAST_UPDATE_LOGIN, FND_API.G_MISS_NUM, NULL, NULL, LAST_UPDATE_LOGIN, p_LAST_UPDATE_LOGIN)
+       ,ATTRIBUTE_CATEGORY = decode( p_ATTRIBUTE_CATEGORY, FND_API.G_MISS_CHAR, NULL, NULL, ATTRIBUTE_CATEGORY, p_ATTRIBUTE_CATEGORY)
+       ,ATTRIBUTE1 = decode( p_ATTRIBUTE1, FND_API.G_MISS_CHAR, NULL, NULL, ATTRIBUTE1, p_ATTRIBUTE1)
+       ,ATTRIBUTE2 = decode( p_ATTRIBUTE2, FND_API.G_MISS_CHAR, NULL, NULL, ATTRIBUTE2, p_ATTRIBUTE2)
+       ,ATTRIBUTE3 = decode( p_ATTRIBUTE3, FND_API.G_MISS_CHAR, NULL, NULL, ATTRIBUTE3, p_ATTRIBUTE3)
+       ,ATTRIBUTE4 = decode( p_ATTRIBUTE4, FND_API.G_MISS_CHAR, NULL, NULL, ATTRIBUTE4, p_ATTRIBUTE4)
+       ,ATTRIBUTE5 = decode( p_ATTRIBUTE5, FND_API.G_MISS_CHAR, NULL, NULL, ATTRIBUTE5, p_ATTRIBUTE5)
+       ,ATTRIBUTE6 = decode( p_ATTRIBUTE6, FND_API.G_MISS_CHAR, NULL, NULL, ATTRIBUTE6, p_ATTRIBUTE6)
+       ,ATTRIBUTE7 = decode( p_ATTRIBUTE7, FND_API.G_MISS_CHAR, NULL, NULL, ATTRIBUTE7, p_ATTRIBUTE7)
+       ,ATTRIBUTE8 = decode( p_ATTRIBUTE8, FND_API.G_MISS_CHAR, NULL, NULL, ATTRIBUTE8, p_ATTRIBUTE8)
+       ,ATTRIBUTE9 = decode( p_ATTRIBUTE9, FND_API.G_MISS_CHAR, NULL, NULL, ATTRIBUTE9, p_ATTRIBUTE9)
+       ,ATTRIBUTE10 = decode( p_ATTRIBUTE10, FND_API.G_MISS_CHAR, NULL, NULL, ATTRIBUTE10, p_ATTRIBUTE10)
+       ,ATTRIBUTE11 = decode( p_ATTRIBUTE11, FND_API.G_MISS_CHAR, NULL, NULL, ATTRIBUTE11, p_ATTRIBUTE11)
+       ,ATTRIBUTE12 = decode( p_ATTRIBUTE12, FND_API.G_MISS_CHAR, NULL, NULL, ATTRIBUTE12, p_ATTRIBUTE12)
+       ,ATTRIBUTE13 = decode( p_ATTRIBUTE13, FND_API.G_MISS_CHAR, NULL, NULL, ATTRIBUTE13, p_ATTRIBUTE13)
+       ,ATTRIBUTE14 = decode( p_ATTRIBUTE14, FND_API.G_MISS_CHAR, NULL, NULL, ATTRIBUTE14, p_ATTRIBUTE14)
+       ,ATTRIBUTE15 = decode( p_ATTRIBUTE15, FND_API.G_MISS_CHAR, NULL, NULL, ATTRIBUTE15, p_ATTRIBUTE15)
+	  ,DIAGNOSTIC_ITEM_ID = decode( p_DIAGNOSTIC_ITEM_ID, FND_API.G_MISS_NUM, NULL, NULL, DIAGNOSTIC_ITEM_ID, p_DIAGNOSTIC_ITEM_ID) -- rfieldma, 4666403
+    where RO_DIAGNOSTIC_CODE_ID = p_RO_DIAGNOSTIC_CODE_ID;
+
+    If (SQL%NOTFOUND) then
+        RAISE NO_DATA_FOUND;
+    End If;
+END Update_Row;
+
+PROCEDURE Delete_Row(
+    p_RO_DIAGNOSTIC_CODE_ID  NUMBER)
+IS
+BEGIN
+    DELETE FROM CSD_RO_DIAGNOSTIC_CODES
+    WHERE RO_DIAGNOSTIC_CODE_ID = p_RO_DIAGNOSTIC_CODE_ID;
+    If (SQL%NOTFOUND) then
+        RAISE NO_DATA_FOUND;
+    End If;
+END Delete_Row;
+
+PROCEDURE Lock_Row(
+          p_RO_DIAGNOSTIC_CODE_ID    NUMBER
+         ,p_OBJECT_VERSION_NUMBER    NUMBER
+
+         --commented out the rest of the record
+         /*
+         ,p_REPAIR_LINE_ID    NUMBER
+         ,p_DIAGNOSTIC_CODE_ID    NUMBER
+         ,p_CREATED_BY    NUMBER
+         ,p_CREATION_DATE    DATE
+         ,p_LAST_UPDATED_BY    NUMBER
+         ,p_LAST_UPDATE_DATE    DATE
+         ,p_LAST_UPDATE_LOGIN    NUMBER
+         ,p_ATTRIBUTE_CATEGORY    VARCHAR2
+         ,p_ATTRIBUTE1    VARCHAR2
+         ,p_ATTRIBUTE2    VARCHAR2
+         ,p_ATTRIBUTE3    VARCHAR2
+         ,p_ATTRIBUTE4    VARCHAR2
+         ,p_ATTRIBUTE5    VARCHAR2
+         ,p_ATTRIBUTE6    VARCHAR2
+         ,p_ATTRIBUTE7    VARCHAR2
+         ,p_ATTRIBUTE8    VARCHAR2
+         ,p_ATTRIBUTE9    VARCHAR2
+         ,p_ATTRIBUTE10    VARCHAR2
+         ,p_ATTRIBUTE11    VARCHAR2
+         ,p_ATTRIBUTE12    VARCHAR2
+         ,p_ATTRIBUTE13    VARCHAR2
+         ,p_ATTRIBUTE14    VARCHAR2
+         ,p_ATTRIBUTE15    VARCHAR2
+         */
+         --
+         )
+
+ IS
+   CURSOR C IS
+       SELECT *
+       FROM CSD_RO_DIAGNOSTIC_CODES
+       WHERE RO_DIAGNOSTIC_CODE_ID =  p_RO_DIAGNOSTIC_CODE_ID
+       FOR UPDATE of RO_DIAGNOSTIC_CODE_ID NOWAIT;
+   Recinfo C%ROWTYPE;
+BEGIN
+    OPEN C;
+    FETCH C INTO Recinfo;
+    If (C%NOTFOUND) then
+        CLOSE C;
+        FND_MESSAGE.SET_NAME('FND', 'FORM_RECORD_DELETED');
+        APP_EXCEPTION.RAISE_EXCEPTION;
+    End If;
+    CLOSE C;
+    if (
+           (      Recinfo.RO_DIAGNOSTIC_CODE_ID = p_RO_DIAGNOSTIC_CODE_ID)
+       AND (    ( Recinfo.OBJECT_VERSION_NUMBER = p_OBJECT_VERSION_NUMBER)
+            OR (    ( Recinfo.OBJECT_VERSION_NUMBER IS NULL )
+                AND (  p_OBJECT_VERSION_NUMBER IS NULL )))
+
+       --commented out the rest of the record
+       /*
+       AND (    ( Recinfo.REPAIR_LINE_ID = p_REPAIR_LINE_ID)
+            OR (    ( Recinfo.REPAIR_LINE_ID IS NULL )
+                AND (  p_REPAIR_LINE_ID IS NULL )))
+       AND (    ( Recinfo.DIAGNOSTIC_CODE_ID = p_DIAGNOSTIC_CODE_ID)
+            OR (    ( Recinfo.DIAGNOSTIC_CODE_ID IS NULL )
+                AND (  p_DIAGNOSTIC_CODE_ID IS NULL )))
+       AND (    ( Recinfo.CREATED_BY = p_CREATED_BY)
+            OR (    ( Recinfo.CREATED_BY IS NULL )
+                AND (  p_CREATED_BY IS NULL )))
+       AND (    ( Recinfo.CREATION_DATE = p_CREATION_DATE)
+            OR (    ( Recinfo.CREATION_DATE IS NULL )
+                AND (  p_CREATION_DATE IS NULL )))
+       AND (    ( Recinfo.LAST_UPDATED_BY = p_LAST_UPDATED_BY)
+            OR (    ( Recinfo.LAST_UPDATED_BY IS NULL )
+                AND (  p_LAST_UPDATED_BY IS NULL )))
+       AND (    ( Recinfo.LAST_UPDATE_DATE = p_LAST_UPDATE_DATE)
+            OR (    ( Recinfo.LAST_UPDATE_DATE IS NULL )
+                AND (  p_LAST_UPDATE_DATE IS NULL )))
+       AND (    ( Recinfo.LAST_UPDATE_LOGIN = p_LAST_UPDATE_LOGIN)
+            OR (    ( Recinfo.LAST_UPDATE_LOGIN IS NULL )
+                AND (  p_LAST_UPDATE_LOGIN IS NULL )))
+       AND (    ( Recinfo.ATTRIBUTE_CATEGORY = p_ATTRIBUTE_CATEGORY)
+            OR (    ( Recinfo.ATTRIBUTE_CATEGORY IS NULL )
+                AND (  p_ATTRIBUTE_CATEGORY IS NULL )))
+       AND (    ( Recinfo.ATTRIBUTE1 = p_ATTRIBUTE1)
+            OR (    ( Recinfo.ATTRIBUTE1 IS NULL )
+                AND (  p_ATTRIBUTE1 IS NULL )))
+       AND (    ( Recinfo.ATTRIBUTE2 = p_ATTRIBUTE2)
+            OR (    ( Recinfo.ATTRIBUTE2 IS NULL )
+                AND (  p_ATTRIBUTE2 IS NULL )))
+       AND (    ( Recinfo.ATTRIBUTE3 = p_ATTRIBUTE3)
+            OR (    ( Recinfo.ATTRIBUTE3 IS NULL )
+                AND (  p_ATTRIBUTE3 IS NULL )))
+       AND (    ( Recinfo.ATTRIBUTE4 = p_ATTRIBUTE4)
+            OR (    ( Recinfo.ATTRIBUTE4 IS NULL )
+                AND (  p_ATTRIBUTE4 IS NULL )))
+       AND (    ( Recinfo.ATTRIBUTE5 = p_ATTRIBUTE5)
+            OR (    ( Recinfo.ATTRIBUTE5 IS NULL )
+                AND (  p_ATTRIBUTE5 IS NULL )))
+       AND (    ( Recinfo.ATTRIBUTE6 = p_ATTRIBUTE6)
+            OR (    ( Recinfo.ATTRIBUTE6 IS NULL )
+                AND (  p_ATTRIBUTE6 IS NULL )))
+       AND (    ( Recinfo.ATTRIBUTE7 = p_ATTRIBUTE7)
+            OR (    ( Recinfo.ATTRIBUTE7 IS NULL )
+                AND (  p_ATTRIBUTE7 IS NULL )))
+       AND (    ( Recinfo.ATTRIBUTE8 = p_ATTRIBUTE8)
+            OR (    ( Recinfo.ATTRIBUTE8 IS NULL )
+                AND (  p_ATTRIBUTE8 IS NULL )))
+       AND (    ( Recinfo.ATTRIBUTE9 = p_ATTRIBUTE9)
+            OR (    ( Recinfo.ATTRIBUTE9 IS NULL )
+                AND (  p_ATTRIBUTE9 IS NULL )))
+       AND (    ( Recinfo.ATTRIBUTE10 = p_ATTRIBUTE10)
+            OR (    ( Recinfo.ATTRIBUTE10 IS NULL )
+                AND (  p_ATTRIBUTE10 IS NULL )))
+       AND (    ( Recinfo.ATTRIBUTE11 = p_ATTRIBUTE11)
+            OR (    ( Recinfo.ATTRIBUTE11 IS NULL )
+                AND (  p_ATTRIBUTE11 IS NULL )))
+       AND (    ( Recinfo.ATTRIBUTE12 = p_ATTRIBUTE12)
+            OR (    ( Recinfo.ATTRIBUTE12 IS NULL )
+                AND (  p_ATTRIBUTE12 IS NULL )))
+       AND (    ( Recinfo.ATTRIBUTE13 = p_ATTRIBUTE13)
+            OR (    ( Recinfo.ATTRIBUTE13 IS NULL )
+                AND (  p_ATTRIBUTE13 IS NULL )))
+       AND (    ( Recinfo.ATTRIBUTE14 = p_ATTRIBUTE14)
+            OR (    ( Recinfo.ATTRIBUTE14 IS NULL )
+                AND (  p_ATTRIBUTE14 IS NULL )))
+       AND (    ( Recinfo.ATTRIBUTE15 = p_ATTRIBUTE15)
+            OR (    ( Recinfo.ATTRIBUTE15 IS NULL )
+                AND (  p_ATTRIBUTE15 IS NULL )))
+       */
+       --
+        ) then
+        return;
+    else
+        FND_MESSAGE.SET_NAME('FND', 'FORM_RECORD_CHANGED');
+        APP_EXCEPTION.RAISE_EXCEPTION;
+    End If;
+END Lock_Row;
+
+End CSD_RO_DIAGNOSTIC_CODES_PKG;
+
+/

@@ -1,0 +1,62 @@
+--------------------------------------------------------
+--  DDL for Package PSA_MFAR_TRANSACTION_COVER_PKG
+--------------------------------------------------------
+
+  CREATE OR REPLACE EDITIONABLE PACKAGE "APPS"."PSA_MFAR_TRANSACTION_COVER_PKG" AUTHID CURRENT_USER AS
+/* $Header: PSAMFTHS.pls 120.3 2006/09/13 13:53:04 agovil ship $ */
+
+
+PROCEDURE INSERT_ROW (	X_ROWID 			IN OUT NOCOPY VARCHAR2,
+			X_CUST_TRX_LINE_GL_DIST_ID 	IN NUMBER,
+			X_RECEIVABLES_CCID 		IN NUMBER,
+			X_PREV_MF_RECEIVABLES_CCID	IN NUMBER,
+			X_ATTRIBUTE_CATEGORY            IN VARCHAR2 default null,
+			X_ATTRIBUTE1			IN VARCHAR2 default null,
+			X_ATTRIBUTE2			IN VARCHAR2 default null,
+			X_ATTRIBUTE3			IN VARCHAR2 default null,
+			X_ATTRIBUTE4			IN VARCHAR2 default null,
+			X_ATTRIBUTE5			IN VARCHAR2 default null,
+			X_ATTRIBUTE6			IN VARCHAR2 default null,
+			X_ATTRIBUTE7			IN VARCHAR2 default null,
+			X_ATTRIBUTE8			IN VARCHAR2 default null,
+			X_ATTRIBUTE9			IN VARCHAR2 default null,
+			X_ATTRIBUTE10			IN VARCHAR2 default null,
+			X_ATTRIBUTE11			IN VARCHAR2 default null,
+			X_ATTRIBUTE12			IN VARCHAR2 default null,
+			X_ATTRIBUTE13			IN VARCHAR2 default null,
+			X_ATTRIBUTE14			IN VARCHAR2 default null,
+			X_ATTRIBUTE15			IN VARCHAR2 default null,
+			X_MODE 				IN VARCHAR2 default 'R'	);
+
+
+PROCEDURE LOCK_ROW (	X_CUST_TRX_LINE_GL_DIST_ID 	IN NUMBER,
+			X_RECEIVABLES_CCID 		IN NUMBER);
+
+PROCEDURE UPDATE_ROW (  X_CUST_TRX_LINE_GL_DIST_ID 	in NUMBER,
+			X_RECEIVABLES_CCID 		in NUMBER,
+			X_PREV_MF_RECEIVABLES_CCID	IN NUMBER,
+			X_ATTRIBUTE_CATEGORY            IN VARCHAR2 default null,
+			X_ATTRIBUTE1			IN VARCHAR2 default null,
+			X_ATTRIBUTE2			IN VARCHAR2 default null,
+			X_ATTRIBUTE3			IN VARCHAR2 default null,
+			X_ATTRIBUTE4			IN VARCHAR2 default null,
+			X_ATTRIBUTE5			IN VARCHAR2 default null,
+			X_ATTRIBUTE6			IN VARCHAR2 default null,
+			X_ATTRIBUTE7			IN VARCHAR2 default null,
+			X_ATTRIBUTE8			IN VARCHAR2 default null,
+			X_ATTRIBUTE9			IN VARCHAR2 default null,
+			X_ATTRIBUTE10			IN VARCHAR2 default null,
+			X_ATTRIBUTE11			IN VARCHAR2 default null,
+			X_ATTRIBUTE12			IN VARCHAR2 default null,
+			X_ATTRIBUTE13			IN VARCHAR2 default null,
+			X_ATTRIBUTE14			IN VARCHAR2 default null,
+			X_ATTRIBUTE15			IN VARCHAR2 default null,
+			X_MODE 				in VARCHAR2 default 'R');
+
+PROCEDURE DELETE_ROW (	X_CUST_TRX_LINE_GL_DIST_ID in NUMBER );
+
+END PSA_MFAR_TRANSACTION_COVER_PKG;
+
+ 
+
+/

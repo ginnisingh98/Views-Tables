@@ -1,0 +1,43 @@
+--------------------------------------------------------
+--  DDL for Package HR_NAV_UNIT_GLOBAL_USAGES_PKG
+--------------------------------------------------------
+
+  CREATE OR REPLACE EDITIONABLE PACKAGE "APPS"."HR_NAV_UNIT_GLOBAL_USAGES_PKG" AUTHID CURRENT_USER as
+/* $Header: hrnvulct.pkh 115.2 2003/06/03 10:12:29 pkakar noship $ */
+procedure INSERT_ROW (
+  X_ROWID in out nocopy VARCHAR2,
+  X_GLOBAL_USAGE_ID in NUMBER,
+  X_NAV_UNIT_ID in NUMBER,
+  X_GLOBAL_NAME in VARCHAR2,
+  X_IN_OR_OUT in VARCHAR2,
+  X_MANDATORY_FLAG in VARCHAR2
+);
+procedure LOCK_ROW (
+  X_GLOBAL_USAGE_ID in NUMBER,
+  X_NAV_UNIT_ID in NUMBER,
+  X_GLOBAL_NAME in VARCHAR2,
+  X_IN_OR_OUT in VARCHAR2,
+  X_MANDATORY_FLAG in VARCHAR2
+);
+procedure UPDATE_ROW (
+  X_GLOBAL_USAGE_ID in NUMBER,
+  X_NAV_UNIT_ID in NUMBER,
+  X_GLOBAL_NAME in VARCHAR2,
+  X_IN_OR_OUT in VARCHAR2,
+  X_MANDATORY_FLAG in VARCHAR2
+);
+procedure DELETE_ROW (
+  X_GLOBAL_USAGE_ID in NUMBER
+);
+procedure LOAD_ROW(
+  X_FORM_NAME in VARCHAR2,
+  X_BLOCK_NAME in VARCHAR2,
+  X_GLOBAL_NAME in VARCHAR2,
+  X_IN_OR_OUT in VARCHAR2,
+  X_MANDATORY_FLAG in VARCHAR2
+);
+end HR_NAV_UNIT_GLOBAL_USAGES_PKG;
+
+ 
+
+/

@@ -1,0 +1,469 @@
+--------------------------------------------------------
+--  DDL for Package Body CSI_T_II_RELATIONSHIPS_PKG
+--------------------------------------------------------
+
+  CREATE OR REPLACE EDITIONABLE PACKAGE BODY "APPS"."CSI_T_II_RELATIONSHIPS_PKG" as
+/* $Header: csittiib.pls 115.9 2003/09/02 20:06:47 epajaril ship $ */
+-- Package name     : CSI_T_II_RELATIONSHIPS_PKG
+-- Purpose          : Table Handler for csi_t_ii_relationships
+-- History          : brmanesh created 12-MAY-2001
+--                  : epajaril added the transfer_components 26-AUG-2003
+-- NOTE             :
+
+G_PKG_NAME CONSTANT VARCHAR2(30):= 'CSI_T_II_RELATIONSHIPS_PKG';
+G_FILE_NAME CONSTANT VARCHAR2(12) := 'csittiib.pls';
+
+---Added (Start) for m-to-m enhancements
+--New columns p_OBJECT_TYPE , p_SUBJECT_TYPE added
+--and due to this there are changes at various modules
+---Added (End) for m-to-m enhancements
+
+PROCEDURE Insert_Row(
+          px_TXN_RELATIONSHIP_ID   IN OUT NOCOPY NUMBER,
+          p_TRANSACTION_LINE_ID    NUMBER,
+          p_OBJECT_TYPE VARCHAR2 ,
+          p_OBJECT_ID    NUMBER,
+          p_RELATIONSHIP_TYPE_CODE    VARCHAR2,
+          p_DISPLAY_ORDER    NUMBER,
+          p_POSITION_REFERENCE    VARCHAR2,
+          p_MANDATORY_FLAG    VARCHAR2,
+          p_ACTIVE_START_DATE    DATE,
+          p_ACTIVE_END_DATE    DATE,
+          p_CSI_INST_RELATIONSHIP_ID    NUMBER,
+          p_SUBJECT_TYPE  VARCHAR2 ,
+          p_SUBJECT_ID    NUMBER,
+          p_SUB_CONFIG_INST_HDR_ID  NUMBER ,
+          p_SUB_CONFIG_INST_REV_NUM NUMBER ,
+          p_SUB_CONFIG_INST_ITEM_ID NUMBER ,
+          p_OBJ_CONFIG_INST_HDR_ID  NUMBER ,
+          p_OBJ_CONFIG_INST_REV_NUM NUMBER ,
+          p_OBJ_CONFIG_INST_ITEM_ID NUMBER ,
+          p_TARGET_COMMITMENT_DATE  DATE   ,
+          p_ATTRIBUTE1    VARCHAR2,
+          p_ATTRIBUTE2    VARCHAR2,
+          p_ATTRIBUTE3    VARCHAR2,
+          p_ATTRIBUTE4    VARCHAR2,
+          p_ATTRIBUTE5    VARCHAR2,
+          p_ATTRIBUTE6    VARCHAR2,
+          p_ATTRIBUTE7    VARCHAR2,
+          p_ATTRIBUTE8    VARCHAR2,
+          p_ATTRIBUTE9    VARCHAR2,
+          p_ATTRIBUTE10    VARCHAR2,
+          p_ATTRIBUTE11    VARCHAR2,
+          p_ATTRIBUTE12    VARCHAR2,
+          p_ATTRIBUTE13    VARCHAR2,
+          p_ATTRIBUTE14    VARCHAR2,
+          p_ATTRIBUTE15    VARCHAR2,
+          p_CREATED_BY    NUMBER,
+          p_CREATION_DATE    DATE,
+          p_LAST_UPDATED_BY    NUMBER,
+          p_LAST_UPDATE_DATE    DATE,
+          p_LAST_UPDATE_LOGIN    NUMBER,
+          p_OBJECT_VERSION_NUMBER    NUMBER,
+          p_CONTEXT    VARCHAR2,
+          p_TRANSFER_COMPONENTS_FLAG  VARCHAR2)
+
+ IS
+   CURSOR C2 IS SELECT CSI_T_II_RELATIONSHIPS_S.nextval FROM sys.dual;
+BEGIN
+   If (px_TXN_RELATIONSHIP_ID IS NULL) OR (px_TXN_RELATIONSHIP_ID = FND_API.G_MISS_NUM) then
+       OPEN C2;
+       FETCH C2 INTO px_TXN_RELATIONSHIP_ID;
+       CLOSE C2;
+   End If;
+   INSERT INTO CSI_T_II_RELATIONSHIPS(
+           TXN_RELATIONSHIP_ID,
+           TRANSACTION_LINE_ID,
+           OBJECT_TYPE ,
+           OBJECT_ID,
+           RELATIONSHIP_TYPE_CODE,
+           DISPLAY_ORDER,
+           POSITION_REFERENCE,
+           MANDATORY_FLAG,
+           ACTIVE_START_DATE,
+           ACTIVE_END_DATE,
+           CSI_INST_RELATIONSHIP_ID,
+           SUBJECT_TYPE ,
+           SUBJECT_ID,
+           SUB_CONFIG_INST_HDR_ID ,
+           SUB_CONFIG_INST_REV_NUM  ,
+           SUB_CONFIG_INST_ITEM_ID  ,
+           OBJ_CONFIG_INST_HDR_ID    ,
+           OBJ_CONFIG_INST_REV_NUM  ,
+           OBJ_CONFIG_INST_ITEM_ID ,
+           TARGET_COMMITMENT_DATE ,
+           ATTRIBUTE1,
+           ATTRIBUTE2,
+           ATTRIBUTE3,
+           ATTRIBUTE4,
+           ATTRIBUTE5,
+           ATTRIBUTE6,
+           ATTRIBUTE7,
+           ATTRIBUTE8,
+           ATTRIBUTE9,
+           ATTRIBUTE10,
+           ATTRIBUTE11,
+           ATTRIBUTE12,
+           ATTRIBUTE13,
+           ATTRIBUTE14,
+           ATTRIBUTE15,
+           CREATED_BY,
+           CREATION_DATE,
+           LAST_UPDATED_BY,
+           LAST_UPDATE_DATE,
+           LAST_UPDATE_LOGIN,
+           OBJECT_VERSION_NUMBER,
+           CONTEXT,
+           TRANSFER_COMPONENTS_FLAG
+          ) VALUES (
+           px_TXN_RELATIONSHIP_ID,
+           decode( p_TRANSACTION_LINE_ID, FND_API.G_MISS_NUM, NULL, p_TRANSACTION_LINE_ID),
+           decode( p_OBJECT_TYPE, FND_API.G_MISS_CHAR, NULL, p_OBJECT_TYPE),
+           decode( p_OBJECT_ID, FND_API.G_MISS_NUM, NULL, p_OBJECT_ID),
+           decode( p_RELATIONSHIP_TYPE_CODE, FND_API.G_MISS_CHAR, NULL, p_RELATIONSHIP_TYPE_CODE),
+           decode( p_DISPLAY_ORDER, FND_API.G_MISS_NUM, NULL, p_DISPLAY_ORDER),
+           decode( p_POSITION_REFERENCE, FND_API.G_MISS_CHAR, NULL, p_POSITION_REFERENCE),
+           decode( p_MANDATORY_FLAG, FND_API.G_MISS_CHAR, NULL, p_MANDATORY_FLAG),
+           decode( p_ACTIVE_START_DATE, FND_API.G_MISS_DATE, TO_DATE(NULL), p_ACTIVE_START_DATE),
+           decode( p_ACTIVE_END_DATE, FND_API.G_MISS_DATE, TO_DATE(NULL), p_ACTIVE_END_DATE),
+           decode( p_CSI_INST_RELATIONSHIP_ID, FND_API.G_MISS_NUM, NULL, p_CSI_INST_RELATIONSHIP_ID),
+           decode( p_SUBJECT_TYPE, FND_API.G_MISS_CHAR, NULL, p_SUBJECT_TYPE),
+           decode( p_SUBJECT_ID, FND_API.G_MISS_NUM, NULL, p_SUBJECT_ID),
+           decode( p_SUB_CONFIG_INST_HDR_ID, FND_API.G_MISS_NUM, NULL, p_SUB_CONFIG_INST_HDR_ID),
+           decode( p_SUB_CONFIG_INST_REV_NUM, FND_API.G_MISS_NUM, NULL, p_SUB_CONFIG_INST_REV_NUM),
+           decode( p_SUB_CONFIG_INST_ITEM_ID, FND_API.G_MISS_NUM, NULL, p_SUB_CONFIG_INST_ITEM_ID),
+           decode( p_OBJ_CONFIG_INST_HDR_ID, FND_API.G_MISS_NUM, NULL, p_OBJ_CONFIG_INST_HDR_ID),
+           decode( p_OBJ_CONFIG_INST_REV_NUM, FND_API.G_MISS_NUM, NULL, p_OBJ_CONFIG_INST_REV_NUM),
+           decode( p_OBJ_CONFIG_INST_ITEM_ID, FND_API.G_MISS_NUM, NULL, p_OBJ_CONFIG_INST_ITEM_ID),
+           decode( p_TARGET_COMMITMENT_DATE, FND_API.G_MISS_DATE, TO_DATE(NULL), p_TARGET_COMMITMENT_DATE),
+           decode( p_ATTRIBUTE1, FND_API.G_MISS_CHAR, NULL, p_ATTRIBUTE1),
+           decode( p_ATTRIBUTE2, FND_API.G_MISS_CHAR, NULL, p_ATTRIBUTE2),
+           decode( p_ATTRIBUTE3, FND_API.G_MISS_CHAR, NULL, p_ATTRIBUTE3),
+           decode( p_ATTRIBUTE4, FND_API.G_MISS_CHAR, NULL, p_ATTRIBUTE4),
+           decode( p_ATTRIBUTE5, FND_API.G_MISS_CHAR, NULL, p_ATTRIBUTE5),
+           decode( p_ATTRIBUTE6, FND_API.G_MISS_CHAR, NULL, p_ATTRIBUTE6),
+           decode( p_ATTRIBUTE7, FND_API.G_MISS_CHAR, NULL, p_ATTRIBUTE7),
+           decode( p_ATTRIBUTE8, FND_API.G_MISS_CHAR, NULL, p_ATTRIBUTE8),
+           decode( p_ATTRIBUTE9, FND_API.G_MISS_CHAR, NULL, p_ATTRIBUTE9),
+           decode( p_ATTRIBUTE10, FND_API.G_MISS_CHAR, NULL, p_ATTRIBUTE10),
+           decode( p_ATTRIBUTE11, FND_API.G_MISS_CHAR, NULL, p_ATTRIBUTE11),
+           decode( p_ATTRIBUTE12, FND_API.G_MISS_CHAR, NULL, p_ATTRIBUTE12),
+           decode( p_ATTRIBUTE13, FND_API.G_MISS_CHAR, NULL, p_ATTRIBUTE13),
+           decode( p_ATTRIBUTE14, FND_API.G_MISS_CHAR, NULL, p_ATTRIBUTE14),
+           decode( p_ATTRIBUTE15, FND_API.G_MISS_CHAR, NULL, p_ATTRIBUTE15),
+           decode( p_CREATED_BY, FND_API.G_MISS_NUM, NULL, p_CREATED_BY),
+           decode( p_CREATION_DATE, FND_API.G_MISS_DATE, TO_DATE(NULL), p_CREATION_DATE),
+           decode( p_LAST_UPDATED_BY, FND_API.G_MISS_NUM, NULL, p_LAST_UPDATED_BY),
+           decode( p_LAST_UPDATE_DATE, FND_API.G_MISS_DATE, TO_DATE(NULL), p_LAST_UPDATE_DATE),
+           decode( p_LAST_UPDATE_LOGIN, FND_API.G_MISS_NUM, NULL, p_LAST_UPDATE_LOGIN),
+           decode( p_OBJECT_VERSION_NUMBER, FND_API.G_MISS_NUM, NULL, p_OBJECT_VERSION_NUMBER),
+           decode( p_CONTEXT, FND_API.G_MISS_CHAR, NULL, p_CONTEXT),
+           decode( p_TRANSFER_COMPONENTS_FLAG, FND_API.G_MISS_CHAR, NULL, p_TRANSFER_COMPONENTS_FLAG));
+End Insert_Row;
+
+PROCEDURE Update_Row(
+          p_TXN_RELATIONSHIP_ID    NUMBER,
+          p_TRANSACTION_LINE_ID    NUMBER,
+          p_OBJECT_TYPE VARCHAR2 ,
+          p_OBJECT_ID    NUMBER,
+          p_RELATIONSHIP_TYPE_CODE    VARCHAR2,
+          p_DISPLAY_ORDER    NUMBER,
+          p_POSITION_REFERENCE    VARCHAR2,
+          p_MANDATORY_FLAG    VARCHAR2,
+          p_ACTIVE_START_DATE    DATE,
+          p_ACTIVE_END_DATE    DATE,
+          p_CSI_INST_RELATIONSHIP_ID    NUMBER,
+          p_SUBJECT_TYPE  VARCHAR2 ,
+          p_SUBJECT_ID    NUMBER,
+          p_SUB_CONFIG_INST_HDR_ID  NUMBER ,
+          p_SUB_CONFIG_INST_REV_NUM NUMBER ,
+          p_SUB_CONFIG_INST_ITEM_ID NUMBER ,
+          p_OBJ_CONFIG_INST_HDR_ID  NUMBER ,
+          p_OBJ_CONFIG_INST_REV_NUM NUMBER ,
+          p_OBJ_CONFIG_INST_ITEM_ID NUMBER ,
+          p_TARGET_COMMITMENT_DATE  DATE   ,
+          p_ATTRIBUTE1    VARCHAR2,
+          p_ATTRIBUTE2    VARCHAR2,
+          p_ATTRIBUTE3    VARCHAR2,
+          p_ATTRIBUTE4    VARCHAR2,
+          p_ATTRIBUTE5    VARCHAR2,
+          p_ATTRIBUTE6    VARCHAR2,
+          p_ATTRIBUTE7    VARCHAR2,
+          p_ATTRIBUTE8    VARCHAR2,
+          p_ATTRIBUTE9    VARCHAR2,
+          p_ATTRIBUTE10    VARCHAR2,
+          p_ATTRIBUTE11    VARCHAR2,
+          p_ATTRIBUTE12    VARCHAR2,
+          p_ATTRIBUTE13    VARCHAR2,
+          p_ATTRIBUTE14    VARCHAR2,
+          p_ATTRIBUTE15    VARCHAR2,
+          p_CREATED_BY    NUMBER,
+          p_CREATION_DATE    DATE,
+          p_LAST_UPDATED_BY    NUMBER,
+          p_LAST_UPDATE_DATE    DATE,
+          p_LAST_UPDATE_LOGIN    NUMBER,
+          p_OBJECT_VERSION_NUMBER    NUMBER,
+          p_CONTEXT    VARCHAR2,
+          p_TRANSFER_COMPONENTS_FLAG VARCHAR2)
+
+ IS
+ BEGIN
+    Update CSI_T_II_RELATIONSHIPS
+    SET
+              TRANSACTION_LINE_ID = decode( p_TRANSACTION_LINE_ID, FND_API.G_MISS_NUM, TRANSACTION_LINE_ID, p_TRANSACTION_LINE_ID),
+              OBJECT_TYPE = decode( OBJECT_TYPE, FND_API.G_MISS_CHAR, OBJECT_TYPE, p_OBJECT_TYPE) ,
+              OBJECT_ID = decode( p_OBJECT_ID, FND_API.G_MISS_NUM, OBJECT_ID, p_OBJECT_ID),
+              RELATIONSHIP_TYPE_CODE = decode( p_RELATIONSHIP_TYPE_CODE, FND_API.G_MISS_CHAR, RELATIONSHIP_TYPE_CODE, p_RELATIONSHIP_TYPE_CODE),
+              DISPLAY_ORDER = decode( p_DISPLAY_ORDER, FND_API.G_MISS_NUM, DISPLAY_ORDER, p_DISPLAY_ORDER),
+              POSITION_REFERENCE = decode( p_POSITION_REFERENCE, FND_API.G_MISS_CHAR, POSITION_REFERENCE, p_POSITION_REFERENCE),
+              MANDATORY_FLAG = decode( p_MANDATORY_FLAG, FND_API.G_MISS_CHAR, MANDATORY_FLAG, p_MANDATORY_FLAG),
+              ACTIVE_START_DATE = decode( p_ACTIVE_START_DATE, FND_API.G_MISS_DATE, ACTIVE_START_DATE, p_ACTIVE_START_DATE),
+              ACTIVE_END_DATE = decode( p_ACTIVE_END_DATE, FND_API.G_MISS_DATE, ACTIVE_END_DATE, p_ACTIVE_END_DATE),
+              CSI_INST_RELATIONSHIP_ID = decode( p_CSI_INST_RELATIONSHIP_ID, FND_API.G_MISS_NUM, CSI_INST_RELATIONSHIP_ID, p_CSI_INST_RELATIONSHIP_ID),
+              SUBJECT_TYPE = decode( SUBJECT_TYPE, FND_API.G_MISS_CHAR, SUBJECT_TYPE , p_SUBJECT_TYPE),
+              SUBJECT_ID = decode( p_SUBJECT_ID, FND_API.G_MISS_NUM, SUBJECT_ID, p_SUBJECT_ID),
+              SUB_CONFIG_INST_HDR_ID = decode( p_SUB_CONFIG_INST_HDR_ID, FND_API.G_MISS_NUM, SUB_CONFIG_INST_HDR_ID, p_SUB_CONFIG_INST_HDR_ID),
+              SUB_CONFIG_INST_REV_NUM = decode( p_SUB_CONFIG_INST_REV_NUM, FND_API.G_MISS_NUM, SUB_CONFIG_INST_REV_NUM, p_SUB_CONFIG_INST_REV_NUM),
+              SUB_CONFIG_INST_ITEM_ID = decode( p_SUB_CONFIG_INST_ITEM_ID, FND_API.G_MISS_NUM, SUB_CONFIG_INST_ITEM_ID, p_SUB_CONFIG_INST_ITEM_ID),
+             OBJ_CONFIG_INST_HDR_ID = decode( p_OBJ_CONFIG_INST_HDR_ID, FND_API.G_MISS_NUM, OBJ_CONFIG_INST_HDR_ID, p_OBJ_CONFIG_INST_HDR_ID),
+              OBJ_CONFIG_INST_REV_NUM = decode( p_OBJ_CONFIG_INST_REV_NUM, FND_API.G_MISS_NUM, OBJ_CONFIG_INST_REV_NUM, p_OBJ_CONFIG_INST_REV_NUM),
+              OBJ_CONFIG_INST_ITEM_ID = decode( p_OBJ_CONFIG_INST_ITEM_ID, FND_API.G_MISS_NUM, OBJ_CONFIG_INST_ITEM_ID, p_OBJ_CONFIG_INST_ITEM_ID),
+              TARGET_COMMITMENT_DATE = decode( p_TARGET_COMMITMENT_DATE, FND_API.G_MISS_DATE, TARGET_COMMITMENT_DATE, p_TARGET_COMMITMENT_DATE),
+              ATTRIBUTE1 = decode( p_ATTRIBUTE1, FND_API.G_MISS_CHAR, ATTRIBUTE1, p_ATTRIBUTE1),
+              ATTRIBUTE2 = decode( p_ATTRIBUTE2, FND_API.G_MISS_CHAR, ATTRIBUTE2, p_ATTRIBUTE2),
+              ATTRIBUTE3 = decode( p_ATTRIBUTE3, FND_API.G_MISS_CHAR, ATTRIBUTE3, p_ATTRIBUTE3),
+              ATTRIBUTE4 = decode( p_ATTRIBUTE4, FND_API.G_MISS_CHAR, ATTRIBUTE4, p_ATTRIBUTE4),
+              ATTRIBUTE5 = decode( p_ATTRIBUTE5, FND_API.G_MISS_CHAR, ATTRIBUTE5, p_ATTRIBUTE5),
+              ATTRIBUTE6 = decode( p_ATTRIBUTE6, FND_API.G_MISS_CHAR, ATTRIBUTE6, p_ATTRIBUTE6),
+              ATTRIBUTE7 = decode( p_ATTRIBUTE7, FND_API.G_MISS_CHAR, ATTRIBUTE7, p_ATTRIBUTE7),
+              ATTRIBUTE8 = decode( p_ATTRIBUTE8, FND_API.G_MISS_CHAR, ATTRIBUTE8, p_ATTRIBUTE8),
+              ATTRIBUTE9 = decode( p_ATTRIBUTE9, FND_API.G_MISS_CHAR, ATTRIBUTE9, p_ATTRIBUTE9),
+              ATTRIBUTE10 = decode( p_ATTRIBUTE10, FND_API.G_MISS_CHAR, ATTRIBUTE10, p_ATTRIBUTE10),
+              ATTRIBUTE11 = decode( p_ATTRIBUTE11, FND_API.G_MISS_CHAR, ATTRIBUTE11, p_ATTRIBUTE11),
+              ATTRIBUTE12 = decode( p_ATTRIBUTE12, FND_API.G_MISS_CHAR, ATTRIBUTE12, p_ATTRIBUTE12),
+              ATTRIBUTE13 = decode( p_ATTRIBUTE13, FND_API.G_MISS_CHAR, ATTRIBUTE13, p_ATTRIBUTE13),
+              ATTRIBUTE14 = decode( p_ATTRIBUTE14, FND_API.G_MISS_CHAR, ATTRIBUTE14, p_ATTRIBUTE14),
+              ATTRIBUTE15 = decode( p_ATTRIBUTE15, FND_API.G_MISS_CHAR, ATTRIBUTE15, p_ATTRIBUTE15),
+              CREATED_BY = decode( p_CREATED_BY, FND_API.G_MISS_NUM, CREATED_BY, p_CREATED_BY),
+              CREATION_DATE = decode( p_CREATION_DATE, FND_API.G_MISS_DATE, CREATION_DATE, p_CREATION_DATE),
+              LAST_UPDATED_BY = decode( p_LAST_UPDATED_BY, FND_API.G_MISS_NUM, LAST_UPDATED_BY, p_LAST_UPDATED_BY),
+              LAST_UPDATE_DATE = decode( p_LAST_UPDATE_DATE, FND_API.G_MISS_DATE, LAST_UPDATE_DATE, p_LAST_UPDATE_DATE),
+              LAST_UPDATE_LOGIN = decode( p_LAST_UPDATE_LOGIN, FND_API.G_MISS_NUM, LAST_UPDATE_LOGIN, p_LAST_UPDATE_LOGIN),
+              OBJECT_VERSION_NUMBER = decode( p_OBJECT_VERSION_NUMBER, FND_API.G_MISS_NUM, OBJECT_VERSION_NUMBER, p_OBJECT_VERSION_NUMBER),
+              CONTEXT = decode( p_CONTEXT, FND_API.G_MISS_CHAR, CONTEXT, p_CONTEXT),
+              TRANSFER_COMPONENTS_FLAG = decode( p_TRANSFER_COMPONENTS_FLAG, FND_API.G_MISS_CHAR, TRANSFER_COMPONENTS_FLAG, p_TRANSFER_COMPONENTS_FLAG)
+    where TXN_RELATIONSHIP_ID = p_TXN_RELATIONSHIP_ID;
+
+    If (SQL%NOTFOUND) then
+        RAISE NO_DATA_FOUND;
+    End If;
+END Update_Row;
+
+PROCEDURE Delete_Row(
+    p_TXN_RELATIONSHIP_ID  NUMBER)
+ IS
+ BEGIN
+   DELETE FROM CSI_T_II_RELATIONSHIPS
+    WHERE TXN_RELATIONSHIP_ID = p_TXN_RELATIONSHIP_ID;
+   If (SQL%NOTFOUND) then
+       RAISE NO_DATA_FOUND;
+   End If;
+ END Delete_Row;
+
+PROCEDURE Lock_Row(
+          p_TXN_RELATIONSHIP_ID    NUMBER,
+          p_TRANSACTION_LINE_ID    NUMBER,
+          p_OBJECT_TYPE VARCHAR2 ,
+          p_OBJECT_ID    NUMBER,
+          p_RELATIONSHIP_TYPE_CODE    VARCHAR2,
+          p_DISPLAY_ORDER    NUMBER,
+          p_POSITION_REFERENCE    VARCHAR2,
+          p_MANDATORY_FLAG    VARCHAR2,
+          p_ACTIVE_START_DATE    DATE,
+          p_ACTIVE_END_DATE    DATE,
+          p_CSI_INST_RELATIONSHIP_ID    NUMBER,
+          p_SUBJECT_TYPE  VARCHAR2 ,
+          p_SUBJECT_ID    NUMBER,
+          p_SUB_CONFIG_INST_HDR_ID  NUMBER ,
+          p_SUB_CONFIG_INST_REV_NUM NUMBER ,
+          p_SUB_CONFIG_INST_ITEM_ID NUMBER ,
+          p_OBJ_CONFIG_INST_HDR_ID  NUMBER ,
+          p_OBJ_CONFIG_INST_REV_NUM NUMBER ,
+          p_OBJ_CONFIG_INST_ITEM_ID NUMBER ,
+          p_TARGET_COMMITMENT_DATE  DATE   ,
+          p_ATTRIBUTE1    VARCHAR2,
+          p_ATTRIBUTE2    VARCHAR2,
+          p_ATTRIBUTE3    VARCHAR2,
+          p_ATTRIBUTE4    VARCHAR2,
+          p_ATTRIBUTE5    VARCHAR2,
+          p_ATTRIBUTE6    VARCHAR2,
+          p_ATTRIBUTE7    VARCHAR2,
+          p_ATTRIBUTE8    VARCHAR2,
+          p_ATTRIBUTE9    VARCHAR2,
+          p_ATTRIBUTE10    VARCHAR2,
+          p_ATTRIBUTE11    VARCHAR2,
+          p_ATTRIBUTE12    VARCHAR2,
+          p_ATTRIBUTE13    VARCHAR2,
+          p_ATTRIBUTE14    VARCHAR2,
+          p_ATTRIBUTE15    VARCHAR2,
+          p_CREATED_BY    NUMBER,
+          p_CREATION_DATE    DATE,
+          p_LAST_UPDATED_BY    NUMBER,
+          p_LAST_UPDATE_DATE    DATE,
+          p_LAST_UPDATE_LOGIN    NUMBER,
+          p_OBJECT_VERSION_NUMBER    NUMBER,
+          p_CONTEXT    VARCHAR2,
+          p_TRANSFER_COMPONENTS_FLAG  VARCHAR2)
+
+ IS
+   CURSOR C IS
+        SELECT *
+         FROM CSI_T_II_RELATIONSHIPS
+        WHERE TXN_RELATIONSHIP_ID =  p_TXN_RELATIONSHIP_ID
+        FOR UPDATE of TXN_RELATIONSHIP_ID NOWAIT;
+   Recinfo C%ROWTYPE;
+ BEGIN
+    OPEN C;
+    FETCH C INTO Recinfo;
+    If (C%NOTFOUND) then
+        CLOSE C;
+        FND_MESSAGE.SET_NAME('FND', 'FORM_RECORD_DELETED');
+        APP_EXCEPTION.RAISE_EXCEPTION;
+    End If;
+    CLOSE C;
+    if (
+           (      Recinfo.TXN_RELATIONSHIP_ID = p_TXN_RELATIONSHIP_ID)
+       AND (    ( Recinfo.TRANSACTION_LINE_ID = p_TRANSACTION_LINE_ID)
+            OR (    ( Recinfo.TRANSACTION_LINE_ID IS NULL )
+                AND (  p_TRANSACTION_LINE_ID IS NULL )))
+       AND (    ( Recinfo.OBJECT_TYPE = p_OBJECT_TYPE)
+            OR (    ( Recinfo.OBJECT_TYPE IS NULL )
+                AND (  p_OBJECT_TYPE IS NULL )))
+       AND (    ( Recinfo.OBJECT_ID = p_OBJECT_ID)
+            OR (    ( Recinfo.OBJECT_ID IS NULL )
+                AND (  p_OBJECT_ID IS NULL )))
+       AND (    ( Recinfo.RELATIONSHIP_TYPE_CODE = p_RELATIONSHIP_TYPE_CODE)
+            OR (    ( Recinfo.RELATIONSHIP_TYPE_CODE IS NULL )
+                AND (  p_RELATIONSHIP_TYPE_CODE IS NULL )))
+       AND (    ( Recinfo.DISPLAY_ORDER = p_DISPLAY_ORDER)
+            OR (    ( Recinfo.DISPLAY_ORDER IS NULL )
+                AND (  p_DISPLAY_ORDER IS NULL )))
+       AND (    ( Recinfo.POSITION_REFERENCE = p_POSITION_REFERENCE)
+            OR (    ( Recinfo.POSITION_REFERENCE IS NULL )
+                AND (  p_POSITION_REFERENCE IS NULL )))
+       AND (    ( Recinfo.MANDATORY_FLAG = p_MANDATORY_FLAG)
+            OR (    ( Recinfo.MANDATORY_FLAG IS NULL )
+                AND (  p_MANDATORY_FLAG IS NULL )))
+       AND (    ( Recinfo.ACTIVE_START_DATE = p_ACTIVE_START_DATE)
+            OR (    ( Recinfo.ACTIVE_START_DATE IS NULL )
+                AND (  p_ACTIVE_START_DATE IS NULL )))
+       AND (    ( Recinfo.ACTIVE_END_DATE = p_ACTIVE_END_DATE)
+            OR (    ( Recinfo.ACTIVE_END_DATE IS NULL )
+                AND (  p_ACTIVE_END_DATE IS NULL )))
+       AND (    ( Recinfo.CSI_INST_RELATIONSHIP_ID = p_CSI_INST_RELATIONSHIP_ID)
+            OR (    ( Recinfo.CSI_INST_RELATIONSHIP_ID IS NULL )
+                AND (  p_CSI_INST_RELATIONSHIP_ID IS NULL )))
+       AND (    ( Recinfo.SUBJECT_TYPE = p_SUBJECT_TYPE)
+            OR (    ( Recinfo.SUBJECT_TYPE IS NULL )
+                AND (  p_SUBJECT_TYPE IS NULL )))
+       AND (    ( Recinfo.SUBJECT_ID = p_SUBJECT_ID)
+            OR (    ( Recinfo.SUBJECT_ID IS NULL )
+                AND (  p_SUBJECT_ID IS NULL )))
+       AND (    ( Recinfo.SUB_CONFIG_INST_HDR_ID = p_SUB_CONFIG_INST_HDR_ID)
+            OR (    ( Recinfo.SUB_CONFIG_INST_HDR_ID IS NULL )
+                AND (  p_SUB_CONFIG_INST_HDR_ID IS NULL )))
+       AND (    ( Recinfo.SUB_CONFIG_INST_REV_NUM = p_SUB_CONFIG_INST_REV_NUM)
+            OR (    ( Recinfo.SUB_CONFIG_INST_REV_NUM IS NULL )
+                AND (  p_SUB_CONFIG_INST_REV_NUM IS NULL )))
+       AND (    ( Recinfo.SUB_CONFIG_INST_ITEM_ID = p_SUB_CONFIG_INST_ITEM_ID)
+            OR (    ( Recinfo.SUB_CONFIG_INST_ITEM_ID IS NULL )
+                AND (  p_SUB_CONFIG_INST_ITEM_ID IS NULL )))
+       AND (    ( Recinfo.OBJ_CONFIG_INST_HDR_ID = p_OBJ_CONFIG_INST_HDR_ID)
+            OR (    ( Recinfo.OBJ_CONFIG_INST_HDR_ID IS NULL )
+                AND (  p_OBJ_CONFIG_INST_HDR_ID IS NULL )))
+       AND (    ( Recinfo.OBJ_CONFIG_INST_REV_NUM = p_OBJ_CONFIG_INST_REV_NUM)
+            OR (    ( Recinfo.OBJ_CONFIG_INST_REV_NUM IS NULL )
+                AND (  p_OBJ_CONFIG_INST_REV_NUM IS NULL )))
+       AND (    ( Recinfo.OBJ_CONFIG_INST_ITEM_ID = p_OBJ_CONFIG_INST_ITEM_ID)
+            OR (    ( Recinfo.OBJ_CONFIG_INST_ITEM_ID IS NULL )
+                AND (  p_OBJ_CONFIG_INST_ITEM_ID IS NULL )))
+       AND (    ( Recinfo.ATTRIBUTE1 = p_ATTRIBUTE1)
+            OR (    ( Recinfo.ATTRIBUTE1 IS NULL )
+                AND (  p_ATTRIBUTE1 IS NULL )))
+       AND (    ( Recinfo.ATTRIBUTE2 = p_ATTRIBUTE2)
+            OR (    ( Recinfo.ATTRIBUTE2 IS NULL )
+                AND (  p_ATTRIBUTE2 IS NULL )))
+       AND (    ( Recinfo.ATTRIBUTE3 = p_ATTRIBUTE3)
+            OR (    ( Recinfo.ATTRIBUTE3 IS NULL )
+                AND (  p_ATTRIBUTE3 IS NULL )))
+       AND (    ( Recinfo.ATTRIBUTE4 = p_ATTRIBUTE4)
+            OR (    ( Recinfo.ATTRIBUTE4 IS NULL )
+                AND (  p_ATTRIBUTE4 IS NULL )))
+       AND (    ( Recinfo.ATTRIBUTE5 = p_ATTRIBUTE5)
+            OR (    ( Recinfo.ATTRIBUTE5 IS NULL )
+                AND (  p_ATTRIBUTE5 IS NULL )))
+       AND (    ( Recinfo.ATTRIBUTE6 = p_ATTRIBUTE6)
+            OR (    ( Recinfo.ATTRIBUTE6 IS NULL )
+                AND (  p_ATTRIBUTE6 IS NULL )))
+       AND (    ( Recinfo.ATTRIBUTE7 = p_ATTRIBUTE7)
+            OR (    ( Recinfo.ATTRIBUTE7 IS NULL )
+                AND (  p_ATTRIBUTE7 IS NULL )))
+       AND (    ( Recinfo.ATTRIBUTE8 = p_ATTRIBUTE8)
+            OR (    ( Recinfo.ATTRIBUTE8 IS NULL )
+                AND (  p_ATTRIBUTE8 IS NULL )))
+       AND (    ( Recinfo.ATTRIBUTE9 = p_ATTRIBUTE9)
+            OR (    ( Recinfo.ATTRIBUTE9 IS NULL )
+                AND (  p_ATTRIBUTE9 IS NULL )))
+       AND (    ( Recinfo.ATTRIBUTE10 = p_ATTRIBUTE10)
+            OR (    ( Recinfo.ATTRIBUTE10 IS NULL )
+                AND (  p_ATTRIBUTE10 IS NULL )))
+       AND (    ( Recinfo.ATTRIBUTE11 = p_ATTRIBUTE11)
+            OR (    ( Recinfo.ATTRIBUTE11 IS NULL )
+                AND (  p_ATTRIBUTE11 IS NULL )))
+       AND (    ( Recinfo.ATTRIBUTE12 = p_ATTRIBUTE12)
+            OR (    ( Recinfo.ATTRIBUTE12 IS NULL )
+                AND (  p_ATTRIBUTE12 IS NULL )))
+       AND (    ( Recinfo.ATTRIBUTE13 = p_ATTRIBUTE13)
+            OR (    ( Recinfo.ATTRIBUTE13 IS NULL )
+                AND (  p_ATTRIBUTE13 IS NULL )))
+       AND (    ( Recinfo.ATTRIBUTE14 = p_ATTRIBUTE14)
+            OR (    ( Recinfo.ATTRIBUTE14 IS NULL )
+                AND (  p_ATTRIBUTE14 IS NULL )))
+       AND (    ( Recinfo.ATTRIBUTE15 = p_ATTRIBUTE15)
+            OR (    ( Recinfo.ATTRIBUTE15 IS NULL )
+                AND (  p_ATTRIBUTE15 IS NULL )))
+       AND (    ( Recinfo.CREATED_BY = p_CREATED_BY)
+            OR (    ( Recinfo.CREATED_BY IS NULL )
+                AND (  p_CREATED_BY IS NULL )))
+       AND (    ( Recinfo.CREATION_DATE = p_CREATION_DATE)
+            OR (    ( Recinfo.CREATION_DATE IS NULL )
+                AND (  p_CREATION_DATE IS NULL )))
+       AND (    ( Recinfo.LAST_UPDATED_BY = p_LAST_UPDATED_BY)
+            OR (    ( Recinfo.LAST_UPDATED_BY IS NULL )
+                AND (  p_LAST_UPDATED_BY IS NULL )))
+       AND (    ( Recinfo.LAST_UPDATE_DATE = p_LAST_UPDATE_DATE)
+            OR (    ( Recinfo.LAST_UPDATE_DATE IS NULL )
+                AND (  p_LAST_UPDATE_DATE IS NULL )))
+       AND (    ( Recinfo.LAST_UPDATE_LOGIN = p_LAST_UPDATE_LOGIN)
+            OR (    ( Recinfo.LAST_UPDATE_LOGIN IS NULL )
+                AND (  p_LAST_UPDATE_LOGIN IS NULL )))
+       AND (    ( Recinfo.OBJECT_VERSION_NUMBER = p_OBJECT_VERSION_NUMBER)
+            OR (    ( Recinfo.OBJECT_VERSION_NUMBER IS NULL )
+                AND (  p_OBJECT_VERSION_NUMBER IS NULL )))
+       AND (    ( Recinfo.CONTEXT = p_CONTEXT)
+            OR (    ( Recinfo.CONTEXT IS NULL )
+                AND (  p_CONTEXT IS NULL )))
+       AND (    ( Recinfo.TRANSFER_COMPONENTS_FLAG = p_TRANSFER_COMPONENTS_FLAG)
+            OR (    ( Recinfo.TRANSFER_COMPONENTS_FLAG IS NULL )
+                AND (  p_TRANSFER_COMPONENTS_FLAG IS NULL )))
+       ) then
+       return;
+   else
+       FND_MESSAGE.SET_NAME('FND', 'FORM_RECORD_CHANGED');
+       APP_EXCEPTION.RAISE_EXCEPTION;
+   End If;
+END Lock_Row;
+
+End CSI_T_II_RELATIONSHIPS_PKG;
+
+/

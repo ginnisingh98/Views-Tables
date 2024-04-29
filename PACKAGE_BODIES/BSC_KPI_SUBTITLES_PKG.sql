@@ -1,0 +1,216 @@
+--------------------------------------------------------
+--  DDL for Package Body BSC_KPI_SUBTITLES_PKG
+--------------------------------------------------------
+
+  CREATE OR REPLACE EDITIONABLE PACKAGE BODY "APPS"."BSC_KPI_SUBTITLES_PKG" as
+/* $Header: BSCKSBTB.pls 115.6 2003/02/12 14:26:01 adrao ship $ */
+procedure INSERT_ROW (
+  X_ROWID in out NOCOPY VARCHAR2,
+  X_INDICATOR in NUMBER,
+  X_CALC_COMB in NUMBER,
+  X_ANALYSIS_OPTION0 in NUMBER,
+  X_ANALYSIS_OPTION1 in NUMBER,
+  X_ANALYSIS_OPTION2 in NUMBER,
+  X_SUBTITLE in VARCHAR2
+) is
+  cursor C is select ROWID from BSC_KPI_SUBTITLES_TL
+    where INDICATOR = X_INDICATOR
+    and CALC_COMB = X_CALC_COMB
+    and ANALYSIS_OPTION0 = X_ANALYSIS_OPTION0
+    and ANALYSIS_OPTION1 = X_ANALYSIS_OPTION1
+    and ANALYSIS_OPTION2 = X_ANALYSIS_OPTION2
+    and LANGUAGE = userenv('LANG')
+    ;
+begin
+  insert into BSC_KPI_SUBTITLES_TL (
+    INDICATOR,
+    CALC_COMB,
+    ANALYSIS_OPTION0,
+    ANALYSIS_OPTION1,
+    ANALYSIS_OPTION2,
+    SUBTITLE,
+    LANGUAGE,
+    SOURCE_LANG
+  ) select
+    X_INDICATOR,
+    X_CALC_COMB,
+    X_ANALYSIS_OPTION0,
+    X_ANALYSIS_OPTION1,
+    X_ANALYSIS_OPTION2,
+    X_SUBTITLE,
+    L.LANGUAGE_CODE,
+    userenv('LANG')
+  from FND_LANGUAGES L
+  where L.INSTALLED_FLAG in ('I', 'B')
+  and not exists
+    (select NULL
+    from BSC_KPI_SUBTITLES_TL T
+    where T.INDICATOR = X_INDICATOR
+    and T.CALC_COMB = X_CALC_COMB
+    and T.ANALYSIS_OPTION0 = X_ANALYSIS_OPTION0
+    and T.ANALYSIS_OPTION1 = X_ANALYSIS_OPTION1
+    and T.ANALYSIS_OPTION2 = X_ANALYSIS_OPTION2
+    and T.LANGUAGE = L.LANGUAGE_CODE);
+
+  open c;
+  fetch c into X_ROWID;
+  if (c%notfound) then
+    close c;
+    raise no_data_found;
+  end if;
+  close c;
+
+end INSERT_ROW;
+
+procedure LOCK_ROW (
+  X_INDICATOR in NUMBER,
+  X_CALC_COMB in NUMBER,
+  X_ANALYSIS_OPTION0 in NUMBER,
+  X_ANALYSIS_OPTION1 in NUMBER,
+  X_ANALYSIS_OPTION2 in NUMBER,
+  X_SUBTITLE in VARCHAR2
+) is
+  cursor c1 is select
+      SUBTITLE,
+      decode(LANGUAGE, userenv('LANG'), 'Y', 'N') BASELANG
+    from BSC_KPI_SUBTITLES_TL
+    where INDICATOR = X_INDICATOR
+    and CALC_COMB = X_CALC_COMB
+    and ANALYSIS_OPTION0 = X_ANALYSIS_OPTION0
+    and ANALYSIS_OPTION1 = X_ANALYSIS_OPTION1
+    and ANALYSIS_OPTION2 = X_ANALYSIS_OPTION2
+    and userenv('LANG') in (LANGUAGE, SOURCE_LANG)
+    for update of INDICATOR nowait;
+begin
+  for tlinfo in c1 loop
+    if (tlinfo.BASELANG = 'Y') then
+      if (    (tlinfo.SUBTITLE = X_SUBTITLE)
+      ) then
+        null;
+      else
+        fnd_message.set_name('FND', 'FORM_RECORD_CHANGED');
+        app_exception.raise_exception;
+      end if;
+    end if;
+  end loop;
+  return;
+end LOCK_ROW;
+
+procedure UPDATE_ROW (
+  X_INDICATOR in NUMBER,
+  X_CALC_COMB in NUMBER,
+  X_ANALYSIS_OPTION0 in NUMBER,
+  X_ANALYSIS_OPTION1 in NUMBER,
+  X_ANALYSIS_OPTION2 in NUMBER,
+  X_SUBTITLE in VARCHAR2
+) is
+begin
+  update BSC_KPI_SUBTITLES_TL set
+    SUBTITLE = X_SUBTITLE,
+    SOURCE_LANG = userenv('LANG')
+  where INDICATOR = X_INDICATOR
+  and CALC_COMB = X_CALC_COMB
+  and ANALYSIS_OPTION0 = X_ANALYSIS_OPTION0
+  and ANALYSIS_OPTION1 = X_ANALYSIS_OPTION1
+  and ANALYSIS_OPTION2 = X_ANALYSIS_OPTION2
+  and userenv('LANG') in (LANGUAGE, SOURCE_LANG);
+
+  if (sql%notfound) then
+    raise no_data_found;
+  end if;
+end UPDATE_ROW;
+
+procedure DELETE_ROW (
+  X_INDICATOR in NUMBER,
+  X_CALC_COMB in NUMBER,
+  X_ANALYSIS_OPTION0 in NUMBER,
+  X_ANALYSIS_OPTION1 in NUMBER,
+  X_ANALYSIS_OPTION2 in NUMBER
+) is
+begin
+  delete from BSC_KPI_SUBTITLES_TL
+  where INDICATOR = X_INDICATOR
+  and CALC_COMB = X_CALC_COMB
+  and ANALYSIS_OPTION0 = X_ANALYSIS_OPTION0
+  and ANALYSIS_OPTION1 = X_ANALYSIS_OPTION1
+  and ANALYSIS_OPTION2 = X_ANALYSIS_OPTION2;
+
+  if (sql%notfound) then
+    raise no_data_found;
+  end if;
+
+end DELETE_ROW;
+
+procedure ADD_LANGUAGE
+is
+begin
+  update BSC_KPI_SUBTITLES_TL T set (
+      SUBTITLE
+    ) = (select
+      B.SUBTITLE
+    from BSC_KPI_SUBTITLES_TL B
+    where B.INDICATOR = T.INDICATOR
+    and B.CALC_COMB = T.CALC_COMB
+    and B.ANALYSIS_OPTION0 = T.ANALYSIS_OPTION0
+    and B.ANALYSIS_OPTION1 = T.ANALYSIS_OPTION1
+    and B.ANALYSIS_OPTION2 = T.ANALYSIS_OPTION2
+    and B.LANGUAGE = T.SOURCE_LANG)
+  where (
+      T.INDICATOR,
+      T.CALC_COMB,
+      T.ANALYSIS_OPTION0,
+      T.ANALYSIS_OPTION1,
+      T.ANALYSIS_OPTION2,
+      T.LANGUAGE
+  ) in (select
+      SUBT.INDICATOR,
+      SUBT.CALC_COMB,
+      SUBT.ANALYSIS_OPTION0,
+      SUBT.ANALYSIS_OPTION1,
+      SUBT.ANALYSIS_OPTION2,
+      SUBT.LANGUAGE
+    from BSC_KPI_SUBTITLES_TL SUBB, BSC_KPI_SUBTITLES_TL SUBT
+    where SUBB.INDICATOR = SUBT.INDICATOR
+    and SUBB.CALC_COMB = SUBT.CALC_COMB
+    and SUBB.ANALYSIS_OPTION0 = SUBT.ANALYSIS_OPTION0
+    and SUBB.ANALYSIS_OPTION1 = SUBT.ANALYSIS_OPTION1
+    and SUBB.ANALYSIS_OPTION2 = SUBT.ANALYSIS_OPTION2
+    and SUBB.LANGUAGE = SUBT.SOURCE_LANG
+    and (SUBB.SUBTITLE <> SUBT.SUBTITLE
+  ));
+
+  insert into BSC_KPI_SUBTITLES_TL (
+    INDICATOR,
+    CALC_COMB,
+    ANALYSIS_OPTION0,
+    ANALYSIS_OPTION1,
+    ANALYSIS_OPTION2,
+    SUBTITLE,
+    LANGUAGE,
+    SOURCE_LANG
+  ) select
+    B.INDICATOR,
+    B.CALC_COMB,
+    B.ANALYSIS_OPTION0,
+    B.ANALYSIS_OPTION1,
+    B.ANALYSIS_OPTION2,
+    B.SUBTITLE,
+    L.LANGUAGE_CODE,
+    B.SOURCE_LANG
+  from BSC_KPI_SUBTITLES_TL B, FND_LANGUAGES L
+  where L.INSTALLED_FLAG in ('I', 'B')
+  and B.LANGUAGE = userenv('LANG')
+  and not exists
+    (select NULL
+    from BSC_KPI_SUBTITLES_TL T
+    where T.INDICATOR = B.INDICATOR
+    and T.CALC_COMB = B.CALC_COMB
+    and T.ANALYSIS_OPTION0 = B.ANALYSIS_OPTION0
+    and T.ANALYSIS_OPTION1 = B.ANALYSIS_OPTION1
+    and T.ANALYSIS_OPTION2 = B.ANALYSIS_OPTION2
+    and T.LANGUAGE = L.LANGUAGE_CODE);
+end ADD_LANGUAGE;
+
+end BSC_KPI_SUBTITLES_PKG;
+
+/

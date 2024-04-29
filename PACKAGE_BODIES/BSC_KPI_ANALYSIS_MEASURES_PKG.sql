@@ -1,0 +1,387 @@
+--------------------------------------------------------
+--  DDL for Package Body BSC_KPI_ANALYSIS_MEASURES_PKG
+--------------------------------------------------------
+
+  CREATE OR REPLACE EDITIONABLE PACKAGE BODY "APPS"."BSC_KPI_ANALYSIS_MEASURES_PKG" as
+/* $Header: BSCKAMSB.pls 115.9 2003/06/21 01:24:19 meastmon ship $ */
+procedure INSERT_ROW (
+  X_ROWID in out NOCOPY VARCHAR2,
+  X_INDICATOR in NUMBER,
+  X_ANALYSIS_OPTION0 in NUMBER,
+  X_ANALYSIS_OPTION1 in NUMBER,
+  X_ANALYSIS_OPTION2 in NUMBER,
+  X_SERIES_ID in NUMBER,
+  X_DATASET_ID in NUMBER,
+  X_AXIS in NUMBER,
+  X_SERIES_TYPE in NUMBER,
+  X_STACK_SERIES_ID in NUMBER,
+  X_BM_FLAG in NUMBER,
+  X_BUDGET_FLAG in NUMBER,
+  X_DEFAULT_VALUE in NUMBER,
+  X_SERIES_COLOR in NUMBER,
+  X_BM_COLOR in NUMBER,
+  X_NAME in VARCHAR2,
+  X_HELP in VARCHAR2
+) is
+  cursor C is select ROWID from BSC_KPI_ANALYSIS_MEASURES_B
+    where INDICATOR = X_INDICATOR
+    and ANALYSIS_OPTION0 = X_ANALYSIS_OPTION0
+    and ANALYSIS_OPTION1 = X_ANALYSIS_OPTION1
+    and ANALYSIS_OPTION2 = X_ANALYSIS_OPTION2
+    and SERIES_ID = X_SERIES_ID
+    ;
+begin
+  insert into BSC_KPI_ANALYSIS_MEASURES_B (
+    ANALYSIS_OPTION2,
+    SERIES_ID,
+    DATASET_ID,
+    AXIS,
+    SERIES_TYPE,
+    STACK_SERIES_ID,
+    BM_FLAG,
+    BUDGET_FLAG,
+    DEFAULT_VALUE,
+    SERIES_COLOR,
+    BM_COLOR,
+    INDICATOR,
+    ANALYSIS_OPTION0,
+    ANALYSIS_OPTION1
+  ) values (
+    X_ANALYSIS_OPTION2,
+    X_SERIES_ID,
+    X_DATASET_ID,
+    X_AXIS,
+    X_SERIES_TYPE,
+    X_STACK_SERIES_ID,
+    X_BM_FLAG,
+    X_BUDGET_FLAG,
+    X_DEFAULT_VALUE,
+    X_SERIES_COLOR,
+    X_BM_COLOR,
+    X_INDICATOR,
+    X_ANALYSIS_OPTION0,
+    X_ANALYSIS_OPTION1
+  );
+
+  insert into BSC_KPI_ANALYSIS_MEASURES_TL (
+    INDICATOR,
+    ANALYSIS_OPTION0,
+    ANALYSIS_OPTION1,
+    ANALYSIS_OPTION2,
+    SERIES_ID,
+    NAME,
+    HELP,
+    LANGUAGE,
+    SOURCE_LANG
+  ) select
+    X_INDICATOR,
+    X_ANALYSIS_OPTION0,
+    X_ANALYSIS_OPTION1,
+    X_ANALYSIS_OPTION2,
+    X_SERIES_ID,
+    X_NAME,
+    X_HELP,
+    L.LANGUAGE_CODE,
+    userenv('LANG')
+  from FND_LANGUAGES L
+  where L.INSTALLED_FLAG in ('I', 'B')
+  and not exists
+    (select NULL
+    from BSC_KPI_ANALYSIS_MEASURES_TL T
+    where T.INDICATOR = X_INDICATOR
+    and T.ANALYSIS_OPTION0 = X_ANALYSIS_OPTION0
+    and T.ANALYSIS_OPTION1 = X_ANALYSIS_OPTION1
+    and T.ANALYSIS_OPTION2 = X_ANALYSIS_OPTION2
+    and T.SERIES_ID = X_SERIES_ID
+    and T.LANGUAGE = L.LANGUAGE_CODE);
+
+  open c;
+  fetch c into X_ROWID;
+  if (c%notfound) then
+    close c;
+    raise no_data_found;
+  end if;
+  close c;
+
+end INSERT_ROW;
+
+procedure LOCK_ROW (
+  X_INDICATOR in NUMBER,
+  X_ANALYSIS_OPTION0 in NUMBER,
+  X_ANALYSIS_OPTION1 in NUMBER,
+  X_ANALYSIS_OPTION2 in NUMBER,
+  X_SERIES_ID in NUMBER,
+  X_DATASET_ID in NUMBER,
+  X_AXIS in NUMBER,
+  X_SERIES_TYPE in NUMBER,
+  X_STACK_SERIES_ID in NUMBER,
+  X_BM_FLAG in NUMBER,
+  X_BUDGET_FLAG in NUMBER,
+  X_DEFAULT_VALUE in NUMBER,
+  X_SERIES_COLOR in NUMBER,
+  X_BM_COLOR in NUMBER,
+  X_NAME in VARCHAR2,
+  X_HELP in VARCHAR2
+) is
+  cursor c is select
+      DATASET_ID,
+      AXIS,
+      SERIES_TYPE,
+      STACK_SERIES_ID,
+      BM_FLAG,
+      BUDGET_FLAG,
+      DEFAULT_VALUE,
+      SERIES_COLOR,
+      BM_COLOR
+    from BSC_KPI_ANALYSIS_MEASURES_B
+    where INDICATOR = X_INDICATOR
+    and ANALYSIS_OPTION0 = X_ANALYSIS_OPTION0
+    and ANALYSIS_OPTION1 = X_ANALYSIS_OPTION1
+    and ANALYSIS_OPTION2 = X_ANALYSIS_OPTION2
+    and SERIES_ID = X_SERIES_ID
+    for update of INDICATOR nowait;
+  recinfo c%rowtype;
+
+  cursor c1 is select
+      NAME,
+      HELP,
+      decode(LANGUAGE, userenv('LANG'), 'Y', 'N') BASELANG
+    from BSC_KPI_ANALYSIS_MEASURES_TL
+    where INDICATOR = X_INDICATOR
+    and ANALYSIS_OPTION0 = X_ANALYSIS_OPTION0
+    and ANALYSIS_OPTION1 = X_ANALYSIS_OPTION1
+    and ANALYSIS_OPTION2 = X_ANALYSIS_OPTION2
+    and SERIES_ID = X_SERIES_ID
+    and userenv('LANG') in (LANGUAGE, SOURCE_LANG)
+    for update of INDICATOR nowait;
+begin
+  open c;
+  fetch c into recinfo;
+  if (c%notfound) then
+    close c;
+    fnd_message.set_name('FND', 'FORM_RECORD_DELETED');
+    app_exception.raise_exception;
+  end if;
+  close c;
+  if (    (recinfo.DATASET_ID = X_DATASET_ID)
+      AND (recinfo.AXIS = X_AXIS)
+      AND (recinfo.SERIES_TYPE = X_SERIES_TYPE)
+      AND ((recinfo.STACK_SERIES_ID = X_STACK_SERIES_ID)
+           OR ((recinfo.STACK_SERIES_ID is null) AND (X_STACK_SERIES_ID is null)))
+      AND (recinfo.BM_FLAG = X_BM_FLAG)
+      AND (recinfo.BUDGET_FLAG = X_BUDGET_FLAG)
+      AND (recinfo.DEFAULT_VALUE = X_DEFAULT_VALUE)
+      AND (recinfo.SERIES_COLOR = X_SERIES_COLOR)
+      AND (recinfo.BM_COLOR = X_BM_COLOR)
+  ) then
+    null;
+  else
+    fnd_message.set_name('FND', 'FORM_RECORD_CHANGED');
+    app_exception.raise_exception;
+  end if;
+
+  for tlinfo in c1 loop
+    if (tlinfo.BASELANG = 'Y') then
+      if (    (tlinfo.NAME = X_NAME)
+          AND (tlinfo.HELP = X_HELP)
+      ) then
+        null;
+      else
+        fnd_message.set_name('FND', 'FORM_RECORD_CHANGED');
+        app_exception.raise_exception;
+      end if;
+    end if;
+  end loop;
+  return;
+end LOCK_ROW;
+
+procedure UPDATE_ROW (
+  X_INDICATOR in NUMBER,
+  X_ANALYSIS_OPTION0 in NUMBER,
+  X_ANALYSIS_OPTION1 in NUMBER,
+  X_ANALYSIS_OPTION2 in NUMBER,
+  X_SERIES_ID in NUMBER,
+  X_DATASET_ID in NUMBER,
+  X_AXIS in NUMBER,
+  X_SERIES_TYPE in NUMBER,
+  X_STACK_SERIES_ID in NUMBER,
+  X_BM_FLAG in NUMBER,
+  X_BUDGET_FLAG in NUMBER,
+  X_DEFAULT_VALUE in NUMBER,
+  X_SERIES_COLOR in NUMBER,
+  X_BM_COLOR in NUMBER,
+  X_NAME in VARCHAR2,
+  X_HELP in VARCHAR2
+) is
+l_old_dataset_id	number;
+begin
+
+  -- mdamle 4/23/2003 - PMD - Measure Definer - Update flag if dataset changed
+  select dataset_id into l_old_dataset_id
+  from bsc_kpi_analysis_measures_b
+  where INDICATOR = X_INDICATOR
+  and ANALYSIS_OPTION0 = X_ANALYSIS_OPTION0
+  and ANALYSIS_OPTION1 = X_ANALYSIS_OPTION1
+  and ANALYSIS_OPTION2 = X_ANALYSIS_OPTION2
+  and SERIES_ID = X_SERIES_ID;
+
+  if (l_old_dataset_id <> X_DATASET_ID) then
+	BSC_DESIGNER_PVT.ActionFlag_Change(x_indicator, BSC_DESIGNER_PVT.G_ActionFlag.GAA_Structure);
+  end if;
+
+  update BSC_KPI_ANALYSIS_MEASURES_B set
+    DATASET_ID = X_DATASET_ID,
+    AXIS = X_AXIS,
+    SERIES_TYPE = X_SERIES_TYPE,
+    STACK_SERIES_ID = X_STACK_SERIES_ID,
+    BM_FLAG = X_BM_FLAG,
+    BUDGET_FLAG = X_BUDGET_FLAG,
+    DEFAULT_VALUE = X_DEFAULT_VALUE,
+    SERIES_COLOR = X_SERIES_COLOR,
+    BM_COLOR = X_BM_COLOR
+  where INDICATOR = X_INDICATOR
+  and ANALYSIS_OPTION0 = X_ANALYSIS_OPTION0
+  and ANALYSIS_OPTION1 = X_ANALYSIS_OPTION1
+  and ANALYSIS_OPTION2 = X_ANALYSIS_OPTION2
+  and SERIES_ID = X_SERIES_ID;
+
+  if (sql%notfound) then
+    raise no_data_found;
+  end if;
+
+  update BSC_KPI_ANALYSIS_MEASURES_TL set
+    NAME = X_NAME,
+    HELP = X_HELP,
+    SOURCE_LANG = userenv('LANG')
+  where INDICATOR = X_INDICATOR
+  and ANALYSIS_OPTION0 = X_ANALYSIS_OPTION0
+  and ANALYSIS_OPTION1 = X_ANALYSIS_OPTION1
+  and ANALYSIS_OPTION2 = X_ANALYSIS_OPTION2
+  and SERIES_ID = X_SERIES_ID
+  and userenv('LANG') in (LANGUAGE, SOURCE_LANG);
+
+  if (sql%notfound) then
+    raise no_data_found;
+  end if;
+end UPDATE_ROW;
+
+procedure DELETE_ROW (
+  X_INDICATOR in NUMBER,
+  X_ANALYSIS_OPTION0 in NUMBER,
+  X_ANALYSIS_OPTION1 in NUMBER,
+  X_ANALYSIS_OPTION2 in NUMBER,
+  X_SERIES_ID in NUMBER
+) is
+begin
+  delete from BSC_KPI_ANALYSIS_MEASURES_TL
+  where INDICATOR = X_INDICATOR
+  and ANALYSIS_OPTION0 = X_ANALYSIS_OPTION0
+  and ANALYSIS_OPTION1 = X_ANALYSIS_OPTION1
+  and ANALYSIS_OPTION2 = X_ANALYSIS_OPTION2
+  and SERIES_ID = X_SERIES_ID;
+
+  if (sql%notfound) then
+    raise no_data_found;
+  end if;
+
+  delete from BSC_KPI_ANALYSIS_MEASURES_B
+  where INDICATOR = X_INDICATOR
+  and ANALYSIS_OPTION0 = X_ANALYSIS_OPTION0
+  and ANALYSIS_OPTION1 = X_ANALYSIS_OPTION1
+  and ANALYSIS_OPTION2 = X_ANALYSIS_OPTION2
+  and SERIES_ID = X_SERIES_ID;
+
+  if (sql%notfound) then
+    raise no_data_found;
+  end if;
+end DELETE_ROW;
+
+procedure ADD_LANGUAGE
+is
+begin
+  delete from BSC_KPI_ANALYSIS_MEASURES_TL T
+  where not exists
+    (select NULL
+    from BSC_KPI_ANALYSIS_MEASURES_B B
+    where B.INDICATOR = T.INDICATOR
+    and B.ANALYSIS_OPTION0 = T.ANALYSIS_OPTION0
+    and B.ANALYSIS_OPTION1 = T.ANALYSIS_OPTION1
+    and B.ANALYSIS_OPTION2 = T.ANALYSIS_OPTION2
+    and B.SERIES_ID = T.SERIES_ID
+    );
+
+  update BSC_KPI_ANALYSIS_MEASURES_TL T set (
+      NAME,
+      HELP
+    ) = (select
+      B.NAME,
+      B.HELP
+    from BSC_KPI_ANALYSIS_MEASURES_TL B
+    where B.INDICATOR = T.INDICATOR
+    and B.ANALYSIS_OPTION0 = T.ANALYSIS_OPTION0
+    and B.ANALYSIS_OPTION1 = T.ANALYSIS_OPTION1
+    and B.ANALYSIS_OPTION2 = T.ANALYSIS_OPTION2
+    and B.SERIES_ID = T.SERIES_ID
+    and B.LANGUAGE = T.SOURCE_LANG)
+  where (
+      T.INDICATOR,
+      T.ANALYSIS_OPTION0,
+      T.ANALYSIS_OPTION1,
+      T.ANALYSIS_OPTION2,
+      T.SERIES_ID,
+      T.LANGUAGE
+  ) in (select
+      SUBT.INDICATOR,
+      SUBT.ANALYSIS_OPTION0,
+      SUBT.ANALYSIS_OPTION1,
+      SUBT.ANALYSIS_OPTION2,
+      SUBT.SERIES_ID,
+      SUBT.LANGUAGE
+    from BSC_KPI_ANALYSIS_MEASURES_TL SUBB, BSC_KPI_ANALYSIS_MEASURES_TL SUBT
+    where SUBB.INDICATOR = SUBT.INDICATOR
+    and SUBB.ANALYSIS_OPTION0 = SUBT.ANALYSIS_OPTION0
+    and SUBB.ANALYSIS_OPTION1 = SUBT.ANALYSIS_OPTION1
+    and SUBB.ANALYSIS_OPTION2 = SUBT.ANALYSIS_OPTION2
+    and SUBB.SERIES_ID = SUBT.SERIES_ID
+    and SUBB.LANGUAGE = SUBT.SOURCE_LANG
+    and (SUBB.NAME <> SUBT.NAME
+      or SUBB.HELP <> SUBT.HELP
+  ));
+
+  insert into BSC_KPI_ANALYSIS_MEASURES_TL (
+    INDICATOR,
+    ANALYSIS_OPTION0,
+    ANALYSIS_OPTION1,
+    ANALYSIS_OPTION2,
+    SERIES_ID,
+    NAME,
+    HELP,
+    LANGUAGE,
+    SOURCE_LANG
+  ) select
+    B.INDICATOR,
+    B.ANALYSIS_OPTION0,
+    B.ANALYSIS_OPTION1,
+    B.ANALYSIS_OPTION2,
+    B.SERIES_ID,
+    B.NAME,
+    B.HELP,
+    L.LANGUAGE_CODE,
+    B.SOURCE_LANG
+  from BSC_KPI_ANALYSIS_MEASURES_TL B, FND_LANGUAGES L
+  where L.INSTALLED_FLAG in ('I', 'B')
+  and B.LANGUAGE = userenv('LANG')
+  and not exists
+    (select NULL
+    from BSC_KPI_ANALYSIS_MEASURES_TL T
+    where T.INDICATOR = B.INDICATOR
+    and T.ANALYSIS_OPTION0 = B.ANALYSIS_OPTION0
+    and T.ANALYSIS_OPTION1 = B.ANALYSIS_OPTION1
+    and T.ANALYSIS_OPTION2 = B.ANALYSIS_OPTION2
+    and T.SERIES_ID = B.SERIES_ID
+    and T.LANGUAGE = L.LANGUAGE_CODE);
+end ADD_LANGUAGE;
+
+end BSC_KPI_ANALYSIS_MEASURES_PKG;
+
+/

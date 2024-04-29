@@ -1,0 +1,92 @@
+--------------------------------------------------------
+--  DDL for Package IGS_AS_CAL_CONF_PKG
+--------------------------------------------------------
+
+  CREATE OR REPLACE EDITIONABLE PACKAGE "APPS"."IGS_AS_CAL_CONF_PKG" AUTHID CURRENT_USER as
+/* $Header: IGSDI45S.pls 115.6 2002/11/28 23:21:57 nsidana ship $ */
+
+procedure INSERT_ROW (
+  X_ROWID in out NOCOPY VARCHAR2,
+  X_S_CONTROL_NUM in  NUMBER,
+  X_ASS_ITEM_CUTOFF_DT_ALIAS in VARCHAR2,
+  X_MID_MGS_START_DT_ALIAS    in VARCHAR2,
+  X_MID_MGS_END_DT_ALIAS      in VARCHAR2,
+  X_EFINAL_MGS_START_DT_ALIAS in VARCHAR2,
+  X_EFINAL_MGS_END_DT_ALIAS   in VARCHAR2,
+  X_FINAL_MGS_START_DT_ALIAS  in VARCHAR2,
+  X_FINAL_MGS_END_DT_ALIAS    in VARCHAR2,
+  X_MODE in VARCHAR2 default 'R'
+  );
+procedure LOCK_ROW (
+  X_ROWID in VARCHAR2,
+  X_S_CONTROL_NUM in NUMBER,
+  X_ASS_ITEM_CUTOFF_DT_ALIAS in VARCHAR2,
+  X_MID_MGS_START_DT_ALIAS    in VARCHAR2,
+  X_MID_MGS_END_DT_ALIAS      in VARCHAR2,
+  X_EFINAL_MGS_START_DT_ALIAS in VARCHAR2,
+  X_EFINAL_MGS_END_DT_ALIAS   in VARCHAR2,
+  X_FINAL_MGS_START_DT_ALIAS  in VARCHAR2,
+  X_FINAL_MGS_END_DT_ALIAS    in VARCHAR2
+
+);
+procedure UPDATE_ROW (
+  X_ROWID in VARCHAR2,
+  X_S_CONTROL_NUM in NUMBER,
+  X_ASS_ITEM_CUTOFF_DT_ALIAS in VARCHAR2,
+  X_MID_MGS_START_DT_ALIAS    in VARCHAR2,
+  X_MID_MGS_END_DT_ALIAS      in VARCHAR2,
+  X_EFINAL_MGS_START_DT_ALIAS in VARCHAR2,
+  X_EFINAL_MGS_END_DT_ALIAS   in VARCHAR2,
+  X_FINAL_MGS_START_DT_ALIAS  in VARCHAR2,
+  X_FINAL_MGS_END_DT_ALIAS    in VARCHAR2,
+  X_MODE in VARCHAR2 default 'R'
+  );
+procedure ADD_ROW (
+  X_ROWID in out NOCOPY VARCHAR2,
+  X_S_CONTROL_NUM in  NUMBER,
+  X_ASS_ITEM_CUTOFF_DT_ALIAS in VARCHAR2,
+  X_MID_MGS_START_DT_ALIAS    in VARCHAR2,
+  X_MID_MGS_END_DT_ALIAS      in VARCHAR2,
+  X_EFINAL_MGS_START_DT_ALIAS in VARCHAR2,
+  X_EFINAL_MGS_END_DT_ALIAS   in VARCHAR2,
+  X_FINAL_MGS_START_DT_ALIAS  in VARCHAR2,
+  X_FINAL_MGS_END_DT_ALIAS    in VARCHAR2,
+  X_MODE in VARCHAR2 default 'R'
+  );
+procedure DELETE_ROW (
+  X_ROWID in VARCHAR2
+);
+FUNCTION Get_PK_For_Validation (
+    x_s_control_num IN NUMBER
+    ) RETURN BOOLEAN;
+
+  PROCEDURE GET_FK_IGS_CA_DA (
+    x_dt_alias IN VARCHAR2
+    );
+ PROCEDURE Check_Constraints (
+ Column_Name	IN	VARCHAR2	DEFAULT NULL,
+ Column_Value 	IN	VARCHAR2	DEFAULT NULL
+ );
+
+  PROCEDURE Before_DML (
+    p_action IN VARCHAR2,
+    x_rowid IN  VARCHAR2 DEFAULT NULL,
+    x_s_control_num IN NUMBER DEFAULT NULL,
+    x_ass_item_cutoff_dt_alias IN VARCHAR2 DEFAULT NULL,
+    x_mid_mgs_start_dt_alias    IN VARCHAR2 DEFAULT NULL ,
+    x_mid_mgs_end_dt_alias      IN VARCHAR2 DEFAULT NULL ,
+    x_efinal_mgs_start_dt_alias IN VARCHAR2 DEFAULT NULL ,
+    x_efinal_mgs_end_dt_alias   IN VARCHAR2 DEFAULT NULL ,
+    x_final_mgs_start_dt_alias  IN VARCHAR2 DEFAULT NULL ,
+    x_final_mgs_end_dt_alias    IN VARCHAR2 DEFAULT NULL ,
+    x_creation_date IN DATE DEFAULT NULL,
+    x_created_by IN NUMBER DEFAULT NULL,
+    x_last_update_date IN DATE DEFAULT NULL,
+    x_last_updated_by IN NUMBER DEFAULT NULL,
+    x_last_update_login IN NUMBER DEFAULT NULL
+  ) ;
+end IGS_AS_CAL_CONF_PKG;
+
+ 
+
+/

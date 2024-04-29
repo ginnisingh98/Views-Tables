@@ -1,0 +1,50 @@
+--------------------------------------------------------
+--  DDL for Package IGW_ROLES_PKG
+--------------------------------------------------------
+
+  CREATE OR REPLACE EDITIONABLE PACKAGE "APPS"."IGW_ROLES_PKG" AUTHID CURRENT_USER as
+/* $Header: igwstros.pls 115.4 2002/11/15 00:48:20 ashkumar ship $ */
+procedure INSERT_ROW (
+  X_ROWID in out NOCOPY VARCHAR2,
+  X_ROLE_ID in NUMBER,
+  X_SEEDED_FLAG in VARCHAR2,
+  X_START_DATE_ACTIVE in DATE,
+  X_END_DATE_ACTIVE in DATE,
+  X_ROLE_NAME in VARCHAR2,
+  X_CREATION_DATE in DATE,
+  X_CREATED_BY in NUMBER,
+  X_LAST_UPDATE_DATE in DATE,
+  X_LAST_UPDATED_BY in NUMBER,
+  X_LAST_UPDATE_LOGIN in NUMBER);
+procedure LOCK_ROW (
+  X_ROLE_ID in NUMBER,
+  X_SEEDED_FLAG in VARCHAR2,
+  X_START_DATE_ACTIVE in DATE,
+  X_END_DATE_ACTIVE in DATE,
+  X_ROLE_NAME in VARCHAR2
+);
+procedure UPDATE_ROW (
+  X_ROLE_ID in NUMBER,
+  X_SEEDED_FLAG in VARCHAR2,
+  X_START_DATE_ACTIVE in DATE,
+  X_END_DATE_ACTIVE in DATE,
+  X_ROLE_NAME in VARCHAR2,
+  X_LAST_UPDATE_DATE in DATE,
+  X_LAST_UPDATED_BY in NUMBER,
+  X_LAST_UPDATE_LOGIN in NUMBER
+);
+procedure DELETE_ROW (
+  X_ROLE_ID in NUMBER
+);
+procedure ADD_LANGUAGE;
+
+procedure TRANSLATE_ROW (
+  X_ROLE_ID in NUMBER,
+  X_ROLE_NAME in VARCHAR2,
+  X_OWNER  in  VARCHAR2);
+
+end IGW_ROLES_PKG;
+
+ 
+
+/

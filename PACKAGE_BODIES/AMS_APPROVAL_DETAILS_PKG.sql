@@ -1,0 +1,553 @@
+--------------------------------------------------------
+--  DDL for Package Body AMS_APPROVAL_DETAILS_PKG
+--------------------------------------------------------
+
+  CREATE OR REPLACE EDITIONABLE PACKAGE BODY "APPS"."AMS_APPROVAL_DETAILS_PKG" as
+/* $Header: amslapdb.pls 120.1 2005/06/27 05:37:47 appldev ship $ */
+procedure INSERT_ROW (
+  X_ROWID in OUT NOCOPY VARCHAR2,
+  X_APPROVAL_DETAIL_ID in NUMBER,
+  X_START_DATE_ACTIVE in DATE,
+  X_END_DATE_ACTIVE in DATE,
+  X_OBJECT_VERSION_NUMBER in NUMBER,
+  --X_SECURITY_GROUP_ID in NUMBER,
+  X_BUSINESS_GROUP_ID in NUMBER,
+  X_BUSINESS_UNIT_ID in NUMBER,
+  X_ORGANIZATION_ID in NUMBER,
+  X_CUSTOM_SETUP_ID in NUMBER,
+  X_APPROVAL_OBJECT in VARCHAR2,
+  X_APPROVAL_OBJECT_TYPE in VARCHAR2,
+  X_APPROVAL_TYPE in VARCHAR2,
+  X_APPROVAL_PRIORITY in VARCHAR2,
+  X_APPROVAL_LIMIT_TO in NUMBER,
+  X_APPROVAL_LIMIT_FROM in NUMBER,
+  X_SEEDED_FLAG in VARCHAR2,
+  X_ACTIVE_FLAG in VARCHAR2,
+  X_CURRENCY_CODE in VARCHAR2,
+  X_USER_COUNTRY_CODE in VARCHAR2,
+  X_NAME in VARCHAR2,
+  X_DESCRIPTION in VARCHAR2,
+  X_CREATION_DATE in DATE,
+  X_CREATED_BY in NUMBER,
+  X_LAST_UPDATE_DATE in DATE,
+  X_LAST_UPDATED_BY in NUMBER,
+  X_LAST_UPDATE_LOGIN in NUMBER
+) is
+  cursor C is select ROWID from AMS_APPROVAL_DETAILS
+    where APPROVAL_DETAIL_ID = X_APPROVAL_DETAIL_ID
+    ;
+begin
+  insert into AMS_APPROVAL_DETAILS (
+    START_DATE_ACTIVE,
+    END_DATE_ACTIVE,
+    APPROVAL_DETAIL_ID,
+    OBJECT_VERSION_NUMBER,
+    --SECURITY_GROUP_ID,
+    BUSINESS_GROUP_ID,
+    BUSINESS_UNIT_ID,
+    ORGANIZATION_ID,
+    CUSTOM_SETUP_ID,
+    APPROVAL_OBJECT,
+    APPROVAL_OBJECT_TYPE,
+    APPROVAL_TYPE,
+    APPROVAL_PRIORITY,
+    APPROVAL_LIMIT_TO,
+    APPROVAL_LIMIT_FROM,
+    SEEDED_FLAG,
+    ACTIVE_FLAG,
+    CURRENCY_CODE,
+    USER_COUNTRY_CODE,
+    CREATION_DATE,
+    CREATED_BY,
+    LAST_UPDATE_DATE,
+    LAST_UPDATED_BY,
+    LAST_UPDATE_LOGIN
+  ) values (
+    X_START_DATE_ACTIVE,
+    X_END_DATE_ACTIVE,
+    X_APPROVAL_DETAIL_ID,
+    X_OBJECT_VERSION_NUMBER,
+    --X_SECURITY_GROUP_ID,
+    X_BUSINESS_GROUP_ID,
+    X_BUSINESS_UNIT_ID,
+    X_ORGANIZATION_ID,
+    X_CUSTOM_SETUP_ID,
+    X_APPROVAL_OBJECT,
+    X_APPROVAL_OBJECT_TYPE,
+    X_APPROVAL_TYPE,
+    X_APPROVAL_PRIORITY,
+    X_APPROVAL_LIMIT_TO,
+    X_APPROVAL_LIMIT_FROM,
+    X_SEEDED_FLAG,
+    X_ACTIVE_FLAG,
+    X_CURRENCY_CODE,
+    X_USER_COUNTRY_CODE,
+    X_CREATION_DATE,
+    X_CREATED_BY,
+    X_LAST_UPDATE_DATE,
+    X_LAST_UPDATED_BY,
+    X_LAST_UPDATE_LOGIN
+  );
+
+  insert into AMS_APPROVAL_DETAILS_TL (
+    APPROVAL_DETAIL_ID,
+    CREATION_DATE,
+    CREATED_BY,
+    LAST_UPDATE_DATE,
+    LAST_UPDATED_BY,
+    LAST_UPDATE_LOGIN,
+    NAME,
+    DESCRIPTION,
+    --SECURITY_GROUP_ID,
+    LANGUAGE,
+    SOURCE_LANG
+  ) select
+    X_APPROVAL_DETAIL_ID,
+    X_CREATION_DATE,
+    X_CREATED_BY,
+    X_LAST_UPDATE_DATE,
+    X_LAST_UPDATED_BY,
+    X_LAST_UPDATE_LOGIN,
+    X_NAME,
+    X_DESCRIPTION,
+    --X_SECURITY_GROUP_ID,
+    L.LANGUAGE_CODE,
+    userenv('LANG')
+  from FND_LANGUAGES L
+  where L.INSTALLED_FLAG in ('I', 'B')
+  and not exists
+    (select NULL
+    from AMS_APPROVAL_DETAILS_TL T
+    where T.APPROVAL_DETAIL_ID = X_APPROVAL_DETAIL_ID
+    and T.LANGUAGE = L.LANGUAGE_CODE);
+
+  open c;
+  fetch c into X_ROWID;
+  if (c%notfound) then
+    close c;
+    raise no_data_found;
+  end if;
+  close c;
+
+end INSERT_ROW;
+
+procedure LOCK_ROW (
+  X_APPROVAL_DETAIL_ID in NUMBER,
+  X_START_DATE_ACTIVE in DATE,
+  X_END_DATE_ACTIVE in DATE,
+  X_OBJECT_VERSION_NUMBER in NUMBER,
+  --X_SECURITY_GROUP_ID in NUMBER,
+  X_BUSINESS_GROUP_ID in NUMBER,
+  X_BUSINESS_UNIT_ID in NUMBER,
+  X_ORGANIZATION_ID in NUMBER,
+  X_CUSTOM_SETUP_ID in NUMBER,
+  X_APPROVAL_OBJECT in VARCHAR2,
+  X_APPROVAL_OBJECT_TYPE in VARCHAR2,
+  X_APPROVAL_TYPE in VARCHAR2,
+  X_APPROVAL_PRIORITY in VARCHAR2,
+  X_APPROVAL_LIMIT_TO in NUMBER,
+  X_APPROVAL_LIMIT_FROM in NUMBER,
+  X_SEEDED_FLAG in VARCHAR2,
+  X_ACTIVE_FLAG in VARCHAR2,
+  X_CURRENCY_CODE in VARCHAR2,
+  X_USER_COUNTRY_CODE in VARCHAR2,
+  X_NAME in VARCHAR2,
+  X_DESCRIPTION in VARCHAR2
+) is
+  cursor c is select
+      START_DATE_ACTIVE,
+      END_DATE_ACTIVE,
+      OBJECT_VERSION_NUMBER,
+      --SECURITY_GROUP_ID,
+      BUSINESS_GROUP_ID,
+      BUSINESS_UNIT_ID,
+      ORGANIZATION_ID,
+      CUSTOM_SETUP_ID,
+      APPROVAL_OBJECT,
+      APPROVAL_OBJECT_TYPE,
+      APPROVAL_TYPE,
+      APPROVAL_PRIORITY,
+      APPROVAL_LIMIT_TO,
+      APPROVAL_LIMIT_FROM,
+      SEEDED_FLAG
+    from AMS_APPROVAL_DETAILS
+    where APPROVAL_DETAIL_ID = X_APPROVAL_DETAIL_ID
+    for update of APPROVAL_DETAIL_ID nowait;
+  recinfo c%rowtype;
+
+  cursor c1 is select
+      NAME,
+      DESCRIPTION,
+      decode(LANGUAGE, userenv('LANG'), 'Y', 'N') BASELANG
+    from AMS_APPROVAL_DETAILS_TL
+    where APPROVAL_DETAIL_ID = X_APPROVAL_DETAIL_ID
+    and userenv('LANG') in (LANGUAGE, SOURCE_LANG)
+    for update of APPROVAL_DETAIL_ID nowait;
+begin
+  open c;
+  fetch c into recinfo;
+  if (c%notfound) then
+    close c;
+    fnd_message.set_name('FND', 'FORM_RECORD_DELETED');
+    app_exception.raise_exception;
+  end if;
+  close c;
+  if (    ((recinfo.START_DATE_ACTIVE = X_START_DATE_ACTIVE)
+           OR ((recinfo.START_DATE_ACTIVE is null) AND (X_START_DATE_ACTIVE is null)))
+      AND ((recinfo.END_DATE_ACTIVE = X_END_DATE_ACTIVE)
+           OR ((recinfo.END_DATE_ACTIVE is null) AND (X_END_DATE_ACTIVE is null)))
+      AND ((recinfo.OBJECT_VERSION_NUMBER = X_OBJECT_VERSION_NUMBER)
+           OR ((recinfo.OBJECT_VERSION_NUMBER is null) AND (X_OBJECT_VERSION_NUMBER is null)))
+     -- AND ((recinfo.SECURITY_GROUP_ID = X_SECURITY_GROUP_ID)
+       --    OR ((recinfo.SECURITY_GROUP_ID is null) AND (X_SECURITY_GROUP_ID is null)))
+      AND ((recinfo.BUSINESS_GROUP_ID = X_BUSINESS_GROUP_ID)
+           OR ((recinfo.BUSINESS_GROUP_ID is null) AND (X_BUSINESS_GROUP_ID is null)))
+      AND ((recinfo.BUSINESS_UNIT_ID = X_BUSINESS_UNIT_ID)
+           OR ((recinfo.BUSINESS_UNIT_ID is null) AND (X_BUSINESS_UNIT_ID is null)))
+      AND ((recinfo.ORGANIZATION_ID = X_ORGANIZATION_ID)
+           OR ((recinfo.ORGANIZATION_ID is null) AND (X_ORGANIZATION_ID is null)))
+      AND ((recinfo.CUSTOM_SETUP_ID = X_CUSTOM_SETUP_ID)
+           OR ((recinfo.CUSTOM_SETUP_ID is null) AND (X_CUSTOM_SETUP_ID is null)))
+      AND ((recinfo.APPROVAL_OBJECT = X_APPROVAL_OBJECT)
+           OR ((recinfo.APPROVAL_OBJECT is null) AND (X_APPROVAL_OBJECT is null)))
+      AND ((recinfo.APPROVAL_OBJECT_TYPE = X_APPROVAL_OBJECT_TYPE)
+           OR ((recinfo.APPROVAL_OBJECT_TYPE is null) AND (X_APPROVAL_OBJECT_TYPE is null)))
+      AND ((recinfo.APPROVAL_TYPE = X_APPROVAL_TYPE)
+           OR ((recinfo.APPROVAL_TYPE is null) AND (X_APPROVAL_TYPE is null)))
+      AND ((recinfo.APPROVAL_PRIORITY = X_APPROVAL_PRIORITY)
+           OR ((recinfo.APPROVAL_PRIORITY is null) AND (X_APPROVAL_PRIORITY is null)))
+      AND ((recinfo.APPROVAL_LIMIT_TO = X_APPROVAL_LIMIT_TO)
+           OR ((recinfo.APPROVAL_LIMIT_TO is null) AND (X_APPROVAL_LIMIT_TO is null)))
+      AND ((recinfo.APPROVAL_LIMIT_FROM = X_APPROVAL_LIMIT_FROM)
+           OR ((recinfo.APPROVAL_LIMIT_FROM is null) AND (X_APPROVAL_LIMIT_FROM is null)))
+      AND ((recinfo.SEEDED_FLAG = X_SEEDED_FLAG)
+           OR ((recinfo.SEEDED_FLAG is null) AND (X_SEEDED_FLAG is null)))
+  ) then
+    null;
+  else
+    fnd_message.set_name('FND', 'FORM_RECORD_CHANGED');
+    app_exception.raise_exception;
+  end if;
+
+  for tlinfo in c1 loop
+    if (tlinfo.BASELANG = 'Y') then
+      if (    (tlinfo.NAME = X_NAME)
+          AND ((tlinfo.DESCRIPTION = X_DESCRIPTION)
+               OR ((tlinfo.DESCRIPTION is null) AND (X_DESCRIPTION is null)))
+      ) then
+        null;
+      else
+        fnd_message.set_name('FND', 'FORM_RECORD_CHANGED');
+        app_exception.raise_exception;
+      end if;
+    end if;
+  end loop;
+  return;
+end LOCK_ROW;
+
+procedure UPDATE_ROW (
+  X_APPROVAL_DETAIL_ID in NUMBER,
+  X_START_DATE_ACTIVE in DATE,
+  X_END_DATE_ACTIVE in DATE,
+  X_OBJECT_VERSION_NUMBER in NUMBER,
+  --X_SECURITY_GROUP_ID in NUMBER,
+  X_BUSINESS_GROUP_ID in NUMBER,
+  X_BUSINESS_UNIT_ID in NUMBER,
+  X_ORGANIZATION_ID in NUMBER,
+  X_CUSTOM_SETUP_ID in NUMBER,
+  X_APPROVAL_OBJECT in VARCHAR2,
+  X_APPROVAL_OBJECT_TYPE in VARCHAR2,
+  X_APPROVAL_TYPE in VARCHAR2,
+  X_APPROVAL_PRIORITY in VARCHAR2,
+  X_APPROVAL_LIMIT_TO in NUMBER,
+  X_APPROVAL_LIMIT_FROM in NUMBER,
+  X_SEEDED_FLAG in VARCHAR2,
+  X_ACTIVE_FLAG in VARCHAR2,
+  X_CURRENCY_CODE in VARCHAR2,
+  X_USER_COUNTRY_CODE in VARCHAR2,
+  X_NAME in VARCHAR2,
+  X_DESCRIPTION in VARCHAR2,
+  X_LAST_UPDATE_DATE in DATE,
+  X_LAST_UPDATED_BY in NUMBER,
+  X_LAST_UPDATE_LOGIN in NUMBER
+) is
+begin
+  update AMS_APPROVAL_DETAILS set
+    START_DATE_ACTIVE = X_START_DATE_ACTIVE,
+    END_DATE_ACTIVE = X_END_DATE_ACTIVE,
+    OBJECT_VERSION_NUMBER = X_OBJECT_VERSION_NUMBER,
+    --SECURITY_GROUP_ID = X_SECURITY_GROUP_ID,
+    BUSINESS_GROUP_ID = X_BUSINESS_GROUP_ID,
+    BUSINESS_UNIT_ID = X_BUSINESS_UNIT_ID,
+    ORGANIZATION_ID = X_ORGANIZATION_ID,
+    CUSTOM_SETUP_ID = X_CUSTOM_SETUP_ID,
+    APPROVAL_OBJECT = X_APPROVAL_OBJECT,
+    APPROVAL_OBJECT_TYPE = X_APPROVAL_OBJECT_TYPE,
+    APPROVAL_TYPE = X_APPROVAL_TYPE,
+    APPROVAL_PRIORITY = X_APPROVAL_PRIORITY,
+    APPROVAL_LIMIT_TO = X_APPROVAL_LIMIT_TO,
+    APPROVAL_LIMIT_FROM = X_APPROVAL_LIMIT_FROM,
+    SEEDED_FLAG = X_SEEDED_FLAG,
+    ACTIVE_FLAG = X_ACTIVE_FLAG,
+    CURRENCY_CODE = X_CURRENCY_CODE,
+    USER_COUNTRY_CODE = X_USER_COUNTRY_CODE,
+    LAST_UPDATE_DATE = X_LAST_UPDATE_DATE,
+    LAST_UPDATED_BY = X_LAST_UPDATED_BY,
+    LAST_UPDATE_LOGIN = X_LAST_UPDATE_LOGIN
+  where APPROVAL_DETAIL_ID = X_APPROVAL_DETAIL_ID;
+
+  if (sql%notfound) then
+    raise no_data_found;
+  end if;
+
+  update AMS_APPROVAL_DETAILS_TL set
+    NAME = X_NAME,
+    DESCRIPTION = X_DESCRIPTION,
+    LAST_UPDATE_DATE = X_LAST_UPDATE_DATE,
+    LAST_UPDATED_BY = X_LAST_UPDATED_BY,
+    LAST_UPDATE_LOGIN = X_LAST_UPDATE_LOGIN,
+    SOURCE_LANG = userenv('LANG')
+  where APPROVAL_DETAIL_ID = X_APPROVAL_DETAIL_ID
+  and userenv('LANG') in (LANGUAGE, SOURCE_LANG);
+
+  if (sql%notfound) then
+    raise no_data_found;
+  end if;
+end UPDATE_ROW;
+
+procedure DELETE_ROW (
+  X_APPROVAL_DETAIL_ID in NUMBER
+) is
+begin
+  delete from AMS_APPROVAL_DETAILS_TL
+  where APPROVAL_DETAIL_ID = X_APPROVAL_DETAIL_ID;
+
+  if (sql%notfound) then
+    raise no_data_found;
+  end if;
+
+  delete from AMS_APPROVAL_DETAILS
+  where APPROVAL_DETAIL_ID = X_APPROVAL_DETAIL_ID;
+
+  if (sql%notfound) then
+    raise no_data_found;
+  end if;
+end DELETE_ROW;
+
+procedure ADD_LANGUAGE
+is
+begin
+  delete from AMS_APPROVAL_DETAILS_TL T
+  where not exists
+    (select NULL
+    from AMS_APPROVAL_DETAILS B
+    where B.APPROVAL_DETAIL_ID = T.APPROVAL_DETAIL_ID
+    );
+
+  update AMS_APPROVAL_DETAILS_TL T set (
+      NAME,
+      DESCRIPTION
+    ) = (select
+      B.NAME,
+      B.DESCRIPTION
+    from AMS_APPROVAL_DETAILS_TL B
+    where B.APPROVAL_DETAIL_ID = T.APPROVAL_DETAIL_ID
+    and B.LANGUAGE = T.SOURCE_LANG)
+  where (
+      T.APPROVAL_DETAIL_ID,
+      T.LANGUAGE
+  ) in (select
+      SUBT.APPROVAL_DETAIL_ID,
+      SUBT.LANGUAGE
+    from AMS_APPROVAL_DETAILS_TL SUBB, AMS_APPROVAL_DETAILS_TL SUBT
+    where SUBB.APPROVAL_DETAIL_ID = SUBT.APPROVAL_DETAIL_ID
+    and SUBB.LANGUAGE = SUBT.SOURCE_LANG
+    and (SUBB.NAME <> SUBT.NAME
+      or SUBB.DESCRIPTION <> SUBT.DESCRIPTION
+      or (SUBB.DESCRIPTION is null and SUBT.DESCRIPTION is not null)
+      or (SUBB.DESCRIPTION is not null and SUBT.DESCRIPTION is null)
+  ));
+
+  insert into AMS_APPROVAL_DETAILS_TL (
+    APPROVAL_DETAIL_ID,
+    CREATION_DATE,
+    CREATED_BY,
+    LAST_UPDATE_DATE,
+    LAST_UPDATED_BY,
+    LAST_UPDATE_LOGIN,
+    NAME,
+    DESCRIPTION,
+    --SECURITY_GROUP_ID,
+    LANGUAGE,
+    SOURCE_LANG
+  ) select
+    B.APPROVAL_DETAIL_ID,
+    B.CREATION_DATE,
+    B.CREATED_BY,
+    B.LAST_UPDATE_DATE,
+    B.LAST_UPDATED_BY,
+    B.LAST_UPDATE_LOGIN,
+    B.NAME,
+    B.DESCRIPTION,
+    --B.SECURITY_GROUP_ID,
+    L.LANGUAGE_CODE,
+    B.SOURCE_LANG
+  from AMS_APPROVAL_DETAILS_TL B, FND_LANGUAGES L
+  where L.INSTALLED_FLAG in ('I', 'B')
+  and B.LANGUAGE = userenv('LANG')
+  and not exists
+    (select NULL
+    from AMS_APPROVAL_DETAILS_TL T
+    where T.APPROVAL_DETAIL_ID = B.APPROVAL_DETAIL_ID
+    and T.LANGUAGE = L.LANGUAGE_CODE);
+end ADD_LANGUAGE;
+
+procedure TRANSLATE_ROW(
+   X_APPROVAL_DETAIL_ID  in NUMBER,
+   X_NAME       in VARCHAR2,
+   X_DESCRIPTION          in VARCHAR2,
+   X_OWNER      in VARCHAR2
+) IS
+  begin
+     update AMS_APPROVAL_DETAILS_TL set
+     name = nvl(x_name, name),
+     description = nvl(x_description, description),
+     source_lang = userenv('LANG'),
+     last_update_date = sysdate,
+     last_updated_by = decode(x_owner, 'SEED', 1, 0),
+     last_update_login = 0
+     where  APPROVAL_DETAIL_ID = X_APPROVAL_DETAIL_ID
+     and      userenv('LANG') in (language, source_lang);
+  end TRANSLATE_ROW;
+
+procedure LOAD_ROW(
+  X_APPROVAL_DETAIL_ID in NUMBER,
+  X_START_DATE_ACTIVE in DATE,
+  X_END_DATE_ACTIVE in DATE,
+  X_OBJECT_VERSION_NUMBER in NUMBER,
+  --X_SECURITY_GROUP_ID in NUMBER,
+  X_BUSINESS_GROUP_ID in NUMBER,
+  X_BUSINESS_UNIT_ID in NUMBER,
+  X_ORGANIZATION_ID in NUMBER,
+  X_CUSTOM_SETUP_ID in NUMBER,
+  X_APPROVAL_OBJECT in VARCHAR2,
+  X_APPROVAL_OBJECT_TYPE in VARCHAR2,
+  X_APPROVAL_TYPE in VARCHAR2,
+  X_APPROVAL_PRIORITY in VARCHAR2,
+  X_APPROVAL_LIMIT_TO in NUMBER,
+  X_APPROVAL_LIMIT_FROM in NUMBER,
+  X_SEEDED_FLAG in VARCHAR2,
+  X_ACTIVE_FLAG in VARCHAR2,
+  X_CURRENCY_CODE in VARCHAR2,
+  X_USER_COUNTRY_CODE in VARCHAR2,
+  X_NAME       in VARCHAR2,
+  X_DESCRIPTION          in VARCHAR2,
+  X_OWNER in VARCHAR2
+) is
+
+l_user_id number := 0;
+l_obj_verno  number;
+l_approval_detail_id  number;
+l_dummy_char  varchar2(1);
+l_row_id    varchar2(100);
+
+ cursor  c_obj_verno is
+ select object_version_number
+ from    AMS_APPROVAL_DETAILS
+ where  approval_detail_id =  X_APPROVAL_DETAIL_ID;
+
+ cursor c_chk_apr_dtls_exists is
+ select 'x'
+ from    AMS_APPROVAL_DETAILS
+ where  approval_detail_id =  X_APPROVAL_DETAIL_ID;
+
+ cursor c_get_apr_dtl_id is
+ select AMS_APPROVAL_DETAILS_S.nextval
+ from dual;
+
+BEGIN
+   if X_OWNER = 'SEED' then
+      l_user_id := 1;
+   end if;
+
+   open c_chk_apr_dtls_exists;
+   fetch c_chk_apr_dtls_exists into l_dummy_char;
+   if c_chk_apr_dtls_exists%notfound
+   then
+      close c_chk_apr_dtls_exists;
+      if X_APPROVAL_DETAIL_ID is null
+      then
+         open c_get_apr_dtl_id;
+         fetch c_get_apr_dtl_id into l_approval_detail_id;
+         close c_get_apr_dtl_id;
+      else
+         l_approval_detail_id := X_APPROVAL_DETAIL_ID;
+      end if;
+      l_obj_verno := 1;
+      AMS_APPROVAL_DETAILS_PKG.INSERT_ROW(
+	     X_ROWID => l_row_id,
+	     X_APPROVAL_DETAIL_ID => l_approval_detail_id,
+	     X_START_DATE_ACTIVE => X_START_DATE_ACTIVE,
+	     X_END_DATE_ACTIVE =>  X_END_DATE_ACTIVE,
+	     X_OBJECT_VERSION_NUMBER =>  l_obj_verno,
+	     --X_SECURITY_GROUP_ID =>  X_SECURITY_GROUP_ID,
+	     X_BUSINESS_GROUP_ID =>  X_BUSINESS_GROUP_ID,
+	     X_BUSINESS_UNIT_ID =>  X_BUSINESS_UNIT_ID,
+	     X_ORGANIZATION_ID =>  X_ORGANIZATION_ID,
+	     X_CUSTOM_SETUP_ID =>  X_CUSTOM_SETUP_ID,
+	     X_APPROVAL_OBJECT =>  X_APPROVAL_OBJECT,
+	     X_APPROVAL_OBJECT_TYPE =>  X_APPROVAL_OBJECT_TYPE,
+	     X_APPROVAL_TYPE =>  X_APPROVAL_TYPE,
+	     X_APPROVAL_PRIORITY =>  X_APPROVAL_PRIORITY,
+	     X_APPROVAL_LIMIT_TO =>  X_APPROVAL_LIMIT_TO,
+	     X_APPROVAL_LIMIT_FROM =>  X_APPROVAL_LIMIT_FROM,
+	     X_SEEDED_FLAG =>  X_SEEDED_FLAG,
+	     X_ACTIVE_FLAG =>  X_ACTIVE_FLAG,
+	     X_CURRENCY_CODE =>  X_CURRENCY_CODE,
+	     X_USER_COUNTRY_CODE =>   X_USER_COUNTRY_CODE,
+          X_NAME  => X_NAME,
+          X_DESCRIPTION  => X_DESCRIPTION,
+	     X_CREATION_DATE =>  SYSDATE,
+	     X_CREATED_BY =>  l_user_id,
+     	X_LAST_UPDATE_DATE =>  SYSDATE,
+	     X_LAST_UPDATED_BY =>  l_user_id,
+	     X_LAST_UPDATE_LOGIN =>  0);
+	else
+	   close c_chk_apr_dtls_exists;
+	   open c_obj_verno;
+	   fetch c_obj_verno into l_obj_verno;
+	   close c_obj_verno;
+        -- assigning value for l_user_status_id
+        l_approval_detail_id := X_APPROVAL_DETAIL_ID;
+	   AMS_APPROVAL_DETAILS_PKG.UPDATE_ROW(
+	      X_APPROVAL_DETAIL_ID => l_approval_detail_id,
+	      X_START_DATE_ACTIVE => X_START_DATE_ACTIVE,
+	      X_END_DATE_ACTIVE => X_END_DATE_ACTIVE,
+	      X_OBJECT_VERSION_NUMBER => l_obj_verno+1,
+	      --X_SECURITY_GROUP_ID => X_SECURITY_GROUP_ID,
+	      X_BUSINESS_GROUP_ID => X_BUSINESS_GROUP_ID,
+	      X_BUSINESS_UNIT_ID => X_BUSINESS_UNIT_ID,
+	      X_ORGANIZATION_ID => X_ORGANIZATION_ID,
+	      X_CUSTOM_SETUP_ID => X_CUSTOM_SETUP_ID,
+	      X_APPROVAL_OBJECT => X_APPROVAL_OBJECT,
+	      X_APPROVAL_OBJECT_TYPE => X_APPROVAL_OBJECT_TYPE,
+	      X_APPROVAL_TYPE => X_APPROVAL_TYPE,
+	      X_APPROVAL_PRIORITY => X_APPROVAL_PRIORITY,
+	      X_APPROVAL_LIMIT_TO => X_APPROVAL_LIMIT_TO,
+	      X_APPROVAL_LIMIT_FROM => X_APPROVAL_LIMIT_FROM,
+	      X_SEEDED_FLAG => X_SEEDED_FLAG,
+	      X_ACTIVE_FLAG =>  X_ACTIVE_FLAG,
+	      X_CURRENCY_CODE =>  X_CURRENCY_CODE,
+	      X_USER_COUNTRY_CODE =>  X_USER_COUNTRY_CODE,
+           X_NAME  => X_NAME,
+           X_DESCRIPTION   => X_DESCRIPTION,
+	      X_LAST_UPDATE_DATE => SYSDATE,
+	      X_LAST_UPDATED_BY => l_user_id,
+	      X_LAST_UPDATE_LOGIN => 0
+	     );
+     END iF;
+END;
+
+end AMS_APPROVAL_DETAILS_PKG;
+
+/

@@ -1,0 +1,48 @@
+--------------------------------------------------------
+--  DDL for Package Body MSC_PS_SNO_TAB_ANLYZ
+--------------------------------------------------------
+
+  CREATE OR REPLACE EDITIONABLE PACKAGE BODY "APPS"."MSC_PS_SNO_TAB_ANLYZ" AS
+/* $Header: MSCANLYB.pls 120.0.12010000.3 2010/01/06 06:45:56 saskrish noship $ */
+PROCEDURE ANALYZE_PS_SNO_TABLES (a in number) is
+
+    TYPE         CUR_TYPE IS REF CURSOR;
+    AnalyzeCur   CUR_TYPE;
+
+    LV_TAB       VARCHAR2(50);
+    T_NAME       VARCHAR2(50);
+    V_MODEL      VARCHAR2(20);
+    V_QUERY_STR1 VARCHAR2(500);
+
+BEGIN
+    V_MODEL      := 'REFERENCE';
+    V_QUERY_STR1 := 'SELECT DISTINCT A.TABLE_NAME TABLE_NAME ' ||
+		    'FROM DBA_TABLES A, MSC_INT_MODEL_NAVIGATION B '||
+		    'WHERE A.TABLE_NAME   = TRIM(UPPER(B.TABLE_NAME)) '||
+		      'AND A.OWNER        = MSC_UTIL.GET_SCHEMA_NAME(724) '||
+                      'AND UPPER(B.MODEL) = :V_MODEL ';
+
+    SELECT TRIM(UPPER(TABLE_NAME)) INTO T_NAME
+      FROM DBA_TABLES
+     WHERE TABLE_NAME = 'MSC_INT_MODEL_NAVIGATION'
+       AND OWNER      = MSC_UTIL.GET_SCHEMA_NAME(724);
+
+    IF T_NAME = 'MSC_INT_MODEL_NAVIGATION'
+    THEN
+        OPEN AnalyzeCur FOR V_QUERY_STR1 USING V_MODEL;
+        LOOP
+            FETCH AnalyzeCur INTO LV_TAB;
+            EXIT WHEN AnalyzeCur%NOTFOUND;
+            EXECUTE IMMEDIATE 'ANALYZE TABLE '||MSC_UTIL.GET_SCHEMA_NAME(724)||'.'||LV_TAB||' DELETE STATISTICS';
+        END LOOP;
+        COMMIT;
+    END IF;
+
+EXCEPTION
+WHEN OTHERS THEN
+    RETURN;
+END ANALYZE_PS_SNO_TABLES;
+
+END MSC_PS_SNO_TAB_ANLYZ;
+
+/

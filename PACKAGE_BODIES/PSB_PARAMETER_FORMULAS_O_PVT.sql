@@ -1,0 +1,214 @@
+--------------------------------------------------------
+--  DDL for Package Body PSB_PARAMETER_FORMULAS_O_PVT
+--------------------------------------------------------
+
+  CREATE OR REPLACE EDITIONABLE PACKAGE BODY "APPS"."PSB_PARAMETER_FORMULAS_O_PVT" AS
+/* $Header: PSBWPFOB.pls 120.2 2005/07/13 11:36:18 shtripat ship $ */
+
+PROCEDURE UPDATE_ROW (
+  p_api_version                 in       number,
+  p_init_msg_list               in       varchar2 := fnd_api.g_false,
+  p_commit                      in       varchar2 := fnd_api.g_false,
+  p_validation_level            in       number   := fnd_api.g_valid_level_full,
+  p_return_status               OUT  NOCOPY      varchar2,
+  p_msg_count                   OUT  NOCOPY      number,
+  p_msg_data                    OUT  NOCOPY      varchar2,
+  --
+  p_rowid                       in varchar2,
+  p_parameter_formula_id        in number,
+  p_parameter_id                in number,
+  p_step_number                 in number,
+  p_budget_year_type_id         in number,
+  p_balance_type                in varchar2,
+  p_template_id                 in number,
+  p_concatenated_segments       in varchar2,
+  p_segment1                    in varchar2,
+  p_segment2                    in varchar2,
+  p_segment3                    in varchar2,
+  p_segment4                    in varchar2,
+  p_segment5                    in varchar2,
+  p_segment6                    in varchar2,
+  p_segment7                    in varchar2,
+  p_segment8                    in varchar2,
+  p_segment9                    in varchar2,
+  p_segment10                   in varchar2,
+  p_segment11                   in varchar2,
+  p_segment12                   in varchar2,
+  p_segment13                   in varchar2,
+  p_segment14                   in varchar2,
+  p_segment15                   in varchar2,
+  p_segment16                   in varchar2,
+  p_segment17                   in varchar2,
+  p_segment18                   in varchar2,
+  p_segment19                   in varchar2,
+  p_segment20                   in varchar2,
+  p_segment21                   in varchar2,
+  p_segment22                   in varchar2,
+  p_segment23                   in varchar2,
+  p_segment24                   in varchar2,
+  p_segment25                   in varchar2,
+  p_segment26                   in varchar2,
+  p_segment27                   in varchar2,
+  p_segment28                   in varchar2,
+  p_segment29                   in varchar2,
+  p_segment30                   in varchar2,
+  p_currency_code               in varchar2,
+  p_amount                      in number,
+  p_prefix_operator             in varchar2,
+  p_postfix_operator            in varchar2,
+  p_hiredate_between_from       in number,
+  p_hiredate_between_to         in number,
+  p_adjdate_between_from        in number,
+  p_adjdate_between_to          in number,
+  p_increment_by                in number,
+  p_increment_type              in varchar2,
+  p_assignment_type             in varchar2,
+  p_attribute_id                in number,
+  p_attribute_value             in varchar2,
+  p_pay_element_id              in number,
+  p_pay_element_option_id       in number,
+  p_grade_step                  in number,
+  p_element_value               in number,
+  p_element_value_type          in varchar2,
+  p_effective_start_date        in date,
+  p_effective_end_date          in date,
+  p_attribute1                  in varchar2,
+  p_attribute2                  in varchar2,
+  p_attribute3                  in varchar2,
+  p_attribute4                  in varchar2,
+  p_attribute5                  in varchar2,
+  p_attribute6                  in varchar2,
+  p_attribute7                  in varchar2,
+  p_attribute8                  in varchar2,
+  p_attribute9                  in varchar2,
+  p_attribute10                 in varchar2,
+  p_context                     in varchar2,
+  p_last_update_date            in date,
+  p_last_updated_by             in number,
+  p_last_update_login           in number
+) is
+
+
+BEGIN
+
+PSB_PARAMETER_FORMULAS_PVT.UPDATE_ROW (
+  p_api_version ,
+  p_init_msg_list,
+  p_commit  ,
+  p_validation_level,
+  p_return_status ,
+  p_msg_count,
+  p_msg_data,
+  --
+  p_rowid,
+  p_parameter_formula_id,
+  p_parameter_id,
+  p_step_number,
+  p_budget_year_type_id,
+  p_balance_type,
+  p_template_id,
+  p_concatenated_segments,
+  p_segment1,
+  p_segment2,
+  p_segment3,
+  p_segment4,
+  p_segment5,
+  p_segment6,
+  p_segment7,
+  p_segment8,
+  p_segment9,
+  p_segment10,
+  p_segment11,
+  p_segment12,
+  p_segment13,
+  p_segment14,
+  p_segment15,
+  p_segment16,
+  p_segment17,
+  p_segment18,
+  p_segment19,
+  p_segment20,
+  p_segment21,
+  p_segment22,
+  p_segment23,
+  p_segment24,
+  p_segment25,
+  p_segment26,
+  p_segment27,
+  p_segment28,
+  p_segment29,
+  p_segment30,
+  p_currency_code,
+  p_amount,
+  p_prefix_operator,
+  p_postfix_operator,
+  p_hiredate_between_from,
+  p_hiredate_between_to,
+  p_adjdate_between_from,
+  p_adjdate_between_to,
+  p_increment_by,
+  p_increment_type,
+  p_assignment_type,
+  p_attribute_id,
+  p_attribute_value,
+  p_pay_element_id,
+  p_pay_element_option_id,
+  p_grade_step,
+  p_element_value,
+  p_element_value_type,
+  p_effective_start_date,
+  p_effective_end_date,
+  p_attribute1,
+  p_attribute2,
+  p_attribute3,
+  p_attribute4,
+  p_attribute5,
+  p_attribute6,
+  p_attribute7,
+  p_attribute8,
+  p_attribute9,
+  p_attribute10,
+  p_context,
+  p_last_update_date,
+  p_last_updated_by,
+  p_last_update_login
+) ;
+
+
+END Update_Row ;
+
+PROCEDURE DELETE_ROW (
+  p_api_version               in       number,
+  p_init_msg_list             in       varchar2 := fnd_api.g_false,
+  p_commit                    in       varchar2 := fnd_api.g_false,
+  p_validation_level          in       number   := fnd_api.g_valid_level_full,
+  p_return_status             OUT  NOCOPY      varchar2,
+  p_msg_count                 OUT  NOCOPY      number,
+  p_msg_data                  OUT  NOCOPY      varchar2,
+  --
+  p_parameter_formula_id      in       number
+)
+
+IS
+
+BEGIN
+
+PSB_PARAMETER_FORMULAS_PVT.DELETE_ROW (
+  p_api_version  ,
+  p_init_msg_list,
+  p_commit       ,
+  p_validation_level ,
+  p_return_status ,
+  p_msg_count,
+  p_msg_data  ,
+  --
+  p_parameter_formula_id
+) ;
+
+
+END Delete_Row ;
+
+
+END PSB_PARAMETER_FORMULAS_O_PVT ;
+
+/

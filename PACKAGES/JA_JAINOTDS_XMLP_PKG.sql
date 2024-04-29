@@ -1,0 +1,52 @@
+--------------------------------------------------------
+--  DDL for Package JA_JAINOTDS_XMLP_PKG
+--------------------------------------------------------
+
+  CREATE OR REPLACE EDITIONABLE PACKAGE "APPS"."JA_JAINOTDS_XMLP_PKG" AUTHID CURRENT_USER AS
+/* $Header: JAINOTDSS.pls 120.1 2007/12/25 16:23:53 dwkrishn noship $ */
+  P_FROM_DATE DATE;
+
+  P_TO_DATE DATE;
+ P_FROM_DATE_1 varchar2(25);
+
+  P_TO_DATE_1 varchar2(25);
+  P_ORG_ID NUMBER;
+
+  P_CONC_REQUEST_ID NUMBER;
+
+  FUNCTION CF_VENDOR_NAMEFORMULA0009(VENDOR_ID IN NUMBER) RETURN CHAR;
+
+  FUNCTION CF_VENDOR_SITEFORMULA(VENDOR_SITE_ID IN NUMBER) RETURN CHAR;
+
+  FUNCTION CF_VENDOR_NAME1FORMULA(VENDOR_ID1 IN NUMBER
+                                 ,VENDOR_ID IN NUMBER
+                                 ,CF_VENDOR_NAME IN VARCHAR2) RETURN CHAR;
+
+  FUNCTION CF_VENDOR_SITE_1FORMULA(VENDOR_SITE_ID1 IN NUMBER
+                                  ,VENDOR_SITE_ID IN NUMBER
+                                  ,CF_VENDOR_SITE IN VARCHAR2) RETURN CHAR;
+
+  FUNCTION CF_TDS_SECTIONFORMULA(VENDOR_ID1 IN NUMBER
+                                ,VENDOR_ID IN NUMBER
+                                ,INVOICE_ID IN NUMBER
+                                ,INVOICE_NUM1 IN VARCHAR2) RETURN CHAR;
+
+  FUNCTION CF_TDS_TAX_RATEFORMULA(VENDOR_ID1 IN NUMBER
+                                 ,VENDOR_ID IN NUMBER
+                                 ,INVOICE_ID IN NUMBER
+                                 ,INVOICE_NUM1 IN VARCHAR2) RETURN NUMBER;
+
+  FUNCTION CF_TAX_NAMEFORMULA(VENDOR_ID1 IN NUMBER
+                             ,VENDOR_ID IN NUMBER
+                             ,INVOICE_ID IN NUMBER
+                             ,INVOICE_NUM1 IN VARCHAR2) RETURN CHAR;
+
+  FUNCTION BEFOREREPORT RETURN BOOLEAN;
+
+  FUNCTION AFTERREPORT RETURN BOOLEAN;
+
+END JA_JAINOTDS_XMLP_PKG;
+
+
+
+/

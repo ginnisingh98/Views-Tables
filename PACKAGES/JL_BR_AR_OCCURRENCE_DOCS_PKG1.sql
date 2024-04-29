@@ -1,0 +1,84 @@
+--------------------------------------------------------
+--  DDL for Package JL_BR_AR_OCCURRENCE_DOCS_PKG1
+--------------------------------------------------------
+
+  CREATE OR REPLACE EDITIONABLE PACKAGE "APPS"."JL_BR_AR_OCCURRENCE_DOCS_PKG1" AUTHID CURRENT_USER as
+/* $Header: jlbrri2s.pls 120.2 2005/02/23 23:28:24 vsidhart noship $ */
+
+PROCEDURE Lock_Row(X_Rowid                        VARCHAR2,
+                   X_Occurrence_Id    	          NUMBER,
+                   X_Document_Id             	  NUMBER,
+                   X_Bank_Occurrence_Code         NUMBER,
+                   --X_Bank_Number                VARCHAR2,
+                   X_Bank_Party_Id                NUMBER,
+                   X_Bank_Occurrence_Type         VARCHAR2,
+                   X_Occurrence_Date              DATE     DEFAULT NULL,
+                   X_Occurrence_Status            VARCHAR2 DEFAULT NULL,
+                   X_Original_Remittance_Media    VARCHAR2 DEFAULT NULL,
+                   X_Remittance_Media             VARCHAR2 DEFAULT NULL,
+                   X_Selection_Date          	  DATE     DEFAULT NULL,
+                   X_Bordero_Id             	  NUMBER   DEFAULT NULL,
+                   X_Portfolio_Code               NUMBER   DEFAULT NULL,
+                   X_Trade_Note_Number      	  VARCHAR2 DEFAULT NULL,
+                   X_Due_Date             	      DATE     DEFAULT NULL,
+                   X_Document_Amount       	      NUMBER   DEFAULT NULL,
+                   X_Bank_Instruction_Code1  	  NUMBER   DEFAULT NULL,
+                   X_Bank_Instruction_Code2       NUMBER   DEFAULT NULL,
+                   X_Num_Days_Instruction   	  NUMBER   DEFAULT NULL,
+                   X_Interest_Percent      	      NUMBER   DEFAULT NULL,
+                   X_Interest_Period       	      NUMBER   DEFAULT NULL,
+                   X_Interest_Amount       	      NUMBER   DEFAULT NULL,
+                   X_Grace_Days            	      NUMBER   DEFAULT NULL,
+                   X_Discount_Limit_Date   	      DATE     DEFAULT NULL,
+                   X_Discount_Amount       	      NUMBER   DEFAULT NULL,
+                   X_Customer_Id                      NUMBER   DEFAULT NULL,
+                   X_Site_Use_Id            	      NUMBER   DEFAULT NULL,
+                   X_Abatement_Amount       	      NUMBER   DEFAULT NULL,
+                   X_Flag_Post_Gl           	      VARCHAR2 DEFAULT NULL,
+                   X_Gl_Date                	      DATE     DEFAULT NULL,
+                   X_Gl_Posted_Date         	      DATE     DEFAULT NULL,
+                   X_Endorsement_Credit_Ccid          NUMBER   DEFAULT NULL,
+                   X_Endorsement_Debit_Ccid 	      NUMBER   DEFAULT NULL,
+                   X_Endorsement_Debit_Amount         NUMBER   DEFAULT NULL,
+                   X_Endorsement_Credit_Amount        NUMBER   DEFAULT NULL,
+                   X_Bank_Charge_Amount  	      NUMBER   DEFAULT NULL,
+                   X_Bank_Charges_Credit_Ccid         NUMBER   DEFAULT NULL,
+                   X_Bank_Charges_Debit_Ccid          NUMBER   DEFAULT NULL,
+                   X_Bank_Charges_Credit_Amount       NUMBER   DEFAULT NULL,
+                   X_Bank_Charges_Debit_Amount        NUMBER   DEFAULT NULL,
+                   X_Request_Id            	      NUMBER   DEFAULT NULL,
+                   X_Return_Info           	      VARCHAR2 DEFAULT NULL,
+                   X_Interest_Indicator    	      VARCHAR2 DEFAULT NULL,
+                   X_Return_Request_Id     	      NUMBER   DEFAULT NULL,
+                   X_Gl_Cancel_Date         	      DATE     DEFAULT NULL,
+                   X_Attribute_Category     	      VARCHAR2 DEFAULT NULL,
+                   X_Attribute1            	      VARCHAR2 DEFAULT NULL,
+                   X_Attribute2            	      VARCHAR2 DEFAULT NULL,
+                   X_Attribute3            	      VARCHAR2 DEFAULT NULL,
+                   X_Attribute4            	      VARCHAR2 DEFAULT NULL,
+                   X_Attribute5            	      VARCHAR2 DEFAULT NULL,
+                   X_Attribute6            	      VARCHAR2 DEFAULT NULL,
+                   X_Attribute7            	      VARCHAR2 DEFAULT NULL,
+                   X_Attribute8            	      VARCHAR2 DEFAULT NULL,
+                   X_Attribute9            	      VARCHAR2 DEFAULT NULL,
+                   X_Attribute10           	      VARCHAR2 DEFAULT NULL,
+                   X_Attribute11           	      VARCHAR2 DEFAULT NULL,
+                   X_Attribute12          	      VARCHAR2 DEFAULT NULL,
+                   X_Attribute13           	      VARCHAR2 DEFAULT NULL,
+                   X_Attribute14           	      VARCHAR2 DEFAULT NULL,
+                   X_Attribute15           	      VARCHAR2 DEFAULT NULL,
+                   X_Last_Update_Date      	      DATE,
+                   X_Last_Updated_By      	      NUMBER,
+                   X_Creation_Date        	      DATE     DEFAULT NULL,
+                   X_Created_By            	      NUMBER,
+                   X_Last_Update_Login      	      NUMBER   DEFAULT NULL,
+                   X_calling_sequence		      VARCHAR2);
+
+PROCEDURE Delete_Row(X_Rowid 		   VARCHAR2,
+                     X_calling_sequence	IN VARCHAR2);
+
+END JL_BR_AR_OCCURRENCE_DOCS_PKG1;
+
+ 
+
+/

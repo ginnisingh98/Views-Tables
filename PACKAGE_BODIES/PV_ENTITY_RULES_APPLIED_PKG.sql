@@ -1,0 +1,425 @@
+--------------------------------------------------------
+--  DDL for Package Body PV_ENTITY_RULES_APPLIED_PKG
+--------------------------------------------------------
+
+  CREATE OR REPLACE EDITIONABLE PACKAGE BODY "APPS"."PV_ENTITY_RULES_APPLIED_PKG" as
+/* $Header: pvrterab.pls 115.5 2003/06/19 18:07:33 solin ship $ */
+-- Start of Comments
+-- Package name     : PV_ENTITY_RULES_APPLIED_PKG
+-- Purpose          :
+-- History          :
+-- NOTE             :
+-- End of Comments
+
+
+G_PKG_NAME CONSTANT VARCHAR2(30):= 'PV_ENTITY_RULES_APPLIED_PKG';
+G_FILE_NAME CONSTANT VARCHAR2(12) := 'pvrterab.pls';
+
+AS_DEBUG_HIGH_ON boolean := FND_MSG_PUB.CHECK_MSG_LEVEL(FND_MSG_PUB.G_MSG_LVL_DEBUG_HIGH);
+AS_DEBUG_LOW_ON boolean := FND_MSG_PUB.CHECK_MSG_LEVEL(FND_MSG_PUB.G_MSG_LVL_DEBUG_LOW);
+AS_DEBUG_MEDIUM_ON boolean := FND_MSG_PUB.CHECK_MSG_LEVEL(FND_MSG_PUB.G_MSG_LVL_DEBUG_MEDIUM);
+
+PROCEDURE Insert_Row(
+          px_ENTITY_RULE_APPLIED_ID   IN OUT NOCOPY NUMBER
+         ,p_LAST_UPDATE_DATE    DATE
+         ,p_LAST_UPDATED_BY    NUMBER
+         ,p_CREATION_DATE    DATE
+         ,p_CREATED_BY    NUMBER
+         ,p_LAST_UPDATE_LOGIN    NUMBER
+         ,p_OBJECT_VERSION_NUMBER    NUMBER
+         ,p_REQUEST_ID    NUMBER
+         ,p_PROGRAM_APPLICATION_ID    NUMBER
+         ,p_PROGRAM_ID    NUMBER
+         ,p_PROGRAM_UPDATE_DATE    DATE
+         ,p_ENTITY    VARCHAR2
+         ,p_ENTITY_ID    NUMBER
+         ,p_PROCESS_RULE_ID    NUMBER
+         ,p_PARENT_PROCESS_RULE_ID    NUMBER
+         ,p_LATEST_FLAG    VARCHAR2
+         ,p_ACTION_VALUE    VARCHAR2
+         ,p_PROCESS_TYPE    VARCHAR2
+         ,p_WINNING_RULE_FLAG    VARCHAR2
+	 ,p_ENTITY_DETAIL     VARCHAR2
+         ,p_ATTRIBUTE_CATEGORY    VARCHAR2
+         ,p_ATTRIBUTE1    VARCHAR2
+         ,p_ATTRIBUTE2    VARCHAR2
+         ,p_ATTRIBUTE3    VARCHAR2
+         ,p_ATTRIBUTE4    VARCHAR2
+         ,p_ATTRIBUTE5    VARCHAR2
+         ,p_ATTRIBUTE6    VARCHAR2
+         ,p_ATTRIBUTE7    VARCHAR2
+         ,p_ATTRIBUTE8    VARCHAR2
+         ,p_ATTRIBUTE9    VARCHAR2
+         ,p_ATTRIBUTE10    VARCHAR2
+         ,p_ATTRIBUTE11    VARCHAR2
+         ,p_ATTRIBUTE12    VARCHAR2
+         ,p_ATTRIBUTE13    VARCHAR2
+         ,p_ATTRIBUTE14    VARCHAR2
+         ,p_ATTRIBUTE15    VARCHAR2
+         ,p_PROCESS_STATUS    VARCHAR2)
+
+ IS
+   CURSOR C2 IS SELECT PV_ENTITY_RULES_APPLIED_S.nextval FROM sys.dual;
+BEGIN
+--   If (px_ENTITY_RULE_APPLIED_ID IS NULL) OR (px_ENTITY_RULE_APPLIED_ID = FND_API.G_MISS_NUM) then
+--       OPEN C2;
+--       FETCH C2 INTO px_ENTITY_RULE_APPLIED_ID;
+--       CLOSE C2;
+--   End If;
+   IF NVL(fnd_profile.value('AS_ENABLE_RULE_ENGINE_LOG'), 'Y') = 'N'
+   THEN
+       RETURN;
+   END IF;
+
+   INSERT INTO PV_ENTITY_RULES_APPLIED(
+           ENTITY_RULE_APPLIED_ID
+          ,LAST_UPDATE_DATE
+          ,LAST_UPDATED_BY
+          ,CREATION_DATE
+          ,CREATED_BY
+          ,LAST_UPDATE_LOGIN
+          ,OBJECT_VERSION_NUMBER
+          ,REQUEST_ID
+          ,PROGRAM_APPLICATION_ID
+          ,PROGRAM_ID
+          ,PROGRAM_UPDATE_DATE
+          ,ENTITY
+          ,ENTITY_ID
+          ,PROCESS_RULE_ID
+          ,PARENT_PROCESS_RULE_ID
+          ,LATEST_FLAG
+          ,ACTION_VALUE
+          ,PROCESS_TYPE
+          ,WINNING_RULE_FLAG
+	  ,ENTITY_DETAIL
+          ,ATTRIBUTE_CATEGORY
+          ,ATTRIBUTE1
+          ,ATTRIBUTE2
+          ,ATTRIBUTE3
+          ,ATTRIBUTE4
+          ,ATTRIBUTE5
+          ,ATTRIBUTE6
+          ,ATTRIBUTE7
+          ,ATTRIBUTE8
+          ,ATTRIBUTE9
+          ,ATTRIBUTE10
+          ,ATTRIBUTE11
+          ,ATTRIBUTE12
+          ,ATTRIBUTE13
+          ,ATTRIBUTE14
+          ,ATTRIBUTE15
+          ,PROCESS_STATUS
+          ) VALUES (
+           PV_ENTITY_RULES_APPLIED_S.nextval --px_ENTITY_RULE_APPLIED_ID
+          ,decode( p_LAST_UPDATE_DATE, FND_API.G_MISS_DATE, TO_DATE(NULL), p_LAST_UPDATE_DATE)
+          ,decode( p_LAST_UPDATED_BY, FND_API.G_MISS_NUM, NULL, p_LAST_UPDATED_BY)
+          ,decode( p_CREATION_DATE, FND_API.G_MISS_DATE, TO_DATE(NULL), p_CREATION_DATE)
+          ,decode( p_CREATED_BY, FND_API.G_MISS_NUM, NULL, p_CREATED_BY)
+          ,decode( p_LAST_UPDATE_LOGIN, FND_API.G_MISS_NUM, NULL, p_LAST_UPDATE_LOGIN)
+          ,1
+          ,decode( p_REQUEST_ID, FND_API.G_MISS_NUM, NULL, p_REQUEST_ID)
+          ,decode( p_PROGRAM_APPLICATION_ID, FND_API.G_MISS_NUM, NULL, p_PROGRAM_APPLICATION_ID)
+          ,decode( p_PROGRAM_ID, FND_API.G_MISS_NUM, NULL, p_PROGRAM_ID)
+          ,decode( p_PROGRAM_UPDATE_DATE, FND_API.G_MISS_DATE, TO_DATE(NULL), p_PROGRAM_UPDATE_DATE)
+          ,decode( p_ENTITY, FND_API.G_MISS_CHAR, NULL, p_ENTITY)
+          ,decode( p_ENTITY_ID, FND_API.G_MISS_NUM, NULL, p_ENTITY_ID)
+          ,decode( p_PROCESS_RULE_ID, FND_API.G_MISS_NUM, NULL, p_PROCESS_RULE_ID)
+          ,decode( p_PARENT_PROCESS_RULE_ID, FND_API.G_MISS_NUM, NULL, p_PARENT_PROCESS_RULE_ID)
+          ,decode( p_LATEST_FLAG, FND_API.G_MISS_CHAR, NULL, p_LATEST_FLAG)
+          ,decode( p_ACTION_VALUE, FND_API.G_MISS_CHAR, NULL, p_ACTION_VALUE)
+          ,decode( p_PROCESS_TYPE, FND_API.G_MISS_CHAR, NULL, p_PROCESS_TYPE)
+          ,decode( p_WINNING_RULE_FLAG, FND_API.G_MISS_CHAR, NULL, p_WINNING_RULE_FLAG)
+	  ,decode( p_ENTITY_DETAIL, FND_API.G_MISS_CHAR, NULL, p_ENTITY_DETAIL)
+          ,decode( p_ATTRIBUTE_CATEGORY, FND_API.G_MISS_CHAR, NULL, p_ATTRIBUTE_CATEGORY)
+          ,decode( p_ATTRIBUTE1, FND_API.G_MISS_CHAR, NULL, p_ATTRIBUTE1)
+          ,decode( p_ATTRIBUTE2, FND_API.G_MISS_CHAR, NULL, p_ATTRIBUTE2)
+          ,decode( p_ATTRIBUTE3, FND_API.G_MISS_CHAR, NULL, p_ATTRIBUTE3)
+          ,decode( p_ATTRIBUTE4, FND_API.G_MISS_CHAR, NULL, p_ATTRIBUTE4)
+          ,decode( p_ATTRIBUTE5, FND_API.G_MISS_CHAR, NULL, p_ATTRIBUTE5)
+          ,decode( p_ATTRIBUTE6, FND_API.G_MISS_CHAR, NULL, p_ATTRIBUTE6)
+          ,decode( p_ATTRIBUTE7, FND_API.G_MISS_CHAR, NULL, p_ATTRIBUTE7)
+          ,decode( p_ATTRIBUTE8, FND_API.G_MISS_CHAR, NULL, p_ATTRIBUTE8)
+          ,decode( p_ATTRIBUTE9, FND_API.G_MISS_CHAR, NULL, p_ATTRIBUTE9)
+          ,decode( p_ATTRIBUTE10, FND_API.G_MISS_CHAR, NULL, p_ATTRIBUTE10)
+          ,decode( p_ATTRIBUTE11, FND_API.G_MISS_CHAR, NULL, p_ATTRIBUTE11)
+          ,decode( p_ATTRIBUTE12, FND_API.G_MISS_CHAR, NULL, p_ATTRIBUTE12)
+          ,decode( p_ATTRIBUTE13, FND_API.G_MISS_CHAR, NULL, p_ATTRIBUTE13)
+          ,decode( p_ATTRIBUTE14, FND_API.G_MISS_CHAR, NULL, p_ATTRIBUTE14)
+          ,decode( p_ATTRIBUTE15, FND_API.G_MISS_CHAR, NULL, p_ATTRIBUTE15)
+          ,decode( p_PROCESS_STATUS, FND_API.G_MISS_CHAR, NULL, p_PROCESS_STATUS))
+          RETURNING ENTITY_RULE_APPLIED_ID INTO px_ENTITY_RULE_APPLIED_ID;
+End Insert_Row;
+
+PROCEDURE Update_Row(
+          p_ENTITY_RULE_APPLIED_ID    NUMBER
+         ,p_LAST_UPDATE_DATE    DATE
+         ,p_LAST_UPDATED_BY    NUMBER
+         ,p_CREATION_DATE    DATE
+         ,p_CREATED_BY    NUMBER
+         ,p_LAST_UPDATE_LOGIN    NUMBER
+         ,p_OBJECT_VERSION_NUMBER    NUMBER
+         ,p_REQUEST_ID    NUMBER
+         ,p_PROGRAM_APPLICATION_ID    NUMBER
+         ,p_PROGRAM_ID    NUMBER
+         ,p_PROGRAM_UPDATE_DATE    DATE
+         ,p_ENTITY    VARCHAR2
+         ,p_ENTITY_ID    NUMBER
+         ,p_PROCESS_RULE_ID    NUMBER
+         ,p_PARENT_PROCESS_RULE_ID    NUMBER
+         ,p_LATEST_FLAG    VARCHAR2
+         ,p_ACTION_VALUE    VARCHAR2
+         ,p_PROCESS_TYPE    VARCHAR2
+         ,p_WINNING_RULE_FLAG    VARCHAR2
+	 ,p_ENTITY_DETAIL   VARCHAR2
+         ,p_ATTRIBUTE_CATEGORY    VARCHAR2
+         ,p_ATTRIBUTE1    VARCHAR2
+         ,p_ATTRIBUTE2    VARCHAR2
+         ,p_ATTRIBUTE3    VARCHAR2
+         ,p_ATTRIBUTE4    VARCHAR2
+         ,p_ATTRIBUTE5    VARCHAR2
+         ,p_ATTRIBUTE6    VARCHAR2
+         ,p_ATTRIBUTE7    VARCHAR2
+         ,p_ATTRIBUTE8    VARCHAR2
+         ,p_ATTRIBUTE9    VARCHAR2
+         ,p_ATTRIBUTE10    VARCHAR2
+         ,p_ATTRIBUTE11    VARCHAR2
+         ,p_ATTRIBUTE12    VARCHAR2
+         ,p_ATTRIBUTE13    VARCHAR2
+         ,p_ATTRIBUTE14    VARCHAR2
+         ,p_ATTRIBUTE15    VARCHAR2
+         ,p_PROCESS_STATUS    VARCHAR2)
+
+ IS
+ BEGIN
+    Update PV_ENTITY_RULES_APPLIED
+    SET
+              LAST_UPDATE_DATE = decode( p_LAST_UPDATE_DATE, FND_API.G_MISS_DATE, LAST_UPDATE_DATE, p_LAST_UPDATE_DATE)
+             ,LAST_UPDATED_BY = decode( p_LAST_UPDATED_BY, FND_API.G_MISS_NUM, LAST_UPDATED_BY, p_LAST_UPDATED_BY)
+             ,CREATION_DATE = decode( p_CREATION_DATE, FND_API.G_MISS_DATE, CREATION_DATE, p_CREATION_DATE)
+             ,CREATED_BY = decode( p_CREATED_BY, FND_API.G_MISS_NUM, CREATED_BY, p_CREATED_BY)
+             ,LAST_UPDATE_LOGIN = decode( p_LAST_UPDATE_LOGIN, FND_API.G_MISS_NUM, LAST_UPDATE_LOGIN, p_LAST_UPDATE_LOGIN)
+             ,OBJECT_VERSION_NUMBER = decode( p_OBJECT_VERSION_NUMBER, FND_API.G_MISS_NUM, OBJECT_VERSION_NUMBER, p_OBJECT_VERSION_NUMBER+1)
+             ,REQUEST_ID = decode( p_REQUEST_ID, FND_API.G_MISS_NUM, REQUEST_ID, p_REQUEST_ID)
+             ,PROGRAM_APPLICATION_ID = decode( p_PROGRAM_APPLICATION_ID, FND_API.G_MISS_NUM, PROGRAM_APPLICATION_ID, p_PROGRAM_APPLICATION_ID)
+             ,PROGRAM_ID = decode( p_PROGRAM_ID, FND_API.G_MISS_NUM, PROGRAM_ID, p_PROGRAM_ID)
+             ,PROGRAM_UPDATE_DATE = decode( p_PROGRAM_UPDATE_DATE, FND_API.G_MISS_DATE, PROGRAM_UPDATE_DATE, p_PROGRAM_UPDATE_DATE)
+             ,ENTITY = decode( p_ENTITY, FND_API.G_MISS_CHAR, ENTITY, p_ENTITY)
+             ,ENTITY_ID = decode( p_ENTITY_ID, FND_API.G_MISS_NUM, ENTITY_ID, p_ENTITY_ID)
+             ,PROCESS_RULE_ID = decode( p_PROCESS_RULE_ID, FND_API.G_MISS_NUM, PROCESS_RULE_ID, p_PROCESS_RULE_ID)
+             ,PARENT_PROCESS_RULE_ID = decode( p_PARENT_PROCESS_RULE_ID, FND_API.G_MISS_NUM, PARENT_PROCESS_RULE_ID, p_PARENT_PROCESS_RULE_ID)
+             ,LATEST_FLAG = decode( p_LATEST_FLAG, FND_API.G_MISS_CHAR, LATEST_FLAG, p_LATEST_FLAG)
+             ,ACTION_VALUE = decode( p_ACTION_VALUE, FND_API.G_MISS_CHAR, ACTION_VALUE, p_ACTION_VALUE)
+             ,PROCESS_TYPE = decode( p_PROCESS_TYPE, FND_API.G_MISS_CHAR, PROCESS_TYPE, p_PROCESS_TYPE)
+             ,WINNING_RULE_FLAG = decode( p_WINNING_RULE_FLAG, FND_API.G_MISS_CHAR, WINNING_RULE_FLAG, p_WINNING_RULE_FLAG)
+	     ,ENTITY_DETAIL = decode( p_ENTITY_DETAIL, FND_API.G_MISS_CHAR, ENTITY_DETAIL, p_ENTITY_DETAIL)
+             ,ATTRIBUTE_CATEGORY = decode( p_ATTRIBUTE_CATEGORY, FND_API.G_MISS_CHAR, ATTRIBUTE_CATEGORY, p_ATTRIBUTE_CATEGORY)
+             ,ATTRIBUTE1 = decode( p_ATTRIBUTE1, FND_API.G_MISS_CHAR, ATTRIBUTE1, p_ATTRIBUTE1)
+             ,ATTRIBUTE2 = decode( p_ATTRIBUTE2, FND_API.G_MISS_CHAR, ATTRIBUTE2, p_ATTRIBUTE2)
+             ,ATTRIBUTE3 = decode( p_ATTRIBUTE3, FND_API.G_MISS_CHAR, ATTRIBUTE3, p_ATTRIBUTE3)
+             ,ATTRIBUTE4 = decode( p_ATTRIBUTE4, FND_API.G_MISS_CHAR, ATTRIBUTE4, p_ATTRIBUTE4)
+             ,ATTRIBUTE5 = decode( p_ATTRIBUTE5, FND_API.G_MISS_CHAR, ATTRIBUTE5, p_ATTRIBUTE5)
+             ,ATTRIBUTE6 = decode( p_ATTRIBUTE6, FND_API.G_MISS_CHAR, ATTRIBUTE6, p_ATTRIBUTE6)
+             ,ATTRIBUTE7 = decode( p_ATTRIBUTE7, FND_API.G_MISS_CHAR, ATTRIBUTE7, p_ATTRIBUTE7)
+             ,ATTRIBUTE8 = decode( p_ATTRIBUTE8, FND_API.G_MISS_CHAR, ATTRIBUTE8, p_ATTRIBUTE8)
+             ,ATTRIBUTE9 = decode( p_ATTRIBUTE9, FND_API.G_MISS_CHAR, ATTRIBUTE9, p_ATTRIBUTE9)
+             ,ATTRIBUTE10 = decode( p_ATTRIBUTE10, FND_API.G_MISS_CHAR, ATTRIBUTE10, p_ATTRIBUTE10)
+             ,ATTRIBUTE11 = decode( p_ATTRIBUTE11, FND_API.G_MISS_CHAR, ATTRIBUTE11, p_ATTRIBUTE11)
+             ,ATTRIBUTE12 = decode( p_ATTRIBUTE12, FND_API.G_MISS_CHAR, ATTRIBUTE12, p_ATTRIBUTE12)
+             ,ATTRIBUTE13 = decode( p_ATTRIBUTE13, FND_API.G_MISS_CHAR, ATTRIBUTE13, p_ATTRIBUTE13)
+             ,ATTRIBUTE14 = decode( p_ATTRIBUTE14, FND_API.G_MISS_CHAR, ATTRIBUTE14, p_ATTRIBUTE14)
+             ,ATTRIBUTE15 = decode( p_ATTRIBUTE15, FND_API.G_MISS_CHAR, ATTRIBUTE15, p_ATTRIBUTE15)
+             ,PROCESS_STATUS = decode( p_PROCESS_STATUS, FND_API.G_MISS_CHAR, PROCESS_STATUS, p_PROCESS_STATUS)
+    where ENTITY_RULE_APPLIED_ID = p_ENTITY_RULE_APPLIED_ID;
+
+    If (SQL%NOTFOUND) then
+        RAISE NO_DATA_FOUND;
+    End If;
+END Update_Row;
+
+PROCEDURE Delete_Row(
+    p_ENTITY_RULE_APPLIED_ID  NUMBER)
+ IS
+ BEGIN
+   DELETE FROM PV_ENTITY_RULES_APPLIED
+    WHERE ENTITY_RULE_APPLIED_ID = p_ENTITY_RULE_APPLIED_ID;
+   If (SQL%NOTFOUND) then
+       RAISE NO_DATA_FOUND;
+   End If;
+ END Delete_Row;
+
+PROCEDURE Lock_Row(
+          p_ENTITY_RULE_APPLIED_ID    NUMBER
+         ,p_LAST_UPDATE_DATE    DATE
+         ,p_LAST_UPDATED_BY    NUMBER
+         ,p_CREATION_DATE    DATE
+         ,p_CREATED_BY    NUMBER
+         ,p_LAST_UPDATE_LOGIN    NUMBER
+         ,p_OBJECT_VERSION_NUMBER    NUMBER
+         ,p_REQUEST_ID    NUMBER
+         ,p_PROGRAM_APPLICATION_ID    NUMBER
+         ,p_PROGRAM_ID    NUMBER
+         ,p_PROGRAM_UPDATE_DATE    DATE
+         ,p_ENTITY    VARCHAR2
+         ,p_ENTITY_ID    NUMBER
+         ,p_PROCESS_RULE_ID    NUMBER
+         ,p_PARENT_PROCESS_RULE_ID    NUMBER
+         ,p_LATEST_FLAG    VARCHAR2
+         ,p_ACTION_VALUE    VARCHAR2
+         ,p_PROCESS_TYPE    VARCHAR2
+         ,p_WINNING_RULE_FLAG    VARCHAR2
+	 ,p_ENTITY_DETAIL VARCHAR2
+         ,p_ATTRIBUTE_CATEGORY    VARCHAR2
+         ,p_ATTRIBUTE1    VARCHAR2
+         ,p_ATTRIBUTE2    VARCHAR2
+         ,p_ATTRIBUTE3    VARCHAR2
+         ,p_ATTRIBUTE4    VARCHAR2
+         ,p_ATTRIBUTE5    VARCHAR2
+         ,p_ATTRIBUTE6    VARCHAR2
+         ,p_ATTRIBUTE7    VARCHAR2
+         ,p_ATTRIBUTE8    VARCHAR2
+         ,p_ATTRIBUTE9    VARCHAR2
+         ,p_ATTRIBUTE10    VARCHAR2
+         ,p_ATTRIBUTE11    VARCHAR2
+         ,p_ATTRIBUTE12    VARCHAR2
+         ,p_ATTRIBUTE13    VARCHAR2
+         ,p_ATTRIBUTE14    VARCHAR2
+         ,p_ATTRIBUTE15    VARCHAR2
+         ,p_PROCESS_STATUS    VARCHAR2)
+
+ IS
+   CURSOR C IS
+        SELECT *
+         FROM PV_ENTITY_RULES_APPLIED
+        WHERE ENTITY_RULE_APPLIED_ID =  p_ENTITY_RULE_APPLIED_ID
+        FOR UPDATE of ENTITY_RULE_APPLIED_ID NOWAIT;
+   Recinfo C%ROWTYPE;
+ BEGIN
+    OPEN C;
+    FETCH C INTO Recinfo;
+    If (C%NOTFOUND) then
+        CLOSE C;
+        FND_MESSAGE.SET_NAME('FND', 'FORM_RECORD_DELETED');
+        APP_EXCEPTION.RAISE_EXCEPTION;
+    End If;
+    CLOSE C;
+    if (
+           (      Recinfo.ENTITY_RULE_APPLIED_ID = p_ENTITY_RULE_APPLIED_ID)
+       AND (    ( Recinfo.LAST_UPDATE_DATE = p_LAST_UPDATE_DATE)
+            OR (    ( Recinfo.LAST_UPDATE_DATE IS NULL )
+                AND (  p_LAST_UPDATE_DATE IS NULL )))
+       AND (    ( Recinfo.LAST_UPDATED_BY = p_LAST_UPDATED_BY)
+            OR (    ( Recinfo.LAST_UPDATED_BY IS NULL )
+                AND (  p_LAST_UPDATED_BY IS NULL )))
+       AND (    ( Recinfo.CREATION_DATE = p_CREATION_DATE)
+            OR (    ( Recinfo.CREATION_DATE IS NULL )
+                AND (  p_CREATION_DATE IS NULL )))
+       AND (    ( Recinfo.CREATED_BY = p_CREATED_BY)
+            OR (    ( Recinfo.CREATED_BY IS NULL )
+                AND (  p_CREATED_BY IS NULL )))
+       AND (    ( Recinfo.LAST_UPDATE_LOGIN = p_LAST_UPDATE_LOGIN)
+            OR (    ( Recinfo.LAST_UPDATE_LOGIN IS NULL )
+                AND (  p_LAST_UPDATE_LOGIN IS NULL )))
+       AND (    ( Recinfo.OBJECT_VERSION_NUMBER = p_OBJECT_VERSION_NUMBER)
+            OR (    ( Recinfo.OBJECT_VERSION_NUMBER IS NULL )
+                AND (  p_OBJECT_VERSION_NUMBER IS NULL )))
+       AND (    ( Recinfo.REQUEST_ID = p_REQUEST_ID)
+            OR (    ( Recinfo.REQUEST_ID IS NULL )
+                AND (  p_REQUEST_ID IS NULL )))
+       AND (    ( Recinfo.PROGRAM_APPLICATION_ID = p_PROGRAM_APPLICATION_ID)
+            OR (    ( Recinfo.PROGRAM_APPLICATION_ID IS NULL )
+                AND (  p_PROGRAM_APPLICATION_ID IS NULL )))
+       AND (    ( Recinfo.PROGRAM_ID = p_PROGRAM_ID)
+            OR (    ( Recinfo.PROGRAM_ID IS NULL )
+                AND (  p_PROGRAM_ID IS NULL )))
+       AND (    ( Recinfo.PROGRAM_UPDATE_DATE = p_PROGRAM_UPDATE_DATE)
+            OR (    ( Recinfo.PROGRAM_UPDATE_DATE IS NULL )
+                AND (  p_PROGRAM_UPDATE_DATE IS NULL )))
+       AND (    ( Recinfo.ENTITY = p_ENTITY)
+            OR (    ( Recinfo.ENTITY IS NULL )
+                AND (  p_ENTITY IS NULL )))
+       AND (    ( Recinfo.ENTITY_ID = p_ENTITY_ID)
+            OR (    ( Recinfo.ENTITY_ID IS NULL )
+                AND (  p_ENTITY_ID IS NULL )))
+       AND (    ( Recinfo.PROCESS_RULE_ID = p_PROCESS_RULE_ID)
+            OR (    ( Recinfo.PROCESS_RULE_ID IS NULL )
+                AND (  p_PROCESS_RULE_ID IS NULL )))
+       AND (    ( Recinfo.PARENT_PROCESS_RULE_ID = p_PARENT_PROCESS_RULE_ID)
+            OR (    ( Recinfo.PARENT_PROCESS_RULE_ID IS NULL )
+                AND (  p_PARENT_PROCESS_RULE_ID IS NULL )))
+       AND (    ( Recinfo.LATEST_FLAG = p_LATEST_FLAG)
+            OR (    ( Recinfo.LATEST_FLAG IS NULL )
+                AND (  p_LATEST_FLAG IS NULL )))
+       AND (    ( Recinfo.ACTION_VALUE = p_ACTION_VALUE)
+            OR (    ( Recinfo.ACTION_VALUE IS NULL )
+                AND (  p_ACTION_VALUE IS NULL )))
+       AND (    ( Recinfo.PROCESS_TYPE = p_PROCESS_TYPE)
+            OR (    ( Recinfo.PROCESS_TYPE IS NULL )
+                AND (  p_PROCESS_TYPE IS NULL )))
+       AND (    ( Recinfo.WINNING_RULE_FLAG = p_WINNING_RULE_FLAG)
+            OR (    ( Recinfo.WINNING_RULE_FLAG IS NULL )
+                AND (  p_WINNING_RULE_FLAG IS NULL )))
+       AND (    ( Recinfo.ENTITY_DETAIL = p_ENTITY_DETAIL)
+            OR (    ( Recinfo.ENTITY_DETAIL IS NULL )
+                AND (  p_ENTITY_DETAIL IS NULL )))
+       AND (    ( Recinfo.ATTRIBUTE_CATEGORY = p_ATTRIBUTE_CATEGORY)
+            OR (    ( Recinfo.ATTRIBUTE_CATEGORY IS NULL )
+                AND (  p_ATTRIBUTE_CATEGORY IS NULL )))
+       AND (    ( Recinfo.ATTRIBUTE1 = p_ATTRIBUTE1)
+            OR (    ( Recinfo.ATTRIBUTE1 IS NULL )
+                AND (  p_ATTRIBUTE1 IS NULL )))
+       AND (    ( Recinfo.ATTRIBUTE2 = p_ATTRIBUTE2)
+            OR (    ( Recinfo.ATTRIBUTE2 IS NULL )
+                AND (  p_ATTRIBUTE2 IS NULL )))
+       AND (    ( Recinfo.ATTRIBUTE3 = p_ATTRIBUTE3)
+            OR (    ( Recinfo.ATTRIBUTE3 IS NULL )
+                AND (  p_ATTRIBUTE3 IS NULL )))
+       AND (    ( Recinfo.ATTRIBUTE4 = p_ATTRIBUTE4)
+            OR (    ( Recinfo.ATTRIBUTE4 IS NULL )
+                AND (  p_ATTRIBUTE4 IS NULL )))
+       AND (    ( Recinfo.ATTRIBUTE5 = p_ATTRIBUTE5)
+            OR (    ( Recinfo.ATTRIBUTE5 IS NULL )
+                AND (  p_ATTRIBUTE5 IS NULL )))
+       AND (    ( Recinfo.ATTRIBUTE6 = p_ATTRIBUTE6)
+            OR (    ( Recinfo.ATTRIBUTE6 IS NULL )
+                AND (  p_ATTRIBUTE6 IS NULL )))
+       AND (    ( Recinfo.ATTRIBUTE7 = p_ATTRIBUTE7)
+            OR (    ( Recinfo.ATTRIBUTE7 IS NULL )
+                AND (  p_ATTRIBUTE7 IS NULL )))
+       AND (    ( Recinfo.ATTRIBUTE8 = p_ATTRIBUTE8)
+            OR (    ( Recinfo.ATTRIBUTE8 IS NULL )
+                AND (  p_ATTRIBUTE8 IS NULL )))
+       AND (    ( Recinfo.ATTRIBUTE9 = p_ATTRIBUTE9)
+            OR (    ( Recinfo.ATTRIBUTE9 IS NULL )
+                AND (  p_ATTRIBUTE9 IS NULL )))
+       AND (    ( Recinfo.ATTRIBUTE10 = p_ATTRIBUTE10)
+            OR (    ( Recinfo.ATTRIBUTE10 IS NULL )
+                AND (  p_ATTRIBUTE10 IS NULL )))
+       AND (    ( Recinfo.ATTRIBUTE11 = p_ATTRIBUTE11)
+            OR (    ( Recinfo.ATTRIBUTE11 IS NULL )
+                AND (  p_ATTRIBUTE11 IS NULL )))
+       AND (    ( Recinfo.ATTRIBUTE12 = p_ATTRIBUTE12)
+            OR (    ( Recinfo.ATTRIBUTE12 IS NULL )
+                AND (  p_ATTRIBUTE12 IS NULL )))
+       AND (    ( Recinfo.ATTRIBUTE13 = p_ATTRIBUTE13)
+            OR (    ( Recinfo.ATTRIBUTE13 IS NULL )
+                AND (  p_ATTRIBUTE13 IS NULL )))
+       AND (    ( Recinfo.ATTRIBUTE14 = p_ATTRIBUTE14)
+            OR (    ( Recinfo.ATTRIBUTE14 IS NULL )
+                AND (  p_ATTRIBUTE14 IS NULL )))
+       AND (    ( Recinfo.ATTRIBUTE15 = p_ATTRIBUTE15)
+            OR (    ( Recinfo.ATTRIBUTE15 IS NULL )
+                AND (  p_ATTRIBUTE15 IS NULL )))
+       AND (    ( Recinfo.PROCESS_STATUS = p_PROCESS_STATUS)
+            OR (    ( Recinfo.PROCESS_STATUS IS NULL )
+                AND (  p_PROCESS_STATUS IS NULL )))
+       ) then
+       return;
+   else
+       FND_MESSAGE.SET_NAME('FND', 'FORM_RECORD_CHANGED');
+       APP_EXCEPTION.RAISE_EXCEPTION;
+   End If;
+END Lock_Row;
+
+End PV_ENTITY_RULES_APPLIED_PKG;
+
+/

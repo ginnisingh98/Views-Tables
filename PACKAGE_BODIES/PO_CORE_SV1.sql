@@ -1,0 +1,298 @@
+--------------------------------------------------------
+--  DDL for Package Body PO_CORE_SV1
+--------------------------------------------------------
+
+  CREATE OR REPLACE EDITIONABLE PACKAGE BODY "APPS"."PO_CORE_SV1" AS
+/* $Header: POXPICOB.pls 120.2 2006/04/20 11:32:12 bao noship $ */
+
+/*================================================================
+
+  FUNCTION NAME: 	val_effective_date()
+
+==================================================================*/
+ FUNCTION val_effective_date(x_effective_date   IN DATE,
+                             x_po_header_id     IN NUMBER)
+ RETURN BOOLEAN IS
+
+  x_progress     VARCHAR2(3):= null;
+  l_temp         VARCHAR2(10);
+
+  CURSOR l_val_date_csr IS
+      SELECT 'valid'
+        FROM po_headers
+       WHERE po_header_id = x_po_header_id
+         AND (TRUNC(x_effective_date) BETWEEN
+                 TRUNC(nvl(start_date,x_effective_date)) AND
+                 TRUNC(nvl(end_date, x_effective_date)));
+
+ BEGIN
+    x_progress := '010';
+    /* This is to check if the X_effective_date is between start_date
+        and end_date for a specific po_header_id */
+
+    -- Bug 2449186. Truncate the dates when comparing them. Also
+    -- refactored to use a cursor instead of a select with count(*).
+    OPEN l_val_date_csr;
+    FETCH l_val_date_csr INTO l_temp;
+
+    x_progress := '020';
+
+    IF l_val_date_csr%FOUND THEN
+        CLOSE l_val_date_csr;
+        RETURN TRUE;    /* validation succeeds */
+    ELSE
+        CLOSE l_val_date_csr;
+        RETURN FALSE;   /* validation fails */
+    END IF;
+
+EXCEPTION
+  WHEN others THEN
+       IF l_val_date_csr%ISOPEN THEN
+           CLOSE l_val_date_csr;
+       END IF;
+       po_message_s.sql_error('val_effective_date', x_progress, sqlcode);
+       raise;
+END val_effective_date;
+
+/*================================================================
+
+  FUNCTION NAME: 	val_numeric_value()
+
+==================================================================*/
+ FUNCTION val_numeric_value(x_value  IN VARCHAR2) RETURN BOOLEAN
+ IS
+
+   x_progress   varchar2(3) := null;
+   X_temp       NUMBER;
+
+ BEGIN
+   x_progress := '010';
+
+   X_temp := TO_NUMBER(X_value);
+
+   RETURN TRUE;
+
+ EXCEPTION
+   WHEN value_error THEN   /* when input value is not a numeric */
+	RETURN  FALSE;
+   WHEN others THEN
+        po_message_s.sql_error('val_numeric_value', x_progress,sqlcode);
+        raise;
+ END val_numeric_value;
+
+/*================================================================
+
+  FUNCTION NAME: 	val_start_and_end_date()
+
+==================================================================*/
+ FUNCTION val_start_and_end_date(X_start_date  IN DATE,
+			         X_end_date    IN DATE)
+ RETURN BOOLEAN
+ IS
+
+   x_progress   varchar2(3) := null;
+
+ BEGIN
+   x_progress := '010';
+
+   IF (X_start_date > X_end_date) THEN
+      RETURN FALSE;   /* validation fails */
+   ELSE
+      RETURN TRUE;    /* validation succeeds */
+   END IF;
+
+ EXCEPTION
+   WHEN others THEN
+        po_message_s.sql_error('val_start_and_end_date', x_progress,sqlcode);
+        raise;
+ END val_start_and_end_date;
+
+/*================================================================
+
+  FUNCTION NAME: 	val_flag_value()
+
+==================================================================*/
+ FUNCTION val_flag_value(x_flag_value  IN VARCHAR2)
+ RETURN BOOLEAN
+ IS
+
+   x_progress   varchar2(3) := null;
+
+ BEGIN
+   x_progress := '010';
+
+   IF X_flag_value In ('Y','N') THEN
+      RETURN TRUE;    /* validation fails */
+   ELSE
+      RETURN FALSE;   /* validation succeeds */
+   END IF;
+
+ EXCEPTION
+   WHEN others THEN
+        po_message_s.sql_error('val_flag_value', x_progress,sqlcode);
+        raise;
+ END val_flag_value;
+
+/*================================================================
+
+  FUNCTION NAME:        default_po_unique_identifier()
+
+==================================================================*/
+
+FUNCTION  default_po_unique_identifier(X_table_name IN VARCHAR2)
+return varchar2 IS
+
+   X_progress       		varchar2(3)     := NULL;
+   X_po_unique_identifier_v     NUMBER    := NULL;
+
+   l_org_id NUMBER := PO_MOAC_UTILS_PVT.get_current_org_id; -- bug5174177
+
+BEGIN
+
+   X_progress := '010';
+
+   -- bug5174177
+   -- PO number generation logic has been moved to the following procedure,
+   -- which takes in ou id.
+   X_po_unique_identifier_v := default_po_unique_identifier
+                               ( p_table_name => x_table_name,
+                                 p_org_id     => l_org_id
+                               );
+
+   RETURN X_po_unique_identifier_v;
+
+END default_po_unique_identifier;
+
+
+-- bug5174177 START
+-- Moved the po num generation logic to this overloaded function.
+-- Need to introduce p_org_id because autocreate creates the PO
+-- from a different OU.
+
+-----------------------------------------------------------------------
+--Start of Comments
+--Name: default_po_unique_identifier
+--Pre-reqs: None
+--Modifies:
+--Locks:
+--  None
+--Function:
+--  Return the next po/req number generated by the system
+--Parameters:
+--IN:
+--p_table_name
+--  Type of document to generate number for. Possible values are:
+--  PO_HEADERS             -- For PO and PA
+--  PO_HEADERS_QUOTE       -- For Quote
+--  PO_HEADERS_RFQ         -- For RFQ
+--  PO_REQUISITION_HEADERS -- For Requisition
+--p_org_id
+--  Operating unit where the document belongs to
+--IN OUT:
+--OUT:
+--Returns: Next po/req number generated by the system
+--Notes:
+--Testing:
+--End of Comments
+------------------------------------------------------------------------
+FUNCTION  default_po_unique_identifier
+( p_table_name IN VARCHAR2,
+  p_org_id     IN NUMBER
+) RETURN VARCHAR2 IS
+PRAGMA AUTONOMOUS_TRANSACTION; -- bug5047141
+
+l_progress                   varchar2(3)     := NULL;
+l_po_unique_identifier_v     NUMBER    := NULL;
+
+BEGIN
+
+  l_progress := '010';
+
+  -- increment the number in po_unique_identifier_cont_all by 1
+  -- based on table_name and org_id from parameter list.
+  UPDATE po_unique_identifier_cont_all
+  SET    current_max_unique_identifier =
+           current_max_unique_identifier +1
+  WHERE  table_name = p_table_name
+  AND    org_id     = p_org_id
+  RETURNING current_max_unique_identifier
+  INTO   l_po_unique_identifier_v;
+
+  COMMIT;  -- bug5047141
+
+
+  RETURN TO_CHAR(l_po_unique_identifier_v);
+
+EXCEPTION
+WHEN NO_DATA_FOUND THEN
+  RETURN NULL;
+WHEN OTHERS THEN
+  PO_MESSAGE_S.sql_error('default_po_unique_identifier',
+                         l_progress, sqlcode);
+  RAISE;
+END default_po_unique_identifier;
+
+-- bug5174177 END
+
+
+
+
+/*================================================================
+
+  FUNCTION NAME: 	val_max_and_min_qty()
+
+==================================================================*/
+ FUNCTION val_max_and_min_qty(x_qty1  IN NUMBER,
+                              x_qty2  IN NUMBER) RETURN BOOLEAN
+ IS
+
+   x_progress        varchar2(3) := null;
+
+ BEGIN
+   x_progress := '010';
+
+   /* check to see if x_qty1 > x_qty2 */
+
+   IF (x_qty1 > x_qty2) THEN
+      RETURN FALSE;    /* validation fails */
+   ELSE
+      RETURN TRUE;     /* validation succeeds */
+   END IF;
+
+ EXCEPTION
+   WHEN others THEN
+        po_message_s.sql_error
+        ('val_gt_and_lt_qty', x_progress, sqlcode);
+      raise;
+ END val_max_and_min_qty;
+
+/*================================================================
+
+  FUNCTION NAME: 	val_discount()
+
+==================================================================*/
+ FUNCTION val_discount(x_discount  IN NUMBER) RETURN BOOLEAN
+ IS
+
+   x_progress     varchar2(3) := null;
+
+ BEGIN
+   x_progress := '010';
+
+   IF (x_discount < 0) OR (x_discount > 100) THEN
+      RETURN FALSE;    /* validation fails */
+   ELSE
+      RETURN TRUE;     /* validation succeeds */
+   END IF;
+
+ EXCEPTION
+   WHEN others THEN
+        po_message_s.sql_error('val_discount_betwn_zero_and_hundred',
+                               x_progress,sqlcode);
+        raise;
+ END val_discount;
+
+
+END PO_CORE_SV1;
+
+/

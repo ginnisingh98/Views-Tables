@@ -1,0 +1,229 @@
+--------------------------------------------------------
+--  DDL for Package Body OKS_OKSSCOFM_XMLP_PKG
+--------------------------------------------------------
+
+  CREATE OR REPLACE EDITIONABLE PACKAGE BODY "APPS"."OKS_OKSSCOFM_XMLP_PKG" AS
+/* $Header: OKSSCOFMB.pls 120.2 2008/02/21 06:12:33 dwkrishn noship $ */
+  FUNCTION BEFOREREPORT RETURN BOOLEAN IS
+   apf boolean;
+  BEGIN
+    apf := afterpform;
+    IF P_OPERATING_UNIT IS NOT NULL THEN
+      MO_GLOBAL.SET_POLICY_CONTEXT('S'
+                                  ,P_OPERATING_UNIT);
+    END IF;
+    P_FORECAST_ST_PERIOD_V := to_char(P_FORECAST_ST_PERIOD,'DD-MON-YY');
+    P_FORECAST_END_PERIOD_V := TO_CHAR(P_FORECAST_END_PERIOD,'DD-MON-YY');
+    RETURN (TRUE);
+  END BEFOREREPORT;
+  FUNCTION CF_FORECAST_REVFORMULA(CF_CONTRACT_VALUE IN NUMBER
+                                 ,FORECAST_PER IN NUMBER
+                                 ,CF_REV_REC IN NUMBER) RETURN NUMBER IS
+    RET_VALUE1 NUMBER;
+    RET_VALUE2 NUMBER;
+  BEGIN
+    IF (CF_CONTRACT_VALUE = 0) THEN
+      RETURN (0);
+    ELSE
+      RET_VALUE1 := ((FORECAST_PER / 100) * CF_REV_REC);
+      RET_VALUE2 := RET_VALUE1;
+      RETURN (NVL(RET_VALUE2
+                ,0));
+    END IF;
+  END CF_FORECAST_REVFORMULA;
+  FUNCTION CF_SALESREP_NAMEFORMULA(SR_SALESREP_ID IN VARCHAR2
+                                  ,ORG_ID IN NUMBER) RETURN CHAR IS
+    P_SALESREP_NAME JTF_RS_SALESREPS.NAME%TYPE;
+  BEGIN
+    SELECT
+      NAME
+    INTO P_SALESREP_NAME
+    FROM
+      JTF_RS_SALESREPS
+    WHERE SALESREP_ID = SR_SALESREP_ID
+      AND ORG_ID = CF_SALESREP_NAMEFORMULA.ORG_ID
+      AND ROWNUM < 2;
+    RETURN (P_SALESREP_NAME);
+  END CF_SALESREP_NAMEFORMULA;
+  FUNCTION CF_PARTY_NAMEFORMULA(HZ_PARTY_ID IN VARCHAR2) RETURN CHAR IS
+    P_PARTY_NAME HZ_PARTIES.PARTY_NAME%TYPE;
+  BEGIN
+    SELECT
+      PARTY_NAME
+    INTO P_PARTY_NAME
+    FROM
+      HZ_PARTIES
+    WHERE PARTY_ID = HZ_PARTY_ID
+      AND ROWNUM = 1;
+    RETURN (P_PARTY_NAME);
+  END CF_PARTY_NAMEFORMULA;
+  FUNCTION CF_CONTRACT_VALUEFORMULA(CONTRACT_ID IN NUMBER) RETURN NUMBER IS
+    CURSOR L_CONTRACT_CSR IS
+      SELECT
+        NVL(SUM(PRICE_NEGOTIATED)
+           ,0)
+      FROM
+        OKC_K_LINES_B
+      WHERE DNZ_CHR_ID = CONTRACT_ID
+        AND LSE_ID in ( 25 , 7 , 9 , 10 , 8 , 35 , 11 )
+        AND DATE_CANCELLED is NULL
+        AND PRICE_NEGOTIATED between 0
+        AND 90999999
+      HAVING NVL(SUM(PRICE_NEGOTIATED)
+         ,0) >= NVL(P_MINIMUM_CONTRACT_VALUE
+         ,NVL(SUM(PRICE_NEGOTIATED)
+            ,0))
+        AND NVL(SUM(PRICE_NEGOTIATED)
+         ,0) <= NVL(P_MAXIMUM_CONTRACT_VALUE
+         ,NVL(SUM(PRICE_NEGOTIATED)
+            ,0));
+    L_AMT NUMBER := 0;
+  BEGIN
+    OPEN L_CONTRACT_CSR;
+    FETCH L_CONTRACT_CSR
+     INTO L_AMT;
+    CLOSE L_CONTRACT_CSR;
+    RETURN NVL(L_AMT
+              ,0);
+  EXCEPTION
+    WHEN OTHERS THEN
+      RETURN 0;
+  END CF_CONTRACT_VALUEFORMULA;
+  FUNCTION CF_CONTRACT_FORECASTFORMULA(CF_CONTRACT_VALUE IN NUMBER
+                                      ,FORECAST_PER IN NUMBER) RETURN NUMBER IS
+  BEGIN
+    IF (CF_CONTRACT_VALUE = 0) THEN
+      RETURN (0);
+    ELSE
+      RETURN (NVL((CF_CONTRACT_VALUE * FORECAST_PER / 100)
+                ,0));
+    END IF;
+  END CF_CONTRACT_FORECASTFORMULA;
+  FUNCTION CF_REV_RECFORMULA(CONTRACT_ID IN NUMBER
+                            ,CF_CONTRACT_VALUE IN NUMBER) RETURN NUMBER IS
+    CURSOR L_FORECAST_CSR IS
+      SELECT
+        NVL(SUM((KL.PRICE_NEGOTIATED / CEIL(DECODE(SIGN(END_DATE - START_DATE)
+                           ,0
+                           ,1
+                           ,(MONTHS_BETWEEN(KL.END_DATE
+                                         ,KL.START_DATE))))) * CEIL(DECODE(SIGN(P_REGZ_DATE - KL.START_DATE)
+                           ,0
+                           ,1
+                           ,MONTHS_BETWEEN(P_REGZ_DATE
+                                         ,KL.START_DATE))))
+           ,0)
+      FROM
+        OKC_K_LINES_B KL
+      WHERE KL.DNZ_CHR_ID = CONTRACT_ID
+        AND KL.LSE_ID in ( 25 , 7 , 9 , 10 , 8 , 35 , 11 )
+        AND KL.PRICE_NEGOTIATED between 0
+        AND 90999999
+        AND KL.START_DATE <= P_REGZ_DATE
+      HAVING NVL(SUM(PRICE_NEGOTIATED)
+         ,0) >= NVL(P_MINIMUM_CONTRACT_VALUE
+         ,NVL(SUM(PRICE_NEGOTIATED)
+            ,0))
+        AND NVL(SUM(PRICE_NEGOTIATED)
+         ,0) <= NVL(P_MAXIMUM_CONTRACT_VALUE
+         ,NVL(SUM(PRICE_NEGOTIATED)
+            ,0));
+    L_AMT NUMBER := 0;
+  BEGIN
+    IF (CF_CONTRACT_VALUE = 0) THEN
+      RETURN (0);
+    ELSE
+      OPEN L_FORECAST_CSR;
+      FETCH L_FORECAST_CSR
+       INTO L_AMT;
+      CLOSE L_FORECAST_CSR;
+      RETURN NVL(L_AMT
+                ,0);
+    END IF;
+  EXCEPTION
+    WHEN OTHERS THEN
+      RETURN 0;
+  END CF_REV_RECFORMULA;
+  FUNCTION AFTERPFORM RETURN BOOLEAN IS
+    CURSOR C1(CN_SALESREPID IN NUMBER,CN_ORGID IN NUMBER) IS
+      SELECT
+        NAME
+      FROM
+        JTF_RS_SALESREPS
+      WHERE SALESREP_ID = CN_SALESREPID;
+    CURSOR C2(CN_ORG_ID IN NUMBER) IS
+      SELECT
+        NAME
+      FROM
+        HR_OPERATING_UNITS
+      WHERE ORGANIZATION_ID = CN_ORG_ID;
+    CURSOR C3(CN_CONTRACT_GROUP_ID IN NUMBER) IS
+      SELECT
+        NAME
+      FROM
+        OKC_K_GROUPS_V
+      WHERE ID = CN_CONTRACT_GROUP_ID;
+  BEGIN
+    BEGIN
+      P_CONC_REQUEST_ID := FND_GLOBAL.CONC_REQUEST_ID;
+      /*SRW.USER_EXIT('FND SRWINIT')*/NULL;
+    EXCEPTION
+      WHEN /*SRW.USER_EXIT_FAILURE*/OTHERS THEN
+        /*SRW.MESSAGE(1
+                   ,'srw_init')*/NULL;
+    END;
+    P_WHERE_CLAUSE := ' ';
+    IF (P_OPERATING_UNIT IS NOT NULL) THEN
+      P_ORG_NAME := NULL;
+      OPEN C2(P_OPERATING_UNIT);
+      FETCH C2
+       INTO P_ORG_NAME;
+      CLOSE C2;
+    END IF;
+    IF (P_SALESREP IS NOT NULL) THEN
+      P_WHERE_CLAUSE := P_WHERE_CLAUSE || '  and ct.object1_id1 = :p_salesrep';
+      P_SALESREP_NAME := NULL;
+      OPEN C1(P_SALESREP,P_OPERATING_UNIT);
+      FETCH C1
+       INTO P_SALESREP_NAME;
+      CLOSE C1;
+    END IF;
+    IF (P_CURRENCY_CODE IS NOT NULL) THEN
+      P_WHERE_CLAUSE := P_WHERE_CLAUSE || '  and  kh.currency_code = :p_currency_code';
+    END IF;
+    IF (P_FORECAST_ST_PERIOD IS NOT NULL) THEN
+      P_WHERE_CLAUSE := P_WHERE_CLAUSE || ' and KR.EST_REV_DATE >= :P_ForeCast_St_Period ';
+    END IF;
+    IF (P_FORECAST_END_PERIOD IS NOT NULL) THEN
+      P_WHERE_CLAUSE := P_WHERE_CLAUSE || ' and KR.EST_REV_DATE <= :P_ForeCast_End_Period ';
+    END IF;
+    IF P_STATUS_CODE IS NOT NULL THEN
+      P_WHERE_CLAUSE := P_WHERE_CLAUSE || ' and kh.sts_code = :p_status_code ';
+    END IF;
+    IF P_CONTRACT_GROUP IS NOT NULL THEN
+      P_CONTRACT_GROUP_WHERE := ' and kh.id in ( select INCLUDED_CHR_ID from okc_k_grpings
+                                                                                    start with CGP_PARENT_ID =  :p_contract_group
+                                                                                    connect by CGP_PARENT_ID = PRIOR INCLUDED_CGP_ID ) ';
+      P_CONTRACT_GROUP_NAME := NULL;
+      OPEN C3(P_CONTRACT_GROUP);
+      FETCH C3
+       INTO P_CONTRACT_GROUP_NAME;
+      CLOSE C3;
+    END IF;
+    RETURN (TRUE);
+  END AFTERPFORM;
+  FUNCTION AFTERREPORT RETURN BOOLEAN IS
+  BEGIN
+    BEGIN
+      /*SRW.USER_EXIT('FND SRWEXIT')*/NULL;
+    EXCEPTION
+      WHEN /*SRW.USER_EXIT_FAILURE*/OTHERS THEN
+        /*SRW.MESSAGE(1
+                   ,'srw_exit')*/NULL;
+    END;
+    RETURN (TRUE);
+  END AFTERREPORT;
+END OKS_OKSSCOFM_XMLP_PKG;
+
+
+/

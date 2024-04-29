@@ -1,0 +1,813 @@
+--------------------------------------------------------
+--  DDL for Package Body AMW_PROCESS_NAMES_PKG
+--------------------------------------------------------
+
+  CREATE OR REPLACE EDITIONABLE PACKAGE BODY "APPS"."AMW_PROCESS_NAMES_PKG" as
+/* $Header: amwprnmb.pls 120.1 2005/06/28 14:26:55 appldev noship $ */
+
+procedure INSERT_ROW (
+  X_ROWID in out NOCOPY VARCHAR2,
+  X_PROCESS_REV_ID in NUMBER,
+  X_CLASSIFICATION in NUMBER,
+  X_PROCESS_CODE in VARCHAR2,
+  X_REVISION_NUMBER in NUMBER,
+  X_START_DATE in DATE,
+  X_APPROVAL_DATE in DATE,
+  X_APPROVAL_END_DATE in DATE,
+  X_END_DATE in DATE,
+  X_DELETION_DATE in DATE,
+  X_PROCESS_TYPE in VARCHAR2,
+  X_CONTROL_ACTIVITY_TYPE in VARCHAR2,
+  X_RISK_COUNT_LATEST in NUMBER,
+  X_CONTROL_COUNT_LATEST in NUMBER,
+  X_STANDARD_VARIATION in NUMBER,
+  X_SIGNIFICANT_PROCESS_FLAG in VARCHAR2,
+  X_STANDARD_PROCESS_FLAG in VARCHAR2,
+  X_APPROVAL_STATUS in VARCHAR2,
+  X_CERTIFICATION_STATUS in VARCHAR2,
+  X_PROCESS_CATEGORY in VARCHAR2,
+  X_PROCESS_OWNER_ID in NUMBER,
+  X_PROCESS_ID in NUMBER,
+  X_ITEM_TYPE in VARCHAR2,
+  X_NAME in VARCHAR2,
+  X_CREATED_FROM in VARCHAR2,
+  X_REQUEST_ID in NUMBER,
+  X_ATTRIBUTE_CATEGORY in VARCHAR2,
+  X_ATTRIBUTE1 in VARCHAR2,
+  X_ATTRIBUTE2 in VARCHAR2,
+  X_ATTRIBUTE3 in VARCHAR2,
+  X_ATTRIBUTE4 in VARCHAR2,
+  X_ATTRIBUTE5 in VARCHAR2,
+  X_ATTRIBUTE6 in VARCHAR2,
+  X_ATTRIBUTE7 in VARCHAR2,
+  X_ATTRIBUTE8 in VARCHAR2,
+  X_ATTRIBUTE9 in VARCHAR2,
+  X_ATTRIBUTE10 in VARCHAR2,
+  X_ATTRIBUTE11 in VARCHAR2,
+  X_ATTRIBUTE12 in VARCHAR2,
+  X_ATTRIBUTE13 in VARCHAR2,
+  X_ATTRIBUTE14 in VARCHAR2,
+  X_ATTRIBUTE15 in VARCHAR2,
+  X_OBJECT_VERSION_NUMBER in NUMBER,
+  X_CONTROL_COUNT in NUMBER,
+  X_RISK_COUNT in NUMBER,
+  X_ORG_COUNT in NUMBER,
+  X_FINANCE_OWNER_ID in NUMBER,
+  X_APPLICATION_OWNER_ID in NUMBER,
+  X_DISPLAY_NAME in VARCHAR2,
+  X_DESCRIPTION in VARCHAR2,
+  X_CREATION_DATE in DATE,
+  X_CREATED_BY in NUMBER,
+  X_LAST_UPDATE_DATE in DATE,
+  X_LAST_UPDATED_BY in NUMBER,
+  X_LAST_UPDATE_LOGIN in NUMBER
+) is
+  cursor C is select ROWID from AMW_PROCESS
+    where PROCESS_REV_ID = X_PROCESS_REV_ID
+    ;
+begin
+  insert into AMW_PROCESS (
+    CLASSIFICATION,
+    PROCESS_CODE,
+    REVISION_NUMBER,
+    START_DATE,
+    APPROVAL_DATE,
+    APPROVAL_END_DATE,
+    END_DATE,
+    DELETION_DATE,
+    PROCESS_TYPE,
+    CONTROL_ACTIVITY_TYPE,
+    RISK_COUNT_LATEST,
+    CONTROL_COUNT_LATEST,
+    STANDARD_VARIATION,
+    PROCESS_REV_ID,
+    SIGNIFICANT_PROCESS_FLAG,
+    STANDARD_PROCESS_FLAG,
+    APPROVAL_STATUS,
+    CERTIFICATION_STATUS,
+    PROCESS_CATEGORY,
+    PROCESS_OWNER_ID,
+    PROCESS_ID,
+    ITEM_TYPE,
+    NAME,
+    CREATED_FROM,
+    REQUEST_ID,
+    ATTRIBUTE_CATEGORY,
+    ATTRIBUTE1,
+    ATTRIBUTE2,
+    ATTRIBUTE3,
+    ATTRIBUTE4,
+    ATTRIBUTE5,
+    ATTRIBUTE6,
+    ATTRIBUTE7,
+    ATTRIBUTE8,
+    ATTRIBUTE9,
+    ATTRIBUTE10,
+    ATTRIBUTE11,
+    ATTRIBUTE12,
+    ATTRIBUTE13,
+    ATTRIBUTE14,
+    ATTRIBUTE15,
+    OBJECT_VERSION_NUMBER,
+    CONTROL_COUNT,
+    RISK_COUNT,
+    ORG_COUNT,
+    FINANCE_OWNER_ID,
+    APPLICATION_OWNER_ID,
+    CREATION_DATE,
+    CREATED_BY,
+    LAST_UPDATE_DATE,
+    LAST_UPDATED_BY,
+    LAST_UPDATE_LOGIN
+  ) values (
+    X_CLASSIFICATION,
+    X_PROCESS_CODE,
+    X_REVISION_NUMBER,
+    X_START_DATE,
+    X_APPROVAL_DATE,
+    X_APPROVAL_END_DATE,
+    X_END_DATE,
+    X_DELETION_DATE,
+    X_PROCESS_TYPE,
+    X_CONTROL_ACTIVITY_TYPE,
+    X_RISK_COUNT_LATEST,
+    X_CONTROL_COUNT_LATEST,
+    X_STANDARD_VARIATION,
+    X_PROCESS_REV_ID,
+    X_SIGNIFICANT_PROCESS_FLAG,
+    X_STANDARD_PROCESS_FLAG,
+    X_APPROVAL_STATUS,
+    X_CERTIFICATION_STATUS,
+    X_PROCESS_CATEGORY,
+    X_PROCESS_OWNER_ID,
+    X_PROCESS_ID,
+    X_ITEM_TYPE,
+    X_NAME,
+    X_CREATED_FROM,
+    X_REQUEST_ID,
+    X_ATTRIBUTE_CATEGORY,
+    X_ATTRIBUTE1,
+    X_ATTRIBUTE2,
+    X_ATTRIBUTE3,
+    X_ATTRIBUTE4,
+    X_ATTRIBUTE5,
+    X_ATTRIBUTE6,
+    X_ATTRIBUTE7,
+    X_ATTRIBUTE8,
+    X_ATTRIBUTE9,
+    X_ATTRIBUTE10,
+    X_ATTRIBUTE11,
+    X_ATTRIBUTE12,
+    X_ATTRIBUTE13,
+    X_ATTRIBUTE14,
+    X_ATTRIBUTE15,
+    X_OBJECT_VERSION_NUMBER,
+    X_CONTROL_COUNT,
+    X_RISK_COUNT,
+    X_ORG_COUNT,
+    X_FINANCE_OWNER_ID,
+    X_APPLICATION_OWNER_ID,
+    X_CREATION_DATE,
+    X_CREATED_BY,
+    X_LAST_UPDATE_DATE,
+    X_LAST_UPDATED_BY,
+    X_LAST_UPDATE_LOGIN
+  );
+
+  insert into AMW_PROCESS_NAMES_TL (
+    PROCESS_ID,
+    REVISION_NUMBER,
+    DISPLAY_NAME,
+    DESCRIPTION,
+    LAST_UPDATE_DATE,
+    LAST_UPDATED_BY,
+    LAST_UPDATE_LOGIN,
+    CREATION_DATE,
+    CREATED_BY,
+    OBJECT_VERSION_NUMBER,
+    PROCESS_REV_ID,
+    LANGUAGE,
+    SOURCE_LANG
+  ) select
+    X_PROCESS_ID,
+    X_REVISION_NUMBER,
+    X_DISPLAY_NAME,
+    X_DESCRIPTION,
+    X_LAST_UPDATE_DATE,
+    X_LAST_UPDATED_BY,
+    X_LAST_UPDATE_LOGIN,
+    X_CREATION_DATE,
+    X_CREATED_BY,
+    X_OBJECT_VERSION_NUMBER,
+    X_PROCESS_REV_ID,
+    L.LANGUAGE_CODE,
+    userenv('LANG')
+  from FND_LANGUAGES L
+  where L.INSTALLED_FLAG in ('I', 'B')
+  and not exists
+    (select NULL
+    from AMW_PROCESS_NAMES_TL T
+    where T.PROCESS_REV_ID = X_PROCESS_REV_ID
+    and T.LANGUAGE = L.LANGUAGE_CODE);
+
+  open c;
+  fetch c into X_ROWID;
+  if (c%notfound) then
+    close c;
+    raise no_data_found;
+  end if;
+  close c;
+
+end INSERT_ROW;
+
+procedure LOCK_ROW (
+  X_PROCESS_REV_ID in NUMBER,
+  X_CLASSIFICATION in NUMBER,
+  X_PROCESS_CODE in VARCHAR2,
+  X_REVISION_NUMBER in NUMBER,
+  X_START_DATE in DATE,
+  X_APPROVAL_DATE in DATE,
+  X_APPROVAL_END_DATE in DATE,
+  X_END_DATE in DATE,
+  X_DELETION_DATE in DATE,
+  X_PROCESS_TYPE in VARCHAR2,
+  X_CONTROL_ACTIVITY_TYPE in VARCHAR2,
+  X_RISK_COUNT_LATEST in NUMBER,
+  X_CONTROL_COUNT_LATEST in NUMBER,
+  X_STANDARD_VARIATION in NUMBER,
+  X_SIGNIFICANT_PROCESS_FLAG in VARCHAR2,
+  X_STANDARD_PROCESS_FLAG in VARCHAR2,
+  X_APPROVAL_STATUS in VARCHAR2,
+  X_CERTIFICATION_STATUS in VARCHAR2,
+  X_PROCESS_CATEGORY in VARCHAR2,
+  X_PROCESS_OWNER_ID in NUMBER,
+  X_PROCESS_ID in NUMBER,
+  X_ITEM_TYPE in VARCHAR2,
+  X_NAME in VARCHAR2,
+  X_CREATED_FROM in VARCHAR2,
+  X_REQUEST_ID in NUMBER,
+  X_ATTRIBUTE_CATEGORY in VARCHAR2,
+  X_ATTRIBUTE1 in VARCHAR2,
+  X_ATTRIBUTE2 in VARCHAR2,
+  X_ATTRIBUTE3 in VARCHAR2,
+  X_ATTRIBUTE4 in VARCHAR2,
+  X_ATTRIBUTE5 in VARCHAR2,
+  X_ATTRIBUTE6 in VARCHAR2,
+  X_ATTRIBUTE7 in VARCHAR2,
+  X_ATTRIBUTE8 in VARCHAR2,
+  X_ATTRIBUTE9 in VARCHAR2,
+  X_ATTRIBUTE10 in VARCHAR2,
+  X_ATTRIBUTE11 in VARCHAR2,
+  X_ATTRIBUTE12 in VARCHAR2,
+  X_ATTRIBUTE13 in VARCHAR2,
+  X_ATTRIBUTE14 in VARCHAR2,
+  X_ATTRIBUTE15 in VARCHAR2,
+  X_OBJECT_VERSION_NUMBER in NUMBER,
+  X_CONTROL_COUNT in NUMBER,
+  X_RISK_COUNT in NUMBER,
+  X_ORG_COUNT in NUMBER,
+  X_FINANCE_OWNER_ID in NUMBER,
+  X_APPLICATION_OWNER_ID in NUMBER,
+  X_DISPLAY_NAME in VARCHAR2,
+  X_DESCRIPTION in VARCHAR2
+) is
+  cursor c is select
+      CLASSIFICATION,
+      PROCESS_CODE,
+      REVISION_NUMBER,
+      START_DATE,
+      APPROVAL_DATE,
+      APPROVAL_END_DATE,
+      END_DATE,
+      DELETION_DATE,
+      PROCESS_TYPE,
+      CONTROL_ACTIVITY_TYPE,
+      RISK_COUNT_LATEST,
+      CONTROL_COUNT_LATEST,
+      STANDARD_VARIATION,
+      SIGNIFICANT_PROCESS_FLAG,
+      STANDARD_PROCESS_FLAG,
+      APPROVAL_STATUS,
+      CERTIFICATION_STATUS,
+      PROCESS_CATEGORY,
+      PROCESS_OWNER_ID,
+      PROCESS_ID,
+      ITEM_TYPE,
+      NAME,
+      CREATED_FROM,
+      REQUEST_ID,
+      ATTRIBUTE_CATEGORY,
+      ATTRIBUTE1,
+      ATTRIBUTE2,
+      ATTRIBUTE3,
+      ATTRIBUTE4,
+      ATTRIBUTE5,
+      ATTRIBUTE6,
+      ATTRIBUTE7,
+      ATTRIBUTE8,
+      ATTRIBUTE9,
+      ATTRIBUTE10,
+      ATTRIBUTE11,
+      ATTRIBUTE12,
+      ATTRIBUTE13,
+      ATTRIBUTE14,
+      ATTRIBUTE15,
+      OBJECT_VERSION_NUMBER,
+      CONTROL_COUNT,
+      RISK_COUNT,
+      ORG_COUNT,
+      FINANCE_OWNER_ID,
+      APPLICATION_OWNER_ID
+    from AMW_PROCESS
+    where PROCESS_REV_ID = X_PROCESS_REV_ID
+    for update of PROCESS_REV_ID nowait;
+  recinfo c%rowtype;
+
+  cursor c1 is select
+      DISPLAY_NAME,
+      DESCRIPTION,
+      decode(LANGUAGE, userenv('LANG'), 'Y', 'N') BASELANG
+    from AMW_PROCESS_NAMES_TL
+    where PROCESS_REV_ID = X_PROCESS_REV_ID
+    and userenv('LANG') in (LANGUAGE, SOURCE_LANG)
+    for update of PROCESS_REV_ID nowait;
+begin
+  open c;
+  fetch c into recinfo;
+  if (c%notfound) then
+    close c;
+    fnd_message.set_name('FND', 'FORM_RECORD_DELETED');
+    app_exception.raise_exception;
+  end if;
+  close c;
+  if (    ((recinfo.CLASSIFICATION = X_CLASSIFICATION)
+           OR ((recinfo.CLASSIFICATION is null) AND (X_CLASSIFICATION is null)))
+      AND ((recinfo.PROCESS_CODE = X_PROCESS_CODE)
+           OR ((recinfo.PROCESS_CODE is null) AND (X_PROCESS_CODE is null)))
+      AND ((recinfo.REVISION_NUMBER = X_REVISION_NUMBER)
+           OR ((recinfo.REVISION_NUMBER is null) AND (X_REVISION_NUMBER is null)))
+      AND ((recinfo.START_DATE = X_START_DATE)
+           OR ((recinfo.START_DATE is null) AND (X_START_DATE is null)))
+      AND ((recinfo.APPROVAL_DATE = X_APPROVAL_DATE)
+           OR ((recinfo.APPROVAL_DATE is null) AND (X_APPROVAL_DATE is null)))
+      AND ((recinfo.APPROVAL_END_DATE = X_APPROVAL_END_DATE)
+           OR ((recinfo.APPROVAL_END_DATE is null) AND (X_APPROVAL_END_DATE is null)))
+      AND ((recinfo.END_DATE = X_END_DATE)
+           OR ((recinfo.END_DATE is null) AND (X_END_DATE is null)))
+      AND ((recinfo.DELETION_DATE = X_DELETION_DATE)
+           OR ((recinfo.DELETION_DATE is null) AND (X_DELETION_DATE is null)))
+      AND ((recinfo.PROCESS_TYPE = X_PROCESS_TYPE)
+           OR ((recinfo.PROCESS_TYPE is null) AND (X_PROCESS_TYPE is null)))
+      AND ((recinfo.CONTROL_ACTIVITY_TYPE = X_CONTROL_ACTIVITY_TYPE)
+           OR ((recinfo.CONTROL_ACTIVITY_TYPE is null) AND (X_CONTROL_ACTIVITY_TYPE is null)))
+      AND ((recinfo.RISK_COUNT_LATEST = X_RISK_COUNT_LATEST)
+           OR ((recinfo.RISK_COUNT_LATEST is null) AND (X_RISK_COUNT_LATEST is null)))
+      AND ((recinfo.CONTROL_COUNT_LATEST = X_CONTROL_COUNT_LATEST)
+           OR ((recinfo.CONTROL_COUNT_LATEST is null) AND (X_CONTROL_COUNT_LATEST is null)))
+      AND ((recinfo.STANDARD_VARIATION = X_STANDARD_VARIATION)
+           OR ((recinfo.STANDARD_VARIATION is null) AND (X_STANDARD_VARIATION is null)))
+      AND ((recinfo.SIGNIFICANT_PROCESS_FLAG = X_SIGNIFICANT_PROCESS_FLAG)
+           OR ((recinfo.SIGNIFICANT_PROCESS_FLAG is null) AND (X_SIGNIFICANT_PROCESS_FLAG is null)))
+      AND ((recinfo.STANDARD_PROCESS_FLAG = X_STANDARD_PROCESS_FLAG)
+           OR ((recinfo.STANDARD_PROCESS_FLAG is null) AND (X_STANDARD_PROCESS_FLAG is null)))
+      AND ((recinfo.APPROVAL_STATUS = X_APPROVAL_STATUS)
+           OR ((recinfo.APPROVAL_STATUS is null) AND (X_APPROVAL_STATUS is null)))
+      AND ((recinfo.CERTIFICATION_STATUS = X_CERTIFICATION_STATUS)
+           OR ((recinfo.CERTIFICATION_STATUS is null) AND (X_CERTIFICATION_STATUS is null)))
+      AND ((recinfo.PROCESS_CATEGORY = X_PROCESS_CATEGORY)
+           OR ((recinfo.PROCESS_CATEGORY is null) AND (X_PROCESS_CATEGORY is null)))
+      AND ((recinfo.PROCESS_OWNER_ID = X_PROCESS_OWNER_ID)
+           OR ((recinfo.PROCESS_OWNER_ID is null) AND (X_PROCESS_OWNER_ID is null)))
+      AND (recinfo.PROCESS_ID = X_PROCESS_ID)
+      AND (recinfo.ITEM_TYPE = X_ITEM_TYPE)
+      AND (recinfo.NAME = X_NAME)
+      AND ((recinfo.CREATED_FROM = X_CREATED_FROM)
+           OR ((recinfo.CREATED_FROM is null) AND (X_CREATED_FROM is null)))
+      AND ((recinfo.REQUEST_ID = X_REQUEST_ID)
+           OR ((recinfo.REQUEST_ID is null) AND (X_REQUEST_ID is null)))
+      AND ((recinfo.ATTRIBUTE_CATEGORY = X_ATTRIBUTE_CATEGORY)
+           OR ((recinfo.ATTRIBUTE_CATEGORY is null) AND (X_ATTRIBUTE_CATEGORY is null)))
+      AND ((recinfo.ATTRIBUTE1 = X_ATTRIBUTE1)
+           OR ((recinfo.ATTRIBUTE1 is null) AND (X_ATTRIBUTE1 is null)))
+      AND ((recinfo.ATTRIBUTE2 = X_ATTRIBUTE2)
+           OR ((recinfo.ATTRIBUTE2 is null) AND (X_ATTRIBUTE2 is null)))
+      AND ((recinfo.ATTRIBUTE3 = X_ATTRIBUTE3)
+           OR ((recinfo.ATTRIBUTE3 is null) AND (X_ATTRIBUTE3 is null)))
+      AND ((recinfo.ATTRIBUTE4 = X_ATTRIBUTE4)
+           OR ((recinfo.ATTRIBUTE4 is null) AND (X_ATTRIBUTE4 is null)))
+      AND ((recinfo.ATTRIBUTE5 = X_ATTRIBUTE5)
+           OR ((recinfo.ATTRIBUTE5 is null) AND (X_ATTRIBUTE5 is null)))
+      AND ((recinfo.ATTRIBUTE6 = X_ATTRIBUTE6)
+           OR ((recinfo.ATTRIBUTE6 is null) AND (X_ATTRIBUTE6 is null)))
+      AND ((recinfo.ATTRIBUTE7 = X_ATTRIBUTE7)
+           OR ((recinfo.ATTRIBUTE7 is null) AND (X_ATTRIBUTE7 is null)))
+      AND ((recinfo.ATTRIBUTE8 = X_ATTRIBUTE8)
+           OR ((recinfo.ATTRIBUTE8 is null) AND (X_ATTRIBUTE8 is null)))
+      AND ((recinfo.ATTRIBUTE9 = X_ATTRIBUTE9)
+           OR ((recinfo.ATTRIBUTE9 is null) AND (X_ATTRIBUTE9 is null)))
+      AND ((recinfo.ATTRIBUTE10 = X_ATTRIBUTE10)
+           OR ((recinfo.ATTRIBUTE10 is null) AND (X_ATTRIBUTE10 is null)))
+      AND ((recinfo.ATTRIBUTE11 = X_ATTRIBUTE11)
+           OR ((recinfo.ATTRIBUTE11 is null) AND (X_ATTRIBUTE11 is null)))
+      AND ((recinfo.ATTRIBUTE12 = X_ATTRIBUTE12)
+           OR ((recinfo.ATTRIBUTE12 is null) AND (X_ATTRIBUTE12 is null)))
+      AND ((recinfo.ATTRIBUTE13 = X_ATTRIBUTE13)
+           OR ((recinfo.ATTRIBUTE13 is null) AND (X_ATTRIBUTE13 is null)))
+      AND ((recinfo.ATTRIBUTE14 = X_ATTRIBUTE14)
+           OR ((recinfo.ATTRIBUTE14 is null) AND (X_ATTRIBUTE14 is null)))
+      AND ((recinfo.ATTRIBUTE15 = X_ATTRIBUTE15)
+           OR ((recinfo.ATTRIBUTE15 is null) AND (X_ATTRIBUTE15 is null)))
+      AND ((recinfo.OBJECT_VERSION_NUMBER = X_OBJECT_VERSION_NUMBER)
+           OR ((recinfo.OBJECT_VERSION_NUMBER is null) AND (X_OBJECT_VERSION_NUMBER is null)))
+      AND ((recinfo.CONTROL_COUNT = X_CONTROL_COUNT)
+           OR ((recinfo.CONTROL_COUNT is null) AND (X_CONTROL_COUNT is null)))
+      AND ((recinfo.RISK_COUNT = X_RISK_COUNT)
+           OR ((recinfo.RISK_COUNT is null) AND (X_RISK_COUNT is null)))
+      AND ((recinfo.ORG_COUNT = X_ORG_COUNT)
+           OR ((recinfo.ORG_COUNT is null) AND (X_ORG_COUNT is null)))
+      AND ((recinfo.FINANCE_OWNER_ID = X_FINANCE_OWNER_ID)
+           OR ((recinfo.FINANCE_OWNER_ID is null) AND (X_FINANCE_OWNER_ID is null)))
+      AND ((recinfo.APPLICATION_OWNER_ID = X_APPLICATION_OWNER_ID)
+           OR ((recinfo.APPLICATION_OWNER_ID is null) AND (X_APPLICATION_OWNER_ID is null)))
+  ) then
+    null;
+  else
+    fnd_message.set_name('FND', 'FORM_RECORD_CHANGED');
+    app_exception.raise_exception;
+  end if;
+
+  for tlinfo in c1 loop
+    if (tlinfo.BASELANG = 'Y') then
+      if (    ((tlinfo.DISPLAY_NAME = X_DISPLAY_NAME)
+               OR ((tlinfo.DISPLAY_NAME is null) AND (X_DISPLAY_NAME is null)))
+          AND ((tlinfo.DESCRIPTION = X_DESCRIPTION)
+               OR ((tlinfo.DESCRIPTION is null) AND (X_DESCRIPTION is null)))
+      ) then
+        null;
+      else
+        fnd_message.set_name('FND', 'FORM_RECORD_CHANGED');
+        app_exception.raise_exception;
+      end if;
+    end if;
+  end loop;
+  return;
+end LOCK_ROW;
+
+procedure UPDATE_ROW (
+  X_PROCESS_REV_ID in NUMBER,
+  X_CLASSIFICATION in NUMBER,
+  X_PROCESS_CODE in VARCHAR2,
+  X_REVISION_NUMBER in NUMBER,
+  X_START_DATE in DATE,
+  X_APPROVAL_DATE in DATE,
+  X_APPROVAL_END_DATE in DATE,
+  X_END_DATE in DATE,
+  X_DELETION_DATE in DATE,
+  X_PROCESS_TYPE in VARCHAR2,
+  X_CONTROL_ACTIVITY_TYPE in VARCHAR2,
+  X_RISK_COUNT_LATEST in NUMBER,
+  X_CONTROL_COUNT_LATEST in NUMBER,
+  X_STANDARD_VARIATION in NUMBER,
+  X_SIGNIFICANT_PROCESS_FLAG in VARCHAR2,
+  X_STANDARD_PROCESS_FLAG in VARCHAR2,
+  X_APPROVAL_STATUS in VARCHAR2,
+  X_CERTIFICATION_STATUS in VARCHAR2,
+  X_PROCESS_CATEGORY in VARCHAR2,
+  X_PROCESS_OWNER_ID in NUMBER,
+  X_PROCESS_ID in NUMBER,
+  X_ITEM_TYPE in VARCHAR2,
+  X_NAME in VARCHAR2,
+  X_CREATED_FROM in VARCHAR2,
+  X_REQUEST_ID in NUMBER,
+  X_ATTRIBUTE_CATEGORY in VARCHAR2,
+  X_ATTRIBUTE1 in VARCHAR2,
+  X_ATTRIBUTE2 in VARCHAR2,
+  X_ATTRIBUTE3 in VARCHAR2,
+  X_ATTRIBUTE4 in VARCHAR2,
+  X_ATTRIBUTE5 in VARCHAR2,
+  X_ATTRIBUTE6 in VARCHAR2,
+  X_ATTRIBUTE7 in VARCHAR2,
+  X_ATTRIBUTE8 in VARCHAR2,
+  X_ATTRIBUTE9 in VARCHAR2,
+  X_ATTRIBUTE10 in VARCHAR2,
+  X_ATTRIBUTE11 in VARCHAR2,
+  X_ATTRIBUTE12 in VARCHAR2,
+  X_ATTRIBUTE13 in VARCHAR2,
+  X_ATTRIBUTE14 in VARCHAR2,
+  X_ATTRIBUTE15 in VARCHAR2,
+  X_OBJECT_VERSION_NUMBER in NUMBER,
+  X_CONTROL_COUNT in NUMBER,
+  X_RISK_COUNT in NUMBER,
+  X_ORG_COUNT in NUMBER,
+  X_FINANCE_OWNER_ID in NUMBER,
+  X_APPLICATION_OWNER_ID in NUMBER,
+  X_DISPLAY_NAME in VARCHAR2,
+  X_DESCRIPTION in VARCHAR2,
+  X_LAST_UPDATE_DATE in DATE,
+  X_LAST_UPDATED_BY in NUMBER,
+  X_LAST_UPDATE_LOGIN in NUMBER
+) is
+begin
+  update AMW_PROCESS set
+    CLASSIFICATION = X_CLASSIFICATION,
+    PROCESS_CODE = X_PROCESS_CODE,
+    REVISION_NUMBER = X_REVISION_NUMBER,
+    START_DATE = X_START_DATE,
+    APPROVAL_DATE = X_APPROVAL_DATE,
+    APPROVAL_END_DATE = X_APPROVAL_END_DATE,
+    END_DATE = X_END_DATE,
+    DELETION_DATE = X_DELETION_DATE,
+    PROCESS_TYPE = X_PROCESS_TYPE,
+    CONTROL_ACTIVITY_TYPE = X_CONTROL_ACTIVITY_TYPE,
+    RISK_COUNT_LATEST = X_RISK_COUNT_LATEST,
+    CONTROL_COUNT_LATEST = X_CONTROL_COUNT_LATEST,
+    STANDARD_VARIATION = X_STANDARD_VARIATION,
+    SIGNIFICANT_PROCESS_FLAG = X_SIGNIFICANT_PROCESS_FLAG,
+    STANDARD_PROCESS_FLAG = X_STANDARD_PROCESS_FLAG,
+    APPROVAL_STATUS = X_APPROVAL_STATUS,
+    CERTIFICATION_STATUS = X_CERTIFICATION_STATUS,
+    PROCESS_CATEGORY = X_PROCESS_CATEGORY,
+    PROCESS_OWNER_ID = X_PROCESS_OWNER_ID,
+    PROCESS_ID = X_PROCESS_ID,
+    ITEM_TYPE = X_ITEM_TYPE,
+    NAME = X_NAME,
+    CREATED_FROM = X_CREATED_FROM,
+    REQUEST_ID = X_REQUEST_ID,
+    ATTRIBUTE_CATEGORY = X_ATTRIBUTE_CATEGORY,
+    ATTRIBUTE1 = X_ATTRIBUTE1,
+    ATTRIBUTE2 = X_ATTRIBUTE2,
+    ATTRIBUTE3 = X_ATTRIBUTE3,
+    ATTRIBUTE4 = X_ATTRIBUTE4,
+    ATTRIBUTE5 = X_ATTRIBUTE5,
+    ATTRIBUTE6 = X_ATTRIBUTE6,
+    ATTRIBUTE7 = X_ATTRIBUTE7,
+    ATTRIBUTE8 = X_ATTRIBUTE8,
+    ATTRIBUTE9 = X_ATTRIBUTE9,
+    ATTRIBUTE10 = X_ATTRIBUTE10,
+    ATTRIBUTE11 = X_ATTRIBUTE11,
+    ATTRIBUTE12 = X_ATTRIBUTE12,
+    ATTRIBUTE13 = X_ATTRIBUTE13,
+    ATTRIBUTE14 = X_ATTRIBUTE14,
+    ATTRIBUTE15 = X_ATTRIBUTE15,
+    OBJECT_VERSION_NUMBER = X_OBJECT_VERSION_NUMBER,
+    CONTROL_COUNT = X_CONTROL_COUNT,
+    RISK_COUNT = X_RISK_COUNT,
+    ORG_COUNT = X_ORG_COUNT,
+    FINANCE_OWNER_ID = X_FINANCE_OWNER_ID,
+    APPLICATION_OWNER_ID = X_APPLICATION_OWNER_ID,
+    LAST_UPDATE_DATE = X_LAST_UPDATE_DATE,
+    LAST_UPDATED_BY = X_LAST_UPDATED_BY,
+    LAST_UPDATE_LOGIN = X_LAST_UPDATE_LOGIN
+  where PROCESS_REV_ID = X_PROCESS_REV_ID;
+
+  if (sql%notfound) then
+    raise no_data_found;
+  end if;
+
+  update AMW_PROCESS_NAMES_TL set
+    DISPLAY_NAME = X_DISPLAY_NAME,
+    DESCRIPTION = X_DESCRIPTION,
+    LAST_UPDATE_DATE = X_LAST_UPDATE_DATE,
+    LAST_UPDATED_BY = X_LAST_UPDATED_BY,
+    LAST_UPDATE_LOGIN = X_LAST_UPDATE_LOGIN,
+    SOURCE_LANG = userenv('LANG')
+  where PROCESS_REV_ID = X_PROCESS_REV_ID
+  and userenv('LANG') in (LANGUAGE, SOURCE_LANG);
+
+  if (sql%notfound) then
+    raise no_data_found;
+  end if;
+end UPDATE_ROW;
+
+procedure DELETE_ROW (
+  X_PROCESS_REV_ID in NUMBER
+) is
+begin
+  delete from AMW_PROCESS_NAMES_TL
+  where PROCESS_REV_ID = X_PROCESS_REV_ID;
+
+  if (sql%notfound) then
+    raise no_data_found;
+  end if;
+
+  delete from AMW_PROCESS
+  where PROCESS_REV_ID = X_PROCESS_REV_ID;
+
+  if (sql%notfound) then
+    raise no_data_found;
+  end if;
+end DELETE_ROW;
+
+procedure ADD_LANGUAGE
+is
+begin
+  delete from AMW_PROCESS_NAMES_TL T
+  where not exists
+    (select NULL
+    from AMW_PROCESS B
+    where B.PROCESS_REV_ID = T.PROCESS_REV_ID
+    );
+
+  update AMW_PROCESS_NAMES_TL T set (
+      DISPLAY_NAME,
+      DESCRIPTION
+    ) = (select
+      B.DISPLAY_NAME,
+      B.DESCRIPTION
+    from AMW_PROCESS_NAMES_TL B
+    where B.PROCESS_REV_ID = T.PROCESS_REV_ID
+    and B.LANGUAGE = T.SOURCE_LANG)
+  where (
+      T.PROCESS_REV_ID,
+      T.LANGUAGE
+  ) in (select
+      SUBT.PROCESS_REV_ID,
+      SUBT.LANGUAGE
+    from AMW_PROCESS_NAMES_TL SUBB, AMW_PROCESS_NAMES_TL SUBT
+    where SUBB.PROCESS_REV_ID = SUBT.PROCESS_REV_ID
+    and SUBB.LANGUAGE = SUBT.SOURCE_LANG
+    and (SUBB.DISPLAY_NAME <> SUBT.DISPLAY_NAME
+      or (SUBB.DISPLAY_NAME is null and SUBT.DISPLAY_NAME is not null)
+      or (SUBB.DISPLAY_NAME is not null and SUBT.DISPLAY_NAME is null)
+      or SUBB.DESCRIPTION <> SUBT.DESCRIPTION
+      or (SUBB.DESCRIPTION is null and SUBT.DESCRIPTION is not null)
+      or (SUBB.DESCRIPTION is not null and SUBT.DESCRIPTION is null)
+  ));
+
+  insert into AMW_PROCESS_NAMES_TL (
+    PROCESS_ID,
+    REVISION_NUMBER,
+    DISPLAY_NAME,
+    DESCRIPTION,
+    LAST_UPDATE_DATE,
+    LAST_UPDATED_BY,
+    LAST_UPDATE_LOGIN,
+    CREATION_DATE,
+    CREATED_BY,
+    OBJECT_VERSION_NUMBER,
+    PROCESS_REV_ID,
+    LANGUAGE,
+    SOURCE_LANG
+  ) select /*+ ORDERED */
+    B.PROCESS_ID,
+    B.REVISION_NUMBER,
+    B.DISPLAY_NAME,
+    B.DESCRIPTION,
+    B.LAST_UPDATE_DATE,
+    B.LAST_UPDATED_BY,
+    B.LAST_UPDATE_LOGIN,
+    B.CREATION_DATE,
+    B.CREATED_BY,
+    B.OBJECT_VERSION_NUMBER,
+    B.PROCESS_REV_ID,
+    L.LANGUAGE_CODE,
+    B.SOURCE_LANG
+  from AMW_PROCESS_NAMES_TL B, FND_LANGUAGES L
+  where L.INSTALLED_FLAG in ('I', 'B')
+  and B.LANGUAGE = userenv('LANG')
+  and not exists
+    (select NULL
+    from AMW_PROCESS_NAMES_TL T
+    where T.PROCESS_REV_ID = B.PROCESS_REV_ID
+    and T.LANGUAGE = L.LANGUAGE_CODE);
+end ADD_LANGUAGE;
+
+
+procedure load_seed_data (x_owner in varchar2,
+			  x_last_update_date in varchar2,
+			  x_display_name in varchar2,
+			  x_description in varchar2,
+			  x_process_rev_id in number,
+			  x_process_code in varchar2) is
+G_TXN_DATE date := sysdate;
+L_ROWID varchar2(100);
+l_OWNER number;
+l_last_update_date date;
+
+begin
+l_OWNER := fnd_load_util.owner_id(X_OWNER);
+l_last_update_date := nvl(to_date(X_LAST_UPDATE_DATE, 'YYYY/MM/DD'), sysdate);
+
+delete from amw_process where process_rev_id = x_process_rev_id;
+delete from amw_process_names_tl where process_rev_id = x_process_rev_id;
+
+INSERT_ROW (
+  X_ROWID		=> L_ROWID,
+  X_PROCESS_REV_ID	=> x_process_rev_id,
+  X_CLASSIFICATION	=> null,
+  X_PROCESS_CODE	=> x_process_code,
+  X_REVISION_NUMBER	=> 1,
+  X_START_DATE		=> G_TXN_DATE,
+  X_APPROVAL_DATE	=> G_TXN_DATE,
+  X_APPROVAL_END_DATE	=> null,
+  X_END_DATE		=> null,
+  X_DELETION_DATE	=> null,
+  X_PROCESS_TYPE	=> 'P',
+  X_CONTROL_ACTIVITY_TYPE    => null,
+  X_RISK_COUNT_LATEST	     => null,
+  X_CONTROL_COUNT_LATEST     => null,
+  X_STANDARD_VARIATION	     => null,
+  X_SIGNIFICANT_PROCESS_FLAG => null,
+  X_STANDARD_PROCESS_FLAG    =>	null,
+  X_APPROVAL_STATUS 	     =>	'A',
+  X_CERTIFICATION_STATUS     =>	null,
+  X_PROCESS_CATEGORY 	     => null,
+  X_PROCESS_OWNER_ID 	     =>	null,
+  X_PROCESS_ID 		     =>	x_process_rev_id,
+  X_ITEM_TYPE                =>	'AUDITMGR',
+  X_NAME 		     => x_process_code,
+  X_CREATED_FROM 	     =>	null,
+  X_REQUEST_ID 		     =>	null,
+  X_ATTRIBUTE_CATEGORY 	     =>	null,
+  X_ATTRIBUTE1 		     => null,
+  X_ATTRIBUTE2 		     =>	null,
+  X_ATTRIBUTE3 		     =>	null,
+  X_ATTRIBUTE4 		     =>	null,
+  X_ATTRIBUTE5 		     => null,
+  X_ATTRIBUTE6 		     =>	null,
+  X_ATTRIBUTE7               =>	null,
+  X_ATTRIBUTE8 		     =>	null,
+  X_ATTRIBUTE9 		     => null,
+  X_ATTRIBUTE10		     =>	null,
+  X_ATTRIBUTE11		     =>	null,
+  X_ATTRIBUTE12		     =>	null,
+  X_ATTRIBUTE13		     => null,
+  X_ATTRIBUTE14		     =>	null,
+  X_ATTRIBUTE15		     =>	null,
+  X_OBJECT_VERSION_NUMBER    =>	1,
+  X_CONTROL_COUNT 	     => null,
+  X_RISK_COUNT               =>	null,
+  X_ORG_COUNT 		     =>	null,
+  X_FINANCE_OWNER_ID 	     =>	null,
+  X_APPLICATION_OWNER_ID     => null,
+  X_DISPLAY_NAME 	     =>	x_display_name,
+  X_DESCRIPTION 	     =>	x_description,
+  X_CREATION_DATE 	     =>	l_last_update_date,
+  X_CREATED_BY 		     => l_OWNER,
+  X_LAST_UPDATE_DATE 	     =>	l_last_update_date,
+  X_LAST_UPDATED_BY 	     =>	l_OWNER,
+  X_LAST_UPDATE_LOGIN 	     => 0 );
+
+/*
+INSERT_ROW (
+  X_ROWID		=> L_ROWID,
+  X_PROCESS_REV_ID	=> -2,
+  X_CLASSIFICATION	=> null,
+  X_PROCESS_CODE	=> 'ORG_PROCESS',
+  X_REVISION_NUMBER	=> 1,
+  X_START_DATE		=> G_TXN_DATE,
+  X_APPROVAL_DATE	=> G_TXN_DATE,
+  X_APPROVAL_END_DATE	=> null,
+  X_END_DATE		=> null,
+  X_DELETION_DATE	=> null,
+  X_PROCESS_TYPE	=> 'P',
+  X_CONTROL_ACTIVITY_TYPE    => null,
+  X_RISK_COUNT_LATEST	     => null,
+  X_CONTROL_COUNT_LATEST     => null,
+  X_STANDARD_VARIATION	     => null,
+  X_SIGNIFICANT_PROCESS_FLAG => null,
+  X_STANDARD_PROCESS_FLAG    =>	null,
+  X_APPROVAL_STATUS 	     =>	'A',
+  X_CERTIFICATION_STATUS     =>	null,
+  X_PROCESS_CATEGORY 	     => null,
+  X_PROCESS_OWNER_ID 	     =>	null,
+  X_PROCESS_ID 		     =>	-2,
+  X_ITEM_TYPE                =>	'AUDITMGR',
+  X_NAME 		     => 'ORG_PROCESS',
+  X_CREATED_FROM 	     =>	null,
+  X_REQUEST_ID 		     =>	null,
+  X_ATTRIBUTE_CATEGORY 	     =>	null,
+  X_ATTRIBUTE1 		     => null,
+  X_ATTRIBUTE2 		     =>	null,
+  X_ATTRIBUTE3 		     =>	null,
+  X_ATTRIBUTE4 		     =>	null,
+  X_ATTRIBUTE5 		     => null,
+  X_ATTRIBUTE6 		     =>	null,
+  X_ATTRIBUTE7               =>	null,
+  X_ATTRIBUTE8 		     =>	null,
+  X_ATTRIBUTE9 		     => null,
+  X_ATTRIBUTE10		     =>	null,
+  X_ATTRIBUTE11		     =>	null,
+  X_ATTRIBUTE12		     =>	null,
+  X_ATTRIBUTE13		     => null,
+  X_ATTRIBUTE14		     =>	null,
+  X_ATTRIBUTE15		     =>	null,
+  X_OBJECT_VERSION_NUMBER    =>	1,
+  X_CONTROL_COUNT 	     => null,
+  X_RISK_COUNT               =>	null,
+  X_ORG_COUNT 		     =>	null,
+  X_FINANCE_OWNER_ID 	     =>	null,
+  X_APPLICATION_OWNER_ID     => null,
+  X_DISPLAY_NAME 	     =>	'Assigned Processes',
+  X_DESCRIPTION 	     =>	'Assigned Processes',
+  X_CREATION_DATE 	     =>	l_last_update_date,
+  X_CREATED_BY 		     => l_OWNER,
+  X_LAST_UPDATE_DATE 	     =>	l_last_update_date,
+  X_LAST_UPDATED_BY 	     =>	l_OWNER,
+  X_LAST_UPDATE_LOGIN 	     => 0 );
+*/
+end load_seed_data;
+
+end AMW_PROCESS_NAMES_PKG;
+
+/

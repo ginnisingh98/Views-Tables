@@ -1,0 +1,232 @@
+--------------------------------------------------------
+--  DDL for Package PAY_DYT_ELEMENT_ENTRY_VAL_PKG
+--------------------------------------------------------
+
+  CREATE OR REPLACE EDITIONABLE PACKAGE "APPS"."PAY_DYT_ELEMENT_ENTRY_VAL_PKG" 
+AS
+
+--
+/*
+  ==================================================
+  This is a dynamically generated database package  
+  containing code to support the use of dynamic     
+  triggers.                                          
+  Preference of package Vs dbms triggers supporting 
+  dyn' triggers is made via the dated table form.  
+  .                                                 
+  This code will be called implicitly by table rhi  
+  and explictly from non-API packages that maintain 
+  data on the relevant table.                       
+  ==================================================
+              ** DO NOT CHANGE MANUALLY **          
+  --------------------------------------------------
+    Package Name: PAY_DYT_ELEMENT_ENTRY_VAL_PKG
+    Base Table:   PAY_ELEMENT_ENTRY_VALUES_F
+    Date:         30/08/2013 11:37
+  ==================================================
+*/
+
+--
+/*
+  ================================================
+  This is a dynamically generated package procedure
+  with code representing a dynamic trigger        
+  ================================================
+            ** DO NOT CHANGE MANUALLY **           
+  ------------------------------------------------
+    Name:   PAY_ELEMENT_ENTRY_VALUES_F_ARU
+    Table:  PAY_ELEMENT_ENTRY_VALUES_F
+    Action: Update
+    Generated Date:   30/08/2013 11:37
+    Description: Continuous Calculation trigger on update of element entry value
+    Full trigger name: PAY_ELEMENT_ENTRY_VALUES_F_ARU
+  ================================================
+*/
+--
+PROCEDURE PAY_ELEMENT_ENTRY_VALUES_F_ARU
+(
+    p_new_EFFECTIVE_END_DATE                 in DATE
+   ,p_new_EFFECTIVE_START_DATE               in DATE
+   ,p_new_ELEMENT_ENTRY_ID                   in NUMBER
+   ,p_new_ELEMENT_ENTRY_VALUE_ID             in NUMBER
+   ,p_new_INPUT_VALUE_ID                     in NUMBER
+   ,p_new_SCREEN_ENTRY_VALUE                 in VARCHAR2
+   ,p_old_EFFECTIVE_END_DATE                 in DATE
+   ,p_old_EFFECTIVE_START_DATE               in DATE
+   ,p_old_ELEMENT_ENTRY_ID                   in NUMBER
+   ,p_old_ELEMENT_ENTRY_VALUE_ID             in NUMBER
+   ,p_old_INPUT_VALUE_ID                     in NUMBER
+   ,p_old_SCREEN_ENTRY_VALUE                 in VARCHAR2
+ ); -- End of procedure definition for PAY_ELEMENT_ENTRY_VALUES_F_ARU
+
+--
+/*
+  ================================================
+  This is a dynamically generated package procedure
+  with code representing a dynamic trigger        
+  ================================================
+            ** DO NOT CHANGE MANUALLY **           
+  ------------------------------------------------
+    Name:   ES_SS_REP_ELEMENT_I_I
+    Table:  PAY_ELEMENT_ENTRY_VALUES_F
+    Action: Insert
+    Generated Date:   30/08/2013 11:37
+    Description: Spanish Trigger for Social Security Reporting
+    Full trigger name: ES_SS_REP_ELEMENT_I
+  ================================================
+*/
+--
+PROCEDURE ES_SS_REP_ELEMENT_I_I
+(
+    p_new_EFFECTIVE_END_DATE                 in DATE
+   ,p_new_EFFECTIVE_START_DATE               in DATE
+   ,p_new_ELEMENT_ENTRY_ID                   in NUMBER
+   ,p_new_ELEMENT_ENTRY_VALUE_ID             in NUMBER
+   ,p_new_INPUT_VALUE_ID                     in NUMBER
+   ,p_new_SCREEN_ENTRY_VALUE                 in VARCHAR2
+   ,p_old_EFFECTIVE_END_DATE                 in DATE
+   ,p_old_EFFECTIVE_START_DATE               in DATE
+   ,p_old_ELEMENT_ENTRY_ID                   in NUMBER
+   ,p_old_ELEMENT_ENTRY_VALUE_ID             in NUMBER
+   ,p_old_INPUT_VALUE_ID                     in NUMBER
+   ,p_old_SCREEN_ENTRY_VALUE                 in VARCHAR2
+ ); -- End of procedure definition for ES_SS_REP_ELEMENT_I_I
+
+--
+/*
+  ================================================
+  This is a dynamically generated package procedure
+  with code representing a dynamic trigger        
+  ================================================
+            ** DO NOT CHANGE MANUALLY **           
+  ------------------------------------------------
+    Name:   ES_SS_REP_ELEMENT_U_U
+    Table:  PAY_ELEMENT_ENTRY_VALUES_F
+    Action: Update
+    Generated Date:   30/08/2013 11:37
+    Description: Spanish Trigger for Social Security Reporting
+    Full trigger name: ES_SS_REP_ELEMENT_U
+  ================================================
+*/
+--
+PROCEDURE ES_SS_REP_ELEMENT_U_U
+(
+    p_new_EFFECTIVE_END_DATE                 in DATE
+   ,p_new_EFFECTIVE_START_DATE               in DATE
+   ,p_new_ELEMENT_ENTRY_ID                   in NUMBER
+   ,p_new_ELEMENT_ENTRY_VALUE_ID             in NUMBER
+   ,p_new_INPUT_VALUE_ID                     in NUMBER
+   ,p_new_SCREEN_ENTRY_VALUE                 in VARCHAR2
+   ,p_old_EFFECTIVE_END_DATE                 in DATE
+   ,p_old_EFFECTIVE_START_DATE               in DATE
+   ,p_old_ELEMENT_ENTRY_ID                   in NUMBER
+   ,p_old_ELEMENT_ENTRY_VALUE_ID             in NUMBER
+   ,p_old_INPUT_VALUE_ID                     in NUMBER
+   ,p_old_SCREEN_ENTRY_VALUE                 in VARCHAR2
+ ); -- End of procedure definition for ES_SS_REP_ELEMENT_U_U
+
+--
+/*
+  ================================================
+  This is a dynamically generated procedure.      
+  Will be called  by API.                         
+  ================================================
+            ** DO NOT CHANGE MANUALLY **           
+  ------------------------------------------------
+    Name:   AFTER_INSERT
+    Table:  PAY_ELEMENT_ENTRY_VALUES_F
+    Action: INSERT
+    Generated Date:   30/08/2013 11:37
+    Description: Called as part of INSERT process
+  ================================================
+*/
+
+--
+PROCEDURE AFTER_INSERT
+(
+    P_EFFECTIVE_END_DATE                     in DATE
+   ,P_EFFECTIVE_START_DATE                   in DATE
+   ,P_ELEMENT_ENTRY_ID                       in NUMBER
+   ,P_ELEMENT_ENTRY_VALUE_ID                 in NUMBER
+   ,P_INPUT_VALUE_ID                         in NUMBER
+   ,P_SCREEN_ENTRY_VALUE                     in VARCHAR2
+   ,P_EFFECTIVE_END_DATE_O                   in DATE
+   ,P_EFFECTIVE_START_DATE_O                 in DATE
+   ,P_ELEMENT_ENTRY_ID_O                     in NUMBER
+   ,P_ELEMENT_ENTRY_VALUE_ID_O               in NUMBER
+   ,P_INPUT_VALUE_ID_O                       in NUMBER
+   ,P_SCREEN_ENTRY_VALUE_O                   in VARCHAR2
+ ); -- End of procedure definition for AFTER_INSERT
+
+--
+/*
+  ================================================
+  This is a dynamically generated procedure.      
+  Will be called  by API.                         
+  ================================================
+            ** DO NOT CHANGE MANUALLY **           
+  ------------------------------------------------
+    Name:   AFTER_UPDATE
+    Table:  PAY_ELEMENT_ENTRY_VALUES_F
+    Action: UPDATE
+    Generated Date:   30/08/2013 11:37
+    Description: Called as part of UPDATE process
+  ================================================
+*/
+
+--
+PROCEDURE AFTER_UPDATE
+(
+    P_EFFECTIVE_END_DATE                     in DATE
+   ,P_EFFECTIVE_START_DATE                   in DATE
+   ,P_ELEMENT_ENTRY_ID                       in NUMBER
+   ,P_ELEMENT_ENTRY_VALUE_ID                 in NUMBER
+   ,P_INPUT_VALUE_ID                         in NUMBER
+   ,P_SCREEN_ENTRY_VALUE                     in VARCHAR2
+   ,P_EFFECTIVE_END_DATE_O                   in DATE
+   ,P_EFFECTIVE_START_DATE_O                 in DATE
+   ,P_ELEMENT_ENTRY_ID_O                     in NUMBER
+   ,P_ELEMENT_ENTRY_VALUE_ID_O               in NUMBER
+   ,P_INPUT_VALUE_ID_O                       in NUMBER
+   ,P_SCREEN_ENTRY_VALUE_O                   in VARCHAR2
+   ,P_DATETRACK_MODE                         in VARCHAR2
+ ); -- End of procedure definition for AFTER_UPDATE
+
+--
+/*
+  ================================================
+  This is a dynamically generated procedure.      
+  Will be called  by API.                         
+  ================================================
+            ** DO NOT CHANGE MANUALLY **           
+  ------------------------------------------------
+    Name:   AFTER_DELETE
+    Table:  PAY_ELEMENT_ENTRY_VALUES_F
+    Action: DELETE
+    Generated Date:   30/08/2013 11:37
+    Description: Called as part of DELETE process
+  ================================================
+*/
+
+--
+PROCEDURE AFTER_DELETE
+(
+    P_EFFECTIVE_END_DATE                     in DATE
+   ,P_EFFECTIVE_START_DATE                   in DATE
+   ,P_ELEMENT_ENTRY_ID                       in NUMBER
+   ,P_ELEMENT_ENTRY_VALUE_ID                 in NUMBER
+   ,P_INPUT_VALUE_ID                         in NUMBER
+   ,P_SCREEN_ENTRY_VALUE                     in VARCHAR2
+   ,P_VALIDATION_END_DATE                    in DATE
+   ,P_VALIDATION_START_DATE                  in DATE
+   ,P_ELEMENT_ENTRY_ID_O                     in NUMBER
+   ,P_ELEMENT_ENTRY_VALUE_ID_O               in NUMBER
+   ,P_INPUT_VALUE_ID_O                       in NUMBER
+   ,P_SCREEN_ENTRY_VALUE_O                   in VARCHAR2
+   ,P_DATETRACK_MODE                         in VARCHAR2
+ ); -- End of procedure definition for AFTER_DELETE
+
+--
+END PAY_DYT_ELEMENT_ENTRY_VAL_PKG;
+
+/

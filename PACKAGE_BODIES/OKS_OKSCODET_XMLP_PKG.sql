@@ -1,0 +1,346 @@
+--------------------------------------------------------
+--  DDL for Package Body OKS_OKSCODET_XMLP_PKG
+--------------------------------------------------------
+
+  CREATE OR REPLACE EDITIONABLE PACKAGE BODY "APPS"."OKS_OKSCODET_XMLP_PKG" AS
+/* $Header: OKSCODETB.pls 120.2 2008/02/21 06:11:43 dwkrishn noship $ */
+  FUNCTION BEFOREREPORT RETURN BOOLEAN IS
+   apf boolean;
+  BEGIN
+    apf := afterpform;
+    IF P_OPERATING_UNIT IS NOT NULL THEN
+      MO_GLOBAL.SET_POLICY_CONTEXT('S'
+                                  ,P_OPERATING_UNIT);
+    END IF;
+    RETURN (TRUE);
+  END BEFOREREPORT;
+
+  FUNCTION CF_PARTYROLEFORMULA(RLE_CODE IN VARCHAR2) RETURN CHAR IS
+    CURSOR C1 IS
+      SELECT
+        MEANING
+      FROM
+        FND_LOOKUPS
+      WHERE LOOKUP_TYPE = 'OKC_ROLE'
+        AND LOOKUP_CODE = RLE_CODE;
+    LV_PARTYROLE VARCHAR2(80);
+  BEGIN
+    OPEN C1;
+    FETCH C1
+     INTO LV_PARTYROLE;
+    CLOSE C1;
+    RETURN (LV_PARTYROLE);
+  END CF_PARTYROLEFORMULA;
+
+  FUNCTION CF_PARTYNAMEFORMULA(OBJECT1_ID1 IN VARCHAR2
+                              ,JTOT_OBJECT1_CODE IN VARCHAR2) RETURN CHAR IS
+    CURSOR C1 IS
+      SELECT
+        PARTY_NUMBER || '-' || NAME
+      FROM
+        OKX_PARTIES_V
+      WHERE ID1 = OBJECT1_ID1;
+    CURSOR C2 IS
+      SELECT
+        NAME
+      FROM
+        OKX_ORGANIZATION_DEFS_V
+      WHERE ORGANIZATION_TYPE = 'OPERATING_UNIT'
+        AND INFORMATION_TYPE = 'Operating Unit Information'
+        AND ID1 = OBJECT1_ID1;
+    LV_PARTYNAME VARCHAR2(400);
+  BEGIN
+    IF JTOT_OBJECT1_CODE = 'OKX_PARTY' THEN
+      OPEN C1;
+      FETCH C1
+       INTO LV_PARTYNAME;
+      CLOSE C1;
+    ELSIF JTOT_OBJECT1_CODE = 'OKX_OPERUNIT' THEN
+      OPEN C2;
+      FETCH C2
+       INTO LV_PARTYNAME;
+      CLOSE C2;
+    END IF;
+    RETURN LV_PARTYNAME;
+  END CF_PARTYNAMEFORMULA;
+
+  FUNCTION CF_PRICE_NEGOTIATED_ROUNDFORMU(PRICE_NEGOTIATED IN NUMBER
+                                         ,CURRENCY_CODE IN VARCHAR2) RETURN NUMBER IS
+    LN_PROD_VALUE NUMBER;
+    LV_CURRENCY_CODE VARCHAR2(400);
+    LN_PROD_VALUE_ROUND NUMBER;
+  BEGIN
+    LN_PROD_VALUE := PRICE_NEGOTIATED;
+    LV_CURRENCY_CODE := CURRENCY_CODE;
+    LN_PROD_VALUE_ROUND := OKS_EXTWAR_UTIL_PVT.ROUND_CURRENCY_AMT(LN_PROD_VALUE
+                                                                 ,LV_CURRENCY_CODE);
+    RETURN (LN_PROD_VALUE_ROUND);
+  END CF_PRICE_NEGOTIATED_ROUNDFORMU;
+
+  FUNCTION CF_SRV_PRICE_ROUNDFORMULA(SL_PRICE_NEGOTIATED IN NUMBER
+                                    ,CURRENCY_CODE IN VARCHAR2) RETURN NUMBER IS
+    LN_PROD_VALUE NUMBER;
+    LV_CURRENCY_CODE VARCHAR2(400);
+    LN_PROD_VALUE_ROUND NUMBER;
+  BEGIN
+    LN_PROD_VALUE := SL_PRICE_NEGOTIATED;
+    LV_CURRENCY_CODE := CURRENCY_CODE;
+    LN_PROD_VALUE_ROUND := OKS_EXTWAR_UTIL_PVT.ROUND_CURRENCY_AMT(LN_PROD_VALUE
+                                                                 ,LV_CURRENCY_CODE);
+    RETURN (LN_PROD_VALUE_ROUND);
+  END CF_SRV_PRICE_ROUNDFORMULA;
+
+  FUNCTION CF_HDR_PRICE_ROUNDFORMULA(CS_HDR_PRICE IN NUMBER
+                                    ,CURRENCY_CODE IN VARCHAR2) RETURN NUMBER IS
+    LN_PROD_VALUE NUMBER;
+    LV_CURRENCY_CODE VARCHAR2(400);
+    LN_PROD_VALUE_ROUND NUMBER;
+  BEGIN
+    LN_PROD_VALUE := CS_HDR_PRICE;
+    LV_CURRENCY_CODE := CURRENCY_CODE;
+    LN_PROD_VALUE_ROUND := OKS_EXTWAR_UTIL_PVT.ROUND_CURRENCY_AMT(LN_PROD_VALUE
+                                                                 ,LV_CURRENCY_CODE);
+    RETURN (LN_PROD_VALUE_ROUND);
+  END CF_HDR_PRICE_ROUNDFORMULA;
+
+  FUNCTION CF_PRODUCT_DETAILSFORMULA(CL_ID IN NUMBER) RETURN NUMBER IS
+    CURSOR C1 IS
+      SELECT
+        XP.NAME,
+        XP.CURRENT_SERIAL_NUMBER,
+        XP.REFERENCE_NUMBER,
+        XP.QUANTITY,
+        XP.PRICING_ATTRIBUTE3,
+        XP.PRICING_ATTRIBUTE4,
+        XP.PRICING_ATTRIBUTE5,
+        XP.SYSTEM_ID
+      FROM
+        OKC_K_ITEMS IT,
+        OKX_CUSTOMER_PRODUCTS_V XP
+      WHERE IT.CLE_ID = CL_ID
+        AND IT.JTOT_OBJECT1_CODE = 'OKX_CUSTPROD'
+        AND XP.ID1 = IT.OBJECT1_ID1
+        AND XP.ID2 = IT.OBJECT1_ID2;
+    CURSOR C2(CN_SYSTEM_ID IN NUMBER) IS
+      SELECT
+        NAME
+      FROM
+        OKX_SYSTEMS_V
+      WHERE ID1 = CN_SYSTEM_ID
+        AND ID2 = '#';
+    LN_SYSTEM_ID NUMBER;
+  BEGIN
+    CP_PROD_NAME := NULL;
+    CP_CSI := NULL;
+    CP_PROD_SERIAL_NO := NULL;
+    CP_PROD_REF_NO := NULL;
+    CP_PROD_QTY := NULL;
+    CP_NUM_OF_USERS := NULL;
+    CP_PRICING_LIC_LVL := NULL;
+    CP_LIC_LVL := NULL;
+    OPEN C1;
+    FETCH C1
+     INTO CP_PROD_NAME,CP_PROD_SERIAL_NO,CP_PROD_REF_NO,CP_PROD_QTY,CP_NUM_OF_USERS,CP_PRICING_LIC_LVL,CP_LIC_LVL,LN_SYSTEM_ID;
+    CLOSE C1;
+    OPEN C2(LN_SYSTEM_ID);
+    FETCH C2
+     INTO CP_CSI;
+    CLOSE C2;
+    --select s1.nextval into seq_val from dual;
+    --autonomous_proc('val1', to_char(sysdate, 'dd-mon-yy hh:mi:ss')|| ' @ '||seq_val , 'Raj', 'Raj');
+    RETURN (1);
+  END CF_PRODUCT_DETAILSFORMULA;
+
+  FUNCTION CF_SERVICE_LEVELFORMULA(SL_LSE_ID IN NUMBER
+                                  ,SL_ID IN NUMBER) RETURN CHAR IS
+    CURSOR C1 IS
+      SELECT
+        LTRIM(RTRIM(NAME))
+      FROM
+        OKC_LINE_STYLES_V
+      WHERE ID = SL_LSE_ID;
+    CURSOR C2 IS
+      SELECT
+        NAME,
+        DESCRIPTION
+      FROM
+        OKC_K_ITEMS IT,
+        OKX_SYSTEM_ITEMS_V XI
+      WHERE IT.CLE_ID = SL_ID
+        AND XI.ID1 = IT.OBJECT1_ID1
+        AND XI.ID2 = IT.OBJECT1_ID2;
+    LV_LINE_STYLE VARCHAR2(200);
+    LV_SRV_NAME VARCHAR2(300);
+    LV_SRV_DESC VARCHAR2(300);
+    LV_PROF_SRV_NAME VARCHAR2(300);
+    LV_PROF_SRV_DESC VARCHAR2(300);
+    LV_PROF_NAME CONSTANT VARCHAR2(300) DEFAULT 'OKS_ITEM_DISPLAY_PREFERENCE';
+    LV_PROF_VALUE VARCHAR2(300);
+    LV_SERVICE_LEVEL VARCHAR2(500);
+  BEGIN
+    OPEN C1;
+    FETCH C1
+     INTO LV_LINE_STYLE;
+    CLOSE C1;
+    OPEN C2;
+    FETCH C2
+     INTO LV_SRV_NAME,LV_SRV_DESC;
+    CLOSE C2;
+    FND_PROFILE.GET(LV_PROF_NAME
+                   ,LV_PROF_VALUE);
+    IF LV_PROF_VALUE = 'DISPLAY_NAME' THEN
+      LV_PROF_SRV_NAME := LV_SRV_NAME;
+      LV_PROF_SRV_DESC := LV_SRV_DESC;
+    ELSE
+      LV_PROF_SRV_NAME := LV_SRV_DESC;
+      LV_PROF_SRV_DESC := LV_SRV_NAME;
+    END IF;
+    LV_SERVICE_LEVEL := LV_LINE_STYLE || ' - ' || LV_PROF_SRV_NAME;
+    RETURN (LV_SERVICE_LEVEL);
+  END CF_SERVICE_LEVELFORMULA;
+
+  FUNCTION AFTERPFORM RETURN BOOLEAN IS
+  BEGIN
+    BEGIN
+      P_CONC_REQUEST_ID := FND_GLOBAL.CONC_REQUEST_ID;
+      --select s1.nextval into seq_val from dual;
+      /*SRW.USER_EXIT('FND SRWINIT')*/NULL;
+    EXCEPTION
+      WHEN /*SRW.USER_EXIT_FAILURE*/OTHERS THEN
+        /*SRW.MESSAGE(1
+                   ,'srw_init')*/NULL;
+    END;
+
+    --autonomous_proc('P_CONTRACT_ID', P_CONTRACT_ID, 'Raj', 'Raj');
+    --autonomous_proc('P_CONTRACT_ID_WHERE', P_CONTRACT_ID_WHERE, 'Raj', 'Raj');
+
+    IF P_CONTRACT_GROUP IS NOT NULL THEN
+      P_CONTRACT_GROUP_WHERE := ' and hr1.id in ( select INCLUDED_CHR_ID from okc_k_grpings
+                                                                                    start with CGP_PARENT_ID = :p_contract_group
+                                                                                    connect by CGP_PARENT_ID = PRIOR INCLUDED_CGP_ID ) ';
+    END IF;
+    IF P_CONTRACT_ID IS NOT NULL THEN
+      P_CONTRACT_ID_WHERE := ' and hr1.id = :p_contract_id';
+    END IF;
+    IF P_CUSTOMER_ID IS NOT NULL THEN
+      P_CUSTOMER_ID_WHERE := ' and rl.object1_id1 = :p_customer_id
+                                                            AND RL.Rle_Code = ''CUSTOMER'' AND RL.Jtot_Object1_Code = ''OKX_PARTY''';
+    END IF;
+    IF P_STATUS_TYPE IS NOT NULL THEN
+      P_STATUS_TYPE_WHERE := ' and st.ste_code = :p_status_type';
+    END IF;
+    IF P_STATUS_CODE IS NOT NULL THEN
+      P_STATUS_CODE_WHERE := ' and hr1.sts_code = :p_status_code';
+    END IF;
+    IF P_START_DATE_FROM IS NOT NULL THEN
+      P_START_DATE_FROM_WHERE := ' and hr1.start_date >= :p_start_date_from';
+    END IF;
+    IF P_START_DATE_TO IS NOT NULL THEN
+      P_START_DATE_TO_WHERE := ' and hr1.start_date <= :p_start_date_to';
+    END IF;
+    IF P_END_DATE_FROM IS NOT NULL THEN
+      P_END_DATE_FROM_WHERE := ' and hr1.end_date >= :p_end_date_from';
+    END IF;
+    IF P_END_DATE_TO IS NOT NULL THEN
+      P_END_DATE_TO_WHERE := ' and hr1.end_date <= :p_end_date_to';
+    END IF;
+    RETURN (TRUE);
+  END AFTERPFORM;
+
+  FUNCTION AFTERREPORT RETURN BOOLEAN IS
+  BEGIN
+    BEGIN
+      /*SRW.USER_EXIT('FND SRWEXIT')*/NULL;
+    EXCEPTION
+      WHEN /*SRW.USER_EXIT_FAILURE*/OTHERS THEN
+        /*SRW.MESSAGE(1
+                   ,'srw_exit')*/NULL;
+    END;
+    RETURN (TRUE);
+  END AFTERREPORT;
+
+  FUNCTION CF_TOTAL_VALUEFORMULA(CL_STE_CODE IN VARCHAR2
+                                ,PRICE_NEGOTIATED IN NUMBER) RETURN NUMBER IS
+  BEGIN
+    IF CL_STE_CODE = 'CANCELLED' THEN
+      RETURN (0);
+    ELSE
+      RETURN (PRICE_NEGOTIATED);
+    END IF;
+  END CF_TOTAL_VALUEFORMULA;
+
+  FUNCTION CF_CANCELLED_VALUEFORMULA(CL_STE_CODE IN VARCHAR2
+                                    ,PRICE_NEGOTIATED IN NUMBER) RETURN NUMBER IS
+  BEGIN
+    IF CL_STE_CODE = 'CANCELLED' THEN
+      RETURN (PRICE_NEGOTIATED);
+    ELSE
+      RETURN (0);
+    END IF;
+  END CF_CANCELLED_VALUEFORMULA;
+
+  FUNCTION CF_CANCELLED_PRICE_ROUNDFORMUL(CS_CANCELLED_PRICE IN NUMBER
+                                         ,CURRENCY_CODE IN VARCHAR2) RETURN NUMBER IS
+    LN_CAN_VALUE NUMBER;
+    LV_CURRENCY_CODE VARCHAR2(400);
+    LN_CAN_VALUE_ROUND NUMBER;
+  BEGIN
+    LN_CAN_VALUE := CS_CANCELLED_PRICE;
+    LV_CURRENCY_CODE := CURRENCY_CODE;
+    LN_CAN_VALUE_ROUND := OKS_EXTWAR_UTIL_PVT.ROUND_CURRENCY_AMT(LN_CAN_VALUE
+                                                                ,LV_CURRENCY_CODE);
+    RETURN (LN_CAN_VALUE_ROUND);
+  END CF_CANCELLED_PRICE_ROUNDFORMUL;
+
+  FUNCTION CP_PROD_NAME_P RETURN VARCHAR2 IS
+  BEGIN
+  --select s1.nextval into seq_val from dual;
+  --autonomous_proc('val2a', to_char(sysdate, 'dd-mon-yy hh:mi:ss')|| ' @ '|| seq_val, 'Raj', 'Raj');
+  --select s1.nextval into seq_val from dual;
+  --autonomous_proc('val2b', CP_PROD_NAME|| ' @ '|| seq_val, 'Raj', 'Raj');
+    RETURN CP_PROD_NAME;
+  END CP_PROD_NAME_P;
+
+  FUNCTION CP_CSI_P RETURN VARCHAR2 IS
+  BEGIN
+    RETURN CP_CSI;
+  END CP_CSI_P;
+
+  FUNCTION CP_PROD_SERIAL_NO_P RETURN VARCHAR2 IS
+  BEGIN
+    RETURN CP_PROD_SERIAL_NO;
+  END CP_PROD_SERIAL_NO_P;
+
+  FUNCTION CP_PROD_REF_NO_P RETURN VARCHAR2 IS
+  BEGIN
+  --select s1.nextval into seq_val from dual;
+  --autonomous_proc('val3a', to_char(sysdate, 'dd-mon-yy hh:mi:ss')|| ' @ '|| seq_val, 'Raj', 'Raj');
+  --select s1.nextval into seq_val from dual;
+  --autonomous_proc('val3b', CP_PROD_REF_NO|| ' @ '|| seq_val, 'Raj', 'Raj');
+    RETURN CP_PROD_REF_NO;
+  END CP_PROD_REF_NO_P;
+
+  FUNCTION CP_PROD_QTY_P RETURN NUMBER IS
+  BEGIN
+    RETURN CP_PROD_QTY;
+  END CP_PROD_QTY_P;
+
+  FUNCTION CP_NUM_OF_USERS_P RETURN VARCHAR2 IS
+  BEGIN
+    RETURN CP_NUM_OF_USERS;
+  END CP_NUM_OF_USERS_P;
+
+  FUNCTION CP_PRICING_LIC_LVL_P RETURN VARCHAR2 IS
+  BEGIN
+    RETURN CP_PRICING_LIC_LVL;
+  END CP_PRICING_LIC_LVL_P;
+
+  FUNCTION CP_LIC_LVL_P RETURN VARCHAR2 IS
+  BEGIN
+    RETURN CP_LIC_LVL;
+  END CP_LIC_LVL_P;
+
+END OKS_OKSCODET_XMLP_PKG;
+
+
+/

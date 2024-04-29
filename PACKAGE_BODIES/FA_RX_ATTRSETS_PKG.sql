@@ -1,0 +1,652 @@
+--------------------------------------------------------
+--  DDL for Package Body FA_RX_ATTRSETS_PKG
+--------------------------------------------------------
+
+  CREATE OR REPLACE EDITIONABLE PACKAGE BODY "APPS"."FA_RX_ATTRSETS_PKG" as
+/* $Header: faxrxatb.pls 120.6.12010000.2 2009/07/19 13:11:00 glchen ship $ */
+procedure INSERT_ROW (
+  X_ROWID in out nocopy VARCHAR2,
+  X_REPORT_ID in NUMBER,
+  X_ATTRIBUTE_SET in VARCHAR2,
+  X_PAGE_WIDTH in NUMBER,
+  X_PAGE_HEIGHT in NUMBER,
+  X_PRINT_SOB_FLAG in VARCHAR2,
+  X_PRINT_FUNC_CURR_FLAG in VARCHAR2,
+  X_PRINT_TITLE in VARCHAR2,
+  X_PRINT_SUBMISSION_DATE in VARCHAR2,
+  X_PRINT_CURRENT_PAGE in VARCHAR2,
+  X_PRINT_TOTAL_PAGES in VARCHAR2,
+  X_PRINT_PARAMETERS in VARCHAR2,
+  X_PRINT_PAGE_BREAK_COLS in VARCHAR2,
+  X_GROUP_DISPLAY_TYPE in VARCHAR2,
+  X_PUBLIC_FLAG in VARCHAR2,
+  X_SYSTEM_FLAG in VARCHAR2,
+  X_DEFAULT_DATE_FORMAT in VARCHAR2,
+  X_DEFAULT_DATE_TIME_FORMAT in VARCHAR2,
+  X_REPORT_TITLE in VARCHAR2,
+  X_USER_ATTRIBUTE_SET in VARCHAR2,
+  X_CREATION_DATE in DATE,
+  X_CREATED_BY in NUMBER,
+  X_LAST_UPDATE_DATE in DATE,
+  X_LAST_UPDATED_BY in NUMBER,
+  X_LAST_UPDATE_LOGIN in NUMBER
+) is
+  cursor C is select ROWID from FA_RX_ATTRSETS_B
+    where REPORT_ID = X_REPORT_ID
+    and ATTRIBUTE_SET = X_ATTRIBUTE_SET
+    ;
+begin
+  insert into FA_RX_ATTRSETS_B (
+    PAGE_WIDTH,
+    PAGE_HEIGHT,
+    PRINT_SOB_FLAG,
+    PRINT_FUNC_CURR_FLAG,
+    PRINT_TITLE,
+    PRINT_SUBMISSION_DATE,
+    PRINT_CURRENT_PAGE,
+    PRINT_TOTAL_PAGES,
+    PRINT_PARAMETERS,
+    PRINT_PAGE_BREAK_COLS,
+    GROUP_DISPLAY_TYPE,
+    REPORT_ID,
+    ATTRIBUTE_SET,
+    PUBLIC_FLAG,
+    SYSTEM_FLAG,
+    DEFAULT_DATE_FORMAT,
+    DEFAULT_DATE_TIME_FORMAT,
+    CREATION_DATE,
+    CREATED_BY,
+    LAST_UPDATE_DATE,
+    LAST_UPDATED_BY,
+    LAST_UPDATE_LOGIN
+  ) values (
+    X_PAGE_WIDTH,
+    X_PAGE_HEIGHT,
+    X_PRINT_SOB_FLAG,
+    X_PRINT_FUNC_CURR_FLAG,
+    X_PRINT_TITLE,
+    X_PRINT_SUBMISSION_DATE,
+    X_PRINT_CURRENT_PAGE,
+    X_PRINT_TOTAL_PAGES,
+    X_PRINT_PARAMETERS,
+    X_PRINT_PAGE_BREAK_COLS,
+    X_GROUP_DISPLAY_TYPE,
+    X_REPORT_ID,
+    X_ATTRIBUTE_SET,
+    X_PUBLIC_FLAG,
+    X_SYSTEM_FLAG,
+    X_DEFAULT_DATE_FORMAT,
+    X_DEFAULT_DATE_TIME_FORMAT,
+    X_CREATION_DATE,
+    X_CREATED_BY,
+    X_LAST_UPDATE_DATE,
+    X_LAST_UPDATED_BY,
+    X_LAST_UPDATE_LOGIN
+  );
+
+  insert into FA_RX_ATTRSETS_TL (
+    REPORT_ID,
+    ATTRIBUTE_SET,
+    REPORT_TITLE,
+    USER_ATTRIBUTE_SET,
+    LAST_UPDATE_DATE,
+    LAST_UPDATE_LOGIN,
+    LAST_UPDATED_BY,
+    CREATED_BY,
+    CREATION_DATE,
+    LANGUAGE,
+    SOURCE_LANG
+  ) select
+    X_REPORT_ID,
+    X_ATTRIBUTE_SET,
+    X_REPORT_TITLE,
+    X_USER_ATTRIBUTE_SET,
+    X_LAST_UPDATE_DATE,
+    X_LAST_UPDATE_LOGIN,
+    X_LAST_UPDATED_BY,
+    X_CREATED_BY,
+    X_CREATION_DATE,
+    L.LANGUAGE_CODE,
+    userenv('LANG')
+  from FND_LANGUAGES L
+  where L.INSTALLED_FLAG in ('I', 'B')
+  and not exists
+    (select NULL
+    from FA_RX_ATTRSETS_TL T
+    where T.REPORT_ID = X_REPORT_ID
+    and T.ATTRIBUTE_SET = X_ATTRIBUTE_SET
+    and T.LANGUAGE = L.LANGUAGE_CODE);
+
+  open c;
+  fetch c into X_ROWID;
+  if (c%notfound) then
+    close c;
+    raise no_data_found;
+  end if;
+  close c;
+
+end INSERT_ROW;
+
+procedure LOCK_ROW (
+  X_REPORT_ID in NUMBER,
+  X_ATTRIBUTE_SET in VARCHAR2,
+  X_PAGE_WIDTH in NUMBER,
+  X_PAGE_HEIGHT in NUMBER,
+  X_PRINT_SOB_FLAG in VARCHAR2,
+  X_PRINT_FUNC_CURR_FLAG in VARCHAR2,
+  X_PRINT_TITLE in VARCHAR2,
+  X_PRINT_SUBMISSION_DATE in VARCHAR2,
+  X_PRINT_CURRENT_PAGE in VARCHAR2,
+  X_PRINT_TOTAL_PAGES in VARCHAR2,
+  X_PRINT_PARAMETERS in VARCHAR2,
+  X_PRINT_PAGE_BREAK_COLS in VARCHAR2,
+  X_GROUP_DISPLAY_TYPE in VARCHAR2,
+  X_PUBLIC_FLAG in VARCHAR2,
+  X_SYSTEM_FLAG in VARCHAR2,
+  X_DEFAULT_DATE_FORMAT in VARCHAR2,
+  X_DEFAULT_DATE_TIME_FORMAT in VARCHAR2,
+  X_REPORT_TITLE in VARCHAR2,
+  X_USER_ATTRIBUTE_SET in VARCHAR2
+) is
+  cursor c is select
+      PAGE_WIDTH,
+      PAGE_HEIGHT,
+      PRINT_SOB_FLAG,
+      PRINT_FUNC_CURR_FLAG,
+      PRINT_TITLE,
+      PRINT_SUBMISSION_DATE,
+      PRINT_CURRENT_PAGE,
+      PRINT_TOTAL_PAGES,
+      PRINT_PARAMETERS,
+      PRINT_PAGE_BREAK_COLS,
+      GROUP_DISPLAY_TYPE,
+      PUBLIC_FLAG,
+      SYSTEM_FLAG,
+      DEFAULT_DATE_FORMAT,
+      DEFAULT_DATE_TIME_FORMAT
+    from FA_RX_ATTRSETS_B
+    where REPORT_ID = X_REPORT_ID
+    and ATTRIBUTE_SET = X_ATTRIBUTE_SET
+    for update of REPORT_ID nowait;
+  recinfo c%rowtype;
+
+  cursor c1 is select
+      REPORT_TITLE,
+      USER_ATTRIBUTE_SET,
+      decode(LANGUAGE, userenv('LANG'), 'Y', 'N') BASELANG
+    from FA_RX_ATTRSETS_TL
+    where REPORT_ID = X_REPORT_ID
+    and ATTRIBUTE_SET = X_ATTRIBUTE_SET
+    and userenv('LANG') in (LANGUAGE, SOURCE_LANG)
+    for update of REPORT_ID nowait;
+begin
+  open c;
+  fetch c into recinfo;
+  if (c%notfound) then
+    close c;
+    fnd_message.set_name('FND', 'FORM_RECORD_DELETED');
+    app_exception.raise_exception;
+  end if;
+  close c;
+
+  --  Bug 1320919:  Modified checks for defaulted items if they are not
+  --  equal, then only check for the datebase value = null.
+
+  if (    ((recinfo.PAGE_WIDTH = X_PAGE_WIDTH)
+           OR ((recinfo.PAGE_WIDTH is null) AND (X_PAGE_WIDTH is null)))
+      AND ((recinfo.PAGE_HEIGHT = X_PAGE_HEIGHT)
+           OR ((recinfo.PAGE_HEIGHT is null) AND (X_PAGE_HEIGHT is null)))
+      AND (   (recinfo.PRINT_SOB_FLAG = X_PRINT_SOB_FLAG)
+           OR (recinfo.PRINT_SOB_FLAG is null))
+      AND ((recinfo.PRINT_FUNC_CURR_FLAG = X_PRINT_FUNC_CURR_FLAG)
+           OR (recinfo.PRINT_FUNC_CURR_FLAG is null))
+      AND ((recinfo.PRINT_TITLE = X_PRINT_TITLE)
+           OR (recinfo.PRINT_TITLE is null) )
+      AND ((recinfo.PRINT_SUBMISSION_DATE = X_PRINT_SUBMISSION_DATE)
+           OR (recinfo.PRINT_SUBMISSION_DATE is null))
+      AND ((recinfo.PRINT_CURRENT_PAGE = X_PRINT_CURRENT_PAGE)
+           OR (recinfo.PRINT_CURRENT_PAGE is null))
+      AND ((recinfo.PRINT_TOTAL_PAGES = X_PRINT_TOTAL_PAGES)
+           OR (recinfo.PRINT_TOTAL_PAGES is null))
+      AND ((recinfo.PRINT_PARAMETERS = X_PRINT_PARAMETERS)
+           OR (recinfo.PRINT_PARAMETERS is null) )
+      AND ((recinfo.PRINT_PAGE_BREAK_COLS = X_PRINT_PAGE_BREAK_COLS)
+           OR (recinfo.PRINT_PAGE_BREAK_COLS is null))
+      AND ((recinfo.GROUP_DISPLAY_TYPE = X_GROUP_DISPLAY_TYPE)
+           OR (recinfo.GROUP_DISPLAY_TYPE is null))
+      AND (recinfo.PUBLIC_FLAG = X_PUBLIC_FLAG)
+      AND (recinfo.SYSTEM_FLAG = X_SYSTEM_FLAG)
+      AND ((recinfo.DEFAULT_DATE_FORMAT = X_DEFAULT_DATE_FORMAT)
+            OR (recinfo.DEFAULT_DATE_FORMAT is null))
+      AND ((recinfo.DEFAULT_DATE_TIME_FORMAT = X_DEFAULT_DATE_TIME_FORMAT)
+            OR (recinfo.DEFAULT_DATE_TIME_FORMAT is null))
+  ) then
+    null;
+  else
+    fnd_message.set_name('FND', 'FORM_RECORD_CHANGED');
+    app_exception.raise_exception;
+  end if;
+
+  for tlinfo in c1 loop
+    if (tlinfo.BASELANG = 'Y') then
+      if (    ((tlinfo.REPORT_TITLE = X_REPORT_TITLE)
+               OR (tlinfo.REPORT_TITLE is null) )
+          AND ((tlinfo.USER_ATTRIBUTE_SET = X_USER_ATTRIBUTE_SET)
+               OR (tlinfo.USER_ATTRIBUTE_SET is null))
+      ) then
+        null;
+      else
+        fnd_message.set_name('FND', 'FORM_RECORD_CHANGED');
+        app_exception.raise_exception;
+      end if;
+    end if;
+  end loop;
+  return;
+end LOCK_ROW;
+
+procedure UPDATE_ROW (
+  X_REPORT_ID in NUMBER,
+  X_ATTRIBUTE_SET in VARCHAR2,
+  X_PAGE_WIDTH in NUMBER,
+  X_PAGE_HEIGHT in NUMBER,
+  X_PRINT_SOB_FLAG in VARCHAR2,
+  X_PRINT_FUNC_CURR_FLAG in VARCHAR2,
+  X_PRINT_TITLE in VARCHAR2,
+  X_PRINT_SUBMISSION_DATE in VARCHAR2,
+  X_PRINT_CURRENT_PAGE in VARCHAR2,
+  X_PRINT_TOTAL_PAGES in VARCHAR2,
+  X_PRINT_PARAMETERS in VARCHAR2,
+  X_PRINT_PAGE_BREAK_COLS in VARCHAR2,
+  X_GROUP_DISPLAY_TYPE in VARCHAR2,
+  X_PUBLIC_FLAG in VARCHAR2,
+  X_SYSTEM_FLAG in VARCHAR2,
+  X_DEFAULT_DATE_FORMAT in VARCHAR2,
+  X_DEFAULT_DATE_TIME_FORMAT in VARCHAR2,
+  X_REPORT_TITLE in VARCHAR2,
+  X_USER_ATTRIBUTE_SET in VARCHAR2,
+  X_LAST_UPDATE_DATE in DATE,
+  X_LAST_UPDATED_BY in NUMBER,
+  X_LAST_UPDATE_LOGIN in NUMBER
+) is
+begin
+  update FA_RX_ATTRSETS_B set
+    PAGE_WIDTH = X_PAGE_WIDTH,
+    PAGE_HEIGHT = X_PAGE_HEIGHT,
+    PRINT_SOB_FLAG = X_PRINT_SOB_FLAG,
+    PRINT_FUNC_CURR_FLAG = X_PRINT_FUNC_CURR_FLAG,
+    PRINT_TITLE = X_PRINT_TITLE,
+    PRINT_SUBMISSION_DATE = X_PRINT_SUBMISSION_DATE,
+    PRINT_CURRENT_PAGE = X_PRINT_CURRENT_PAGE,
+    PRINT_TOTAL_PAGES = X_PRINT_TOTAL_PAGES,
+    PRINT_PARAMETERS = X_PRINT_PARAMETERS,
+    PRINT_PAGE_BREAK_COLS = X_PRINT_PAGE_BREAK_COLS,
+    GROUP_DISPLAY_TYPE = X_GROUP_DISPLAY_TYPE,
+    PUBLIC_FLAG = X_PUBLIC_FLAG,
+    SYSTEM_FLAG = X_SYSTEM_FLAG,
+    DEFAULT_DATE_FORMAT = X_DEFAULT_DATE_FORMAT,
+    DEFAULT_DATE_TIME_FORMAT = X_DEFAULT_DATE_TIME_FORMAT,
+    LAST_UPDATE_DATE = X_LAST_UPDATE_DATE,
+    LAST_UPDATED_BY = X_LAST_UPDATED_BY,
+    LAST_UPDATE_LOGIN = X_LAST_UPDATE_LOGIN
+  where REPORT_ID = X_REPORT_ID
+  and ATTRIBUTE_SET = X_ATTRIBUTE_SET;
+
+  if (sql%notfound) then
+    raise no_data_found;
+  end if;
+
+  update FA_RX_ATTRSETS_TL set
+    REPORT_TITLE = X_REPORT_TITLE,
+    USER_ATTRIBUTE_SET = X_USER_ATTRIBUTE_SET,
+    LAST_UPDATE_DATE = X_LAST_UPDATE_DATE,
+    LAST_UPDATED_BY = X_LAST_UPDATED_BY,
+    LAST_UPDATE_LOGIN = X_LAST_UPDATE_LOGIN,
+    SOURCE_LANG = userenv('LANG')
+  where REPORT_ID = X_REPORT_ID
+  and ATTRIBUTE_SET = X_ATTRIBUTE_SET
+  and userenv('LANG') in (LANGUAGE, SOURCE_LANG);
+
+  if (sql%notfound) then
+    raise no_data_found;
+  end if;
+end UPDATE_ROW;
+
+procedure DELETE_ROW (
+  X_REPORT_ID in NUMBER,
+  X_ATTRIBUTE_SET in VARCHAR2
+) is
+begin
+  delete from FA_RX_ATTRSETS_TL
+  where REPORT_ID = X_REPORT_ID
+  and ATTRIBUTE_SET = X_ATTRIBUTE_SET;
+
+  if (sql%notfound) then
+    raise no_data_found;
+  end if;
+
+  delete from FA_RX_ATTRSETS_B
+  where REPORT_ID = X_REPORT_ID
+  and ATTRIBUTE_SET = X_ATTRIBUTE_SET;
+
+  if (sql%notfound) then
+    raise no_data_found;
+  end if;
+end DELETE_ROW;
+
+procedure ADD_LANGUAGE
+is
+begin
+  delete from FA_RX_ATTRSETS_TL T
+  where not exists
+    (select NULL
+    from FA_RX_ATTRSETS_B B
+    where B.REPORT_ID = T.REPORT_ID
+    and B.ATTRIBUTE_SET = T.ATTRIBUTE_SET
+    );
+
+  update FA_RX_ATTRSETS_TL T set (
+      REPORT_TITLE,
+      USER_ATTRIBUTE_SET
+    ) = (select
+      B.REPORT_TITLE,
+      B.USER_ATTRIBUTE_SET
+    from FA_RX_ATTRSETS_TL B
+    where B.REPORT_ID = T.REPORT_ID
+    and B.ATTRIBUTE_SET = T.ATTRIBUTE_SET
+    and B.LANGUAGE = T.SOURCE_LANG)
+  where (
+      T.REPORT_ID,
+      T.ATTRIBUTE_SET,
+      T.LANGUAGE
+  ) in (select
+      SUBT.REPORT_ID,
+      SUBT.ATTRIBUTE_SET,
+      SUBT.LANGUAGE
+    from FA_RX_ATTRSETS_TL SUBB, FA_RX_ATTRSETS_TL SUBT
+    where SUBB.REPORT_ID = SUBT.REPORT_ID
+    and SUBB.ATTRIBUTE_SET = SUBT.ATTRIBUTE_SET
+    and SUBB.LANGUAGE = SUBT.SOURCE_LANG
+    and (SUBB.REPORT_TITLE <> SUBT.REPORT_TITLE
+      or (SUBB.REPORT_TITLE is null and SUBT.REPORT_TITLE is not null)
+      or (SUBB.REPORT_TITLE is not null and SUBT.REPORT_TITLE is null)
+      or SUBB.USER_ATTRIBUTE_SET <> SUBT.USER_ATTRIBUTE_SET
+      or (SUBB.USER_ATTRIBUTE_SET is null and SUBT.USER_ATTRIBUTE_SET is not null)
+      or (SUBB.USER_ATTRIBUTE_SET is not null and SUBT.USER_ATTRIBUTE_SET is null)
+  ));
+
+  insert into FA_RX_ATTRSETS_TL (
+    REPORT_ID,
+    ATTRIBUTE_SET,
+    REPORT_TITLE,
+    USER_ATTRIBUTE_SET,
+    LAST_UPDATE_DATE,
+    LAST_UPDATE_LOGIN,
+    LAST_UPDATED_BY,
+    CREATED_BY,
+    CREATION_DATE,
+    LANGUAGE,
+    SOURCE_LANG
+  ) select
+    B.REPORT_ID,
+    B.ATTRIBUTE_SET,
+    B.REPORT_TITLE,
+    B.USER_ATTRIBUTE_SET,
+    B.LAST_UPDATE_DATE,
+    B.LAST_UPDATE_LOGIN,
+    B.LAST_UPDATED_BY,
+    B.CREATED_BY,
+    B.CREATION_DATE,
+    L.LANGUAGE_CODE,
+    B.SOURCE_LANG
+  from FA_RX_ATTRSETS_TL B, FND_LANGUAGES L
+  where L.INSTALLED_FLAG in ('I', 'B')
+  and B.LANGUAGE = userenv('LANG')
+  and not exists
+    (select NULL
+    from FA_RX_ATTRSETS_TL T
+    where T.REPORT_ID = B.REPORT_ID
+    and T.ATTRIBUTE_SET = B.ATTRIBUTE_SET
+    and T.LANGUAGE = L.LANGUAGE_CODE);
+end ADD_LANGUAGE;
+
+procedure LOAD_ROW(
+  X_REPORT_ID in NUMBER,
+  X_ATTRIBUTE_SET in VARCHAR2,
+  X_PAGE_WIDTH in NUMBER,
+  X_PAGE_HEIGHT in NUMBER,
+  X_PRINT_SOB_FLAG in VARCHAR2,
+  X_PRINT_FUNC_CURR_FLAG in VARCHAR2,
+  X_PRINT_TITLE in VARCHAR2,
+  X_PRINT_SUBMISSION_DATE in VARCHAR2,
+  X_PRINT_CURRENT_PAGE in VARCHAR2,
+  X_PRINT_TOTAL_PAGES in VARCHAR2,
+  X_PRINT_PARAMETERS in VARCHAR2,
+  X_PRINT_PAGE_BREAK_COLS in VARCHAR2,
+  X_GROUP_DISPLAY_TYPE in VARCHAR2,
+  X_PUBLIC_FLAG in VARCHAR2,
+  X_SYSTEM_FLAG in VARCHAR2,
+  X_DEFAULT_DATE_FORMAT in VARCHAR2,
+  X_DEFAULT_DATE_TIME_FORMAT in VARCHAR2,
+  X_REPORT_TITLE in VARCHAR2,
+  X_USER_ATTRIBUTE_SET in VARCHAR2,
+  X_OWNER in VARCHAR2
+  ) is
+  Begin
+	LOAD_ROW(
+	  X_REPORT_ID => X_REPORT_ID ,
+	  X_ATTRIBUTE_SET =>X_ATTRIBUTE_SET ,
+	  X_PAGE_WIDTH =>X_PAGE_WIDTH ,
+	  X_PAGE_HEIGHT =>X_PAGE_HEIGHT ,
+	  X_PRINT_SOB_FLAG => X_PRINT_SOB_FLAG ,
+	  X_PRINT_FUNC_CURR_FLAG => X_PRINT_FUNC_CURR_FLAG ,
+	  X_PRINT_TITLE => X_PRINT_TITLE ,
+	  X_PRINT_SUBMISSION_DATE => X_PRINT_SUBMISSION_DATE ,
+	  X_PRINT_CURRENT_PAGE => X_PRINT_CURRENT_PAGE ,
+	  X_PRINT_TOTAL_PAGES => X_PRINT_TOTAL_PAGES ,
+	  X_PRINT_PARAMETERS => X_PRINT_PARAMETERS ,
+	  X_PRINT_PAGE_BREAK_COLS => X_PRINT_PAGE_BREAK_COLS ,
+	  X_GROUP_DISPLAY_TYPE => X_GROUP_DISPLAY_TYPE ,
+	  X_PUBLIC_FLAG => X_PUBLIC_FLAG ,
+	  X_SYSTEM_FLAG => X_SYSTEM_FLAG ,
+	  X_DEFAULT_DATE_FORMAT => X_DEFAULT_DATE_FORMAT ,
+	  X_DEFAULT_DATE_TIME_FORMAT => X_DEFAULT_DATE_TIME_FORMAT ,
+	  X_REPORT_TITLE => X_REPORT_TITLE ,
+	  X_USER_ATTRIBUTE_SET =>X_USER_ATTRIBUTE_SET  ,
+	  X_OWNER => X_OWNER ,
+	  X_Last_Update_Date => Null ,
+	  X_CUSTOM_MODE => Null
+  );
+  End LOAD_ROW;
+
+procedure LOAD_ROW(
+  X_REPORT_ID in NUMBER,
+  X_ATTRIBUTE_SET in VARCHAR2,
+  X_PAGE_WIDTH in NUMBER,
+  X_PAGE_HEIGHT in NUMBER,
+  X_PRINT_SOB_FLAG in VARCHAR2,
+  X_PRINT_FUNC_CURR_FLAG in VARCHAR2,
+  X_PRINT_TITLE in VARCHAR2,
+  X_PRINT_SUBMISSION_DATE in VARCHAR2,
+  X_PRINT_CURRENT_PAGE in VARCHAR2,
+  X_PRINT_TOTAL_PAGES in VARCHAR2,
+  X_PRINT_PARAMETERS in VARCHAR2,
+  X_PRINT_PAGE_BREAK_COLS in VARCHAR2,
+  X_GROUP_DISPLAY_TYPE in VARCHAR2,
+  X_PUBLIC_FLAG in VARCHAR2,
+  X_SYSTEM_FLAG in VARCHAR2,
+  X_DEFAULT_DATE_FORMAT in VARCHAR2,
+  X_DEFAULT_DATE_TIME_FORMAT in VARCHAR2,
+  X_REPORT_TITLE in VARCHAR2,
+  X_USER_ATTRIBUTE_SET in VARCHAR2,
+  X_OWNER in VARCHAR2,
+  X_Last_Update_Date VARCHAR2,
+  X_CUSTOM_MODE in VARCHAR2
+  )
+is
+	--* Bug#5102292, rravunny
+	--* Begin
+	--*
+			f_luby number;  -- entity owner in file
+			f_ludate date;  -- entity update date in file
+			db_luby number; -- entity owner in db
+			db_ludate date; -- entity update date in db
+			db_luby_tl number; -- entity owner in db
+			db_ludate_tl date; -- entity update date in db
+
+	--* End
+	--*
+begin
+  declare
+    user_id number := 0;
+    row_id varchar2(64);
+  begin
+
+	--* Bug#5102292, rravunny
+	--* Begin
+	--*
+		f_luby := fnd_load_util.owner_id(X_Owner);
+
+		-- Translate char last_update_date to date
+		f_ludate := nvl(to_date(X_Last_Update_Date, 'YYYY/MM/DD HH24:MI:SS'), sysdate);
+
+		select	LAST_UPDATED_BY, LAST_UPDATE_DATE
+		into	db_luby, db_ludate
+		from	fa_rx_attrsets_b
+		where	report_id = X_Report_Id
+		and     ATTRIBUTE_SET = X_ATTRIBUTE_SET;
+
+		Begin
+			select	LAST_UPDATED_BY, LAST_UPDATE_DATE
+			into	db_luby_tl, db_ludate_tl
+			from	fa_rx_attrsets_tl
+			where	report_id = X_Report_Id
+			and     ATTRIBUTE_SET = X_ATTRIBUTE_SET
+			and     language = userenv('LANG');
+		Exception
+		When Others Then
+			db_luby_tl := db_luby;
+			db_ludate_tl := db_ludate;
+		End;
+
+	--* End
+	--*
+
+    If (
+        fnd_load_util.upload_test(f_luby, f_ludate, db_luby, db_ludate, X_CUSTOM_MODE)
+        and
+	fnd_load_util.upload_test(f_luby, f_ludate, db_luby_tl, db_ludate_tl, X_CUSTOM_MODE)
+	)
+    Then
+	    UPDATE_ROW (
+		X_REPORT_ID =>			X_REPORT_ID,
+		X_ATTRIBUTE_SET =>		X_ATTRIBUTE_SET,
+		X_PAGE_WIDTH =>			X_PAGE_WIDTH,
+		X_PAGE_HEIGHT =>		X_PAGE_HEIGHT,
+		X_PRINT_SOB_FLAG =>		X_PRINT_SOB_FLAG,
+		X_PRINT_FUNC_CURR_FLAG =>	X_PRINT_FUNC_CURR_FLAG,
+		X_PRINT_TITLE =>		X_PRINT_TITLE,
+		X_PRINT_SUBMISSION_DATE =>	X_PRINT_SUBMISSION_DATE,
+		X_PRINT_CURRENT_PAGE =>		X_PRINT_CURRENT_PAGE,
+		X_PRINT_TOTAL_PAGES =>		X_PRINT_TOTAL_PAGES,
+		X_PRINT_PARAMETERS =>		X_PRINT_PARAMETERS,
+		X_PRINT_PAGE_BREAK_COLS =>	X_PRINT_PAGE_BREAK_COLS,
+		X_GROUP_DISPLAY_TYPE =>		X_GROUP_DISPLAY_TYPE,
+		X_PUBLIC_FLAG =>		X_PUBLIC_FLAG,
+		X_SYSTEM_FLAG =>		X_SYSTEM_FLAG,
+		X_DEFAULT_DATE_FORMAT =>	X_DEFAULT_DATE_FORMAT,
+		X_DEFAULT_DATE_TIME_FORMAT =>	X_DEFAULT_DATE_TIME_FORMAT,
+		X_REPORT_TITLE =>		X_REPORT_TITLE,
+		X_USER_ATTRIBUTE_SET =>		X_USER_ATTRIBUTE_SET,
+		X_LAST_UPDATE_DATE =>		f_ludate,
+		X_LAST_UPDATED_BY =>		f_luby,
+		X_LAST_UPDATE_LOGIN =>		0);
+    end if;
+
+  exception
+  when NO_DATA_FOUND then
+    INSERT_ROW(
+	X_ROWID =>			row_id,
+	X_REPORT_ID =>			X_REPORT_ID,
+	X_ATTRIBUTE_SET =>		X_ATTRIBUTE_SET,
+	X_PAGE_WIDTH =>			X_PAGE_WIDTH,
+	X_PAGE_HEIGHT =>		X_PAGE_HEIGHT,
+	X_PRINT_SOB_FLAG =>		X_PRINT_SOB_FLAG,
+	X_PRINT_FUNC_CURR_FLAG =>	X_PRINT_FUNC_CURR_FLAG,
+	X_PRINT_TITLE =>		X_PRINT_TITLE,
+	X_PRINT_SUBMISSION_DATE =>	X_PRINT_SUBMISSION_DATE,
+	X_PRINT_CURRENT_PAGE =>		X_PRINT_CURRENT_PAGE,
+	X_PRINT_TOTAL_PAGES =>		X_PRINT_TOTAL_PAGES,
+	X_PRINT_PARAMETERS =>		X_PRINT_PARAMETERS,
+	X_PRINT_PAGE_BREAK_COLS =>	X_PRINT_PAGE_BREAK_COLS,
+	X_GROUP_DISPLAY_TYPE =>		X_GROUP_DISPLAY_TYPE,
+	X_PUBLIC_FLAG =>		X_PUBLIC_FLAG,
+	X_SYSTEM_FLAG =>		X_SYSTEM_FLAG,
+	X_DEFAULT_DATE_FORMAT =>	X_DEFAULT_DATE_FORMAT,
+	X_DEFAULT_DATE_TIME_FORMAT =>	X_DEFAULT_DATE_TIME_FORMAT,
+	X_REPORT_TITLE =>		X_REPORT_TITLE,
+	X_USER_ATTRIBUTE_SET =>		X_USER_ATTRIBUTE_SET,
+	X_CREATION_DATE =>		f_ludate,
+	X_CREATED_BY =>			f_luby,
+	X_LAST_UPDATE_DATE =>		f_ludate,
+	X_LAST_UPDATED_BY =>		f_luby,
+	X_LAST_UPDATE_LOGIN =>		0);
+  end;
+end LOAD_ROW;
+
+procedure TRANSLATE_ROW(
+  X_REPORT_ID in NUMBER,
+  X_ATTRIBUTE_SET in VARCHAR2,
+  X_REPORT_TITLE in VARCHAR2,
+  X_USER_ATTRIBUTE_SET in VARCHAR2,
+  X_OWNER in VARCHAR2) is
+begin
+	TRANSLATE_ROW(
+	  X_REPORT_ID => X_REPORT_ID,
+	  X_ATTRIBUTE_SET => X_ATTRIBUTE_SET,
+	  X_REPORT_TITLE =>  X_REPORT_TITLE,
+	  X_USER_ATTRIBUTE_SET => X_USER_ATTRIBUTE_SET,
+	  X_OWNER  => X_OWNER,
+	  X_LAST_UPDATE_DATE => null,
+	  X_CUSTOM_MODE=>null);
+end TRANSLATE_ROW;
+
+procedure TRANSLATE_ROW(
+  X_REPORT_ID in NUMBER,
+  X_ATTRIBUTE_SET in VARCHAR2,
+  X_REPORT_TITLE in VARCHAR2,
+  X_USER_ATTRIBUTE_SET in VARCHAR2,
+  X_OWNER in VARCHAR2,
+  X_Last_Update_Date VARCHAR2,
+  X_CUSTOM_MODE in VARCHAR2
+  )
+is
+  f_luby number;  -- entity owner in file
+  f_ludate date;  -- entity update date in file
+begin
+
+--* Bug#5102292, rravunny
+--* Begin
+--*
+	f_luby := fnd_load_util.owner_id(X_Owner);
+
+	-- Translate char last_update_date to date
+	f_ludate := nvl(to_date(X_Last_Update_Date, 'YYYY/MM/DD HH24:MI:SS'), sysdate);
+
+--* End
+--*
+	  update fa_rx_attrsets_tl
+	  set	 user_attribute_set = X_USER_ATTRIBUTE_SET,
+		 report_title = X_REPORT_TITLE,
+		 LAST_UPDATE_DATE = f_ludate,
+		 LAST_UPDATED_BY = f_luby,
+		 LAST_UPDATE_LOGIN = 0 ,
+		 SOURCE_LANG = userenv('LANG')
+	  where REPORT_ID = X_REPORT_ID
+	  and ATTRIBUTE_SET = X_ATTRIBUTE_SET
+	  and userenv('LANG') in (LANGUAGE, SOURCE_LANG);
+
+end TRANSLATE_ROW;
+
+end FA_RX_ATTRSETS_PKG;
+
+/

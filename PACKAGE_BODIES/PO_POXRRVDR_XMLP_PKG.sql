@@ -1,0 +1,440 @@
+--------------------------------------------------------
+--  DDL for Package Body PO_POXRRVDR_XMLP_PKG
+--------------------------------------------------------
+
+  CREATE OR REPLACE EDITIONABLE PACKAGE BODY "APPS"."PO_POXRRVDR_XMLP_PKG" AS
+/* $Header: POXRRVDRB.pls 120.1.12010000.6 2014/02/27 11:11:03 zazeng ship $ */
+  USER_EXIT_FAILURE EXCEPTION;
+
+  FUNCTION BEFOREREPORT RETURN BOOLEAN IS
+  BEGIN
+    DECLARE
+      L_ORG ORG_ORGANIZATION_DEFINITIONS.ORGANIZATION_NAME%TYPE;
+      L_CURRENCY_CODE VARCHAR2(20);
+      RECEIPT_NUMBERING_TYPE VARCHAR2(240);
+     BEGIN
+      P_CONC_REQUEST_ID := FND_GLOBAL.CONC_REQUEST_ID;
+      QTY_PRECISION:=PO_COMMON_xmlp_pkg.GET_PRECISION(P_QTY_PRECISION);
+      IF P_ORG_ID IS NOT NULL THEN
+        SELECT
+          ORGANIZATION_NAME
+        INTO
+          L_ORG
+        FROM
+          ORG_ORGANIZATION_DEFINITIONS
+        WHERE ORGANIZATION_ID = P_ORG_ID;
+        P_ORG_DISPLAYED := L_ORG;
+      ELSE
+        P_ORG_DISPLAYED := '';
+      END IF;
+      SELECT
+        CURRENCY_CODE
+      INTO
+        L_CURRENCY_CODE
+      FROM
+        GL_SETS_OF_BOOKS GSB,
+        FINANCIALS_SYSTEM_PARAMETERS FSP
+      WHERE GSB.SET_OF_BOOKS_ID = FSP.SET_OF_BOOKS_ID;
+      P_BASE_CURRENCY := L_CURRENCY_CODE;
+      IF (P_SORT_OPTION = 'ACCOUNT AND ITEM') THEN
+        P_SORT_ID := 1;
+      ELSIF (P_SORT_OPTION = 'ACCOUNT AND VENDOR') THEN
+        P_SORT_ID := 2;
+      ELSIF (P_SORT_OPTION = 'ACCOUNT AND RECEIPT') THEN
+        P_SORT_ID := 3;
+      ELSE
+        P_SORT_ID := 1;
+      END IF;
+
+      P_ACCT_DATE_FROM1 := to_char(P_DATE_FROM,'dd-mon-yy');
+      P_ACCT_DATE_TO1 := to_char(P_DATE_TO,'dd-mon-yy');
+
+
+      P_ACCT_DATE_FROM := P_DATE_FROM;
+      P_ACCT_DATE_TO := P_DATE_TO;
+      P_CAT_SET_ID := P_CATEGORY_SET;
+      IF (P_ACCT_DATE_FROM IS NOT NULL) THEN
+        P_WHERE_ACCOUNTING_DATE_FROM := 'rdv.accounting_date >= ' || '''' || TO_CHAR(P_ACCT_DATE_FROM) || '''';
+      ELSE
+        P_WHERE_ACCOUNTING_DATE_FROM := '1=1';
+      END IF;
+      IF (P_ACCT_DATE_TO IS NOT NULL) THEN
+        P_WHERE_ACCOUNTING_DATE_TO := 'rdv.accounting_date <= ' || '''' || TO_CHAR(P_ACCT_DATE_TO) || '''';
+      ELSE
+        P_WHERE_ACCOUNTING_DATE_TO := '1=1';
+      END IF;
+      IF (P_ACCT_DATE_FROM IS NOT NULL) THEN
+        P_WHERE_TRX_DATE_FROM := 'rdv.transaction_date >= ' || '''' || TO_CHAR(P_ACCT_DATE_FROM - 1) || '''';
+      ELSE
+        P_WHERE_TRX_DATE_FROM := '1=1';
+      END IF;
+      IF (P_ACCT_DATE_TO IS NOT NULL) THEN
+        P_WHERE_TRX_DATE_TO := 'rdv.transaction_date <= ' || '''' || TO_CHAR(P_ACCT_DATE_TO + 1) || '''';
+      ELSE
+        P_WHERE_TRX_DATE_TO := '1=1';
+      END IF;
+      IF (P_VENDOR_FROM IS NOT NULL) THEN
+        IF (P_VENDOR_TO IS NOT NULL) THEN
+          P_WHERE_VENDOR := 'pov.vendor_name BETWEEN ''' || P_VENDOR_FROM || ''' AND ''' || P_VENDOR_TO || '''';
+        ELSE
+          P_WHERE_VENDOR := 'pov.vendor_name >= ''' || P_VENDOR_FROM || '''';
+        END IF;
+      ELSE
+        IF (P_VENDOR_TO IS NOT NULL) THEN
+          P_WHERE_VENDOR := 'pov.vendor_name <= ''' || P_VENDOR_TO || '''';
+        ELSE
+          P_WHERE_VENDOR := '1=1';
+        END IF;
+      END IF;
+    END;
+    BEGIN
+      RETURN TRUE;
+    END;
+    RETURN (TRUE);
+  END BEFOREREPORT;
+
+  FUNCTION C_FLEX_ACC_DESCFORMULA(C_FLEX_ACC_DESC IN VARCHAR2) RETURN VARCHAR2 IS
+  BEGIN
+    RETURN (C_FLEX_ACC_DESC);
+  END C_FLEX_ACC_DESCFORMULA;
+
+  FUNCTION CALC_TRX_VALUE(CURRENCY_CODE IN VARCHAR2
+                         ,C_PRECISION IN NUMBER
+                         ,EVENT_TYPE_ID IN NUMBER
+                         ,C_PRIMARY_UNIT_PRICE1 IN NUMBER
+                         ,PRIMARY_QTY IN NUMBER
+                         ,CURR_CONV_RATE IN NUMBER
+                         /* Support for Landed Cost Management */
+                         ,PRIOR_UNIT_PRICE IN NUMBER
+                         ,PRIMARY_LANDED_COST NUMBER
+                         ,ACCOUNTING_LINE_TYPE VARCHAR2) RETURN NUMBER IS
+    L_DOC_CURR_PRECISION NUMBER;
+  BEGIN
+    BEGIN
+      SELECT
+        PRECISION
+      INTO
+        L_DOC_CURR_PRECISION
+      FROM
+        FND_CURRENCIES
+      WHERE CURRENCY_CODE = CURRENCY_CODE;
+    EXCEPTION
+      WHEN OTHERS THEN
+        L_DOC_CURR_PRECISION := C_PRECISION;
+    END;
+
+    /* Support for Landed Cost Management */
+    IF EVENT_TYPE_ID IN (7,8) THEN
+      RETURN (ROUND(ROUND(ROUND((C_PRIMARY_UNIT_PRICE1 * PRIMARY_QTY)
+                              ,L_DOC_CURR_PRECISION) * CURR_CONV_RATE
+                        ,C_PRECISION) - ROUND(ROUND((PRIOR_UNIT_PRICE * PRIMARY_QTY)
+                              ,L_DOC_CURR_PRECISION) * CURR_CONV_RATE
+                        ,C_PRECISION)
+                  ,C_PRECISION));
+
+    ELSIF EVENT_TYPE_ID IN (15,16,17) THEN
+      RETURN (ROUND(ROUND(ROUND((C_PRIMARY_UNIT_PRICE1 * PRIMARY_QTY)
+                              ,L_DOC_CURR_PRECISION)
+                        ,C_PRECISION) - ROUND(ROUND((PRIOR_UNIT_PRICE * PRIMARY_QTY)
+                              ,L_DOC_CURR_PRECISION)
+                        ,C_PRECISION)
+                  ,C_PRECISION));
+
+    ELSIF PRIMARY_LANDED_COST IS NOT NULL THEN
+      IF ACCOUNTING_LINE_TYPE = 'Receiving Inspection' THEN
+	RETURN (ROUND(ROUND((PRIMARY_LANDED_COST * PRIMARY_QTY)
+                        ,L_DOC_CURR_PRECISION)
+                  ,C_PRECISION));
+
+      ELSIF ACCOUNTING_LINE_TYPE = 'Accrual' THEN
+	RETURN (ROUND(ROUND((C_PRIMARY_UNIT_PRICE1 * PRIMARY_QTY)
+                        ,L_DOC_CURR_PRECISION) * CURR_CONV_RATE
+                  ,C_PRECISION));
+
+      ELSIF ACCOUNTING_LINE_TYPE = 'Landed Cost Absorption' THEN
+        RETURN (ROUND(ROUND(ROUND((C_PRIMARY_UNIT_PRICE1 * PRIMARY_QTY)
+                              ,L_DOC_CURR_PRECISION) * CURR_CONV_RATE
+                        ,C_PRECISION) - ROUND(ROUND((PRIMARY_LANDED_COST * PRIMARY_QTY)
+                              ,L_DOC_CURR_PRECISION)
+                        ,C_PRECISION)
+                  ,C_PRECISION));
+
+      END IF;
+
+    ELSE
+        RETURN (ROUND(ROUND((C_PRIMARY_UNIT_PRICE1 * PRIMARY_QTY)
+                        ,L_DOC_CURR_PRECISION) * CURR_CONV_RATE
+                  ,C_PRECISION));
+
+    END IF;
+  END CALC_TRX_VALUE;
+
+  FUNCTION C_SORTFORMULA RETURN VARCHAR2 IS
+  BEGIN
+  IF p_sort_id = 1 then
+      RETURN ('Sorted by account and item');
+    ELSIF p_sort_id = 2 THEN
+      RETURN ('Sorted by account and vendor');
+    ELSIF p_sort_id = 3 THEN
+      RETURN ('Sorted by account and receipt');
+    END IF;
+    RETURN ('Sorted by account and item');
+  END C_SORTFORMULA;
+
+  FUNCTION C_CAT_SET_NAMEFORMULA RETURN VARCHAR2 IS
+  BEGIN
+    DECLARE
+      CAT_SET_ID NUMBER;
+      CAT_SET_NAME VARCHAR2(30);
+    BEGIN
+      IF P_CAT_SET_ID IS NULL THEN
+        RETURN ('');
+      ELSE
+        CAT_SET_ID := P_CAT_SET_ID;
+        SELECT
+          CATEGORY_SET_NAME
+        INTO
+          CAT_SET_NAME
+        FROM
+          MTL_CATEGORY_SETS
+        WHERE CATEGORY_SET_ID = CAT_SET_ID;
+        RETURN (CAT_SET_NAME);
+      END IF;
+    EXCEPTION
+      WHEN NO_DATA_FOUND THEN
+        RETURN ('');
+      WHEN OTHERS THEN
+        RETURN ('Error');
+    END;
+    RETURN NULL;
+  END C_CAT_SET_NAMEFORMULA;
+
+  FUNCTION C_FUNC_CURRENCY_CODEFORMULA(R_CURRENCY_CODE IN VARCHAR2) RETURN VARCHAR2 IS
+  BEGIN
+    RETURN ('(' || R_CURRENCY_CODE || ')');
+  END C_FUNC_CURRENCY_CODEFORMULA;
+
+  FUNCTION PRICE(ENTERED_DR IN NUMBER
+                ,PRIMARY_UNIT_PRICE IN NUMBER) RETURN NUMBER IS
+    PRICE NUMBER;
+  BEGIN
+    IF (ENTERED_DR IS NULL) THEN
+      PRICE := (-1) * PRIMARY_UNIT_PRICE;
+      RETURN (PRICE);
+    ELSE
+      RETURN (PRIMARY_UNIT_PRICE);
+    END IF;
+    RETURN NULL;
+  END PRICE;
+
+  FUNCTION GET_P_STRUCT_NUM RETURN BOOLEAN IS
+    L_P_STRUCT_NUM NUMBER;
+  BEGIN
+    SELECT
+      STRUCTURE_ID
+    INTO
+      L_P_STRUCT_NUM
+    FROM
+      MTL_DEFAULT_SETS_VIEW
+    WHERE FUNCTIONAL_AREA_ID = 2;
+    P_STRUCT_NUM := L_P_STRUCT_NUM;
+    RETURN (TRUE);
+    RETURN NULL;
+  EXCEPTION
+    WHEN OTHERS THEN
+      RETURN (FALSE);
+  END GET_P_STRUCT_NUM;
+
+  FUNCTION C_SORT_MAIN_DISPFORMULA(C_FLEX_ITEM_DISP IN VARCHAR2) RETURN VARCHAR2 IS
+  BEGIN
+    IF (P_SORT_ID = 1) THEN
+      RETURN (C_FLEX_ITEM_DISP);
+    END IF;
+    RETURN NULL;
+  END C_SORT_MAIN_DISPFORMULA;
+
+  FUNCTION C_CAT_DISPFORMULA(C_FLEX_CAT_DISP IN VARCHAR2) RETURN VARCHAR2 IS
+  BEGIN
+    IF (P_SORT_ID = 1) THEN
+      RETURN (C_FLEX_CAT_DISP);
+    END IF;
+    RETURN NULL;
+  END C_CAT_DISPFORMULA;
+
+  FUNCTION C_VENDORFORMULA(VENDOR_NAME IN VARCHAR2) RETURN VARCHAR2 IS
+  BEGIN
+    IF (P_SORT_ID = 2) THEN
+      RETURN (VENDOR_NAME);
+    END IF;
+    RETURN NULL;
+  END C_VENDORFORMULA;
+
+  FUNCTION C_VENDOR_NUMBERFORMULA(VENDOR_NUMBER IN VARCHAR2) RETURN VARCHAR2 IS
+  BEGIN
+    IF (P_SORT_ID = 2) THEN
+      RETURN (VENDOR_NUMBER);
+    END IF;
+    RETURN NULL;
+  END C_VENDOR_NUMBERFORMULA;
+
+  FUNCTION DISPLAY_COLUMN(DELIVER_TO_LOCATION IN VARCHAR2
+                         ,C_FLEX_ITEM_DISP IN VARCHAR2) RETURN CHARACTER IS
+  BEGIN
+    IF (P_SORT_ID = 1) THEN
+      RETURN (DELIVER_TO_LOCATION);
+    ELSE
+      RETURN (C_FLEX_ITEM_DISP);
+    END IF;
+    RETURN NULL;
+  END DISPLAY_COLUMN;
+
+  FUNCTION AFTERPFORM RETURN BOOLEAN IS
+    RECEIPT_NUMBERING_TYPE VARCHAR2(240);
+  BEGIN
+    P_CONC_REQUEST_ID := FND_GLOBAL.CONC_REQUEST_ID;
+    IF (P_ORG_ID IS NULL) THEN
+      BEGIN
+        SELECT
+          PSP.MANUAL_RECEIPT_NUM_TYPE
+        INTO
+          RECEIPT_NUMBERING_TYPE
+        FROM
+          PO_SYSTEM_PARAMETERS PSP;
+      END;
+    ELSE
+      BEGIN
+        SELECT
+          DISTINCT
+          MANUAL_RECEIPT_NUM_TYPE
+        INTO
+          RECEIPT_NUMBERING_TYPE
+        FROM
+          RCV_RECEIVING_PARAMETERS_V
+        WHERE ORGANIZATION_ID = P_ORG_ID;
+      EXCEPTION
+        WHEN NO_DATA_FOUND THEN
+          RECEIPT_NUMBERING_TYPE := 'ALPHANUMERIC';
+      END;
+    END IF;
+    IF P_RECEIPT_NUM_FROM = P_RECEIPT_NUM_TO THEN
+      P_WHERE_RECEIPT_NUM_FROM := ' rdv.receipt_number = :p_receipt_num_from ';
+      P_WHERE_RECEIPT_NUM_TO := '1=1';
+    ELSE
+      IF (P_RECEIPT_NUM_FROM IS NOT NULL) THEN
+        IF (RECEIPT_NUMBERING_TYPE = 'ALPHANUMERIC') THEN
+          P_WHERE_RECEIPT_NUM_FROM := ' rdv.receipt_number >= :P_receipt_num_from ';
+        ELSE
+          P_WHERE_RECEIPT_NUM_FROM := ' decode(ltrim(rdv.receipt_number, ''0123456789''), NULL, to_number(rdv.receipt_number), -1) >= :P_receipt_num_from ';
+        END IF;
+      ELSE
+        P_WHERE_RECEIPT_NUM_FROM := '1=1';
+      END IF;
+      IF (P_RECEIPT_NUM_TO IS NOT NULL) THEN
+        IF (RECEIPT_NUMBERING_TYPE = 'ALPHANUMERIC') THEN
+          P_WHERE_RECEIPT_NUM_TO := ' rdv.receipt_number <= :P_receipt_num_to ';
+        ELSE
+          P_WHERE_RECEIPT_NUM_TO := ' decode(ltrim(rdv.receipt_number, ''0123456789''), NULL, to_number(rdv.receipt_number), -1) <= :P_receipt_num_to ';
+        END IF;
+      ELSE
+        P_WHERE_RECEIPT_NUM_TO := '1=1';
+      END IF;
+    END IF;
+    RETURN (TRUE);
+  END AFTERPFORM;
+
+  FUNCTION C_PRIMARY_UNIT_PRICE1FORMULA(ACC_EVENT_ID IN NUMBER
+                                       ,TRX_ID IN NUMBER
+                                       ,PRIMARY_UNIT_PRICE IN NUMBER
+                                       ,PO_TO_PR_UOM_RATE IN NUMBER) RETURN NUMBER IS
+    L_TOT_TAX NUMBER;
+  BEGIN
+    IF ACC_EVENT_ID = -1 THEN
+      SELECT
+        NVL((SUM(NVL(PO_TAX_SV.GET_TAX('PO'
+                                     ,POD.PO_DISTRIBUTION_ID)
+                   ,0)) / SUM(POD.QUANTITY_ORDERED))
+           ,0)
+      INTO
+        L_TOT_TAX
+      FROM
+        PO_DISTRIBUTIONS_ALL POD,
+        RCV_TRANSACTIONS RT
+      WHERE RT.TRANSACTION_ID = TRX_ID
+        AND ( ( RT.PO_DISTRIBUTION_ID IS NOT NULL
+        AND RT.PO_DISTRIBUTION_ID = POD.PO_DISTRIBUTION_ID )
+      OR ( RT.PO_DISTRIBUTION_ID IS NULL
+        AND RT.PO_LINE_LOCATION_ID = POD.LINE_LOCATION_ID ) );
+      SELECT
+        DECODE(SIGN(NVL(SUM(ACCOUNTED_NR_TAX)
+                       ,0))
+              ,0
+              ,0
+              ,1) * L_TOT_TAX
+      INTO
+        L_TOT_TAX
+      FROM
+        RCV_RECEIVING_SUB_LEDGER
+      WHERE RCV_TRANSACTION_ID = TRX_ID;
+      RETURN ((PRIMARY_UNIT_PRICE + (L_TOT_TAX * PO_TO_PR_UOM_RATE)));
+    ELSE
+      RETURN (PRIMARY_UNIT_PRICE);
+    END IF;
+  END C_PRIMARY_UNIT_PRICE1FORMULA;
+
+  FUNCTION C_PRIMARY_UNIT_PRICE2FORMULA(EVENT_TYPE_ID IN NUMBER
+                                       ,C_PRIMARY_UNIT_PRICE1 IN NUMBER
+                                       /* Support for Landed Cost Management */
+                                       ,PRIMARY_LANDED_COST IN NUMBER
+                                       ,PRIOR_UNIT_PRICE IN NUMBER
+                                       ,ACCOUNTING_LINE_TYPE IN VARCHAR2
+                                       ,CURR_CONV_RATE IN NUMBER) RETURN NUMBER IS
+  BEGIN
+
+    /* Support for Landed Cost Management */
+    IF (EVENT_TYPE_ID in (7,8)) THEN
+      RETURN (NULL);
+
+    ELSIF (EVENT_TYPE_ID in (15,16,17)) THEN
+      RETURN (ROUND((C_PRIMARY_UNIT_PRICE1 * CURR_CONV_RATE - PRIOR_UNIT_PRICE * CURR_CONV_RATE)
+                  ,8));
+
+    ELSIF PRIMARY_LANDED_COST IS NOT NULL THEN
+      IF ACCOUNTING_LINE_TYPE = 'Receiving Inspection' THEN
+        RETURN (ROUND(PRIMARY_LANDED_COST
+                  ,8));
+      ELSIF ACCOUNTING_LINE_TYPE = 'Accrual' THEN
+        RETURN (ROUND(C_PRIMARY_UNIT_PRICE1 * CURR_CONV_RATE
+                  ,8));
+      ELSIF ACCOUNTING_LINE_TYPE = 'Landed Cost Absorption' THEN
+        RETURN (ROUND((C_PRIMARY_UNIT_PRICE1 * CURR_CONV_RATE - PRIMARY_LANDED_COST)
+                  ,8));
+      END IF;
+
+    ELSE
+      RETURN (ROUND(C_PRIMARY_UNIT_PRICE1 * CURR_CONV_RATE
+                  ,8));
+
+    END IF;
+  END C_PRIMARY_UNIT_PRICE2FORMULA;
+
+  FUNCTION C_QUANTITYFORMULA(EVENT_TYPE_ID IN NUMBER
+                            ,QTY IN NUMBER) RETURN NUMBER IS
+  BEGIN
+    IF (EVENT_TYPE_ID in (7,8)) THEN
+      RETURN NULL;
+    ELSE
+      RETURN QTY;
+    END IF;
+  END C_QUANTITYFORMULA;
+
+  FUNCTION AFTERREPORT RETURN BOOLEAN IS
+  BEGIN
+    RETURN (TRUE);
+  END AFTERREPORT;
+
+
+
+END PO_POXRRVDR_XMLP_PKG;
+
+
+/

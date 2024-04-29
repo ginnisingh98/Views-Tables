@@ -1,0 +1,296 @@
+--------------------------------------------------------
+--  DDL for Package IGS_AS_EXAM_INSTANCE_PKG
+--------------------------------------------------------
+
+  CREATE OR REPLACE EDITIONABLE PACKAGE "APPS"."IGS_AS_EXAM_INSTANCE_PKG" AUTHID CURRENT_USER AS
+ /* $Header: IGSDI04S.pls 115.4 2002/11/28 23:11:18 nsidana ship $ */
+procedure INSERT_ROW (
+  X_ROWID in out NOCOPY VARCHAR2,
+  X_ASS_ID in NUMBER,
+  X_ORG_ID in NUMBER,
+  X_EXAM_CAL_TYPE in VARCHAR2,
+  X_EXAM_CI_SEQUENCE_NUMBER in NUMBER,
+  X_DT_ALIAS in VARCHAR2,
+  X_DAI_SEQUENCE_NUMBER in NUMBER,
+  X_START_TIME in DATE,
+  X_END_TIME in DATE,
+  X_VENUE_CD in VARCHAR2,
+  X_ESE_ID in NUMBER,
+  X_COLLECT_PERSON_ID in NUMBER,
+  X_SPECIAL_SESSION_IND in VARCHAR2,
+  X_OVERRIDE_START_TIME in DATE,
+  X_OVERRIDE_END_TIME in DATE,
+  X_SPECIAL_ANNOUNCEMENTS in VARCHAR2,
+  X_SPECIAL_INSTRUCTIONS in VARCHAR2,
+  X_WORKED_SCRIPT_INSTRUCTIONS in VARCHAR2,
+  X_COMMENTS in VARCHAR2,
+  X_MODE in VARCHAR2 default 'R'
+  );
+procedure LOCK_ROW (
+  X_ROWID in VARCHAR2,
+  X_ASS_ID in NUMBER,
+  X_EXAM_CAL_TYPE in VARCHAR2,
+  X_EXAM_CI_SEQUENCE_NUMBER in NUMBER,
+  X_DT_ALIAS in VARCHAR2,
+  X_DAI_SEQUENCE_NUMBER in NUMBER,
+  X_START_TIME in DATE,
+  X_END_TIME in DATE,
+  X_VENUE_CD in VARCHAR2,
+  X_ESE_ID in NUMBER,
+  X_COLLECT_PERSON_ID in NUMBER,
+  X_SPECIAL_SESSION_IND in VARCHAR2,
+  X_OVERRIDE_START_TIME in DATE,
+  X_OVERRIDE_END_TIME in DATE,
+  X_SPECIAL_ANNOUNCEMENTS in VARCHAR2,
+  X_SPECIAL_INSTRUCTIONS in VARCHAR2,
+  X_WORKED_SCRIPT_INSTRUCTIONS in VARCHAR2,
+  X_COMMENTS in VARCHAR2
+);
+procedure UPDATE_ROW (
+  X_ROWID in VARCHAR2,
+  X_ASS_ID in NUMBER,
+  X_EXAM_CAL_TYPE in VARCHAR2,
+  X_EXAM_CI_SEQUENCE_NUMBER in NUMBER,
+  X_DT_ALIAS in VARCHAR2,
+  X_DAI_SEQUENCE_NUMBER in NUMBER,
+  X_START_TIME in DATE,
+  X_END_TIME in DATE,
+  X_VENUE_CD in VARCHAR2,
+  X_ESE_ID in NUMBER,
+  X_COLLECT_PERSON_ID in NUMBER,
+  X_SPECIAL_SESSION_IND in VARCHAR2,
+  X_OVERRIDE_START_TIME in DATE,
+  X_OVERRIDE_END_TIME in DATE,
+  X_SPECIAL_ANNOUNCEMENTS in VARCHAR2,
+  X_SPECIAL_INSTRUCTIONS in VARCHAR2,
+  X_WORKED_SCRIPT_INSTRUCTIONS in VARCHAR2,
+  X_COMMENTS in VARCHAR2,
+  X_MODE in VARCHAR2 default 'R'
+  );
+procedure ADD_ROW (
+  X_ROWID in out NOCOPY VARCHAR2,
+  X_ASS_ID in NUMBER,
+  X_ORG_ID in NUMBER,
+  X_EXAM_CAL_TYPE in VARCHAR2,
+  X_EXAM_CI_SEQUENCE_NUMBER in NUMBER,
+  X_DT_ALIAS in VARCHAR2,
+  X_DAI_SEQUENCE_NUMBER in NUMBER,
+  X_START_TIME in DATE,
+  X_END_TIME in DATE,
+  X_VENUE_CD in VARCHAR2,
+  X_ESE_ID in NUMBER,
+  X_COLLECT_PERSON_ID in NUMBER,
+  X_SPECIAL_SESSION_IND in VARCHAR2,
+  X_OVERRIDE_START_TIME in DATE,
+  X_OVERRIDE_END_TIME in DATE,
+  X_SPECIAL_ANNOUNCEMENTS in VARCHAR2,
+  X_SPECIAL_INSTRUCTIONS in VARCHAR2,
+  X_WORKED_SCRIPT_INSTRUCTIONS in VARCHAR2,
+  X_COMMENTS in VARCHAR2,
+  X_MODE in VARCHAR2 default 'R'
+  );
+procedure DELETE_ROW (
+  X_ROWID in VARCHAR2
+);
+
+
+
+
+
+FUNCTION Get_PK_For_Validation (
+    x_ass_id IN NUMBER,
+    x_exam_cal_type IN VARCHAR2,
+    x_exam_ci_sequence_number IN NUMBER,
+    x_dt_alias IN VARCHAR2,
+    x_dai_sequence_number IN NUMBER,
+    x_start_time IN DATE,
+    x_end_time IN DATE,
+    x_venue_cd IN VARCHAR2
+    )RETURN BOOLEAN;
+
+
+
+
+
+  PROCEDURE GET_FK_IGS_AS_ASSESSMNT_ITM (
+    x_ass_id IN NUMBER
+    );
+  PROCEDURE GET_FK_IGS_AS_EXAM_SESSION (
+    x_exam_cal_type IN VARCHAR2,
+    x_exam_ci_sequence_number IN NUMBER,
+    x_dt_alias IN VARCHAR2,
+    x_dai_sequence_number IN NUMBER,
+    x_start_time IN DATE,
+    x_end_time IN DATE
+    );
+  PROCEDURE GET_UFK_IGS_AS_EXAM_SESSION (
+    x_ese_id IN NUMBER
+    );
+  PROCEDURE GET_FK_IGS_PE_PERSON (
+    x_person_id IN NUMBER
+    );
+  PROCEDURE GET_FK_IGS_GR_VENUE (
+    x_venue_cd IN VARCHAR2
+    );
+
+
+
+
+
+
+
+
+
+	PROCEDURE Check_Constraints (
+
+
+
+
+	Column_Name	IN	VARCHAR2	DEFAULT NULL,
+
+
+
+
+	Column_Value 	IN	VARCHAR2	DEFAULT NULL
+
+
+
+
+	);
+
+
+
+
+PROCEDURE Before_DML (
+
+
+
+
+    p_action IN VARCHAR2,
+
+
+
+
+    x_rowid IN  VARCHAR2 DEFAULT NULL,
+
+
+   x_org_id IN NUMBER DEFAULT NULL,
+
+    x_ass_id IN NUMBER DEFAULT NULL,
+
+
+
+
+    x_exam_cal_type IN VARCHAR2 DEFAULT NULL,
+
+
+
+
+    x_exam_ci_sequence_number IN NUMBER DEFAULT NULL,
+
+
+
+
+    x_dt_alias IN VARCHAR2 DEFAULT NULL,
+
+
+
+
+    x_dai_sequence_number IN NUMBER DEFAULT NULL,
+
+
+
+
+    x_start_time IN DATE DEFAULT NULL,
+
+
+
+
+    x_end_time IN DATE DEFAULT NULL,
+
+
+
+
+    x_ese_id IN NUMBER DEFAULT NULL,
+
+
+
+
+    x_venue_cd IN VARCHAR2 DEFAULT NULL,
+
+
+
+
+    x_collect_person_id IN NUMBER DEFAULT NULL,
+
+
+
+
+    x_special_session_ind IN VARCHAR2 DEFAULT NULL,
+
+
+
+
+    x_override_start_time IN DATE DEFAULT NULL,
+
+
+
+
+    x_override_end_time IN DATE DEFAULT NULL,
+
+
+
+
+    x_special_announcements IN VARCHAR2 DEFAULT NULL,
+
+
+
+
+    x_special_instructions IN VARCHAR2 DEFAULT NULL,
+
+
+
+
+    x_worked_script_instructions IN VARCHAR2 DEFAULT NULL,
+
+
+
+
+    x_comments IN VARCHAR2 DEFAULT NULL,
+
+
+
+
+    x_creation_date IN DATE DEFAULT NULL,
+
+
+
+
+    x_created_by IN NUMBER DEFAULT NULL,
+
+
+
+
+    x_last_update_date IN DATE DEFAULT NULL,
+
+
+
+
+    x_last_updated_by IN NUMBER DEFAULT NULL,
+
+
+
+
+    x_last_update_login IN NUMBER DEFAULT NULL
+
+
+
+  ) ;
+
+
+
+end IGS_AS_EXAM_INSTANCE_PKG;
+
+ 
+
+/

@@ -1,0 +1,111 @@
+--------------------------------------------------------
+--  DDL for Package Body JTF_RS_ROLE_RELATE_IUHK
+--------------------------------------------------------
+
+  CREATE OR REPLACE EDITIONABLE PACKAGE BODY "APPS"."JTF_RS_ROLE_RELATE_IUHK" AS
+ /* $Header: jtfrsnlb.pls 120.0 2005/05/11 08:20:50 appldev ship $ */
+
+  /*****************************************************************************************
+   This is a user hook  API for the jtf_rs_role_relate_pvt package
+  ******************************************************************************************/
+
+
+  /*for create resource role relate */
+
+  PROCEDURE  create_res_role_relate_pre
+  (P_ROLE_RESOURCE_TYPE    JTF_RS_ROLE_RELATIONS.ROLE_RESOURCE_TYPE%TYPE,
+   P_ROLE_RESOURCE_ID       JTF_RS_ROLE_RELATIONS.ROLE_RESOURCE_ID%TYPE,
+   P_ROLE_ID                 JTF_RS_ROLE_RELATIONS.ROLE_ID%TYPE,
+   P_START_DATE_ACTIVE      JTF_RS_ROLE_RELATIONS.START_DATE_ACTIVE%TYPE,
+   P_END_DATE_ACTIVE         JTF_RS_ROLE_RELATIONS.END_DATE_ACTIVE%TYPE ,
+   P_DATA                   OUT NOCOPY  VARCHAR2,
+   P_COUNT                  OUT NOCOPY  NUMBER,
+   P_RETURN_CODE            OUT NOCOPY  VARCHAR2
+  )
+  IS
+  BEGIN
+    NULL;
+  END;
+
+
+  PROCEDURE  update_res_role_relate_pre
+  (
+   P_ROLE_RELATE_ID       IN     JTF_RS_ROLE_RELATIONS.ROLE_RELATE_ID%TYPE,
+   P_START_DATE_ACTIVE    IN     JTF_RS_ROLE_RELATIONS.START_DATE_ACTIVE%TYPE   DEFAULT  FND_API.G_MISS_DATE,
+   P_END_DATE_ACTIVE      IN     JTF_RS_ROLE_RELATIONS.END_DATE_ACTIVE%TYPE   DEFAULT  FND_API.G_MISS_DATE,
+   P_OBJECT_VERSION_NUM   IN     JTF_RS_ROLE_RELATIONS.OBJECT_VERSION_NUMBER%TYPE,
+   P_DATA                   OUT NOCOPY  VARCHAR2,
+   P_COUNT            OUT NOCOPY  NUMBER,
+   P_RETURN_CODE            OUT NOCOPY  VARCHAR2
+  )
+ IS
+  BEGIN
+    NULL;
+  END;
+
+
+  PROCEDURE  delete_res_role_relate_pre
+  (P_ROLE_RELATE_ID       IN     JTF_RS_ROLE_RELATIONS.ROLE_RELATE_ID%TYPE,
+   P_OBJECT_VERSION_NUM   IN  JTF_RS_ROLE_RELATIONS.OBJECT_VERSION_NUMBER%TYPE,
+   P_DATA                 OUT NOCOPY  VARCHAR2,
+   P_COUNT                OUT NOCOPY  NUMBER,
+   P_RETURN_CODE          OUT NOCOPY  VARCHAR2
+  )
+ IS
+  BEGIN
+    NULL;
+  END;
+
+
+   PROCEDURE  create_res_role_relate_post
+  (P_ROLE_RELATE_ID       IN     JTF_RS_ROLE_RELATIONS.ROLE_RELATE_ID%TYPE,
+   P_ROLE_RESOURCE_TYPE   IN   JTF_RS_ROLE_RELATIONS.ROLE_RESOURCE_TYPE%TYPE,
+   P_ROLE_RESOURCE_ID     IN   JTF_RS_ROLE_RELATIONS.ROLE_RESOURCE_ID%TYPE,
+   P_ROLE_ID              IN   JTF_RS_ROLE_RELATIONS.ROLE_ID%TYPE,
+   P_START_DATE_ACTIVE    IN   JTF_RS_ROLE_RELATIONS.START_DATE_ACTIVE%TYPE,
+   P_END_DATE_ACTIVE      IN   JTF_RS_ROLE_RELATIONS.END_DATE_ACTIVE%TYPE   DEFAULT  NULL,
+   P_DATA                 OUT NOCOPY  VARCHAR2,
+   P_COUNT                OUT NOCOPY  NUMBER,
+   P_RETURN_CODE          OUT NOCOPY  VARCHAR2
+  )
+ IS
+  BEGIN
+    NULL;
+  END;
+
+
+
+  PROCEDURE  update_res_role_relate_post
+  (
+   P_ROLE_RELATE_ID       IN     JTF_RS_ROLE_RELATIONS.ROLE_RELATE_ID%TYPE,
+   P_START_DATE_ACTIVE    IN     JTF_RS_ROLE_RELATIONS.START_DATE_ACTIVE%TYPE   DEFAULT  FND_API.G_MISS_DATE,
+   P_END_DATE_ACTIVE      IN     JTF_RS_ROLE_RELATIONS.END_DATE_ACTIVE%TYPE   DEFAULT  FND_API.G_MISS_DATE,
+   P_OBJECT_VERSION_NUM   IN     JTF_RS_ROLE_RELATIONS.OBJECT_VERSION_NUMBER%TYPE,
+   P_DATA                 OUT NOCOPY  VARCHAR2,
+   P_COUNT                OUT NOCOPY  NUMBER,
+   P_RETURN_CODE          OUT NOCOPY  VARCHAR2
+  )
+ IS
+  BEGIN
+    NULL;
+  END;
+
+
+
+  PROCEDURE  delete_res_role_relate_post
+  (P_ROLE_RELATE_ID       IN     JTF_RS_ROLE_RELATIONS.ROLE_RELATE_ID%TYPE,
+   P_OBJECT_VERSION_NUM   IN  JTF_RS_ROLE_RELATIONS.OBJECT_VERSION_NUMBER%TYPE,
+   P_DATA                   OUT NOCOPY  VARCHAR2,
+   P_COUNT            OUT NOCOPY  NUMBER,
+   P_RETURN_CODE            OUT NOCOPY  VARCHAR2
+  )
+ IS
+  BEGIN
+    NULL;
+  END;
+
+
+
+END jtf_rs_role_relate_iuhk;
+
+/

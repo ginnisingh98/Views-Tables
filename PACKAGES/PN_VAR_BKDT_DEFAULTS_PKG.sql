@@ -1,0 +1,154 @@
+--------------------------------------------------------
+--  DDL for Package PN_VAR_BKDT_DEFAULTS_PKG
+--------------------------------------------------------
+
+  CREATE OR REPLACE EDITIONABLE PACKAGE "APPS"."PN_VAR_BKDT_DEFAULTS_PKG" AUTHID CURRENT_USER AS
+/* $Header: PNVRBDDS.pls 120.0 2007/10/03 14:27:50 rthumma noship $ */
+
+procedure INSERT_ROW (
+  X_ROWID                    in out NOCOPY VARCHAR2,
+  X_BKDT_DEFAULT_ID          in out NOCOPY NUMBER,
+  X_BKDT_DETAIL_NUM          in out NOCOPY NUMBER,
+  X_BKHD_DEFAULT_ID          in NUMBER,
+  X_BKDT_START_DATE          in DATE,
+  X_BKDT_END_DATE            in DATE,
+  X_PERIOD_BKPT_VOL_START    in NUMBER,
+  X_PERIOD_BKPT_VOL_END      in NUMBER,
+  X_GROUP_BKPT_VOL_START     in NUMBER,
+  X_GROUP_BKPT_VOL_END       in NUMBER,
+  X_BKPT_RATE                in NUMBER,
+  X_PROCESSED_FLAG           in NUMBER,
+  X_VAR_RENT_ID              in NUMBER,
+  X_CREATION_DATE            in DATE,
+  X_CREATED_BY               in NUMBER,
+  X_LAST_UPDATE_DATE         in DATE,
+  X_LAST_UPDATED_BY          in NUMBER,
+  X_LAST_UPDATE_LOGIN        in NUMBER,
+  X_ORG_ID                   in NUMBER,
+  X_ANNUAL_BASIS_AMOUNT      in NUMBER DEFAULT NULL,
+  X_ATTRIBUTE_CATEGORY       in VARCHAR2,
+  X_ATTRIBUTE1               in VARCHAR2,
+  X_ATTRIBUTE2               in VARCHAR2,
+  X_ATTRIBUTE3               in VARCHAR2,
+  X_ATTRIBUTE4               in VARCHAR2,
+  X_ATTRIBUTE5               in VARCHAR2,
+  X_ATTRIBUTE6               in VARCHAR2,
+  X_ATTRIBUTE7               in VARCHAR2,
+  X_ATTRIBUTE8               in VARCHAR2,
+  X_ATTRIBUTE9               in VARCHAR2,
+  X_ATTRIBUTE10              in VARCHAR2,
+  X_ATTRIBUTE11              in VARCHAR2,
+  X_ATTRIBUTE12              in VARCHAR2,
+  X_ATTRIBUTE13              in VARCHAR2,
+  X_ATTRIBUTE14              in VARCHAR2,
+  X_ATTRIBUTE15              in VARCHAR2
+  );
+
+procedure LOCK_ROW (
+  X_BKDT_DEFAULT_ID          in NUMBER,
+  X_BKDT_DETAIL_NUM          in NUMBER,
+  X_BKHD_DEFAULT_ID          in NUMBER,
+  X_BKDT_START_DATE          in DATE,
+  X_BKDT_END_DATE            in DATE,
+  X_PERIOD_BKPT_VOL_START    in NUMBER,
+  X_PERIOD_BKPT_VOL_END      in NUMBER,
+  X_GROUP_BKPT_VOL_START     in NUMBER,
+  X_GROUP_BKPT_VOL_END       in NUMBER,
+  X_BKPT_RATE                in NUMBER,
+  X_VAR_RENT_ID              in NUMBER,
+  X_ANNUAL_BASIS_AMOUNT      in NUMBER DEFAULT NULL,
+  X_ATTRIBUTE_CATEGORY       in VARCHAR2,
+  X_ATTRIBUTE1               in VARCHAR2,
+  X_ATTRIBUTE2               in VARCHAR2,
+  X_ATTRIBUTE3               in VARCHAR2,
+  X_ATTRIBUTE4               in VARCHAR2,
+  X_ATTRIBUTE5               in VARCHAR2,
+  X_ATTRIBUTE6               in VARCHAR2,
+  X_ATTRIBUTE7               in VARCHAR2,
+  X_ATTRIBUTE8               in VARCHAR2,
+  X_ATTRIBUTE9               in VARCHAR2,
+  X_ATTRIBUTE10              in VARCHAR2,
+  X_ATTRIBUTE11              in VARCHAR2,
+  X_ATTRIBUTE12              in VARCHAR2,
+  X_ATTRIBUTE13              in VARCHAR2,
+  X_ATTRIBUTE14              in VARCHAR2,
+  X_ATTRIBUTE15              in VARCHAR2
+);
+
+procedure UPDATE_ROW (
+  X_BKDT_DEFAULT_ID          in NUMBER,
+  X_BKDT_DETAIL_NUM          in NUMBER,
+  X_BKHD_DEFAULT_ID          in NUMBER,
+  X_BKDT_START_DATE          in DATE,
+  X_BKDT_END_DATE            in DATE,
+  X_PERIOD_BKPT_VOL_START    in NUMBER,
+  X_PERIOD_BKPT_VOL_END      in NUMBER,
+  X_GROUP_BKPT_VOL_START     in NUMBER,
+  X_GROUP_BKPT_VOL_END       in NUMBER,
+  X_BKPT_RATE                in NUMBER,
+  X_PROCESSED_FLAG           in NUMBER,
+  X_VAR_RENT_ID              in NUMBER,
+  X_LAST_UPDATE_DATE         in DATE,
+  X_LAST_UPDATED_BY          in NUMBER,
+  X_LAST_UPDATE_LOGIN        in NUMBER,
+  X_ANNUAL_BASIS_AMOUNT      in NUMBER DEFAULT NULL,
+  X_ATTRIBUTE_CATEGORY       in VARCHAR2,
+  X_ATTRIBUTE1               in VARCHAR2,
+  X_ATTRIBUTE2               in VARCHAR2,
+  X_ATTRIBUTE3               in VARCHAR2,
+  X_ATTRIBUTE4               in VARCHAR2,
+  X_ATTRIBUTE5               in VARCHAR2,
+  X_ATTRIBUTE6               in VARCHAR2,
+  X_ATTRIBUTE7               in VARCHAR2,
+  X_ATTRIBUTE8               in VARCHAR2,
+  X_ATTRIBUTE9               in VARCHAR2,
+  X_ATTRIBUTE10              in VARCHAR2,
+  X_ATTRIBUTE11              in VARCHAR2,
+  X_ATTRIBUTE12              in VARCHAR2,
+  X_ATTRIBUTE13              in VARCHAR2,
+  X_ATTRIBUTE14              in VARCHAR2,
+  X_ATTRIBUTE15              in VARCHAR2
+);
+
+procedure DELETE_ROW (
+  X_BKDT_DEFAULT_ID   in NUMBER
+);
+
+procedure MODIFY_ROW (
+  X_BKDT_DEFAULT_ID          in NUMBER,
+  X_BKDT_DETAIL_NUM          in NUMBER   DEFAULT NULL,
+  X_BKHD_DEFAULT_ID          in NUMBER,
+  X_BKDT_START_DATE          in DATE     DEFAULT NULL,
+  X_BKDT_END_DATE            in DATE     DEFAULT NULL,
+  X_PERIOD_BKPT_VOL_START    in NUMBER   DEFAULT NULL,
+  X_PERIOD_BKPT_VOL_END      in NUMBER   DEFAULT NULL,
+  X_GROUP_BKPT_VOL_START     in NUMBER   DEFAULT NULL,
+  X_GROUP_BKPT_VOL_END       in NUMBER   DEFAULT NULL,
+  X_BKPT_RATE                in NUMBER   DEFAULT NULL,
+  X_PROCESSED_FLAG           in NUMBER   DEFAULT NULL,
+  X_VAR_RENT_ID              in NUMBER   DEFAULT NULL,
+  X_LAST_UPDATE_DATE         in DATE     DEFAULT NULL,
+  X_LAST_UPDATED_BY          in NUMBER   DEFAULT NULL,
+  X_LAST_UPDATE_LOGIN        in NUMBER   DEFAULT NULL,
+  X_ANNUAL_BASIS_AMOUNT      in NUMBER   DEFAULT NULL,
+  X_ATTRIBUTE_CATEGORY       in VARCHAR2 DEFAULT NULL,
+  X_ATTRIBUTE1               in VARCHAR2 DEFAULT NULL,
+  X_ATTRIBUTE2               in VARCHAR2 DEFAULT NULL,
+  X_ATTRIBUTE3               in VARCHAR2 DEFAULT NULL,
+  X_ATTRIBUTE4               in VARCHAR2 DEFAULT NULL,
+  X_ATTRIBUTE5               in VARCHAR2 DEFAULT NULL,
+  X_ATTRIBUTE6               in VARCHAR2 DEFAULT NULL,
+  X_ATTRIBUTE7               in VARCHAR2 DEFAULT NULL,
+  X_ATTRIBUTE8               in VARCHAR2 DEFAULT NULL,
+  X_ATTRIBUTE9               in VARCHAR2 DEFAULT NULL,
+  X_ATTRIBUTE10              in VARCHAR2 DEFAULT NULL,
+  X_ATTRIBUTE11              in VARCHAR2 DEFAULT NULL,
+  X_ATTRIBUTE12              in VARCHAR2 DEFAULT NULL,
+  X_ATTRIBUTE13              in VARCHAR2 DEFAULT NULL,
+  X_ATTRIBUTE14              in VARCHAR2 DEFAULT NULL,
+  X_ATTRIBUTE15              in VARCHAR2 DEFAULT NULL
+);
+
+end PN_VAR_BKDT_DEFAULTS_PKG;
+
+/

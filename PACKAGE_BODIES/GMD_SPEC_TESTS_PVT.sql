@@ -1,0 +1,1096 @@
+--------------------------------------------------------
+--  DDL for Package Body GMD_SPEC_TESTS_PVT
+--------------------------------------------------------
+
+  CREATE OR REPLACE EDITIONABLE PACKAGE BODY "APPS"."GMD_SPEC_TESTS_PVT" as
+/* $Header: GMDVSPTB.pls 120.0 2005/05/25 19:16:49 appldev noship $ */
+procedure INSERT_ROW (
+  X_ROWID in out NOCOPY VARCHAR2,
+  X_SPEC_ID in NUMBER,
+  X_TEST_ID in NUMBER,
+  X_ATTRIBUTE1 in VARCHAR2,
+  X_ATTRIBUTE2 in VARCHAR2,
+  X_MIN_VALUE_CHAR in VARCHAR2,
+  X_TEST_METHOD_ID in NUMBER,
+  X_SEQ in NUMBER,
+  X_FROM_BASE_IND in VARCHAR2,
+  X_EXCLUDE_IND in VARCHAR2,
+  X_MODIFIED_IND in VARCHAR2,
+  X_TEST_QTY in NUMBER,
+  X_TEST_QTY_UOM in VARCHAR2,
+  X_MIN_VALUE_NUM in NUMBER,
+  X_TARGET_VALUE_NUM in NUMBER,
+  X_MAX_VALUE_NUM in NUMBER,
+  X_ATTRIBUTE5 in VARCHAR2,
+  X_ATTRIBUTE6 in VARCHAR2,
+  X_ATTRIBUTE7 in VARCHAR2,
+  X_ATTRIBUTE8 in VARCHAR2,
+  X_ATTRIBUTE9 in VARCHAR2,
+  X_ATTRIBUTE10 in VARCHAR2,
+  X_ATTRIBUTE11 in VARCHAR2,
+  X_ATTRIBUTE12 in VARCHAR2,
+  X_ATTRIBUTE13 in VARCHAR2,
+  X_ATTRIBUTE14 in VARCHAR2,
+  X_ATTRIBUTE15 in VARCHAR2,
+  X_ATTRIBUTE16 in VARCHAR2,
+  X_ATTRIBUTE17 in VARCHAR2,
+  X_ATTRIBUTE18 in VARCHAR2,
+  X_USE_TO_CONTROL_STEP in VARCHAR2,
+  X_PRINT_SPEC_IND in VARCHAR2,
+  X_PRINT_RESULT_IND in VARCHAR2,
+  X_TEXT_CODE in NUMBER,
+  X_ATTRIBUTE_CATEGORY in VARCHAR2,
+  X_ATTRIBUTE3 in VARCHAR2,
+  X_RETEST_LOT_EXPIRY_IND in VARCHAR2,
+  X_ATTRIBUTE19 in VARCHAR2,
+  X_ATTRIBUTE20 in VARCHAR2,
+  X_MAX_VALUE_CHAR in VARCHAR2,
+  X_TEST_REPLICATE in NUMBER,
+  X_CHECK_RESULT_INTERVAL in NUMBER,
+  X_OUT_OF_SPEC_ACTION in VARCHAR2,
+  X_EXP_ERROR_TYPE in VARCHAR2,
+  X_BELOW_SPEC_MIN in NUMBER,
+  X_ABOVE_SPEC_MIN in NUMBER,
+  X_BELOW_SPEC_MAX in NUMBER,
+  X_ABOVE_SPEC_MAX in NUMBER,
+  X_BELOW_MIN_ACTION_CODE in VARCHAR2,
+  X_ABOVE_MIN_ACTION_CODE in VARCHAR2,
+  X_BELOW_MAX_ACTION_CODE in VARCHAR2,
+  X_ABOVE_MAX_ACTION_CODE in VARCHAR2,
+  X_OPTIONAL_IND in VARCHAR2,
+  X_DISPLAY_PRECISION in NUMBER,
+  X_REPORT_PRECISION in NUMBER,
+  X_TEST_PRIORITY in VARCHAR2,
+  X_PRINT_ON_COA_IND in VARCHAR2,
+  X_TARGET_VALUE_CHAR in VARCHAR2,
+  X_ATTRIBUTE4 in VARCHAR2,
+  X_ATTRIBUTE21 in VARCHAR2,
+  X_ATTRIBUTE22 in VARCHAR2,
+  X_ATTRIBUTE23 in VARCHAR2,
+  X_ATTRIBUTE24 in VARCHAR2,
+  X_ATTRIBUTE25 in VARCHAR2,
+  X_ATTRIBUTE26 in VARCHAR2,
+  X_ATTRIBUTE27 in VARCHAR2,
+  X_ATTRIBUTE28 in VARCHAR2,
+  X_ATTRIBUTE29 in VARCHAR2,
+  X_ATTRIBUTE30 in VARCHAR2,
+  X_TEST_DISPLAY in VARCHAR2,
+  X_CREATION_DATE in DATE,
+  X_CREATED_BY in NUMBER,
+  X_LAST_UPDATE_DATE in DATE,
+  X_LAST_UPDATED_BY in NUMBER,
+  X_LAST_UPDATE_LOGIN in NUMBER,
+  X_VIABILITY_DURATION in number,
+  X_TEST_EXPIRATION_DAYS in number,
+  X_TEST_EXPIRATION_HOURS in number,
+  X_TEST_EXPIRATION_MINUTES in number,
+  X_TEST_EXPIRATION_SECONDS in number,
+  X_CALC_UOM_CONV_IND in VARCHAR2,
+  X_TO_QTY_UOM in VARCHAR2
+) is
+  cursor C is select ROWID from GMD_SPEC_TESTS_B
+    where SPEC_ID = X_SPEC_ID
+    and TEST_ID = X_TEST_ID
+    ;
+begin
+    insert into GMD_SPEC_TESTS_B (
+    ATTRIBUTE1,
+    ATTRIBUTE2,
+    MIN_VALUE_CHAR,
+    SPEC_ID,
+    TEST_ID,
+    TEST_METHOD_ID,
+    SEQ,
+    FROM_BASE_IND,
+    EXCLUDE_IND,
+    MODIFIED_IND,
+    TEST_QTY,
+    TEST_QTY_UOM,
+    MIN_VALUE_NUM,
+    TARGET_VALUE_NUM,
+    MAX_VALUE_NUM,
+    ATTRIBUTE5,
+    ATTRIBUTE6,
+    ATTRIBUTE7,
+    ATTRIBUTE8,
+    ATTRIBUTE9,
+    ATTRIBUTE10,
+    ATTRIBUTE11,
+    ATTRIBUTE12,
+    ATTRIBUTE13,
+    ATTRIBUTE14,
+    ATTRIBUTE15,
+    ATTRIBUTE16,
+    ATTRIBUTE17,
+    ATTRIBUTE18,
+    USE_TO_CONTROL_STEP,
+    PRINT_SPEC_IND,
+    PRINT_RESULT_IND,
+    TEXT_CODE,
+    ATTRIBUTE_CATEGORY,
+    ATTRIBUTE3,
+    RETEST_LOT_EXPIRY_IND,
+    ATTRIBUTE19,
+    ATTRIBUTE20,
+    MAX_VALUE_CHAR,
+    TEST_REPLICATE,
+    CHECK_RESULT_INTERVAL,
+    OUT_OF_SPEC_ACTION,
+    EXP_ERROR_TYPE,
+    BELOW_SPEC_MIN,
+    ABOVE_SPEC_MIN,
+    BELOW_SPEC_MAX,
+    ABOVE_SPEC_MAX,
+    BELOW_MIN_ACTION_CODE,
+    ABOVE_MIN_ACTION_CODE,
+    BELOW_MAX_ACTION_CODE,
+    ABOVE_MAX_ACTION_CODE,
+    OPTIONAL_IND,
+    DISPLAY_PRECISION,
+    REPORT_PRECISION,
+    TEST_PRIORITY,
+    PRINT_ON_COA_IND,
+    TARGET_VALUE_CHAR,
+    ATTRIBUTE4,
+    ATTRIBUTE21,
+    ATTRIBUTE22,
+    ATTRIBUTE23,
+    ATTRIBUTE24,
+    ATTRIBUTE25,
+    ATTRIBUTE26,
+    ATTRIBUTE27,
+    ATTRIBUTE28,
+    ATTRIBUTE29,
+    ATTRIBUTE30,
+    CREATION_DATE,
+    CREATED_BY,
+    LAST_UPDATE_DATE,
+    LAST_UPDATED_BY,
+    LAST_UPDATE_LOGIN,
+    VIABILITY_DURATION,
+    DAYS,
+    HOURS,
+    MINUTES,
+    SECONDS,
+    CALC_UOM_CONV_IND,
+    TO_QTY_UOM
+  ) values (
+    X_ATTRIBUTE1,
+    X_ATTRIBUTE2,
+    X_MIN_VALUE_CHAR,
+    X_SPEC_ID,
+    X_TEST_ID,
+    X_TEST_METHOD_ID,
+    X_SEQ,
+    X_FROM_BASE_IND,
+    X_EXCLUDE_IND,
+    X_MODIFIED_IND,
+    X_TEST_QTY,
+    X_TEST_QTY_UOM,
+    X_MIN_VALUE_NUM,
+    X_TARGET_VALUE_NUM,
+    X_MAX_VALUE_NUM,
+    X_ATTRIBUTE5,
+    X_ATTRIBUTE6,
+    X_ATTRIBUTE7,
+    X_ATTRIBUTE8,
+    X_ATTRIBUTE9,
+    X_ATTRIBUTE10,
+    X_ATTRIBUTE11,
+    X_ATTRIBUTE12,
+    X_ATTRIBUTE13,
+    X_ATTRIBUTE14,
+    X_ATTRIBUTE15,
+    X_ATTRIBUTE16,
+    X_ATTRIBUTE17,
+    X_ATTRIBUTE18,
+    X_USE_TO_CONTROL_STEP,
+    X_PRINT_SPEC_IND,
+    X_PRINT_RESULT_IND,
+    X_TEXT_CODE,
+    X_ATTRIBUTE_CATEGORY,
+    X_ATTRIBUTE3,
+    X_RETEST_LOT_EXPIRY_IND,
+    X_ATTRIBUTE19,
+    X_ATTRIBUTE20,
+    X_MAX_VALUE_CHAR,
+    X_TEST_REPLICATE,
+    X_CHECK_RESULT_INTERVAL,
+    X_OUT_OF_SPEC_ACTION,
+    X_EXP_ERROR_TYPE,
+    X_BELOW_SPEC_MIN,
+    X_ABOVE_SPEC_MIN,
+    X_BELOW_SPEC_MAX,
+    X_ABOVE_SPEC_MAX,
+    X_BELOW_MIN_ACTION_CODE,
+    X_ABOVE_MIN_ACTION_CODE,
+    X_BELOW_MAX_ACTION_CODE,
+    X_ABOVE_MAX_ACTION_CODE,
+    X_OPTIONAL_IND,
+    X_DISPLAY_PRECISION,
+    X_REPORT_PRECISION,
+    X_TEST_PRIORITY,
+    X_PRINT_ON_COA_IND,
+    X_TARGET_VALUE_CHAR,
+    X_ATTRIBUTE4,
+    X_ATTRIBUTE21,
+    X_ATTRIBUTE22,
+    X_ATTRIBUTE23,
+    X_ATTRIBUTE24,
+    X_ATTRIBUTE25,
+    X_ATTRIBUTE26,
+    X_ATTRIBUTE27,
+    X_ATTRIBUTE28,
+    X_ATTRIBUTE29,
+    X_ATTRIBUTE30,
+    NVL(X_CREATION_DATE,SYSDATE),
+    NVL(X_CREATED_BY,FND_GLOBAL.USER_ID),
+    NVL(X_LAST_UPDATE_DATE,SYSDATE),
+    NVL(X_LAST_UPDATED_BY,FND_GLOBAL.USER_ID),
+    NVL(X_LAST_UPDATE_LOGIN,FND_GLOBAL.LOGIN_ID),
+    X_VIABILITY_DURATION,
+    X_TEST_EXPIRATION_DAYS,
+    X_TEST_EXPIRATION_HOURS,
+    X_TEST_EXPIRATION_MINUTES,
+    X_TEST_EXPIRATION_SECONDS,
+    X_CALC_UOM_CONV_IND,
+    X_TO_QTY_UOM
+  );
+
+  insert into GMD_SPEC_TESTS_TL (
+    CREATED_BY,
+    LAST_UPDATED_BY,
+    LAST_UPDATE_DATE,
+    LAST_UPDATE_LOGIN,
+    SPEC_ID,
+    TEST_ID,
+    TEST_DISPLAY,
+    CREATION_DATE,
+    LANGUAGE,
+    SOURCE_LANG
+  ) select
+    NVL(X_CREATED_BY,FND_GLOBAL.USER_ID),
+    NVL(X_LAST_UPDATED_BY,FND_GLOBAL.USER_ID),
+    NVL(X_LAST_UPDATE_DATE,SYSDATE),
+    NVL(X_LAST_UPDATE_LOGIN,FND_GLOBAL.LOGIN_ID),
+    X_SPEC_ID,
+    X_TEST_ID,
+    X_TEST_DISPLAY,
+    NVL(X_CREATION_DATE,SYSDATE),
+    L.LANGUAGE_CODE,
+    userenv('LANG')
+  from FND_LANGUAGES L
+  where L.INSTALLED_FLAG in ('I', 'B')
+  and not exists
+    (select NULL
+    from GMD_SPEC_TESTS_TL T
+    where T.SPEC_ID = X_SPEC_ID
+    and T.TEST_ID = X_TEST_ID
+    and T.LANGUAGE = L.LANGUAGE_CODE);
+
+  open c;
+  fetch c into X_ROWID;
+  if (c%notfound) then
+    close c;
+    raise no_data_found;
+  end if;
+  close c;
+
+end INSERT_ROW;
+
+procedure LOCK_ROW (
+  X_SPEC_ID in NUMBER,
+  X_TEST_ID in NUMBER,
+  X_ATTRIBUTE1 in VARCHAR2,
+  X_ATTRIBUTE2 in VARCHAR2,
+  X_MIN_VALUE_CHAR in VARCHAR2,
+  X_TEST_METHOD_ID in NUMBER,
+  X_SEQ in NUMBER,
+  X_FROM_BASE_IND in VARCHAR2,
+  X_EXCLUDE_IND in VARCHAR2,
+  X_MODIFIED_IND in VARCHAR2,
+  X_TEST_QTY in NUMBER,
+  X_TEST_QTY_UOM in VARCHAR2,
+  X_MIN_VALUE_NUM in NUMBER,
+  X_TARGET_VALUE_NUM in NUMBER,
+  X_MAX_VALUE_NUM in NUMBER,
+  X_ATTRIBUTE5 in VARCHAR2,
+  X_ATTRIBUTE6 in VARCHAR2,
+  X_ATTRIBUTE7 in VARCHAR2,
+  X_ATTRIBUTE8 in VARCHAR2,
+  X_ATTRIBUTE9 in VARCHAR2,
+  X_ATTRIBUTE10 in VARCHAR2,
+  X_ATTRIBUTE11 in VARCHAR2,
+  X_ATTRIBUTE12 in VARCHAR2,
+  X_ATTRIBUTE13 in VARCHAR2,
+  X_ATTRIBUTE14 in VARCHAR2,
+  X_ATTRIBUTE15 in VARCHAR2,
+  X_ATTRIBUTE16 in VARCHAR2,
+  X_ATTRIBUTE17 in VARCHAR2,
+  X_ATTRIBUTE18 in VARCHAR2,
+  X_USE_TO_CONTROL_STEP in VARCHAR2,
+  X_PRINT_SPEC_IND in VARCHAR2,
+  X_PRINT_RESULT_IND in VARCHAR2,
+  X_TEXT_CODE in NUMBER,
+  X_ATTRIBUTE_CATEGORY in VARCHAR2,
+  X_ATTRIBUTE3 in VARCHAR2,
+  X_RETEST_LOT_EXPIRY_IND in VARCHAR2,
+  X_ATTRIBUTE19 in VARCHAR2,
+  X_ATTRIBUTE20 in VARCHAR2,
+  X_MAX_VALUE_CHAR in VARCHAR2,
+  X_TEST_REPLICATE in NUMBER,
+  X_CHECK_RESULT_INTERVAL in NUMBER,
+  X_OUT_OF_SPEC_ACTION in VARCHAR2,
+  X_EXP_ERROR_TYPE in VARCHAR2,
+  X_BELOW_SPEC_MIN in NUMBER,
+  X_ABOVE_SPEC_MIN in NUMBER,
+  X_BELOW_SPEC_MAX in NUMBER,
+  X_ABOVE_SPEC_MAX in NUMBER,
+  X_BELOW_MIN_ACTION_CODE in VARCHAR2,
+  X_ABOVE_MIN_ACTION_CODE in VARCHAR2,
+  X_BELOW_MAX_ACTION_CODE in VARCHAR2,
+  X_ABOVE_MAX_ACTION_CODE in VARCHAR2,
+  X_OPTIONAL_IND in VARCHAR2,
+  X_DISPLAY_PRECISION in NUMBER,
+  X_REPORT_PRECISION in NUMBER,
+  X_TEST_PRIORITY in VARCHAR2,
+  X_PRINT_ON_COA_IND in VARCHAR2,
+  X_TARGET_VALUE_CHAR in VARCHAR2,
+  X_ATTRIBUTE4 in VARCHAR2,
+  X_ATTRIBUTE21 in VARCHAR2,
+  X_ATTRIBUTE22 in VARCHAR2,
+  X_ATTRIBUTE23 in VARCHAR2,
+  X_ATTRIBUTE24 in VARCHAR2,
+  X_ATTRIBUTE25 in VARCHAR2,
+  X_ATTRIBUTE26 in VARCHAR2,
+  X_ATTRIBUTE27 in VARCHAR2,
+  X_ATTRIBUTE28 in VARCHAR2,
+  X_ATTRIBUTE29 in VARCHAR2,
+  X_ATTRIBUTE30 in VARCHAR2,
+  X_TEST_DISPLAY in VARCHAR2,
+  X_VIABILITY_DURATION in number,
+  X_TEST_EXPIRATION_DAYS in number,
+  X_TEST_EXPIRATION_HOURS in number,
+  X_TEST_EXPIRATION_MINUTES in number,
+  X_TEST_EXPIRATION_SECONDS in number,
+  X_CALC_UOM_CONV_IND in VARCHAR2,
+  X_TO_QTY_UOM in VARCHAR2
+) is
+  cursor c is select
+      ATTRIBUTE1,
+      ATTRIBUTE2,
+      MIN_VALUE_CHAR,
+      TEST_METHOD_ID,
+      SEQ,
+      FROM_BASE_IND,
+      EXCLUDE_IND,
+      MODIFIED_IND,
+      TEST_QTY,
+      TEST_QTY_UOM,
+      MIN_VALUE_NUM,
+      TARGET_VALUE_NUM,
+      MAX_VALUE_NUM,
+      ATTRIBUTE5,
+      ATTRIBUTE6,
+      ATTRIBUTE7,
+      ATTRIBUTE8,
+      ATTRIBUTE9,
+      ATTRIBUTE10,
+      ATTRIBUTE11,
+      ATTRIBUTE12,
+      ATTRIBUTE13,
+      ATTRIBUTE14,
+      ATTRIBUTE15,
+      ATTRIBUTE16,
+      ATTRIBUTE17,
+      ATTRIBUTE18,
+      USE_TO_CONTROL_STEP,
+      PRINT_SPEC_IND,
+      PRINT_RESULT_IND,
+      TEXT_CODE,
+      ATTRIBUTE_CATEGORY,
+      ATTRIBUTE3,
+      RETEST_LOT_EXPIRY_IND,
+      ATTRIBUTE19,
+      ATTRIBUTE20,
+      MAX_VALUE_CHAR,
+      TEST_REPLICATE,
+      CHECK_RESULT_INTERVAL,
+      OUT_OF_SPEC_ACTION,
+      EXP_ERROR_TYPE,
+      BELOW_SPEC_MIN,
+      ABOVE_SPEC_MIN,
+      BELOW_SPEC_MAX,
+      ABOVE_SPEC_MAX,
+      BELOW_MIN_ACTION_CODE,
+      ABOVE_MIN_ACTION_CODE,
+      BELOW_MAX_ACTION_CODE,
+      ABOVE_MAX_ACTION_CODE,
+      OPTIONAL_IND,
+      DISPLAY_PRECISION,
+      REPORT_PRECISION,
+      TEST_PRIORITY,
+      PRINT_ON_COA_IND,
+      TARGET_VALUE_CHAR,
+      ATTRIBUTE4,
+      ATTRIBUTE21,
+      ATTRIBUTE22,
+      ATTRIBUTE23,
+      ATTRIBUTE24,
+      ATTRIBUTE25,
+      ATTRIBUTE26,
+      ATTRIBUTE27,
+      ATTRIBUTE28,
+      ATTRIBUTE29,
+      ATTRIBUTE30,
+      VIABILITY_DURATION,
+      DAYS,
+      HOURS,
+      MINUTES,
+      SECONDS,
+      CALC_UOM_CONV_IND,
+      TO_QTY_UOM
+    from GMD_SPEC_TESTS_B
+    where SPEC_ID = X_SPEC_ID
+    and TEST_ID = X_TEST_ID
+    for update of SPEC_ID nowait;
+  recinfo c%rowtype;
+
+  cursor c1 is select
+      TEST_DISPLAY,
+      decode(LANGUAGE, userenv('LANG'), 'Y', 'N') BASELANG
+    from GMD_SPEC_TESTS_TL
+    where SPEC_ID = X_SPEC_ID
+    and TEST_ID = X_TEST_ID
+    and userenv('LANG') in (LANGUAGE, SOURCE_LANG)
+    for update of SPEC_ID nowait;
+begin
+  open c;
+  fetch c into recinfo;
+  if (c%notfound) then
+    close c;
+    fnd_message.set_name('FND', 'FORM_RECORD_DELETED');
+    app_exception.raise_exception;
+  end if;
+  close c;
+  if (    ((recinfo.ATTRIBUTE1 = X_ATTRIBUTE1)
+           OR ((recinfo.ATTRIBUTE1 is null) AND (X_ATTRIBUTE1 is null)))
+      AND ((recinfo.ATTRIBUTE2 = X_ATTRIBUTE2)
+           OR ((recinfo.ATTRIBUTE2 is null) AND (X_ATTRIBUTE2 is null)))
+      AND ((recinfo.MIN_VALUE_CHAR = X_MIN_VALUE_CHAR)
+           OR ((recinfo.MIN_VALUE_CHAR is null) AND (X_MIN_VALUE_CHAR is null)))
+      AND (recinfo.TEST_METHOD_ID = X_TEST_METHOD_ID)
+      AND (recinfo.SEQ = X_SEQ)
+      AND ((recinfo.FROM_BASE_IND = X_FROM_BASE_IND)
+           OR ((recinfo.FROM_BASE_IND is null) AND (X_FROM_BASE_IND is null)))
+      AND ((recinfo.EXCLUDE_IND = X_EXCLUDE_IND)
+           OR ((recinfo.EXCLUDE_IND is null) AND (X_EXCLUDE_IND is null)))
+      AND ((recinfo.MODIFIED_IND = X_MODIFIED_IND)
+           OR ((recinfo.MODIFIED_IND is null) AND (X_MODIFIED_IND is null)))
+      AND ((recinfo.TEST_QTY = X_TEST_QTY)
+           OR ((recinfo.TEST_QTY is null) AND (X_TEST_QTY is null)))
+      AND ((recinfo.TEST_QTY_UOM = X_TEST_QTY_UOM)
+           OR ((recinfo.TEST_QTY_UOM is null) AND (X_TEST_QTY_UOM is null)))
+      AND ((recinfo.MIN_VALUE_NUM = X_MIN_VALUE_NUM)
+           OR ((recinfo.MIN_VALUE_NUM is null) AND (X_MIN_VALUE_NUM is null)))
+      AND ((recinfo.TARGET_VALUE_NUM = X_TARGET_VALUE_NUM)
+           OR ((recinfo.TARGET_VALUE_NUM is null) AND (X_TARGET_VALUE_NUM is null)))
+      AND ((recinfo.MAX_VALUE_NUM = X_MAX_VALUE_NUM)
+           OR ((recinfo.MAX_VALUE_NUM is null) AND (X_MAX_VALUE_NUM is null)))
+      AND ((recinfo.ATTRIBUTE5 = X_ATTRIBUTE5)
+           OR ((recinfo.ATTRIBUTE5 is null) AND (X_ATTRIBUTE5 is null)))
+      AND ((recinfo.ATTRIBUTE6 = X_ATTRIBUTE6)
+           OR ((recinfo.ATTRIBUTE6 is null) AND (X_ATTRIBUTE6 is null)))
+      AND ((recinfo.ATTRIBUTE7 = X_ATTRIBUTE7)
+           OR ((recinfo.ATTRIBUTE7 is null) AND (X_ATTRIBUTE7 is null)))
+      AND ((recinfo.ATTRIBUTE8 = X_ATTRIBUTE8)
+           OR ((recinfo.ATTRIBUTE8 is null) AND (X_ATTRIBUTE8 is null)))
+      AND ((recinfo.ATTRIBUTE9 = X_ATTRIBUTE9)
+           OR ((recinfo.ATTRIBUTE9 is null) AND (X_ATTRIBUTE9 is null)))
+      AND ((recinfo.ATTRIBUTE10 = X_ATTRIBUTE10)
+           OR ((recinfo.ATTRIBUTE10 is null) AND (X_ATTRIBUTE10 is null)))
+      AND ((recinfo.ATTRIBUTE11 = X_ATTRIBUTE11)
+           OR ((recinfo.ATTRIBUTE11 is null) AND (X_ATTRIBUTE11 is null)))
+      AND ((recinfo.ATTRIBUTE12 = X_ATTRIBUTE12)
+           OR ((recinfo.ATTRIBUTE12 is null) AND (X_ATTRIBUTE12 is null)))
+      AND ((recinfo.ATTRIBUTE13 = X_ATTRIBUTE13)
+           OR ((recinfo.ATTRIBUTE13 is null) AND (X_ATTRIBUTE13 is null)))
+      AND ((recinfo.ATTRIBUTE14 = X_ATTRIBUTE14)
+           OR ((recinfo.ATTRIBUTE14 is null) AND (X_ATTRIBUTE14 is null)))
+      AND ((recinfo.ATTRIBUTE15 = X_ATTRIBUTE15)
+           OR ((recinfo.ATTRIBUTE15 is null) AND (X_ATTRIBUTE15 is null)))
+      AND ((recinfo.ATTRIBUTE16 = X_ATTRIBUTE16)
+           OR ((recinfo.ATTRIBUTE16 is null) AND (X_ATTRIBUTE16 is null)))
+      AND ((recinfo.ATTRIBUTE17 = X_ATTRIBUTE17)
+           OR ((recinfo.ATTRIBUTE17 is null) AND (X_ATTRIBUTE17 is null)))
+      AND ((recinfo.ATTRIBUTE18 = X_ATTRIBUTE18)
+           OR ((recinfo.ATTRIBUTE18 is null) AND (X_ATTRIBUTE18 is null)))
+      AND ((recinfo.USE_TO_CONTROL_STEP = X_USE_TO_CONTROL_STEP)
+           OR ((recinfo.USE_TO_CONTROL_STEP is null) AND (X_USE_TO_CONTROL_STEP is null)))
+      AND ((recinfo.PRINT_SPEC_IND = X_PRINT_SPEC_IND)
+           OR ((recinfo.PRINT_SPEC_IND is null) AND (X_PRINT_SPEC_IND is null)))
+      AND ((recinfo.PRINT_RESULT_IND = X_PRINT_RESULT_IND)
+           OR ((recinfo.PRINT_RESULT_IND is null) AND (X_PRINT_RESULT_IND is null)))
+      AND ((recinfo.TEXT_CODE = X_TEXT_CODE)
+           OR ((recinfo.TEXT_CODE is null) AND (X_TEXT_CODE is null)))
+      AND ((recinfo.ATTRIBUTE_CATEGORY = X_ATTRIBUTE_CATEGORY)
+           OR ((recinfo.ATTRIBUTE_CATEGORY is null) AND (X_ATTRIBUTE_CATEGORY is null)))
+      AND ((recinfo.ATTRIBUTE3 = X_ATTRIBUTE3)
+           OR ((recinfo.ATTRIBUTE3 is null) AND (X_ATTRIBUTE3 is null)))
+      AND ((recinfo.RETEST_LOT_EXPIRY_IND = X_RETEST_LOT_EXPIRY_IND)
+           OR ((recinfo.RETEST_LOT_EXPIRY_IND is null) AND (X_RETEST_LOT_EXPIRY_IND is null)))
+      AND ((recinfo.ATTRIBUTE19 = X_ATTRIBUTE19)
+           OR ((recinfo.ATTRIBUTE19 is null) AND (X_ATTRIBUTE19 is null)))
+      AND ((recinfo.ATTRIBUTE20 = X_ATTRIBUTE20)
+           OR ((recinfo.ATTRIBUTE20 is null) AND (X_ATTRIBUTE20 is null)))
+      AND ((recinfo.MAX_VALUE_CHAR = X_MAX_VALUE_CHAR)
+           OR ((recinfo.MAX_VALUE_CHAR is null) AND (X_MAX_VALUE_CHAR is null)))
+      AND (recinfo.TEST_REPLICATE = X_TEST_REPLICATE)
+      AND ((recinfo.CHECK_RESULT_INTERVAL = X_CHECK_RESULT_INTERVAL)
+           OR ((recinfo.CHECK_RESULT_INTERVAL is null) AND (X_CHECK_RESULT_INTERVAL is null)))
+      AND ((recinfo.OUT_OF_SPEC_ACTION = X_OUT_OF_SPEC_ACTION)
+           OR ((recinfo.OUT_OF_SPEC_ACTION is null) AND (X_OUT_OF_SPEC_ACTION is null)))
+      AND ((recinfo.EXP_ERROR_TYPE = X_EXP_ERROR_TYPE)
+           OR ((recinfo.EXP_ERROR_TYPE is null) AND (X_EXP_ERROR_TYPE is null)))
+      AND ((recinfo.BELOW_SPEC_MIN = X_BELOW_SPEC_MIN)
+           OR ((recinfo.BELOW_SPEC_MIN is null) AND (X_BELOW_SPEC_MIN is null)))
+      AND ((recinfo.ABOVE_SPEC_MIN = X_ABOVE_SPEC_MIN)
+           OR ((recinfo.ABOVE_SPEC_MIN is null) AND (X_ABOVE_SPEC_MIN is null)))
+      AND ((recinfo.BELOW_SPEC_MAX = X_BELOW_SPEC_MAX)
+           OR ((recinfo.BELOW_SPEC_MAX is null) AND (X_BELOW_SPEC_MAX is null)))
+      AND ((recinfo.ABOVE_SPEC_MAX = X_ABOVE_SPEC_MAX)
+           OR ((recinfo.ABOVE_SPEC_MAX is null) AND (X_ABOVE_SPEC_MAX is null)))
+      AND ((recinfo.BELOW_MIN_ACTION_CODE = X_BELOW_MIN_ACTION_CODE)
+           OR ((recinfo.BELOW_MIN_ACTION_CODE is null) AND (X_BELOW_MIN_ACTION_CODE is null)))
+      AND ((recinfo.ABOVE_MIN_ACTION_CODE = X_ABOVE_MIN_ACTION_CODE)
+           OR ((recinfo.ABOVE_MIN_ACTION_CODE is null) AND (X_ABOVE_MIN_ACTION_CODE is null)))
+      AND ((recinfo.BELOW_MAX_ACTION_CODE = X_BELOW_MAX_ACTION_CODE)
+           OR ((recinfo.BELOW_MAX_ACTION_CODE is null) AND (X_BELOW_MAX_ACTION_CODE is null)))
+      AND ((recinfo.ABOVE_MAX_ACTION_CODE = X_ABOVE_MAX_ACTION_CODE)
+           OR ((recinfo.ABOVE_MAX_ACTION_CODE is null) AND (X_ABOVE_MAX_ACTION_CODE is null)))
+      AND ((recinfo.OPTIONAL_IND = X_OPTIONAL_IND)
+           OR ((recinfo.OPTIONAL_IND is null) AND (X_OPTIONAL_IND is null)))
+      AND ((recinfo.DISPLAY_PRECISION = X_DISPLAY_PRECISION)
+           OR ((recinfo.DISPLAY_PRECISION is null) AND (X_DISPLAY_PRECISION is null)))
+      AND ((recinfo.REPORT_PRECISION = X_REPORT_PRECISION)
+           OR ((recinfo.REPORT_PRECISION is null) AND (X_REPORT_PRECISION is null)))
+      AND (recinfo.TEST_PRIORITY = X_TEST_PRIORITY)
+      --AND ((recinfo.PRINT_ON_COA_IND = X_PRINT_ON_COA_IND)
+        --   OR ((recinfo.PRINT_ON_COA_IND is null) AND (X_PRINT_ON_COA_IND is null)))
+      AND ((recinfo.TARGET_VALUE_CHAR = X_TARGET_VALUE_CHAR)
+           OR ((recinfo.TARGET_VALUE_CHAR is null) AND (X_TARGET_VALUE_CHAR is null)))
+      AND ((recinfo.ATTRIBUTE4 = X_ATTRIBUTE4)
+           OR ((recinfo.ATTRIBUTE4 is null) AND (X_ATTRIBUTE4 is null)))
+      AND ((recinfo.ATTRIBUTE21 = X_ATTRIBUTE21)
+           OR ((recinfo.ATTRIBUTE21 is null) AND (X_ATTRIBUTE21 is null)))
+      AND ((recinfo.ATTRIBUTE22 = X_ATTRIBUTE22)
+           OR ((recinfo.ATTRIBUTE22 is null) AND (X_ATTRIBUTE22 is null)))
+      AND ((recinfo.ATTRIBUTE23 = X_ATTRIBUTE23)
+           OR ((recinfo.ATTRIBUTE23 is null) AND (X_ATTRIBUTE23 is null)))
+      AND ((recinfo.ATTRIBUTE24 = X_ATTRIBUTE24)
+           OR ((recinfo.ATTRIBUTE24 is null) AND (X_ATTRIBUTE24 is null)))
+      AND ((recinfo.ATTRIBUTE25 = X_ATTRIBUTE25)
+           OR ((recinfo.ATTRIBUTE25 is null) AND (X_ATTRIBUTE25 is null)))
+      AND ((recinfo.ATTRIBUTE26 = X_ATTRIBUTE26)
+           OR ((recinfo.ATTRIBUTE26 is null) AND (X_ATTRIBUTE26 is null)))
+      AND ((recinfo.ATTRIBUTE27 = X_ATTRIBUTE27)
+           OR ((recinfo.ATTRIBUTE27 is null) AND (X_ATTRIBUTE27 is null)))
+      AND ((recinfo.ATTRIBUTE28 = X_ATTRIBUTE28)
+           OR ((recinfo.ATTRIBUTE28 is null) AND (X_ATTRIBUTE28 is null)))
+      AND ((recinfo.ATTRIBUTE29 = X_ATTRIBUTE29)
+           OR ((recinfo.ATTRIBUTE29 is null) AND (X_ATTRIBUTE29 is null)))
+      AND ((recinfo.ATTRIBUTE30 = X_ATTRIBUTE30)
+           OR ((recinfo.ATTRIBUTE30 is null) AND (X_ATTRIBUTE30 is null)))
+      /*AND ((recinfo.VIABILITY_DURATION = X_VIABILITY_DURATION)
+           OR ((recinfo.VIABILITY_DURATION is null) AND (X_VIABILITY_DURATION is null)))
+      AND ((recinfo.DAYS = X_TEST_EXPIRATION_DAYS)
+           OR ((recinfo.DAYS is null) AND (X_TEST_EXPIRATION_DAYS is null)))
+      AND ((recinfo.HOURS = X_TEST_EXPIRATION_HOURS)
+           OR ((recinfo.HOURS is null) AND (X_TEST_EXPIRATION_HOURS is null)))
+      AND ((recinfo.MINUTES = X_TEST_EXPIRATION_MINUTES)
+           OR ((recinfo.MINUTES is null) AND (X_TEST_EXPIRATION_MINUTES is null)))
+      AND ((recinfo.SECONDS = X_TEST_EXPIRATION_SECONDS)
+           OR ((recinfo.SECONDS is null) AND (X_TEST_EXPIRATION_SECONDS is null)) )*/
+      AND ((recinfo.CALC_UOM_CONV_IND = X_CALC_UOM_CONV_IND)
+           OR ((recinfo.CALC_UOM_CONV_IND is null) AND (X_CALC_UOM_CONV_IND is null)))
+      AND ((recinfo.TO_QTY_UOM = X_TO_QTY_UOM)
+           OR ((recinfo.TO_QTY_UOM is null) AND (X_TO_QTY_UOM is null)))
+
+  ) then
+    null;
+  else
+    fnd_message.set_name('FND', 'FORM_RECORD_CHANGED');
+    app_exception.raise_exception;
+  end if;
+
+  for tlinfo in c1 loop
+    if (tlinfo.BASELANG = 'Y') then
+      if (    ((tlinfo.TEST_DISPLAY = X_TEST_DISPLAY)
+               OR ((tlinfo.TEST_DISPLAY is null) AND (X_TEST_DISPLAY is null)))
+      ) then
+        null;
+      else
+        fnd_message.set_name('FND', 'FORM_RECORD_CHANGED');
+        app_exception.raise_exception;
+      end if;
+    end if;
+  end loop;
+  return;
+end LOCK_ROW;
+
+
+procedure UPDATE_ROW (
+  X_SPEC_ID in NUMBER,
+  X_TEST_ID in NUMBER,
+  X_ATTRIBUTE1 in VARCHAR2,
+  X_ATTRIBUTE2 in VARCHAR2,
+  X_MIN_VALUE_CHAR in VARCHAR2,
+  X_TEST_METHOD_ID in NUMBER,
+  X_SEQ in NUMBER,
+  X_FROM_BASE_IND in VARCHAR2,
+  X_EXCLUDE_IND in VARCHAR2,
+  X_MODIFIED_IND in VARCHAR2,
+  X_TEST_QTY in NUMBER,
+  X_TEST_QTY_UOM in VARCHAR2,
+  X_MIN_VALUE_NUM in NUMBER,
+  X_TARGET_VALUE_NUM in NUMBER,
+  X_MAX_VALUE_NUM in NUMBER,
+  X_ATTRIBUTE5 in VARCHAR2,
+  X_ATTRIBUTE6 in VARCHAR2,
+  X_ATTRIBUTE7 in VARCHAR2,
+  X_ATTRIBUTE8 in VARCHAR2,
+  X_ATTRIBUTE9 in VARCHAR2,
+  X_ATTRIBUTE10 in VARCHAR2,
+  X_ATTRIBUTE11 in VARCHAR2,
+  X_ATTRIBUTE12 in VARCHAR2,
+  X_ATTRIBUTE13 in VARCHAR2,
+  X_ATTRIBUTE14 in VARCHAR2,
+  X_ATTRIBUTE15 in VARCHAR2,
+  X_ATTRIBUTE16 in VARCHAR2,
+  X_ATTRIBUTE17 in VARCHAR2,
+  X_ATTRIBUTE18 in VARCHAR2,
+  X_USE_TO_CONTROL_STEP in VARCHAR2,
+  X_PRINT_SPEC_IND in VARCHAR2,
+  X_PRINT_RESULT_IND in VARCHAR2,
+  X_TEXT_CODE in NUMBER,
+  X_ATTRIBUTE_CATEGORY in VARCHAR2,
+  X_ATTRIBUTE3 in VARCHAR2,
+  X_RETEST_LOT_EXPIRY_IND in VARCHAR2,
+  X_ATTRIBUTE19 in VARCHAR2,
+  X_ATTRIBUTE20 in VARCHAR2,
+  X_MAX_VALUE_CHAR in VARCHAR2,
+  X_TEST_REPLICATE in NUMBER,
+  X_CHECK_RESULT_INTERVAL in NUMBER,
+  X_OUT_OF_SPEC_ACTION in VARCHAR2,
+  X_EXP_ERROR_TYPE in VARCHAR2,
+  X_BELOW_SPEC_MIN in NUMBER,
+  X_ABOVE_SPEC_MIN in NUMBER,
+  X_BELOW_SPEC_MAX in NUMBER,
+  X_ABOVE_SPEC_MAX in NUMBER,
+  X_BELOW_MIN_ACTION_CODE in VARCHAR2,
+  X_ABOVE_MIN_ACTION_CODE in VARCHAR2,
+  X_BELOW_MAX_ACTION_CODE in VARCHAR2,
+  X_ABOVE_MAX_ACTION_CODE in VARCHAR2,
+  X_OPTIONAL_IND in VARCHAR2,
+  X_DISPLAY_PRECISION in NUMBER,
+  X_REPORT_PRECISION in NUMBER,
+  X_TEST_PRIORITY in VARCHAR2,
+  X_PRINT_ON_COA_IND in VARCHAR2,
+  X_TARGET_VALUE_CHAR in VARCHAR2,
+  X_ATTRIBUTE4 in VARCHAR2,
+  X_ATTRIBUTE21 in VARCHAR2,
+  X_ATTRIBUTE22 in VARCHAR2,
+  X_ATTRIBUTE23 in VARCHAR2,
+  X_ATTRIBUTE24 in VARCHAR2,
+  X_ATTRIBUTE25 in VARCHAR2,
+  X_ATTRIBUTE26 in VARCHAR2,
+  X_ATTRIBUTE27 in VARCHAR2,
+  X_ATTRIBUTE28 in VARCHAR2,
+  X_ATTRIBUTE29 in VARCHAR2,
+  X_ATTRIBUTE30 in VARCHAR2,
+  X_TEST_DISPLAY in VARCHAR2,
+  X_LAST_UPDATE_DATE in DATE,
+  X_LAST_UPDATED_BY in NUMBER,
+  X_LAST_UPDATE_LOGIN in NUMBER,
+  X_VIABILITY_DURATION in number,
+  X_TEST_EXPIRATION_DAYS in number,
+  X_TEST_EXPIRATION_HOURS in number,
+  X_TEST_EXPIRATION_MINUTES in number,
+  X_TEST_EXPIRATION_SECONDS in number,
+  X_CALC_UOM_CONV_IND in VARCHAR2,
+  X_TO_QTY_UOM in VARCHAR2
+) is
+begin
+  update GMD_SPEC_TESTS_B set
+    ATTRIBUTE1 = X_ATTRIBUTE1,
+    ATTRIBUTE2 = X_ATTRIBUTE2,
+    MIN_VALUE_CHAR = X_MIN_VALUE_CHAR,
+    TEST_METHOD_ID = X_TEST_METHOD_ID,
+    SEQ = X_SEQ,
+    FROM_BASE_IND = X_FROM_BASE_IND,
+    EXCLUDE_IND = X_EXCLUDE_IND,
+    MODIFIED_IND = X_MODIFIED_IND,
+    TEST_QTY = X_TEST_QTY,
+    TEST_QTY_UOM = X_TEST_QTY_UOM,
+    MIN_VALUE_NUM = X_MIN_VALUE_NUM,
+    TARGET_VALUE_NUM = X_TARGET_VALUE_NUM,
+    MAX_VALUE_NUM = X_MAX_VALUE_NUM,
+    ATTRIBUTE5 = X_ATTRIBUTE5,
+    ATTRIBUTE6 = X_ATTRIBUTE6,
+    ATTRIBUTE7 = X_ATTRIBUTE7,
+    ATTRIBUTE8 = X_ATTRIBUTE8,
+    ATTRIBUTE9 = X_ATTRIBUTE9,
+    ATTRIBUTE10 = X_ATTRIBUTE10,
+    ATTRIBUTE11 = X_ATTRIBUTE11,
+    ATTRIBUTE12 = X_ATTRIBUTE12,
+    ATTRIBUTE13 = X_ATTRIBUTE13,
+    ATTRIBUTE14 = X_ATTRIBUTE14,
+    ATTRIBUTE15 = X_ATTRIBUTE15,
+    ATTRIBUTE16 = X_ATTRIBUTE16,
+    ATTRIBUTE17 = X_ATTRIBUTE17,
+    ATTRIBUTE18 = X_ATTRIBUTE18,
+    USE_TO_CONTROL_STEP = X_USE_TO_CONTROL_STEP,
+    PRINT_SPEC_IND = X_PRINT_SPEC_IND,
+    PRINT_RESULT_IND = X_PRINT_RESULT_IND,
+    TEXT_CODE = X_TEXT_CODE,
+    ATTRIBUTE_CATEGORY = X_ATTRIBUTE_CATEGORY,
+    ATTRIBUTE3 = X_ATTRIBUTE3,
+    RETEST_LOT_EXPIRY_IND = X_RETEST_LOT_EXPIRY_IND,
+    ATTRIBUTE19 = X_ATTRIBUTE19,
+    ATTRIBUTE20 = X_ATTRIBUTE20,
+    MAX_VALUE_CHAR = X_MAX_VALUE_CHAR,
+    TEST_REPLICATE = X_TEST_REPLICATE,
+    CHECK_RESULT_INTERVAL = X_CHECK_RESULT_INTERVAL,
+    OUT_OF_SPEC_ACTION = X_OUT_OF_SPEC_ACTION,
+    EXP_ERROR_TYPE = X_EXP_ERROR_TYPE,
+    BELOW_SPEC_MIN = X_BELOW_SPEC_MIN,
+    ABOVE_SPEC_MIN = X_ABOVE_SPEC_MIN,
+    BELOW_SPEC_MAX = X_BELOW_SPEC_MAX,
+    ABOVE_SPEC_MAX = X_ABOVE_SPEC_MAX,
+    BELOW_MIN_ACTION_CODE = X_BELOW_MIN_ACTION_CODE,
+    ABOVE_MIN_ACTION_CODE = X_ABOVE_MIN_ACTION_CODE,
+    BELOW_MAX_ACTION_CODE = X_BELOW_MAX_ACTION_CODE,
+    ABOVE_MAX_ACTION_CODE = X_ABOVE_MAX_ACTION_CODE,
+    OPTIONAL_IND = X_OPTIONAL_IND,
+    DISPLAY_PRECISION = X_DISPLAY_PRECISION,
+    REPORT_PRECISION = X_REPORT_PRECISION,
+    TEST_PRIORITY = X_TEST_PRIORITY,
+    PRINT_ON_COA_IND = X_PRINT_ON_COA_IND,
+    TARGET_VALUE_CHAR = X_TARGET_VALUE_CHAR,
+    ATTRIBUTE4 = X_ATTRIBUTE4,
+    ATTRIBUTE21 = X_ATTRIBUTE21,
+    ATTRIBUTE22 = X_ATTRIBUTE22,
+    ATTRIBUTE23 = X_ATTRIBUTE23,
+    ATTRIBUTE24 = X_ATTRIBUTE24,
+    ATTRIBUTE25 = X_ATTRIBUTE25,
+    ATTRIBUTE26 = X_ATTRIBUTE26,
+    ATTRIBUTE27 = X_ATTRIBUTE27,
+    ATTRIBUTE28 = X_ATTRIBUTE28,
+    ATTRIBUTE29 = X_ATTRIBUTE29,
+    ATTRIBUTE30 = X_ATTRIBUTE30,
+    LAST_UPDATE_DATE =  NVL(X_LAST_UPDATE_DATE,SYSDATE),
+    LAST_UPDATED_BY =   NVL(X_LAST_UPDATED_BY,FND_GLOBAL.USER_ID),
+    LAST_UPDATE_LOGIN = NVL(X_LAST_UPDATE_LOGIN,FND_GLOBAL.LOGIN_ID),
+    VIABILITY_DURATION = X_VIABILITY_DURATION ,
+    DAYS = X_TEST_EXPIRATION_DAYS ,
+    HOURS = X_TEST_EXPIRATION_HOURS ,
+    MINUTES = X_TEST_EXPIRATION_MINUTES ,
+    SECONDS = X_TEST_EXPIRATION_SECONDS ,
+    CALC_UOM_CONV_IND = X_CALC_UOM_CONV_IND ,
+    TO_QTY_UOM = X_TO_QTY_UOM
+  where SPEC_ID = X_SPEC_ID
+  and TEST_ID = X_TEST_ID;
+
+  if (sql%notfound) then
+    raise no_data_found;
+  end if;
+
+  update GMD_SPEC_TESTS_TL set
+    TEST_DISPLAY = X_TEST_DISPLAY,
+    LAST_UPDATE_DATE =  NVL(X_LAST_UPDATE_DATE,SYSDATE),
+    LAST_UPDATED_BY =   NVL(X_LAST_UPDATED_BY,FND_GLOBAL.USER_ID),
+    LAST_UPDATE_LOGIN = NVL(X_LAST_UPDATE_LOGIN,FND_GLOBAL.LOGIN_ID),
+    SOURCE_LANG = userenv('LANG')
+  where SPEC_ID = X_SPEC_ID
+  and TEST_ID = X_TEST_ID
+  and userenv('LANG') in (LANGUAGE, SOURCE_LANG);
+
+  if (sql%notfound) then
+    raise no_data_found;
+  end if;
+end UPDATE_ROW;
+
+FUNCTION DELETE_ROW (
+  P_SPEC_ID in NUMBER,
+  P_TEST_ID in NUMBER
+) RETURN BOOLEAN  IS
+begin
+  IF p_spec_id IS NOT NULL and p_test_id IS NOT NULL THEN
+     delete from GMD_SPEC_TESTS_TL
+     where SPEC_ID = P_SPEC_ID
+     and TEST_ID = P_TEST_ID;
+
+     if (sql%notfound) then
+        raise no_data_found;
+     end if;
+
+     delete from GMD_SPEC_TESTS_B
+     where SPEC_ID = P_SPEC_ID
+     and TEST_ID = P_TEST_ID;
+
+     if (sql%notfound) then
+       raise no_data_found;
+     end if;
+  ELSE
+    gmd_api_pub.log_message('GMD_NO_KEYS','TABLE_NAME', 'GMD_SPEC_TESTS');
+    RETURN FALSE;
+  END IF;
+
+  RETURN TRUE;
+
+EXCEPTION
+ WHEN NO_DATA_FOUND
+   THEN
+     gmd_api_pub.log_message('GMD_NO_DATA_FOUND','TABLE_NAME', 'GMD_SPEC_TESTS');
+     RETURN FALSE;
+ WHEN OTHERS
+   THEN
+     gmd_api_pub.log_message('GMD_API_ERROR','PACKAGE','GMD_SPEC_TESTS_PVT.DELETE_ROW','ERROR',SUBSTR(SQLERRM,1,100),'POSITION','010');
+     RETURN FALSE;
+end DELETE_ROW;
+
+
+procedure ADD_LANGUAGE
+is
+begin
+  delete from GMD_SPEC_TESTS_TL T
+  where not exists
+    (select NULL
+    from GMD_SPEC_TESTS_B B
+    where B.SPEC_ID = T.SPEC_ID
+    and B.TEST_ID = T.TEST_ID
+    );
+
+  update GMD_SPEC_TESTS_TL T set (
+      TEST_DISPLAY
+    ) = (select
+      B.TEST_DISPLAY
+    from GMD_SPEC_TESTS_TL B
+    where B.SPEC_ID = T.SPEC_ID
+    and B.TEST_ID = T.TEST_ID
+    and B.LANGUAGE = T.SOURCE_LANG)
+  where (
+      T.SPEC_ID,
+      T.TEST_ID,
+      T.LANGUAGE
+  ) in (select
+      SUBT.SPEC_ID,
+      SUBT.TEST_ID,
+      SUBT.LANGUAGE
+    from GMD_SPEC_TESTS_TL SUBB, GMD_SPEC_TESTS_TL SUBT
+    where SUBB.SPEC_ID = SUBT.SPEC_ID
+    and SUBB.TEST_ID = SUBT.TEST_ID
+    and SUBB.LANGUAGE = SUBT.SOURCE_LANG
+    and (SUBB.TEST_DISPLAY <> SUBT.TEST_DISPLAY
+      or (SUBB.TEST_DISPLAY is null and SUBT.TEST_DISPLAY is not null)
+      or (SUBB.TEST_DISPLAY is not null and SUBT.TEST_DISPLAY is null)
+  ));
+
+  insert into GMD_SPEC_TESTS_TL (
+    CREATED_BY,
+    LAST_UPDATED_BY,
+    LAST_UPDATE_DATE,
+    LAST_UPDATE_LOGIN,
+    SPEC_ID,
+    TEST_ID,
+    TEST_DISPLAY,
+    CREATION_DATE,
+    LANGUAGE,
+    SOURCE_LANG
+  ) select
+    B.CREATED_BY,
+    B.LAST_UPDATED_BY,
+    B.LAST_UPDATE_DATE,
+    B.LAST_UPDATE_LOGIN,
+    B.SPEC_ID,
+    B.TEST_ID,
+    B.TEST_DISPLAY,
+    B.CREATION_DATE,
+    L.LANGUAGE_CODE,
+    B.SOURCE_LANG
+  from GMD_SPEC_TESTS_TL B, FND_LANGUAGES L
+  where L.INSTALLED_FLAG in ('I', 'B')
+  and B.LANGUAGE = userenv('LANG')
+  and not exists
+    (select NULL
+    from GMD_SPEC_TESTS_TL T
+    where T.SPEC_ID = B.SPEC_ID
+    and T.TEST_ID = B.TEST_ID
+    and T.LANGUAGE = L.LANGUAGE_CODE);
+end ADD_LANGUAGE;
+
+FUNCTION fetch_row (
+  p_spec_tests IN  gmd_spec_tests%ROWTYPE
+, x_spec_tests OUT NOCOPY gmd_spec_tests%ROWTYPE
+)
+RETURN BOOLEAN
+IS
+BEGIN
+  IF (p_spec_tests.spec_id IS NOT NULL) and (p_spec_tests.spec_id IS NOT NULL) THEN
+    SELECT *
+    INTO   x_spec_tests
+    FROM   gmd_spec_tests
+    WHERE  spec_id = p_spec_tests.spec_id and test_id = p_spec_tests.test_id;
+  ELSE
+    gmd_api_pub.log_message('GMD_NO_KEYS','TABLE_NAME', 'GMD_SPEC_TESTS');
+    RETURN FALSE;
+  END IF;
+RETURN TRUE;
+
+EXCEPTION
+ WHEN NO_DATA_FOUND
+   THEN
+     gmd_api_pub.log_message('GMD_NO_DATA_FOUND','TABLE_NAME', 'GMD_SPEC_TESTS');
+     RETURN FALSE;
+ WHEN OTHERS
+   THEN
+     fnd_msg_pub.add_exc_msg ('GMD_SPEC_TESTS_PVT', 'FETCH_ROW');
+     RETURN FALSE;
+
+END fetch_row;
+
+FUNCTION lock_row (
+  p_spec_id   IN  NUMBER   ,
+  p_test_id   IN  NUMBER
+)
+RETURN BOOLEAN
+IS
+  dummy       NUMBER;
+BEGIN
+
+  IF (p_spec_id IS NOT NULL) and (p_test_id is NOT NULL) THEN
+    SELECT spec_id
+    INTO   dummy
+    FROM   gmd_spec_tests_b
+    WHERE  spec_id = p_spec_id
+      AND  test_id = p_test_id
+    FOR UPDATE OF spec_id NOWAIT  ;
+  ELSE
+    gmd_api_pub.log_message('GMD_NO_KEYS','TABLE_NAME', 'GMD_SPEC_TESTS');
+    RETURN FALSE;
+  END IF;
+
+  RETURN TRUE;
+
+EXCEPTION
+ WHEN NO_DATA_FOUND
+   THEN
+     gmd_api_pub.log_message('GMD_NO_DATA_FOUND','TABLE_NAME', 'GMD_SPEC_TESTS');
+     RETURN FALSE;
+ WHEN OTHERS
+   THEN
+     gmd_api_pub.log_message('GMD_API_ERROR','PACKAGE','GMD_SPEC_TESTS_PVT.LOCK_ROW','ERROR',SUBSTR(SQLERRM,1,100),'POSITION','010');
+     RETURN FALSE;
+END lock_row;
+
+FUNCTION INSERT_ROW(p_spec_tests IN OUT NOCOPY GMD_SPEC_TESTS%ROWTYPE)
+RETURN BOOLEAN IS
+l_rowid ROWID ;
+BEGIN
+
+  GMD_SPEC_TESTS_PVT.INSERT_ROW(
+    X_ROWID => l_rowid,
+    X_SPEC_ID  => p_spec_tests.spec_id,
+    X_TEST_ID  => p_spec_tests.test_id,
+    X_TEST_METHOD_ID => p_spec_tests.test_method_id,
+    X_MIN_VALUE_CHAR => p_spec_tests.min_value_char,
+    X_MAX_VALUE_CHAR => p_spec_tests.max_value_char,
+    X_SEQ            => p_spec_tests.seq,
+    X_FROM_BASE_IND => p_spec_tests.from_base_ind,
+    X_EXCLUDE_IND => p_spec_tests.exclude_ind,
+    X_MODIFIED_IND => p_spec_tests.modified_ind,
+    X_TEST_QTY       => p_spec_tests.test_qty,
+    X_TEST_QTY_UOM       => p_spec_tests.TEST_QTY_UOM,
+    X_MIN_VALUE_NUM  => p_spec_tests.min_value_num,
+    X_MAX_VALUE_NUM  => p_spec_tests.max_value_num,
+    X_TARGET_VALUE_NUM => p_spec_tests.target_value_num,
+    X_USE_TO_CONTROL_STEP => p_spec_tests.use_to_control_step,
+    X_PRINT_SPEC_IND      => p_spec_tests.print_spec_ind,
+    X_PRINT_RESULT_IND    => p_spec_tests.print_result_ind,
+    X_RETEST_LOT_EXPIRY_IND => p_spec_tests.retest_lot_expiry_ind,
+    X_TEST_REPLICATE        => p_spec_tests.test_replicate,
+    X_CHECK_RESULT_INTERVAL => p_spec_tests.check_result_interval,
+    X_OUT_OF_SPEC_ACTION    => p_spec_tests.out_of_spec_action,
+    X_EXP_ERROR_TYPE        => p_spec_tests.exp_error_type,
+    X_BELOW_SPEC_MIN        => p_spec_tests.below_spec_min,
+    X_ABOVE_SPEC_MIN        => p_spec_tests.above_spec_min,
+    X_BELOW_SPEC_MAX        => p_spec_tests.below_spec_max,
+    X_ABOVE_SPEC_MAX        => p_spec_tests.above_spec_max,
+    X_BELOW_MIN_ACTION_CODE => p_spec_tests.below_min_action_code,
+    X_ABOVE_MIN_ACTION_CODE => p_spec_tests.above_min_action_code,
+    X_BELOW_MAX_ACTION_CODE => p_spec_tests.below_max_action_code,
+    X_ABOVE_MAX_ACTION_CODE => p_spec_tests.above_max_action_code,
+    X_OPTIONAL_IND          => p_spec_tests.optional_ind,
+    X_DISPLAY_PRECISION     => p_spec_tests.display_precision,
+    X_REPORT_PRECISION      => p_spec_tests.report_precision,
+    X_TEST_PRIORITY         => p_spec_tests.test_priority,
+    X_PRINT_ON_COA_IND      => p_spec_tests.print_on_coa_ind,
+    X_TARGET_VALUE_CHAR     => p_spec_tests.target_value_char,
+    X_TEST_DISPLAY          => p_spec_tests.test_display,
+    X_TEXT_CODE             => p_spec_tests.TEXT_CODE,
+    X_ATTRIBUTE_CATEGORY    => p_spec_tests.ATTRIBUTE_CATEGORY,
+    X_ATTRIBUTE1  => p_spec_tests.ATTRIBUTE1,
+    X_ATTRIBUTE2  => p_spec_tests.ATTRIBUTE2,
+    X_ATTRIBUTE3  => p_spec_tests.ATTRIBUTE3,
+    X_ATTRIBUTE4  => p_spec_tests.ATTRIBUTE4,
+    X_ATTRIBUTE5  => p_spec_tests.ATTRIBUTE5,
+    X_ATTRIBUTE6  => p_spec_tests.ATTRIBUTE6,
+    X_ATTRIBUTE7  => p_spec_tests.ATTRIBUTE7,
+    X_ATTRIBUTE8  => p_spec_tests.ATTRIBUTE8,
+    X_ATTRIBUTE9  => p_spec_tests.ATTRIBUTE9,
+    X_ATTRIBUTE10 => p_spec_tests.ATTRIBUTE10,
+    X_ATTRIBUTE11 => p_spec_tests.ATTRIBUTE11,
+    X_ATTRIBUTE12 => p_spec_tests.ATTRIBUTE12,
+    X_ATTRIBUTE13 => p_spec_tests.ATTRIBUTE13,
+    X_ATTRIBUTE14 => p_spec_tests.ATTRIBUTE14,
+    X_ATTRIBUTE15 => p_spec_tests.ATTRIBUTE15,
+    X_ATTRIBUTE16 => p_spec_tests.ATTRIBUTE16,
+    X_ATTRIBUTE17 => p_spec_tests.ATTRIBUTE17,
+    X_ATTRIBUTE18 => p_spec_tests.ATTRIBUTE18,
+    X_ATTRIBUTE19 => p_spec_tests.ATTRIBUTE19,
+    X_ATTRIBUTE20 => p_spec_tests.ATTRIBUTE20,
+    X_ATTRIBUTE21 => p_spec_tests.ATTRIBUTE21,
+    X_ATTRIBUTE22 => p_spec_tests.ATTRIBUTE22,
+    X_ATTRIBUTE23 => p_spec_tests.ATTRIBUTE23,
+    X_ATTRIBUTE24 => p_spec_tests.ATTRIBUTE24,
+    X_ATTRIBUTE25 => p_spec_tests.ATTRIBUTE25,
+    X_ATTRIBUTE26 => p_spec_tests.ATTRIBUTE26,
+    X_ATTRIBUTE27 => p_spec_tests.ATTRIBUTE27,
+    X_ATTRIBUTE28 => p_spec_tests.ATTRIBUTE28,
+    X_ATTRIBUTE29 => p_spec_tests.ATTRIBUTE29,
+    X_ATTRIBUTE30 => p_spec_tests.ATTRIBUTE30,
+    X_CREATION_DATE     => p_spec_tests.CREATION_DATE,
+    X_CREATED_BY        => p_spec_tests.CREATED_BY,
+    X_LAST_UPDATE_DATE  => p_spec_tests.LAST_UPDATE_DATE,
+    X_LAST_UPDATED_BY   => p_spec_tests.LAST_UPDATED_BY,
+    X_LAST_UPDATE_LOGIN => p_spec_tests.LAST_UPDATE_LOGIN,
+    X_VIABILITY_DURATION => p_spec_tests.VIABILITY_DURATION ,
+    X_TEST_EXPIRATION_DAYS => p_spec_tests.DAYS ,
+    X_TEST_EXPIRATION_HOURS => p_spec_tests.HOURS ,
+    X_TEST_EXPIRATION_MINUTES => p_spec_tests.MINUTES ,
+    X_TEST_EXPIRATION_SECONDS => p_spec_tests.SECONDS ,
+    X_CALC_UOM_CONV_IND => p_spec_tests.CALC_UOM_CONV_IND ,
+    X_TO_QTY_UOM => p_spec_tests.TO_QTY_UOM
+		);
+
+    return TRUE;
+
+EXCEPTION WHEN OTHERS THEN
+    gmd_api_pub.log_message('GMD_API_ERROR','PACKAGE','GMD_QC_TESTS_PVT.INSERT_ROW','ERROR',
+    SUBSTR(SQLERRM,1,100),'POSITION','010');
+RETURN FALSE;
+
+END INSERT_ROW;
+end GMD_SPEC_TESTS_PVT;
+
+/

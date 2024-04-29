@@ -1,0 +1,73 @@
+--------------------------------------------------------
+--  DDL for Package JTF_RS_GROUPS_AUD_PVT
+--------------------------------------------------------
+
+  CREATE OR REPLACE EDITIONABLE PACKAGE "APPS"."JTF_RS_GROUPS_AUD_PVT" AUTHID CURRENT_USER AS
+  /* $Header: jtfrsags.pls 120.0.12010000.2 2009/05/11 07:35:14 rgokavar ship $ */
+-- API Name	: JTF_RS_GROUPS_AUD_PVT
+-- Type		: Private
+-- Purpose	: Inserts IN  the JTF_RS_GROUPS_AUD_VL
+-- Modification History
+-- DATE		  NAME	        PURPOSE
+-- 17 Jan 2000    S Choudhury   Created
+-- Notes:
+--
+
+
+   /*FOR INSERT  */
+   PROCEDURE   INSERT_GROUP(
+    P_API_VERSION	    IN	NUMBER,
+    P_INIT_MSG_LIST         IN	VARCHAR2  DEFAULT FND_API.G_FALSE,
+    P_COMMIT		    IN	VARCHAR2  DEFAULT FND_API.G_FALSE,
+    P_GROUP_ID              IN  NUMBER,
+    P_GROUP_NUMBER          IN  VARCHAR2,
+    P_EMAIL_ADDRESS         IN  VARCHAR2,
+    P_START_DATE_ACTIVE     IN  DATE,
+    P_END_DATE_ACTIVE       IN  DATE,
+    P_ACCOUNTING_CODE       IN  VARCHAR2,
+    P_EXCLUSIVE_FLAG        IN  VARCHAR2,
+    P_GROUP_NAME            IN  VARCHAR2,
+    P_GROUP_DESC            IN  VARCHAR2,
+    P_OBJECT_VERSION_NUMBER  IN  NUMBER,
+    X_RETURN_STATUS         OUT NOCOPY VARCHAR2,
+    X_MSG_COUNT             OUT NOCOPY NUMBER,
+    X_MSG_DATA              OUT NOCOPY VARCHAR2,
+    P_TIME_ZONE             IN  NUMBER );
+
+
+  /* FOR UPDATE */
+
+   PROCEDURE   UPDATE_GROUP(
+    P_API_VERSION	    IN	NUMBER,
+    P_INIT_MSG_LIST         IN	VARCHAR2  DEFAULT FND_API.G_FALSE,
+    P_COMMIT		    IN	VARCHAR2  DEFAULT FND_API.G_FALSE,
+    P_GROUP_ID              IN  NUMBER,
+    P_GROUP_NUMBER          IN  VARCHAR2,
+    P_EMAIL_ADDRESS         IN  VARCHAR2,
+    P_START_DATE_ACTIVE     IN  DATE,
+    P_END_DATE_ACTIVE       IN  DATE      DEFAULT FND_API.G_MISS_DATE,
+    P_ACCOUNTING_CODE       IN  VARCHAR2,
+    P_EXCLUSIVE_FLAG        IN  VARCHAR2,
+    P_GROUP_NAME            IN  VARCHAR2,
+    P_GROUP_DESC            IN  VARCHAR2,
+    P_OBJECT_VERSION_NUMBER  IN  NUMBER,
+    X_RETURN_STATUS         OUT NOCOPY VARCHAR2,
+    X_MSG_COUNT             OUT NOCOPY NUMBER,
+    X_MSG_DATA              OUT NOCOPY VARCHAR2,
+    P_TIME_ZONE             IN  NUMBER);
+
+
+   --FOR DELETE
+
+   PROCEDURE   DELETE_GROUP(
+    P_API_VERSION	IN  NUMBER,
+    P_INIT_MSG_LIST	IN  VARCHAR2  DEFAULT FND_API.G_FALSE,
+    P_COMMIT		IN  VARCHAR2  DEFAULT FND_API.G_FALSE,
+    P_GROUP_ID          IN  NUMBER,
+    X_RETURN_STATUS     OUT NOCOPY VARCHAR2,
+    X_MSG_COUNT         OUT NOCOPY NUMBER,
+    X_MSG_DATA          OUT NOCOPY VARCHAR2 );
+
+END; -- Package Specification JTF_RS_GROUPS_AUD_PVT
+
+/

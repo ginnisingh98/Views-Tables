@@ -1,0 +1,150 @@
+--------------------------------------------------------
+--  DDL for Package PA_PAXBAUPD_XMLP_PKG
+--------------------------------------------------------
+
+  CREATE OR REPLACE EDITIONABLE PACKAGE "APPS"."PA_PAXBAUPD_XMLP_PKG" AUTHID CURRENT_USER AS
+/* $Header: PAXBAUPDS.pls 120.0 2008/01/02 11:21:30 krreddy noship $ */
+  P_RULE_OPTIMIZER VARCHAR2(3);
+
+  P_DEBUG_MODE VARCHAR2(3);
+
+  P_CONC_REQUEST_ID NUMBER;
+
+  P_BATCH_ID NUMBER;
+
+  C_COMPANY_NAME_HEADER VARCHAR2(50);
+
+  C_NO_DATA_FOUND VARCHAR2(80);
+
+  C_DUMMY_DATA NUMBER;
+
+  CP_RET_CODE VARCHAR2(2);
+
+  CP_ERRBUF VARCHAR2(2000);
+
+  CP_REQ_ID NUMBER;
+
+  FUNCTION GET_COVER_PAGE_VALUES RETURN BOOLEAN;
+
+  FUNCTION BEFOREREPORT RETURN BOOLEAN;
+
+  FUNCTION GET_COMPANY_NAME RETURN BOOLEAN;
+
+  FUNCTION CF_UPDATE_FLAGFORMULA(UPDATE_FLAG IN VARCHAR2) RETURN VARCHAR2;
+
+  FUNCTION CF_RECAL_FLAGFORMULA(RECALCULATE_FLAG IN VARCHAR2) RETURN VARCHAR2;
+
+  FUNCTION AFTERREPORT RETURN BOOLEAN;
+
+  FUNCTION C_COMPANY_NAME_HEADER_P RETURN VARCHAR2;
+
+  FUNCTION C_NO_DATA_FOUND_P RETURN VARCHAR2;
+
+  FUNCTION C_DUMMY_DATA_P RETURN NUMBER;
+
+  FUNCTION CP_RET_CODE_P RETURN VARCHAR2;
+
+  FUNCTION CP_ERRBUF_P RETURN VARCHAR2;
+
+  FUNCTION CP_REQ_ID_P RETURN NUMBER;
+/*
+  PROCEDURE INSERT_ROW1(X_ROWID IN OUT NOCOPY VARCHAR2
+                      ,X_BATCH_ID IN OUT NOCOPY NUMBER
+                      ,X_CREATION_DATE IN DATE
+                      ,X_CREATED_BY IN NUMBER
+                      ,X_LAST_UPDATED_BY IN NUMBER
+                      ,X_LAST_UPDATE_DATE IN DATE
+                      ,X_LAST_UPDATE_LOGIN IN NUMBER
+                      ,X_BATCH_NAME IN VARCHAR2
+                      ,X_BATCH_STATUS_CODE IN VARCHAR2
+                      ,X_DESCRIPTION IN VARCHAR2
+                      ,X_PROJECT_ATTRIBUTE IN VARCHAR2
+                      ,X_EFFECTIVE_DATE IN DATE
+                      ,X_ATTRIBUTE_CATEGORY IN VARCHAR2
+                      ,X_ATTRIBUTE1 IN VARCHAR2
+                      ,X_ATTRIBUTE2 IN VARCHAR2
+                      ,X_ATTRIBUTE3 IN VARCHAR2
+                      ,X_ATTRIBUTE4 IN VARCHAR2
+                      ,X_ATTRIBUTE5 IN VARCHAR2
+                      ,X_ATTRIBUTE6 IN VARCHAR2
+                      ,X_ATTRIBUTE7 IN VARCHAR2
+                      ,X_ATTRIBUTE8 IN VARCHAR2
+                      ,X_ATTRIBUTE9 IN VARCHAR2
+                      ,X_ATTRIBUTE10 IN VARCHAR2
+                      ,X_ATTRIBUTE11 IN VARCHAR2
+                      ,X_ATTRIBUTE12 IN VARCHAR2
+                      ,X_ATTRIBUTE13 IN VARCHAR2
+                      ,X_ATTRIBUTE14 IN VARCHAR2
+                      ,X_ATTRIBUTE15 IN VARCHAR2);
+
+  PROCEDURE UPDATE_ROW(X_ROWID IN VARCHAR2
+                      ,X_LAST_UPDATED_BY IN NUMBER
+                      ,X_LAST_UPDATE_DATE IN DATE
+                      ,X_LAST_UPDATE_LOGIN IN NUMBER
+                      ,X_BATCH_NAME IN VARCHAR2
+                      ,X_BATCH_STATUS_CODE IN VARCHAR2
+                      ,X_REJECTION_CODE IN VARCHAR2
+                      ,X_DESCRIPTION IN VARCHAR2
+                      ,X_PROJECT_ATTRIBUTE IN VARCHAR2
+                      ,X_EFFECTIVE_DATE IN DATE
+                      ,X_PROCESS_RUN_BY IN NUMBER
+                      ,X_PROCESS_RUN_DATE IN DATE
+                      ,X_ATTRIBUTE_CATEGORY IN VARCHAR2
+                      ,X_ATTRIBUTE1 IN VARCHAR2
+                      ,X_ATTRIBUTE2 IN VARCHAR2
+                      ,X_ATTRIBUTE3 IN VARCHAR2
+                      ,X_ATTRIBUTE4 IN VARCHAR2
+                      ,X_ATTRIBUTE5 IN VARCHAR2
+                      ,X_ATTRIBUTE6 IN VARCHAR2
+                      ,X_ATTRIBUTE7 IN VARCHAR2
+                      ,X_ATTRIBUTE8 IN VARCHAR2
+                      ,X_ATTRIBUTE9 IN VARCHAR2
+                      ,X_ATTRIBUTE10 IN VARCHAR2
+                      ,X_ATTRIBUTE11 IN VARCHAR2
+                      ,X_ATTRIBUTE12 IN VARCHAR2
+                      ,X_ATTRIBUTE13 IN VARCHAR2
+                      ,X_ATTRIBUTE14 IN VARCHAR2
+                      ,X_ATTRIBUTE15 IN VARCHAR2);
+
+  PROCEDURE LOCK_ROW(X_ROWID IN VARCHAR2
+                    ,X_BATCH_NAME IN VARCHAR2
+                    ,X_BATCH_STATUS_CODE IN VARCHAR2
+                    ,X_DESCRIPTION IN VARCHAR2
+                    ,X_PROJECT_ATTRIBUTE IN VARCHAR2
+                    ,X_PROCESS_RUN_BY IN NUMBER
+                    ,X_PROCESS_RUN_DATE IN DATE
+                    ,X_EFFECTIVE_DATE IN DATE
+                    ,X_REJECTION_CODE IN VARCHAR2
+                    ,X_ATTRIBUTE_CATEGORY IN VARCHAR2
+                    ,X_ATTRIBUTE1 IN VARCHAR2
+                    ,X_ATTRIBUTE2 IN VARCHAR2
+                    ,X_ATTRIBUTE3 IN VARCHAR2
+                    ,X_ATTRIBUTE4 IN VARCHAR2
+                    ,X_ATTRIBUTE5 IN VARCHAR2
+                    ,X_ATTRIBUTE6 IN VARCHAR2
+                    ,X_ATTRIBUTE7 IN VARCHAR2
+                    ,X_ATTRIBUTE8 IN VARCHAR2
+                    ,X_ATTRIBUTE9 IN VARCHAR2
+                    ,X_ATTRIBUTE10 IN VARCHAR2
+                    ,X_ATTRIBUTE11 IN VARCHAR2
+                    ,X_ATTRIBUTE12 IN VARCHAR2
+                    ,X_ATTRIBUTE13 IN VARCHAR2
+                    ,X_ATTRIBUTE14 IN VARCHAR2
+                    ,X_ATTRIBUTE15 IN VARCHAR2);
+
+  PROCEDURE DELETE_ROW(X_ROWID IN VARCHAR2);
+*/
+  PROCEDURE PROC_CONC(ERRBUF OUT NOCOPY VARCHAR2
+                     ,RETCODE OUT NOCOPY VARCHAR2
+                     ,X_BATCH_ID IN NUMBER
+                     ,X_REQUEST_ID OUT NOCOPY NUMBER);
+/*
+  PROCEDURE PROCESS(ERRBUF OUT NOCOPY VARCHAR2
+                   ,RETCODE OUT NOCOPY VARCHAR2
+                   ,X_BATCH_ID IN NUMBER
+                   ,X_CONCURRENT IN VARCHAR2
+                   ,X_ALL_BATCHES IN VARCHAR2);
+*/
+END PA_PAXBAUPD_XMLP_PKG;
+
+/

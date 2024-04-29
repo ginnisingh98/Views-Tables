@@ -1,0 +1,905 @@
+--------------------------------------------------------
+--  DDL for Package Body AMW_RISK_CTRL_COUNT_PVT
+--------------------------------------------------------
+
+  CREATE OR REPLACE EDITIONABLE PACKAGE BODY "APPS"."AMW_RISK_CTRL_COUNT_PVT" AS
+/* $Header: amwvrccb.pls 115.9 2003/12/03 02:28:16 abedajna noship $ */
+-- ===============================================================
+-- Start of Comments
+-- Package name
+--          AMW_Proc_Org_PVT
+-- Purpose
+--
+-- History
+--        mpande updated 11/13/2003 bug#3191406
+--
+-- NOTE
+--
+-- End of Comments
+-- ===============================================================
+   g_pkg_name    CONSTANT VARCHAR2 (30) := 'AMW_RISK_CTRL_COUNT_PVT';
+   g_file_name   CONSTANT VARCHAR2 (12) := 'amwvrccb.pls';
+   g_user_id              NUMBER        := fnd_global.user_id;
+   g_login_id             NUMBER        := fnd_global.conc_login_id;
+   --------------------- BEGIN: Declaring internal Procedures ----------------------
+
+   --------------------- END: Declaring internal Procedures ----------------------
+
+   --   ==============================================================================
+--    Start of Comments
+--   ==============================================================================
+--   API Name
+--           Process_Process_Hierarchy
+--   Type
+--           Public
+--   Pre-Req
+--
+--   Parameters
+--
+--   IN
+--       p_process_id              IN   NUMBER     Optional  Default = null
+--       p_organization_id         IN   NUMBER     Optional  Default = null
+--       p_mode                    IN   VARCHAR2   Required  Default = 'ASSOCIATE'
+--       p_apo_type                IN   apo_type   Optional  Default = null
+--       p_commit                  IN   VARCHAR2   Required  Default = FND_API_G_FALSE
+--       p_validation_level        IN   NUMBER     Optional  Default = FND_API.G_VALID_LEVEL_FULL
+--       p_init_msg_list           IN   VARCHAR2   Optional  Default = FND_API_G_FALSE
+--
+--   OUT
+--       x_return_status           OUT  VARCHAR2
+--       x_msg_count               OUT  NUMBER
+--       x_msg_data                OUT  VARCHAR2
+--   Version : Current version 1.0
+--   Note:
+--
+--   End of Comments
+--   ==============================================================================
+--
+   PROCEDURE insert_risk_control_count (
+      p_process_id                IN              NUMBER := NULL,
+      p_risk_id                   IN              NUMBER := NULL,
+      p_control_id                IN              NUMBER := NULL,
+      p_process_organization_id   IN              NUMBER := NULL,
+      p_association_mode          IN              VARCHAR2 := 'ASSOCIATE',
+      p_object                    IN              VARCHAR2 := 'RISK',
+      p_commit                    IN              VARCHAR2 := fnd_api.g_false,
+      p_validation_level          IN              NUMBER
+            := fnd_api.g_valid_level_full,
+      p_init_msg_list             IN              VARCHAR2 := fnd_api.g_false,
+      p_api_version_number        IN              NUMBER,
+      x_return_status             OUT NOCOPY      VARCHAR2,
+      x_msg_count                 OUT NOCOPY      NUMBER,
+      x_msg_data                  OUT NOCOPY      VARCHAR2
+   ) IS
+--      l_api_name             CONSTANT VARCHAR2 (30) := 'increase_risk_control_count';
+--      l_api_version_number   CONSTANT NUMBER        := 1.0;
+--      x_process_organization_id       NUMBER        := 0;
+--      l_process_id                    NUMBER;
+--      l_org_id			      NUMBER;
+--      --- for risk association to a process, we are passed risk_id and process_id
+--      --- foll. cursor traverses the process hierarchy tree to get all parent processes
+--      --- for this process_id
+--      CURSOR c1 IS
+--         SELECT NVL (risk_count, 0) AS risk_count, process_id,
+--             nvl (control_count,0) as control_count,
+--                NVL (object_version_number, 0) object_version_number
+--           FROM amw_process
+--          WHERE process_id IN (
+--                   SELECT p2.process_id
+--                     FROM amw_process p1, amw_process p2, wf_activities wa
+--                    WHERE (p2.NAME, p2.item_type) IN (
+--                             SELECT     activity_name, activity_item_type
+--                                   FROM wf_process_activities
+--                             CONNECT BY activity_name = PRIOR process_name
+--                                    AND activity_item_type =
+--                                                          PRIOR process_item_type
+--                             START WITH activity_name = p1.NAME
+--                                    AND activity_item_type = p1.item_type)
+--                      AND p2.NAME = wa.NAME
+--                      AND p2.item_type = wa.item_type
+--                      AND wa.end_date IS NULL
+--                      AND p1.process_id = p_process_id);
+--
+--      -----find the control_count for this risk, and append this
+--     -----to all the control_counts of upward processes
+--     cursor cc1(l_risk_id in number) is
+--       select count(*)
+--      from amw_control_associations where object_type='RISK'
+--      and pk1=l_risk_id;
+--
+--      --find the organizations to which this risk is associated.
+--      /**cursor c2 is
+--        select process_organization_id,organization_id,nvl(risk_count,0) as risk_count,
+--              nvl(object_version_number,0) object_version_number
+--         from amw_process_organization where process_id in (
+--       select p2.process_id
+--         from amw_process p1, amw_process p2, wf_activities wa
+--         where (p2.name, p2.item_type) in (select activity_name, activity_item_type
+--                                             from WF_PROCESS_ACTIVITIES
+--                                       connect by activity_name = prior process_name
+--                                              and activity_item_type = prior process_item_type
+--                                       start with activity_name=p1.name
+--                                              and activity_item_type=p1.item_type)
+--           and p2.name=wa.name
+--           and p2.item_type=wa.item_type
+--           and wa.end_date is null
+--          and  p1.process_id=p_process_id);
+--      **/
+--      --find the organizations to which this risk is associated.
+--      CURSOR c2 IS
+--         SELECT NVL (risk_count, 0) AS risk_count, process_id, organization_id,
+--                process_organization_id,
+--            nvl (control_count,0) as control_count,
+--                NVL (object_version_number, 0) object_version_number
+--           FROM amw_process_organization
+--          WHERE organization_id IN (
+--                       SELECT organization_id
+--                         FROM amw_process_organization
+--                        WHERE process_organization_id =
+--                                                       p_process_organization_id)
+--            AND process_id IN (
+--                   SELECT DISTINCT p2.process_id
+--                              FROM amw_process p1,
+--                                   amw_process p2,
+--                                   amw_process_organization apo1,
+--                                   amw_process_organization apo2,
+--                                   wf_activities wa
+--                             WHERE (p2.NAME, p2.item_type) IN (
+--                                      SELECT     activity_name,
+--                                                 activity_item_type
+--                                            FROM wf_process_activities
+--                                      CONNECT BY activity_name =
+--                                                               PRIOR process_name
+--                                             AND activity_item_type =
+--                                                          PRIOR process_item_type
+--                                      START WITH activity_name = p1.NAME
+--                                             AND activity_item_type =
+--                                                                    p1.item_type)
+--                               AND p2.NAME = wa.NAME
+--                               AND p2.item_type = wa.item_type
+--                               AND wa.end_date IS NULL
+--                               AND p2.process_id = apo2.process_id
+--                               AND apo2.organization_id = apo1.organization_id
+--                               AND p1.process_id = apo1.process_id
+--                               ---and apo1.process_id=142
+--                               AND apo1.process_id IN (
+--                                      SELECT process_id
+--                                        FROM amw_process_organization
+--                                       WHERE process_organization_id =
+--                                                       p_process_organization_id)
+--                               AND apo1.organization_id IN (
+--                                      SELECT organization_id
+--                                        FROM amw_process_organization
+--                                       WHERE process_organization_id =
+--                                                       p_process_organization_id));
+--      ---and apo1.process_organization_id=150
+--
+--     cursor cc2 (p_process_organization_id in number,
+--                 p_risk_id IN NUMBER ) is
+--       select count(*)
+--         from amw_control_associations
+--        where object_type='RISK_ORG'
+--          and pk1 in (
+--      select risk_association_id
+--        from amw_risk_associations
+--       where object_type='PROCESS_ORG' and pk1=p_process_organization_id
+--       and risk_id = p_risk_id);
+--
+--      --find the processes to which this control is associated
+--      CURSOR c3 IS
+--         SELECT NVL (control_count, 0) AS control_count, process_id,
+--                NVL (object_version_number, 0) object_version_number
+--           FROM amw_process
+--          WHERE process_id IN (
+--                   SELECT DISTINCT process_id
+--                              FROM amw_process
+--                             WHERE process_id IN (
+--                                      SELECT p2.process_id
+--                                        FROM amw_process p1,
+--                                             amw_process p2,
+--                                             wf_activities wa
+--                                       WHERE (p2.NAME, p2.item_type) IN (
+--                                                SELECT     activity_name,
+--                                                           activity_item_type
+--                                                      FROM wf_process_activities
+--                                                CONNECT BY activity_name =
+--                                                               PRIOR process_name
+--                                                       AND activity_item_type =
+--                                                              PRIOR process_item_type
+--                                                START WITH activity_name =
+--                                                                         p1.NAME
+--                                                       AND activity_item_type =
+--                                                                    p1.item_type)
+--                                         AND p2.NAME = wa.NAME
+--                                         AND p2.item_type = wa.item_type
+--                                         AND wa.end_date IS NULL
+--                                         AND p1.process_id IN (
+--                                                SELECT pk1
+--                                                  FROM amw_risk_associations
+--                                                 WHERE risk_id = p_risk_id
+--                                                   AND object_type = 'PROCESS')));
+--      --find the organizations to which this control is associated
+--      /**cursor c4 is
+--        select process_organization_id,organization_id,control_count,object_version_number
+--         from amw_process_organization
+--       where process_id in (
+--        select distinct p2.process_id
+--         from amw_process p1, amw_process p2, wf_activities wa
+--         where (p2.name, p2.item_type) in (select activity_name, activity_item_type
+--                                             from WF_PROCESS_ACTIVITIES
+--                                       connect by activity_name = prior process_name
+--                                              and activity_item_type = prior process_item_type
+--                                       start with activity_name=p1.name
+--                                              and activity_item_type=p1.item_type)
+--           and p2.name=wa.name
+--           and p2.item_type=wa.item_type
+--           and wa.end_date is null
+--           and p1.process_id in (select pk1 from amw_risk_associations where risk_id=p_risk_id and object_type='PROCESS_ORG')
+--         );
+--        **/
+--      CURSOR c4 IS
+--         SELECT NVL (control_count, 0) AS control_count, process_id,
+--                organization_id, process_organization_id,
+--                NVL (object_version_number, 0) object_version_number
+--           FROM amw_process_organization
+--          WHERE organization_id IN (
+--                       SELECT organization_id
+--                         FROM amw_process_organization
+--                        WHERE process_organization_id =
+--                                                       p_process_organization_id)
+--            AND process_id IN (
+--                   SELECT DISTINCT p2.process_id
+--                              FROM amw_process p1,
+--                                   amw_process p2,
+--                                   amw_process_organization apo1,
+--                                   amw_process_organization apo2,
+--                                   wf_activities wa
+--                             WHERE (p2.NAME, p2.item_type) IN (
+--                                      SELECT     activity_name,
+--                                                 activity_item_type
+--                                            FROM wf_process_activities
+--                                      CONNECT BY activity_name =
+--                                                               PRIOR process_name
+--                                             AND activity_item_type =
+--                                                          PRIOR process_item_type
+--                                      START WITH activity_name = p1.NAME
+--                                             AND activity_item_type =
+--                                                                    p1.item_type)
+--                               AND p2.NAME = wa.NAME
+--                               AND p2.item_type = wa.item_type
+--                               AND wa.end_date IS NULL
+--                               ----and apo1.process_organization_id in (select pk1 from amw_risk_associations where risk_id=p_risk_id and object_type='PROCESS_ORG')
+--                               AND apo1.process_id IN (
+--                                      /* Commneted by moadne bug#3191406
+--                                      SELECT pk1
+--                                        FROM amw_risk_associations
+--                                       WHERE risk_id = p_risk_id
+--                                         AND object_type = 'PROCESS')
+--                                         */
+--                                      SELECT ampo5.process_id
+--                                        FROM amw_risk_associations ara1, amw_process_organization ampo5
+--                                       WHERE risk_id = p_risk_id
+--                                         AND object_type = 'PROCESS_ORG'
+--                                         AND ara1.pk1=ampo5.process_organization_id and
+--                                         ampo5.process_organization_id = p_process_organization_id)
+--                               AND apo1.organization_id IN (
+--                                      SELECT organization_id
+--                                        FROM amw_process_organization
+--                                       WHERE process_organization_id =
+--                                                       p_process_organization_id)
+--                               AND apo2.process_id = p2.process_id
+--                               AND apo2.organization_id = apo1.organization_id
+--                               AND p1.process_id = apo1.process_id);
+--      assoc_risk                      c1%ROWTYPE;
+--      assoc_risk_org                  c2%ROWTYPE;
+--      assoc_ctrl                      c3%ROWTYPE;
+--      assoc_ctrl_org                  c4%ROWTYPE;
+--
+--     l_risk_control_count number := 0;
+--     l_risk_org_control_count number := 0;
+--
+--     cursor cc5 IS
+--     SELECT control_association_id ,control_id from amw_control_associations
+--            where object_type='RISK_ORG'
+--            and pk1 In (
+--            select risk_association_id
+--            from amw_risk_associations
+--            where object_type='PROCESS_ORG' and pk1= p_process_organization_id
+--            and risk_id = p_risk_id );
+--
+--     delete_ctrl_org                    cc5 %ROWTYPE;
+--
+--
+   BEGIN
+	   null;
+--       ---Inserting process_id
+--      ----commit;
+--      SAVEPOINT get_process_hierarchy_pvt;
+--      x_return_status            := fnd_api.g_ret_sts_success;
+--      -- Standard call to check for call compatibility.
+--      IF NOT fnd_api.compatible_api_call (l_api_version_number,
+--                                          p_api_version_number,
+--                                          l_api_name,
+--                                          g_pkg_name
+--                                         ) THEN
+--         RAISE fnd_api.g_exc_unexpected_error;
+--      END IF;
+--      -- Initialize message list if p_init_msg_list is set to TRUE.
+--      IF fnd_api.to_boolean (p_init_msg_list) THEN
+--         fnd_msg_pub.initialize;
+--      END IF;
+--      -- Debug Message
+--      amw_utility_pvt.debug_message ('Private API: ' || l_api_name || 'start');
+--      -- Initialize API return status to SUCCESS
+--      x_return_status            := fnd_api.g_ret_sts_success;
+-- /* Temporarily commenting out the validata session code ..... */
+-- -- =========================================================================
+-- -- Validate Environment
+-- -- =========================================================================
+--       IF fnd_global.user_id IS NULL THEN
+--          amw_utility_pvt.error_message
+--                                       (p_message_name      => 'USER_PROFILE_MISSING');
+--          RAISE fnd_api.g_exc_error;
+--       END IF;
+--       IF (p_object = 'RISK') THEN
+--          IF (p_process_id IS NULL) THEN
+--             amw_utility_pvt.error_message
+--                    (p_message_name      => 'AMW_NO_PROCESS_ID');
+--             RAISE fnd_api.g_exc_error;
+--          ELSIF (p_risk_id IS NULL) THEN
+--             amw_utility_pvt.error_message
+--                       (p_message_name      => 'AMW_NO_RISK_ID');
+--             RAISE fnd_api.g_exc_error;
+--          END IF;
+--       END IF;
+--      IF (p_object = 'CONTROL') THEN
+--         IF (p_risk_id IS NULL) THEN
+--            amw_utility_pvt.error_message
+--                      (p_message_name      => 'AMW_NO_RISK_ID');
+--            RAISE fnd_api.g_exc_error;
+--         ELSIF (p_control_id IS NULL) THEN
+--            amw_utility_pvt.error_message
+--                   (p_message_name      => 'AMW_NO_CONTROL_ID');
+--            RAISE fnd_api.g_exc_error;
+--         END IF;
+--      END IF;
+--      IF (p_object = 'RISK_ORG') THEN
+--         IF (p_process_organization_id IS NULL) THEN
+--            amw_utility_pvt.error_message
+--               (p_message_name      => 'AMW_NO_ORG_ID'
+--               );
+--            RAISE fnd_api.g_exc_error;
+--         END IF;
+--      END IF;
+--      IF (p_object = 'CONTROL_ORG') THEN
+--         IF (p_process_organization_id IS NULL) THEN
+--            amw_utility_pvt.error_message
+--               (p_message_name      => 'AMW_NO_ORG_ID'
+--               );
+--            RAISE fnd_api.g_exc_error;
+--         ELSIF (p_risk_id IS NULL) THEN
+--            amw_utility_pvt.error_message
+--                      (p_message_name      => 'AMW_NO_RISK_ID');
+--            RAISE fnd_api.g_exc_error;
+--         ELSIF (p_control_id IS NULL) THEN
+--            amw_utility_pvt.error_message
+--                   (p_message_name      => 'AMW_NO_CONTROL_ID');
+--            RAISE fnd_api.g_exc_error;
+--         END IF;
+--      END IF;
+--
+--
+--
+--      --Commenting out the validation level for now ....
+--      /***
+--      IF(p_validation_level >= FND_API.G_VALID_LEVEL_FULL)
+--      THEN
+--       -- Invoke validation procedures
+--       validate_apo_type(
+--          p_api_version_number => 1.0,
+--          p_init_msg_list => FND_API.G_FALSE,
+--          p_validation_level => p_validation_level,
+--          x_return_status => x_return_status,
+--          x_msg_count => x_msg_count,
+--          x_msg_data  => x_msg_data);
+--      END IF;
+--      ***/
+--
+--      IF ( (p_object = 'RISK_ORG') OR (p_object = 'CONTROL_ORG') ) THEN
+--		select organization_id
+--		into l_org_id
+--		from amw_process_organization
+--		where process_organization_id = p_process_organization_id;
+--      END IF;
+--
+--
+--      IF (p_association_mode = 'ASSOCIATE') THEN
+--         IF (p_object = 'RISK') THEN
+--            --implement risk_count for
+--            -----dbms_output.put_line('Associating Risk');
+--       l_risk_control_count := 0;
+--       OPEN cc1(p_risk_id);
+--           FETCH cc1 INTO l_risk_control_count;
+--         CLOSE cc1;
+--
+--         OPEN c1;
+--            LOOP
+--               FETCH c1
+--                INTO assoc_risk;
+--               EXIT WHEN c1%NOTFOUND;
+--                -----dbms_output.put_line('process_id: '||assoc_risk.process_id);
+--               --increment risk count for associate
+--               assoc_risk.risk_count      := assoc_risk.risk_count + 1;
+--               assoc_risk.control_count   := assoc_risk.control_count + l_risk_control_count;
+--               assoc_risk.object_version_number :=
+--                                           assoc_risk.object_version_number + 1;
+--
+--            --dbms_output.put_line('In the ''RISK'' mode');
+--
+--
+--
+--               --update amw_process' risk_count
+--               UPDATE amw_process
+--                  SET risk_count = assoc_risk.risk_count,
+--                  control_count = assoc_risk.control_count,
+--                      object_version_number = assoc_risk.object_version_number,
+--                      last_updated_by = g_user_id,
+--                      last_update_date = SYSDATE,
+--                      last_update_login = g_login_id
+--                WHERE process_id = assoc_risk.process_id;
+--            END LOOP;
+--            CLOSE c1;
+--         ELSIF (p_object = 'RISK_ORG') THEN
+--		AMW_WF_HIERARCHY_PKG.reset_proc_org_risk_ctrl_count(l_org_id);
+----          /*
+----          l_risk_org_control_count := 0;
+----          OPEN cc2(p_process_organization_id,p_risk_id );
+----          FETCH cc2 INTO l_risk_org_control_count;
+----          CLOSE cc2;
+----          */
+----
+----          OPEN c2;
+----          LOOP
+----             FETCH c2
+----              INTO assoc_risk_org;
+----             EXIT WHEN c2%NOTFOUND;
+----              -----dbms_output.put_line('process_id: '||assoc_risk_org.process_id||' organization_id: '||assoc_risk_org.organization_id);
+----             --increment risk count for associate
+----             assoc_risk_org.risk_count  := assoc_risk_org.risk_count + 1;
+----          /** Commenting out Control_Count increment on 11/12/2003
+----                because in Risk_Org context, Risk association does not mean
+----               Control association
+----            **/
+----            ---assoc_risk_org.control_count  := assoc_risk_org.control_count + l_risk_org_control_count;
+----               assoc_risk_org.object_version_number := assoc_risk_org.object_version_number + 1;
+--
+--               --update amw_process' risk_count
+--                UPDATE amw_process_organization
+--                   SET risk_count = assoc_risk_org.risk_count,
+--                   /* Commenting below for above reasons **/
+--                   ---control_count = assoc_risk_org.control_count,
+--                       object_version_number = assoc_risk_org.object_version_number,
+--                       last_updated_by = g_user_id,
+--                       last_update_date = SYSDATE,
+--                       last_update_login = g_login_id
+--                 WHERE process_organization_id =
+--                                           assoc_risk_org.process_organization_id;
+--             END LOOP;
+--             CLOSE c2;
+--          ELSIF (p_object = 'CONTROL') THEN
+--             --associate a control
+--             -----dbms_output.put_line('Associating Control');
+--            OPEN c3;
+--            LOOP
+--               FETCH c3
+--                INTO assoc_ctrl;
+--               EXIT WHEN c3%NOTFOUND;
+--               -----dbms_output.put_line('process_id: '||assoc_ctrl.process_id);
+--               --increment risk count for associate
+--               assoc_ctrl.control_count   := assoc_ctrl.control_count + 1;
+--               assoc_ctrl.object_version_number :=
+--                                           assoc_ctrl.object_version_number + 1;
+--               --update amw_process' risk_count
+--               UPDATE amw_process
+--                  SET control_count = assoc_ctrl.control_count,
+--                      object_version_number = assoc_ctrl.object_version_number,
+--                      last_updated_by = g_user_id,
+--                      last_update_date = SYSDATE,
+--                      last_update_login = g_login_id
+--                WHERE process_id = assoc_ctrl.process_id;
+--            END LOOP;
+--            CLOSE c3;
+--         ELSIF (p_object = 'CONTROL_ORG') THEN
+--		AMW_WF_HIERARCHY_PKG.reset_proc_org_risk_ctrl_count(l_org_id);
+----             --associate a control
+----             -----dbms_output.put_line('Associating Control-Org');
+----             OPEN c4;
+----             LOOP
+----                FETCH c4
+----                 INTO assoc_ctrl_org;
+----                EXIT WHEN c4%NOTFOUND;
+----                -----dbms_output.put_line('process_id: '||assoc_ctrl_org.process_id||' organization_id: '||assoc_ctrl_org.organization_id);
+----                --increment risk count for associate
+----                assoc_ctrl_org.control_count := assoc_ctrl_org.control_count + 1;
+----                assoc_ctrl_org.object_version_number :=
+----                                        assoc_ctrl_org.object_version_number + 1;
+----                --update amw_process' risk_count
+----                UPDATE amw_process_organization
+----                   SET control_count = assoc_ctrl_org.control_count,
+--                       object_version_number =
+--                                             assoc_ctrl_org.object_version_number,
+--                       last_updated_by = g_user_id,
+--                       last_update_date = SYSDATE,
+--                       last_update_login = g_login_id
+--                 WHERE process_organization_id =
+--                                           assoc_ctrl_org.process_organization_id;
+--             END LOOP;
+--             CLOSE c4;
+--          END IF;
+--       ELSIF (p_association_mode = 'DISASSOCIATE') THEN
+--          IF (p_object = 'RISK') THEN
+--             --associate a process
+--             -----dbms_output.put_line('Disassociating Risk');
+--          l_risk_control_count := 0;
+--           OPEN cc1(p_risk_id);
+--           FETCH cc1 INTO l_risk_control_count;
+--          CLOSE cc1;
+--
+--            OPEN c1;
+--            LOOP
+--               FETCH c1
+--                INTO assoc_risk;
+--               EXIT WHEN c1%NOTFOUND;
+--               -----dbms_output.put_line('process_id: '||assoc_risk.process_id);
+--               --increment risk count for associate
+--               assoc_risk.risk_count      := assoc_risk.risk_count - 1;
+--               assoc_risk.control_count      := assoc_risk.control_count - l_risk_control_count;
+--               assoc_risk.object_version_number := assoc_risk.object_version_number + 1;
+--               --update amw_process' risk_count
+--               UPDATE amw_process
+--                  SET risk_count = assoc_risk.risk_count,
+--                  control_count = assoc_risk.control_count,
+--                      object_version_number = assoc_risk.object_version_number,
+--                      last_updated_by = g_user_id,
+--                      last_update_date = SYSDATE,
+--                      last_update_login = g_login_id
+--                WHERE process_id = assoc_risk.process_id;
+--            END LOOP;
+--            CLOSE c1;
+--         ELSIF (p_object = 'RISK_ORG') THEN
+--		AMW_WF_HIERARCHY_PKG.reset_proc_org_risk_ctrl_count(l_org_id);
+--
+----            l_risk_org_control_count := 0;
+----            OPEN cc2(p_process_organization_id,p_risk_id);
+----            FETCH cc2 INTO l_risk_org_control_count;
+----            CLOSE cc2;
+----
+----            --mpande 11/13/2003
+--            OPEN cc5;
+--            LOOP
+--              FETCH cc5            INTO delete_ctrl_org;
+--               EXIT WHEN cc5%NOTFOUND;
+--
+--
+--            /* - added  mpande 11/14/2003 */
+--               delete   from amw_ap_associations
+--               where object_type='CTRL_ORG'
+--               and pk1  = ( SELECT  organization_id from amw_process_organization
+--               where process_organization_id = p_process_organization_id )
+--               and pk2  = ( SELECT  process_id from amw_process_organization
+--               where process_organization_id = p_process_organization_id )
+--               AND pk3 = delete_ctrl_org.control_id
+--               and
+--               not exists ( select control_id from amw_control_associations aca, amw_risk_associations ara
+--                            where aca.pk1= ara.risk_association_id
+--                            and ara.object_type = 'PROCESS_ORG'
+--                            and aca.object_type = 'RISK_ORG'
+--                            and control_id = delete_ctrl_org.control_id  ) ;
+--
+--               delete   from amw_control_associations
+--               where control_association_id = delete_ctrl_org.control_association_id ;
+--            /* addition ends */
+--             END LOOP ;
+--             CLOSE cc5 ;
+--
+--            OPEN c2;
+--            LOOP
+--               FETCH c2
+--                INTO assoc_risk_org;
+--               EXIT WHEN c2%NOTFOUND;
+--               -----dbms_output.put_line('process_id: '||assoc_risk_org.process_id||' organization_id: '||assoc_risk_org.organization_id);
+--               --increment risk count for associate
+--               assoc_risk_org.risk_count  := assoc_risk_org.risk_count - 1;
+--            /** Commenting out Control_Count decrease on 11/12/2003
+--                because in Risk_Org context, Risk disassociation does not mean
+--               Control disassociation
+--            **/
+--
+--
+--
+--            -- mpande 11/13/2003 control_count does get reduced when risk is disassocaited
+--               assoc_risk_org.control_count := assoc_risk_org.control_count - l_risk_org_control_count;
+--               assoc_risk_org.object_version_number := assoc_risk_org.object_version_number + 1;
+--               --update amw_process' risk_count
+--               UPDATE amw_process_organization
+--                  SET risk_count = assoc_risk_org.risk_count,
+--                  /** Commented below for above reasons **/ -- mpande 11/13/2003
+--                      control_count = assoc_risk_org.control_count,
+--                      object_version_number = assoc_risk_org.object_version_number,
+--                      last_updated_by = g_user_id,
+--                      last_update_date = SYSDATE,
+--                      last_update_login = g_login_id
+--                WHERE process_organization_id = assoc_risk_org.process_organization_id;
+--            END LOOP;
+--            CLOSE c2;
+--         ELSIF (p_object = 'CONTROL') THEN
+--            --disassociate a control
+--            -----dbms_output.put_line('Disassociating Control');
+--            -- added 11/13/2003 mpande to delete ap
+--
+--            OPEN c3;
+--            LOOP
+--               FETCH c3
+--                INTO assoc_ctrl;
+--               EXIT WHEN c3%NOTFOUND;
+--               -----dbms_output.put_line('process_id: '||assoc_ctrl.process_id);
+--               --increment risk count for associate
+--               assoc_ctrl.control_count   := assoc_ctrl.control_count - 1;
+--               assoc_ctrl.object_version_number :=
+--                                           assoc_ctrl.object_version_number + 1;
+--               --update amw_process' risk_count
+--               UPDATE amw_process
+--                  SET control_count = assoc_ctrl.control_count,
+--                      object_version_number = assoc_ctrl.object_version_number,
+--                      last_updated_by = g_user_id,
+--                      last_update_date = SYSDATE,
+--                      last_update_login = g_login_id
+--                WHERE process_id = assoc_ctrl.process_id;
+--            END LOOP;
+--            CLOSE c3;
+--         ELSIF (p_object = 'CONTROL_ORG') THEN
+--		AMW_WF_HIERARCHY_PKG.reset_proc_org_risk_ctrl_count(l_org_id);
+----            /* - added  mpande 11/14/2003 */
+----            delete   from amw_ap_associations
+----            where object_type='CTRL_ORG'
+----            and pk1  = ( SELECT  organization_id from amw_process_organization
+----            where process_organization_id = p_process_organization_id )
+----            and pk2  = ( SELECT  process_id from amw_process_organization
+----            where process_organization_id = p_process_organization_id )
+----            AND pk3 = p_control_id
+----            and
+----            not exists ( select control_id from amw_control_associations aca, amw_risk_associations ara
+----                         where aca.pk1= ara.risk_association_id
+----                         and ara.object_type = 'PROCESS_ORG'
+----                         and aca.object_type = 'RISK_ORG'
+--                         and control_id = p_control_id  ) ;
+--
+--
+--            OPEN c4;
+--            LOOP
+--               FETCH c4
+--                INTO assoc_ctrl_org;
+--               EXIT WHEN c4%NOTFOUND;
+--               -----dbms_output.put_line('process_id: '||assoc_ctrl_org.process_id||' organization_id: '||assoc_ctrl_org.organization_id);
+--               --increment risk count for associate
+--               assoc_ctrl_org.control_count := assoc_ctrl_org.control_count - 1;
+--               assoc_ctrl_org.object_version_number :=
+--                                       assoc_ctrl_org.object_version_number + 1;
+--               --update amw_process' risk_count
+--               UPDATE amw_process_organization
+--                  SET control_count = assoc_ctrl_org.control_count,
+--                      object_version_number =
+--                                            assoc_ctrl_org.object_version_number,
+--                      last_updated_by = g_user_id,
+--                      last_update_date = SYSDATE,
+--                      last_update_login = g_login_id
+--                WHERE process_organization_id =
+--                                          assoc_ctrl_org.process_organization_id;
+--            END LOOP;
+--            CLOSE c4;
+--         END IF;
+--      END IF;
+-- =========================================================================
+-- End Validate Environment
+-- =========================================================================
+-- End commenting the session validation code ....
+--      IF x_return_status <> fnd_api.g_ret_sts_success THEN
+--         RAISE fnd_api.g_exc_error;
+--      END IF;
+--      -- Standard check for p_commit
+--      IF fnd_api.to_boolean (p_commit) THEN
+--         COMMIT WORK;
+--      END IF;
+--      --Debug Message
+--      amw_utility_pvt.debug_message ('Private API: ' || l_api_name || 'end');
+--      -- Standard call to get message count and if count is 1, get message info.
+--      fnd_msg_pub.count_and_get (p_count => x_msg_count, p_data => x_msg_data);
+--   EXCEPTION
+--      WHEN fnd_api.g_exc_error THEN
+--         ROLLBACK TO get_process_hierarchy_pvt;
+--         x_return_status            := fnd_api.g_ret_sts_error;
+--         -- Standard call to get message count and if count=1, get the message
+--         fnd_msg_pub.count_and_get (p_encoded      => fnd_api.g_false,
+--                                    p_count        => x_msg_count,
+--                                    p_data         => x_msg_data
+--                                   );
+--      WHEN fnd_api.g_exc_unexpected_error THEN
+--         ROLLBACK TO get_process_hierarchy_pvt;
+--         x_return_status            := fnd_api.g_ret_sts_unexp_error;
+--         -- Standard call to get message count and if count=1, get the message
+--         fnd_msg_pub.count_and_get (p_encoded      => fnd_api.g_false,
+--                                    p_count        => x_msg_count,
+--                                    p_data         => x_msg_data
+--                                   );
+--      WHEN OTHERS THEN
+--         ROLLBACK TO get_process_hierarchy_pvt;
+--         x_return_status            := fnd_api.g_ret_sts_unexp_error;
+--         IF fnd_msg_pub.check_msg_level (fnd_msg_pub.g_msg_lvl_unexp_error) THEN
+--            fnd_msg_pub.add_exc_msg (g_pkg_name, l_api_name);
+--         END IF;
+--         -- Standard call to get message count and if count=1, get the message
+--         fnd_msg_pub.count_and_get (p_encoded      => fnd_api.g_false,
+--                                    p_count        => x_msg_count,
+--                                    p_data         => x_msg_data
+--                                 );
+   END insert_risk_control_count;
+--   ==============================================================================
+--    Start of Comments
+--   ==============================================================================
+--   API Name
+--           Process_Amw_Process_Org
+--   Type
+--           Private
+--   Pre-Req
+--
+--   Parameters
+--
+--   IN
+--       p_apo_type                IN   apo_type   Optional  Default = null
+--       p_do_insert               IN   VARCHAR2   Optional  Default = 'INSERT'
+--       p_org_count               IN   NUMBER     Optional  Default = 0
+--       p_commit                  IN   VARCHAR2   Required  Default = FND_API_G_FALSE
+--       p_validation_level        IN   NUMBER     Optional  Default = FND_API.G_VALID_LEVEL_FULL
+--       p_init_msg_list           IN   VARCHAR2   Optional  Default = FND_API_G_FALSE
+--
+--
+--   OUT
+--       x_return_status           OUT  VARCHAR2
+--       x_msg_count               OUT  NUMBER
+--       x_msg_data                OUT  VARCHAR2
+--   Version : Current version 1.0
+--   Note:
+--
+--   End of Comments
+--   ==============================================================================
+--/*
+--   PROCEDURE validate_apo_type (
+--      p_api_version_number   IN              NUMBER,
+--      p_init_msg_list        IN              VARCHAR2 := fnd_api.g_false,
+--      p_validation_level     IN              NUMBER
+--            := fnd_api.g_valid_level_full,
+--      x_return_status        OUT NOCOPY      VARCHAR2,
+--      x_msg_count            OUT NOCOPY      NUMBER,
+--      x_msg_data             OUT NOCOPY      VARCHAR2
+--   ) IS
+--      l_api_name             CONSTANT VARCHAR2 (30) := 'Validate_Process';
+--      l_api_version_number   CONSTANT NUMBER        := 1.0;
+--      l_object_version_number         NUMBER;
+--   --l_process_rec  AMW_Process_PVT.process_rec_type;
+--   BEGIN
+--
+--      -- Standard Start of API savepoint
+--      SAVEPOINT validate_process_pvt;
+--      -- Standard call to check for call compatibility.
+--      IF NOT fnd_api.compatible_api_call (l_api_version_number,
+--                                          p_api_version_number,
+--                                          l_api_name,
+--                                          g_pkg_name
+--                                         ) THEN
+--         RAISE fnd_api.g_exc_unexpected_error;
+--      END IF;
+--      -- Initialize message list if p_init_msg_list is set to TRUE.
+--      IF fnd_api.to_boolean (p_init_msg_list) THEN
+--         fnd_msg_pub.initialize;
+--      END IF;
+--      IF p_validation_level >= jtf_plsql_api.g_valid_level_item THEN
+--         check_apo_row (p_validation_mode      => jtf_plsql_api.g_update,
+--                        x_return_status        => x_return_status
+--                       );
+--         IF x_return_status = fnd_api.g_ret_sts_error THEN
+--            RAISE fnd_api.g_exc_error;
+--         ELSIF x_return_status = fnd_api.g_ret_sts_unexp_error THEN
+--            RAISE fnd_api.g_exc_unexpected_error;
+--         END IF;
+--      END IF;
+--      -- Debug Message
+--      amw_utility_pvt.debug_message ('Private API: ' || l_api_name || 'start');
+--      -- Initialize API return status to SUCCESS
+--      x_return_status            := fnd_api.g_ret_sts_success;
+--      -- Debug Message
+--      amw_utility_pvt.debug_message ('Private API: ' || l_api_name || 'end');
+--      -- Standard call to get message count and if count is 1, get message info.
+--      fnd_msg_pub.count_and_get (p_count => x_msg_count, p_data => x_msg_data);
+--   EXCEPTION
+--      WHEN amw_utility_pvt.resource_locked THEN
+--         x_return_status            := fnd_api.g_ret_sts_error;
+--         amw_utility_pvt.error_message
+--                                   (p_message_name      => 'AMW_API_RESOURCE_LOCKED');
+--      WHEN fnd_api.g_exc_error THEN
+--         ROLLBACK TO validate_process_pvt;
+--         x_return_status            := fnd_api.g_ret_sts_error;
+--         -- Standard call to get message count and if count=1, get the message
+--         fnd_msg_pub.count_and_get (p_encoded      => fnd_api.g_false,
+--                                    p_count        => x_msg_count,
+--                                    p_data         => x_msg_data
+--                                   );
+--      WHEN fnd_api.g_exc_unexpected_error THEN
+--         ROLLBACK TO validate_process_pvt;
+--         x_return_status            := fnd_api.g_ret_sts_unexp_error;
+--         -- Standard call to get message count and if count=1, get the message
+--         fnd_msg_pub.count_and_get (p_encoded      => fnd_api.g_false,
+--                                    p_count        => x_msg_count,
+--                                    p_data         => x_msg_data
+--                                   );
+--      WHEN OTHERS THEN
+--         ROLLBACK TO validate_process_pvt;
+--         x_return_status            := fnd_api.g_ret_sts_unexp_error;
+--         IF fnd_msg_pub.check_msg_level (fnd_msg_pub.g_msg_lvl_unexp_error) THEN
+--            fnd_msg_pub.add_exc_msg (g_pkg_name, l_api_name);
+--         END IF;
+--         -- Standard call to get message count and if count=1, get the message
+--         fnd_msg_pub.count_and_get (p_encoded      => fnd_api.g_false,
+--                                    p_count        => x_msg_count,
+--                                    p_data         => x_msg_data
+--                                   );
+--   END validate_apo_type;
+--   ==============================================================================
+--    Start of Comments
+--   ==============================================================================
+--   API Name
+--           Check_Apo_Row
+--   Type
+--           Private
+--   Pre-Req
+--
+--   Parameters
+--
+--   IN
+--       p_apo_type                IN   apo_type   Required
+--       p_validation_mode         IN   VARCHAR2   Optional  Default = JTF_PLSQL_API.g_create
+--
+--   OUT
+--       x_return_status           OUT  VARCHAR2
+--   Version : Current version 1.0
+--   Note:
+--
+--   End of Comments
+--   ==============================================================================
+--
+--   PROCEDURE check_apo_row (
+--      p_validation_mode   IN              VARCHAR2 := jtf_plsql_api.g_create,
+--      x_return_status     OUT NOCOPY      VARCHAR2
+--   ) IS
+--   BEGIN
+--      x_return_status            := fnd_api.g_ret_sts_success;
+--      /*
+--      IF p_validation_mode = jtf_plsql_api.g_create THEN
+--         IF 2 IS NULL THEN
+--            amw_utility_pvt.error_message
+--               (p_message_name      => 'AMW_NO_ORGANIZATION_ID');
+--            x_return_status            := fnd_api.g_ret_sts_error;
+--            RETURN;
+--         END IF;
+--         IF 3 IS NULL THEN
+--            amw_utility_pvt.error_message
+--                                 (p_message_name      => 'AMW_NO_PROCESS_ID');
+--            x_return_status            := fnd_api.g_ret_sts_error;
+--            RETURN;
+--         END IF;
+--      END IF;
+--
+--   END check_apo_row;
+--   */
+END amw_risk_ctrl_count_pvt;
+
+/

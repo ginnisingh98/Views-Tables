@@ -1,0 +1,120 @@
+--------------------------------------------------------
+--  DDL for Package CS_CHG_SUB_REST_PKG
+--------------------------------------------------------
+
+  CREATE OR REPLACE EDITIONABLE PACKAGE "APPS"."CS_CHG_SUB_REST_PKG" AUTHID CURRENT_USER AS
+/* $Header: csxrestts.pls 115.1 2004/06/04 01:45:11 aseethep noship $ */
+
+   PROCEDURE INSERT_ROW (
+      PX_RESTRICTION_ID         IN OUT NOCOPY NUMBER,
+      P_RESTRICTION_TYPE        IN VARCHAR2,
+      P_CONDITION             	IN VARCHAR2,
+      P_VALUE_OBJECT_ID 	IN NUMBER,
+      P_VALUE_AMOUNT       	IN NUMBER,
+      P_CURRENCY_CODE         	IN VARCHAR2,
+      P_START_DATE_ACTIVE 	IN DATE,
+      P_END_DATE_ACTIVE 	IN DATE,
+      P_CREATION_DATE 		IN DATE,
+      P_CREATED_BY		IN NUMBER,
+      P_LAST_UPDATE_DATE        IN DATE,
+      P_LAST_UPDATED_BY		IN NUMBER,
+      P_LAST_UPDATE_LOGIN	IN NUMBER,
+      P_ATTRIBUTE1              IN VARCHAR2,
+      P_ATTRIBUTE2              IN VARCHAR2,
+      P_ATTRIBUTE3              IN VARCHAR2,
+      P_ATTRIBUTE4              IN VARCHAR2,
+      P_ATTRIBUTE5              IN VARCHAR2,
+      P_ATTRIBUTE6              IN VARCHAR2,
+      P_ATTRIBUTE7              IN VARCHAR2,
+      P_ATTRIBUTE8              IN VARCHAR2,
+      P_ATTRIBUTE9              IN VARCHAR2,
+      P_ATTRIBUTE10             IN VARCHAR2,
+      P_ATTRIBUTE11             IN VARCHAR2,
+      P_ATTRIBUTE12             IN VARCHAR2,
+      P_ATTRIBUTE13             IN VARCHAR2,
+      P_ATTRIBUTE14             IN VARCHAR2,
+      P_ATTRIBUTE15             IN VARCHAR2,
+      P_CONTEXT                 IN VARCHAR2,
+      P_OBJECT_VERSION_NUMBER   IN NUMBER,
+      P_SECURITY_GROUP_ID       IN NUMBER);
+
+   PROCEDURE LOCK_ROW (
+      P_RESTRICTION_ID            IN NUMBER,
+      P_OBJECT_VERSION_NUMBER     IN NUMBER );
+
+
+   PROCEDURE UPDATE_ROW (
+      P_RESTRICTION_ID          IN NUMBER,
+      P_RESTRICTION_TYPE        IN VARCHAR2,
+      P_CONDITION             	IN VARCHAR2,
+      P_VALUE_OBJECT_ID 	IN NUMBER,
+      P_VALUE_AMOUNT       	IN NUMBER,
+      P_CURRENCY_CODE         	IN VARCHAR2,
+      P_START_DATE_ACTIVE 	IN DATE,
+      P_END_DATE_ACTIVE 	IN DATE,
+      P_CREATION_DATE 		IN DATE,
+      P_CREATED_BY		IN NUMBER,
+      P_LAST_UPDATE_DATE        IN DATE,
+      P_LAST_UPDATED_BY		IN NUMBER,
+      P_LAST_UPDATE_LOGIN	IN NUMBER,
+      P_ATTRIBUTE1              IN VARCHAR2,
+      P_ATTRIBUTE2              IN VARCHAR2,
+      P_ATTRIBUTE3              IN VARCHAR2,
+      P_ATTRIBUTE4              IN VARCHAR2,
+      P_ATTRIBUTE5              IN VARCHAR2,
+      P_ATTRIBUTE6              IN VARCHAR2,
+      P_ATTRIBUTE7              IN VARCHAR2,
+      P_ATTRIBUTE8              IN VARCHAR2,
+      P_ATTRIBUTE9              IN VARCHAR2,
+      P_ATTRIBUTE10             IN VARCHAR2,
+      P_ATTRIBUTE11             IN VARCHAR2,
+      P_ATTRIBUTE12             IN VARCHAR2,
+      P_ATTRIBUTE13             IN VARCHAR2,
+      P_ATTRIBUTE14             IN VARCHAR2,
+      P_ATTRIBUTE15             IN VARCHAR2,
+      P_CONTEXT                 IN VARCHAR2,
+      P_OBJECT_VERSION_NUMBER   IN NUMBER,
+      P_SECURITY_GROUP_ID       IN NUMBER);
+
+   PROCEDURE DELETE_ROW (
+      P_RESTRICTION_ID in NUMBER );
+
+
+   PROCEDURE LOAD_ROW (
+      P_RESTRICTION_ID          IN NUMBER,
+      P_RESTRICTION_TYPE        IN VARCHAR2,
+      P_CONDITION             	IN VARCHAR2,
+      P_VALUE_OBJECT_ID 	IN NUMBER,
+      P_VALUE_AMOUNT       	IN NUMBER,
+      P_CURRENCY_CODE         	IN VARCHAR2,
+      P_START_DATE_ACTIVE 	IN DATE,
+      P_END_DATE_ACTIVE 	IN DATE,
+      P_CREATION_DATE 		IN DATE,
+      P_CREATED_BY		IN NUMBER,
+      P_LAST_UPDATE_DATE        IN DATE,
+      P_LAST_UPDATED_BY		IN NUMBER,
+      P_LAST_UPDATE_LOGIN	IN NUMBER,
+      P_ATTRIBUTE1              IN VARCHAR2,
+      P_ATTRIBUTE2              IN VARCHAR2,
+      P_ATTRIBUTE3              IN VARCHAR2,
+      P_ATTRIBUTE4              IN VARCHAR2,
+      P_ATTRIBUTE5              IN VARCHAR2,
+      P_ATTRIBUTE6              IN VARCHAR2,
+      P_ATTRIBUTE7              IN VARCHAR2,
+      P_ATTRIBUTE8              IN VARCHAR2,
+      P_ATTRIBUTE9              IN VARCHAR2,
+      P_ATTRIBUTE10             IN VARCHAR2,
+      P_ATTRIBUTE11             IN VARCHAR2,
+      P_ATTRIBUTE12             IN VARCHAR2,
+      P_ATTRIBUTE13             IN VARCHAR2,
+      P_ATTRIBUTE14             IN VARCHAR2,
+      P_ATTRIBUTE15             IN VARCHAR2,
+      P_CONTEXT                 IN VARCHAR2,
+      P_OBJECT_VERSION_NUMBER   IN NUMBER,
+      P_SECURITY_GROUP_ID   	IN NUMBER);
+
+END CS_CHG_SUB_REST_PKG;
+
+ 
+
+/

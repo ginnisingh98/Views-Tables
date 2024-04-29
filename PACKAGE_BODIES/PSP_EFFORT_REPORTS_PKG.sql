@@ -1,0 +1,335 @@
+--------------------------------------------------------
+--  DDL for Package Body PSP_EFFORT_REPORTS_PKG
+--------------------------------------------------------
+
+  CREATE OR REPLACE EDITIONABLE PACKAGE BODY "APPS"."PSP_EFFORT_REPORTS_PKG" as
+ /* $Header: PSPERREB.pls 115.6 2002/11/18 12:44:18 lveerubh ship $ */
+procedure INSERT_ROW (
+  X_ROWID in out NOCOPY VARCHAR2,
+  X_EFFORT_REPORT_ID in NUMBER,
+  X_VERSION_NUM in NUMBER,
+  X_PERSON_ID in NUMBER,
+  X_EFFECTIVE_START_DATE in DATE,
+  X_EFFECTIVE_END_DATE in DATE,
+  X_VERSION_CREATION_DATE in DATE,
+  X_VERSION_REASON_CODE in VARCHAR2,
+  X_MESSAGE_ID in NUMBER,
+  X_REPORT_COMMENT in VARCHAR2,
+  X_REPORT_CREATION_DATE in DATE,
+  X_STATUS_CODE in VARCHAR2,
+  X_TEMPLATE_ID in NUMBER,
+  X_PREV_EFFORT_REPORT_ID in NUMBER,
+  X_BUSINESS_GROUP_ID	in   NUMBER,
+  X_SET_OF_BOOKS_ID	in   NUMBER,
+  X_MODE in VARCHAR2 default 'R'
+  ) is
+    cursor C is select ROWID from PSP_EFFORT_REPORTS
+      where EFFORT_REPORT_ID = X_EFFORT_REPORT_ID
+      and VERSION_NUM = X_VERSION_NUM;
+    X_LAST_UPDATE_DATE DATE;
+    X_LAST_UPDATED_BY NUMBER;
+    X_LAST_UPDATE_LOGIN NUMBER;
+begin
+  X_LAST_UPDATE_DATE := SYSDATE;
+  if(X_MODE = 'I') then
+    X_LAST_UPDATED_BY := 1;
+    X_LAST_UPDATE_LOGIN := 0;
+  elsif (X_MODE = 'R') then
+    X_LAST_UPDATED_BY := FND_GLOBAL.USER_ID;
+    if X_LAST_UPDATED_BY is NULL then
+      X_LAST_UPDATED_BY := -1;
+    end if;
+    X_LAST_UPDATE_LOGIN :=FND_GLOBAL.LOGIN_ID;
+    if X_LAST_UPDATE_LOGIN is NULL then
+      X_LAST_UPDATE_LOGIN := -1;
+    end if;
+  else
+    FND_MESSAGE.SET_NAME( 'FND', 'SYSTEM-INVALID ARGS');
+    app_exception.raise_exception;
+  end if;
+  insert into PSP_EFFORT_REPORTS (
+    EFFORT_REPORT_ID,
+    VERSION_NUM,
+    PERSON_ID,
+    EFFECTIVE_START_DATE,
+    EFFECTIVE_END_DATE,
+    VERSION_CREATION_DATE,
+    VERSION_REASON_CODE,
+    MESSAGE_ID,
+    REPORT_COMMENT,
+    REPORT_CREATION_DATE,
+    STATUS_CODE,
+    TEMPLATE_ID,
+    PREV_EFFORT_REPORT_ID,
+    BUSINESS_GROUP_ID,
+    SET_OF_BOOKS_ID,
+    CREATION_DATE,
+    CREATED_BY,
+    LAST_UPDATE_DATE,
+    LAST_UPDATED_BY,
+    LAST_UPDATE_LOGIN
+  ) values (
+    X_EFFORT_REPORT_ID,
+    X_VERSION_NUM,
+    X_PERSON_ID,
+    X_EFFECTIVE_START_DATE,
+    X_EFFECTIVE_END_DATE,
+    X_VERSION_CREATION_DATE,
+    X_VERSION_REASON_CODE,
+    X_MESSAGE_ID,
+    X_REPORT_COMMENT,
+    X_REPORT_CREATION_DATE,
+    X_STATUS_CODE,
+    X_TEMPLATE_ID,
+    X_PREV_EFFORT_REPORT_ID,
+    X_BUSINESS_GROUP_ID,
+    X_SET_OF_BOOKS_ID,
+    X_LAST_UPDATE_DATE,
+    X_LAST_UPDATED_BY,
+    X_LAST_UPDATE_DATE,
+    X_LAST_UPDATED_BY,
+    X_LAST_UPDATE_LOGIN
+  );
+
+  open c;
+  fetch c into X_ROWID;
+  if (c%notfound) then
+    close c;
+    raise no_data_found;
+  end if;
+  close c;
+
+end INSERT_ROW;
+
+procedure LOCK_ROW (
+  X_EFFORT_REPORT_ID in NUMBER,
+  X_VERSION_NUM in NUMBER,
+  X_PERSON_ID in NUMBER,
+  X_EFFECTIVE_START_DATE in DATE,
+  X_EFFECTIVE_END_DATE in DATE,
+  X_VERSION_CREATION_DATE in DATE,
+  X_VERSION_REASON_CODE in VARCHAR2,
+  X_MESSAGE_ID in NUMBER,
+  X_REPORT_COMMENT in VARCHAR2,
+  X_REPORT_CREATION_DATE in DATE,
+  X_STATUS_CODE in VARCHAR2,
+  X_TEMPLATE_ID in NUMBER,
+  X_BUSINESS_GROUP_ID	in   NUMBER,
+  X_SET_OF_BOOKS_ID	in   NUMBER,
+  X_PREV_EFFORT_REPORT_ID in NUMBER
+) is
+  cursor c1 is select
+      PERSON_ID,
+      EFFECTIVE_START_DATE,
+      EFFECTIVE_END_DATE,
+      VERSION_CREATION_DATE,
+      VERSION_REASON_CODE,
+      MESSAGE_ID,
+      REPORT_COMMENT,
+      REPORT_CREATION_DATE,
+      STATUS_CODE,
+      TEMPLATE_ID,
+      PREV_EFFORT_REPORT_ID
+    from PSP_EFFORT_REPORTS
+    where EFFORT_REPORT_ID = X_EFFORT_REPORT_ID
+    and VERSION_NUM = X_VERSION_NUM
+    for update of EFFORT_REPORT_ID nowait;
+  tlinfo c1%rowtype;
+
+begin
+  open c1;
+  fetch c1 into tlinfo;
+  if (c1%notfound) then
+    fnd_message.set_name('FND', 'FORM_RECORD_CHANGED');
+    app_exception.raise_exception;
+    close c1;
+    return;
+  end if;
+  close c1;
+
+  if ( (tlinfo.PERSON_ID = X_PERSON_ID)
+      AND ((tlinfo.EFFECTIVE_START_DATE = X_EFFECTIVE_START_DATE)
+           OR ((tlinfo.EFFECTIVE_START_DATE is null)
+               AND (X_EFFECTIVE_START_DATE is null)))
+      AND ((tlinfo.EFFECTIVE_END_DATE = X_EFFECTIVE_END_DATE)
+           OR ((tlinfo.EFFECTIVE_END_DATE is null)
+               AND (X_EFFECTIVE_END_DATE is null)))
+      AND (tlinfo.VERSION_CREATION_DATE = X_VERSION_CREATION_DATE)
+      AND ((tlinfo.VERSION_REASON_CODE = X_VERSION_REASON_CODE)
+           OR ((tlinfo.VERSION_REASON_CODE is null)
+               AND (X_VERSION_REASON_CODE is null)))
+      AND ((tlinfo.MESSAGE_ID = X_MESSAGE_ID)
+           OR ((tlinfo.MESSAGE_ID is null)
+               AND (X_MESSAGE_ID is null)))
+      AND ((tlinfo.REPORT_COMMENT = X_REPORT_COMMENT)
+           OR ((tlinfo.REPORT_COMMENT is null)
+               AND (X_REPORT_COMMENT is null)))
+      AND ((tlinfo.REPORT_CREATION_DATE = X_REPORT_CREATION_DATE)
+           OR ((tlinfo.REPORT_CREATION_DATE is null)
+               AND (X_REPORT_CREATION_DATE is null)))
+      AND (tlinfo.STATUS_CODE = X_STATUS_CODE)
+      AND ((tlinfo.TEMPLATE_ID = X_TEMPLATE_ID)
+           OR ((tlinfo.TEMPLATE_ID is null)
+               AND (X_TEMPLATE_ID is null)))
+      AND ((tlinfo.PREV_EFFORT_REPORT_ID = X_PREV_EFFORT_REPORT_ID)
+           OR ((tlinfo.PREV_EFFORT_REPORT_ID is null)
+               AND (X_PREV_EFFORT_REPORT_ID is null)))
+  ) then
+    null;
+  else
+    fnd_message.set_name('FND', 'FORM_RECORD_CHANGED');
+    app_exception.raise_exception;
+  end if;
+  return;
+end LOCK_ROW;
+
+procedure UPDATE_ROW (
+  X_EFFORT_REPORT_ID in NUMBER,
+  X_VERSION_NUM in NUMBER,
+  X_PERSON_ID in NUMBER,
+  X_EFFECTIVE_START_DATE in DATE,
+  X_EFFECTIVE_END_DATE in DATE,
+  X_VERSION_CREATION_DATE in DATE,
+  X_VERSION_REASON_CODE in VARCHAR2,
+  X_MESSAGE_ID in NUMBER,
+  X_REPORT_COMMENT in VARCHAR2,
+  X_REPORT_CREATION_DATE in DATE,
+  X_STATUS_CODE in VARCHAR2,
+  X_TEMPLATE_ID in NUMBER,
+  X_PREV_EFFORT_REPORT_ID in NUMBER,
+  X_BUSINESS_GROUP_ID	in   NUMBER,
+  X_SET_OF_BOOKS_ID	in   NUMBER,
+  X_MODE in VARCHAR2 default 'R'
+  ) is
+    X_LAST_UPDATE_DATE DATE;
+    X_LAST_UPDATED_BY NUMBER;
+    X_LAST_UPDATE_LOGIN NUMBER;
+begin
+  X_LAST_UPDATE_DATE := SYSDATE;
+  if(X_MODE = 'I') then
+    X_LAST_UPDATED_BY := 1;
+    X_LAST_UPDATE_LOGIN := 0;
+  elsif (X_MODE = 'R') then
+    X_LAST_UPDATED_BY := FND_GLOBAL.USER_ID;
+    if X_LAST_UPDATED_BY is NULL then
+      X_LAST_UPDATED_BY := -1;
+    end if;
+    X_LAST_UPDATE_LOGIN :=FND_GLOBAL.LOGIN_ID;
+    if X_LAST_UPDATE_LOGIN is NULL then
+      X_LAST_UPDATE_LOGIN := -1;
+    end if;
+  else
+    FND_MESSAGE.SET_NAME('FND', 'SYSTEM-INVALID ARGS');
+    app_exception.raise_exception;
+  end if;
+  update PSP_EFFORT_REPORTS set
+    PERSON_ID = X_PERSON_ID,
+    EFFECTIVE_START_DATE = X_EFFECTIVE_START_DATE,
+    EFFECTIVE_END_DATE = X_EFFECTIVE_END_DATE,
+    VERSION_CREATION_DATE = X_VERSION_CREATION_DATE,
+    VERSION_REASON_CODE = X_VERSION_REASON_CODE,
+    MESSAGE_ID = X_MESSAGE_ID,
+    REPORT_COMMENT = X_REPORT_COMMENT,
+    REPORT_CREATION_DATE = X_REPORT_CREATION_DATE,
+    STATUS_CODE = X_STATUS_CODE,
+    TEMPLATE_ID = X_TEMPLATE_ID,
+    PREV_EFFORT_REPORT_ID = X_PREV_EFFORT_REPORT_ID,
+    BUSINESS_GROUP_ID = X_BUSINESS_GROUP_ID,
+    SET_OF_BOOKS_ID = X_SET_OF_BOOKS_ID,
+    LAST_UPDATE_DATE = X_LAST_UPDATE_DATE,
+    LAST_UPDATED_BY = X_LAST_UPDATED_BY,
+    LAST_UPDATE_LOGIN = X_LAST_UPDATE_LOGIN
+  where EFFORT_REPORT_ID = X_EFFORT_REPORT_ID
+  and VERSION_NUM = X_VERSION_NUM
+  ;
+  ---if (sql%notfound) then
+    ---raise no_data_found;
+  ---end if;
+  commit;
+end UPDATE_ROW;
+
+procedure ADD_ROW (
+  X_ROWID in out NOCOPY VARCHAR2,
+  X_EFFORT_REPORT_ID in NUMBER,
+  X_VERSION_NUM in NUMBER,
+  X_PERSON_ID in NUMBER,
+  X_EFFECTIVE_START_DATE in DATE,
+  X_EFFECTIVE_END_DATE in DATE,
+  X_VERSION_CREATION_DATE in DATE,
+  X_VERSION_REASON_CODE in VARCHAR2,
+  X_MESSAGE_ID in NUMBER,
+  X_REPORT_COMMENT in VARCHAR2,
+  X_REPORT_CREATION_DATE in DATE,
+  X_STATUS_CODE in VARCHAR2,
+  X_TEMPLATE_ID in NUMBER,
+  X_PREV_EFFORT_REPORT_ID in NUMBER,
+  X_BUSINESS_GROUP_ID	in   NUMBER,
+  X_SET_OF_BOOKS_ID	in   NUMBER,
+  X_MODE in VARCHAR2 default 'R'
+  ) is
+  cursor c1 is select rowid from PSP_EFFORT_REPORTS
+     where EFFORT_REPORT_ID = X_EFFORT_REPORT_ID
+     and VERSION_NUM = X_VERSION_NUM
+  ;
+  dummy c1%rowtype;
+begin
+  open c1;
+  fetch c1 into dummy;
+  if (c1%notfound) then
+    close c1;
+    INSERT_ROW (
+     X_ROWID,
+     X_EFFORT_REPORT_ID,
+     X_VERSION_NUM,
+     X_PERSON_ID,
+     X_EFFECTIVE_START_DATE,
+     X_EFFECTIVE_END_DATE,
+     X_VERSION_CREATION_DATE,
+     X_VERSION_REASON_CODE,
+     X_MESSAGE_ID,
+     X_REPORT_COMMENT,
+     X_REPORT_CREATION_DATE,
+     X_STATUS_CODE,
+     X_TEMPLATE_ID,
+     X_PREV_EFFORT_REPORT_ID,
+     X_BUSINESS_GROUP_ID,
+     X_SET_OF_BOOKS_ID,
+     X_MODE);
+    return;
+  end if;
+  close c1;
+  UPDATE_ROW (
+   X_EFFORT_REPORT_ID,
+   X_VERSION_NUM,
+   X_PERSON_ID,
+   X_EFFECTIVE_START_DATE,
+   X_EFFECTIVE_END_DATE,
+   X_VERSION_CREATION_DATE,
+   X_VERSION_REASON_CODE,
+   X_MESSAGE_ID,
+   X_REPORT_COMMENT,
+   X_REPORT_CREATION_DATE,
+   X_STATUS_CODE,
+   X_TEMPLATE_ID,
+   X_PREV_EFFORT_REPORT_ID,
+   X_BUSINESS_GROUP_ID,
+   X_SET_OF_BOOKS_ID,
+   X_MODE);
+end ADD_ROW;
+
+procedure DELETE_ROW (
+  X_EFFORT_REPORT_ID in NUMBER,
+  X_VERSION_NUM in NUMBER
+) is
+begin
+  delete from PSP_EFFORT_REPORTS
+  where EFFORT_REPORT_ID = X_EFFORT_REPORT_ID
+  and VERSION_NUM = X_VERSION_NUM;
+  ---if (sql%notfound) then
+    ---raise no_data_found;
+  ---end if;
+end DELETE_ROW;
+
+end PSP_EFFORT_REPORTS_PKG;
+
+/

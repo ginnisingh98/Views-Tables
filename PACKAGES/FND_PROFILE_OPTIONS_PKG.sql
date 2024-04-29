@@ -1,0 +1,402 @@
+--------------------------------------------------------
+--  DDL for Package FND_PROFILE_OPTIONS_PKG
+--------------------------------------------------------
+
+  CREATE OR REPLACE EDITIONABLE PACKAGE "APPS"."FND_PROFILE_OPTIONS_PKG" AUTHID CURRENT_USER as
+/* $Header: AFPOMPOS.pls 120.1.12000000.2 2007/04/13 13:23:44 stadepal ship $ */
+/*#
+ * Table Handler to Insert
+ * and Update data into FND_PROFILE_OPTIONS table.
+ * @rep:scope public
+ * @rep:product FND
+ * @rep:displayname Profile Table Handler
+ * @rep:category BUSINESS_ENTITY FND_PROFILE
+ * @rep:compatibility S
+ * @rep:lifecycle active
+ */
+
+--
+-- ### Overloaded version of procedure at package end!
+--
+procedure INSERT_ROW (
+  X_ROWID 			in out 	NOCOPY VARCHAR2,
+  X_PROFILE_OPTION_NAME 	in	VARCHAR2,
+  X_APPLICATION_ID 		in	NUMBER,
+  X_PROFILE_OPTION_ID 		in	NUMBER,
+  X_WRITE_ALLOWED_FLAG 		in	VARCHAR2,
+  X_READ_ALLOWED_FLAG 		in	VARCHAR2,
+  X_USER_CHANGEABLE_FLAG 	in	VARCHAR2,
+  X_USER_VISIBLE_FLAG 		in	VARCHAR2,
+  X_SITE_ENABLED_FLAG 		in	VARCHAR2,
+  X_SITE_UPDATE_ALLOWED_FLAG 	in	VARCHAR2,
+  X_APP_ENABLED_FLAG 		in	VARCHAR2,
+  X_APP_UPDATE_ALLOWED_FLAG 	in	VARCHAR2,
+  X_RESP_ENABLED_FLAG 		in	VARCHAR2,
+  X_RESP_UPDATE_ALLOWED_FLAG 	in	VARCHAR2,
+  X_USER_ENABLED_FLAG 		in	VARCHAR2,
+  X_USER_UPDATE_ALLOWED_FLAG 	in	VARCHAR2,
+  X_START_DATE_ACTIVE 		in	DATE,
+  X_SQL_VALIDATION 		in	VARCHAR2,
+  X_END_DATE_ACTIVE 		in	DATE,
+  X_USER_PROFILE_OPTION_NAME 	in	VARCHAR2,
+  X_DESCRIPTION 		in	VARCHAR2,
+  X_CREATION_DATE 		in	DATE,
+  X_CREATED_BY 			in	NUMBER,
+  X_LAST_UPDATE_DATE 		in	DATE,
+  X_LAST_UPDATED_BY 		in	NUMBER,
+  X_LAST_UPDATE_LOGIN 		in	NUMBER,
+  X_HIERARCHY_TYPE              in      VARCHAR2 default 'SECURITY',
+  X_SERVER_ENABLED_FLAG         in      VARCHAR2 default 'N',
+  X_SERVER_UPDATE_ALLOWED_FLAG  in      VARCHAR2 default 'N',
+  X_ORG_ENABLED_FLAG            in      VARCHAR2 default 'N',
+  X_ORG_UPDATE_ALLOWED_FLAG     in      VARCHAR2 default 'N');
+
+
+--
+-- ### Overloaded version of procedure at package end!
+--
+procedure TRANSLATE_ROW (
+  X_PROFILE_NAME		in 	VARCHAR2,
+  X_OWNER			in	VARCHAR2,
+  X_USER_PROFILE_OPTION_NAME	in 	VARCHAR2,
+  X_DESCRIPTION			in 	VARCHAR2);
+
+--
+-- ### Overloaded version of procedure at package end!
+--
+procedure LOAD_ROW (
+  X_PROFILE_NAME		in 	VARCHAR2,
+  X_OWNER			in	VARCHAR2,
+  X_APPLICATION_SHORT_NAME	in 	VARCHAR2,
+  X_USER_PROFILE_OPTION_NAME	in 	VARCHAR2,
+  X_DESCRIPTION			in 	VARCHAR2,
+  X_USER_CHANGEABLE_FLAG	in 	VARCHAR2,
+  X_USER_VISIBLE_FLAG		in 	VARCHAR2,
+  X_READ_ALLOWED_FLAG		in 	VARCHAR2,
+  X_WRITE_ALLOWED_FLAG		in 	VARCHAR2,
+  X_SITE_ENABLED_FLAG		in 	VARCHAR2,
+  X_SITE_UPDATE_ALLOWED_FLAG	in 	VARCHAR2,
+  X_APP_ENABLED_FLAG		in 	VARCHAR2,
+  X_APP_UPDATE_ALLOWED_FLAG	in 	VARCHAR2,
+  X_RESP_ENABLED_FLAG		in 	VARCHAR2,
+  X_RESP_UPDATE_ALLOWED_FLAG	in 	VARCHAR2,
+  X_USER_ENABLED_FLAG		in 	VARCHAR2,
+  X_USER_UPDATE_ALLOWED_FLAG	in 	VARCHAR2,
+  X_START_DATE_ACTIVE		in 	VARCHAR2,
+  X_END_DATE_ACTIVE		in 	VARCHAR2,
+  X_SQL_VALIDATION		in 	VARCHAR2);
+
+--
+-- ### Overloaded version of procedure at package end!
+--
+procedure LOCK_ROW (
+  X_PROFILE_OPTION_NAME 	in	VARCHAR2,
+  X_APPLICATION_ID 		in	NUMBER,
+  X_PROFILE_OPTION_ID 		in	NUMBER,
+  X_WRITE_ALLOWED_FLAG 		in 	VARCHAR2,
+  X_READ_ALLOWED_FLAG 		in 	VARCHAR2,
+  X_USER_CHANGEABLE_FLAG 	in 	VARCHAR2,
+  X_USER_VISIBLE_FLAG 		in 	VARCHAR2,
+  X_SITE_ENABLED_FLAG 		in 	VARCHAR2,
+  X_SITE_UPDATE_ALLOWED_FLAG 	in 	VARCHAR2,
+  X_APP_ENABLED_FLAG 		in 	VARCHAR2,
+  X_APP_UPDATE_ALLOWED_FLAG 	in 	VARCHAR2,
+  X_RESP_ENABLED_FLAG 		in 	VARCHAR2,
+  X_RESP_UPDATE_ALLOWED_FLAG 	in 	VARCHAR2,
+  X_USER_ENABLED_FLAG 		in 	VARCHAR2,
+  X_USER_UPDATE_ALLOWED_FLAG 	in 	VARCHAR2,
+  X_START_DATE_ACTIVE 		in 	DATE,
+  X_SQL_VALIDATION 		in 	VARCHAR2,
+  X_END_DATE_ACTIVE 		in 	DATE,
+  X_USER_PROFILE_OPTION_NAME 	in 	VARCHAR2,
+  X_DESCRIPTION 		in 	VARCHAR2,
+  X_HIERARCHY_TYPE              in      VARCHAR2 default 'SECURITY',
+  X_SERVER_ENABLED_FLAG         in      VARCHAR2 default 'N',
+  X_SERVER_UPDATE_ALLOWED_FLAG  in      VARCHAR2 default 'N',
+  X_ORG_ENABLED_FLAG            in      VARCHAR2 default 'N',
+  X_ORG_UPDATE_ALLOWED_FLAG     in      VARCHAR2 default 'N');
+
+--
+-- ### Overloaded version of procedure at package end!
+--
+procedure UPDATE_ROW (
+  X_PROFILE_OPTION_NAME 	in 	VARCHAR2,
+  X_APPLICATION_ID 		in 	NUMBER,
+  X_PROFILE_OPTION_ID 		in 	NUMBER,
+  X_WRITE_ALLOWED_FLAG 		in 	VARCHAR2,
+  X_READ_ALLOWED_FLAG 		in 	VARCHAR2,
+  X_USER_CHANGEABLE_FLAG 	in 	VARCHAR2,
+  X_USER_VISIBLE_FLAG 		in 	VARCHAR2,
+  X_SITE_ENABLED_FLAG 		in 	VARCHAR2,
+  X_SITE_UPDATE_ALLOWED_FLAG 	in 	VARCHAR2,
+  X_APP_ENABLED_FLAG 		in 	VARCHAR2,
+  X_APP_UPDATE_ALLOWED_FLAG 	in 	VARCHAR2,
+  X_RESP_ENABLED_FLAG 		in 	VARCHAR2,
+  X_RESP_UPDATE_ALLOWED_FLAG 	in 	VARCHAR2,
+  X_USER_ENABLED_FLAG 		in 	VARCHAR2,
+  X_USER_UPDATE_ALLOWED_FLAG 	in 	VARCHAR2,
+  X_START_DATE_ACTIVE 		in 	DATE,
+  X_SQL_VALIDATION 		in 	VARCHAR2,
+  X_END_DATE_ACTIVE 		in 	DATE,
+  X_USER_PROFILE_OPTION_NAME 	in 	VARCHAR2,
+  X_DESCRIPTION 		in 	VARCHAR2,
+  X_LAST_UPDATE_DATE 		in 	DATE,
+  X_LAST_UPDATED_BY 		in 	NUMBER,
+  X_LAST_UPDATE_LOGIN 		in 	NUMBER,
+  X_HIERARCHY_TYPE              in      VARCHAR2 default 'SECURITY',
+  X_SERVER_ENABLED_FLAG         in      VARCHAR2 default 'N',
+  X_SERVER_UPDATE_ALLOWED_FLAG  in      VARCHAR2 default 'N',
+  X_ORG_ENABLED_FLAG            in      VARCHAR2 default 'N',
+  X_ORG_UPDATE_ALLOWED_FLAG     in      VARCHAR2 default 'N');
+
+
+procedure DELETE_ROW (
+  X_PROFILE_OPTION_NAME in VARCHAR2);
+
+procedure ADD_LANGUAGE;
+
+--
+-- ### Overloaded version above!
+--
+procedure TRANSLATE_ROW (
+  X_PROFILE_NAME		in 	VARCHAR2,
+  X_OWNER			in	VARCHAR2,
+  X_USER_PROFILE_OPTION_NAME	in 	VARCHAR2,
+  X_DESCRIPTION			in 	VARCHAR2,
+  X_CUSTOM_MODE                 in      VARCHAR2,
+  X_LAST_UPDATE_DATE            in      VARCHAR2);
+
+--
+-- ### Overloaded version above and below!
+--
+procedure LOAD_ROW (
+  X_PROFILE_NAME		in 	VARCHAR2,
+  X_OWNER			in	VARCHAR2,
+  X_APPLICATION_SHORT_NAME	in 	VARCHAR2,
+  X_USER_PROFILE_OPTION_NAME	in 	VARCHAR2,
+  X_DESCRIPTION			in 	VARCHAR2,
+  X_USER_CHANGEABLE_FLAG	in 	VARCHAR2,
+  X_USER_VISIBLE_FLAG		in 	VARCHAR2,
+  X_READ_ALLOWED_FLAG		in 	VARCHAR2,
+  X_WRITE_ALLOWED_FLAG		in 	VARCHAR2,
+  X_SITE_ENABLED_FLAG		in 	VARCHAR2,
+  X_SITE_UPDATE_ALLOWED_FLAG	in 	VARCHAR2,
+  X_APP_ENABLED_FLAG		in 	VARCHAR2,
+  X_APP_UPDATE_ALLOWED_FLAG	in 	VARCHAR2,
+  X_RESP_ENABLED_FLAG		in 	VARCHAR2,
+  X_RESP_UPDATE_ALLOWED_FLAG	in 	VARCHAR2,
+  X_USER_ENABLED_FLAG		in 	VARCHAR2,
+  X_USER_UPDATE_ALLOWED_FLAG	in 	VARCHAR2,
+  X_START_DATE_ACTIVE		in 	VARCHAR2,
+  X_END_DATE_ACTIVE		in 	VARCHAR2,
+  X_SQL_VALIDATION		in 	VARCHAR2,
+  X_HIERARCHY_TYPE		in	VARCHAR2,
+  X_CUSTOM_MODE                 in      VARCHAR2,
+  X_LAST_UPDATE_DATE            in      VARCHAR2,
+  X_SERVER_ENABLED_FLAG		IN	VARCHAR2,
+  X_SERVER_UPDATE_ALLOWED_FLAG	IN	VARCHAR2,
+  X_ORG_ENABLED_FLAG		IN	VARCHAR2,
+  X_ORG_UPDATE_ALLOWED_FLAG	IN	VARCHAR2);
+
+--
+-- ### Overloaded version above !
+--
+procedure UPDATE_ROW (
+  X_PROFILE_OPTION_NAME         in      VARCHAR2,
+  X_APPLICATION_ID              in      NUMBER,
+  X_PROFILE_OPTION_ID           in      NUMBER,
+  X_WRITE_ALLOWED_FLAG          in      VARCHAR2,
+  X_READ_ALLOWED_FLAG           in      VARCHAR2,
+  X_USER_CHANGEABLE_FLAG        in      VARCHAR2,
+  X_USER_VISIBLE_FLAG           in      VARCHAR2,
+  X_SITE_ENABLED_FLAG           in      VARCHAR2,
+  X_SITE_UPDATE_ALLOWED_FLAG    in      VARCHAR2,
+  X_APP_ENABLED_FLAG            in      VARCHAR2,
+  X_APP_UPDATE_ALLOWED_FLAG     in      VARCHAR2,
+  X_RESP_ENABLED_FLAG           in      VARCHAR2,
+  X_RESP_UPDATE_ALLOWED_FLAG    in      VARCHAR2,
+  X_USER_ENABLED_FLAG           in      VARCHAR2,
+  X_USER_UPDATE_ALLOWED_FLAG    in      VARCHAR2,
+  X_START_DATE_ACTIVE           in      DATE,
+  X_SQL_VALIDATION              in      VARCHAR2,
+  X_END_DATE_ACTIVE             in      DATE,
+  X_USER_PROFILE_OPTION_NAME    in      VARCHAR2,
+  X_DESCRIPTION                 in      VARCHAR2,
+  X_LAST_UPDATE_DATE            in      DATE,
+  X_LAST_UPDATED_BY             in      NUMBER,
+  X_LAST_UPDATE_LOGIN           in      NUMBER,
+  X_HIERARCHY_TYPE              in      VARCHAR2 default 'SECURITY',
+  X_SERVER_ENABLED_FLAG         in      VARCHAR2 default 'N',
+  X_SERVER_UPDATE_ALLOWED_FLAG  in      VARCHAR2 default 'N',
+  X_ORG_ENABLED_FLAG            in      VARCHAR2 default 'N',
+  X_ORG_UPDATE_ALLOWED_FLAG     in      VARCHAR2 default 'N',
+  X_SERVERRESP_ENABLED_FLAG     in      VARCHAR2,
+  X_SERVERRESP_UPD_ALLOW_FL     in      VARCHAR2);
+
+--
+-- ### Overloaded version above !
+--
+procedure UPDATE_ROW (
+  X_PROFILE_OPTION_NAME         in      VARCHAR2,
+  X_HIERARCHY_TYPE              in      VARCHAR2,
+  X_SITE_ENABLED_FLAG           in      VARCHAR2 default NULL,
+  X_SITE_UPDATE_ALLOWED_FLAG    in      VARCHAR2 default NULL,
+  X_APP_ENABLED_FLAG            in      VARCHAR2 default NULL,
+  X_APP_UPDATE_ALLOWED_FLAG     in      VARCHAR2 default NULL,
+  X_RESP_ENABLED_FLAG           in      VARCHAR2 default NULL,
+  X_RESP_UPDATE_ALLOWED_FLAG    in      VARCHAR2 default NULL,
+  X_USER_ENABLED_FLAG           in      VARCHAR2 default NULL,
+  X_USER_UPDATE_ALLOWED_FLAG    in      VARCHAR2 default NULL,
+  X_SERVER_ENABLED_FLAG         in      VARCHAR2 default NULL,
+  X_SERVER_UPDATE_ALLOWED_FLAG  in      VARCHAR2 default NULL,
+  X_ORG_ENABLED_FLAG            in      VARCHAR2 default NULL,
+  X_ORG_UPDATE_ALLOWED_FLAG     in      VARCHAR2 default NULL,
+  X_SERVERRESP_ENABLED_FLAG     in      VARCHAR2 default NULL,
+  X_SERVERRESP_UPD_ALLOW_FL     in      VARCHAR2 default NULL);
+
+--
+-- ### Overloaded version above !
+--
+procedure INSERT_ROW (
+  X_ROWID 			in out 	NOCOPY VARCHAR2,
+  X_PROFILE_OPTION_NAME 	in	VARCHAR2,
+  X_APPLICATION_ID 		in	NUMBER,
+  X_PROFILE_OPTION_ID 		in	NUMBER,
+  X_WRITE_ALLOWED_FLAG 		in	VARCHAR2,
+  X_READ_ALLOWED_FLAG 		in	VARCHAR2,
+  X_USER_CHANGEABLE_FLAG 	in	VARCHAR2,
+  X_USER_VISIBLE_FLAG 		in	VARCHAR2,
+  X_SITE_ENABLED_FLAG 		in	VARCHAR2,
+  X_SITE_UPDATE_ALLOWED_FLAG 	in	VARCHAR2,
+  X_APP_ENABLED_FLAG 		in	VARCHAR2,
+  X_APP_UPDATE_ALLOWED_FLAG 	in	VARCHAR2,
+  X_RESP_ENABLED_FLAG 		in	VARCHAR2,
+  X_RESP_UPDATE_ALLOWED_FLAG 	in	VARCHAR2,
+  X_USER_ENABLED_FLAG 		in	VARCHAR2,
+  X_USER_UPDATE_ALLOWED_FLAG 	in	VARCHAR2,
+  X_START_DATE_ACTIVE 		in	DATE,
+  X_SQL_VALIDATION 		in	VARCHAR2,
+  X_END_DATE_ACTIVE 		in	DATE,
+  X_USER_PROFILE_OPTION_NAME 	in	VARCHAR2,
+  X_DESCRIPTION 		in	VARCHAR2,
+  X_CREATION_DATE 		in	DATE,
+  X_CREATED_BY 			in	NUMBER,
+  X_LAST_UPDATE_DATE 		in	DATE,
+  X_LAST_UPDATED_BY 		in	NUMBER,
+  X_LAST_UPDATE_LOGIN 		in	NUMBER,
+  X_HIERARCHY_TYPE              in      VARCHAR2 default 'SECURITY',
+  X_SERVER_ENABLED_FLAG         in      VARCHAR2 default 'N',
+  X_SERVER_UPDATE_ALLOWED_FLAG  in      VARCHAR2 default 'N',
+  X_ORG_ENABLED_FLAG            in      VARCHAR2 default 'N',
+  X_ORG_UPDATE_ALLOWED_FLAG     in      VARCHAR2 default 'N',
+  X_SERVERRESP_ENABLED_FLAG     in      VARCHAR2,
+  X_SERVERRESP_UPD_ALLOW_FL     in      VARCHAR2);
+
+--
+-- ### Overloaded version above !
+--
+/*#
+ * Loads a row of FND_PROFILE_OPTIONS.
+ * There are also overloaded versions of this procedure with fewer parameters.
+ * @param  X_PROFILE_NAME Profile name
+ * @param  X_OWNER Profile owner
+ * @param  X_APPLICATION_SHORT_NAME Application short name
+ * @param  X_USER_PROFILE_OPTION_NAME User friendly profile name
+ * @param  X_DESCRIPTION  Profile description
+ * @param  X_USER_CHANGEABLE_FLAG Can user change the profile?
+ * @param  X_USER_VISIBLE_FLAG Is profile visible to user?
+ * @param  X_READ_ALLOWED_FLAG Is read is allowed?
+ * @param  X_WRITE_ALLOWED_FLAG Is write is allowed?
+ * @param  X_SITE_ENABLED_FLAG  Is enabled in site level?
+ * @param  X_SITE_UPDATE_ALLOWED_FLAG Is updatable in site level?
+ * @param  X_APP_ENABLED_FLAG Is enabled in application level?
+ * @param  X_APP_UPDATE_ALLOWED_FLAG Is updateable in application level?
+ * @param  X_RESP_ENABLED_FLAG Is enabled in resposibility level?
+ * @param  X_RESP_UPDATE_ALLOWED_FLAG Is updateable in resposibility level?
+ * @param  X_USER_ENABLED_FLAG Is enabled in user level?
+ * @param  X_USER_UPDATE_ALLOWED_FLAG Is updateable in user level?
+ * @param  X_START_DATE_ACTIVE Start date from when the profile is active
+ * @param  X_END_DATE_ACTIVE End date to which the profile will be active
+ * @param  X_SQL_VALIDATION  SQL which retrieves the profile values
+ * @param  X_HIERARCHY_TYPE Hierarchy type
+ * @param  X_CUSTOM_MODE Custom mode
+ * @param  X_LAST_UPDATE_DATE Last date when the profile was updated
+ * @param  X_SERVER_ENABLED_FLAG Is enabled at server level?
+ * @param  X_SERVER_UPDATE_ALLOWED_FLAG Is updateable in server level?
+ * @param  X_ORG_ENABLED_FLAG Is enabled in organisation level?
+ * @param  X_ORG_UPDATE_ALLOWED_FLAG Is updateable in organisation level?
+ * @param  X_SERVERRESP_ENABLED_FLAG Is enabled in server-resp level?
+ * @param  X_SERVERRESP_UPD_ALLOW_FL Is updateable in server-resp level?
+ * @rep:scope public
+ * @rep:displayname Load Row
+ * @rep:compatibility S
+ * @rep:lifecycle active
+ */
+procedure LOAD_ROW (
+  X_PROFILE_NAME		in 	VARCHAR2,
+  X_OWNER			in	VARCHAR2,
+  X_APPLICATION_SHORT_NAME	in 	VARCHAR2,
+  X_USER_PROFILE_OPTION_NAME	in 	VARCHAR2,
+  X_DESCRIPTION			in 	VARCHAR2,
+  X_USER_CHANGEABLE_FLAG	in 	VARCHAR2,
+  X_USER_VISIBLE_FLAG		in 	VARCHAR2,
+  X_READ_ALLOWED_FLAG		in 	VARCHAR2,
+  X_WRITE_ALLOWED_FLAG		in 	VARCHAR2,
+  X_SITE_ENABLED_FLAG		in 	VARCHAR2,
+  X_SITE_UPDATE_ALLOWED_FLAG	in 	VARCHAR2,
+  X_APP_ENABLED_FLAG		in 	VARCHAR2,
+  X_APP_UPDATE_ALLOWED_FLAG	in 	VARCHAR2,
+  X_RESP_ENABLED_FLAG		in 	VARCHAR2,
+  X_RESP_UPDATE_ALLOWED_FLAG	in 	VARCHAR2,
+  X_USER_ENABLED_FLAG		in 	VARCHAR2,
+  X_USER_UPDATE_ALLOWED_FLAG	in 	VARCHAR2,
+  X_START_DATE_ACTIVE		in 	VARCHAR2,
+  X_END_DATE_ACTIVE		in 	VARCHAR2,
+  X_SQL_VALIDATION		in 	VARCHAR2,
+  X_HIERARCHY_TYPE		in	VARCHAR2,
+  X_CUSTOM_MODE                 in      VARCHAR2,
+  X_LAST_UPDATE_DATE            in      VARCHAR2,
+  X_SERVER_ENABLED_FLAG		IN	VARCHAR2,
+  X_SERVER_UPDATE_ALLOWED_FLAG	IN	VARCHAR2,
+  X_ORG_ENABLED_FLAG		IN	VARCHAR2,
+  X_ORG_UPDATE_ALLOWED_FLAG	IN	VARCHAR2,
+  X_SERVERRESP_ENABLED_FLAG     in      VARCHAR2,
+  X_SERVERRESP_UPD_ALLOW_FL     in      VARCHAR2);
+
+--
+-- ### Overloaded version above !
+--
+procedure LOCK_ROW (
+  X_PROFILE_OPTION_NAME 	in	VARCHAR2,
+  X_APPLICATION_ID 		in	NUMBER,
+  X_PROFILE_OPTION_ID 		in	NUMBER,
+  X_WRITE_ALLOWED_FLAG 		in 	VARCHAR2,
+  X_READ_ALLOWED_FLAG 		in 	VARCHAR2,
+  X_USER_CHANGEABLE_FLAG 	in 	VARCHAR2,
+  X_USER_VISIBLE_FLAG 		in 	VARCHAR2,
+  X_SITE_ENABLED_FLAG 		in 	VARCHAR2,
+  X_SITE_UPDATE_ALLOWED_FLAG 	in 	VARCHAR2,
+  X_APP_ENABLED_FLAG 		in 	VARCHAR2,
+  X_APP_UPDATE_ALLOWED_FLAG 	in 	VARCHAR2,
+  X_RESP_ENABLED_FLAG 		in 	VARCHAR2,
+  X_RESP_UPDATE_ALLOWED_FLAG 	in 	VARCHAR2,
+  X_USER_ENABLED_FLAG 		in 	VARCHAR2,
+  X_USER_UPDATE_ALLOWED_FLAG 	in 	VARCHAR2,
+  X_START_DATE_ACTIVE 		in 	DATE,
+  X_SQL_VALIDATION 		in 	VARCHAR2,
+  X_END_DATE_ACTIVE 		in 	DATE,
+  X_USER_PROFILE_OPTION_NAME 	in 	VARCHAR2,
+  X_DESCRIPTION 		in 	VARCHAR2,
+  X_HIERARCHY_TYPE              in      VARCHAR2 default 'SECURITY',
+  X_SERVER_ENABLED_FLAG         in      VARCHAR2 default 'N',
+  X_SERVER_UPDATE_ALLOWED_FLAG  in      VARCHAR2 default 'N',
+  X_ORG_ENABLED_FLAG            in      VARCHAR2 default 'N',
+  X_ORG_UPDATE_ALLOWED_FLAG     in      VARCHAR2 default 'N',
+  X_SERVERRESP_ENABLED_FLAG     in      VARCHAR2,
+  X_SERVERRESP_UPD_ALLOW_FL     in      VARCHAR2);
+
+end FND_PROFILE_OPTIONS_PKG;
+
+ 
+
+/

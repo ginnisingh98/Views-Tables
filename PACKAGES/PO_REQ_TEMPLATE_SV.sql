@@ -1,0 +1,150 @@
+--------------------------------------------------------
+--  DDL for Package PO_REQ_TEMPLATE_SV
+--------------------------------------------------------
+
+  CREATE OR REPLACE EDITIONABLE PACKAGE "APPS"."PO_REQ_TEMPLATE_SV" AUTHID CURRENT_USER AS
+/* $Header: POXRQT1S.pls 120.0 2005/06/02 01:43:50 appldev noship $*/
+
+PROCEDURE insert_line (x_rowid				IN OUT NOCOPY VARCHAR2,
+		        x_express_name			IN 	VARCHAR2,
+			x_sequence_num			IN	NUMBER,
+			x_creation_date			IN	DATE,
+			x_last_update_date		IN 	DATE,
+			x_po_header_id			IN	NUMBER,
+			x_po_line_id			IN	NUMBER,
+			x_created_by			IN	NUMBER,
+			x_last_update_login		IN	NUMBER,
+			x_item_id			IN	NUMBER,
+			x_line_type_id			IN	NUMBER,
+			x_item_revision			IN	VARCHAR2,
+			x_category_id			IN	NUMBER,
+			x_unit_meas_lookup_code 	IN	VARCHAR2,
+			x_suggested_quantity		IN	NUMBER, --KitSupport FPJ
+			x_unit_price			IN	NUMBER,
+			x_suggested_vendor_id 		IN	NUMBER,
+			x_suggested_vendor_site_id	IN	NUMBER,
+			x_suggested_vendor_contact_id	IN	NUMBER,
+			x_suggested_vendor_prod_code 	IN	VARCHAR2,
+			x_suggested_buyer_id		IN	NUMBER,
+			x_rfq_required_flag		IN	VARCHAR2,
+			x_vendor_source_context		IN	VARCHAR2,
+			x_source_type_code		IN	VARCHAR2,
+			x_source_organization_id	IN	NUMBER,
+			x_source_subinventory		IN	VARCHAR2,
+			x_item_description		IN	VARCHAR2,
+			x_attribute_category		IN	VARCHAR2,
+			x_attribute1			IN      VARCHAR2,
+			x_attribute2			IN      VARCHAR2,
+			x_attribute3			IN      VARCHAR2,
+			x_attribute4			IN      VARCHAR2,
+			x_attribute5			IN      VARCHAR2,
+			x_attribute6			IN      VARCHAR2,
+			x_attribute7			IN      VARCHAR2,
+			x_attribute8			IN      VARCHAR2,
+			x_attribute9			IN      VARCHAR2,
+			x_attribute10			IN      VARCHAR2,
+			x_attribute11			IN      VARCHAR2,
+			x_attribute12			IN      VARCHAR2,
+			x_attribute13			IN      VARCHAR2,
+			x_attribute14			IN      VARCHAR2,
+			x_attribute15			IN      VARCHAR2,
+                        x_amount                        IN      NUMBER,  -- <SERVICES FPJ>
+			x_negotiated_by_preparer_flag   IN      VARCHAR2, --<DBI FPJ>
+                        p_org_id                        IN      NUMBER DEFAULT NULL   -- <R12 MOAC>
+			);
+
+PROCEDURE update_line (x_rowid		VARCHAR2,
+		        x_express_name		VARCHAR2,
+			x_sequence_num		NUMBER,
+			x_last_updated_by	NUMBER,
+			x_last_update_date	DATE,
+			x_po_header_id		NUMBER,
+			x_po_line_id		NUMBER,
+			x_last_update_login	NUMBER,
+			x_item_id		NUMBER,
+			x_line_type_id		NUMBER,
+			x_item_revision		VARCHAR2,
+			x_category_id		NUMBER,
+			x_unit_meas_lookup_code VARCHAR2,
+			x_suggested_quantity	NUMBER, --KitSupport FPJ
+			x_unit_price		NUMBER,
+			x_suggested_vendor_id 	NUMBER,
+			x_suggested_vendor_site_id	NUMBER,
+			x_suggested_vendor_contact_id	NUMBER,
+			x_suggested_vendor_prod_code 	VARCHAR2,
+			x_suggested_buyer_id		NUMBER,
+			x_rfq_required_flag		VARCHAR2,
+			x_vendor_source_context		VARCHAR2,
+			x_source_type_code		VARCHAR2,
+			x_source_organization_id	NUMBER,
+			x_source_subinventory		VARCHAR2,
+			x_item_description		VARCHAR2,
+			x_attribute_category		VARCHAR2,
+			x_attribute1			VARCHAR2,
+			x_attribute2			VARCHAR2,
+			x_attribute3			VARCHAR2,
+			x_attribute4			VARCHAR2,
+			x_attribute5			VARCHAR2,
+			x_attribute6			VARCHAR2,
+			x_attribute7			VARCHAR2,
+			x_attribute8			VARCHAR2,
+			x_attribute9			VARCHAR2,
+			x_attribute10			VARCHAR2,
+			x_attribute11			VARCHAR2,
+			x_attribute12			VARCHAR2,
+			x_attribute13			VARCHAR2,
+			x_attribute14			VARCHAR2,
+			x_attribute15			VARCHAR2,
+                        x_amount                        NUMBER,  -- <SERVICES FPJ>
+			x_negotiated_by_preparer_flag   VARCHAR2); --<DBI FPJ>
+
+PROCEDURE lock_line (x_rowid		VARCHAR2,
+		        x_express_name		VARCHAR2,
+			x_sequence_num		NUMBER,
+			x_po_header_id		NUMBER,
+			x_po_line_id		NUMBER,
+			x_item_id		NUMBER,
+			x_line_type_id		NUMBER,
+			x_item_revision		VARCHAR2,
+			x_category_id		NUMBER,
+			x_unit_meas_lookup_code VARCHAR2,
+			x_suggested_quantity	NUMBER, --KitSupport FPJ
+			x_unit_price		NUMBER,
+			x_suggested_vendor_id 	NUMBER,
+			x_suggested_vendor_site_id	NUMBER,
+			x_suggested_vendor_contact_id	NUMBER,
+			x_suggested_vendor_prod_code 	VARCHAR2,
+			x_suggested_buyer_id		NUMBER,
+			x_rfq_required_flag		VARCHAR2,
+			x_vendor_source_context		VARCHAR2,
+			x_source_type_code		VARCHAR2,
+			x_source_organization_id	NUMBER,
+			x_source_subinventory		VARCHAR2,
+			x_item_description		VARCHAR2,
+			x_attribute_category		VARCHAR2,
+			x_attribute1			VARCHAR2,
+			x_attribute2			VARCHAR2,
+			x_attribute3			VARCHAR2,
+			x_attribute4			VARCHAR2,
+			x_attribute5			VARCHAR2,
+			x_attribute6			VARCHAR2,
+			x_attribute7			VARCHAR2,
+			x_attribute8			VARCHAR2,
+			x_attribute9			VARCHAR2,
+			x_attribute10			VARCHAR2,
+			x_attribute11			VARCHAR2,
+			x_attribute12			VARCHAR2,
+			x_attribute13			VARCHAR2,
+			x_attribute14			VARCHAR2,
+			x_attribute15			VARCHAR2,
+                        x_amount                        NUMBER);  -- <SERVICES FPJ>
+
+
+PROCEDURE delete_line (x_rowid VARCHAR2);
+
+
+END PO_REQ_TEMPLATE_SV;
+
+ 
+
+/

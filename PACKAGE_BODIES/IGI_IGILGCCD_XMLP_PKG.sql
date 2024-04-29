@@ -1,0 +1,25 @@
+--------------------------------------------------------
+--  DDL for Package Body IGI_IGILGCCD_XMLP_PKG
+--------------------------------------------------------
+
+  CREATE OR REPLACE EDITIONABLE PACKAGE BODY "APPS"."IGI_IGILGCCD_XMLP_PKG" AS
+/* $Header: IGILGCCDB.pls 120.0.12010000.1 2008/07/29 08:58:55 appldev ship $ */
+  FUNCTION BEFOREREPORT RETURN BOOLEAN IS
+  BEGIN
+    IF P_RUN_AOL = 'Y' THEN
+      P_CONC_REQUEST_ID := FND_GLOBAL.CONC_REQUEST_ID;
+    END IF;
+    RETURN (TRUE);
+  END BEFOREREPORT;
+
+  FUNCTION AFTERREPORT RETURN BOOLEAN IS
+  BEGIN
+    IF P_RUN_AOL = 'Y' THEN
+      NULL;
+    END IF;
+    RETURN (TRUE);
+  END AFTERREPORT;
+
+END IGI_IGILGCCD_XMLP_PKG;
+
+/

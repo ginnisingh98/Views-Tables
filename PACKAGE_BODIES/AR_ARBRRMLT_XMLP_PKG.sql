@@ -1,0 +1,289 @@
+--------------------------------------------------------
+--  DDL for Package Body AR_ARBRRMLT_XMLP_PKG
+--------------------------------------------------------
+
+  CREATE OR REPLACE EDITIONABLE PACKAGE BODY "APPS"."AR_ARBRRMLT_XMLP_PKG" AS
+/* $Header: ARBRRMLTB.pls 120.0 2007/12/27 13:18:29 abraghun noship $ */
+  FUNCTION BEFOREREPORT RETURN BOOLEAN IS
+  BEGIN
+    P_CONC_REQUEST_ID := FND_GLOBAL.CONC_REQUEST_ID;
+    LP_CREATION_DATE_FROM := P_CREATION_DATE_FROM;
+    LP_CREATION_DATE_TO := P_CREATION_DATE_TO;
+    LP_DRAWEE_NAME_FROM := P_DRAWEE_NAME_FROM;
+    LP_DRAWEE_NAME_TO := P_DRAWEE_NAME_TO;
+    LP_DRAWEE_NUMBER_FROM := P_DRAWEE_NUMBER_FROM;
+    LP_DRAWEE_NUMBER_TO := P_DRAWEE_NUMBER_TO;
+    /*SRW.USER_EXIT('FND SRWINIT')*/NULL;
+    SELECT
+      SET_OF_BOOKS_ID
+    INTO P_SET_OF_BOOKS_ID
+    FROM
+      AR_SYSTEM_PARAMETERS;
+    IF LP_DRAWEE_NAME_FROM IS NULL THEN
+      LP_DRAWEE_NAME_FROM := LP_DRAWEE_NAME_TO;
+    END IF;
+    IF LP_DRAWEE_NAME_TO IS NULL THEN
+      LP_DRAWEE_NAME_TO := LP_DRAWEE_NAME_FROM;
+    END IF;
+    IF LP_DRAWEE_NAME_FROM IS NULL THEN
+      LP_CUSTOMER_RANGE := ' AND 1 = 1';
+    ELSE
+      LP_CUSTOMER_RANGE := ' and party.party_name between ' || '''' || LP_DRAWEE_NAME_FROM || '''' || ' and ' || '''' || LP_DRAWEE_NAME_TO || '''';
+    END IF;
+    IF LP_CREATION_DATE_FROM IS NULL THEN
+      LP_CREATION_DATE_FROM := LP_CREATION_DATE_TO;
+    END IF;
+    IF LP_CREATION_DATE_TO IS NULL THEN
+      LP_CREATION_DATE_TO := LP_CREATION_DATE_FROM;
+    END IF;
+    IF LP_CREATION_DATE_FROM IS NULL THEN
+      LP_CREATION_DATE_RANGE := NULL;
+
+    ELSE
+      LP_CREATION_DATE_RANGE := ' and  trx_date between ' || '''' || LP_CREATION_DATE_FROM || '''' || ' and  ' || '''' || LP_CREATION_DATE_TO || '''';
+    END IF;
+    IF LP_DRAWEE_NUMBER_FROM IS NULL THEN
+      LP_DRAWEE_NUMBER_FROM := LP_DRAWEE_NUMBER_TO;
+    END IF;
+    IF LP_DRAWEE_NUMBER_TO IS NULL THEN
+      LP_DRAWEE_NUMBER_TO := LP_DRAWEE_NUMBER_FROM;
+    END IF;
+    IF LP_DRAWEE_NUMBER_FROM IS NULL THEN
+      LP_CUSTOMER_NUMBER_RANGE := ' AND 1 = 1';
+    ELSE
+      LP_CUSTOMER_NUMBER_RANGE := ' and cust.cust_account_id between ' || LP_DRAWEE_NUMBER_FROM || ' and  ' || LP_DRAWEE_NUMBER_TO;
+    END IF;
+    IF P_DAYS_LATE_SINCE_CREATION IS NULL THEN
+      LP_DAYS_LATE_SINCE_CREATION := NULL;
+    ELSE
+      LP_DAYS_LATE_SINCE_CREATION := ' and trunc(sysdate - term_due_date) = ' || P_DAYS_LATE_SINCE_CREATION;
+    END IF;
+    RETURN (TRUE);
+  EXCEPTION
+    WHEN OTHERS THEN
+      /*SRW.MESSAGE(9999
+                 ,'Exception Others in Before Report Trigger')*/NULL;
+      /*RAISE SRW.PROGRAM_ABORT*/RAISE_APPLICATION_ERROR(-20101,null);
+      RETURN (TRUE);
+  END BEFOREREPORT;
+
+  FUNCTION AFTERREPORT RETURN BOOLEAN IS
+  BEGIN
+    /*SRW.USER_EXIT('FND SRWEXIT')*/NULL;
+    RETURN (TRUE);
+  END AFTERREPORT;
+
+  FUNCTION CF_CURRENT_DATEFORMULA RETURN CHAR IS
+  BEGIN
+    RETURN FND_DATE.DATE_TO_CHARDATE(SYSDATE);
+  END CF_CURRENT_DATEFORMULA;
+
+  FUNCTION CF_BR_DATEFORMULA(BR_DATE IN DATE) RETURN CHAR IS
+  BEGIN
+    RETURN (FND_DATE.DATE_TO_CHARDATE(BR_DATE));
+  END CF_BR_DATEFORMULA;
+
+  FUNCTION AFTERPFORM RETURN BOOLEAN IS
+    L_PRINT_COUNTRY_FLAG VARCHAR2(1);
+    L_DEFAULT_COUNTRY VARCHAR2(60);
+  BEGIN
+    P_CONC_REQUEST_ID := FND_GLOBAL.CONC_REQUEST_ID;
+    /*SRW.USER_EXIT('FND SRWINIT')*/NULL;
+    /*SRW.MESSAGE(100
+               ,'DEBUG: AfterpForm')*/NULL;
+    SELECT
+      PRINT_HOME_COUNTRY_FLAG,
+      NVL(DEFAULT_COUNTRY
+         ,'US')
+    INTO L_PRINT_COUNTRY_FLAG,L_DEFAULT_COUNTRY
+    FROM
+      AR_SYSTEM_PARAMETERS;
+    P_PRINT_HOME_COUNTRY_FLAG := L_PRINT_COUNTRY_FLAG;
+    P_DEFAULT_COUNTRY := L_DEFAULT_COUNTRY;
+    P_DEFAULT_COUNTRY_DESCRIPTION := GET_COUNTRY_DESCRIPTION(P_DEFAULT_COUNTRY);
+    RETURN (TRUE);
+  END AFTERPFORM;
+
+  FUNCTION GET_COUNTRY_DESCRIPTION(COUNTRY_CODE IN VARCHAR2) RETURN VARCHAR2 IS
+    COUNTRY_DESCRIPTION VARCHAR2(80) := NULL;
+  BEGIN
+    /*SRW.MESSAGE(100
+               ,'DEBUG:  Get_Country_Description.')*/NULL;
+    IF COUNTRY_CODE IS NOT NULL THEN
+      IF COUNTRY_CODE <> NVL(P_DEFAULT_COUNTRY
+         ,'XXXXXX') THEN
+        SELECT
+          TERRITORY_SHORT_NAME
+        INTO COUNTRY_DESCRIPTION
+        FROM
+          FND_TERRITORIES_VL
+        WHERE TERRITORY_CODE = COUNTRY_CODE;
+        IF COUNTRY_DESCRIPTION IS NULL THEN
+          COUNTRY_DESCRIPTION := COUNTRY_CODE;
+        END IF;
+      ELSE
+        IF P_PRINT_HOME_COUNTRY_FLAG = 'Y' THEN
+          SELECT
+            TERRITORY_SHORT_NAME
+          INTO COUNTRY_DESCRIPTION
+          FROM
+            FND_TERRITORIES_VL
+          WHERE TERRITORY_CODE = COUNTRY_CODE;
+        ELSE
+          COUNTRY_DESCRIPTION := NULL;
+        END IF;
+      END IF;
+    ELSE
+      COUNTRY_DESCRIPTION := NULL;
+    END IF;
+    RETURN (COUNTRY_DESCRIPTION);
+  EXCEPTION
+    WHEN NO_DATA_FOUND THEN
+      RETURN (COUNTRY_CODE);
+    WHEN OTHERS THEN
+      IF SQLCODE = -20000 THEN
+        /*SRW.MESSAGE('100'
+                   ,ARP_STANDARD.FND_MESSAGE(ARP_STANDARD.MD_MSG_TEXT + ARP_STANDARD.MD_MSG_NUMBER))*/NULL;
+        RETURN (COUNTRY_CODE);
+      ELSE
+        /*SRW.MESSAGE('100'
+                   ,'Oracle Error in call to' || ' arp_adds.location_description ' || TO_CHAR(SQLCODE
+                          ,'999999'))*/NULL;
+        /*RAISE SRW.PROGRAM_ABORT*/RAISE_APPLICATION_ERROR(-20101,null);
+      END IF;
+      RETURN NULL;
+  END GET_COUNTRY_DESCRIPTION;
+
+  FUNCTION CUSTOMER_ADDRESS_STRINGFORMULA(CUST_NAME IN VARCHAR2
+                                         ,CUST_ADDRESS1 IN VARCHAR2
+                                         ,CUST_ADDRESS2 IN VARCHAR2
+                                         ,CUST_ADDRESS3 IN VARCHAR2
+                                         ,CUST_ADDRESS4 IN VARCHAR2
+                                         ,CUST_CITY IN VARCHAR2
+                                         ,CUST_STATE IN VARCHAR2
+                                         ,CUST_POSTAL_CODE IN VARCHAR2
+                                         ,CUST_COUNTRY IN VARCHAR2) RETURN VARCHAR2 IS
+    CUST_ADDRESS_STRING VARCHAR2(5000);
+    ADDRESS_STYLE VARCHAR2(30);
+    ADDRESS1 VARCHAR2(240);
+    ADDRESS2 VARCHAR2(240);
+    ADDRESS3 VARCHAR2(240);
+    ADDRESS4 VARCHAR2(240);
+    CITY VARCHAR2(60);
+    COUNTY VARCHAR2(60);
+    STATE VARCHAR2(60);
+    PROVINCE VARCHAR2(60);
+    POSTAL_CODE VARCHAR2(60);
+    TERRITORY_SHORT_NAME VARCHAR2(80);
+    COUNTRY_CODE VARCHAR2(60);
+    CUSTOMER_NAME VARCHAR2(360);
+    BILL_TO_LOCATION VARCHAR2(40);
+    FIRST_NAME VARCHAR2(40);
+    LAST_NAME VARCHAR2(50);
+    MAIL_STOP VARCHAR2(60);
+    DEFAULT_COUNTRY_CODE VARCHAR2(60);
+    DEFAULT_COUNTRY_DESC VARCHAR2(80);
+    PRINT_HOME_COUNTRY_FLAG VARCHAR2(5);
+    PRINT_DEFAULT_ATTN_FLAG VARCHAR2(5);
+    WIDTH NUMBER(3);
+    HEIGHT_MIN NUMBER(3);
+    HEIGHT_MAX NUMBER(3);
+  BEGIN
+    /*SRW.REFERENCE(CUST_NAME)*/NULL;
+    /*SRW.REFERENCE(CUST_ADDRESS1)*/NULL;
+    /*SRW.REFERENCE(CUST_ADDRESS2)*/NULL;
+    /*SRW.REFERENCE(CUST_ADDRESS3)*/NULL;
+    /*SRW.REFERENCE(CUST_ADDRESS4)*/NULL;
+    /*SRW.REFERENCE(CUST_CITY)*/NULL;
+    /*SRW.REFERENCE(CUST_STATE)*/NULL;
+    /*SRW.REFERENCE(CUST_POSTAL_CODE)*/NULL;
+    /*SRW.REFERENCE(CUST_COUNTRY)*/NULL;
+    /*SRW.REFERENCE(P_DEFAULT_COUNTRY)*/NULL;
+    /*SRW.REFERENCE(P_DEFAULT_COUNTRY_DESCRIPTION)*/NULL;
+    /*SRW.REFERENCE(P_PRINT_HOME_COUNTRY_FLAG)*/NULL;
+    ADDRESS1 := CUST_ADDRESS1;
+    ADDRESS2 := CUST_ADDRESS2;
+    ADDRESS3 := CUST_ADDRESS3;
+    ADDRESS4 := CUST_ADDRESS4;
+    CITY := CUST_CITY;
+    STATE := CUST_STATE;
+    COUNTY := NULL;
+    PROVINCE := NULL;
+    POSTAL_CODE := CUST_POSTAL_CODE;
+    TERRITORY_SHORT_NAME := NULL;
+    COUNTRY_CODE := CUST_COUNTRY;
+    CUSTOMER_NAME := CUST_NAME;
+    BILL_TO_LOCATION := NULL;
+    FIRST_NAME := NULL;
+    LAST_NAME := NULL;
+    MAIL_STOP := NULL;
+    DEFAULT_COUNTRY_CODE := P_DEFAULT_COUNTRY;
+    DEFAULT_COUNTRY_DESC := P_DEFAULT_COUNTRY_DESCRIPTION;
+    PRINT_HOME_COUNTRY_FLAG := P_PRINT_HOME_COUNTRY_FLAG;
+    PRINT_DEFAULT_ATTN_FLAG := 'N';
+    WIDTH := 40;
+    HEIGHT_MIN := 8;
+    HEIGHT_MAX := 8;
+    CUST_ADDRESS_STRING := ARP_ADDR_LABEL_PKG.FORMAT_ADDRESS(ADDRESS_STYLE
+                                                            ,ADDRESS1
+                                                            ,ADDRESS2
+                                                            ,ADDRESS3
+                                                            ,ADDRESS4
+                                                            ,CITY
+                                                            ,COUNTY
+                                                            ,STATE
+                                                            ,PROVINCE
+                                                            ,POSTAL_CODE
+                                                            ,TERRITORY_SHORT_NAME
+                                                            ,COUNTRY_CODE
+                                                            ,CUSTOMER_NAME
+                                                            ,BILL_TO_LOCATION
+                                                            ,FIRST_NAME
+                                                            ,LAST_NAME
+                                                            ,MAIL_STOP
+                                                            ,DEFAULT_COUNTRY_CODE
+                                                            ,DEFAULT_COUNTRY_DESC
+                                                            ,PRINT_HOME_COUNTRY_FLAG
+                                                            ,PRINT_DEFAULT_ATTN_FLAG
+                                                            ,WIDTH
+                                                            ,HEIGHT_MIN
+                                                            ,HEIGHT_MAX);
+    RETURN (CUST_ADDRESS_STRING);
+    RETURN NULL;
+  EXCEPTION
+    WHEN OTHERS THEN
+      /*SRW.MESSAGE(5000
+                 ,'DEBUG:  Cannot format Cust_address_String.')*/NULL;
+      CUST_ADDRESS_STRING := '';
+      RETURN (CUST_ADDRESS_STRING);
+  END CUSTOMER_ADDRESS_STRINGFORMULA;
+
+  FUNCTION C_OUR_STREET_P RETURN VARCHAR2 IS
+  BEGIN
+    RETURN C_OUR_STREET;
+  END C_OUR_STREET_P;
+
+  FUNCTION C_OUR_ZIPCITY_P RETURN VARCHAR2 IS
+  BEGIN
+    RETURN C_OUR_ZIPCITY;
+  END C_OUR_ZIPCITY_P;
+
+  FUNCTION C_LISTNUM_P RETURN NUMBER IS
+  BEGIN
+    RETURN C_LISTNUM;
+  END C_LISTNUM_P;
+
+  FUNCTION C_OUR_SOB_NAME_P RETURN VARCHAR2 IS
+  BEGIN
+    RETURN C_OUR_SOB_NAME;
+  END C_OUR_SOB_NAME_P;
+
+  FUNCTION C_LOCATION_P RETURN VARCHAR2 IS
+  BEGIN
+    RETURN C_LOCATION;
+  END C_LOCATION_P;
+
+END AR_ARBRRMLT_XMLP_PKG;
+
+
+/

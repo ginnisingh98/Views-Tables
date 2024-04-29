@@ -1,0 +1,362 @@
+--------------------------------------------------------
+--  DDL for Package PO_CONSTANTS_SV
+--------------------------------------------------------
+
+  CREATE OR REPLACE EDITIONABLE PACKAGE "APPS"."PO_CONSTANTS_SV" AUTHID CURRENT_USER AS
+-- $Header: POXCNSTS.pls 120.5 2006/04/18 23:46:46 nipagarw noship $
+
+
+--
+-- Application Id
+--
+APPLICATION_ID
+   CONSTANT
+   NUMBER
+   := 201
+   ;
+
+
+--
+-- PO_DOCUMENT_TYPES_ALL_B.DOCUMENT_TYPE_CODE
+--
+PA
+   CONSTANT
+   PO_DOCUMENT_TYPES_ALL_B.document_type_code%TYPE
+   := 'PA'
+   ;
+PO
+   CONSTANT
+   PO_DOCUMENT_TYPES_ALL_B.document_type_code%TYPE
+   := 'PO'
+   ;
+QUOTATION
+   CONSTANT
+   PO_DOCUMENT_TYPES_ALL_B.document_type_code%TYPE
+   := 'QUOTATION'
+   ;
+RELEASE
+   CONSTANT
+   PO_DOCUMENT_TYPES_ALL_B.document_type_code%TYPE
+   := 'RELEASE'
+   ;
+REQUISITION
+   CONSTANT
+   PO_DOCUMENT_TYPES_ALL_B.document_type_code%TYPE
+   := 'REQUISITION'
+   ;
+RFQ
+   CONSTANT
+   PO_DOCUMENT_TYPES_ALL_B.document_type_code%TYPE
+   := 'RFQ'
+   ;
+
+
+
+
+--
+-- PO_DOCUMENT_TYPES_ALL_B.DOCUMENT_SUBTYPE
+--
+
+BLANKET
+   CONSTANT
+   PO_DOCUMENT_TYPES_ALL_B.document_subtype%TYPE
+   := 'BLANKET'
+   ;
+CONTRACT
+   CONSTANT
+   PO_DOCUMENT_TYPES_ALL_B.document_subtype%TYPE
+   := 'CONTRACT'
+   ;
+INTERNAL
+   CONSTANT
+   PO_DOCUMENT_TYPES_ALL_B.document_subtype%TYPE
+   := 'INTERNAL'
+   ;
+PLANNED
+   CONSTANT
+   PO_DOCUMENT_TYPES_ALL_B.document_subtype%TYPE
+   := 'PLANNED'
+   ;
+PURCHASE
+   CONSTANT
+   PO_DOCUMENT_TYPES_ALL_B.document_subtype%TYPE
+   := 'PURCHASE'
+   ;
+SCHEDULED
+   CONSTANT
+   PO_DOCUMENT_TYPES_ALL_B.document_subtype%TYPE
+   := 'SCHEDULED'
+   ;
+STANDARD
+   CONSTANT
+   PO_DOCUMENT_TYPES_ALL_B.document_subtype%TYPE
+   := 'STANDARD'
+   ;
+
+  --
+  -- PO_LINE_LOCATIONS_ALL.SHIPMENT_TYPE
+  --
+SHIP_TYPE_STANDARD
+   CONSTANT
+   PO_LINE_LOCATIONS_ALL.shipment_type%TYPE
+   := 'STANDARD';
+SHIP_TYPE_PRICE_BREAK
+   CONSTANT
+   PO_LINE_LOCATIONS_ALL.shipment_type%TYPE
+   := 'PRICE BREAK';
+SHIP_TYPE_PREPAYMENT
+   CONSTANT
+   PO_LINE_LOCATIONS_ALL.shipment_type%TYPE
+   := 'PREPAYMENT';
+
+--
+-- PO_HEADERS_ALL.AUTHORIZATION_STATUS
+--
+
+APPROVED
+   CONSTANT
+   PO_HEADERS_ALL.authorization_status%TYPE
+   := 'APPROVED'
+   ;
+IN_PROCESS
+   CONSTANT
+   PO_HEADERS_ALL.authorization_status%TYPE
+   := 'IN PROCESS'
+   ;
+INCOMPLETE
+   CONSTANT
+   PO_HEADERS_ALL.authorization_status%TYPE
+   := 'INCOMPLETE'
+   ;
+PRE_APPROVED
+   CONSTANT
+   PO_HEADERS_ALL.authorization_status%TYPE
+   := 'PRE-APPROVED'
+   ;
+REJECTED
+   CONSTANT
+   PO_HEADERS_ALL.authorization_status%TYPE
+   := 'REJECTED'
+   ;
+REQUIRES_REAPPROVAL
+   CONSTANT
+   PO_HEADERS_ALL.authorization_status%TYPE
+   := 'REQUIRES REAPPROVAL'
+   ;
+
+
+
+
+--
+-- PO_ACTION_HISTORY.ACTION_CODE
+--
+
+ADJUST
+   CONSTANT
+   PO_ACTION_HISTORY.action_code%TYPE
+   := 'ADJUST'
+   ;
+CANCEL
+   CONSTANT
+   PO_ACTION_HISTORY.action_code%TYPE
+   := 'CANCEL'
+   ;
+FINALLY_CLOSE
+   CONSTANT
+   PO_ACTION_HISTORY.action_code%TYPE
+   := 'FINALLY CLOSE'
+   ;
+IGC_YEAR_END_RESERVE
+   CONSTANT
+   PO_ACTION_HISTORY.action_code%TYPE
+   := 'IGC YEAR END RESERVE'
+   ;
+IGC_YEAR_END_UNRESERVE
+   CONSTANT
+   PO_ACTION_HISTORY.action_code%TYPE
+   := 'IGC YEAR END UNRESERVE'
+   ;
+REJECT
+   CONSTANT
+   PO_ACTION_HISTORY.action_code%TYPE
+   := 'REJECT'
+   ;
+RESERVE
+   CONSTANT
+   PO_ACTION_HISTORY.action_code%TYPE
+   := 'RESERVE'
+   ;
+RETURN
+   CONSTANT
+   PO_ACTION_HISTORY.action_code%TYPE
+   := 'RETURN'
+   ;
+SUBMIT
+   CONSTANT
+   PO_ACTION_HISTORY.action_code%TYPE
+   := 'SUBMIT'
+   ;
+UNRESERVE
+   CONSTANT
+   PO_ACTION_HISTORY.action_code%TYPE
+   := 'UNRESERVE'
+   ;
+
+
+
+
+--
+-- Tax Constants for POs
+--
+
+PO_ENTITY_CODE
+   CONSTANT
+   VARCHAR2(25)
+   := 'PURCHASE_ORDER'
+   ;
+PO_EVENT_CLASS_CODE
+   CONSTANT
+   VARCHAR2(25)
+   := 'PO_PA'
+   ;
+PO_TRX_LEVEL_TYPE
+   CONSTANT
+   VARCHAR2(25)
+   := 'SHIPMENT'
+   ;
+PO_CREATED
+   CONSTANT
+   VARCHAR2(25)
+   := 'PO_PA_CREATED'
+   ;
+PO_ADJUSTED
+   CONSTANT
+   VARCHAR2(25)
+   := 'PO_PA_ADJUSTED'
+   ;
+PO_DELETED
+   CONSTANT
+   VARCHAR2(25)
+   := 'PO_PA_DELETED'
+   ;
+PO_CANCELLED
+   CONSTANT
+   VARCHAR2(25)
+   := 'PO_PA_CANCELLED'
+   ;
+PO_PURGED
+   CONSTANT
+   VARCHAR2(25)
+   := 'PO_PA_PURGED'
+   ;
+PO_DISTRIBUTED
+   CONSTANT
+   VARCHAR2(25)
+   := 'PO_PA_DISTRIBUTED'
+   ;
+PO_REDISTRIBUTED
+   CONSTANT
+   VARCHAR2(25)
+   := 'PO_PA_REDISTRIBUTED'
+   ;
+
+
+--
+-- Tax Constants for Releases
+--
+
+-- Bug 5165473. Updated entity code in accordance with change in XLA
+REL_ENTITY_CODE
+   CONSTANT
+   VARCHAR2(25)
+   := 'RELEASE'
+   ;
+REL_EVENT_CLASS_CODE
+   CONSTANT
+   VARCHAR2(25)
+   := 'RELEASE'
+   ;
+REL_TRX_LEVEL_TYPE
+   CONSTANT
+   VARCHAR2(25)
+   := 'SHIPMENT'
+   ;
+REL_CREATED
+   CONSTANT
+   VARCHAR2(25)
+   := 'RELEASE_CREATED'
+   ;
+REL_ADJUSTED
+   CONSTANT
+   VARCHAR2(25)
+   := 'RELEASE_ADJUSTED'
+   ;
+REL_DELETED
+   CONSTANT
+   VARCHAR2(25)
+   := 'RELEASE_DELETED'
+   ;
+REL_CANCELLED
+   CONSTANT
+   VARCHAR2(25)
+   := 'RELEASE_CANCELLED'
+   ;
+REL_PURGED
+   CONSTANT
+   VARCHAR2(25)
+   := 'RELEASE_PURGED'
+   ;
+REL_DISTRIBUTED
+   CONSTANT
+   VARCHAR2(25)
+   := 'RELEASE_DISTRIBUTED'
+   ;
+REL_REDISTRIBUTED
+   CONSTANT
+   VARCHAR2(25)
+   := 'RELEASE_REDISTRIBUTED'
+   ;
+
+
+
+--
+-- Tax Constants for Requisitions
+--
+
+REQ_ENTITY_CODE
+   CONSTANT
+   VARCHAR2(25)
+   := 'REQUISITION'
+   ;
+REQ_EVENT_CLASS_CODE
+   CONSTANT
+   VARCHAR2(25)
+   := 'REQUISITION'
+   ;
+REQ_TRX_LEVEL_TYPE
+   CONSTANT
+   VARCHAR2(25)
+   := 'LINE'
+   ;
+REQ_CREATED
+   CONSTANT
+   VARCHAR2(25)
+   := 'REQ_CREATED'
+   ;
+REQ_DELETED
+   CONSTANT
+   VARCHAR2(25)
+   := 'REQ_DELETED'
+   ;
+REQ_DISTRIBUTED
+   CONSTANT
+   VARCHAR2(25)
+   := 'REQ_DISTRIBUTED'
+   ;
+
+
+END PO_CONSTANTS_SV;
+
+ 
+
+/

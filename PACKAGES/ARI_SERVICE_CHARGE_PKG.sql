@@ -1,0 +1,59 @@
+--------------------------------------------------------
+--  DDL for Package ARI_SERVICE_CHARGE_PKG
+--------------------------------------------------------
+
+  CREATE OR REPLACE EDITIONABLE PACKAGE "APPS"."ARI_SERVICE_CHARGE_PKG" AUTHID CURRENT_USER AS
+/* $Header: ARISCRGS.pls 120.0.12010000.3 2010/03/22 10:21:11 nkanchan ship $ */
+--
+--
+-- Purpose: This package is called to apply any service charges
+--          to the invoice.
+--
+-- MODIFICATION HISTORY
+-- Person      Date         Comments
+-- ---------   ------       ------------------------------------------
+-- bchowdar    15-Jan-2003   Created.
+
+/*=======================================================================+
+ |  Procedures and Functions
+ +=======================================================================*/
+
+ -- RECORD TYPE FOR AR ADJUSTMENT FUNCTION
+TYPE ADJUSTMENT_REC_TYPE IS RECORD
+        (PAYMENT_SCHEDULE_ID  AR_ADJUSTMENTS.PAYMENT_SCHEDULE_ID%TYPE,
+	 RECEIVABLES_TRX_ID   AR_ADJUSTMENTS.RECEIVABLES_TRX_ID%TYPE,
+	 AMOUNT		      AR_ADJUSTMENTS.AMOUNT%TYPE,
+	 CUSTOMER_TRX_LINE_ID AR_ADJUSTMENTS.CUSTOMER_TRX_LINE_ID%TYPE,
+	 APPLY_DATE	      AR_ADJUSTMENTS.APPLY_DATE%TYPE,
+	 GL_DATE	      AR_ADJUSTMENTS.GL_DATE%TYPE,
+	 CREATED_FROM	      AR_ADJUSTMENTS.CREATED_FROM%TYPE);
+
+--Bug 3886652 - Customer site added to Invoice_rec_type
+TYPE INVOICE_REC_TYPE IS RECORD
+     (PAYMENT_SCHEDULE_ID     NUMBER(15),
+      PAYMENT_AMOUNT		  NUMBER,
+      CUSTOMER_ID             NUMBER(15),
+      CUSTOMER_SITE_USE_ID    NUMBER(15),
+      ACCOUNT_NUMBER          VARCHAR2(30),
+      CUSTOMER_TRX_ID         NUMBER(15),
+      CURRENCY_CODE           VARCHAR2(15),
+      SERVICE_CHARGE          NUMBER
+     );
+
+
+TYPE INVOICE_LIST_TABTYPE IS TABLE OF INVOICE_REC_TYPE INDEX BY BINARY_INTEGER;
+
+-- ADJUST AN INVOICE.
+FUNCTION ADJUST_INVOICE (P_ADJUSTMENT_REC_TYPE IN ARI_SERVICE_CHARGE_PKG.ADJUSTMENT_REC_TYPE)
+RETURN VARCHAR2;
+
+-- APPLY SERVICE CHARGE
+FUNCTION APPLY_CHARGE(P_INVOICE_SET IN ARI_SERVICE_CHARGE_PKG.INVOICE_LIST_TABTYPE)
+RETURN VARCHAR2;
+
+PROCEDURE COMPUTE_SERVICE_CHARGE(P_INVOICE_SET IN OUT NOCOPY ARI_SERVICE_CHARGE_PKG.INVOICE_LIST_TABTYPE,
+                                 P_PAYMENT_TYPE IN varchar2 DEFAULT NULL, P_LOOKUP_CODE IN varchar2 DEFAULT NULL);
+
+END ARI_SERVICE_CHARGE_PKG;
+
+/

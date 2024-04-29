@@ -1,0 +1,58 @@
+--------------------------------------------------------
+--  DDL for Package FND_OAM_DS_PSETS_PKG
+--------------------------------------------------------
+
+  CREATE OR REPLACE EDITIONABLE PACKAGE "APPS"."FND_OAM_DS_PSETS_PKG" AUTHID CURRENT_USER as
+/* $Header: AFOAMPSS.pls 120.1 2005/07/28 21:39:18 yawu noship $ */
+procedure INSERT_ROW (
+      X_ROWID in out nocopy VARCHAR2,
+	X_POLICYSET_ID in NUMBER,
+	X_POLICYSET_NAME IN VARCHAR2,
+	X_DESCRIPTION IN VARCHAR2,
+	X_CREATED_BY in NUMBER,
+	X_CREATION_DATE in DATE,
+	X_LAST_UPDATED_BY in NUMBER,
+	X_LAST_UPDATE_DATE in DATE,
+	X_LAST_UPDATE_LOGIN in NUMBER
+);
+
+procedure LOCK_ROW (
+	X_POLICYSET_ID in NUMBER,
+	X_POLICYSET_NAME IN VARCHAR2,
+	X_DESCRIPTION IN VARCHAR2,
+	X_CREATED_BY in NUMBER,
+	X_CREATION_DATE in DATE,
+	X_LAST_UPDATED_BY in NUMBER,
+	X_LAST_UPDATE_DATE in DATE,
+	X_LAST_UPDATE_LOGIN in NUMBER
+);
+
+procedure UPDATE_ROW (
+	X_POLICYSET_ID in NUMBER,
+	X_POLICYSET_NAME IN VARCHAR2,
+	X_DESCRIPTION IN VARCHAR2,
+	X_LAST_UPDATED_BY in NUMBER,
+	X_LAST_UPDATE_DATE in DATE,
+	X_LAST_UPDATE_LOGIN in NUMBER
+);
+
+procedure DELETE_ROW (
+  X_POLICYSET_ID in NUMBER
+);
+
+procedure ADD_LANGUAGE;
+
+procedure TRANSLATE_ROW
+(
+ x_POLICYSET_ID  in NUMBER,
+ x_POLICYSET_NAME in varchar2,
+ x_Last_update_date in date,
+ x_last_updated_by in number,
+ x_last_update_login in number
+);
+
+end FND_OAM_DS_PSETS_PKG;
+
+ 
+
+/

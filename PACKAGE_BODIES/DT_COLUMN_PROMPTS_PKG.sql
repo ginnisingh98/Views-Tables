@@ -1,0 +1,256 @@
+--------------------------------------------------------
+--  DDL for Package Body DT_COLUMN_PROMPTS_PKG
+--------------------------------------------------------
+
+  CREATE OR REPLACE EDITIONABLE PACKAGE BODY "APPS"."DT_COLUMN_PROMPTS_PKG" AS
+/* $Header: dtclprhi.pkb 115.5 2002/12/09 13:36:34 apholt ship $ */
+procedure ADD_LANGUAGE
+is
+begin
+  update DT_COLUMN_PROMPTS_TL T set (
+      COLUMN_PROMPT
+    ) = (select
+      B.COLUMN_PROMPT
+    from DT_COLUMN_PROMPTS_TL B
+    where B.VIEW_NAME = T.VIEW_NAME
+    and B.COLUMN_NAME = T.COLUMN_NAME
+    and B.LANGUAGE = T.LANGUAGE
+    and B.LANGUAGE = T.SOURCE_LANG)
+  where (
+      T.VIEW_NAME,
+      T.COLUMN_NAME,
+      T.LANGUAGE,
+      T.LANGUAGE
+  ) in (select
+      SUBT.VIEW_NAME,
+      SUBT.COLUMN_NAME,
+      SUBT.LANGUAGE,
+      SUBT.LANGUAGE
+    from DT_COLUMN_PROMPTS_TL SUBB, DT_COLUMN_PROMPTS_TL SUBT
+    where SUBB.VIEW_NAME = SUBT.VIEW_NAME
+    and SUBB.COLUMN_NAME = SUBT.COLUMN_NAME
+    and SUBB.LANGUAGE = SUBT.LANGUAGE
+    and SUBB.LANGUAGE = SUBT.SOURCE_LANG
+    and (SUBB.COLUMN_PROMPT <> SUBT.COLUMN_PROMPT
+      or (SUBB.COLUMN_PROMPT is null and SUBT.COLUMN_PROMPT is not null)
+      or (SUBB.COLUMN_PROMPT is not null and SUBT.COLUMN_PROMPT is null)
+  ));
+
+  insert into DT_COLUMN_PROMPTS_TL (
+    LAST_UPDATE_LOGIN,
+    CREATED_BY,
+    CREATION_DATE,
+    COLUMN_NAME,
+    VIEW_NAME,
+    COLUMN_PROMPT,
+    LAST_UPDATE_DATE,
+    LAST_UPDATED_BY,
+    LANGUAGE,
+    SOURCE_LANG
+  ) select
+    B.LAST_UPDATE_LOGIN,
+    B.CREATED_BY,
+    B.CREATION_DATE,
+    B.COLUMN_NAME,
+    B.VIEW_NAME,
+    B.COLUMN_PROMPT,
+    B.LAST_UPDATE_DATE,
+    B.LAST_UPDATED_BY,
+    L.LANGUAGE_CODE,
+    B.SOURCE_LANG
+  from DT_COLUMN_PROMPTS_TL B, FND_LANGUAGES L
+  where L.INSTALLED_FLAG in ('I', 'B')
+  and B.LANGUAGE = userenv('LANG')
+  and not exists
+    (select NULL
+    from DT_COLUMN_PROMPTS_TL T
+    where T.VIEW_NAME = B.VIEW_NAME
+    and T.COLUMN_NAME = B.COLUMN_NAME
+    and T.LANGUAGE = L.LANGUAGE_CODE);
+end ADD_LANGUAGE;
+
+PROCEDURE INSERT_ROW (
+  X_ROWID in out nocopy VARCHAR2,
+  X_VIEW_NAME in VARCHAR2,
+  X_COLUMN_NAME in VARCHAR2,
+  X_COLUMN_PROMPT in VARCHAR2,
+  X_CREATION_DATE in DATE,
+  X_CREATED_BY in NUMBER,
+  X_LAST_UPDATE_DATE in DATE,
+  X_LAST_UPDATED_BY in NUMBER,
+  X_LAST_UPDATE_LOGIN in NUMBER
+) IS
+  cursor C is select ROWID from DT_COLUMN_PROMPTS_TL
+    where VIEW_NAME = X_VIEW_NAME
+    and COLUMN_NAME = X_COLUMN_NAME
+    and LANGUAGE = userenv('LANG')
+    ;
+BEGIN
+  insert into DT_COLUMN_PROMPTS_TL (
+    LAST_UPDATE_LOGIN,
+    CREATED_BY,
+    CREATION_DATE,
+    COLUMN_NAME,
+    VIEW_NAME,
+    COLUMN_PROMPT,
+    LAST_UPDATE_DATE,
+    LAST_UPDATED_BY,
+    LANGUAGE,
+    SOURCE_LANG
+  ) select
+    X_LAST_UPDATE_LOGIN,
+    X_CREATED_BY,
+    X_CREATION_DATE,
+    X_COLUMN_NAME,
+    X_VIEW_NAME,
+    X_COLUMN_PROMPT,
+    X_LAST_UPDATE_DATE,
+    X_LAST_UPDATED_BY,
+    L.LANGUAGE_CODE,
+    userenv('LANG')
+  from FND_LANGUAGES L
+  where L.INSTALLED_FLAG in ('I', 'B')
+  and not exists
+    (select NULL
+    from DT_COLUMN_PROMPTS_TL T
+    where T.VIEW_NAME = X_VIEW_NAME
+    and T.COLUMN_NAME = X_COLUMN_NAME
+    and T.LANGUAGE = L.LANGUAGE_CODE);
+
+  open c;
+  fetch c into X_ROWID;
+  if (c%notfound) then
+    close c;
+    raise no_data_found;
+  end if;
+  close c;
+--
+END INSERT_ROW;
+--
+procedure UPDATE_ROW (
+  X_VIEW_NAME in VARCHAR2,
+  X_COLUMN_NAME in VARCHAR2,
+  X_COLUMN_PROMPT in VARCHAR2,
+  X_LAST_UPDATE_DATE in DATE,
+  X_LAST_UPDATED_BY in NUMBER,
+  X_LAST_UPDATE_LOGIN in NUMBER
+) is
+begin
+  update DT_COLUMN_PROMPTS_TL set
+    COLUMN_PROMPT = X_COLUMN_PROMPT,
+    LAST_UPDATE_DATE = X_LAST_UPDATE_DATE,
+    LAST_UPDATED_BY = X_LAST_UPDATED_BY,
+    LAST_UPDATE_LOGIN = X_LAST_UPDATE_LOGIN,
+    SOURCE_LANG = userenv('LANG')
+  where VIEW_NAME = X_VIEW_NAME
+  and COLUMN_NAME = X_COLUMN_NAME
+  and userenv('LANG') in (LANGUAGE, SOURCE_LANG);
+
+  if (sql%notfound) then
+    raise no_data_found;
+  end if;
+
+end UPDATE_ROW;
+--
+--
+PROCEDURE OWNER_TO_WHO (
+  X_OWNER in VARCHAR2,
+  X_CREATION_DATE out nocopy DATE,
+  X_CREATED_BY out nocopy NUMBER,
+  X_LAST_UPDATE_DATE out nocopy DATE,
+  X_LAST_UPDATED_BY out nocopy NUMBER,
+  X_LAST_UPDATE_LOGIN out nocopy NUMBER
+) is
+begin
+  if X_OWNER = 'SEED' then
+    X_CREATED_BY := 1;
+    X_LAST_UPDATED_BY := 1;
+  else
+    X_CREATED_BY := 0;
+    X_LAST_UPDATED_BY := 0;
+  end if;
+  X_CREATION_DATE := sysdate;
+  X_LAST_UPDATE_DATE := sysdate;
+  X_LAST_UPDATE_LOGIN := 0;
+end OWNER_TO_WHO;
+--
+PROCEDURE LOAD_ROW (
+  X_VIEW_NAME  in VARCHAR2,
+  X_COLUMN_NAME  in VARCHAR2,
+  X_COLUMN_PROMPT  in VARCHAR2,
+  X_OWNER in VARCHAR2
+) IS
+  X_ROWID ROWID;
+  X_CREATION_DATE DATE;
+  X_CREATED_BY NUMBER;
+  X_LAST_UPDATE_DATE DATE;
+  X_LAST_UPDATED_BY NUMBER;
+  X_LAST_UPDATE_LOGIN NUMBER;
+begin
+  OWNER_TO_WHO (
+    X_OWNER,
+    X_CREATION_DATE,
+    X_CREATED_BY,
+    X_LAST_UPDATE_DATE,
+    X_LAST_UPDATED_BY,
+    X_LAST_UPDATE_LOGIN
+  );
+  begin
+    UPDATE_ROW (
+      X_VIEW_NAME,
+      X_COLUMN_NAME,
+      X_COLUMN_PROMPT,
+      X_LAST_UPDATE_DATE,
+      X_LAST_UPDATED_BY,
+      X_LAST_UPDATE_LOGIN
+    );
+  exception
+    when no_data_found then
+      INSERT_ROW (
+        X_ROWID,
+        X_VIEW_NAME,
+        X_COLUMN_NAME,
+        X_COLUMN_PROMPT,
+        X_CREATION_DATE,
+        X_CREATED_BY,
+        X_LAST_UPDATE_DATE,
+        X_LAST_UPDATED_BY,
+        X_LAST_UPDATE_LOGIN
+      );
+  end;
+END LOAD_ROW;
+--
+PROCEDURE TRANSLATE_ROW (
+  X_VIEW_NAME in VARCHAR2,
+  X_COLUMN_NAME in VARCHAR2,
+  X_COLUMN_PROMPT in VARCHAR2,
+  X_OWNER in VARCHAR2
+) IS
+  X_CREATION_DATE DATE;
+  X_CREATED_BY NUMBER;
+  X_LAST_UPDATE_DATE DATE;
+  X_LAST_UPDATED_BY NUMBER;
+  X_LAST_UPDATE_LOGIN NUMBER;
+begin
+  OWNER_TO_WHO (
+    X_OWNER,
+    X_CREATION_DATE,
+    X_CREATED_BY,
+    X_LAST_UPDATE_DATE,
+    X_LAST_UPDATED_BY,
+    X_LAST_UPDATE_LOGIN
+  );
+  update DT_COLUMN_PROMPTS_TL set
+    COLUMN_PROMPT = X_COLUMN_PROMPT,
+    LAST_UPDATE_DATE = X_LAST_UPDATE_DATE,
+    LAST_UPDATED_BY = X_LAST_UPDATED_BY,
+    LAST_UPDATE_LOGIN = X_LAST_UPDATE_LOGIN,
+    SOURCE_LANG = userenv('LANG')
+  where VIEW_NAME = X_VIEW_NAME
+  and COLUMN_NAME = X_COLUMN_NAME
+  and userenv('LANG') in (LANGUAGE, SOURCE_LANG);
+end TRANSLATE_ROW;
+--
+end DT_COLUMN_PROMPTS_PKG;
+
+/

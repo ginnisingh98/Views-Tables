@@ -1,0 +1,142 @@
+--------------------------------------------------------
+--  DDL for Package PER_BIL_BUS
+--------------------------------------------------------
+
+  CREATE OR REPLACE EDITIONABLE PACKAGE "APPS"."PER_BIL_BUS" AUTHID CURRENT_USER as
+/* $Header: pebilrhi.pkh 115.7 2003/04/10 09:18:05 jheer noship $ */
+--
+--
+--  ---------------------------------------------------------------------------
+--  |---------------------< return_legislation_code >-------------------------|
+--  ---------------------------------------------------------------------------
+--
+--  Description:
+--    Return the legislation code for a specific primary key value
+--
+--  Prerequisites:
+--    The primary key identified by p_id_value already exists.
+--
+--  In Arguments:
+--    p_id_value
+--
+--  Post Success:
+--    If the value is found this function will return the values business
+--    group legislation code.
+--
+--  Post Failure:
+--    An error is raised if the value does not exist.
+--
+--  Access Status:
+--    Internal Development Use Only.
+--
+function return_legislation_code
+  (p_id_value in number) return varchar2;
+--
+--
+-- ----------------------------------------------------------------------------
+-- |---------------------------< insert_validate >----------------------------|
+-- ----------------------------------------------------------------------------
+-- {Start Of Comments}
+--
+-- Description:
+--   This procedure controls the execution of all insert business rules
+--   validation.
+--
+-- Prerequisites:
+--   This private procedure is called from ins procedure.
+--
+-- In Parameters:
+--   A Pl/Sql record structre.
+--
+-- Post Success:
+--   Processing continues.
+--
+-- Post Failure:
+--   If a business rules fails the error will not be handled by this procedure
+--   unless explicity coded.
+--
+-- Developer Implementation Notes:
+--   For insert, your business rules should be executed from this procedure and
+--   should ideally (unless really necessary) just be straight procedure or
+--   function calls. Try and avoid using conditional branching logic.
+--
+-- Access Status:
+--   Internal Row Handler Use Only.
+--
+-- {End Of Comments}
+-- ----------------------------------------------------------------------------
+Procedure insert_validate(p_rec in per_bil_shd.g_rec_type);
+--
+-- ----------------------------------------------------------------------------
+-- |---------------------------< update_validate >----------------------------|
+-- ----------------------------------------------------------------------------
+-- {Start Of Comments}
+--
+-- Description:
+--   This procedure controls the execution of all update business rules
+--   validation.
+--
+-- Prerequisites:
+--   This private procedure is called from upd procedure.
+--
+-- In Parameters:
+--   A Pl/Sql record structre.
+--
+-- Post Success:
+--   Processing continues.
+--
+-- Post Failure:
+--   If a business rules fails the error will not be handled by this procedure
+--   unless explicity coded.
+--
+-- Developer Implementation Notes:
+--   For update, your business rules should be executed from this procedure and
+--   should ideally (unless really necessary) just be straight procedure or
+--   function calls. Try and avoid using conditional branching logic.
+--
+-- Access Status:
+--   Internal Row Handler Use Only.
+--
+-- {End Of Comments}
+-- ----------------------------------------------------------------------------
+Procedure update_validate(p_rec in per_bil_shd.g_rec_type);
+--
+-- ----------------------------------------------------------------------------
+-- |---------------------------< delete_validate >----------------------------|
+-- ----------------------------------------------------------------------------
+-- {Start Of Comments}
+--
+-- Description:
+--   This procedure controls the execution of all delete business rules
+--   validation.
+--
+-- Prerequisites:
+--   This private procedure is called from del procedure.
+--
+-- In Parameters:
+--   A Pl/Sql record structre.
+--
+-- Post Success:
+--   Processing continues.
+--
+-- Post Failure:
+--   If a business rules fails the error will not be handled by this procedure
+--   unless explicity coded.
+--
+-- Developer Implementation Notes:
+--   For delete, your business rules should be executed from this procedure and
+--   should ideally (unless really necessary) just be straight procedure or
+--   function calls. Try and avoid using conditional branching logic.
+--
+-- Access Status:
+--   Internal Row Handler Use Only.
+--
+-- {End Of Comments}
+-- ----------------------------------------------------------------------------
+Procedure delete_validate(p_rec in per_bil_shd.g_rec_type);
+--
+end per_bil_bus;
+
+ 
+
+/

@@ -1,0 +1,225 @@
+--------------------------------------------------------
+--  DDL for Package PE_PEI_BUS
+--------------------------------------------------------
+
+  CREATE OR REPLACE EDITIONABLE PACKAGE "APPS"."PE_PEI_BUS" AUTHID CURRENT_USER as
+/* $Header: pepeirhi.pkh 120.0 2005/05/31 13:21:30 appldev noship $ */
+--
+-- ----------------------------------------------------------------------------
+-- |---------------------------< insert_validate >----------------------------|
+-- ----------------------------------------------------------------------------
+-- {Start Of Comments}
+--
+-- Description:
+--   This procedure controls the execution of all insert business rules
+--   validation.
+--
+-- Pre Conditions:
+--   This private procedure is called from ins procedure.
+--
+-- In Parameters:
+--   A Pl/Sql record structre.
+--
+-- Post Success:
+--   Processing continues.
+--
+-- Post Failure:
+--   If a business rules fails the error will not be handled by this procedure
+--   unless explicity coded.
+--
+-- Developer Implementation Notes:
+--   For insert, your business rules should be executed from this procedure and
+--   should ideally (unless really necessary) just be straight procedure or
+--   function calls. Try and avoid using conditional branching logic.
+--
+-- Access Status:
+--   Internal Table Handler Use Only.
+--
+-- {End Of Comments}
+-- ----------------------------------------------------------------------------
+Procedure insert_validate(p_rec in pe_pei_shd.g_rec_type);
+--
+-- ----------------------------------------------------------------------------
+-- |---------------------------< update_validate >----------------------------|
+-- ----------------------------------------------------------------------------
+-- {Start Of Comments}
+--
+-- Description:
+--   This procedure controls the execution of all update business rules
+--   validation.
+--
+-- Pre Conditions:
+--   This private procedure is called from upd procedure.
+--
+-- In Parameters:
+--   A Pl/Sql record structre.
+--
+-- Post Success:
+--   Processing continues.
+--
+-- Post Failure:
+--   If a business rules fails the error will not be handled by this procedure
+--   unless explicity coded.
+--
+-- Developer Implementation Notes:
+--   For update, your business rules should be executed from this procedure and
+--   should ideally (unless really necessary) just be straight procedure or
+--   function calls. Try and avoid using conditional branching logic.
+--
+-- Access Status:
+--   Internal Table Handler Use Only.
+--
+-- {End Of Comments}
+-- ----------------------------------------------------------------------------
+Procedure update_validate(p_rec in pe_pei_shd.g_rec_type);
+--
+-- ----------------------------------------------------------------------------
+-- |---------------------------< delete_validate >----------------------------|
+-- ----------------------------------------------------------------------------
+-- {Start Of Comments}
+--
+-- Description:
+--   This procedure controls the execution of all delete business rules
+--   validation.
+--
+-- Pre Conditions:
+--   This private procedure is called from del procedure.
+--
+-- In Parameters:
+--   A Pl/Sql record structre.
+--
+-- Post Success:
+--   Processing continues.
+--
+-- Post Failure:
+--   If a business rules fails the error will not be handled by this procedure
+--   unless explicity coded.
+--
+-- Developer Implementation Notes:
+--   For delete, your business rules should be executed from this procedure and
+--   should ideally (unless really necessary) just be straight procedure or
+--   function calls. Try and avoid using conditional branching logic.
+--
+-- Access Status:
+--   Internal Table Handler Use Only.
+--
+-- {End Of Comments}
+-- ----------------------------------------------------------------------------
+Procedure delete_validate(p_rec in pe_pei_shd.g_rec_type);
+--
+--  ---------------------------------------------------------------------------
+--  |---------------------< return_legislation_code >-------------------------|
+--  ---------------------------------------------------------------------------
+--
+function return_legislation_code
+  (p_person_extra_info_id in number
+  ) return varchar2;
+--
+-- ----------------------------------------------------------------------------
+-- |-----------------------< chk_non_updateable_args >------------------------|
+-- ----------------------------------------------------------------------------
+-- {Start Of Comments}
+--
+-- Description:
+--   Verify that the non updateable arguments not changed.
+--   For the PERSON_EXTRA_INFO table neither of the FK's can be updated
+--   i.e. PERSON_ID and INFORMATION_TYPE
+--
+-- Pre Conditions:
+--   None
+--
+-- In Parameters:
+--   p_rec
+--
+-- Post Success:
+--   Processing continues.
+--
+-- Post Failure:
+--   An application error will be raised and processing is terminated.
+--
+-- Developer Implementation Notes:
+--   None
+--
+-- Access Status:
+--   Internal Row Handler Use Only.
+--
+-- {End Of Comments}
+-- ----------------------------------------------------------------------------
+--
+Procedure chk_non_updateable_args(p_rec in pe_pei_shd.g_rec_type);
+--
+--
+--  ---------------------------------------------------------------------------
+--  |------------------------------< chk_person_id >---------------------------|
+--  ---------------------------------------------------------------------------
+--
+--  Desciption:
+--    This procedures validates that the person id exists on the PER_PERSON_F
+--    table. Note: It does not check if they exists at a given time such as
+--    p_effective_date
+--
+--  Pre-conditions :
+--    None
+--
+--  In Parameters :
+--    p_person_id
+--
+--  Post Success :
+--    Processing continues if the person id is valid
+--
+--  Post Failure :
+--    An application error will be raised and processing is terminated if the
+--    person id is invalid
+--
+--  Access Status :
+--    Internal Row Handler Use only.
+--
+-- {End of Comments}
+--
+-- ---------------------------------------------------------------------------
+procedure chk_person_id
+  (p_person_id    in  per_people_extra_info.person_id%TYPE
+  --  ,p_effective_date  in  date
+    );
+--
+-- ----------------------------------------------------------------------------
+-- |-------------------------< chk_information_type >--------------------------|
+-- ----------------------------------------------------------------------------
+--
+--  Desciption:
+--    This procedures validates that the information type is active on the
+--    PER_PEOPLE_INFO_TYPE table
+--
+--  Pre-conditions :
+--    p_person_id is valid
+--
+--  In Parameters :
+--    p_information_type
+--    p_person_id
+--
+--  Post Success :
+--    Processing continues if the information type is active. It will also
+--    continue if the information type does not allow multiple occurrences and
+--    there doesn't a record for the given information type and person.
+--
+--  Post Failure :
+--    An application error will be raised and processing is terminated if the
+--    information type is not active.
+--    An application error will also be raised and processing is terminated if
+--    the information type doe not allow multiple occurrences and there already
+--    exists a record for that information type and person.
+--
+--  Access Status :
+--    Internal Row Handler Use only.
+--
+-- {End of Comments}
+--
+-- ---------------------------------------------------------------------------
+Procedure chk_information_type
+ (p_information_type in  per_people_extra_info.information_type%TYPE
+ ,p_person_id        in  per_people_extra_info.person_id%TYPE);
+end pe_pei_bus;
+
+ 
+
+/

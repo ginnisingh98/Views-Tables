@@ -1,0 +1,120 @@
+--------------------------------------------------------
+--  DDL for Package B_STD_SUB_OP_RES_PKG
+--------------------------------------------------------
+
+  CREATE OR REPLACE EDITIONABLE PACKAGE "APPS"."B_STD_SUB_OP_RES_PKG" AUTHID CURRENT_USER as
+/* $Header: BOMPSSRS.pls 120.0.12010000.2 2008/10/15 10:59:31 tbhande ship $ */
+
+PROCEDURE Insert_Row(	 X_Rowid                         IN OUT NOCOPY VARCHAR2,
+			 X_STANDARD_OPERATION_ID            NUMBER,
+			 X_RESOURCE_ID                      NUMBER,
+			 X_SUBSTITUTE_GROUP_NUM             NUMBER,
+			 X_REPLACEMENT_GROUP_NUM            NUMBER,
+			 X_ACTIVITY_ID                      NUMBER,
+			 X_STANDARD_RATE_FLAG               NUMBER,
+			 X_ASSIGNED_UNITS                   NUMBER,
+			 X_USAGE_RATE_OR_AMOUNT             NUMBER,
+			 X_USAGE_RATE_OR_AMOUNT_INVERSE     NUMBER,
+			 X_BASIS_TYPE                       NUMBER,
+			 X_SCHEDULE_FLAG                    NUMBER,
+			 X_LAST_UPDATE_DATE                 DATE,
+			 X_LAST_UPDATED_BY                  NUMBER,
+			 X_CREATION_DATE                    DATE,
+			 X_CREATED_BY                       NUMBER,
+			 X_LAST_UPDATE_LOGIN                NUMBER,
+			 X_AUTOCHARGE_TYPE                  NUMBER,
+			 X_ATTRIBUTE_CATEGORY               VARCHAR2,
+			 X_ATTRIBUTE1                       VARCHAR2,
+			 X_ATTRIBUTE2                       VARCHAR2,
+			 X_ATTRIBUTE3                       VARCHAR2,
+			 X_ATTRIBUTE4                       VARCHAR2,
+			 X_ATTRIBUTE5                       VARCHAR2,
+			 X_ATTRIBUTE6                       VARCHAR2,
+			 X_ATTRIBUTE7                       VARCHAR2,
+			 X_ATTRIBUTE8                       VARCHAR2,
+			 X_ATTRIBUTE9                       VARCHAR2,
+			 X_ATTRIBUTE10                      VARCHAR2,
+			 X_ATTRIBUTE11                      VARCHAR2,
+			 X_ATTRIBUTE12                      VARCHAR2,
+			 X_ATTRIBUTE13                      VARCHAR2,
+			 X_ATTRIBUTE14                      VARCHAR2,
+			 X_ATTRIBUTE15                      VARCHAR2,
+  		      X_SCHEDULE_SEQ_NUM                 NUMBER            -- Bug 7370692
+			 );
+
+PROCEDURE Lock_Row(X_Rowid                              VARCHAR2,
+                     X_Standard_Operation_Id            NUMBER,
+                     X_Resource_Id                      NUMBER,
+		     X_SUBSTITUTE_GROUP_NUM             NUMBER,
+		     X_REPLACEMENT_GROUP_NUM            NUMBER,
+                     X_Activity_Id                      NUMBER DEFAULT NULL,
+                     X_Usage_Rate_Or_Amount             NUMBER,
+                     X_Usage_Rate_Or_Amount_Inverse     NUMBER,
+                     X_Basis_Type                       NUMBER,
+                     X_Autocharge_Type                  NUMBER,
+                     X_Standard_Rate_Flag               NUMBER,
+                     X_Assigned_Units                   NUMBER DEFAULT NULL,
+                     X_Schedule_Flag                    NUMBER,
+                     X_Attribute_Category               VARCHAR2 DEFAULT NULL,
+                     X_Attribute1                       VARCHAR2 DEFAULT NULL,
+                     X_Attribute2                       VARCHAR2 DEFAULT NULL,
+                     X_Attribute3                       VARCHAR2 DEFAULT NULL,
+                     X_Attribute4                       VARCHAR2 DEFAULT NULL,
+                     X_Attribute5                       VARCHAR2 DEFAULT NULL,
+                     X_Attribute6                       VARCHAR2 DEFAULT NULL,
+                     X_Attribute7                       VARCHAR2 DEFAULT NULL,
+                     X_Attribute8                       VARCHAR2 DEFAULT NULL,
+                     X_Attribute9                       VARCHAR2 DEFAULT NULL,
+                     X_Attribute10                      VARCHAR2 DEFAULT NULL,
+                     X_Attribute11                      VARCHAR2 DEFAULT NULL,
+                     X_Attribute12                      VARCHAR2 DEFAULT NULL,
+                     X_Attribute13                      VARCHAR2 DEFAULT NULL,
+                     X_Attribute14                      VARCHAR2 DEFAULT NULL,
+                     X_Attribute15                      VARCHAR2 DEFAULT NULL,
+                     X_SCHEDULE_SEQ_NUM                 NUMBER                       -- Bug 7370692
+                     );
+
+PROCEDURE Update_Row(X_Rowid                           VARCHAR2,
+                     X_Standard_Operation_Id           NUMBER,
+                     X_Resource_Id                     NUMBER,
+		     X_SUBSTITUTE_GROUP_NUM            NUMBER,
+		     X_REPLACEMENT_GROUP_NUM           NUMBER,
+                     X_Activity_Id                     NUMBER DEFAULT NULL,
+                     X_Last_Update_Date                DATE,
+                     X_Last_Updated_By                 NUMBER,
+                     X_Last_Update_Login               NUMBER DEFAULT NULL,
+                     X_Usage_Rate_Or_Amount            NUMBER,
+                     X_Usage_Rate_Or_Amount_Inverse    NUMBER,
+                     X_Basis_Type                      NUMBER,
+                     X_Autocharge_Type                 NUMBER,
+		     X_Standard_Rate_Flag              NUMBER,
+                     X_Assigned_Units                  NUMBER DEFAULT NULL,
+                     X_Schedule_Flag                   NUMBER,
+                     X_Attribute_Category              VARCHAR2 DEFAULT NULL,
+                     X_Attribute1                      VARCHAR2 DEFAULT NULL,
+                     X_Attribute2                      VARCHAR2 DEFAULT NULL,
+                     X_Attribute3                      VARCHAR2 DEFAULT NULL,
+                     X_Attribute4                      VARCHAR2 DEFAULT NULL,
+                     X_Attribute5                      VARCHAR2 DEFAULT NULL,
+                     X_Attribute6                      VARCHAR2 DEFAULT NULL,
+                     X_Attribute7                      VARCHAR2 DEFAULT NULL,
+                     X_Attribute8                      VARCHAR2 DEFAULT NULL,
+                     X_Attribute9                      VARCHAR2 DEFAULT NULL,
+                     X_Attribute10                     VARCHAR2 DEFAULT NULL,
+                     X_Attribute11                     VARCHAR2 DEFAULT NULL,
+                     X_Attribute12                     VARCHAR2 DEFAULT NULL,
+                     X_Attribute13                     VARCHAR2 DEFAULT NULL,
+                     X_Attribute14                     VARCHAR2 DEFAULT NULL,
+                     X_Attribute15                     VARCHAR2 DEFAULT NULL,
+		     X_SCHEDULE_SEQ_NUM                 NUMBER                  -- Bug 7370692
+                     );
+
+PROCEDURE Delete_Row_Sub(X_Rowid VARCHAR2);
+
+PROCEDURE Check_Unique(X_Rowid VARCHAR2,
+	  	  	   X_Standard_Operation_Id NUMBER,
+			   X_Resource_Seq_Num NUMBER);
+
+END B_STD_SUB_OP_RES_PKG;
+
+/

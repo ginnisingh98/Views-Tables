@@ -1,0 +1,151 @@
+--------------------------------------------------------
+--  DDL for Package Body XDP_FA_PARAMETERS_PKG
+--------------------------------------------------------
+
+  CREATE OR REPLACE EDITIONABLE PACKAGE BODY "APPS"."XDP_FA_PARAMETERS_PKG" as
+/* $Header: XDPFAPRB.pls 120.1 2005/06/15 22:59:39 appldev  $ */
+procedure INSERT_ROW (
+  X_ROWID in OUT NOCOPY VARCHAR2,
+  X_FULFILLMENT_ACTION_ID in NUMBER,
+  X_PARAMETER_NAME in VARCHAR2,
+  X_EVALUATION_PROCEDURE in VARCHAR2,
+  X_EVALUATION_SEQ in NUMBER,
+  X_LOG_IN_AUDIT_TRAIL_FLAG in VARCHAR2,
+  X_DISPLAY_SEQ in NUMBER,
+  X_DEFAULT_VALUE in VARCHAR2,
+  X_CREATION_DATE in DATE,
+  X_CREATED_BY in NUMBER,
+  X_LAST_UPDATE_DATE in DATE,
+  X_LAST_UPDATED_BY in NUMBER,
+  X_LAST_UPDATE_LOGIN in NUMBER
+) is
+  cursor C is select ROWID from XDP_FA_PARAMETERS
+    where FULFILLMENT_ACTION_ID = X_FULFILLMENT_ACTION_ID
+    and PARAMETER_NAME = X_PARAMETER_NAME;
+begin
+  insert into XDP_FA_PARAMETERS (
+    FULFILLMENT_ACTION_ID,
+    PARAMETER_NAME,
+    EVALUATION_PROCEDURE,
+    EVALUATION_SEQ,
+    LOG_IN_AUDIT_TRAIL_FLAG,
+    DEFAULT_VALUE,
+    DISPLAY_SEQ,
+    CREATION_DATE,
+    LAST_UPDATE_DATE,
+    LAST_UPDATED_BY,
+    CREATED_BY,
+    LAST_UPDATE_LOGIN
+  ) values (
+    X_FULFILLMENT_ACTION_ID,
+    X_PARAMETER_NAME,
+    X_EVALUATION_PROCEDURE,
+    X_EVALUATION_SEQ,
+    X_LOG_IN_AUDIT_TRAIL_FLAG,
+    X_DEFAULT_VALUE,
+    X_DISPLAY_SEQ,
+    X_CREATION_DATE,
+    X_LAST_UPDATE_DATE,
+    X_LAST_UPDATED_BY,
+    X_CREATED_BY,
+    X_LAST_UPDATE_LOGIN
+  ) ;
+  open c;
+  fetch c into X_ROWID;
+  if (c%notfound) then
+    close c;
+    raise no_data_found;
+  end if;
+  close c;
+
+end INSERT_ROW;
+
+procedure LOCK_ROW (
+  X_FULFILLMENT_ACTION_ID in NUMBER,
+  X_PARAMETER_NAME in VARCHAR2,
+  X_EVALUATION_PROCEDURE in VARCHAR2,
+  X_EVALUATION_SEQ in NUMBER,
+  X_LOG_IN_AUDIT_TRAIL_FLAG in VARCHAR2,
+  X_DISPLAY_SEQ in NUMBER,
+  X_DEFAULT_VALUE in VARCHAR2
+) is
+  cursor c1 is select
+      EVALUATION_PROCEDURE,
+      EVALUATION_SEQ,
+      LOG_IN_AUDIT_TRAIL_FLAG,
+      DISPLAY_SEQ,
+      DEFAULT_VALUE
+    from XDP_FA_PARAMETERS
+    where FULFILLMENT_ACTION_ID = X_FULFILLMENT_ACTION_ID
+    and PARAMETER_NAME = X_PARAMETER_NAME
+    for update of FULFILLMENT_ACTION_ID nowait;
+begin
+  for tlinfo in c1 loop
+      if (    ((tlinfo.DEFAULT_VALUE = X_DEFAULT_VALUE)
+               OR ((tlinfo.DEFAULT_VALUE is null) AND (X_DEFAULT_VALUE is null)))
+          AND ((tlinfo.EVALUATION_PROCEDURE = X_EVALUATION_PROCEDURE)
+               OR ((tlinfo.EVALUATION_PROCEDURE is null) AND (X_EVALUATION_PROCEDURE is null)))
+          AND ((tlinfo.EVALUATION_SEQ = X_EVALUATION_SEQ)
+               OR ((tlinfo.EVALUATION_SEQ is null) AND (X_EVALUATION_SEQ is null)))
+          AND ((tlinfo.LOG_IN_AUDIT_TRAIL_FLAG = X_LOG_IN_AUDIT_TRAIL_FLAG)
+               OR ((tlinfo.LOG_IN_AUDIT_TRAIL_FLAG is null) AND (X_LOG_IN_AUDIT_TRAIL_FLAG is null)))
+          AND ((tlinfo.DISPLAY_SEQ = X_DISPLAY_SEQ)
+               OR ((tlinfo.DISPLAY_SEQ is null) AND (X_DISPLAY_SEQ is null)))
+      ) then
+        null;
+      else
+        fnd_message.set_name('FND', 'FORM_RECORD_CHANGED');
+        app_exception.raise_exception;
+      end if;
+  end loop;
+  return;
+end LOCK_ROW;
+
+procedure UPDATE_ROW (
+  X_FULFILLMENT_ACTION_ID in NUMBER,
+  X_PARAMETER_NAME in VARCHAR2,
+  X_EVALUATION_PROCEDURE in VARCHAR2,
+  X_EVALUATION_SEQ in NUMBER,
+  X_LOG_IN_AUDIT_TRAIL_FLAG in VARCHAR2,
+  X_DISPLAY_SEQ in NUMBER,
+  X_DEFAULT_VALUE in VARCHAR2,
+  X_LAST_UPDATE_DATE in DATE,
+  X_LAST_UPDATED_BY in NUMBER,
+  X_LAST_UPDATE_LOGIN in NUMBER
+) is
+begin
+  update XDP_FA_PARAMETERS set
+    EVALUATION_PROCEDURE = X_EVALUATION_PROCEDURE,
+    EVALUATION_SEQ = X_EVALUATION_SEQ,
+    LOG_IN_AUDIT_TRAIL_FLAG = X_LOG_IN_AUDIT_TRAIL_FLAG,
+    DISPLAY_SEQ = X_DISPLAY_SEQ,
+    DEFAULT_VALUE = X_DEFAULT_VALUE,
+    LAST_UPDATE_DATE = X_LAST_UPDATE_DATE,
+    LAST_UPDATED_BY = X_LAST_UPDATED_BY,
+    LAST_UPDATE_LOGIN = X_LAST_UPDATE_LOGIN
+  where FULFILLMENT_ACTION_ID = X_FULFILLMENT_ACTION_ID
+  and PARAMETER_NAME = X_PARAMETER_NAME ;
+
+  if (sql%notfound) then
+    raise no_data_found;
+  end if;
+end UPDATE_ROW;
+
+procedure DELETE_ROW (
+  X_FULFILLMENT_ACTION_ID in NUMBER,
+  X_PARAMETER_NAME in VARCHAR2
+) is
+begin
+  delete from XDP_FA_PARAMETERS
+  where FULFILLMENT_ACTION_ID = X_FULFILLMENT_ACTION_ID
+  and PARAMETER_NAME = X_PARAMETER_NAME ;
+
+  if (sql%notfound) then
+    raise no_data_found;
+  end if;
+
+end DELETE_ROW;
+
+end XDP_FA_PARAMETERS_PKG;
+
+/

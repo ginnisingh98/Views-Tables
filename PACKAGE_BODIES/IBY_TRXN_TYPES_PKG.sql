@@ -1,0 +1,376 @@
+--------------------------------------------------------
+--  DDL for Package Body IBY_TRXN_TYPES_PKG
+--------------------------------------------------------
+
+  CREATE OR REPLACE EDITIONABLE PACKAGE BODY "APPS"."IBY_TRXN_TYPES_PKG" as
+/* $Header: ibydttpb.pls 120.1 2005/12/01 21:53:13 chhu noship $ */
+
+procedure INSERT_ROW (
+  X_ROWID in out nocopy VARCHAR2,
+  X_APPLICATION_ID in NUMBER,
+  X_PAY_PROC_TRXN_TYPE_CODE in VARCHAR2,
+  X_OBJECT_VERSION_NUMBER in NUMBER,
+  X_PAYMENT_FLOW in VARCHAR2,
+  X_SEEDED_FLAG in VARCHAR2,
+  X_NAME in VARCHAR2,
+  X_DESCRIPTION in VARCHAR2,
+  X_CREATION_DATE in DATE,
+  X_CREATED_BY in NUMBER,
+  X_LAST_UPDATE_DATE in DATE,
+  X_LAST_UPDATED_BY in NUMBER,
+  X_LAST_UPDATE_LOGIN in NUMBER
+) is
+  cursor C is select ROWID from IBY_TRXN_TYPES_B
+    where APPLICATION_ID = X_APPLICATION_ID
+    and PAY_PROC_TRXN_TYPE_CODE = X_PAY_PROC_TRXN_TYPE_CODE
+    ;
+begin
+  insert into IBY_TRXN_TYPES_B (
+    OBJECT_VERSION_NUMBER,
+    PAYMENT_FLOW,
+    APPLICATION_ID,
+    PAY_PROC_TRXN_TYPE_CODE,
+    SEEDED_FLAG,
+    CREATION_DATE,
+    CREATED_BY,
+    LAST_UPDATE_DATE,
+    LAST_UPDATED_BY,
+    LAST_UPDATE_LOGIN
+  ) values (
+    X_OBJECT_VERSION_NUMBER,
+    X_PAYMENT_FLOW,
+    X_APPLICATION_ID,
+    X_PAY_PROC_TRXN_TYPE_CODE,
+    X_SEEDED_FLAG,
+    X_CREATION_DATE,
+    X_CREATED_BY,
+    X_LAST_UPDATE_DATE,
+    X_LAST_UPDATED_BY,
+    X_LAST_UPDATE_LOGIN
+  );
+
+  insert into IBY_TRXN_TYPES_TL (
+    APPLICATION_ID,
+    PAY_PROC_TRXN_TYPE_CODE,
+    NAME,
+    DESCRIPTION,
+    CREATED_BY,
+    CREATION_DATE,
+    LAST_UPDATED_BY,
+    LAST_UPDATE_DATE,
+    LAST_UPDATE_LOGIN,
+    OBJECT_VERSION_NUMBER,
+    LANGUAGE,
+    SOURCE_LANG
+  ) select
+    X_APPLICATION_ID,
+    X_PAY_PROC_TRXN_TYPE_CODE,
+    X_NAME,
+    X_DESCRIPTION,
+    X_CREATED_BY,
+    X_CREATION_DATE,
+    X_LAST_UPDATED_BY,
+    X_LAST_UPDATE_DATE,
+    X_LAST_UPDATE_LOGIN,
+    X_OBJECT_VERSION_NUMBER,
+    L.LANGUAGE_CODE,
+    userenv('LANG')
+  from FND_LANGUAGES L
+  where L.INSTALLED_FLAG in ('I', 'B')
+  and not exists
+    (select NULL
+    from IBY_TRXN_TYPES_TL T
+    where T.APPLICATION_ID = X_APPLICATION_ID
+    and T.PAY_PROC_TRXN_TYPE_CODE = X_PAY_PROC_TRXN_TYPE_CODE
+    and T.LANGUAGE = L.LANGUAGE_CODE);
+
+  open c;
+  fetch c into X_ROWID;
+  if (c%notfound) then
+    close c;
+    raise no_data_found;
+  end if;
+  close c;
+
+end INSERT_ROW;
+
+procedure LOCK_ROW (
+  X_APPLICATION_ID in NUMBER,
+  X_PAY_PROC_TRXN_TYPE_CODE in VARCHAR2,
+  X_OBJECT_VERSION_NUMBER in NUMBER,
+  X_PAYMENT_FLOW in VARCHAR2,
+  X_SEEDED_FLAG in VARCHAR2,
+  X_NAME in VARCHAR2,
+  X_DESCRIPTION in VARCHAR2
+) is
+  cursor c is select
+      OBJECT_VERSION_NUMBER,
+      PAYMENT_FLOW,
+      SEEDED_FLAG
+    from IBY_TRXN_TYPES_B
+    where APPLICATION_ID = X_APPLICATION_ID
+    and PAY_PROC_TRXN_TYPE_CODE = X_PAY_PROC_TRXN_TYPE_CODE
+    for update of APPLICATION_ID nowait;
+  recinfo c%rowtype;
+
+  cursor c1 is select
+      NAME,
+      DESCRIPTION,
+      decode(LANGUAGE, userenv('LANG'), 'Y', 'N') BASELANG
+    from IBY_TRXN_TYPES_TL
+    where APPLICATION_ID = X_APPLICATION_ID
+    and PAY_PROC_TRXN_TYPE_CODE = X_PAY_PROC_TRXN_TYPE_CODE
+    and userenv('LANG') in (LANGUAGE, SOURCE_LANG)
+    for update of APPLICATION_ID nowait;
+begin
+  open c;
+  fetch c into recinfo;
+  if (c%notfound) then
+    close c;
+    fnd_message.set_name('FND', 'FORM_RECORD_DELETED');
+    app_exception.raise_exception;
+  end if;
+  close c;
+  if (    (recinfo.OBJECT_VERSION_NUMBER = X_OBJECT_VERSION_NUMBER)
+      AND (recinfo.PAYMENT_FLOW = X_PAYMENT_FLOW)
+      AND (recinfo.SEEDED_FLAG = X_SEEDED_FLAG)
+  ) then
+    null;
+  else
+    fnd_message.set_name('FND', 'FORM_RECORD_CHANGED');
+    app_exception.raise_exception;
+  end if;
+
+  for tlinfo in c1 loop
+    if (tlinfo.BASELANG = 'Y') then
+      if (    (tlinfo.NAME = X_NAME)
+          AND ((tlinfo.DESCRIPTION = X_DESCRIPTION)
+               OR ((tlinfo.DESCRIPTION is null) AND (X_DESCRIPTION is null)))
+      ) then
+        null;
+      else
+        fnd_message.set_name('FND', 'FORM_RECORD_CHANGED');
+        app_exception.raise_exception;
+      end if;
+    end if;
+  end loop;
+  return;
+end LOCK_ROW;
+
+procedure UPDATE_ROW (
+  X_APPLICATION_ID in NUMBER,
+  X_PAY_PROC_TRXN_TYPE_CODE in VARCHAR2,
+  X_OBJECT_VERSION_NUMBER in NUMBER,
+  X_PAYMENT_FLOW in VARCHAR2,
+  X_SEEDED_FLAG in VARCHAR2,
+  X_NAME in VARCHAR2,
+  X_DESCRIPTION in VARCHAR2,
+  X_LAST_UPDATE_DATE in DATE,
+  X_LAST_UPDATED_BY in NUMBER,
+  X_LAST_UPDATE_LOGIN in NUMBER
+) is
+begin
+  update IBY_TRXN_TYPES_B set
+    OBJECT_VERSION_NUMBER = X_OBJECT_VERSION_NUMBER,
+    PAYMENT_FLOW = X_PAYMENT_FLOW,
+    SEEDED_FLAG = X_SEEDED_FLAG,
+    LAST_UPDATE_DATE = X_LAST_UPDATE_DATE,
+    LAST_UPDATED_BY = X_LAST_UPDATED_BY,
+    LAST_UPDATE_LOGIN = X_LAST_UPDATE_LOGIN
+  where APPLICATION_ID = X_APPLICATION_ID
+  and PAY_PROC_TRXN_TYPE_CODE = X_PAY_PROC_TRXN_TYPE_CODE;
+
+  if (sql%notfound) then
+    raise no_data_found;
+  end if;
+
+  update IBY_TRXN_TYPES_TL set
+    NAME = X_NAME,
+    DESCRIPTION = X_DESCRIPTION,
+    LAST_UPDATE_DATE = X_LAST_UPDATE_DATE,
+    LAST_UPDATED_BY = X_LAST_UPDATED_BY,
+    LAST_UPDATE_LOGIN = X_LAST_UPDATE_LOGIN,
+    SOURCE_LANG = userenv('LANG')
+  where APPLICATION_ID = X_APPLICATION_ID
+  and PAY_PROC_TRXN_TYPE_CODE = X_PAY_PROC_TRXN_TYPE_CODE
+  and userenv('LANG') in (LANGUAGE, SOURCE_LANG);
+
+  if (sql%notfound) then
+    raise no_data_found;
+  end if;
+end UPDATE_ROW;
+
+procedure DELETE_ROW (
+  X_APPLICATION_ID in NUMBER,
+  X_PAY_PROC_TRXN_TYPE_CODE in VARCHAR2
+) is
+begin
+  delete from IBY_TRXN_TYPES_TL
+  where APPLICATION_ID = X_APPLICATION_ID
+  and PAY_PROC_TRXN_TYPE_CODE = X_PAY_PROC_TRXN_TYPE_CODE;
+
+  if (sql%notfound) then
+    raise no_data_found;
+  end if;
+
+  delete from IBY_TRXN_TYPES_B
+  where APPLICATION_ID = X_APPLICATION_ID
+  and PAY_PROC_TRXN_TYPE_CODE = X_PAY_PROC_TRXN_TYPE_CODE;
+
+  if (sql%notfound) then
+    raise no_data_found;
+  end if;
+end DELETE_ROW;
+
+procedure ADD_LANGUAGE
+is
+begin
+  delete from IBY_TRXN_TYPES_TL T
+  where not exists
+    (select NULL
+    from IBY_TRXN_TYPES_B B
+    where B.APPLICATION_ID = T.APPLICATION_ID
+    and B.PAY_PROC_TRXN_TYPE_CODE = T.PAY_PROC_TRXN_TYPE_CODE
+    );
+
+  update IBY_TRXN_TYPES_TL T set (
+      NAME,
+      DESCRIPTION
+    ) = (select
+      B.NAME,
+      B.DESCRIPTION
+    from IBY_TRXN_TYPES_TL B
+    where B.APPLICATION_ID = T.APPLICATION_ID
+    and B.PAY_PROC_TRXN_TYPE_CODE = T.PAY_PROC_TRXN_TYPE_CODE
+    and B.LANGUAGE = T.SOURCE_LANG)
+  where (
+      T.APPLICATION_ID,
+      T.PAY_PROC_TRXN_TYPE_CODE,
+      T.LANGUAGE
+  ) in (select
+      SUBT.APPLICATION_ID,
+      SUBT.PAY_PROC_TRXN_TYPE_CODE,
+      SUBT.LANGUAGE
+    from IBY_TRXN_TYPES_TL SUBB, IBY_TRXN_TYPES_TL SUBT
+    where SUBB.APPLICATION_ID = SUBT.APPLICATION_ID
+    and SUBB.PAY_PROC_TRXN_TYPE_CODE = SUBT.PAY_PROC_TRXN_TYPE_CODE
+    and SUBB.LANGUAGE = SUBT.SOURCE_LANG
+    and (SUBB.NAME <> SUBT.NAME
+      or SUBB.DESCRIPTION <> SUBT.DESCRIPTION
+      or (SUBB.DESCRIPTION is null and SUBT.DESCRIPTION is not null)
+      or (SUBB.DESCRIPTION is not null and SUBT.DESCRIPTION is null)
+  ));
+
+  insert into IBY_TRXN_TYPES_TL (
+    APPLICATION_ID,
+    PAY_PROC_TRXN_TYPE_CODE,
+    NAME,
+    DESCRIPTION,
+    CREATED_BY,
+    CREATION_DATE,
+    LAST_UPDATED_BY,
+    LAST_UPDATE_DATE,
+    LAST_UPDATE_LOGIN,
+    OBJECT_VERSION_NUMBER,
+    LANGUAGE,
+    SOURCE_LANG
+  ) select /*+ ORDERED */
+    B.APPLICATION_ID,
+    B.PAY_PROC_TRXN_TYPE_CODE,
+    B.NAME,
+    B.DESCRIPTION,
+    B.CREATED_BY,
+    B.CREATION_DATE,
+    B.LAST_UPDATED_BY,
+    B.LAST_UPDATE_DATE,
+    B.LAST_UPDATE_LOGIN,
+    B.OBJECT_VERSION_NUMBER,
+    L.LANGUAGE_CODE,
+    B.SOURCE_LANG
+  from IBY_TRXN_TYPES_TL B, FND_LANGUAGES L
+  where L.INSTALLED_FLAG in ('I', 'B')
+  and B.LANGUAGE = userenv('LANG')
+  and not exists
+    (select NULL
+    from IBY_TRXN_TYPES_TL T
+    where T.APPLICATION_ID = B.APPLICATION_ID
+    and T.PAY_PROC_TRXN_TYPE_CODE = B.PAY_PROC_TRXN_TYPE_CODE
+    and T.LANGUAGE = L.LANGUAGE_CODE);
+end ADD_LANGUAGE;
+
+
+procedure LOAD_SEED_ROW (
+  X_APPLICATION_ID in NUMBER,
+  X_PAY_PROC_TRXN_TYPE_CODE in VARCHAR2,
+  X_OBJECT_VERSION_NUMBER in NUMBER,
+  X_PAYMENT_FLOW in VARCHAR2,
+  X_SEEDED_FLAG in VARCHAR2,
+  X_NAME in VARCHAR2,
+  X_DESCRIPTION in VARCHAR2,
+  X_CREATION_DATE in DATE,
+  X_CREATED_BY in NUMBER,
+  X_LAST_UPDATE_DATE in DATE,
+  X_LAST_UPDATED_BY in NUMBER,
+  X_LAST_UPDATE_LOGIN in NUMBER) IS
+    row_id VARCHAR2(200);
+  begin
+
+UPDATE_ROW (
+  X_APPLICATION_ID,
+  X_PAY_PROC_TRXN_TYPE_CODE,
+  X_OBJECT_VERSION_NUMBER,
+  X_PAYMENT_FLOW,
+  X_SEEDED_FLAG,
+  X_NAME,
+  X_DESCRIPTION,
+  X_LAST_UPDATE_DATE,
+  X_LAST_UPDATED_BY,
+  X_LAST_UPDATE_LOGIN
+);
+
+  exception
+    when no_data_found then
+
+      INSERT_ROW (
+  row_id,
+  X_APPLICATION_ID,
+  X_PAY_PROC_TRXN_TYPE_CODE,
+  X_OBJECT_VERSION_NUMBER,
+  X_PAYMENT_FLOW,
+  X_SEEDED_FLAG,
+  X_NAME,
+  X_DESCRIPTION,
+  X_CREATION_DATE,
+  X_CREATED_BY,
+  X_LAST_UPDATE_DATE,
+  X_LAST_UPDATED_BY,
+  X_LAST_UPDATE_LOGIN
+);
+
+end load_seed_row;
+
+procedure TRANSLATE_ROW (
+  X_APPLICATION_ID in NUMBER,
+  X_PAY_PROC_TRXN_TYPE_CODE in VARCHAR2,
+  X_NAME in VARCHAR2,
+  X_DESCRIPTION in VARCHAR2,
+  X_OBJECT_VERSION_NUMBER in NUMBER,
+  X_OWNER in VARCHAR2)
+is
+begin
+  update IBY_TRXN_TYPES_TL set
+    NAME = X_NAME,
+    DESCRIPTION = X_DESCRIPTION,
+    OBJECT_VERSION_NUMBER = X_OBJECT_VERSION_NUMBER,
+    LAST_UPDATED_BY = fnd_load_util.owner_id(X_OWNER),
+    LAST_UPDATE_DATE = trunc(sysdate),
+    LAST_UPDATE_LOGIN = fnd_load_util.owner_id(X_OWNER),
+    SOURCE_LANG = userenv('LANG')
+  where userenv('LANG') in (LANGUAGE, SOURCE_LANG)
+    and APPLICATION_ID = X_APPLICATION_ID
+    and PAY_PROC_TRXN_TYPE_CODE = X_PAY_PROC_TRXN_TYPE_CODE;
+end;
+
+end IBY_TRXN_TYPES_PKG;
+
+/

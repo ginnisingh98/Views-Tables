@@ -1,0 +1,110 @@
+--------------------------------------------------------
+--  DDL for Package AMS_LIST_SRC_TYPES_PKG
+--------------------------------------------------------
+
+  CREATE OR REPLACE EDITIONABLE PACKAGE "APPS"."AMS_LIST_SRC_TYPES_PKG" AUTHID CURRENT_USER AS
+/* $Header: amsllsts.pls 120.1 2005/09/06 12:36:56 vbhandar noship $ */
+
+PROCEDURE insert_row (
+  X_ROWID in OUT NOCOPY VARCHAR2,
+  X_LIST_SOURCE_TYPE_ID in NUMBER,
+  X_OBJECT_VERSION_NUMBER in NUMBER,
+  X_LIST_SOURCE_NAME in VARCHAR2,
+  X_LIST_SOURCE_TYPE in VARCHAR2,
+  X_SOURCE_TYPE_CODE in VARCHAR2,
+  X_SOURCE_OBJECT_NAME in VARCHAR2,
+  X_MASTER_SOURCE_TYPE_FLAG in VARCHAR2,
+  X_SOURCE_OBJECT_PK_FIELD in VARCHAR2,
+  X_ENABLED_FLAG in VARCHAR2,
+  X_DESCRIPTION in VARCHAR2,
+  X_JAVA_CLASS_NAME IN VARCHAR2,
+  x_view_application_id          in number,
+  x_ARC_ACT_SRC_USED_BY          in varchar2,
+  x_SOURCE_CATEGORY              in varchar2,
+  x_import_type                  in varchar2,
+  X_CREATION_DATE in DATE,
+  X_CREATED_BY in NUMBER,
+  X_LAST_UPDATE_DATE in DATE,
+  X_LAST_UPDATED_BY in NUMBER,
+  X_LAST_UPDATE_LOGIN in NUMBER,
+  X_BASED_ON_TCA_FLAG IN varchar2
+);
+
+PROCEDURE lock_row (
+  X_LIST_SOURCE_TYPE_ID in NUMBER,
+  X_OBJECT_VERSION_NUMBER in NUMBER,
+  X_LIST_SOURCE_NAME in VARCHAR2,
+  X_LIST_SOURCE_TYPE in VARCHAR2,
+  X_SOURCE_TYPE_CODE in VARCHAR2,
+  X_SOURCE_OBJECT_NAME in VARCHAR2,
+  X_MASTER_SOURCE_TYPE_FLAG in VARCHAR2,
+  X_SOURCE_OBJECT_PK_FIELD in VARCHAR2,
+  X_ENABLED_FLAG in VARCHAR2,
+  X_DESCRIPTION in VARCHAR2,
+  X_JAVA_CLASS_NAME IN VARCHAR2,
+  x_view_application_id         in number,
+  x_ARC_ACT_SRC_USED_BY          in varchar2,
+  x_SOURCE_CATEGORY              in varchar2,
+  x_IMPORT_TYPE                  in varchar2,
+  x_BASED_ON_TCA_FLAG             IN varchar2
+);
+
+PROCEDURE update_row (
+  X_LIST_SOURCE_TYPE_ID in NUMBER,
+  X_OBJECT_VERSION_NUMBER in NUMBER,
+  X_LIST_SOURCE_NAME in VARCHAR2,
+  X_LIST_SOURCE_TYPE in VARCHAR2,
+  X_SOURCE_TYPE_CODE in VARCHAR2,
+  X_SOURCE_OBJECT_NAME in VARCHAR2,
+  X_MASTER_SOURCE_TYPE_FLAG in VARCHAR2,
+  X_SOURCE_OBJECT_PK_FIELD in VARCHAR2,
+  X_ENABLED_FLAG in VARCHAR2,
+  X_DESCRIPTION in VARCHAR2,
+  X_JAVA_CLASS_NAME IN VARCHAR2,
+  x_view_application_id          in number,
+  x_ARC_ACT_SRC_USED_BY          in varchar2,
+  x_SOURCE_CATEGORY              in varchar2,
+  x_IMPORT_TYPE                  in varchar2,
+  X_LAST_UPDATE_DATE in DATE,
+  X_LAST_UPDATED_BY in NUMBER,
+  X_LAST_UPDATE_LOGIN in NUMBER,
+  x_BASED_ON_TCA_FLAG             IN varchar2
+);
+
+PROCEDURE delete_row (
+  X_LIST_SOURCE_TYPE_ID in NUMBER
+);
+
+PROCEDURE load_row (
+  X_LIST_SOURCE_TYPE_ID in NUMBER,
+  X_LIST_SOURCE_NAME in VARCHAR2,
+  X_LIST_SOURCE_TYPE in VARCHAR2,
+  X_SOURCE_TYPE_CODE in VARCHAR2,
+  X_SOURCE_OBJECT_NAME in VARCHAR2,
+  X_MASTER_SOURCE_TYPE_FLAG in VARCHAR2,
+  X_SOURCE_OBJECT_PK_FIELD in VARCHAR2,
+  X_ENABLED_FLAG in VARCHAR2,
+  X_DESCRIPTION in VARCHAR2,
+  X_JAVA_CLASS_NAME IN VARCHAR2,
+  x_view_application_id          in number,
+  x_ARC_ACT_SRC_USED_BY          in varchar2,
+  x_SOURCE_CATEGORY              in varchar2,
+  x_import_type                  in varchar2,
+  x_owner IN VARCHAR2,
+  x_custom_mode IN VARCHAR2,
+  x_BASED_ON_TCA_FLAG             IN varchar2
+);
+
+procedure ADD_LANGUAGE;
+procedure TRANSLATE_ROW(
+  X_LIST_SOURCE_TYPE_ID in NUMBER,
+  X_LIST_SOURCE_NAME in VARCHAR2,
+  X_DESCRIPTION in VARCHAR2,
+  x_owner   in VARCHAR2,
+  x_custom_mode IN VARCHAR2
+ ) ;
+END ams_list_src_types_pkg;
+
+ 
+
+/

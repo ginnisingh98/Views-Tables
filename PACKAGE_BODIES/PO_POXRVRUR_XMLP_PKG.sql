@@ -1,0 +1,81 @@
+--------------------------------------------------------
+--  DDL for Package Body PO_POXRVRUR_XMLP_PKG
+--------------------------------------------------------
+
+  CREATE OR REPLACE EDITIONABLE PACKAGE BODY "APPS"."PO_POXRVRUR_XMLP_PKG" AS
+/* $Header: POXRVRURB.pls 120.1 2007/12/25 12:21:54 krreddy noship $ */
+  FUNCTION BEFOREREPORT RETURN BOOLEAN IS
+  BEGIN
+    DECLARE
+      L_ORG_DISPLAYED ORG_ORGANIZATION_DEFINITIONS.ORGANIZATION_NAME%TYPE;
+    BEGIN
+      IF (P_ORG_ID IS NOT NULL) THEN
+        BEGIN
+          SELECT
+            ORGANIZATION_NAME
+          INTO
+            L_ORG_DISPLAYED
+          FROM
+            ORG_ORGANIZATION_DEFINITIONS
+          WHERE ORGANIZATION_ID = P_ORG_ID;
+          P_ORG_DISPLAYED := L_ORG_DISPLAYED;
+        END;
+      ELSE
+        P_ORG_DISPLAYED := '';
+      END IF;
+    END;
+    BEGIN
+      FORMAT_MASK := PO_COMMON_xmlp_pkg.GET_PRECISION(P_QTY_PRECISION);
+      P_CONC_REQUEST_ID := FND_GLOBAL.CONC_REQUEST_ID;
+      RETURN TRUE;
+    END;
+    RETURN (TRUE);
+  END BEFOREREPORT;
+  FUNCTION AFTERREPORT RETURN BOOLEAN IS
+  BEGIN
+    RETURN (TRUE);
+  END AFTERREPORT;
+  PROCEDURE GET_PRECISION IS
+  BEGIN
+    IF P_QTY_PRECISION = 0 THEN
+      NULL;
+    ELSE
+      IF P_QTY_PRECISION = 1 THEN
+        NULL;
+      ELSE
+        IF P_QTY_PRECISION = 3 THEN
+          NULL;
+        ELSE
+          IF P_QTY_PRECISION = 4 THEN
+            NULL;
+          ELSE
+            IF P_QTY_PRECISION = 5 THEN
+              NULL;
+            ELSE
+              IF P_QTY_PRECISION = 6 THEN
+                NULL;
+              ELSE
+                NULL;
+              END IF;
+            END IF;
+          END IF;
+        END IF;
+      END IF;
+    END IF;
+  END GET_PRECISION;
+  FUNCTION AFTERPFORM RETURN BOOLEAN IS
+  BEGIN
+    RETURN (TRUE);
+  END AFTERPFORM;
+  FUNCTION BETWEENPAGE RETURN BOOLEAN IS
+  BEGIN
+    RETURN (TRUE);
+  END BETWEENPAGE;
+  FUNCTION BEFOREPFORM RETURN BOOLEAN IS
+  BEGIN
+    RETURN (TRUE);
+  END BEFOREPFORM;
+END PO_POXRVRUR_XMLP_PKG;
+
+
+/

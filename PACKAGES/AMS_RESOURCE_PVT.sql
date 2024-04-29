@@ -1,0 +1,20 @@
+--------------------------------------------------------
+--  DDL for Package AMS_RESOURCE_PVT
+--------------------------------------------------------
+
+  CREATE OR REPLACE EDITIONABLE PACKAGE "APPS"."AMS_RESOURCE_PVT" AUTHID CURRENT_USER AS
+/* $Header: amsvrcts.pls 120.0 2005/05/31 14:24:25 appldev noship $ */
+
+PROCEDURE CREATE_RESOURCE
+   (X_RESOURCE_ID   OUT  NOCOPY JTF_RS_RESOURCE_EXTNS.RESOURCE_ID%TYPE
+   );
+PROCEDURE GET_WEB_INTERACTION_RES_ID
+   (X_RESOURCE_ID   OUT  NOCOPY JTF_RS_RESOURCE_EXTNS.RESOURCE_ID%TYPE
+   );
+
+END AMS_RESOURCE_PVT;
+
+
+ 
+
+/

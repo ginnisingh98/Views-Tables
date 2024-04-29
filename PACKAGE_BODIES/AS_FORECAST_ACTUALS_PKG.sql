@@ -1,0 +1,226 @@
+--------------------------------------------------------
+--  DDL for Package Body AS_FORECAST_ACTUALS_PKG
+--------------------------------------------------------
+
+  CREATE OR REPLACE EDITIONABLE PACKAGE BODY "APPS"."AS_FORECAST_ACTUALS_PKG" as
+/* $Header: asxtfacb.pls 115.4 2002/11/06 00:52:47 appldev ship $ */
+-- Start of Comments
+-- Package name     : AS_FORECAST_ACTUALS_PKG
+-- Purpose          :
+-- History          :
+-- NOTE             :
+-- End of Comments
+
+
+G_PKG_NAME CONSTANT VARCHAR2(30):= 'AS_FORECAST_ACTUALS_PKG';
+G_FILE_NAME CONSTANT VARCHAR2(12) := 'asxtfacb.pls';
+
+PROCEDURE Insert_Row(
+          px_FORECAST_ACTUAL_ID   IN OUT NUMBER,
+          p_CREATED_BY    NUMBER,
+          p_CREATION_DATE    DATE,
+          p_LAST_UPDATED_BY    NUMBER,
+          p_LAST_UPDATE_DATE    DATE,
+          p_LAST_UPDATE_LOGIN    NUMBER,
+          p_REQUEST_ID    NUMBER,
+          p_PROGRAM_APPLICATION_ID    NUMBER,
+          p_PROGRAM_ID    NUMBER,
+          p_PROGRAM_UPDATE_DATE    DATE,
+          p_SALESFORCE_ID    NUMBER,
+          p_SALES_GROUP_ID    NUMBER,
+          p_PERIOD_NAME    VARCHAR2,
+          p_CURRENCY_CODE    VARCHAR2,
+          p_ALLOCATED_BUDGET_AMOUNT    NUMBER,
+          p_ACTUAL_REVENUE_AMOUNT    NUMBER)
+
+ IS
+   CURSOR C2 IS SELECT AS_FORECAST_ACTUALS_S.nextval FROM sys.dual;
+BEGIN
+   If (px_FORECAST_ACTUAL_ID IS NULL) OR (px_FORECAST_ACTUAL_ID = FND_API.G_MISS_NUM) then
+       OPEN C2;
+       FETCH C2 INTO px_FORECAST_ACTUAL_ID;
+       CLOSE C2;
+   End If;
+   INSERT INTO AS_FORECAST_ACTUALS(
+           FORECAST_ACTUAL_ID,
+           CREATED_BY,
+           CREATION_DATE,
+           LAST_UPDATED_BY,
+           LAST_UPDATE_DATE,
+           LAST_UPDATE_LOGIN,
+           REQUEST_ID,
+           PROGRAM_APPLICATION_ID,
+           PROGRAM_ID,
+           PROGRAM_UPDATE_DATE,
+           SALESFORCE_ID,
+           SALES_GROUP_ID,
+           PERIOD_NAME,
+           CURRENCY_CODE,
+           ALLOCATED_BUDGET_AMOUNT,
+           ACTUAL_REVENUE_AMOUNT
+          ) VALUES (
+           px_FORECAST_ACTUAL_ID,
+           decode( p_CREATED_BY, FND_API.G_MISS_NUM, NULL, p_CREATED_BY),
+           decode( p_CREATION_DATE, FND_API.G_MISS_DATE, TO_DATE(NULL), p_CREATION_DATE),
+           decode( p_LAST_UPDATED_BY, FND_API.G_MISS_NUM, NULL, p_LAST_UPDATED_BY),
+           decode( p_LAST_UPDATE_DATE, FND_API.G_MISS_DATE, TO_DATE(NULL), p_LAST_UPDATE_DATE),
+           decode( p_LAST_UPDATE_LOGIN, FND_API.G_MISS_NUM, NULL, p_LAST_UPDATE_LOGIN),
+           decode( p_REQUEST_ID, FND_API.G_MISS_NUM, NULL, p_REQUEST_ID),
+           decode( p_PROGRAM_APPLICATION_ID, FND_API.G_MISS_NUM, NULL, p_PROGRAM_APPLICATION_ID),
+           decode( p_PROGRAM_ID, FND_API.G_MISS_NUM, NULL, p_PROGRAM_ID),
+           decode( p_PROGRAM_UPDATE_DATE, FND_API.G_MISS_DATE, TO_DATE(NULL), p_PROGRAM_UPDATE_DATE),
+           decode( p_SALESFORCE_ID, FND_API.G_MISS_NUM, NULL, p_SALESFORCE_ID),
+           decode( p_SALES_GROUP_ID, FND_API.G_MISS_NUM, NULL, p_SALES_GROUP_ID),
+           decode( p_PERIOD_NAME, FND_API.G_MISS_CHAR, NULL, p_PERIOD_NAME),
+           decode( p_CURRENCY_CODE, FND_API.G_MISS_CHAR, NULL, p_CURRENCY_CODE),
+           decode( p_ALLOCATED_BUDGET_AMOUNT, FND_API.G_MISS_NUM, NULL, p_ALLOCATED_BUDGET_AMOUNT),
+           decode( p_ACTUAL_REVENUE_AMOUNT, FND_API.G_MISS_NUM, NULL, p_ACTUAL_REVENUE_AMOUNT));
+End Insert_Row;
+
+PROCEDURE Update_Row(
+          p_FORECAST_ACTUAL_ID    NUMBER,
+          p_CREATED_BY    NUMBER,
+          p_CREATION_DATE    DATE,
+          p_LAST_UPDATED_BY    NUMBER,
+          p_LAST_UPDATE_DATE    DATE,
+          p_LAST_UPDATE_LOGIN    NUMBER,
+          p_REQUEST_ID    NUMBER,
+          p_PROGRAM_APPLICATION_ID    NUMBER,
+          p_PROGRAM_ID    NUMBER,
+          p_PROGRAM_UPDATE_DATE    DATE,
+          p_SALESFORCE_ID    NUMBER,
+          p_SALES_GROUP_ID    NUMBER,
+          p_PERIOD_NAME    VARCHAR2,
+          p_CURRENCY_CODE    VARCHAR2,
+          p_ALLOCATED_BUDGET_AMOUNT    NUMBER,
+          p_ACTUAL_REVENUE_AMOUNT    NUMBER)
+
+ IS
+ BEGIN
+    Update AS_FORECAST_ACTUALS
+    SET
+              CREATED_BY = decode( p_CREATED_BY, FND_API.G_MISS_NUM, CREATED_BY, p_CREATED_BY),
+              CREATION_DATE = decode( p_CREATION_DATE, FND_API.G_MISS_DATE, CREATION_DATE, p_CREATION_DATE),
+              LAST_UPDATED_BY = decode( p_LAST_UPDATED_BY, FND_API.G_MISS_NUM, LAST_UPDATED_BY, p_LAST_UPDATED_BY),
+              LAST_UPDATE_DATE = decode( p_LAST_UPDATE_DATE, FND_API.G_MISS_DATE, LAST_UPDATE_DATE, p_LAST_UPDATE_DATE),
+              LAST_UPDATE_LOGIN = decode( p_LAST_UPDATE_LOGIN, FND_API.G_MISS_NUM, LAST_UPDATE_LOGIN, p_LAST_UPDATE_LOGIN),
+              REQUEST_ID = decode( p_REQUEST_ID, FND_API.G_MISS_NUM, REQUEST_ID, p_REQUEST_ID),
+              PROGRAM_APPLICATION_ID = decode( p_PROGRAM_APPLICATION_ID, FND_API.G_MISS_NUM, PROGRAM_APPLICATION_ID, p_PROGRAM_APPLICATION_ID),
+              PROGRAM_ID = decode( p_PROGRAM_ID, FND_API.G_MISS_NUM, PROGRAM_ID, p_PROGRAM_ID),
+              PROGRAM_UPDATE_DATE = decode( p_PROGRAM_UPDATE_DATE, FND_API.G_MISS_DATE, PROGRAM_UPDATE_DATE, p_PROGRAM_UPDATE_DATE),
+              SALESFORCE_ID = decode( p_SALESFORCE_ID, FND_API.G_MISS_NUM, SALESFORCE_ID, p_SALESFORCE_ID),
+              SALES_GROUP_ID = decode( p_SALES_GROUP_ID, FND_API.G_MISS_NUM, SALES_GROUP_ID, p_SALES_GROUP_ID),
+              PERIOD_NAME = decode( p_PERIOD_NAME, FND_API.G_MISS_CHAR, PERIOD_NAME, p_PERIOD_NAME),
+              CURRENCY_CODE = decode( p_CURRENCY_CODE, FND_API.G_MISS_CHAR, CURRENCY_CODE, p_CURRENCY_CODE),
+              ALLOCATED_BUDGET_AMOUNT = decode( p_ALLOCATED_BUDGET_AMOUNT, FND_API.G_MISS_NUM, ALLOCATED_BUDGET_AMOUNT, p_ALLOCATED_BUDGET_AMOUNT),
+              ACTUAL_REVENUE_AMOUNT = decode( p_ACTUAL_REVENUE_AMOUNT, FND_API.G_MISS_NUM, ACTUAL_REVENUE_AMOUNT, p_ACTUAL_REVENUE_AMOUNT)
+    where FORECAST_ACTUAL_ID = p_FORECAST_ACTUAL_ID;
+
+    If (SQL%NOTFOUND) then
+        RAISE NO_DATA_FOUND;
+    End If;
+END Update_Row;
+
+PROCEDURE Delete_Row(
+    p_FORECAST_ACTUAL_ID  NUMBER)
+ IS
+ BEGIN
+   DELETE FROM AS_FORECAST_ACTUALS
+    WHERE FORECAST_ACTUAL_ID = p_FORECAST_ACTUAL_ID;
+   If (SQL%NOTFOUND) then
+       RAISE NO_DATA_FOUND;
+   End If;
+ END Delete_Row;
+
+PROCEDURE Lock_Row(
+          p_FORECAST_ACTUAL_ID    NUMBER,
+          p_CREATED_BY    NUMBER,
+          p_CREATION_DATE    DATE,
+          p_LAST_UPDATED_BY    NUMBER,
+          p_LAST_UPDATE_DATE    DATE,
+          p_LAST_UPDATE_LOGIN    NUMBER,
+          p_REQUEST_ID    NUMBER,
+          p_PROGRAM_APPLICATION_ID    NUMBER,
+          p_PROGRAM_ID    NUMBER,
+          p_PROGRAM_UPDATE_DATE    DATE,
+          p_SALESFORCE_ID    NUMBER,
+          p_SALES_GROUP_ID    NUMBER,
+          p_PERIOD_NAME    VARCHAR2,
+          p_CURRENCY_CODE    VARCHAR2,
+          p_ALLOCATED_BUDGET_AMOUNT    NUMBER,
+          p_ACTUAL_REVENUE_AMOUNT    NUMBER)
+
+ IS
+   CURSOR C IS
+        SELECT *
+         FROM AS_FORECAST_ACTUALS
+        WHERE FORECAST_ACTUAL_ID =  p_FORECAST_ACTUAL_ID
+        FOR UPDATE of FORECAST_ACTUAL_ID NOWAIT;
+   Recinfo C%ROWTYPE;
+ BEGIN
+    OPEN C;
+    FETCH C INTO Recinfo;
+    If (C%NOTFOUND) then
+        CLOSE C;
+        FND_MESSAGE.SET_NAME('FND', 'FORM_RECORD_DELETED');
+        APP_EXCEPTION.RAISE_EXCEPTION;
+    End If;
+    CLOSE C;
+    if (
+           (      Recinfo.FORECAST_ACTUAL_ID = p_FORECAST_ACTUAL_ID)
+       AND (    ( Recinfo.CREATED_BY = p_CREATED_BY)
+            OR (    ( Recinfo.CREATED_BY IS NULL )
+                AND (  p_CREATED_BY IS NULL )))
+       AND (    ( Recinfo.CREATION_DATE = p_CREATION_DATE)
+            OR (    ( Recinfo.CREATION_DATE IS NULL )
+                AND (  p_CREATION_DATE IS NULL )))
+       AND (    ( Recinfo.LAST_UPDATED_BY = p_LAST_UPDATED_BY)
+            OR (    ( Recinfo.LAST_UPDATED_BY IS NULL )
+                AND (  p_LAST_UPDATED_BY IS NULL )))
+       AND (    ( Recinfo.LAST_UPDATE_DATE = p_LAST_UPDATE_DATE)
+            OR (    ( Recinfo.LAST_UPDATE_DATE IS NULL )
+                AND (  p_LAST_UPDATE_DATE IS NULL )))
+       AND (    ( Recinfo.LAST_UPDATE_LOGIN = p_LAST_UPDATE_LOGIN)
+            OR (    ( Recinfo.LAST_UPDATE_LOGIN IS NULL )
+                AND (  p_LAST_UPDATE_LOGIN IS NULL )))
+       AND (    ( Recinfo.REQUEST_ID = p_REQUEST_ID)
+            OR (    ( Recinfo.REQUEST_ID IS NULL )
+                AND (  p_REQUEST_ID IS NULL )))
+       AND (    ( Recinfo.PROGRAM_APPLICATION_ID = p_PROGRAM_APPLICATION_ID)
+            OR (    ( Recinfo.PROGRAM_APPLICATION_ID IS NULL )
+                AND (  p_PROGRAM_APPLICATION_ID IS NULL )))
+       AND (    ( Recinfo.PROGRAM_ID = p_PROGRAM_ID)
+            OR (    ( Recinfo.PROGRAM_ID IS NULL )
+                AND (  p_PROGRAM_ID IS NULL )))
+       AND (    ( Recinfo.PROGRAM_UPDATE_DATE = p_PROGRAM_UPDATE_DATE)
+            OR (    ( Recinfo.PROGRAM_UPDATE_DATE IS NULL )
+                AND (  p_PROGRAM_UPDATE_DATE IS NULL )))
+       AND (    ( Recinfo.SALESFORCE_ID = p_SALESFORCE_ID)
+            OR (    ( Recinfo.SALESFORCE_ID IS NULL )
+                AND (  p_SALESFORCE_ID IS NULL )))
+       AND (    ( Recinfo.SALES_GROUP_ID = p_SALES_GROUP_ID)
+            OR (    ( Recinfo.SALES_GROUP_ID IS NULL )
+                AND (  p_SALES_GROUP_ID IS NULL )))
+       AND (    ( Recinfo.PERIOD_NAME = p_PERIOD_NAME)
+            OR (    ( Recinfo.PERIOD_NAME IS NULL )
+                AND (  p_PERIOD_NAME IS NULL )))
+       AND (    ( Recinfo.CURRENCY_CODE = p_CURRENCY_CODE)
+            OR (    ( Recinfo.CURRENCY_CODE IS NULL )
+                AND (  p_CURRENCY_CODE IS NULL )))
+       AND (    ( Recinfo.ALLOCATED_BUDGET_AMOUNT = p_ALLOCATED_BUDGET_AMOUNT)
+            OR (    ( Recinfo.ALLOCATED_BUDGET_AMOUNT IS NULL )
+                AND (  p_ALLOCATED_BUDGET_AMOUNT IS NULL )))
+       AND (    ( Recinfo.ACTUAL_REVENUE_AMOUNT = p_ACTUAL_REVENUE_AMOUNT)
+            OR (    ( Recinfo.ACTUAL_REVENUE_AMOUNT IS NULL )
+                AND (  p_ACTUAL_REVENUE_AMOUNT IS NULL )))
+       ) then
+       return;
+   else
+       FND_MESSAGE.SET_NAME('FND', 'FORM_RECORD_CHANGED');
+       APP_EXCEPTION.RAISE_EXCEPTION;
+   End If;
+END Lock_Row;
+
+End AS_FORECAST_ACTUALS_PKG;
+
+/

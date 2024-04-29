@@ -1,0 +1,353 @@
+--------------------------------------------------------
+--  DDL for Package Body JTF_EVT_HANDLERS_PKG
+--------------------------------------------------------
+
+  CREATE OR REPLACE EDITIONABLE PACKAGE BODY "APPS"."JTF_EVT_HANDLERS_PKG" as
+/* $Header: JTFEVTHB.pls 115.1 2002/02/14 05:44:04 appldev ship $ */
+procedure INSERT_ROW (
+  X_JTF_EVT_HANDLERS_ID in NUMBER,
+  X_JTF_EVT_TYPES_ID in NUMBER,
+  X_JTF_EVT_HANDLERS_NAME in VARCHAR2,
+  X_JTF_EVT_HANDLERS_MTD_NAME in VARCHAR2,
+  X_JTF_EVT_HANDLERS_SYNC_FLAG in VARCHAR2,
+  X_SECURITY_GROUP_ID in NUMBER,
+  X_JTF_EVT_HANDLERS_DESC in VARCHAR2,
+  X_CREATION_DATE in DATE,
+  X_CREATED_BY in NUMBER,
+  X_LAST_UPDATE_DATE in DATE,
+  X_LAST_UPDATED_BY in NUMBER,
+  X_LAST_UPDATE_LOGIN in NUMBER
+) is
+  cursor C is select ROWID from JTF_EVT_HANDLERS_B
+    where JTF_EVT_HANDLERS_ID = X_JTF_EVT_HANDLERS_ID
+    ;
+begin
+  insert into JTF_EVT_HANDLERS_B (
+    JTF_EVT_HANDLERS_ID,
+    JTF_EVT_TYPES_ID,
+    JTF_EVT_HANDLERS_NAME,
+    JTF_EVT_HANDLERS_MTD_NAME,
+    JTF_EVT_HANDLERS_SYNC_FLAG,
+    SECURITY_GROUP_ID,
+    CREATION_DATE,
+    CREATED_BY,
+    LAST_UPDATE_DATE,
+    LAST_UPDATED_BY,
+    LAST_UPDATE_LOGIN
+  ) values (
+    X_JTF_EVT_HANDLERS_ID,
+    X_JTF_EVT_TYPES_ID,
+    X_JTF_EVT_HANDLERS_NAME,
+    X_JTF_EVT_HANDLERS_MTD_NAME,
+    X_JTF_EVT_HANDLERS_SYNC_FLAG,
+    X_SECURITY_GROUP_ID,
+    X_CREATION_DATE,
+    X_CREATED_BY,
+    X_LAST_UPDATE_DATE,
+    X_LAST_UPDATED_BY,
+    X_LAST_UPDATE_LOGIN
+  );
+
+  insert into JTF_EVT_HANDLERS_TL (
+    SECURITY_GROUP_ID,
+    CREATION_DATE,
+    CREATED_BY,
+    LAST_UPDATE_LOGIN,
+    JTF_EVT_HANDLERS_ID,
+    LAST_UPDATE_DATE,
+    LAST_UPDATED_BY,
+    JTF_EVT_HANDLERS_DESC,
+    LANGUAGE,
+    SOURCE_LANG
+  ) select
+    X_SECURITY_GROUP_ID,
+    X_CREATION_DATE,
+    X_CREATED_BY,
+    X_LAST_UPDATE_LOGIN,
+    X_JTF_EVT_HANDLERS_ID,
+    X_LAST_UPDATE_DATE,
+    X_LAST_UPDATED_BY,
+    X_JTF_EVT_HANDLERS_DESC,
+    L.LANGUAGE_CODE,
+    userenv('LANG')
+  from FND_LANGUAGES L
+  where L.INSTALLED_FLAG in ('I', 'B')
+  and not exists
+    (select NULL
+    from JTF_EVT_HANDLERS_TL T
+    where T.JTF_EVT_HANDLERS_ID = X_JTF_EVT_HANDLERS_ID
+    and T.LANGUAGE = L.LANGUAGE_CODE);
+
+  open c;
+  --fetch c into X_ROWID;
+  if (c%notfound) then
+    close c;
+    raise no_data_found;
+  end if;
+  close c;
+
+end INSERT_ROW;
+
+procedure LOCK_ROW (
+  X_JTF_EVT_HANDLERS_ID in NUMBER,
+  X_JTF_EVT_TYPES_ID in NUMBER,
+  X_JTF_EVT_HANDLERS_NAME in VARCHAR2,
+  X_JTF_EVT_HANDLERS_MTD_NAME in VARCHAR2,
+  X_JTF_EVT_HANDLERS_SYNC_FLAG in VARCHAR2,
+  X_SECURITY_GROUP_ID in NUMBER,
+  X_JTF_EVT_HANDLERS_DESC in VARCHAR2
+) is
+  cursor c is select
+      JTF_EVT_TYPES_ID,
+      JTF_EVT_HANDLERS_NAME,
+      JTF_EVT_HANDLERS_MTD_NAME,
+      JTF_EVT_HANDLERS_SYNC_FLAG,
+      SECURITY_GROUP_ID
+    from JTF_EVT_HANDLERS_B
+    where JTF_EVT_HANDLERS_ID = X_JTF_EVT_HANDLERS_ID
+    for update of JTF_EVT_HANDLERS_ID nowait;
+  recinfo c%rowtype;
+
+  cursor c1 is select
+      JTF_EVT_HANDLERS_DESC,
+      decode(LANGUAGE, userenv('LANG'), 'Y', 'N') BASELANG
+    from JTF_EVT_HANDLERS_TL
+    where JTF_EVT_HANDLERS_ID = X_JTF_EVT_HANDLERS_ID
+    and userenv('LANG') in (LANGUAGE, SOURCE_LANG)
+    for update of JTF_EVT_HANDLERS_ID nowait;
+begin
+  open c;
+  fetch c into recinfo;
+  if (c%notfound) then
+    close c;
+    fnd_message.set_name('FND', 'FORM_RECORD_DELETED');
+    app_exception.raise_exception;
+  end if;
+  close c;
+  if (    (recinfo.JTF_EVT_TYPES_ID = X_JTF_EVT_TYPES_ID)
+      AND (recinfo.JTF_EVT_HANDLERS_NAME = X_JTF_EVT_HANDLERS_NAME)
+      AND ((recinfo.JTF_EVT_HANDLERS_MTD_NAME = X_JTF_EVT_HANDLERS_MTD_NAME)
+           OR ((recinfo.JTF_EVT_HANDLERS_MTD_NAME is null) AND (X_JTF_EVT_HANDLERS_MTD_NAME is null)))
+      AND ((recinfo.JTF_EVT_HANDLERS_SYNC_FLAG = X_JTF_EVT_HANDLERS_SYNC_FLAG)
+           OR ((recinfo.JTF_EVT_HANDLERS_SYNC_FLAG is null) AND (X_JTF_EVT_HANDLERS_SYNC_FLAG is null)))
+      AND ((recinfo.SECURITY_GROUP_ID = X_SECURITY_GROUP_ID)
+           OR ((recinfo.SECURITY_GROUP_ID is null) AND (X_SECURITY_GROUP_ID is null)))
+  ) then
+    null;
+  else
+    fnd_message.set_name('FND', 'FORM_RECORD_CHANGED');
+    app_exception.raise_exception;
+  end if;
+
+  for tlinfo in c1 loop
+    if (tlinfo.BASELANG = 'Y') then
+      if (    ((tlinfo.JTF_EVT_HANDLERS_DESC = X_JTF_EVT_HANDLERS_DESC)
+               OR ((tlinfo.JTF_EVT_HANDLERS_DESC is null) AND (X_JTF_EVT_HANDLERS_DESC is null)))
+      ) then
+        null;
+      else
+        fnd_message.set_name('FND', 'FORM_RECORD_CHANGED');
+        app_exception.raise_exception;
+      end if;
+    end if;
+  end loop;
+  return;
+end LOCK_ROW;
+
+procedure UPDATE_ROW (
+  X_JTF_EVT_HANDLERS_ID in NUMBER,
+  X_JTF_EVT_TYPES_ID in NUMBER,
+  X_JTF_EVT_HANDLERS_NAME in VARCHAR2,
+  X_JTF_EVT_HANDLERS_MTD_NAME in VARCHAR2,
+  X_JTF_EVT_HANDLERS_SYNC_FLAG in VARCHAR2,
+  X_SECURITY_GROUP_ID in NUMBER,
+  X_JTF_EVT_HANDLERS_DESC in VARCHAR2,
+  X_LAST_UPDATE_DATE in DATE,
+  X_LAST_UPDATED_BY in NUMBER,
+  X_LAST_UPDATE_LOGIN in NUMBER
+) is
+begin
+  update JTF_EVT_HANDLERS_B set
+    JTF_EVT_TYPES_ID = X_JTF_EVT_TYPES_ID,
+    JTF_EVT_HANDLERS_NAME = X_JTF_EVT_HANDLERS_NAME,
+    JTF_EVT_HANDLERS_MTD_NAME = X_JTF_EVT_HANDLERS_MTD_NAME,
+    JTF_EVT_HANDLERS_SYNC_FLAG = X_JTF_EVT_HANDLERS_SYNC_FLAG,
+    SECURITY_GROUP_ID = X_SECURITY_GROUP_ID,
+    LAST_UPDATE_DATE = X_LAST_UPDATE_DATE,
+    LAST_UPDATED_BY = X_LAST_UPDATED_BY,
+    LAST_UPDATE_LOGIN = X_LAST_UPDATE_LOGIN
+  where JTF_EVT_HANDLERS_ID = X_JTF_EVT_HANDLERS_ID;
+
+  if (sql%notfound) then
+    raise no_data_found;
+  end if;
+
+  update JTF_EVT_HANDLERS_TL set
+    JTF_EVT_HANDLERS_DESC = X_JTF_EVT_HANDLERS_DESC,
+    LAST_UPDATE_DATE = X_LAST_UPDATE_DATE,
+    LAST_UPDATED_BY = X_LAST_UPDATED_BY,
+    LAST_UPDATE_LOGIN = X_LAST_UPDATE_LOGIN,
+    SOURCE_LANG = userenv('LANG')
+  where JTF_EVT_HANDLERS_ID = X_JTF_EVT_HANDLERS_ID
+  and userenv('LANG') in (LANGUAGE, SOURCE_LANG);
+
+  if (sql%notfound) then
+    raise no_data_found;
+  end if;
+end UPDATE_ROW;
+
+procedure DELETE_ROW (
+  X_JTF_EVT_HANDLERS_ID in NUMBER
+) is
+begin
+  delete from JTF_EVT_HANDLERS_TL
+  where JTF_EVT_HANDLERS_ID = X_JTF_EVT_HANDLERS_ID;
+
+  if (sql%notfound) then
+    raise no_data_found;
+  end if;
+
+  delete from JTF_EVT_HANDLERS_B
+  where JTF_EVT_HANDLERS_ID = X_JTF_EVT_HANDLERS_ID;
+
+  if (sql%notfound) then
+    raise no_data_found;
+  end if;
+end DELETE_ROW;
+
+procedure ADD_LANGUAGE
+is
+begin
+  delete from JTF_EVT_HANDLERS_TL T
+  where not exists
+    (select NULL
+    from JTF_EVT_HANDLERS_B B
+    where B.JTF_EVT_HANDLERS_ID = T.JTF_EVT_HANDLERS_ID
+    );
+
+  update JTF_EVT_HANDLERS_TL T set (
+      JTF_EVT_HANDLERS_DESC
+    ) = (select
+      B.JTF_EVT_HANDLERS_DESC
+    from JTF_EVT_HANDLERS_TL B
+    where B.JTF_EVT_HANDLERS_ID = T.JTF_EVT_HANDLERS_ID
+    and B.LANGUAGE = T.SOURCE_LANG)
+  where (
+      T.JTF_EVT_HANDLERS_ID,
+      T.LANGUAGE
+  ) in (select
+      SUBT.JTF_EVT_HANDLERS_ID,
+      SUBT.LANGUAGE
+    from JTF_EVT_HANDLERS_TL SUBB, JTF_EVT_HANDLERS_TL SUBT
+    where SUBB.JTF_EVT_HANDLERS_ID = SUBT.JTF_EVT_HANDLERS_ID
+    and SUBB.LANGUAGE = SUBT.SOURCE_LANG
+    and (SUBB.JTF_EVT_HANDLERS_DESC <> SUBT.JTF_EVT_HANDLERS_DESC
+      or (SUBB.JTF_EVT_HANDLERS_DESC is null and SUBT.JTF_EVT_HANDLERS_DESC is not null)
+      or (SUBB.JTF_EVT_HANDLERS_DESC is not null and SUBT.JTF_EVT_HANDLERS_DESC is null)
+  ));
+
+  insert into JTF_EVT_HANDLERS_TL (
+    SECURITY_GROUP_ID,
+    CREATION_DATE,
+    CREATED_BY,
+    LAST_UPDATE_LOGIN,
+    JTF_EVT_HANDLERS_ID,
+    LAST_UPDATE_DATE,
+    LAST_UPDATED_BY,
+    JTF_EVT_HANDLERS_DESC,
+    LANGUAGE,
+    SOURCE_LANG
+  ) select
+    B.SECURITY_GROUP_ID,
+    B.CREATION_DATE,
+    B.CREATED_BY,
+    B.LAST_UPDATE_LOGIN,
+    B.JTF_EVT_HANDLERS_ID,
+    B.LAST_UPDATE_DATE,
+    B.LAST_UPDATED_BY,
+    B.JTF_EVT_HANDLERS_DESC,
+    L.LANGUAGE_CODE,
+    B.SOURCE_LANG
+  from JTF_EVT_HANDLERS_TL B, FND_LANGUAGES L
+  where L.INSTALLED_FLAG in ('I', 'B')
+  and B.LANGUAGE = userenv('LANG')
+  and not exists
+    (select NULL
+    from JTF_EVT_HANDLERS_TL T
+    where T.JTF_EVT_HANDLERS_ID = B.JTF_EVT_HANDLERS_ID
+    and T.LANGUAGE = L.LANGUAGE_CODE);
+end ADD_LANGUAGE;
+
+procedure LOAD_ROW (
+  X_JTF_EVT_HANDLERS_ID in NUMBER, -- key fields
+  X_SECURITY_GROUP_ID in NUMBER,
+  X_JTF_EVT_TYPES_ID  in NUMBER, -- data fields
+  X_JTF_EVT_HANDLERS_NAME in VARCHAR2,
+  X_JTF_EVT_HANDLERS_MTD_NAME in VARCHAR2,
+  X_JTF_EVT_HANDLERS_SYNC_FLAG in VARCHAR2,
+  X_JTF_EVT_HANDLERS_DESC in VARCHAR2,
+  X_OWNER in VARCHAR2 -- owner fields
+) is
+
+l_rowid  VARCHAR2(64);
+l_user_id NUMBER := 0;
+
+begin
+	if(x_owner = 'SEED') then
+		l_user_id := 1;
+	end if;
+
+      -- Update row if present
+      JTF_EVT_HANDLERS_PKG.UPDATE_ROW (
+  	X_JTF_EVT_HANDLERS_ID 		=> X_JTF_EVT_HANDLERS_ID,
+	X_SECURITY_GROUP_ID     	=> X_SECURITY_GROUP_ID,
+  	X_JTF_EVT_TYPES_ID 		=> X_JTF_EVT_TYPES_ID,
+  	X_JTF_EVT_HANDLERS_NAME 	=> X_JTF_EVT_HANDLERS_NAME,
+        X_JTF_EVT_HANDLERS_MTD_NAME     =>  X_JTF_EVT_HANDLERS_MTD_NAME,
+        X_JTF_EVT_HANDLERS_SYNC_FLAG    => X_JTF_EVT_HANDLERS_SYNC_FLAG,
+  	X_JTF_EVT_HANDLERS_DESC 	=> X_JTF_EVT_HANDLERS_DESC,
+  	X_LAST_UPDATE_DATE 	=> sysdate,
+  	X_LAST_UPDATED_BY 	=> l_user_id,
+  	X_LAST_UPDATE_LOGIN 	=> 0 );
+   exception
+   when NO_DATA_FOUND then
+      -- Insert a row
+      JTF_EVT_HANDLERS_PKG.INSERT_ROW (
+  	X_JTF_EVT_HANDLERS_ID 		=> X_JTF_EVT_HANDLERS_ID,
+  	X_JTF_EVT_TYPES_ID 		=> X_JTF_EVT_TYPES_ID,
+  	X_JTF_EVT_HANDLERS_NAME 	=> X_JTF_EVT_HANDLERS_NAME,
+        X_JTF_EVT_HANDLERS_MTD_NAME     =>  X_JTF_EVT_HANDLERS_MTD_NAME,
+        X_JTF_EVT_HANDLERS_SYNC_FLAG    => X_JTF_EVT_HANDLERS_SYNC_FLAG,
+	X_SECURITY_GROUP_ID     	=> X_SECURITY_GROUP_ID,
+  	X_JTF_EVT_HANDLERS_DESC 	=> X_JTF_EVT_HANDLERS_DESC,
+  	X_CREATION_DATE 		=> sysdate,
+  	X_CREATED_BY 		=> l_user_id,
+  	X_LAST_UPDATE_DATE 	=> sysdate,
+  	X_LAST_UPDATED_BY 	=> l_user_id,
+  	X_LAST_UPDATE_LOGIN 	=> 0 );
+
+end LOAD_ROW;
+
+
+
+procedure TRANSLATE_ROW (
+  X_JTF_EVT_HANDLERS_ID in NUMBER, -- key field
+  X_JTF_EVT_HANDLERS_DESC in VARCHAR2, -- translated field
+  X_OWNER in VARCHAR2 -- owner fields
+) is
+
+begin
+        update JTF_EVT_HANDLERS_TL set
+            JTF_EVT_HANDLERS_DESC   = x_JTF_EVT_HANDLERS_DESC,
+            LAST_UPDATE_DATE 	= sysdate,
+            LAST_UPDATED_BY 	= decode(x_owner, 'SEED', 1, 0),
+            LAST_UPDATE_LOGIN 	= 0,
+            SOURCE_LANG 	= userenv('LANG')
+        where userenv('LANG') in (LANGUAGE, SOURCE_LANG)
+          and JTF_EVT_HANDLERS_ID = X_JTF_EVT_HANDLERS_ID;
+
+end TRANSLATE_ROW;
+
+end JTF_EVT_HANDLERS_PKG;
+
+/

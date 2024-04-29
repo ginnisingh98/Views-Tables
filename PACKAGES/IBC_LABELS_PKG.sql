@@ -1,0 +1,80 @@
+--------------------------------------------------------
+--  DDL for Package IBC_LABELS_PKG
+--------------------------------------------------------
+
+  CREATE OR REPLACE EDITIONABLE PACKAGE "APPS"."IBC_LABELS_PKG" AUTHID CURRENT_USER AS
+/* $Header: ibctlabs.pls 120.1 2005/07/12 01:55:51 appldev ship $*/
+
+-- Purpose: Table Handler for Ibc_Labels table.
+
+-- MODIFICATION HISTORY
+-- Person            Date        Comments
+-- ---------         ------      ------------------------------------------
+-- Sri Rangarajan    01/06/2002      Created Package
+-- vicho	     11/05/2002     Remove G_MISS defaulting on UPDATE_ROW
+-- Sharma	     07/04/2005     Modified LOAD_ROW and created
+--				    LOAD_SEED_ROW for R12 LCT standards bug 4411674
+
+
+PROCEDURE INSERT_ROW (
+  x_ROWID OUT NOCOPY VARCHAR2,
+  p_LABEL_CODE IN VARCHAR2,
+  p_OBJECT_VERSION_NUMBER IN NUMBER,
+  p_LABEL_NAME IN VARCHAR2,
+  p_DESCRIPTION IN VARCHAR2,
+  p_CREATION_DATE IN DATE 	  		DEFAULT NULL,
+  p_CREATED_BY IN NUMBER	  		DEFAULT NULL,
+  p_LAST_UPDATE_DATE IN DATE  		DEFAULT NULL,
+  p_LAST_UPDATED_BY IN NUMBER 		DEFAULT NULL,
+  p_LAST_UPDATE_LOGIN IN NUMBER		DEFAULT NULL
+);
+PROCEDURE LOCK_ROW (
+  p_LABEL_CODE IN VARCHAR2,
+  p_OBJECT_VERSION_NUMBER IN NUMBER,
+  p_LABEL_NAME IN VARCHAR2,
+  p_DESCRIPTION IN VARCHAR2
+);
+PROCEDURE UPDATE_ROW (
+  p_LABEL_CODE    IN  VARCHAR2,
+  p_DESCRIPTION    IN  VARCHAR2 DEFAULT  NULL,
+  p_LABEL_NAME    IN  VARCHAR2 DEFAULT  NULL,
+  p_LAST_UPDATED_BY    IN  NUMBER DEFAULT  NULL,
+  p_LAST_UPDATE_DATE    IN  DATE DEFAULT  NULL,
+  p_LAST_UPDATE_LOGIN    IN  NUMBER DEFAULT  NULL,
+  p_OBJECT_VERSION_NUMBER    IN  NUMBER DEFAULT  NULL
+);
+PROCEDURE DELETE_ROW (
+  p_LABEL_CODE IN VARCHAR2
+);
+
+PROCEDURE ADD_LANGUAGE;
+
+PROCEDURE LOAD_ROW (
+  p_upload_mode	  IN  VARCHAR2,
+  p_label_CODE    IN  VARCHAR2,
+  p_label_NAME    IN  VARCHAR2,
+  p_DESCRIPTION    IN  VARCHAR2,
+  p_OWNER IN VARCHAR2,
+  p_last_update_date IN VARCHAR2);
+
+PROCEDURE TRANSLATE_ROW (
+  p_upload_mode	IN VARCHAR2,
+  p_LABEL_CODE	IN VARCHAR2,
+  p_LABEL_NAME	IN VARCHAR2,
+  p_DESCRIPTION IN VARCHAR2,
+  p_OWNER 	IN VARCHAR2,
+  p_last_update_date IN VARCHAR2);
+
+PROCEDURE LOAD_SEED_ROW (
+  p_upload_mode	  IN VARCHAR2,
+  p_label_CODE    IN  VARCHAR2,
+  p_label_NAME    IN  VARCHAR2,
+  p_DESCRIPTION    IN  VARCHAR2,
+  p_OWNER IN VARCHAR2,
+  p_last_update_date IN VARCHAR2);
+
+END Ibc_Labels_Pkg;
+
+ 
+
+/

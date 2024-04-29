@@ -1,0 +1,128 @@
+--------------------------------------------------------
+--  DDL for Package WMS_OBJECTS_PKG
+--------------------------------------------------------
+
+  CREATE OR REPLACE EDITIONABLE PACKAGE "APPS"."WMS_OBJECTS_PKG" AUTHID CURRENT_USER as
+/* $Header: WMSPOBJS.pls 120.1 2005/06/20 03:28:26 appldev ship $ */
+procedure INSERT_ROW (
+  X_ROWID IN OUT NOCOPY /* file.sql.39 change */ VARCHAR2,
+  X_OBJECT_ID in NUMBER,
+  X_STRAT_ASGMT_DB_OBJECT_ID in NUMBER,
+  X_STRAT_ASGMT_LOV_SQL in VARCHAR2,
+  X_USER_DEFINED_FLAG in VARCHAR2,
+  X_ATTRIBUTE_CATEGORY in VARCHAR2,
+  X_ATTRIBUTE1 in VARCHAR2,
+  X_ATTRIBUTE2 in VARCHAR2,
+  X_ATTRIBUTE3 in VARCHAR2,
+  X_ATTRIBUTE4 in VARCHAR2,
+  X_ATTRIBUTE5 in VARCHAR2,
+  X_ATTRIBUTE6 in VARCHAR2,
+  X_ATTRIBUTE7 in VARCHAR2,
+  X_ATTRIBUTE8 in VARCHAR2,
+  X_ATTRIBUTE9 in VARCHAR2,
+  X_ATTRIBUTE10 in VARCHAR2,
+  X_ATTRIBUTE11 in VARCHAR2,
+  X_ATTRIBUTE12 in VARCHAR2,
+  X_ATTRIBUTE13 in VARCHAR2,
+  X_ATTRIBUTE14 in VARCHAR2,
+  X_ATTRIBUTE15 in VARCHAR2,
+  X_NAME in VARCHAR2,
+  X_DESCRIPTION in VARCHAR2,
+  X_CREATION_DATE in DATE,
+  X_CREATED_BY in NUMBER,
+  X_LAST_UPDATE_DATE in DATE,
+  X_LAST_UPDATED_BY in NUMBER,
+  X_LAST_UPDATE_LOGIN in NUMBER);
+procedure LOCK_ROW (
+  X_OBJECT_ID in NUMBER,
+  X_STRAT_ASGMT_DB_OBJECT_ID in NUMBER,
+  X_STRAT_ASGMT_LOV_SQL in VARCHAR2,
+  X_USER_DEFINED_FLAG in VARCHAR2,
+  X_ATTRIBUTE_CATEGORY in VARCHAR2,
+  X_ATTRIBUTE1 in VARCHAR2,
+  X_ATTRIBUTE2 in VARCHAR2,
+  X_ATTRIBUTE3 in VARCHAR2,
+  X_ATTRIBUTE4 in VARCHAR2,
+  X_ATTRIBUTE5 in VARCHAR2,
+  X_ATTRIBUTE6 in VARCHAR2,
+  X_ATTRIBUTE7 in VARCHAR2,
+  X_ATTRIBUTE8 in VARCHAR2,
+  X_ATTRIBUTE9 in VARCHAR2,
+  X_ATTRIBUTE10 in VARCHAR2,
+  X_ATTRIBUTE11 in VARCHAR2,
+  X_ATTRIBUTE12 in VARCHAR2,
+  X_ATTRIBUTE13 in VARCHAR2,
+  X_ATTRIBUTE14 in VARCHAR2,
+  X_ATTRIBUTE15 in VARCHAR2,
+  X_NAME in VARCHAR2,
+  X_DESCRIPTION in VARCHAR2
+);
+procedure UPDATE_ROW (
+  X_OBJECT_ID in NUMBER,
+  X_STRAT_ASGMT_DB_OBJECT_ID in NUMBER,
+  X_STRAT_ASGMT_LOV_SQL in VARCHAR2,
+  X_USER_DEFINED_FLAG in VARCHAR2,
+  X_ATTRIBUTE_CATEGORY in VARCHAR2,
+  X_ATTRIBUTE1 in VARCHAR2,
+  X_ATTRIBUTE2 in VARCHAR2,
+  X_ATTRIBUTE3 in VARCHAR2,
+  X_ATTRIBUTE4 in VARCHAR2,
+  X_ATTRIBUTE5 in VARCHAR2,
+  X_ATTRIBUTE6 in VARCHAR2,
+  X_ATTRIBUTE7 in VARCHAR2,
+  X_ATTRIBUTE8 in VARCHAR2,
+  X_ATTRIBUTE9 in VARCHAR2,
+  X_ATTRIBUTE10 in VARCHAR2,
+  X_ATTRIBUTE11 in VARCHAR2,
+  X_ATTRIBUTE12 in VARCHAR2,
+  X_ATTRIBUTE13 in VARCHAR2,
+  X_ATTRIBUTE14 in VARCHAR2,
+  X_ATTRIBUTE15 in VARCHAR2,
+  X_NAME in VARCHAR2,
+  X_DESCRIPTION in VARCHAR2,
+  X_LAST_UPDATE_DATE in DATE,
+  X_LAST_UPDATED_BY in NUMBER,
+  X_LAST_UPDATE_LOGIN in NUMBER
+);
+procedure DELETE_ROW (
+  X_OBJECT_ID in NUMBER
+);
+procedure ADD_LANGUAGE;
+PROCEDURE translate_row
+  (
+   x_object_id   IN VARCHAR2,
+   x_owner       IN VARCHAR2,
+   x_name        IN VARCHAR2,
+   x_description IN VARCHAR2
+   );
+PROCEDURE load_row
+  (
+    x_object_id                IN VARCHAR2
+   ,x_owner                    IN VARCHAR2
+   ,x_strat_asgmt_db_object_id IN VARCHAR2
+   ,x_strat_asgmt_lov_sql      IN VARCHAR2
+   ,x_user_defined_flag        IN VARCHAR2
+   ,x_name                     IN VARCHAR2
+   ,x_description              IN VARCHAR2
+   ,x_attribute_category       IN VARCHAR2
+   ,x_attribute1               IN VARCHAR2
+   ,x_attribute2               IN VARCHAR2
+   ,x_attribute3               IN VARCHAR2
+   ,x_attribute4               IN VARCHAR2
+   ,x_attribute5               IN VARCHAR2
+   ,x_attribute6               IN VARCHAR2
+   ,x_attribute7               IN VARCHAR2
+   ,x_attribute8               IN VARCHAR2
+   ,x_attribute9               IN VARCHAR2
+   ,x_attribute10              IN VARCHAR2
+   ,x_attribute11              IN VARCHAR2
+   ,x_attribute12              IN VARCHAR2
+   ,x_attribute13              IN VARCHAR2
+   ,x_attribute14              IN VARCHAR2
+   ,x_attribute15              IN VARCHAR2
+);
+end WMS_OBJECTS_PKG;
+
+ 
+
+/

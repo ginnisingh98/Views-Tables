@@ -1,0 +1,103 @@
+--------------------------------------------------------
+--  DDL for Package PAY_ROLL_ACTS_PKG
+--------------------------------------------------------
+
+  CREATE OR REPLACE EDITIONABLE PACKAGE "APPS"."PAY_ROLL_ACTS_PKG" AUTHID CURRENT_USER as
+/* $Header: pypra01t.pkh 115.2 2002/12/11 11:14:39 ssivasu2 ship $ */
+  procedure delete_row ( p_rowid varchar2 );
+
+  procedure insert_row ( p_rowid IN out nocopy varchar2,
+                         p_payroll_action_id IN out nocopy number,
+                         p_action_type varchar2,
+                         p_business_group_id number,
+                         p_consolidation_set_id number,
+                         p_payroll_id number,
+                         p_action_population_status varchar2,
+                         p_action_status varchar2,
+                         p_effective_date date,
+                         p_comments varchar2,
+                         p_legislative_parameters varchar2,
+                         p_run_type_id number,
+                         p_element_set_id number,
+                         p_assignment_set_id number,
+                         p_date_earned date,
+                         p_display_run_number number,
+                         p_pay_advice_date date,
+                         p_pay_advice_message varchar2,
+                         p_attribute_category varchar2,
+                         p_attribute1 varchar2, p_attribute2 varchar2,
+                         p_attribute3 varchar2, p_attribute4 varchar2,
+                         p_attribute5 varchar2, p_attribute6 varchar2,
+                         p_attribute7 varchar2, p_attribute8 varchar2,
+                         p_attribute9 varchar2, p_attribute10 varchar2,
+                         p_attribute11 varchar2, p_attribute12 varchar2,
+                         p_attribute13 varchar2, p_attribute14 varchar2,
+                         p_attribute15 varchar2, p_attribute16 varchar2,
+                         p_attribute17 varchar2, p_attribute18 varchar2,
+                         p_attribute19 varchar2, p_attribute20 varchar2 );
+
+  procedure lock_row ( p_rowid IN varchar2,
+                       p_payroll_action_id number,
+                       p_action_type varchar2,
+                       p_business_group_id number,
+                       p_consolidation_set_id number,
+                       p_payroll_id number,
+                       p_action_population_status varchar2,
+                       p_action_status varchar2,
+                       p_effective_date date,
+                       p_comments varchar2,
+                       p_legislative_parameters varchar2,
+                       p_run_type_id number,
+                       p_element_set_id number,
+                       p_assignment_set_id number,
+                       p_date_earned date,
+                       p_display_run_number number,
+                       p_pay_advice_date date,
+                       p_pay_advice_message varchar2,
+                       p_attribute_category varchar2,
+                       p_attribute1 varchar2, p_attribute2 varchar2,
+                       p_attribute3 varchar2, p_attribute4 varchar2,
+                       p_attribute5 varchar2, p_attribute6 varchar2,
+                       p_attribute7 varchar2, p_attribute8 varchar2,
+                       p_attribute9 varchar2, p_attribute10 varchar2,
+                       p_attribute11 varchar2, p_attribute12 varchar2,
+                       p_attribute13 varchar2, p_attribute14 varchar2,
+                       p_attribute15 varchar2, p_attribute16 varchar2,
+                       p_attribute17 varchar2, p_attribute18 varchar2,
+                       p_attribute19 varchar2, p_attribute20 varchar2 );
+
+  procedure update_row ( p_rowid IN varchar2,
+                         p_payroll_action_id number,
+                         p_action_type varchar2,
+                         p_business_group_id number,
+                         p_consolidation_set_id number,
+                         p_payroll_id number,
+                         p_action_population_status varchar2,
+                         p_action_status varchar2,
+                         p_effective_date date,
+                         p_comments varchar2,
+                         p_legislative_parameters varchar2,
+                         p_run_type_id number,
+                         p_element_set_id number,
+                         p_assignment_set_id number,
+                         p_date_earned date,
+                         p_display_run_number number,
+                         p_pay_advice_date date,
+                         p_pay_advice_message varchar2,
+                         p_attribute_category varchar2,
+                         p_attribute1 varchar2, p_attribute2 varchar2,
+                         p_attribute3 varchar2, p_attribute4 varchar2,
+                         p_attribute5 varchar2, p_attribute6 varchar2,
+                         p_attribute7 varchar2, p_attribute8 varchar2,
+                         p_attribute9 varchar2, p_attribute10 varchar2,
+                         p_attribute11 varchar2, p_attribute12 varchar2,
+                         p_attribute13 varchar2, p_attribute14 varchar2,
+                         p_attribute15 varchar2, p_attribute16 varchar2,
+                         p_attribute17 varchar2, p_attribute18 varchar2,
+                         p_attribute19 varchar2, p_attribute20 varchar2 );
+
+end pay_roll_acts_pkg;
+
+ 
+
+/

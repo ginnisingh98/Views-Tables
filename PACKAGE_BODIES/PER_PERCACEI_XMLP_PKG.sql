@@ -1,0 +1,139 @@
+--------------------------------------------------------
+--  DDL for Package Body PER_PERCACEI_XMLP_PKG
+--------------------------------------------------------
+
+  CREATE OR REPLACE EDITIONABLE PACKAGE BODY "APPS"."PER_PERCACEI_XMLP_PKG" AS
+/* $Header: PERCACEIB.pls 120.0 2007/12/28 06:52:58 srikrish noship $ */
+  FUNCTION AFTERPFORM RETURN BOOLEAN IS
+  BEGIN
+    P_SORT_COUNT := 0;
+    COL1 := 'null';
+    COL2 := 'null';
+    P_SORT_TAG := '';
+    IF P_SORT1 IS NULL THEN
+      COL1 := '3';
+      COL2 := '2';
+    ELSE
+      IF P_SORT1 = 'Social Insurance Number' THEN
+        COL1 := '2';
+        P_SORT_COUNT := 1;
+      ELSIF P_SORT1 = 'Employee ID' THEN
+        COL1 := '4';
+        P_SORT_COUNT := 1;
+      ELSIF P_SORT1 = 'Hire Date' THEN
+        COL1 := '3';
+        P_SORT_COUNT := 1;
+      END IF;
+      IF P_SORT2 = 'Social Insurance Number' THEN
+        COL2 := '2';
+        P_SORT_COUNT := 2;
+      ELSIF P_SORT2 = 'Employee ID' THEN
+        COL2 := '4';
+        P_SORT_COUNT := 2;
+      ELSIF P_SORT2 = 'Hire Date' THEN
+        COL2 := '3';
+        P_SORT_COUNT := 2;
+      END IF;
+    END IF;
+    IF P_SORT_COUNT = 0 THEN
+      P_SORT_TAG := COL1 || ', ' || COL2;
+    ELSE
+      IF P_SORT_COUNT = 1 THEN
+        P_SORT_TAG := COL1;
+      ELSE
+        IF P_SORT_COUNT = 2 THEN
+          P_SORT_TAG := COL1 || ', ' || COL2;
+        END IF;
+      END IF;
+    END IF;
+    BEGIN
+      INSERT INTO FND_SESSIONS
+        (SESSION_ID
+        ,EFFECTIVE_DATE)
+        SELECT
+          USERENV('sessionid'),
+          P_ENDING_HIRED_DATE
+        FROM
+          SYS.DUAL
+        WHERE not exists (
+          SELECT
+            1
+          FROM
+            FND_SESSIONS FS
+          WHERE FS.SESSION_ID = USERENV('sessionid')
+            AND FS.EFFECTIVE_DATE = P_ENDING_HIRED_DATE );
+      COMMIT;
+    END;
+    RETURN (TRUE);
+  END AFTERPFORM;
+
+  FUNCTION BEFOREREPORT RETURN BOOLEAN IS
+  BEGIN
+    --HR_STANDARD.EVENT('BEFORE REPORT');
+    CP_REPORT_TITLE := 'REPORT ON HIRINGS';
+    IF P_CONSOLIDATION_SET_ID IS NOT NULL THEN
+      SELECT
+        CONSOLIDATION_SET_NAME
+      INTO
+        CP_CONSOLIDATION
+      FROM
+        PAY_CONSOLIDATION_SETS
+      WHERE CONSOLIDATION_SET_ID = P_CONSOLIDATION_SET_ID;
+    END IF;
+    IF P_PAYROLL_ID IS NOT NULL THEN
+      SELECT
+        PAYROLL_NAME
+      INTO
+        CP_PAYROLL_NAME
+      FROM
+        PAY_PAYROLLS_F
+      WHERE PAYROLL_ID = P_PAYROLL_ID;
+    END IF;
+    IF P_TAX_UNIT_ID IS NOT NULL THEN
+      SELECT
+        LTRIM(RTRIM(SUBSTR(NAME
+                          ,1
+                          ,50)))
+      INTO
+        CP_GRE
+      FROM
+        HR_TAX_UNITS_V
+      WHERE TAX_UNIT_ID = P_TAX_UNIT_ID;
+    END IF;
+    RETURN (TRUE);
+  END BEFOREREPORT;
+
+  FUNCTION BEFOREPFORM RETURN BOOLEAN IS
+  BEGIN
+    RETURN (TRUE);
+  END BEFOREPFORM;
+
+  FUNCTION AFTERREPORT RETURN BOOLEAN IS
+  BEGIN
+   -- HR_STANDARD.EVENT('AFTER REPORT');
+    RETURN (TRUE);
+  END AFTERREPORT;
+
+  FUNCTION CP_REPORT_TITLE_P RETURN VARCHAR2 IS
+  BEGIN
+    RETURN CP_REPORT_TITLE;
+  END CP_REPORT_TITLE_P;
+
+  FUNCTION CP_CONSOLIDATION_P RETURN VARCHAR2 IS
+  BEGIN
+    RETURN CP_CONSOLIDATION;
+  END CP_CONSOLIDATION_P;
+
+  FUNCTION CP_PAYROLL_NAME_P RETURN VARCHAR2 IS
+  BEGIN
+    RETURN CP_PAYROLL_NAME;
+  END CP_PAYROLL_NAME_P;
+
+  FUNCTION CP_GRE_P RETURN VARCHAR2 IS
+  BEGIN
+    RETURN CP_GRE;
+  END CP_GRE_P;
+
+END PER_PERCACEI_XMLP_PKG;
+
+/

@@ -1,0 +1,518 @@
+--------------------------------------------------------
+--  DDL for Package Body ASO_SALES_CREDITS_PKG
+--------------------------------------------------------
+
+  CREATE OR REPLACE EDITIONABLE PACKAGE BODY "APPS"."ASO_SALES_CREDITS_PKG" as
+/* $Header: asotqscb.pls 120.0 2005/05/31 12:21:59 appldev noship $ */
+-- Start of Comments
+-- Package name     : ASO_SALES_CREDITS_PKG
+-- Purpose          :
+-- History          :
+-- NOTE             :
+-- End of Comments
+
+
+G_PKG_NAME CONSTANT VARCHAR2(30):= 'ASO_SALES_CREDITS_PKG';
+G_FILE_NAME CONSTANT VARCHAR2(12) := 'asotsccb.pls';
+
+PROCEDURE Insert_Row(
+          p_CREATION_DATE    DATE,
+          p_CREATED_BY    NUMBER,
+          p_LAST_UPDATED_BY    VARCHAR2,
+          p_LAST_UPDATE_DATE    DATE,
+          p_LAST_UPDATE_LOGIN    NUMBER,
+          p_REQUEST_ID    NUMBER,
+          p_PROGRAM_APPLICATION_ID    NUMBER,
+          p_PROGRAM_ID    NUMBER,
+          p_PROGRAM_UPDATE_DATE    DATE,
+          px_SALES_CREDIT_ID   IN OUT NOCOPY NUMBER,
+          p_QUOTE_HEADER_ID    NUMBER,
+          p_QUOTE_LINE_ID    NUMBER,
+          p_PERCENT    NUMBER,
+          p_RESOURCE_ID    NUMBER,
+          p_RESOURCE_GROUP_ID    NUMBER,
+          p_EMPLOYEE_PERSON_ID    NUMBER,
+          p_SALES_CREDIT_TYPE_ID    NUMBER,
+--          p_SECURITY_GROUP_ID    NUMBER,
+          p_ATTRIBUTE_CATEGORY_CODE    VARCHAR2,
+          p_ATTRIBUTE1    VARCHAR2,
+          p_ATTRIBUTE2    VARCHAR2,
+          p_ATTRIBUTE3    VARCHAR2,
+          p_ATTRIBUTE4    VARCHAR2,
+          p_ATTRIBUTE5    VARCHAR2,
+          p_ATTRIBUTE6    VARCHAR2,
+          p_ATTRIBUTE7    VARCHAR2,
+          p_ATTRIBUTE8    VARCHAR2,
+          p_ATTRIBUTE9    VARCHAR2,
+          p_ATTRIBUTE10    VARCHAR2,
+          p_ATTRIBUTE11    VARCHAR2,
+          p_ATTRIBUTE12    VARCHAR2,
+          p_ATTRIBUTE13    VARCHAR2,
+          p_ATTRIBUTE14    VARCHAR2,
+          p_ATTRIBUTE15    VARCHAR2,
+          p_ATTRIBUTE16    VARCHAR2,
+          p_ATTRIBUTE17    VARCHAR2,
+          p_ATTRIBUTE18    VARCHAR2,
+          p_ATTRIBUTE19    VARCHAR2,
+          p_ATTRIBUTE20    VARCHAR2,
+		p_SYSTEM_ASSIGNED_FLAG VARCHAR2,
+		p_CREDIT_RULE_ID NUMBER,
+          p_OBJECT_VERSION_NUMBER    NUMBER)
+
+ IS
+   CURSOR C2 IS SELECT ASO_SALES_CREDITS_S.nextval FROM sys.dual;
+BEGIN
+   If (px_SALES_CREDIT_ID IS NULL) OR (px_SALES_CREDIT_ID = FND_API.G_MISS_NUM) then
+       OPEN C2;
+       FETCH C2 INTO px_SALES_CREDIT_ID;
+       CLOSE C2;
+   End If;
+   INSERT INTO ASO_SALES_CREDITS(
+           CREATION_DATE,
+           CREATED_BY,
+           LAST_UPDATED_BY,
+           LAST_UPDATE_DATE,
+           LAST_UPDATE_LOGIN,
+           REQUEST_ID,
+           PROGRAM_APPLICATION_ID,
+           PROGRAM_ID,
+           PROGRAM_UPDATE_DATE,
+           SALES_CREDIT_ID,
+           QUOTE_HEADER_ID,
+           QUOTE_LINE_ID,
+           PERCENT,
+           RESOURCE_ID,
+           RESOURCE_GROUP_ID,
+           EMPLOYEE_PERSON_ID,
+           SALES_CREDIT_TYPE_ID,
+--           SECURITY_GROUP_ID,
+           ATTRIBUTE_CATEGORY_CODE,
+           ATTRIBUTE1,
+           ATTRIBUTE2,
+           ATTRIBUTE3,
+           ATTRIBUTE4,
+           ATTRIBUTE5,
+           ATTRIBUTE6,
+           ATTRIBUTE7,
+           ATTRIBUTE8,
+           ATTRIBUTE9,
+           ATTRIBUTE10,
+           ATTRIBUTE11,
+           ATTRIBUTE12,
+           ATTRIBUTE13,
+           ATTRIBUTE14,
+           ATTRIBUTE15,
+           ATTRIBUTE16,
+           ATTRIBUTE17,
+           ATTRIBUTE18,
+           ATTRIBUTE19,
+           ATTRIBUTE20,
+		 SYSTEM_ASSIGNED_FLAG,
+		 CREDIT_RULE_ID,
+           OBJECT_VERSION_NUMBER
+          ) VALUES (
+           p_CREATION_DATE,
+           decode( p_CREATED_BY, FND_API.G_MISS_NUM, NULL, p_CREATED_BY),
+           decode( p_LAST_UPDATED_BY, FND_API.G_MISS_CHAR, NULL, p_LAST_UPDATED_BY),
+           decode( p_LAST_UPDATE_DATE, FND_API.G_MISS_DATE, TO_DATE(NULL), p_LAST_UPDATE_DATE),
+           decode( p_LAST_UPDATE_LOGIN, FND_API.G_MISS_NUM, NULL, p_LAST_UPDATE_LOGIN),
+           decode( p_REQUEST_ID, FND_API.G_MISS_NUM, NULL, p_REQUEST_ID),
+           decode( p_PROGRAM_APPLICATION_ID, FND_API.G_MISS_NUM, NULL, p_PROGRAM_APPLICATION_ID),
+           decode( p_PROGRAM_ID, FND_API.G_MISS_NUM, NULL, p_PROGRAM_ID),
+           decode( p_PROGRAM_UPDATE_DATE, FND_API.G_MISS_DATE, TO_DATE(NULL), p_PROGRAM_UPDATE_DATE),
+           decode( px_SALES_CREDIT_ID, FND_API.G_MISS_NUM, NULL, px_SALES_CREDIT_ID),
+           decode( p_QUOTE_HEADER_ID, FND_API.G_MISS_NUM, NULL, p_QUOTE_HEADER_ID),
+           decode( p_QUOTE_LINE_ID, FND_API.G_MISS_NUM, NULL, p_QUOTE_LINE_ID),
+           decode( p_PERCENT, FND_API.G_MISS_NUM, NULL, p_PERCENT),
+           decode( p_RESOURCE_ID, FND_API.G_MISS_NUM, NULL, p_RESOURCE_ID),
+           decode( p_RESOURCE_GROUP_ID, FND_API.G_MISS_NUM, NULL, p_RESOURCE_GROUP_ID),
+           decode( p_EMPLOYEE_PERSON_ID, FND_API.G_MISS_NUM, NULL, p_EMPLOYEE_PERSON_ID),
+           decode( p_SALES_CREDIT_TYPE_ID, FND_API.G_MISS_NUM, NULL, p_SALES_CREDIT_TYPE_ID),
+   --        decode( p_SECURITY_GROUP_ID, FND_API.G_MISS_NUM, NULL, p_SECURITY_GROUP_ID),
+           decode( p_ATTRIBUTE_CATEGORY_CODE, FND_API.G_MISS_CHAR, NULL, p_ATTRIBUTE_CATEGORY_CODE),
+           decode( p_ATTRIBUTE1, FND_API.G_MISS_CHAR, NULL, p_ATTRIBUTE1),
+           decode( p_ATTRIBUTE2, FND_API.G_MISS_CHAR, NULL, p_ATTRIBUTE2),
+           decode( p_ATTRIBUTE3, FND_API.G_MISS_CHAR, NULL, p_ATTRIBUTE3),
+           decode( p_ATTRIBUTE4, FND_API.G_MISS_CHAR, NULL, p_ATTRIBUTE4),
+           decode( p_ATTRIBUTE5, FND_API.G_MISS_CHAR, NULL, p_ATTRIBUTE5),
+           decode( p_ATTRIBUTE6, FND_API.G_MISS_CHAR, NULL, p_ATTRIBUTE6),
+           decode( p_ATTRIBUTE7, FND_API.G_MISS_CHAR, NULL, p_ATTRIBUTE7),
+           decode( p_ATTRIBUTE8, FND_API.G_MISS_CHAR, NULL, p_ATTRIBUTE8),
+           decode( p_ATTRIBUTE9, FND_API.G_MISS_CHAR, NULL, p_ATTRIBUTE9),
+           decode( p_ATTRIBUTE10, FND_API.G_MISS_CHAR, NULL, p_ATTRIBUTE10),
+           decode( p_ATTRIBUTE11, FND_API.G_MISS_CHAR, NULL, p_ATTRIBUTE11),
+           decode( p_ATTRIBUTE12, FND_API.G_MISS_CHAR, NULL, p_ATTRIBUTE12),
+           decode( p_ATTRIBUTE13, FND_API.G_MISS_CHAR, NULL, p_ATTRIBUTE13),
+           decode( p_ATTRIBUTE14, FND_API.G_MISS_CHAR, NULL, p_ATTRIBUTE14),
+           decode( p_ATTRIBUTE15, FND_API.G_MISS_CHAR, NULL, p_ATTRIBUTE15),
+           decode( p_ATTRIBUTE16, FND_API.G_MISS_CHAR, NULL, p_ATTRIBUTE16),
+           decode( p_ATTRIBUTE17, FND_API.G_MISS_CHAR, NULL, p_ATTRIBUTE17),
+           decode( p_ATTRIBUTE18, FND_API.G_MISS_CHAR, NULL, p_ATTRIBUTE18),
+           decode( p_ATTRIBUTE19, FND_API.G_MISS_CHAR, NULL, p_ATTRIBUTE19),
+           decode( p_ATTRIBUTE20, FND_API.G_MISS_CHAR, NULL, p_ATTRIBUTE20),
+           decode( p_SYSTEM_ASSIGNED_FLAG, FND_API.G_MISS_CHAR, NULL, p_SYSTEM_ASSIGNED_FLAG),
+           decode( p_CREDIT_RULE_ID, FND_API.G_MISS_NUM, NULL, p_CREDIT_RULE_ID),
+           decode ( p_OBJECT_VERSION_NUMBER, FND_API.G_MISS_NUM,1,NULL,1, p_OBJECT_VERSION_NUMBER)
+		 );
+End Insert_Row;
+
+PROCEDURE Update_Row(
+          p_CREATION_DATE    DATE,
+          p_CREATED_BY    NUMBER,
+          p_LAST_UPDATED_BY    VARCHAR2,
+          p_LAST_UPDATE_DATE    DATE,
+          p_LAST_UPDATE_LOGIN    NUMBER,
+          p_REQUEST_ID    NUMBER,
+          p_PROGRAM_APPLICATION_ID    NUMBER,
+          p_PROGRAM_ID    NUMBER,
+          p_PROGRAM_UPDATE_DATE    DATE,
+          p_SALES_CREDIT_ID    NUMBER,
+          p_QUOTE_HEADER_ID    NUMBER,
+          p_QUOTE_LINE_ID    NUMBER,
+          p_PERCENT    NUMBER,
+          p_RESOURCE_ID    NUMBER,
+          p_RESOURCE_GROUP_ID    NUMBER,
+          p_EMPLOYEE_PERSON_ID    NUMBER,
+          p_SALES_CREDIT_TYPE_ID    NUMBER,
+--          p_SECURITY_GROUP_ID    NUMBER,
+          p_ATTRIBUTE_CATEGORY_CODE    VARCHAR2,
+          p_ATTRIBUTE1    VARCHAR2,
+          p_ATTRIBUTE2    VARCHAR2,
+          p_ATTRIBUTE3    VARCHAR2,
+          p_ATTRIBUTE4    VARCHAR2,
+          p_ATTRIBUTE5    VARCHAR2,
+          p_ATTRIBUTE6    VARCHAR2,
+          p_ATTRIBUTE7    VARCHAR2,
+          p_ATTRIBUTE8    VARCHAR2,
+          p_ATTRIBUTE9    VARCHAR2,
+          p_ATTRIBUTE10    VARCHAR2,
+          p_ATTRIBUTE11    VARCHAR2,
+          p_ATTRIBUTE12    VARCHAR2,
+          p_ATTRIBUTE13    VARCHAR2,
+          p_ATTRIBUTE14    VARCHAR2,
+          p_ATTRIBUTE15    VARCHAR2,
+          p_ATTRIBUTE16    VARCHAR2,
+          p_ATTRIBUTE17    VARCHAR2,
+          p_ATTRIBUTE18    VARCHAR2,
+          p_ATTRIBUTE19    VARCHAR2,
+          p_ATTRIBUTE20    VARCHAR2,
+		p_SYSTEM_ASSIGNED_FLAG VARCHAR2,
+		p_CREDIT_RULE_ID NUMBER,
+          p_OBJECT_VERSION_NUMBER  NUMBER
+		)
+
+ IS
+ BEGIN
+    Update ASO_SALES_CREDITS
+    SET
+            /*  CREATED_BY = decode( p_CREATED_BY, FND_API.G_MISS_NUM, CREATED_BY, p_CREATED_BY),*/
+              LAST_UPDATED_BY = decode( p_LAST_UPDATED_BY, FND_API.G_MISS_CHAR, LAST_UPDATED_BY, p_LAST_UPDATED_BY),
+              LAST_UPDATE_DATE = decode( p_LAST_UPDATE_DATE, FND_API.G_MISS_DATE, LAST_UPDATE_DATE, p_LAST_UPDATE_DATE),
+              LAST_UPDATE_LOGIN = decode( p_LAST_UPDATE_LOGIN, FND_API.G_MISS_NUM, LAST_UPDATE_LOGIN, p_LAST_UPDATE_LOGIN),
+              REQUEST_ID = decode( p_REQUEST_ID, FND_API.G_MISS_NUM, REQUEST_ID, p_REQUEST_ID),
+              PROGRAM_APPLICATION_ID = decode( p_PROGRAM_APPLICATION_ID, FND_API.G_MISS_NUM, PROGRAM_APPLICATION_ID, p_PROGRAM_APPLICATION_ID),
+              PROGRAM_ID = decode( p_PROGRAM_ID, FND_API.G_MISS_NUM, PROGRAM_ID, p_PROGRAM_ID),
+              PROGRAM_UPDATE_DATE = decode( p_PROGRAM_UPDATE_DATE, FND_API.G_MISS_DATE, PROGRAM_UPDATE_DATE, p_PROGRAM_UPDATE_DATE),
+              SALES_CREDIT_ID = decode( p_SALES_CREDIT_ID, FND_API.G_MISS_NUM, SALES_CREDIT_ID, p_SALES_CREDIT_ID),
+              QUOTE_HEADER_ID = decode( p_QUOTE_HEADER_ID, FND_API.G_MISS_NUM, QUOTE_HEADER_ID, p_QUOTE_HEADER_ID),
+              QUOTE_LINE_ID = decode( p_QUOTE_LINE_ID, FND_API.G_MISS_NUM, QUOTE_LINE_ID, p_QUOTE_LINE_ID),
+              PERCENT = decode( p_PERCENT, FND_API.G_MISS_NUM, PERCENT, p_PERCENT),
+              RESOURCE_ID = decode( p_RESOURCE_ID, FND_API.G_MISS_NUM, RESOURCE_ID, p_RESOURCE_ID),
+              RESOURCE_GROUP_ID = decode( p_RESOURCE_GROUP_ID, FND_API.G_MISS_NUM, RESOURCE_GROUP_ID, p_RESOURCE_GROUP_ID),
+              EMPLOYEE_PERSON_ID = decode( p_EMPLOYEE_PERSON_ID, FND_API.G_MISS_NUM, EMPLOYEE_PERSON_ID, p_EMPLOYEE_PERSON_ID),
+              SALES_CREDIT_TYPE_ID = decode( p_SALES_CREDIT_TYPE_ID, FND_API.G_MISS_NUM, SALES_CREDIT_TYPE_ID, p_SALES_CREDIT_TYPE_ID),
+--              SECURITY_GROUP_ID = decode( p_SECURITY_GROUP_ID, FND_API.G_MISS_NUM, SECURITY_GROUP_ID, p_SECURITY_GROUP_ID),
+              ATTRIBUTE_CATEGORY_CODE = decode( p_ATTRIBUTE_CATEGORY_CODE, FND_API.G_MISS_CHAR, ATTRIBUTE_CATEGORY_CODE, p_ATTRIBUTE_CATEGORY_CODE),
+              ATTRIBUTE1 = decode( p_ATTRIBUTE1, FND_API.G_MISS_CHAR, ATTRIBUTE1, p_ATTRIBUTE1),
+              ATTRIBUTE2 = decode( p_ATTRIBUTE2, FND_API.G_MISS_CHAR, ATTRIBUTE2, p_ATTRIBUTE2),
+              ATTRIBUTE3 = decode( p_ATTRIBUTE3, FND_API.G_MISS_CHAR, ATTRIBUTE3, p_ATTRIBUTE3),
+              ATTRIBUTE4 = decode( p_ATTRIBUTE4, FND_API.G_MISS_CHAR, ATTRIBUTE4, p_ATTRIBUTE4),
+              ATTRIBUTE5 = decode( p_ATTRIBUTE5, FND_API.G_MISS_CHAR, ATTRIBUTE5, p_ATTRIBUTE5),
+              ATTRIBUTE6 = decode( p_ATTRIBUTE6, FND_API.G_MISS_CHAR, ATTRIBUTE6, p_ATTRIBUTE6),
+              ATTRIBUTE7 = decode( p_ATTRIBUTE7, FND_API.G_MISS_CHAR, ATTRIBUTE7, p_ATTRIBUTE7),
+              ATTRIBUTE8 = decode( p_ATTRIBUTE8, FND_API.G_MISS_CHAR, ATTRIBUTE8, p_ATTRIBUTE8),
+              ATTRIBUTE9 = decode( p_ATTRIBUTE9, FND_API.G_MISS_CHAR, ATTRIBUTE9, p_ATTRIBUTE9),
+              ATTRIBUTE10 = decode( p_ATTRIBUTE10, FND_API.G_MISS_CHAR, ATTRIBUTE10, p_ATTRIBUTE10),
+              ATTRIBUTE11 = decode( p_ATTRIBUTE11, FND_API.G_MISS_CHAR, ATTRIBUTE11, p_ATTRIBUTE11),
+              ATTRIBUTE12 = decode( p_ATTRIBUTE12, FND_API.G_MISS_CHAR, ATTRIBUTE12, p_ATTRIBUTE12),
+              ATTRIBUTE13 = decode( p_ATTRIBUTE13, FND_API.G_MISS_CHAR, ATTRIBUTE13, p_ATTRIBUTE13),
+              ATTRIBUTE14 = decode( p_ATTRIBUTE14, FND_API.G_MISS_CHAR, ATTRIBUTE14, p_ATTRIBUTE14),
+              ATTRIBUTE15 = decode( p_ATTRIBUTE15, FND_API.G_MISS_CHAR, ATTRIBUTE15, p_ATTRIBUTE15),
+               ATTRIBUTE16 = decode( p_ATTRIBUTE16, FND_API.G_MISS_CHAR, ATTRIBUTE16, p_ATTRIBUTE16),
+              ATTRIBUTE17 = decode( p_ATTRIBUTE17, FND_API.G_MISS_CHAR, ATTRIBUTE17, p_ATTRIBUTE17),
+              ATTRIBUTE18 = decode( p_ATTRIBUTE18, FND_API.G_MISS_CHAR, ATTRIBUTE18, p_ATTRIBUTE18),
+              ATTRIBUTE19 = decode( p_ATTRIBUTE19, FND_API.G_MISS_CHAR, ATTRIBUTE19, p_ATTRIBUTE19),
+              ATTRIBUTE20 = decode( p_ATTRIBUTE20, FND_API.G_MISS_CHAR, ATTRIBUTE20, p_ATTRIBUTE20),
+              SYSTEM_ASSIGNED_FLAG = decode( p_SYSTEM_ASSIGNED_FLAG, FND_API.G_MISS_CHAR, SYSTEM_ASSIGNED_FLAG, p_SYSTEM_ASSIGNED_FLAG),
+              CREDIT_RULE_ID = decode( p_CREDIT_RULE_ID, FND_API.G_MISS_NUM, CREDIT_RULE_ID, p_CREDIT_RULE_ID),
+		    OBJECT_VERSION_NUMBER = decode( p_OBJECT_VERSION_NUMBER, FND_API.G_MISS_NUM, nvl(OBJECT_VERSION_NUMBER,0)+1, nvl(p_OBJECT_VERSION_NUMBER, nvl(OBJECT_VERSION_NUMBER,0))+1)
+    where SALES_CREDIT_ID = p_SALES_CREDIT_ID;
+
+    If (SQL%NOTFOUND) then
+        RAISE NO_DATA_FOUND;
+    End If;
+END Update_Row;
+
+PROCEDURE Delete_Row(
+    p_SALES_CREDIT_ID  NUMBER)
+ IS
+ BEGIN
+   DELETE FROM ASO_SALES_CREDITS
+    WHERE SALES_CREDIT_ID = p_SALES_CREDIT_ID;
+   If (SQL%NOTFOUND) then
+       RAISE NO_DATA_FOUND;
+   End If;
+ END Delete_Row;
+
+PROCEDURE Lock_Row(
+          --p_OBJECT_VERSION_NUMBER  NUMBER,
+          p_CREATION_DATE    DATE,
+          p_CREATED_BY    NUMBER,
+          p_LAST_UPDATED_BY    VARCHAR2,
+          p_LAST_UPDATE_DATE    DATE,
+          p_LAST_UPDATE_LOGIN    NUMBER,
+          p_REQUEST_ID    NUMBER,
+          p_PROGRAM_APPLICATION_ID    NUMBER,
+          p_PROGRAM_ID    NUMBER,
+          p_PROGRAM_UPDATE_DATE    DATE,
+          p_SALES_CREDIT_ID    NUMBER,
+          p_QUOTE_HEADER_ID    NUMBER,
+          p_QUOTE_LINE_ID    NUMBER,
+          p_PERCENT    NUMBER,
+          p_RESOURCE_ID    NUMBER,
+          p_RESOURCE_GROUP_ID    NUMBER,
+          p_EMPLOYEE_PERSON_ID    NUMBER,
+          p_SALES_CREDIT_TYPE_ID    NUMBER,
+--          p_SECURITY_GROUP_ID    NUMBER,
+          p_ATTRIBUTE_CATEGORY_CODE    VARCHAR2,
+          p_ATTRIBUTE1    VARCHAR2,
+          p_ATTRIBUTE2    VARCHAR2,
+          p_ATTRIBUTE3    VARCHAR2,
+          p_ATTRIBUTE4    VARCHAR2,
+          p_ATTRIBUTE5    VARCHAR2,
+          p_ATTRIBUTE6    VARCHAR2,
+          p_ATTRIBUTE7    VARCHAR2,
+          p_ATTRIBUTE8    VARCHAR2,
+          p_ATTRIBUTE9    VARCHAR2,
+          p_ATTRIBUTE10    VARCHAR2,
+          p_ATTRIBUTE11    VARCHAR2,
+          p_ATTRIBUTE12    VARCHAR2,
+          p_ATTRIBUTE13    VARCHAR2,
+          p_ATTRIBUTE14    VARCHAR2,
+          p_ATTRIBUTE15    VARCHAR2)
+
+ IS
+   CURSOR C IS
+        SELECT
+        SALES_CREDIT_ID,
+        CREATION_DATE,
+        CREATED_BY,
+        LAST_UPDATED_BY,
+        LAST_UPDATE_DATE,
+        LAST_UPDATE_LOGIN,
+        REQUEST_ID,
+        PROGRAM_APPLICATION_ID,
+        PROGRAM_ID,
+        PROGRAM_UPDATE_DATE,
+        QUOTE_HEADER_ID,
+        QUOTE_LINE_ID,
+        PERCENT,
+        RESOURCE_ID,
+        RESOURCE_GROUP_ID,
+        EMPLOYEE_PERSON_ID,
+        SALES_CREDIT_TYPE_ID,
+        --SECURITY_GROUP_ID,
+        ATTRIBUTE_CATEGORY_CODE,
+        ATTRIBUTE1,
+        ATTRIBUTE2,
+        ATTRIBUTE3,
+        ATTRIBUTE4,
+        ATTRIBUTE5,
+        ATTRIBUTE6,
+        ATTRIBUTE7,
+        ATTRIBUTE8,
+        ATTRIBUTE9,
+        ATTRIBUTE10,
+        ATTRIBUTE11,
+        ATTRIBUTE12,
+        ATTRIBUTE13,
+        ATTRIBUTE14,
+        ATTRIBUTE15,
+        --OBJECT_VERSION_NUMBER,
+        SYSTEM_ASSIGNED_FLAG,
+        CREDIT_RULE_ID
+         FROM ASO_SALES_CREDITS
+        WHERE SALES_CREDIT_ID =  p_SALES_CREDIT_ID
+        FOR UPDATE of SALES_CREDIT_ID NOWAIT;
+   Recinfo C%ROWTYPE;
+ BEGIN
+    OPEN C;
+    FETCH C INTO Recinfo;
+    If (C%NOTFOUND) then
+        CLOSE C;
+        FND_MESSAGE.SET_NAME('FND', 'FORM_RECORD_DELETED');
+        APP_EXCEPTION.RAISE_EXCEPTION;
+    End If;
+    CLOSE C;
+    if (
+/*
+           (      Recinfo.CREATION_DATE = p_CREATION_DATE)
+       AND (    ( Recinfo.CREATED_BY = p_CREATED_BY)
+            OR (    ( Recinfo.CREATED_BY IS NULL )
+                AND (  p_CREATED_BY IS NULL )))
+       AND (    ( Recinfo.LAST_UPDATED_BY = p_LAST_UPDATED_BY)
+            OR (    ( Recinfo.LAST_UPDATED_BY IS NULL )
+                AND (  p_LAST_UPDATED_BY IS NULL )))
+       AND
+*/
+	  (    ( Recinfo.LAST_UPDATE_DATE = p_LAST_UPDATE_DATE)
+            OR (    ( Recinfo.LAST_UPDATE_DATE IS NULL )
+                AND (  p_LAST_UPDATE_DATE IS NULL )))
+/*
+       AND
+       (    ( Recinfo.OBJECT_VERSION_NUMBER = p_OBJECT_VERSION_NUMBER)
+         OR (    ( Recinfo.OBJECT_VERSION_NUMBER IS NULL )
+              AND (  p_OBJECT_VERSION_NUMBER IS NULL )))
+       AND (    ( Recinfo.LAST_UPDATE_LOGIN = p_LAST_UPDATE_LOGIN)
+            OR (    ( Recinfo.LAST_UPDATE_LOGIN IS NULL )
+                AND (  p_LAST_UPDATE_LOGIN IS NULL )))
+       AND (    ( Recinfo.REQUEST_ID = p_REQUEST_ID)
+            OR (    ( Recinfo.REQUEST_ID IS NULL )
+                AND (  p_REQUEST_ID IS NULL )))
+       AND (    ( Recinfo.PROGRAM_APPLICATION_ID = p_PROGRAM_APPLICATION_ID)
+            OR (    ( Recinfo.PROGRAM_APPLICATION_ID IS NULL )
+                AND (  p_PROGRAM_APPLICATION_ID IS NULL )))
+       AND (    ( Recinfo.PROGRAM_ID = p_PROGRAM_ID)
+            OR (    ( Recinfo.PROGRAM_ID IS NULL )
+                AND (  p_PROGRAM_ID IS NULL )))
+       AND (    ( Recinfo.PROGRAM_UPDATE_DATE = p_PROGRAM_UPDATE_DATE)
+            OR (    ( Recinfo.PROGRAM_UPDATE_DATE IS NULL )
+                AND (  p_PROGRAM_UPDATE_DATE IS NULL )))
+       AND (    ( Recinfo.SALES_CREDIT_ID = p_SALES_CREDIT_ID)
+            OR (    ( Recinfo.SALES_CREDIT_ID IS NULL )
+                AND (  p_SALES_CREDIT_ID IS NULL )))
+       AND (    ( Recinfo.QUOTE_HEADER_ID = p_QUOTE_HEADER_ID)
+            OR (    ( Recinfo.QUOTE_HEADER_ID IS NULL )
+                AND (  p_QUOTE_HEADER_ID IS NULL )))
+       AND (    ( Recinfo.QUOTE_LINE_ID = p_QUOTE_LINE_ID)
+            OR (    ( Recinfo.QUOTE_LINE_ID IS NULL )
+                AND (  p_QUOTE_LINE_ID IS NULL )))
+       AND (    ( Recinfo.PERCENT = p_PERCENT)
+            OR (    ( Recinfo.PERCENT IS NULL )
+                AND (  p_PERCENT IS NULL )))
+       AND (    ( Recinfo.RESOURCE_ID = p_RESOURCE_ID)
+            OR (    ( Recinfo.RESOURCE_ID IS NULL )
+                AND (  p_RESOURCE_ID IS NULL )))
+       AND (    ( Recinfo.RESOURCE_GROUP_ID = p_RESOURCE_GROUP_ID)
+            OR (    ( Recinfo.RESOURCE_GROUP_ID IS NULL )
+                AND (  p_RESOURCE_GROUP_ID IS NULL )))
+       AND (    ( Recinfo.EMPLOYEE_PERSON_ID = p_EMPLOYEE_PERSON_ID)
+            OR (    ( Recinfo.EMPLOYEE_PERSON_ID IS NULL )
+                AND (  p_EMPLOYEE_PERSON_ID IS NULL )))
+       AND (    ( Recinfo.SALES_CREDIT_TYPE_ID = p_SALES_CREDIT_TYPE_ID)
+            OR (    ( Recinfo.SALES_CREDIT_TYPE_ID IS NULL )
+                AND (  p_SALES_CREDIT_TYPE_ID IS NULL )))
+*/
+/*       AND (    ( Recinfo.SECURITY_GROUP_ID = p_SECURITY_GROUP_ID)
+            OR (    ( Recinfo.SECURITY_GROUP_ID IS NULL )
+                AND (  p_SECURITY_GROUP_ID IS NULL )))*/
+/*
+       AND (    ( Recinfo.ATTRIBUTE_CATEGORY_CODE = p_ATTRIBUTE_CATEGORY_CODE)
+            OR (    ( Recinfo.ATTRIBUTE_CATEGORY_CODE IS NULL )
+                AND (  p_ATTRIBUTE_CATEGORY_CODE IS NULL )))
+       AND (    ( Recinfo.ATTRIBUTE1 = p_ATTRIBUTE1)
+            OR (    ( Recinfo.ATTRIBUTE1 IS NULL )
+                AND (  p_ATTRIBUTE1 IS NULL )))
+       AND (    ( Recinfo.ATTRIBUTE2 = p_ATTRIBUTE2)
+            OR (    ( Recinfo.ATTRIBUTE2 IS NULL )
+                AND (  p_ATTRIBUTE2 IS NULL )))
+       AND (    ( Recinfo.ATTRIBUTE3 = p_ATTRIBUTE3)
+            OR (    ( Recinfo.ATTRIBUTE3 IS NULL )
+                AND (  p_ATTRIBUTE3 IS NULL )))
+       AND (    ( Recinfo.ATTRIBUTE4 = p_ATTRIBUTE4)
+            OR (    ( Recinfo.ATTRIBUTE4 IS NULL )
+                AND (  p_ATTRIBUTE4 IS NULL )))
+       AND (    ( Recinfo.ATTRIBUTE5 = p_ATTRIBUTE5)
+            OR (    ( Recinfo.ATTRIBUTE5 IS NULL )
+                AND (  p_ATTRIBUTE5 IS NULL )))
+       AND (    ( Recinfo.ATTRIBUTE6 = p_ATTRIBUTE6)
+            OR (    ( Recinfo.ATTRIBUTE6 IS NULL )
+                AND (  p_ATTRIBUTE6 IS NULL )))
+       AND (    ( Recinfo.ATTRIBUTE7 = p_ATTRIBUTE7)
+            OR (    ( Recinfo.ATTRIBUTE7 IS NULL )
+                AND (  p_ATTRIBUTE7 IS NULL )))
+       AND (    ( Recinfo.ATTRIBUTE8 = p_ATTRIBUTE8)
+            OR (    ( Recinfo.ATTRIBUTE8 IS NULL )
+                AND (  p_ATTRIBUTE8 IS NULL )))
+       AND (    ( Recinfo.ATTRIBUTE9 = p_ATTRIBUTE9)
+            OR (    ( Recinfo.ATTRIBUTE9 IS NULL )
+                AND (  p_ATTRIBUTE9 IS NULL )))
+       AND (    ( Recinfo.ATTRIBUTE10 = p_ATTRIBUTE10)
+            OR (    ( Recinfo.ATTRIBUTE10 IS NULL )
+                AND (  p_ATTRIBUTE10 IS NULL )))
+       AND (    ( Recinfo.ATTRIBUTE11 = p_ATTRIBUTE11)
+            OR (    ( Recinfo.ATTRIBUTE11 IS NULL )
+                AND (  p_ATTRIBUTE11 IS NULL )))
+       AND (    ( Recinfo.ATTRIBUTE12 = p_ATTRIBUTE12)
+            OR (    ( Recinfo.ATTRIBUTE12 IS NULL )
+                AND (  p_ATTRIBUTE12 IS NULL )))
+       AND (    ( Recinfo.ATTRIBUTE13 = p_ATTRIBUTE13)
+            OR (    ( Recinfo.ATTRIBUTE13 IS NULL )
+                AND (  p_ATTRIBUTE13 IS NULL )))
+       AND (    ( Recinfo.ATTRIBUTE14 = p_ATTRIBUTE14)
+            OR (    ( Recinfo.ATTRIBUTE14 IS NULL )
+                AND (  p_ATTRIBUTE14 IS NULL )))
+       AND (    ( Recinfo.ATTRIBUTE15 = p_ATTRIBUTE15)
+            OR (    ( Recinfo.ATTRIBUTE15 IS NULL )
+                AND (  p_ATTRIBUTE15 IS NULL )))
+*/
+   /*    AND (    ( Recinfo.OBJECT_VERSION_NUMBER = p_OBJECT_VERSION_NUMBER)
+            OR (    ( Recinfo.OBJECT_VERSION_NUMBER IS NULL )
+                AND (  p_OBJECT_VERSION_NUMBER IS NULL )))*/
+       ) then
+       return;
+   else
+       FND_MESSAGE.SET_NAME('FND', 'FORM_RECORD_CHANGED');
+       APP_EXCEPTION.RAISE_EXCEPTION;
+   End If;
+END Lock_Row;
+
+
+PROCEDURE Delete_Row(
+    p_QUOTE_LINE_ID  NUMBER)
+IS
+BEGIN
+   DELETE FROM ASO_SALES_CREDITS
+    WHERE QUOTE_LINE_ID = p_QUOTE_LINE_ID;
+   If (SQL%NOTFOUND) then
+       null;
+   End If;
+END;
+
+PROCEDURE Delete_Row(
+    p_QUOTE_HEADER_ID  NUMBER)
+IS
+BEGIN
+   DELETE FROM ASO_SALES_CREDITS
+    WHERE QUOTE_HEADER_ID = p_QUOTE_HEADER_ID;
+   If (SQL%NOTFOUND) then
+       null;
+   End If;
+END;
+
+PROCEDURE Delete_Header_Row(
+    p_QUOTE_HEADER_ID  NUMBER)
+IS
+BEGIN
+   DELETE FROM ASO_SALES_CREDITS
+    WHERE QUOTE_HEADER_ID = p_QUOTE_HEADER_ID
+	 AND QUOTE_LINE_ID IS NULL;
+   If (SQL%NOTFOUND) then
+       null;
+   End If;
+END;
+
+
+End ASO_SALES_CREDITS_PKG;
+
+/

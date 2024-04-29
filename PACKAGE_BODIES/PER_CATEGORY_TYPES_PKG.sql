@@ -1,0 +1,229 @@
+--------------------------------------------------------
+--  DDL for Package Body PER_CATEGORY_TYPES_PKG
+--------------------------------------------------------
+
+  CREATE OR REPLACE EDITIONABLE PACKAGE BODY "APPS"."PER_CATEGORY_TYPES_PKG" as
+/* $Header: hruoclct.pkb 115.2 1999/11/09 15:05:09 pkm ship $ */
+procedure OWNER_TO_WHO (
+  X_OWNER in VARCHAR2,
+  X_CREATION_DATE out DATE,
+  X_CREATED_BY out NUMBER,
+  X_LAST_UPDATE_DATE out DATE,
+  X_LAST_UPDATED_BY out NUMBER,
+  X_LAST_UPDATE_LOGIN out NUMBER
+) is
+begin
+  if X_OWNER = 'SEED' then
+    X_CREATED_BY := 1;
+    X_LAST_UPDATED_BY := 1;
+  else
+    X_CREATED_BY := 0;
+    X_LAST_UPDATED_BY := 0;
+  end if;
+  X_CREATION_DATE := sysdate;
+  X_LAST_UPDATE_DATE := sysdate;
+  X_LAST_UPDATE_LOGIN := 0;
+end OWNER_TO_WHO;
+--
+procedure INSERT_ROW (
+  X_PROPOSAL_CATEGORY_TYPE_ID in NUMBER,
+  X_TYPE                   in VARCHAR2,
+  X_HEADING_TEXT           in VARCHAR2,
+  X_HELP_TEXT              in VARCHAR2,
+  X_NOTE_TEXT              in VARCHAR2,
+  X_FOOTER_TEXT            in VARCHAR2,
+  X_CATEGORY_NAME          in VARCHAR2,
+  X_CREATION_DATE          in DATE,
+  X_CREATED_BY             in VARCHAR2,
+  X_LAST_UPDATE_DATE       in DATE,
+  X_LAST_UPDATED_BY        in VARCHAR2,
+  X_LAST_UPDATE_LOGIN      in NUMBER
+) is
+begin
+  insert into PER_PROPOSAL_CATEGORY_TYPES (
+    PROPOSAL_CATEGORY_TYPE_ID,
+    CATEGORY_NAME,
+    TYPE,
+    HEADING_TEXT,
+    HELP_TEXT,
+    NOTE_TEXT,
+    FOOTER_TEXT,
+    CREATION_DATE,
+    CREATED_BY,
+    LAST_UPDATE_DATE,
+    LAST_UPDATED_BY,
+    LAST_UPDATE_LOGIN
+  ) values (
+    X_PROPOSAL_CATEGORY_TYPE_ID,
+    X_CATEGORY_NAME,
+    X_TYPE,
+    X_HEADING_TEXT,
+    X_HELP_TEXT,
+    X_NOTE_TEXT,
+    X_FOOTER_TEXT,
+    X_CREATION_DATE,
+    X_CREATED_BY,
+    X_LAST_UPDATE_DATE,
+    X_LAST_UPDATED_BY,
+    X_LAST_UPDATE_LOGIN
+  );
+end INSERT_ROW;
+--
+procedure LOCK_ROW (
+  X_PROPOSAL_CATEGORY_TYPE_ID in NUMBER
+) is
+  cursor CSR_CATEGORY_NAME (
+    X_PROPOSAL_CATEGORY_TYPE_ID in VARCHAR2
+  ) is
+    select CATEGORY_NAME
+    from   PER_PROPOSAL_CATEGORY_TYPES
+    where  PROPOSAL_CATEGORY_TYPE_ID = X_PROPOSAL_CATEGORY_TYPE_ID
+    for update of CATEGORY_NAME nowait;
+  RECINFO CSR_CATEGORY_NAME%rowtype;
+begin
+  open CSR_CATEGORY_NAME(X_PROPOSAL_CATEGORY_TYPE_ID);
+  fetch CSR_CATEGORY_NAME into RECINFO;
+  if (CSR_CATEGORY_NAME%notfound) then
+    close CSR_CATEGORY_NAME;
+    fnd_message.set_name('FND','FORM_RECORD_DELETED');
+    app_exception.raise_exception;
+  end if;
+  close CSR_CATEGORY_NAME;
+end LOCK_ROW;
+--
+procedure UPDATE_ROW (
+  X_PROPOSAL_CATEGORY_TYPE_ID   in NUMBER,
+  X_TYPE                   in VARCHAR2,
+  X_HEADING_TEXT           in VARCHAR2,
+  X_HELP_TEXT              in VARCHAR2,
+  X_NOTE_TEXT              in VARCHAR2,
+  X_FOOTER_TEXT            in VARCHAR2,
+  X_CATEGORY_NAME          in VARCHAR2,
+  X_LAST_UPDATE_DATE       in DATE,
+  X_LAST_UPDATED_BY        in VARCHAR2,
+  X_LAST_UPDATE_LOGIN      in NUMBER
+) is
+begin
+  update PER_PROPOSAL_CATEGORY_TYPES set
+    CATEGORY_NAME = X_CATEGORY_NAME,
+    TYPE = X_TYPE,
+    HEADING_TEXT = X_HEADING_TEXT,
+    HELP_TEXT = X_HELP_TEXT,
+    NOTE_TEXT = X_NOTE_TEXT,
+    FOOTER_TEXT = X_FOOTER_TEXT,
+    LAST_UPDATE_DATE = X_LAST_UPDATE_DATE,
+    LAST_UPDATED_BY = X_LAST_UPDATED_BY,
+    LAST_UPDATE_LOGIN = X_LAST_UPDATE_LOGIN
+  where PROPOSAL_CATEGORY_TYPE_ID = X_PROPOSAL_CATEGORY_TYPE_ID;
+  if (sql%notfound) then
+    raise no_data_found;
+  end if;
+end UPDATE_ROW;
+--
+procedure DELETE_ROW (
+  X_PROPOSAL_CATEGORY_TYPE_ID in NUMBER
+) is
+begin
+  delete from PER_PROPOSAL_CATEGORY_TYPES
+  where PROPOSAL_CATEGORY_TYPE_ID = X_PROPOSAL_CATEGORY_TYPE_ID;
+  if (sql%notfound) then
+    raise no_data_found;
+  end if;
+end DELETE_ROW;
+--
+procedure LOAD_ROW (
+  X_PROPOSAL_CATEGORY_TYPE_ID in NUMBER,
+  X_TYPE                   in VARCHAR2,
+  X_HEADING_TEXT           in VARCHAR2,
+  X_HELP_TEXT              in VARCHAR2,
+  X_NOTE_TEXT              in VARCHAR2,
+  X_FOOTER_TEXT            in VARCHAR2,
+  X_CATEGORY_NAME          in VARCHAR2,
+  X_OWNER                  in VARCHAR2
+) is
+  X_CREATION_DATE DATE;
+  X_CREATED_BY NUMBER;
+  X_LAST_UPDATE_DATE DATE;
+  X_LAST_UPDATED_BY NUMBER;
+  X_LAST_UPDATE_LOGIN NUMBER;
+begin
+  OWNER_TO_WHO (
+    X_OWNER,
+    X_CREATION_DATE,
+    X_CREATED_BY,
+    X_LAST_UPDATE_DATE,
+    X_LAST_UPDATED_BY,
+    X_LAST_UPDATE_LOGIN
+  );
+  begin
+    UPDATE_ROW (
+      X_PROPOSAL_CATEGORY_TYPE_ID,
+      X_TYPE,
+      X_HEADING_TEXT,
+      X_HELP_TEXT,
+      X_NOTE_TEXT,
+      X_FOOTER_TEXT,
+      X_CATEGORY_NAME,
+      X_LAST_UPDATE_DATE,
+      X_LAST_UPDATED_BY,
+      X_LAST_UPDATE_LOGIN
+    );
+  exception
+    when no_data_found then
+      INSERT_ROW (
+        X_PROPOSAL_CATEGORY_TYPE_ID,
+        X_TYPE,
+        X_HEADING_TEXT,
+        X_HELP_TEXT,
+        X_NOTE_TEXT,
+        X_FOOTER_TEXT,
+        X_CATEGORY_NAME,
+        X_CREATION_DATE,
+        X_CREATED_BY,
+        X_LAST_UPDATE_DATE,
+        X_LAST_UPDATED_BY,
+        X_LAST_UPDATE_LOGIN
+      );
+  end;
+end LOAD_ROW;
+--
+procedure TRANSLATE_ROW (
+  X_PROPOSAL_CATEGORY_TYPE_ID         in NUMBER,
+  X_HEADING_TEXT           in VARCHAR2,
+  X_HELP_TEXT              in VARCHAR2,
+  X_NOTE_TEXT              in VARCHAR2,
+  X_FOOTER_TEXT            in VARCHAR2,
+  X_CATEGORY_NAME          in VARCHAR2,
+  X_OWNER                  in VARCHAR2
+) is
+  X_CREATION_DATE DATE;
+  X_CREATED_BY NUMBER;
+  X_LAST_UPDATE_DATE DATE;
+  X_LAST_UPDATED_BY NUMBER;
+  X_LAST_UPDATE_LOGIN NUMBER;
+begin
+  OWNER_TO_WHO (
+    X_OWNER,
+    X_CREATION_DATE,
+    X_CREATED_BY,
+    X_LAST_UPDATE_DATE,
+    X_LAST_UPDATED_BY,
+    X_LAST_UPDATE_LOGIN
+  );
+  update PER_PROPOSAL_CATEGORY_TYPES
+  set CATEGORY_NAME = X_CATEGORY_NAME,
+      HEADING_TEXT = X_HEADING_TEXT,
+      HELP_TEXT = X_HELP_TEXT,
+      NOTE_TEXT = X_NOTE_TEXT,
+      FOOTER_TEXT = X_FOOTER_TEXT,
+      LAST_UPDATE_DATE = X_LAST_UPDATE_DATE,
+      LAST_UPDATED_BY = X_LAST_UPDATED_BY,
+      LAST_UPDATE_LOGIN = X_LAST_UPDATE_LOGIN
+  where PROPOSAL_CATEGORY_TYPE_ID = X_PROPOSAL_CATEGORY_TYPE_ID
+  and userenv('LANG') =   (Select language_code
+  from FND_LANGUAGES where installed_flag = 'B');
+end TRANSLATE_ROW;
+--
+end PER_CATEGORY_TYPES_PKG;
+
+/

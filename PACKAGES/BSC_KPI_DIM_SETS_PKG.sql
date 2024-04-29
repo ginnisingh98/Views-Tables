@@ -1,0 +1,49 @@
+--------------------------------------------------------
+--  DDL for Package BSC_KPI_DIM_SETS_PKG
+--------------------------------------------------------
+
+  CREATE OR REPLACE EDITIONABLE PACKAGE "APPS"."BSC_KPI_DIM_SETS_PKG" AUTHID CURRENT_USER as
+/* $Header: BSCKDSTS.pls 120.1 2007/02/08 13:17:12 akoduri ship $ */
+procedure INSERT_ROW (
+  X_ROWID in out NOCOPY VARCHAR2,
+  X_INDICATOR in NUMBER,
+  X_DIM_SET_ID in NUMBER,
+  X_NAME in VARCHAR2,
+  X_CREATION_DATE in DATE,
+  X_CREATED_BY in NUMBER,
+  X_LAST_UPDATE_DATE in DATE,
+  X_LAST_UPDATED_BY in NUMBER,
+  X_LAST_UPDATE_LOGIN in NUMBER);
+procedure LOCK_ROW (
+  X_INDICATOR in NUMBER,
+  X_DIM_SET_ID in NUMBER,
+  X_NAME in VARCHAR2
+);
+procedure UPDATE_ROW (
+  X_INDICATOR in NUMBER,
+  X_DIM_SET_ID in NUMBER,
+  X_NAME in VARCHAR2,
+  X_CREATION_DATE in DATE,
+  X_CREATED_BY in NUMBER,
+  X_LAST_UPDATE_DATE in DATE,
+  X_LAST_UPDATED_BY in NUMBER,
+  X_LAST_UPDATE_LOGIN in NUMBER
+);
+procedure DELETE_ROW (
+  X_INDICATOR in NUMBER,
+  X_DIM_SET_ID in NUMBER
+);
+procedure ADD_LANGUAGE;
+
+FUNCTION Get_Dim_Set_Name (
+  p_Indicator    IN  NUMBER
+ ,p_Dim_Set_Id   IN  NUMBER
+) RETURN VARCHAR2;
+
+FUNCTION Get_Dim_Level_Names (
+  p_Indicator    IN  NUMBER
+ ,p_Dim_Set_Id   IN  NUMBER
+) RETURN VARCHAR2;
+end BSC_KPI_DIM_SETS_PKG;
+
+/

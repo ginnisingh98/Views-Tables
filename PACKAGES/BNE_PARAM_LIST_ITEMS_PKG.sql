@@ -1,0 +1,99 @@
+--------------------------------------------------------
+--  DDL for Package BNE_PARAM_LIST_ITEMS_PKG
+--------------------------------------------------------
+
+  CREATE OR REPLACE EDITIONABLE PACKAGE "APPS"."BNE_PARAM_LIST_ITEMS_PKG" AUTHID CURRENT_USER as
+/* $Header: bneparamlis.pls 120.2 2005/06/29 03:40:29 dvayro noship $ */
+
+procedure INSERT_ROW (
+  X_ROWID in out NOCOPY VARCHAR2,
+  X_APPLICATION_ID in NUMBER,
+  X_PARAM_LIST_CODE in VARCHAR2,
+  X_SEQUENCE_NUM in NUMBER,
+  X_OBJECT_VERSION_NUMBER in NUMBER,
+  X_PARAM_DEFN_APP_ID in NUMBER,
+  X_PARAM_DEFN_CODE in VARCHAR2,
+  X_ATTRIBUTE_APP_ID in NUMBER,
+  X_ATTRIBUTE_CODE in VARCHAR2,
+  X_STRING_VALUE in VARCHAR2,
+  X_DATE_VALUE in DATE,
+  X_NUMBER_VALUE in NUMBER,
+  X_BOOLEAN_VALUE_FLAG in VARCHAR2,
+  X_FORMULA_VALUE in VARCHAR2,
+  X_DESC_VALUE in VARCHAR2,
+  X_PARAM_NAME in VARCHAR2,
+  X_CREATION_DATE in DATE,
+  X_CREATED_BY in NUMBER,
+  X_LAST_UPDATE_DATE in DATE,
+  X_LAST_UPDATED_BY in NUMBER,
+  X_LAST_UPDATE_LOGIN in NUMBER);
+procedure LOCK_ROW (
+  X_APPLICATION_ID in NUMBER,
+  X_PARAM_LIST_CODE in VARCHAR2,
+  X_SEQUENCE_NUM in NUMBER,
+  X_OBJECT_VERSION_NUMBER in NUMBER,
+  X_PARAM_DEFN_APP_ID in NUMBER,
+  X_PARAM_DEFN_CODE in VARCHAR2,
+  X_ATTRIBUTE_APP_ID in NUMBER,
+  X_ATTRIBUTE_CODE in VARCHAR2,
+  X_STRING_VALUE in VARCHAR2,
+  X_DATE_VALUE in DATE,
+  X_NUMBER_VALUE in NUMBER,
+  X_BOOLEAN_VALUE_FLAG in VARCHAR2,
+  X_FORMULA_VALUE in VARCHAR2,
+  X_DESC_VALUE in VARCHAR2,
+  X_PARAM_NAME in VARCHAR2
+);
+procedure UPDATE_ROW (
+  X_APPLICATION_ID in NUMBER,
+  X_PARAM_LIST_CODE in VARCHAR2,
+  X_SEQUENCE_NUM in NUMBER,
+  X_OBJECT_VERSION_NUMBER in NUMBER,
+  X_PARAM_DEFN_APP_ID in NUMBER,
+  X_PARAM_DEFN_CODE in VARCHAR2,
+  X_ATTRIBUTE_APP_ID in NUMBER,
+  X_ATTRIBUTE_CODE in VARCHAR2,
+  X_STRING_VALUE in VARCHAR2,
+  X_DATE_VALUE in DATE,
+  X_NUMBER_VALUE in NUMBER,
+  X_BOOLEAN_VALUE_FLAG in VARCHAR2,
+  X_FORMULA_VALUE in VARCHAR2,
+  X_DESC_VALUE in VARCHAR2,
+  X_PARAM_NAME in VARCHAR2,
+  X_LAST_UPDATE_DATE in DATE,
+  X_LAST_UPDATED_BY in NUMBER,
+  X_LAST_UPDATE_LOGIN in NUMBER
+);
+procedure DELETE_ROW (
+  X_APPLICATION_ID in NUMBER,
+  X_PARAM_LIST_CODE in VARCHAR2,
+  X_SEQUENCE_NUM in NUMBER
+);
+procedure ADD_LANGUAGE;
+
+procedure LOAD_ROW (
+  x_param_list_asn        IN VARCHAR2,
+  x_param_list_code       IN VARCHAR2,
+  x_sequence_num          IN VARCHAR2,
+  x_object_version_number IN VARCHAR2,
+  x_param_defn_asn        IN VARCHAR2,
+  x_param_defn_code       IN VARCHAR2,
+  x_param_name            IN VARCHAR2,
+  x_attribute_asn         IN VARCHAR2,
+  x_attribute_code        IN VARCHAR2,
+  x_string_value          IN VARCHAR2,
+  x_date_value            IN VARCHAR2,
+  x_number_value          IN VARCHAR2,
+  x_boolean_value_flag    IN VARCHAR2,
+  x_formula_value         IN VARCHAR2,
+  x_desc_value            IN VARCHAR2,
+  x_owner                 IN VARCHAR2,
+  x_last_update_date      IN VARCHAR2,
+  x_custom_mode           IN VARCHAR2
+);
+
+end BNE_PARAM_LIST_ITEMS_PKG;
+
+ 
+
+/

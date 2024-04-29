@@ -1,0 +1,1936 @@
+--------------------------------------------------------
+--  DDL for Package Body HR_PERSON_RECORD
+--------------------------------------------------------
+
+  CREATE OR REPLACE EDITIONABLE PACKAGE BODY "APPS"."HR_PERSON_RECORD" as
+/* $Header: peperqry.pkb 120.1.12010000.24 2009/09/17 11:01:21 sathkris noship $ */
+
+--Procedure to populate the person_record
+procedure GET_PERSON_DETAILS( p_srch_criteria in srch_criteria,
+                        p_entity in options,
+                        p_person out nocopy person_record,
+                        p_error out nocopy varchar2)
+is
+
+Type p_person_id is  table of per_all_peoplE_f.person_id%type index by binary_integer;
+Type p_business_group_id is  table of per_all_peoplE_f.business_group_id%type index by binary_integer;
+Type p_srch_date is table of date index by binary_integer;
+
+
+
+-- Temporary record to fetch and store the person id and business group id for each search criteria
+TYPE p_srch_filter_tbl1 is record
+(person_id  p_person_id,
+ business_group_id p_business_group_id,
+ p_srch_dt p_srch_date);
+
+ p_cnt number := 1;
+  /* Code Commented for bug 7689952 Start
+ l_per_in_ler_id number;
+ l_lf_evt_ocrd_dt date;
+ Code commented for bug 7689952 End */
+ p_srch_filter_tbl p_srch_filter_tbl1;
+
+ TYPE srch_filtered IS REF CURSOR;
+
+ srch_filtrd srch_filtered;
+
+-- temporary record for ease of access
+p_bus_group_id    number default  null;
+p_emplmt_category per_assignments_f2.employee_category%type default  null;
+p_empl_category  per_assignments_f2.EMPLOYMENT_CATEGORY%type default  null;
+
+-- temporary record for ease of access
+-- cursor to fetch the person records
+cursor csr_person_record(p_person_id number,p_business_group_id number,p_eff_date date) is
+SELECT
+PERSON_ID,
+to_char(EFFECTIVE_START_DATE,'YYYY-MM-DD'),
+to_char(EFFECTIVE_END_DATE,'YYYY-MM-DD'),
+ppf.BUSINESS_GROUP_ID,
+hr_general.decode_organization(ppf.BUSINESS_GROUP_ID) BUSINESS_GROUP_DESC,
+ppf.PERSON_TYPE_ID,
+pptl.user_person_type,
+ppt.system_person_type,
+LAST_NAME,
+to_char(START_DATE,'YYYY-MM-DD'),
+APPLICANT_NUMBER,
+BACKGROUND_CHECK_STATUS,
+to_char(BACKGROUND_DATE_CHECK,'YYYY-MM-DD'),
+BLOOD_TYPE,
+(SELECT MEANING FROM HR_LOOKUPS WHERE LOOKUP_TYPE='BLOOD_TYPE'
+ AND LOOKUP_CODE=BLOOD_TYPE AND p_eff_date between nvl(start_date_active,p_eff_date)
+ AND nvl(end_date_active,p_eff_Date)
+ AND enabled_flag = 'Y')
+BLOOD_TYPE_DESC,
+COMMENT_ID,
+CORRESPONDENCE_LANGUAGE,
+ (SELECT DESCRIPTION FROM FND_LANGUAGES_VL
+  WHERE language_code= CORRESPONDENCE_LANGUAGE)
+  CORRESPONDENCE_LANGUAGE_DESC,
+CURRENT_APPLICANT_FLAG,
+CURRENT_EMP_OR_APL_FLAG,
+CURRENT_EMPLOYEE_FLAG,
+to_char(DATE_EMPLOYEE_DATA_VERIFIED,'YYYY-MM-DD'),
+to_char(DATE_OF_BIRTH,'YYYY-MM-DD'),
+EMAIL_ADDRESS,
+EMPLOYEE_NUMBER,
+EXPENSE_CHECK_SEND_TO_ADDRESS,
+FAST_PATH_EMPLOYEE,
+FIRST_NAME,
+FTE_CAPACITY,
+FULL_NAME,
+to_char(HOLD_APPLICANT_DATE_UNTIL,'YYYY-MM-DD'),
+HONORS,
+INTERNAL_LOCATION,
+KNOWN_AS,
+LAST_MEDICAL_TEST_BY,
+to_char(LAST_MEDICAL_TEST_DATE,'YYYY-MM-DD'),
+MAILSTOP,
+MARITAL_STATUS,
+(SELECT MEANING FROM HR_LOOKUPS WHERE LOOKUP_TYPE='MAR_STATUS'
+ AND LOOKUP_CODE=MARITAL_STATUS AND p_eff_date between nvl(start_date_active,p_eff_date)
+ AND nvl(end_date_active,p_eff_Date)
+ AND enabled_flag = 'Y')
+MARITAL_STATUS_DESC,
+MIDDLE_NAMES,
+NATIONALITY,
+(SELECT MEANING FROM HR_LOOKUPS WHERE LOOKUP_TYPE='NATIONALITY'
+ AND LOOKUP_CODE=NATIONALITY AND p_eff_date between nvl(start_date_active,p_eff_date)
+ AND nvl(end_date_active,p_eff_Date)
+ AND enabled_flag = 'Y')
+NATIONALITY_DESC,
+NATIONAL_IDENTIFIER,
+(select message_text from fnd_new_messages where message_name = 'HR_NATIONAL_ID_NUMBER_'|| (select to_char(org_information9) from
+                    hr_organization_information where organization_id = p_business_group_id
+                    and org_information_context = 'Business Group Information')
+and language_code = USERENV('LANG') ) NATIONAL_ID_LABEL,
+OFFICE_NUMBER,
+ON_MILITARY_SERVICE,
+ORDER_NAME,
+PRE_NAME_ADJUNCT,
+PREVIOUS_LAST_NAME,
+to_char(PROJECTED_START_DATE,'YYYY-MM-DD'),
+REHIRE_AUTHORIZOR,
+REHIRE_REASON,
+REHIRE_RECOMMENDATION,
+RESUME_EXISTS,
+to_char(RESUME_LAST_UPDATED,'YYYY-MM-DD'),
+REGISTERED_DISABLED_FLAG,
+SECOND_PASSPORT_EXISTS,
+SEX,
+(SELECT MEANING FROM HR_LOOKUPS WHERE LOOKUP_TYPE='SEX'
+ AND LOOKUP_CODE=SEX AND p_eff_date between nvl(start_date_active,p_eff_date)
+ AND nvl(end_date_active,p_eff_Date)
+ AND enabled_flag = 'Y')
+ SEX_DESC,
+STUDENT_STATUS,
+ (SELECT MEANING FROM HR_LOOKUPS WHERE LOOKUP_TYPE='STUDENT_STATUS'
+ AND LOOKUP_CODE=STUDENT_STATUS AND p_eff_date between nvl(start_date_active,p_eff_date)
+ AND nvl(end_date_active,p_eff_Date)
+ AND  enabled_flag = 'Y')
+STUDENT_STATUS_DESC,
+SUFFIX,
+TITLE,
+  (SELECT MEANING FROM HR_LOOKUPS WHERE LOOKUP_TYPE='TITLE'
+  AND LOOKUP_CODE=TITLE AND p_eff_date between nvl(start_date_active,p_eff_date)
+   and nvl(end_date_active,p_eff_Date)
+   and enabled_flag = 'Y')
+  TITLE_DESC, -- too many rows - date effective ?
+VENDOR_ID,
+WORK_SCHEDULE,
+   (SELECT MEANING FROM HR_LOOKUPS WHERE LOOKUP_TYPE='WORK_SCHEDULE'
+   AND LOOKUP_CODE=WORK_SCHEDULE AND p_eff_date between nvl(start_date_active,p_eff_date)
+   and nvl(end_date_active,p_eff_Date)
+   and enabled_flag = 'Y')
+   WORK_SCHEDULE_DESC,
+WORK_TELEPHONE,
+COORD_BEN_MED_PLN_NO,
+COORD_BEN_NO_CVG_FLAG,
+to_char(DPDNT_ADOPTION_DATE,'YYYY-MM-DD'),
+DPDNT_VLNTRY_SVCE_FLAG,
+to_char(RECEIPT_OF_DEATH_CERT_DATE,'YYYY-MM-DD'),
+USES_TOBACCO_FLAG,
+    (SELECT MEANING FROM HR_LOOKUPS WHERE LOOKUP_TYPE='TOBACCO_USER'
+    AND LOOKUP_CODE=USES_TOBACCO_FLAG AND p_eff_date between nvl(start_date_active,p_eff_date)
+   and nvl(end_date_active,p_eff_Date)
+   and enabled_flag = 'Y')
+    USES_TOBACCO_FLAG_DESC,
+BENEFIT_GROUP_ID,
+    (SELECT NAME FROM BEN_BENFTS_GRP
+     WHERE  BENFTS_GRP_ID = BENEFIT_GROUP_ID)
+     BENEFIT_GROUP_NAME,
+ATTRIBUTE_CATEGORY,
+ATTRIBUTE1,
+ATTRIBUTE2,
+ATTRIBUTE3,
+ATTRIBUTE4,
+ATTRIBUTE5,
+ATTRIBUTE6,
+ATTRIBUTE7,
+ATTRIBUTE8,
+ATTRIBUTE9,
+ATTRIBUTE10,
+ATTRIBUTE11,
+ATTRIBUTE12,
+ATTRIBUTE13,
+ATTRIBUTE14,
+ATTRIBUTE15,
+ATTRIBUTE16,
+ATTRIBUTE17,
+ATTRIBUTE18,
+ATTRIBUTE19,
+ATTRIBUTE20,
+ATTRIBUTE21,
+ATTRIBUTE22,
+ATTRIBUTE23,
+ATTRIBUTE24,
+ATTRIBUTE25,
+ATTRIBUTE26,
+ATTRIBUTE27,
+ATTRIBUTE28,
+ATTRIBUTE29,
+ATTRIBUTE30,
+PER_INFORMATION_CATEGORY,
+PER_INFORMATION1,
+PER_INFORMATION2,
+PER_INFORMATION3,
+PER_INFORMATION4,
+PER_INFORMATION5,
+PER_INFORMATION6,
+PER_INFORMATION7,
+PER_INFORMATION8,
+PER_INFORMATION9,
+PER_INFORMATION10,
+PER_INFORMATION11,
+PER_INFORMATION12,
+PER_INFORMATION13,
+PER_INFORMATION14,
+PER_INFORMATION15,
+PER_INFORMATION16,
+PER_INFORMATION17,
+PER_INFORMATION18,
+PER_INFORMATION19,
+PER_INFORMATION20,
+PER_INFORMATION21,
+PER_INFORMATION22,
+PER_INFORMATION23,
+PER_INFORMATION24,
+PER_INFORMATION25,
+PER_INFORMATION26,
+PER_INFORMATION27,
+PER_INFORMATION28,
+PER_INFORMATION29,
+PER_INFORMATION30,
+to_char(DATE_OF_DEATH,'YYYY-MM-DD'),
+to_char(ORIGINAL_DATE_OF_HIRE,'YYYY-MM-DD'),
+NULL AS ADJUSTED_SVC_DATE,
+NULL AS DATE_START,
+NULL AS ACCEPTED_TERMINATION_DATE,
+NULL AS ACTUAL_TERMINATION_DATE,
+NULL AS FINAL_PROCESS_DATE,
+NULL AS LAST_STANDARD_PROCESS_DATE,
+NULL AS LEAVING_REASON,
+TOWN_OF_BIRTH,
+REGION_OF_BIRTH,
+COUNTRY_OF_BIRTH,
+   (SELECT TERRITORY_SHORT_NAME  FROM FND_TERRITORIES_VL
+     WHERE TERRITORY_CODE = COUNTRY_OF_BIRTH)
+     COUNTRY_OF_BIRTH_DESC,
+GLOBAL_PERSON_ID,
+COORD_BEN_MED_PL_NAME,
+COORD_BEN_MED_INSR_CRR_NAME,
+COORD_BEN_MED_INSR_CRR_IDENT,
+COORD_BEN_MED_EXT_ER,
+to_char(COORD_BEN_MED_CVG_STRT_DT,'YYYY-MM-DD'),
+to_char(COORD_BEN_MED_CVG_END_DT,'YYYY-MM-DD'),
+PARTY_ID,
+NPW_NUMBER,
+CURRENT_NPW_FLAG,
+GLOBAL_NAME,
+LOCAL_NAME
+FROM PER_PEOPLE_F ppf,
+per_person_types ppt,
+per_person_types_v pptl
+where ppf.person_id =    p_person_id
+and ppf.business_group_id = p_business_group_id
+and ppt.person_type_id = pptl.person_type_id
+and ppf.person_type_id = ppt.person_type_id
+and ppf.business_group_id = ppt.business_group_id (+)
+and p_eff_date between ppf.effective_start_date and nvl(ppf.effective_end_date,to_date('31/12/4712','DD/MM/YYYY'));
+
+-- cursor to fetch the assignment records
+cursor csr_assignment_record(p_person_id number,p_business_group_id number,p_eff_date date) IS
+SELECT ASSIGNMENT_ID
+,       to_char(PAAF.EFFECTIVE_START_DATE,'YYYY-MM-DD')
+,       to_char(PAAF.EFFECTIVE_END_DATE,'YYYY-MM-DD')
+,       RECRUITER_ID
+,       GRADE_ID
+, (SELECT NAME FROM PER_GRADES_TL PGT WHERE PGT.GRADE_ID = paaf.GRADE_ID
+    AND LANGUAGE = USERENV('LANG')) GRADE_DESC
+,       POSITION_ID
+, (SELECT NAME FROM HR_ALL_POSITIONS_F_TL HAPFT WHERE HAPFT.POSITION_ID = paaf.POSITION_ID
+    AND LANGUAGE = USERENV('LANG')) POSITION_DESC
+,       JOB_ID
+,  (SELECT NAME FROM PER_JOBS_TL PJT WHERE PJT.JOB_ID = paaf.JOB_ID AND LANGUAGE = USERENV('LANG')) JOB_DESC
+,       PAAF.ASSIGNMENT_STATUS_TYPE_ID
+,       STTL.USER_STATUS
+,       ST.PAY_SYSTEM_STATUS
+,       ST.PER_SYSTEM_STATUS
+,       PAYROLL_ID
+,  (SELECT PAYROLL_NAME FROM PAY_PAYROLLS_F PPF WHERE PPF.PAYROLL_ID = PAAF.PAYROLL_ID
+    and p_eff_date between ppf.effective_start_date and
+    nvl(ppf.effective_end_date,to_date('31/12/4712','DD/MM/YYYY'))) PAYROLL_DESC
+,       LOCATION_ID
+, (SELECT DESCRIPTION FROM HR_LOCATIONS_ALL_TL HLAT WHERE HLAT.LOCATION_ID = PAAF.LOCATION_ID
+   AND LANGUAGE = USERENV('LANG')) LOCATION_DESC
+,       PERSON_REFERRED_BY_ID
+,       SUPERVISOR_ID
+, (SELECT EMPLOYEE_NUMBER FROM PER_ALL_PEOPLE_F PAPF WHERE PAPF.PERSON_ID = PAAF.SUPERVISOR_ID
+    and p_eff_date between papf.effective_start_date and
+    nvl(papf.effective_end_date,to_date('31/12/4712','DD/MM/YYYY'))) SUPERVISOR_EMP_NUMBER
+ , (SELECT NPW_NUMBER FROM PER_ALL_PEOPLE_F PAPF WHERE PAPF.PERSON_ID = PAAF.SUPERVISOR_ID
+    and p_eff_date between papf.effective_start_date and
+    nvl(papf.effective_end_date,to_date('31/12/4712','DD/MM/YYYY'))) SUPERVISOR_CWK_NUMBER
+, (SELECT FULL_NAME FROM PER_ALL_PEOPLE_F PAPF WHERE PAPF.PERSON_ID = PAAF.SUPERVISOR_ID
+    and p_eff_date between papf.effective_start_date and
+    nvl(papf.effective_end_date,to_date('31/12/4712','DD/MM/YYYY'))) SUPERVISOR_NAME
+,       SPECIAL_CEILING_STEP_ID
+,       RECRUITMENT_ACTIVITY_ID
+,       SOURCE_ORGANIZATION_ID
+,       ORGANIZATION_ID
+, (SELECT NAME FROM HR_ALL_ORGANIZATION_UNITS_TL HAOUT  WHERE HAOUT.ORGANIZATION_ID =
+   PAAF.ORGANIZATION_ID AND LANGUAGE = USERENV('LANG')) ORGANIZATION_DESC
+,       PEOPLE_GROUP_ID
+,       SOFT_CODING_KEYFLEX_ID
+,       VACANCY_ID
+,  (SELECT NAME FROM PER_VACANCIES PV
+    WHERE PV.VACANCY_ID = PAAF.VACANCY_ID) VACANCY_DESC
+,       PAY_BASIS_ID
+, (SELECT NAME FROM PER_PAY_BASES PPB
+   WHERE PPB.PAY_BASIS_ID = PAAF.PAY_BASIS_ID) PAY_BASIS_DESC
+,       ASSIGNMENT_SEQUENCE
+,       ASSIGNMENT_TYPE
+,       PAAF.PRIMARY_FLAG
+,       APPLICATION_ID
+,       ASSIGNMENT_NUMBER
+,       CHANGE_REASON
+, (SELECT MEANING FROM HR_LOOKUPS WHERE LOOKUP_TYPE =
+   DECODE(PAAF.ASSIGNMENT_TYPE,'E','EMP_ASSIGN_REASON', 'C', 'CWK_ASSIGN_REASON','')
+   AND LOOKUP_CODE = PAAF.CHANGE_REASON AND p_eff_date between nvl(start_date_active,p_eff_date)
+   and nvl(end_date_active,p_eff_Date)
+   and enabled_flag = 'Y') CHANGE_REASON_DESC
+,       COMMENT_ID
+,       to_char(DATE_PROBATION_END,'YYYY-MM-DD')
+,       DEFAULT_CODE_COMB_ID
+,       EMPLOYMENT_CATEGORY
+, (SELECT MEANING FROM HR_LOOKUPS WHERE LOOKUP_TYPE = 'EMP_CAT'
+    AND LOOKUP_CODE = EMPLOYMENT_CATEGORY
+    AND p_eff_date between nvl(start_date_active,p_eff_date) and nvl(end_date_active,p_eff_Date)
+    and enabled_flag = 'Y')
+   EMPLOYMENT_CATEGORY_DESC -- Too many values
+,       FREQUENCY
+, (SELECT MEANING FROM HR_LOOKUPS WHERE LOOKUP_TYPE = 'FREQUENCY'
+   AND LOOKUP_CODE = PAAF.FREQUENCY AND p_eff_date between nvl(start_date_active,p_eff_date)
+   and nvl(end_date_active,p_eff_Date)
+   and enabled_flag = 'Y')
+  FREQUENCY_DESC -- Too many values
+,       INTERNAL_ADDRESS_LINE
+,       MANAGER_FLAG
+,       NORMAL_HOURS
+,       PERF_REVIEW_PERIOD
+,       PERF_REVIEW_PERIOD_FREQUENCY
+, (SELECT MEANING FROM HR_LOOKUPS WHERE LOOKUP_TYPE = 'FREQUENCY'
+   AND LOOKUP_CODE = PAAF.PERF_REVIEW_PERIOD_FREQUENCY AND p_eff_date between nvl(start_date_active,p_eff_date)
+   and nvl(end_date_active,p_eff_Date)
+   and enabled_flag = 'Y')
+   PERF_RP_FREQUENCY_DESC -- Too many values
+,       PERIOD_OF_SERVICE_ID
+,       PROBATION_PERIOD
+,       PROBATION_UNIT
+, (SELECT MEANING FROM HR_LOOKUPS WHERE LOOKUP_TYPE = 'QUALIFYING_UNITS'
+   AND LOOKUP_CODE = PAAF.PROBATION_UNIT AND p_eff_date between nvl(start_date_active,p_eff_date)
+   and nvl(end_date_active,p_eff_Date)
+   and enabled_flag = 'Y') PROBATION_UNIT_DESC
+,       SAL_REVIEW_PERIOD
+,       SAL_REVIEW_PERIOD_FREQUENCY
+,  (SELECT MEANING FROM HR_LOOKUPS WHERE LOOKUP_TYPE = 'FREQUENCY'
+    AND LOOKUP_CODE = PAAF.SAL_REVIEW_PERIOD_FREQUENCY AND p_eff_date between nvl(start_date_active,p_eff_date)
+   and nvl(end_date_active,p_eff_Date)
+   and enabled_flag = 'Y')
+   SAL_RP_FREQUENCY_DESC -- Too many values
+,       SET_OF_BOOKS_ID
+,       SOURCE_TYPE
+,       TIME_NORMAL_FINISH
+,       TIME_NORMAL_START
+,       BARGAINING_UNIT_CODE
+,  (SELECT MEANING FROM HR_LOOKUPS WHERE LOOKUP_TYPE = 'BARGAINING_UNIT_CODE'
+    AND LOOKUP_CODE = PAAF.BARGAINING_UNIT_CODE AND p_eff_date between nvl(start_date_active,p_eff_date)
+   and nvl(end_date_active,p_eff_Date)
+   and enabled_flag = 'Y')
+    BARGAINING_UNIT_DESC
+,       LABOUR_UNION_MEMBER_FLAG
+,       HOURLY_SALARIED_CODE
+, (SELECT MEANING FROM HR_LOOKUPS WHERE LOOKUP_TYPE = 'HOURLY_SALARIED_CODE'
+   AND LOOKUP_CODE = PAAF.HOURLY_SALARIED_CODE AND p_eff_date between nvl(start_date_active,p_eff_date)
+   and nvl(end_date_active,p_eff_Date)
+   and enabled_flag = 'Y')
+   HOURLY_SALARIED_DESC
+,       CONTRACT_ID
+,       COLLECTIVE_AGREEMENT_ID
+, (SELECT NAME FROM PER_COLLECTIVE_AGREEMENTS PCA WHERE PCA.COLLECTIVE_AGREEMENT_ID = PAAF.COLLECTIVE_AGREEMENT_ID) COLLECTIVE_AGREEMENT_DESC
+,       CAGR_ID_FLEX_NUM
+,       CAGR_GRADE_DEF_ID
+,       ESTABLISHMENT_ID
+, (SELECT NAME FROM HR_ESTABLISHMENTS_V HEV WHERE HEV.ESTABLISHMENT_ID = PAAF.ESTABLISHMENT_ID) ESTABLISHMENT_DESC
+,       ASS_ATTRIBUTE_CATEGORY
+,       ASS_ATTRIBUTE1
+,       ASS_ATTRIBUTE2
+,       ASS_ATTRIBUTE3
+,       ASS_ATTRIBUTE4
+,       ASS_ATTRIBUTE5
+,       ASS_ATTRIBUTE6
+,       ASS_ATTRIBUTE7
+,       ASS_ATTRIBUTE8
+,       ASS_ATTRIBUTE9
+,       ASS_ATTRIBUTE10
+,       ASS_ATTRIBUTE11
+,       ASS_ATTRIBUTE12
+,       ASS_ATTRIBUTE13
+,       ASS_ATTRIBUTE14
+,       ASS_ATTRIBUTE15
+,       ASS_ATTRIBUTE16
+,       ASS_ATTRIBUTE17
+,       ASS_ATTRIBUTE18
+,       ASS_ATTRIBUTE19
+,       ASS_ATTRIBUTE20
+,       ASS_ATTRIBUTE21
+,       ASS_ATTRIBUTE22
+,       ASS_ATTRIBUTE23
+,       ASS_ATTRIBUTE24
+,       ASS_ATTRIBUTE25
+,       ASS_ATTRIBUTE26
+,       ASS_ATTRIBUTE27
+,       ASS_ATTRIBUTE28
+,       ASS_ATTRIBUTE29
+,       ASS_ATTRIBUTE30
+,       TITLE
+,       NOTICE_PERIOD
+,       NOTICE_PERIOD_UOM
+,       EMPLOYEE_CATEGORY
+, (select meaning from HR_LOOKUPS where lookup_type = 'EMPLOYEE_CATG'
+AND LOOKUP_CODE = PAAF.EMPLOYEE_CATEGORY AND p_eff_date between nvl(start_date_active,p_eff_date)
+   and nvl(end_date_active,p_eff_Date)
+   and enabled_flag = 'Y') EMPLOYEE_CATEGORY_DESC
+,       WORK_AT_HOME
+,       JOB_POST_SOURCE_NAME
+,       '' POSTING_CONTENT_ID -- column not exist in PER_ASSIGNMENTS_F2
+,       to_char(PERIOD_OF_PLACEMENT_DATE_START,'YYYY-MM-DD')
+,       VENDOR_ID
+,       VENDOR_EMPLOYEE_NUMBER
+,       VENDOR_ASSIGNMENT_NUMBER
+,       ASSIGNMENT_CATEGORY
+,       PROJECT_TITLE
+,       '' APPLICANT_RANK -- column not exist in PER_ASSIGNMENTS_F2
+,       VENDOR_SITE_ID
+,       PO_HEADER_ID
+,       PO_LINE_ID
+,       PROJECTED_ASSIGNMENT_END
+,       GRADE_LADDER_PGM_ID
+,       '' GRADE_LADDER_PGM_NAME
+,       SUPERVISOR_ASSIGNMENT_ID
+FROM PER_ASSIGNMENTS_F2 paaf,
+PER_ASSIGNMENT_STATUS_TYPES ST ,
+PER_ASSIGNMENT_STATUS_TYPES_TL STTL
+WHERE paaf.person_id = p_person_id
+AND  paaf.business_group_id = p_business_group_id
+AND paaf.ASSIGNMENT_STATUS_TYPE_ID = ST.ASSIGNMENT_STATUS_TYPE_ID
+AND ST.ASSIGNMENT_STATUS_TYPE_ID = STTL.ASSIGNMENT_STATUS_TYPE_ID
+AND STTL.LANGUAGE = USERENV('LANG')
+and p_eff_date between EFFECTIVE_START_DATE AND nvl(EFFECTIVE_END_DATE,to_date('31/12/4712','DD/MM/YYYY'));
+
+--Cursor to fetch the assignment location address
+CURSOR csr_asg_loc_addr(p_location_id number) is
+SELECT      LOCATION_ID,
+            STYLE,
+            ( SELECT descriptive_flex_context_name
+            from fnd_descr_flex_contexts_vl
+            where descriptive_flexfield_name ='Address Structure'
+            AND descriptive_flex_context_code = STYLE)  STYLE_DESC,
+            COUNTRY,
+            (SELECT TERRITORY_SHORT_NAME FROM FND_TERRITORIES_VL WHERE TERRITORY_CODE = COUNTRY) COUNTRY_DESC,
+            ADDRESS_LINE_1,
+            ADDRESS_LINE_2,
+            ADDRESS_LINE_3,
+            TOWN_OR_CITY,
+            REGION_1,
+            REGION_2,
+            REGION_3,
+            POSTAL_CODE,
+            TELEPHONE_NUMBER_1,
+            TELEPHONE_NUMBER_2,
+            TELEPHONE_NUMBER_3,
+            LOC_INFORMATION13,
+            LOC_INFORMATION14,
+            LOC_INFORMATION15,
+            LOC_INFORMATION16,
+            LOC_INFORMATION17,
+            LOC_INFORMATION18,
+            LOC_INFORMATION19,
+            LOC_INFORMATION20
+FROM HR_LOCATIONS_ALL
+WHERE LOCATION_ID = P_LOCATION_ID;
+
+
+-- cursor to fetch the contact information
+CURSOR csr_contact_record(p_person_id number,p_business_group_id number,p_eff_date date) is
+SELECT CONTACT_RELATIONSHIP_ID
+,      CONTACT_PERSON_ID
+,      (SELECT FULL_NAME FROM PER_PEOPLE_F
+        WHERE PERSON_ID = CONTACT_PERSON_ID
+        AND BUSINESS_GROUP_ID = P_BUSINESS_GROUP_ID
+        AND P_EFF_DATE BETWEEN EFFECTIVE_START_DATE AND EFFECTIVE_END_DATE) CONTACT_FULL_NAME
+,      CONTACT_TYPE
+,    (SELECT MEANING FROM hr_leg_lookups WHERE LOOKUP_TYPE='CONTACT'
+      AND LOOKUP_CODE= CONTACT_TYPE ) CONTACT_TYPE_DESC
+,      PRIMARY_CONTACT_FLAG
+,      to_char(DATE_START,'YYYY-MM-DD')
+,      START_LIFE_REASON_ID
+,      to_char(DATE_END,'YYYY-MM-DD')
+,      END_LIFE_REASON_ID
+,      RLTD_PER_RSDS_W_DSGNTR_FLAG
+,      PERSONAL_FLAG
+,      SEQUENCE_NUMBER
+,      CONT_ATTRIBUTE_CATEGORY
+,      CONT_ATTRIBUTE1
+,      CONT_ATTRIBUTE2
+,      CONT_ATTRIBUTE3
+,      CONT_ATTRIBUTE4
+,      CONT_ATTRIBUTE5
+,      CONT_ATTRIBUTE6
+,      CONT_ATTRIBUTE7
+,      CONT_ATTRIBUTE8
+,      CONT_ATTRIBUTE9
+,      CONT_ATTRIBUTE10
+,      CONT_ATTRIBUTE11
+,      CONT_ATTRIBUTE12
+,      CONT_ATTRIBUTE13
+,      CONT_ATTRIBUTE14
+,      CONT_ATTRIBUTE15
+,      CONT_ATTRIBUTE16
+,      CONT_ATTRIBUTE17
+,      CONT_ATTRIBUTE18
+,      CONT_ATTRIBUTE19
+,      CONT_ATTRIBUTE20
+,      THIRD_PARTY_PAY_FLAG
+,      BONDHOLDER_FLAG
+,      DEPENDENT_FLAG
+,      BENEFICIARY_FLAG
+,      PARTY_ID
+,      CONT_INFORMATION_CATEGORY
+,      CONT_INFORMATION1
+,      CONT_INFORMATION2
+,      CONT_INFORMATION3
+,      CONT_INFORMATION4
+,      CONT_INFORMATION5
+,      CONT_INFORMATION6
+,      CONT_INFORMATION7
+,      CONT_INFORMATION8
+,      CONT_INFORMATION9
+,      CONT_INFORMATION10
+,      CONT_INFORMATION11
+,      CONT_INFORMATION12
+,      CONT_INFORMATION13
+,      CONT_INFORMATION14
+,      CONT_INFORMATION15
+,      CONT_INFORMATION16
+,      CONT_INFORMATION17
+,      CONT_INFORMATION18
+,      CONT_INFORMATION19
+,      CONT_INFORMATION20
+FROM   PER_CONTACT_RELATIONSHIPS PCR
+where PCR.PERSON_ID = p_person_id
+and   PCR.business_group_id = p_business_group_id
+and   p_eff_date between DATE_START and nvl(date_end,to_date('31/12/4712','DD/MM/YYYY') );
+
+
+--Cursor to fetch the contact address
+
+CURSOR csr_cont_address(p_person_id number,p_business_group_id number,p_eff_date date) is
+SELECT CONTACT_RELATIONSHIP_ID
+,      CONTACT_PERSON_ID
+,      ADDRESS_ID
+,      to_char(DATE_FROM,'YYYY-MM-DD')
+,      PRIMARY_FLAG
+,      STYLE
+,      ( SELECT descriptive_flex_context_name
+        from fnd_descr_flex_contexts_vl
+        where descriptive_flexfield_name ='Address Structure'
+        AND descriptive_flex_context_code = STYLE)  STYLE_DESC
+,      ADDRESS_LINE1
+,      ADDRESS_LINE2
+,      ADDRESS_LINE3
+,      ADDRESS_TYPE
+,      (SELECT MEANING FROM HR_LOOKUPS WHERE LOOKUP_TYPE = 'ADDRESS_TYPE' AND LOOKUP_CODE = ADDRESS_TYPE
+    AND p_eff_date between nvl(start_date_active,p_eff_date)
+   and nvl(end_date_active,p_eff_Date)
+   and enabled_flag = 'Y') ADDRESS_TYPE_DESC
+,      COUNTRY
+,      (SELECT TERRITORY_SHORT_NAME FROM FND_TERRITORIES_VL WHERE TERRITORY_CODE = COUNTRY) COUNTRY_DESC
+,      to_char(DATE_TO,'YYYY-MM-DD')
+,      POSTAL_CODE
+,      REGION_1
+,       'REGION_1' REGION_1_DESC
+,      REGION_2
+,       'REGION_2' REGION_2_DESC
+,      REGION_3
+,       'REGION_3' REGION_3_DESC
+,      TELEPHONE_NUMBER_1
+,      TELEPHONE_NUMBER_2
+,      TELEPHONE_NUMBER_3
+,      TOWN_OR_CITY
+,       'TOWN_OR_CITY' TOWN_OR_CITY_DESC
+,      ADDR_ATTRIBUTE_CATEGORY
+,      ADDR_ATTRIBUTE1
+,      ADDR_ATTRIBUTE2
+,      ADDR_ATTRIBUTE3
+,      ADDR_ATTRIBUTE4
+,      ADDR_ATTRIBUTE5
+,      ADDR_ATTRIBUTE6
+,      ADDR_ATTRIBUTE7
+,      ADDR_ATTRIBUTE8
+,      ADDR_ATTRIBUTE9
+,      ADDR_ATTRIBUTE10
+,      ADDR_ATTRIBUTE11
+,      ADDR_ATTRIBUTE12
+,      ADDR_ATTRIBUTE13
+,      ADDR_ATTRIBUTE14
+,      ADDR_ATTRIBUTE15
+,      ADDR_ATTRIBUTE16
+,      ADDR_ATTRIBUTE17
+,      ADDR_ATTRIBUTE18
+,      ADDR_ATTRIBUTE19
+,      ADDR_ATTRIBUTE20
+,      ADD_INFORMATION13
+,      ADD_INFORMATION14
+,      ADD_INFORMATION15
+,      ADD_INFORMATION16
+,      ADD_INFORMATION17
+,      ADD_INFORMATION18
+,      ADD_INFORMATION19
+,      ADD_INFORMATION20
+,      PA.PARTY_ID
+,      DERIVED_LOCALE
+,      GEOMETRY
+,      PA.COMMENTS
+FROM   PER_ADDRESSES PA, PER_CONTACT_RELATIONSHIPS PCR
+WHERE  PCR.PERSON_ID = p_person_id
+AND    PCR.CONTACT_PERSON_ID = PA.PERSON_ID
+and     p_eff_date between PCR.DATE_START and nvl(PCR.date_end,to_date('31/12/4712','DD/MM/YYYY'))
+and     p_eff_date between pa.date_from and nvl(pa.date_to,to_date('31/12/4712','DD/MM/YYYY'));
+
+
+-- cursor to fetch the address record
+CURSOR csr_address_record(p_person_id number,p_business_group_id number,p_eff_date date) is  SELECT ADDRESS_ID
+,      to_char(DATE_FROM,'YYYY-MM-DD')
+,      PRIMARY_FLAG
+,      STYLE
+,      ( SELECT descriptive_flex_context_name
+        from fnd_descr_flex_contexts_vl
+        where descriptive_flexfield_name ='Address Structure'
+        AND descriptive_flex_context_code = STYLE)  STYLE_DESC
+,      ADDRESS_LINE1
+,      ADDRESS_LINE2
+,      ADDRESS_LINE3
+,      ADDRESS_TYPE
+,      (SELECT MEANING FROM HR_LOOKUPS WHERE LOOKUP_TYPE = 'ADDRESS_TYPE' AND LOOKUP_CODE = ADDRESS_TYPE
+    AND p_eff_date between nvl(start_date_active,p_eff_date)
+   and nvl(end_date_active,p_eff_Date)
+   and enabled_flag = 'Y') ADDRESS_TYPE_DESC
+,      COUNTRY
+,      (SELECT TERRITORY_SHORT_NAME FROM FND_TERRITORIES_VL WHERE TERRITORY_CODE = COUNTRY) COUNTRY_DESC
+,      to_char(DATE_TO,'YYYY-MM-DD')
+,      POSTAL_CODE
+,      REGION_1
+,       'REGION_1' REGION_1_DESC
+,      REGION_2
+,       'REGION_2' REGION_2_DESC
+,      REGION_3
+,       'REGION_3' REGION_3_DESC
+,      TELEPHONE_NUMBER_1
+,      TELEPHONE_NUMBER_2
+,      TELEPHONE_NUMBER_3
+,      TOWN_OR_CITY
+,       'TOWN_OR_CITY' TOWN_OR_CITY_DESC
+,      ADDR_ATTRIBUTE_CATEGORY
+,      ADDR_ATTRIBUTE1
+,      ADDR_ATTRIBUTE2
+,      ADDR_ATTRIBUTE3
+,      ADDR_ATTRIBUTE4
+,      ADDR_ATTRIBUTE5
+,      ADDR_ATTRIBUTE6
+,      ADDR_ATTRIBUTE7
+,      ADDR_ATTRIBUTE8
+,      ADDR_ATTRIBUTE9
+,      ADDR_ATTRIBUTE10
+,      ADDR_ATTRIBUTE11
+,      ADDR_ATTRIBUTE12
+,      ADDR_ATTRIBUTE13
+,      ADDR_ATTRIBUTE14
+,      ADDR_ATTRIBUTE15
+,      ADDR_ATTRIBUTE16
+,      ADDR_ATTRIBUTE17
+,      ADDR_ATTRIBUTE18
+,      ADDR_ATTRIBUTE19
+,      ADDR_ATTRIBUTE20
+,      ADD_INFORMATION13
+,      ADD_INFORMATION14
+,      ADD_INFORMATION15
+,      ADD_INFORMATION16
+,      ADD_INFORMATION17
+,      ADD_INFORMATION18
+,      ADD_INFORMATION19
+,      ADD_INFORMATION20
+,      PARTY_ID
+,      DERIVED_LOCALE
+,      GEOMETRY
+,      COMMENTS
+FROM   PER_ADDRESSES PA
+WHERE  PA.PERSON_ID = p_person_id
+and p_eff_date between pa.date_from and nvl(pa.date_to,to_date('31/12/4712','DD/MM/YYYY'));
+
+-- cursor to fetch the person extra information record
+CURSOR csr_person_extra_info_record(p_person_id number,p_business_group_id number,p_eff_date date) is SELECT PEI.PERSON_EXTRA_INFO_ID
+,      PEI.INFORMATION_TYPE
+,      PEI.PEI_ATTRIBUTE_CATEGORY
+,      PEI.PEI_ATTRIBUTE1
+,      PEI.PEI_ATTRIBUTE2
+,      PEI.PEI_ATTRIBUTE3
+,      PEI.PEI_ATTRIBUTE4
+,      PEI.PEI_ATTRIBUTE5
+,      PEI.PEI_ATTRIBUTE6
+,      PEI.PEI_ATTRIBUTE7
+,      PEI.PEI_ATTRIBUTE8
+,      PEI.PEI_ATTRIBUTE9
+,      PEI.PEI_ATTRIBUTE10
+,      PEI.PEI_ATTRIBUTE11
+,      PEI.PEI_ATTRIBUTE12
+,      PEI.PEI_ATTRIBUTE13
+,      PEI.PEI_ATTRIBUTE14
+,      PEI.PEI_ATTRIBUTE15
+,      PEI.PEI_ATTRIBUTE16
+,      PEI.PEI_ATTRIBUTE17
+,      PEI.PEI_ATTRIBUTE18
+,      PEI.PEI_ATTRIBUTE19
+,      PEI.PEI_ATTRIBUTE20
+,      PEI.PEI_INFORMATION_CATEGORY
+,      PEI.PEI_INFORMATION1
+,      PEI.PEI_INFORMATION2
+,      PEI.PEI_INFORMATION3
+,      PEI.PEI_INFORMATION4
+,      PEI.PEI_INFORMATION5
+,      PEI.PEI_INFORMATION6
+,      PEI.PEI_INFORMATION7
+,      PEI.PEI_INFORMATION8
+,      PEI.PEI_INFORMATION9
+,      PEI.PEI_INFORMATION10
+,      PEI.PEI_INFORMATION11
+,      PEI.PEI_INFORMATION12
+,      PEI.PEI_INFORMATION13
+,      PEI.PEI_INFORMATION14
+,      PEI.PEI_INFORMATION15
+,      PEI.PEI_INFORMATION16
+,      PEI.PEI_INFORMATION17
+,      PEI.PEI_INFORMATION18
+,      PEI.PEI_INFORMATION19
+,      PEI.PEI_INFORMATION20
+,      PEI.PEI_INFORMATION21
+,      PEI.PEI_INFORMATION22
+,      PEI.PEI_INFORMATION23
+,      PEI.PEI_INFORMATION24
+,      PEI.PEI_INFORMATION25
+,      PEI.PEI_INFORMATION26
+,      PEI.PEI_INFORMATION27
+,      PEI.PEI_INFORMATION28
+,      PEI.PEI_INFORMATION29
+,      PEI.PEI_INFORMATION30
+,      PEI.PARTY_ID
+FROM PER_PEOPLE_EXTRA_INFO PEI
+where PEI.person_id = p_person_id;
+
+-- cursor to fetch the special information record
+CURSOR csr_special_info_record(p_person_id number,p_business_group_id number,p_eff_date date) is
+SELECT PERSON_ANALYSIS_ID
+,      ppa.ANALYSIS_CRITERIA_ID
+,      to_char(DATE_FROM,'YYYY-MM-DD')
+,      to_char(DATE_TO,'YYYY-MM-DD')
+,      ppa.ID_FLEX_NUM
+,      SEGMENT1
+,      SEGMENT2
+,      SEGMENT3
+,      SEGMENT4
+,      SEGMENT5
+,      SEGMENT6
+,      SEGMENT7
+,      SEGMENT8
+,      SEGMENT9
+,      SEGMENT10
+,      SEGMENT11
+,      SEGMENT12
+,      SEGMENT13
+,      SEGMENT14
+,      SEGMENT15
+,      SEGMENT16
+,      SEGMENT17
+,      SEGMENT18
+,      SEGMENT19
+,      SEGMENT20
+,      SEGMENT21
+,      SEGMENT22
+,      SEGMENT23
+,      SEGMENT24
+,      SEGMENT25
+,      SEGMENT26
+,      SEGMENT27
+,      SEGMENT28
+,      SEGMENT29
+,      SEGMENT30
+,      ATTRIBUTE_CATEGORY
+,      ATTRIBUTE1
+,      ATTRIBUTE2
+,      ATTRIBUTE3
+,      ATTRIBUTE4
+,      ATTRIBUTE5
+,      ATTRIBUTE6
+,      ATTRIBUTE7
+,      ATTRIBUTE8
+,      ATTRIBUTE9
+,      ATTRIBUTE10
+,      ATTRIBUTE11
+,      ATTRIBUTE12
+,      ATTRIBUTE13
+,      ATTRIBUTE14
+,      ATTRIBUTE15
+,      ATTRIBUTE16
+,      ATTRIBUTE17
+,      ATTRIBUTE18
+,      ATTRIBUTE19
+,      ATTRIBUTE20
+,      PARTY_ID
+,      COMMENTS
+FROM   PER_PERSON_ANALYSES  ppa,PER_ANALYSIS_CRITERIA pac
+where  ppa.person_id = p_person_id
+and    ppa.business_group_id = p_business_group_id
+and    ppa.analysis_criteria_id  = pac.analysis_criteria_id
+and    ppa.id_flex_num  = pac.id_flex_num
+and    p_eff_date  between date_from and nvl(date_to,to_date('31/12/4712','DD/MM/YYYY'));
+
+-- cursor to fetch the previous employment
+CURSOR csr_prev_emp_info_record(p_person_id number,p_business_group_id number,p_eff_date date) is
+SELECT PREVIOUS_EMPLOYER_ID
+,      PARTY_ID
+,      to_char(START_DATE,'YYYY-MM-DD')
+,      to_char(END_DATE,'YYYY-MM-DD')
+,      PERIOD_YEARS
+,      PERIOD_DAYS
+,      EMPLOYER_NAME
+,      EMPLOYER_COUNTRY
+,      (SELECT TERRITORY_SHORT_NAME FROM FND_TERRITORIES_VL WHERE TERRITORY_CODE = EMPLOYER_COUNTRY) EMPLOYER_COUNTRY_DESC
+,      EMPLOYER_ADDRESS
+,      EMPLOYER_TYPE
+,      (SELECT MEANING FROM HR_LEG_LOOKUPS WHERE LOOKUP_TYPE = 'PREV_EMP_TYPE' AND LOOKUP_CODE = EMPLOYER_TYPE
+        AND P_EFF_DATE BETWEEN NVL(START_DATE_ACTIVE,P_EFF_DATE) AND NVL(END_DATE_ACTIVE,P_EFF_DATE)
+        AND ENABLED_FLAG = 'Y') EMPLOYER_TYPE_DESC
+,      EMPLOYER_SUBTYPE
+,      (SELECT MEANING FROM HR_LEG_LOOKUPS WHERE LOOKUP_TYPE = 'PREV_EMP_SUBTYPE' AND LOOKUP_CODE = EMPLOYER_SUBTYPE
+        AND P_EFF_DATE BETWEEN NVL(START_DATE_ACTIVE,P_EFF_DATE) AND NVL(END_DATE_ACTIVE,P_EFF_DATE)
+        AND ENABLED_FLAG = 'Y') EMPLOYER_SUBTYPE_DESC
+,      DESCRIPTION
+,      PEM_ATTRIBUTE_CATEGORY
+,      PEM_ATTRIBUTE1
+,      PEM_ATTRIBUTE2
+,      PEM_ATTRIBUTE3
+,      PEM_ATTRIBUTE4
+,      PEM_ATTRIBUTE5
+,      PEM_ATTRIBUTE6
+,      PEM_ATTRIBUTE7
+,      PEM_ATTRIBUTE8
+,      PEM_ATTRIBUTE9
+,      PEM_ATTRIBUTE10
+,      PEM_ATTRIBUTE11
+,      PEM_ATTRIBUTE12
+,      PEM_ATTRIBUTE13
+,      PEM_ATTRIBUTE14
+,      PEM_ATTRIBUTE15
+,      PEM_ATTRIBUTE16
+,      PEM_ATTRIBUTE17
+,      PEM_ATTRIBUTE18
+,      PEM_ATTRIBUTE19
+,      PEM_ATTRIBUTE20
+,      PEM_ATTRIBUTE21
+,      PEM_ATTRIBUTE22
+,      PEM_ATTRIBUTE23
+,      PEM_ATTRIBUTE24
+,      PEM_ATTRIBUTE25
+,      PEM_ATTRIBUTE26
+,      PEM_ATTRIBUTE27
+,      PEM_ATTRIBUTE28
+,      PEM_ATTRIBUTE29
+,      PEM_ATTRIBUTE30
+,      PEM_INFORMATION_CATEGORY
+,      PEM_INFORMATION1
+,      PEM_INFORMATION2
+,      PEM_INFORMATION3
+,      PEM_INFORMATION4
+,      PEM_INFORMATION5
+,      PEM_INFORMATION6
+,      PEM_INFORMATION7
+,      PEM_INFORMATION8
+,      PEM_INFORMATION9
+,      PEM_INFORMATION10
+,      PEM_INFORMATION11
+,      PEM_INFORMATION12
+,      PEM_INFORMATION13
+,      PEM_INFORMATION14
+,      PEM_INFORMATION15
+,      PEM_INFORMATION16
+,      PEM_INFORMATION17
+,      PEM_INFORMATION18
+,      PEM_INFORMATION19
+,      PEM_INFORMATION20
+,      PEM_INFORMATION21
+,      PEM_INFORMATION22
+,      PEM_INFORMATION23
+,      PEM_INFORMATION24
+,      PEM_INFORMATION25
+,      PEM_INFORMATION26
+,      PEM_INFORMATION27
+,      PEM_INFORMATION28
+,      PEM_INFORMATION29
+,      PEM_INFORMATION30
+,      ALL_ASSIGNMENTS
+,      PERIOD_MONTHS
+FROM  PER_PREVIOUS_EMPLOYERS
+WHERE PERSON_ID = p_person_id
+and   business_group_id = p_business_group_id
+and   p_eff_date between start_date and nvl(end_date,to_date('31/12/4712','DD/MM/YYYY'));
+
+-- cursor to fetch the work incidents details
+CURSOR CSR_WORK_INC_INFO_RECORD(p_person_id number,p_business_group_id number,p_eff_date date) IS
+SELECT INCIDENT_ID
+,      INCIDENT_REFERENCE
+,      INCIDENT_TYPE
+,      (SELECT MEANING FROM HR_LEG_LOOKUPS WHERE LOOKUP_TYPE = 'INCIDENT_TYPE' AND LOOKUP_CODE = INCIDENT_TYPE
+        AND P_EFF_DATE BETWEEN NVL(START_DATE_ACTIVE,P_EFF_DATE) AND NVL(END_DATE_ACTIVE,P_EFF_DATE)
+        AND ENABLED_FLAG = 'Y') INCIDENT_TYPE_DESC
+,      to_char(INCIDENT_DATE,'YYYY-MM-DD')
+,      INCIDENT_TIME
+,      ASSIGNMENT_ID
+,      LOCATION
+,      AT_WORK_FLAG
+,      (SELECT MEANING FROM HR_LEG_LOOKUPS WHERE LOOKUP_TYPE = 'AT_WORK_FLAG' AND LOOKUP_CODE = AT_WORK_FLAG
+        AND P_EFF_DATE BETWEEN NVL(START_DATE_ACTIVE,P_EFF_DATE) AND NVL(END_DATE_ACTIVE,P_EFF_DATE)
+        AND ENABLED_FLAG = 'Y') AT_WORK_FLAG_DESC
+--,      to_char(LAST_WORK_DATE,'YYYY-MM-DD') -- comented for bug 8905622
+--,      LAST_WORK_TIME -- comented for bug 8905622
+,      to_char(REPORT_DATE,'YYYY-MM-DD')
+,      REPORT_TIME
+,      REPORT_METHOD
+,      PERSON_REPORTED_BY
+,      (SELECT FULL_NAME FROM PER_ALL_PEOPLE_F PAPF WHERE PAPF.PERSON_ID = PERSON_REPORTED_BY
+        and p_eff_date between papf.effective_start_date and
+        nvl(papf.effective_end_date,to_date('31/12/4712','DD/MM/YYYY'))) PERSON_REPORTED_BY_NAME
+,      PERSON_REPORTED_TO
+,      WITNESS_DETAILS
+,      DESCRIPTION
+,      INJURY_TYPE
+,      (SELECT MEANING FROM HR_LEG_LOOKUPS WHERE LOOKUP_TYPE = 'INJURY_TYPE' AND LOOKUP_CODE = INJURY_TYPE
+        AND P_EFF_DATE BETWEEN NVL(START_DATE_ACTIVE,P_EFF_DATE) AND NVL(END_DATE_ACTIVE,P_EFF_DATE)
+        AND ENABLED_FLAG = 'Y') INJURY_TYPE_DESC
+,      DISEASE_TYPE
+,      (SELECT MEANING FROM HR_LEG_LOOKUPS WHERE LOOKUP_TYPE = 'DISEASE_TYPE' AND LOOKUP_CODE = DISEASE_TYPE
+        AND P_EFF_DATE BETWEEN NVL(START_DATE_ACTIVE,P_EFF_DATE) AND NVL(END_DATE_ACTIVE,P_EFF_DATE)
+        AND ENABLED_FLAG = 'Y') DISEASE_TYPE_DESC
+,      HAZARD_TYPE
+,      (SELECT MEANING FROM HR_LEG_LOOKUPS WHERE LOOKUP_TYPE = 'HAZARD_TYPE' AND LOOKUP_CODE = HAZARD_TYPE
+        AND P_EFF_DATE BETWEEN NVL(START_DATE_ACTIVE,P_EFF_DATE) AND NVL(END_DATE_ACTIVE,P_EFF_DATE)
+        AND ENABLED_FLAG = 'Y') HAZARD_TYPE_DESC
+,      BODY_PART
+,      TREATMENT_RECEIVED_FLAG
+,      HOSPITAL_DETAILS
+--,      DOCTOR_ID -- comented for bug 8905622
+--,      NEXT_OF_KIN_ID -- comented for bug 8905622
+--,      ABSENCE_ID -- comented for bug 8905622
+,      to_char(COMPENSATION_DATE,'YYYY-MM-DD')
+,      COMPENSATION_CURRENCY
+,      COMPENSATION_AMOUNT
+,      REMEDIAL_HS_ACTION
+,      NOTIFIED_HSREP_ID
+,      to_char(NOTIFIED_HSREP_DATE,'YYYY-MM-DD')
+,      NOTIFIED_UREP_ID
+,      to_char(NOTIFIED_UREP_DATE,'YYYY-MM-DD')
+,      PREVIOUS_INCIDENT_ID
+,      ATTRIBUTE_CATEGORY
+,      ATTRIBUTE1
+,      ATTRIBUTE2
+,      ATTRIBUTE3
+,      ATTRIBUTE4
+,      ATTRIBUTE5
+,      ATTRIBUTE6
+,      ATTRIBUTE7
+,      ATTRIBUTE8
+,      ATTRIBUTE9
+,      ATTRIBUTE10
+,      ATTRIBUTE11
+,      ATTRIBUTE12
+,      ATTRIBUTE13
+,      ATTRIBUTE14
+,      ATTRIBUTE15
+,      ATTRIBUTE16
+,      ATTRIBUTE17
+,      ATTRIBUTE18
+,      ATTRIBUTE19
+,      ATTRIBUTE20
+,      ATTRIBUTE21
+,      ATTRIBUTE22
+,      ATTRIBUTE23
+,      ATTRIBUTE24
+,      ATTRIBUTE25
+,      ATTRIBUTE26
+,      ATTRIBUTE27
+,      ATTRIBUTE28
+,      ATTRIBUTE29
+,      ATTRIBUTE30
+,      INC_INFORMATION_CATEGORY
+,      INC_INFORMATION1
+,      INC_INFORMATION2
+,      INC_INFORMATION3
+,      INC_INFORMATION4
+,      INC_INFORMATION5
+,      INC_INFORMATION6
+,      INC_INFORMATION7
+,      INC_INFORMATION8
+,      INC_INFORMATION9
+,      INC_INFORMATION10
+,      INC_INFORMATION11
+,      INC_INFORMATION12
+,      INC_INFORMATION13
+,      INC_INFORMATION14
+,      INC_INFORMATION15
+,      INC_INFORMATION16
+,      INC_INFORMATION17
+,      INC_INFORMATION18
+,      INC_INFORMATION19
+,      INC_INFORMATION20
+,      INC_INFORMATION21
+,      INC_INFORMATION22
+,      INC_INFORMATION23
+,      INC_INFORMATION24
+,      INC_INFORMATION25
+,      INC_INFORMATION26
+,      INC_INFORMATION27
+,      INC_INFORMATION28
+,      INC_INFORMATION29
+,      INC_INFORMATION30
+,      to_char(ORG_NOTIFIED_DATE,'YYYY-MM-DD')
+,      DOCTOR_NAME
+,      NOTIFIED_REP_ID
+,      to_char(NOTIFIED_REP_DATE,'YYYY-MM-DD')
+,      NOTIFIED_REP_ORG_ID
+,      RELATED_INCIDENT_ID
+,      OVER_TIME_FLAG
+,      ABSENCE_EXISTS_FLAG
+,      EMERGENCY_CODE
+,      PRIVACY_ISSUE
+,      OBJECTS_INVOLVED
+,      ACTIVITY_AT_TIME_OF_WORK
+,      HOSPITAL_ADDRESS
+,      DAYS_RESTRICTED_WORK
+,      HOSPITALIZED_FLAG
+,      to_char(DATE_OF_DEATH,'YYYY-MM-DD')
+,      DAYS_AWAY_FROM_WORK
+,      WORK_START_TIME
+,      REPORTING_PERSON_PHONE
+,      REPORTING_PERSON_TITLE
+,      REPORT_COMPLETED_BY
+FROM  PER_WORK_INCIDENTS
+WHERE PERSON_ID = p_person_id;
+
+
+-- cursor to fetch the deilvery methode
+CURSOR csr_deliv_method_info(p_person_id number,p_business_group_id number,p_eff_date date) is
+SELECT DELIVERY_METHOD_ID
+,      to_char(DATE_START,'YYYY-MM-DD')
+,      to_char(DATE_END,'YYYY-MM-DD')
+,      COMM_DLVRY_METHOD
+,      (SELECT MEANING FROM HR_LOOKUPS WHERE LOOKUP_TYPE = 'PER_CM_MTHD'  AND LOOKUP_CODE = COMM_DLVRY_METHOD
+        AND P_EFF_DATE BETWEEN NVL(START_DATE_ACTIVE,P_EFF_DATE) AND NVL(END_DATE_ACTIVE,P_EFF_DATE)
+        AND ENABLED_FLAG = 'Y') COMM_DLVRY_METHOD_DESC
+,      PREFERRED_FLAG
+,      ATTRIBUTE_CATEGORY
+,      ATTRIBUTE1
+,      ATTRIBUTE2
+,      ATTRIBUTE3
+,      ATTRIBUTE4
+,      ATTRIBUTE5
+,      ATTRIBUTE6
+,      ATTRIBUTE7
+,      ATTRIBUTE8
+,      ATTRIBUTE9
+,      ATTRIBUTE10
+,      ATTRIBUTE11
+,      ATTRIBUTE12
+,      ATTRIBUTE13
+,      ATTRIBUTE14
+,      ATTRIBUTE15
+,      ATTRIBUTE16
+,      ATTRIBUTE17
+,      ATTRIBUTE18
+,      ATTRIBUTE19
+,      ATTRIBUTE20
+FROM  PER_PERSON_DLVRY_METHODS
+where person_id = p_person_id;
+
+-- cursor to fetch the assignment extra information
+CURSOR csr_ass_extra_info_record(p_person_id number,p_business_group_id number,p_eff_date date) is
+SELECT ASSIGNMENT_EXTRA_INFO_ID
+,      ASSIGNMENT_ID
+,      INFORMATION_TYPE
+,      AEI_ATTRIBUTE_CATEGORY
+,      AEI_ATTRIBUTE1
+,      AEI_ATTRIBUTE2
+,      AEI_ATTRIBUTE3
+,      AEI_ATTRIBUTE4
+,      AEI_ATTRIBUTE5
+,      AEI_ATTRIBUTE6
+,      AEI_ATTRIBUTE7
+,      AEI_ATTRIBUTE8
+,      AEI_ATTRIBUTE9
+,      AEI_ATTRIBUTE10
+,      AEI_ATTRIBUTE11
+,      AEI_ATTRIBUTE12
+,      AEI_ATTRIBUTE13
+,      AEI_ATTRIBUTE14
+,      AEI_ATTRIBUTE15
+,      AEI_ATTRIBUTE16
+,      AEI_ATTRIBUTE17
+,      AEI_ATTRIBUTE18
+,      AEI_ATTRIBUTE19
+,      AEI_ATTRIBUTE20
+,      AEI_INFORMATION_CATEGORY
+,      AEI_INFORMATION1
+,      AEI_INFORMATION2
+,      AEI_INFORMATION3
+,      AEI_INFORMATION4
+,      AEI_INFORMATION5
+,      AEI_INFORMATION6
+,      AEI_INFORMATION7
+,      AEI_INFORMATION8
+,      AEI_INFORMATION9
+,      AEI_INFORMATION10
+,      AEI_INFORMATION11
+,      AEI_INFORMATION12
+,      AEI_INFORMATION13
+,      AEI_INFORMATION14
+,      AEI_INFORMATION15
+,      AEI_INFORMATION16
+,      AEI_INFORMATION17
+,      AEI_INFORMATION18
+,      AEI_INFORMATION19
+,      AEI_INFORMATION20
+,      AEI_INFORMATION21
+,      AEI_INFORMATION22
+,      AEI_INFORMATION23
+,      AEI_INFORMATION24
+,      AEI_INFORMATION25
+,      AEI_INFORMATION26
+,      AEI_INFORMATION27
+,      AEI_INFORMATION28
+,      AEI_INFORMATION29
+,      AEI_INFORMATION30
+FROM PER_ASSIGNMENT_EXTRA_INFO
+WHERE assignment_id in (SELECT assignment_id from PER_ASSIGNMENTS_F
+WHERE person_id = p_person_id
+and business_group_id = p_business_group_id
+and p_eff_date between effective_start_date and nvl(effective_end_date,to_date('31/12/4712','Dd/MM/YYYY')));
+
+-- cursor to fetch the contact extra information
+CURSOR csr_con_extra_info_record(p_person_id number,p_business_group_id number,p_eff_date date) is
+SELECT CONTACT_EXTRA_INFO_ID
+,      to_char(EFFECTIVE_START_DATE,'YYYY-MM-DD')
+,      to_char(EFFECTIVE_END_DATE,'YYYY-MM-DD')
+,      CONTACT_RELATIONSHIP_ID
+,      INFORMATION_TYPE
+,      CEI_INFORMATION_CATEGORY
+,      CEI_INFORMATION1
+,      CEI_INFORMATION2
+,      CEI_INFORMATION3
+,      CEI_INFORMATION4
+,      CEI_INFORMATION5
+,      CEI_INFORMATION6
+,      CEI_INFORMATION7
+,      CEI_INFORMATION8
+,      CEI_INFORMATION9
+,      CEI_INFORMATION10
+,      CEI_INFORMATION11
+,      CEI_INFORMATION12
+,      CEI_INFORMATION13
+,      CEI_INFORMATION14
+,      CEI_INFORMATION15
+,      CEI_INFORMATION16
+,      CEI_INFORMATION17
+,      CEI_INFORMATION18
+,      CEI_INFORMATION19
+,      CEI_INFORMATION20
+,      CEI_INFORMATION21
+,      CEI_INFORMATION22
+,      CEI_INFORMATION23
+,      CEI_INFORMATION24
+,      CEI_INFORMATION25
+,      CEI_INFORMATION26
+,      CEI_INFORMATION27
+,      CEI_INFORMATION28
+,      CEI_INFORMATION29
+,      CEI_INFORMATION30
+,      CEI_ATTRIBUTE_CATEGORY
+,      CEI_ATTRIBUTE1
+,      CEI_ATTRIBUTE2
+,      CEI_ATTRIBUTE3
+,      CEI_ATTRIBUTE4
+,      CEI_ATTRIBUTE5
+,      CEI_ATTRIBUTE6
+,      CEI_ATTRIBUTE7
+,      CEI_ATTRIBUTE8
+,      CEI_ATTRIBUTE9
+,      CEI_ATTRIBUTE10
+,      CEI_ATTRIBUTE11
+,      CEI_ATTRIBUTE12
+,      CEI_ATTRIBUTE13
+,      CEI_ATTRIBUTE14
+,      CEI_ATTRIBUTE15
+,      CEI_ATTRIBUTE16
+,      CEI_ATTRIBUTE17
+,      CEI_ATTRIBUTE18
+,      CEI_ATTRIBUTE19
+,      CEI_ATTRIBUTE20
+FROM  PER_CONTACT_EXTRA_INFO_F
+WHERE CONTACT_RELATIONSHIP_ID in (SELECT PCR.CONTACT_RELATIONSHIP_ID
+FROM   PER_CONTACT_RELATIONSHIPS PCR
+where PCR.PERSON_ID = p_person_id
+and   PCR.business_group_id = p_business_group_id
+and   p_eff_date between DATE_START and nvl(date_end,to_date('31/12/4712','DD/MM/YYYY') ));
+
+--Cursor to fetch the phone details
+CURSOR csr_phone_record (p_person_id number,p_business_group_id number,p_eff_date date) is
+SELECT
+PHONE_ID,
+to_char(DATE_FROM,'YYYY-MM-DD'),
+to_char(DATE_TO,'YYYY-MM-DD'),
+PHONE_TYPE,
+(SELECT MEANING FROM HR_LOOKUPS WHERE LOOKUP_TYPE = 'PHONE_TYPE'  AND LOOKUP_CODE = PHONE_TYPE
+        AND P_EFF_DATE BETWEEN NVL(START_DATE_ACTIVE,P_EFF_DATE) AND NVL(END_DATE_ACTIVE,P_EFF_DATE)
+        AND ENABLED_FLAG = 'Y') COMM_DLVRY_METHOD_DESC,
+PHONE_NUMBER,
+ATTRIBUTE_CATEGORY,
+ATTRIBUTE1,
+ATTRIBUTE2,
+ATTRIBUTE3,
+ATTRIBUTE4,
+ATTRIBUTE5,
+ATTRIBUTE6,
+ATTRIBUTE7,
+ATTRIBUTE8,
+ATTRIBUTE9,
+ATTRIBUTE10,
+ATTRIBUTE11,
+ATTRIBUTE12,
+ATTRIBUTE13,
+ATTRIBUTE14,
+ATTRIBUTE15,
+ATTRIBUTE16,
+ATTRIBUTE17,
+ATTRIBUTE18,
+ATTRIBUTE19,
+ATTRIBUTE20,
+ATTRIBUTE21,
+ATTRIBUTE22,
+ATTRIBUTE23,
+ATTRIBUTE24,
+ATTRIBUTE25,
+ATTRIBUTE26,
+ATTRIBUTE27,
+ATTRIBUTE28,
+ATTRIBUTE29,
+ATTRIBUTE30,
+PARTY_ID,
+VALIDITY
+FROM PER_PHONES
+WHERE  PARENT_ID = p_person_id
+AND PARENT_TABLE            = 'PER_ALL_PEOPLE_F'
+and   p_eff_date between DATE_FROM and nvl(DATE_TO,to_date('31/12/4712','DD/MM/YYYY'));
+
+--cursor to fetch the qualification details
+CURSOR csr_qualification_record(p_person_id number,p_business_group_id number,p_eff_date date)
+is
+select QUALIFICATION_ID,
+TITLE,
+GRADE_ATTAINED,
+STATUS,
+(SELECT MEANING FROM HR_LOOKUPS WHERE LOOKUP_TYPE = 'PER_SUBJECT_STATUSES'  AND LOOKUP_CODE = STATUS
+        AND P_EFF_DATE BETWEEN NVL(START_DATE_ACTIVE,P_EFF_DATE) AND NVL(END_DATE_ACTIVE,P_EFF_DATE)
+        AND ENABLED_FLAG = 'Y') STATUS_DESC,
+TO_CHAR(AWARDED_DATE,'YYYY-MM-DD'),
+FEE,
+FEE_CURRENCY,
+(SELECT  name from fnd_currencies_vl WHERE
+CURRENCY_CODE = FEE_CURRENCY
+AND P_EFF_DATE BETWEEN NVL(START_DATE_ACTIVE,P_EFF_DATE) AND NVL(END_DATE_ACTIVE,P_EFF_DATE)
+AND ENABLED_FLAG = 'Y')  FEE_CURRENCY_DESC,
+TRAINING_COMPLETED_AMOUNT,
+REIMBURSEMENT_ARRANGEMENTS,
+TRAINING_COMPLETED_UNITS,
+TOTAL_TRAINING_AMOUNT,
+TO_CHAR(START_DATE,'YYYY-MM-DD'),
+TO_CHAR(END_DATE,'YYYY-MM-DD'),
+LICENSE_NUMBER,
+TO_CHAR(EXPIRY_DATE,'YYYY-MM-DD'),
+LICENSE_RESTRICTIONS,
+TO_CHAR(PROJECTED_COMPLETION_DATE,'YYYY-MM-DD'),
+AWARDING_BODY,
+TUITION_METHOD,
+(SELECT MEANING FROM HR_LOOKUPS WHERE LOOKUP_TYPE = 'PER_TUITION_METHODS'  AND LOOKUP_CODE = TUITION_METHOD
+        AND P_EFF_DATE BETWEEN NVL(START_DATE_ACTIVE,P_EFF_DATE) AND NVL(END_DATE_ACTIVE,P_EFF_DATE)
+        AND ENABLED_FLAG = 'Y') TUITION_METHOD_DESC,
+GROUP_RANKING,
+COMMENTS,
+pq.QUALIFICATION_TYPE_ID,
+TL.name,
+pq.ATTENDANCE_ID,
+pq.ATTRIBUTE_CATEGORY,
+pq.ATTRIBUTE1,
+pq.ATTRIBUTE2,
+pq.ATTRIBUTE3,
+pq.ATTRIBUTE4,
+pq.ATTRIBUTE5,
+pq.ATTRIBUTE6,
+pq.ATTRIBUTE7,
+pq.ATTRIBUTE8,
+pq.ATTRIBUTE9,
+pq.ATTRIBUTE10,
+pq.ATTRIBUTE11,
+pq.ATTRIBUTE12,
+pq.ATTRIBUTE13,
+pq.ATTRIBUTE14,
+pq.ATTRIBUTE15,
+pq.ATTRIBUTE16,
+pq.ATTRIBUTE17,
+pq.ATTRIBUTE18,
+pq.ATTRIBUTE19,
+pq.ATTRIBUTE20,
+pq.PARTY_ID,
+PROFESSIONAL_BODY_NAME,
+MEMBERSHIP_NUMBER,
+MEMBERSHIP_CATEGORY,
+SUBSCRIPTION_PAYMENT_METHOD,
+(SELECT MEANING FROM HR_LOOKUPS WHERE LOOKUP_TYPE = 'PQP_SUBSCRIPTION_PAY_METHODS'  AND LOOKUP_CODE = SUBSCRIPTION_PAYMENT_METHOD
+        AND P_EFF_DATE BETWEEN NVL(START_DATE_ACTIVE,P_EFF_DATE) AND NVL(END_DATE_ACTIVE,P_EFF_DATE)
+        AND ENABLED_FLAG = 'Y')SUBSCRIPTION_PAYMENT_DESC,
+QUA_INFORMATION_CATEGORY,
+QUA_INFORMATION1,
+QUA_INFORMATION2,
+QUA_INFORMATION3,
+QUA_INFORMATION4,
+QUA_INFORMATION5,
+QUA_INFORMATION6,
+QUA_INFORMATION7,
+QUA_INFORMATION8,
+QUA_INFORMATION9,
+QUA_INFORMATION10,
+QUA_INFORMATION11,
+QUA_INFORMATION12,
+QUA_INFORMATION13,
+QUA_INFORMATION14,
+QUA_INFORMATION15,
+QUA_INFORMATION16,
+QUA_INFORMATION17,
+QUA_INFORMATION18,
+QUA_INFORMATION19,
+QUA_INFORMATION20
+FROM
+PER_QUALIFICATIONS pq,per_qualification_types_tl tl,PER_ESTABLISHMENT_ATTENDANCES pea
+WHERE (pq.person_id = p_person_id or pea.person_id = p_person_id)
+and pq.business_group_id = p_business_group_id
+and pq.attendance_id = pea.attendance_id(+)
+and tl.qualification_type_id = pq.qualification_type_id
+and tl.language = userenv('LANG')
+and nvl(start_date,p_eff_date) <= p_eff_date;
+-- and p_eff_date between nvl(start_date,p_eff_date) and nvl(end_date,p_eff_date); commented for 7460407
+
+--cursor to fetch the subject details for the qualification
+cursor csr_subject_record (p_qualification_id number,p_eff_date date)is
+SELECT SUBJECTS_TAKEN_ID,
+to_char(START_DATE,'YYYY-MM-DD'),
+MAJOR,
+SUBJECT_STATUS,
+(SELECT MEANING FROM HR_LOOKUPS WHERE LOOKUP_TYPE = 'PER_SUBJECT_STATUSES'  AND LOOKUP_CODE = SUBJECT_STATUS
+        AND P_EFF_DATE BETWEEN NVL(START_DATE_ACTIVE,P_EFF_DATE) AND NVL(END_DATE_ACTIVE,P_EFF_DATE)
+        AND ENABLED_FLAG = 'Y')SUBJECT_STATUS_DESC,
+SUBJECT,
+(SELECT MEANING FROM HR_LOOKUPS WHERE LOOKUP_TYPE = 'PER_SUBJECTS'  AND LOOKUP_CODE = SUBJECT
+        AND P_EFF_DATE BETWEEN NVL(START_DATE_ACTIVE,P_EFF_DATE) AND NVL(END_DATE_ACTIVE,P_EFF_DATE)
+        AND ENABLED_FLAG = 'Y')
+        SUBJECT_DESC,
+GRADE_ATTAINED,
+to_char(END_DATE,'YYYY-MM-DD'),
+ATTRIBUTE_CATEGORY,
+ATTRIBUTE1,
+ATTRIBUTE2,
+ATTRIBUTE3,
+ATTRIBUTE4,
+ATTRIBUTE5,
+ATTRIBUTE6,
+ATTRIBUTE7,
+ATTRIBUTE8,
+ATTRIBUTE9,
+ATTRIBUTE10,
+ATTRIBUTE11,
+ATTRIBUTE12,
+ATTRIBUTE13,
+ATTRIBUTE14,
+ATTRIBUTE15,
+ATTRIBUTE16,
+ATTRIBUTE17,
+ATTRIBUTE18,
+ATTRIBUTE19,
+ATTRIBUTE20,
+SUB_INFORMATION_CATEGORY,
+SUB_INFORMATION1,
+SUB_INFORMATION2,
+SUB_INFORMATION3,
+SUB_INFORMATION4,
+SUB_INFORMATION5,
+SUB_INFORMATION6,
+SUB_INFORMATION7,
+SUB_INFORMATION8,
+SUB_INFORMATION9,
+SUB_INFORMATION10,
+SUB_INFORMATION11,
+SUB_INFORMATION12,
+SUB_INFORMATION13,
+SUB_INFORMATION14,
+SUB_INFORMATION15,
+SUB_INFORMATION16,
+SUB_INFORMATION17,
+SUB_INFORMATION18,
+SUB_INFORMATION19,
+SUB_INFORMATION20
+FROM PER_SUBJECTS_TAKEN
+WHERE qualification_id = p_qualification_id
+and nvl(start_date,p_eff_date) <= p_eff_date;
+--and p_eff_date between nvl(start_date,p_eff_date) and nvl(end_date,p_eff_date); commented for 7460407
+
+--cursor to fetch the reportees details for the person
+cursor csr_reportee_record (p_person_id number,p_business_group_id number,p_eff_date date)
+is
+SELECT distinct ppf.full_name,
+ppf.person_id,
+ employee_number ,
+ ppf.npw_number,
+ ppf.applicant_number,
+ papf.location_id,
+ (SELECT DESCRIPTION FROM HR_LOCATIONS_ALL_TL HLAT WHERE HLAT.LOCATION_ID = PAPF.LOCATION_ID
+   AND LANGUAGE = USERENV('LANG')) REPORTEE_LOCATION_DESC,
+ papf.assignment_status_type_id,
+ (SELECT USER_STATUS FROM PER_ASSIGNMENT_STATUS_TYPES_TL
+  WHERE ASSIGNMENT_STATUS_TYPE_ID = papf.assignment_status_type_id
+  AND LANGUAGE = USERENV('LANG')) REPORTEE_ASG_STATUS_DESC
+ FROM   per_assignments_f papf , per_people_f ppf
+ WHERE
+ p_eff_date BETWEEN  papf.effective_start_date AND papf.effective_end_date
+ and p_eff_date BETWEEN  ppf.effective_start_date AND ppf.effective_end_date
+ and papf.business_group_id = P_BUSINESS_GROUP_ID
+ and papf.assignment_type in ('A','E','C') -- added for bug8248111
+ and papf.supervisor_id =  P_PERSON_ID
+ and papf.person_id=ppf.person_id;
+
+
+ --Cursor to fetch  Absence Details
+CURSOR csr_abs_details (p_person_id number,p_business_group_id number,p_eff_date date) is
+SELECT ACCRUAL_PLAN_ID,
+       ACCRUAL_PLAN_NAME,
+       ACCRUAL_UNITS_OF_MEASURE_NAME,
+       ASSIGNMENT_ID,
+       PAYROLL_ID
+FROM PAY_VIEW_ACCRUAL_PLANS_V
+WHERE PERSON_ID = p_person_id
+AND BUSINESS_GROUP_ID = p_business_group_id
+AND P_EFF_dATE BETWEEN ASG_EFFECTIVE_START_DATE AND ASG_EFFECTIVE_END_DATE;
+
+   l_start_date       date   := null;
+   l_end_date         date   := null;
+   l_accrual_end_date date;
+   l_entitlement      number := 0;
+   l_accrual          number := 0;
+
+
+-- Benefit cursors are removed.
+
+
+--Declaration for Payroll - Starts here
+p_leg_code            varchar2(20);
+p_assignment_id       per_all_assignments_f.assignment_id%type;
+p_assg_action_id      pay_assignment_actions.assignment_action_id%type;
+p_pyrl_action_id      pay_payroll_actions.payroll_action_id%type;
+
+cursor csr_leg_code(p_bus_grp_id number) is
+select to_char(org_information9) from
+hr_organization_information where organization_id = p_bus_grp_id
+and org_information_context = 'Business Group Information';
+
+--Declaration for Payroll - ends here
+
+
+cursor csr_periods_of_service(p_person_id number, p_employee_number number, p_effective_end_date varchar2) is
+                select to_char(pps.adjusted_svc_date,'YYYY-MM-DD') adjusted_svc_date
+                      ,to_char(pps.date_start,'YYYY-MM-DD') date_start
+                      ,to_char(pps.accepted_termination_date,'YYYY-MM-DD') accepted_termination_date
+                      ,to_char(pps.actual_termination_date,'YYYY-MM-DD') actual_termination_date
+                      ,to_char(pps.final_process_date,'YYYY-MM-DD') final_process_date
+                      ,to_char(pps.last_standard_process_date,'YYYY-MM-DD') last_standard_process_date
+                      ,leaving_reason
+                 from per_periods_of_service pps
+                where pps.person_id = p_person_id
+                  and ( ( p_employee_number is null )
+                        or ( p_employee_number is not null
+                             and pps.date_start = (
+                                        select max(pps1.date_start)
+                                          from per_periods_of_service pps1
+                                         where pps1.person_id = p_person_id
+                                           and pps1.date_start <= to_date(p_effective_end_date,'YYYY-MM-DD') ) ) );
+cursor csr_periods_of_placement(p_person_id number, p_employee_number number, p_effective_end_date varchar2) is
+                select null adjusted_svc_date
+                      ,to_char(ppp.date_start,'YYYY-MM-DD') date_start
+                      ,null accepted_termination_date
+                      ,to_char(ppp.actual_termination_date,'YYYY-MM-DD') actual_termination_date
+                      ,to_char(ppp.final_process_date,'YYYY-MM-DD') final_process_date
+                      ,to_char(ppp.last_standard_process_date,'YYYY-MM-DD') last_standard_process_date
+                      ,termination_reason leaving_reason
+                 from per_periods_of_placement ppp
+                where ppp.person_id = p_person_id
+                  and (ppp.date_start = (
+                                        select max(ppp1.date_start)
+                                          from per_periods_of_placement ppp1
+                                         where ppp1.person_id = p_person_id
+                                           and ppp1.date_start <= to_date(p_effective_end_date,'YYYY-MM-DD') ) );
+
+
+
+
+
+
+
+BEGIN
+-- fetch the person id business group id and effective date for all the search criteria and store it in a table of record type
+--p_error := 'Before Search counts||';
+
+if p_srch_criteria.count > 0 then
+
+  for i in p_srch_criteria.first .. p_srch_criteria.last
+  loop
+        if p_srch_criteria(i).p_effective_date is null
+        then
+            p_error := 'Effective date is mandatory.Please enter the effective date';
+            exit;
+        end if;
+
+        if p_srch_criteria(i).p_bgrp_id is not null
+        then
+        p_bus_group_id := p_srch_criteria(i).p_bgrp_id;
+        end if;
+
+        if p_srch_criteria(i).p_bgrp_name is not null
+        then
+            select business_group_id into p_bus_group_id
+            from hr_organization_units org
+            where upper(name) = upper(p_srch_criteria(i).p_bgrp_name)
+            and org.organization_id = org.business_group_id
+            and p_srch_criteria(i).p_effective_date between date_from and
+            nvl (date_to, to_date('31-12-4712', 'DD-MM-YYYY'));
+        end if;
+
+        if p_srch_criteria(i).p_employee_category is not null
+        then
+            select LOOKUP_CODE into p_empl_category
+            from HR_LOOKUPS where lookup_type = 'EMPLOYEE_CATG'
+            AND meaning = p_srch_criteria(i).p_employee_category
+            AND p_srch_criteria(i).p_effective_date between nvl(start_date_active,p_srch_criteria(i).p_effective_date)
+            and nvl(end_date_active,p_srch_criteria(i).p_effective_date)
+            and enabled_flag = 'Y';
+        end if;
+
+        if p_srch_criteria(i).p_employment_category is not null
+        then
+            select LOOKUP_CODE into p_emplmt_category
+            from HR_LOOKUPS where lookup_type = 'EMP_CAT'
+            AND meaning = p_srch_criteria(i).p_employment_category
+            AND p_srch_criteria(i).p_effective_date between nvl(start_date_active,p_srch_criteria(i).p_effective_date)
+            and nvl(end_date_active,p_srch_criteria(i).p_effective_date)
+            and enabled_flag = 'Y';
+        end if;
+
+        -- Special cases when qualification_id, phone_id, deliver_mothod id
+        -- and person_address_id is passed without person_id or assignment_id
+        IF p_srch_criteria(i).p_phone_id IS NOT NULL
+           AND p_srch_criteria(i).p_assignment_id IS NULL
+           AND  p_srch_criteria(i).p_person_id IS NULL THEN
+            open srch_filtrd for
+
+            select  distinct ppf.person_id ,ppf.business_group_id,p_srch_criteria(i).p_effective_date
+            from    per_people_f ppf
+                    ,per_person_types ppt
+                    ,per_phones pp
+            where   ppf.business_group_id  = nvl(p_bus_group_id,ppf.business_group_id)
+            and     p_srch_criteria(i).p_effective_date between ppf.effective_start_date and ppf.effective_end_date
+            and     ppf.person_id = pp.parent_id(+)
+            and     pp.parent_table = 'PER_ALL_PEOPLE_F'
+            and     pp.phone_id = p_srch_criteria(i).p_phone_id;
+
+            fetch srch_filtrd bulk collect into p_srch_filter_tbl.person_id,p_srch_filter_tbl.business_group_id,p_srch_filter_tbl.p_srch_dt;
+            close srch_filtrd;
+
+        ELSIF p_srch_criteria(i).p_qualification_id IS NOT NULL
+           AND p_srch_criteria(i).p_assignment_id IS NULL
+           AND  p_srch_criteria(i).p_person_id IS NULL THEN
+            open srch_filtrd for
+
+            select  distinct ppf.person_id ,ppf.business_group_id,p_srch_criteria(i).p_effective_date
+            from    per_people_f ppf
+                    ,per_person_types ppt
+                    ,per_qualifications pq
+                    ,per_establishment_attendances pea
+            where   ppf.business_group_id  = nvl(p_bus_group_id,ppf.business_group_id)
+            and     p_srch_criteria(i).p_effective_date between ppf.effective_start_date and ppf.effective_end_date
+            and     pq.attendance_id = pea.attendance_id(+)
+            and     (pq.person_id = ppf.person_id or pea.person_id = ppf.person_id)
+            and     pq.qualification_id = p_srch_criteria(i).p_qualification_id;
+
+            fetch srch_filtrd bulk collect into p_srch_filter_tbl.person_id,p_srch_filter_tbl.business_group_id,p_srch_filter_tbl.p_srch_dt;
+            close srch_filtrd;
+
+        ELSIF p_srch_criteria(i).p_delivery_method_id IS NOT NULL
+           AND p_srch_criteria(i).p_assignment_id IS NULL
+           AND  p_srch_criteria(i).p_person_id IS NULL THEN
+            open srch_filtrd for
+
+            select  distinct ppf.person_id ,ppf.business_group_id,p_srch_criteria(i).p_effective_date
+            from    per_people_f ppf
+                    ,per_person_types ppt
+                    ,per_person_dlvry_methods ppdm
+            where   ppf.business_group_id  = nvl(p_bus_group_id,ppf.business_group_id)
+            and     p_srch_criteria(i).p_effective_date between ppf.effective_start_date and ppf.effective_end_date
+            and     ppdm.person_id = ppf.person_id
+            and     ppdm.delivery_method_id = p_srch_criteria(i).p_delivery_method_id;
+
+            fetch srch_filtrd bulk collect into p_srch_filter_tbl.person_id,p_srch_filter_tbl.business_group_id,p_srch_filter_tbl.p_srch_dt;
+            close srch_filtrd;
+
+        ELSIF p_srch_criteria(i).p_address_id IS NOT NULL
+           AND p_srch_criteria(i).p_assignment_id IS NULL
+           AND  p_srch_criteria(i).p_person_id IS NULL THEN
+            open srch_filtrd for
+
+            select  distinct ppf.person_id ,ppf.business_group_id,p_srch_criteria(i).p_effective_date
+            from    per_people_f ppf
+                    ,per_person_types ppt
+                    ,per_addresses pa
+            where   ppf.business_group_id  = nvl(p_bus_group_id,ppf.business_group_id)
+            and     p_srch_criteria(i).p_effective_date between ppf.effective_start_date and ppf.effective_end_date
+            and     pa.person_id = ppf.person_id
+            and     pa.address_id = p_srch_criteria(i).p_address_id;
+
+            fetch srch_filtrd bulk collect into p_srch_filter_tbl.person_id,p_srch_filter_tbl.business_group_id,p_srch_filter_tbl.p_srch_dt;
+            close srch_filtrd;
+
+        ELSE
+            open srch_filtrd for
+
+            select  distinct ppf.person_id ,ppf.business_group_id,p_srch_criteria(i).p_effective_date
+            from per_people_f ppf ,per_person_types ppt ,per_assignments_f paaf
+            where nvl(p_srch_criteria(i).p_person_id, ppf.person_id) = ppf.person_id
+            and  ppf.person_id between nvl(p_srch_criteria(i).p_start_person_id, ppf.person_id)
+                 and  nvl(p_srch_criteria(i).p_end_person_id, ppf.person_id)
+            and  ppf.business_group_id  = nvl(p_bus_group_id,ppf.business_group_id)
+            and  last_name = nvl(p_srch_criteria(i).p_last_name,last_name)
+            and  nvl(first_name,'*') = nvl(nvl(p_srch_criteria(i).p_first_name,first_name),'*')
+            and  nvl(employee_number,'*') = nvl(nvl(p_srch_criteria(i).p_employee_no,employee_number),'*')
+            and  nvl(npw_number,'*') = nvl(nvl(p_srch_criteria(i).p_cwk_no,npw_number),'*')
+            and  nvl(applicant_number,'*') = nvl(nvl(p_srch_criteria(i).p_applicant_no,applicant_number),'*')
+            and  p_srch_criteria(i).p_effective_date between ppf.effective_start_date and ppf.effective_end_date
+            and  nvl(ppt.user_person_type ,'*') = nvl(nvl(p_srch_criteria(i).p_person_type,ppt.user_person_type),'*')
+            and  ppf.person_type_id  = ppt.person_type_id
+            and  ppf.business_group_id = ppt.business_group_id
+            and  ppf.person_id = paaf.person_id (+)
+            and  nvl(paaf.assignment_id, -1 ) = nvl(nvl(p_srch_criteria(i).p_assignment_id,paaf.assignment_id),-1)
+            and  p_srch_criteria(i).p_effective_date between paaf.effective_start_date (+) and paaf.effective_end_date (+)
+            and  nvl(employment_category,'*')  = nvl(nvl(p_emplmt_category,paaf.employment_category ),'*')
+            and  nvl(employee_category,'*') = nvl(nvl(p_empl_category,paaf.employee_category ),'*');
+
+
+            fetch srch_filtrd bulk collect into p_srch_filter_tbl.person_id,p_srch_filter_tbl.business_group_id,p_srch_filter_tbl.p_srch_dt;
+            close srch_filtrd;
+        END IF;
+
+  end loop;
+end if;
+    --p_error := 'after selecting the personids||';
+    -- loop through each of the person record stored in the table of record p_srch_filter_tbl
+    -- and fetch the person details and all other details
+
+        if p_srch_filter_tbl.person_id.count > 0
+        then
+             -- p_error := p_error||'Looping in the Person Id||';
+          for j in p_srch_filter_tbl.person_id.first .. p_srch_filter_tbl.person_id.last
+          loop
+
+                open csr_person_record(p_srch_filter_tbl.person_id(j),p_srch_filter_tbl.business_group_id(j),p_srch_filter_tbl.p_srch_dt(j));
+               -- p_error := p_error||'before fetch||'||p_srch_filter_tbl.person_id(j)||'||'||p_srch_filter_tbl.business_group_id(j)||'||'||p_srch_filter_tbl.p_srch_dt(j);
+                fetch csr_person_record  into p_person(j).person;
+                open csr_periods_of_service(p_person(j).person.person_id,p_person(j).person.employee_number,p_person(j).person.effective_end_date);
+                fetch csr_periods_of_service into
+                      p_person(j).person.adjusted_svc_date
+                     ,p_person(j).person.date_start
+                     ,p_person(j).person.accepted_termination_date
+                     ,p_person(j).person.actual_termination_date
+                     ,p_person(j).person.final_process_date
+                     ,p_person(j).person.last_standard_process_date
+                     ,p_person(j).person.leaving_reason;
+                if csr_periods_of_service%notfound then
+
+                  open csr_periods_of_placement(p_person(j).person.person_id,p_person(j).person.employee_number,p_person(j).person.effective_end_date);
+                  fetch csr_periods_of_placement into
+                        p_person(j).person.adjusted_svc_date
+                       ,p_person(j).person.date_start
+                       ,p_person(j).person.accepted_termination_date
+                       ,p_person(j).person.actual_termination_date
+                       ,p_person(j).person.final_process_date
+                       ,p_person(j).person.last_standard_process_date
+                       ,p_person(j).person.leaving_reason;
+                  close csr_periods_of_placement;
+
+                end if;
+                close csr_periods_of_service;
+
+               -- p_error := p_error||'after fectch||';
+                close csr_person_record;
+               --p_error := p_error||'before Entity||';
+
+            if p_entity.count > 0 then
+                for m in p_entity.first .. p_entity.last
+                loop
+
+
+                    if p_entity(m) = 'ASSIGNMENT' then
+                    p_cnt  := 1;
+
+                    open csr_assignment_record(p_srch_filter_tbl.person_id(j),p_srch_filter_tbl.business_group_id(j),p_srch_filter_tbl.p_srch_dt(j));
+                    loop
+                    fetch csr_assignment_record  into p_person(j).assignment(p_cnt).asg_details;
+                    exit when csr_assignment_record%notfound;
+
+                    open csr_asg_loc_addr(p_person(j).assignment(p_cnt).asg_details.location_id);
+                    fetch csr_asg_loc_addr into p_person(j).assignment(p_cnt).asg_loc_addr;
+                    close csr_asg_loc_addr;
+
+                    p_cnt := p_cnt + 1;
+                    end loop;
+                    close csr_assignment_record;
+                    --p_error := p_error||'after selecting the assignments||';
+                    end if;
+
+
+                    if p_entity(m) = 'CONTACT' then
+                    open csr_contact_record(p_srch_filter_tbl.person_id(j),p_srch_filter_tbl.business_group_id(j),p_srch_filter_tbl.p_srch_dt(j));
+                    fetch csr_contact_record bulk collect into p_person(j).contact;
+                    close csr_contact_record;
+                    --p_error := p_error||'after selecting the contacts||';
+                    end if;
+
+                    if p_entity(m) = 'CONTACT_ADDRESS' then
+                    open csr_cont_address(p_srch_filter_tbl.person_id(j),p_srch_filter_tbl.business_group_id(j),p_srch_filter_tbl.p_srch_dt(j));
+                    fetch csr_cont_address bulk collect into p_person(j).contact_address;
+                    close csr_cont_address;
+                    --p_error := p_error||'after selecting the contact address||';
+                    end if;
+
+
+                   if p_entity(m) = 'ADDRESS' then
+                    open csr_address_record(p_srch_filter_tbl.person_id(j),p_srch_filter_tbl.business_group_id(j),p_srch_filter_tbl.p_srch_dt(j));
+                    fetch csr_address_record bulk collect into p_person(j).address;
+                    close csr_address_record;
+                     --p_error := p_error||'after selecting the addresses||';
+                    end if;
+
+                    if p_entity(m) = 'PERSON_EXTRA_INFO' then
+                    open csr_person_extra_info_record(p_srch_filter_tbl.person_id(j),p_srch_filter_tbl.business_group_id(j),p_srch_filter_tbl.p_srch_dt(j));
+                    fetch csr_person_extra_info_record bulk collect into p_person(j).person_extra_information;
+                    close csr_person_extra_info_record;
+                    --p_error := p_error||'after selecting the person extra information||';
+                    end if;
+
+                   if p_entity(m) = 'SPECIAL_INFO' then
+                    open csr_special_info_record(p_srch_filter_tbl.person_id(j),p_srch_filter_tbl.business_group_id(j),p_srch_filter_tbl.p_srch_dt(j));
+                    fetch csr_special_info_record bulk collect into p_person(j).special_information;
+                    close csr_special_info_record;
+                    -- p_error := p_error||'after selecting the person special information||';
+                    end if;
+
+                    if p_entity(m) = 'PREVIOUS_EMPLOYMENT' then
+                    open csr_prev_emp_info_record(p_srch_filter_tbl.person_id(j),p_srch_filter_tbl.business_group_id(j),p_srch_filter_tbl.p_srch_dt(j));
+                    fetch csr_prev_emp_info_record bulk collect into p_person(j).previous_employment;
+                    close csr_prev_emp_info_record;
+                     -- p_error := p_error||'after selecting the person previous employment||';
+                    end if;
+
+
+                    if p_entity(m) = 'DELIVERY_METHODS' then
+                    open csr_deliv_method_info(p_srch_filter_tbl.person_id(j),p_srch_filter_tbl.business_group_id(j),p_srch_filter_tbl.p_srch_dt(j));
+                    fetch csr_deliv_method_info bulk collect into p_person(j).delivery_methods;
+
+                    close csr_deliv_method_info;
+                    --p_error := p_error||'after selecting the delivery  methods||';
+                    end if;
+
+                    if p_entity(m) = 'WORK_INCIDENTS' then
+                    open csr_work_inc_info_record(p_srch_filter_tbl.person_id(j),p_srch_filter_tbl.business_group_id(j),p_srch_filter_tbl.p_srch_dt(j));
+                    fetch csr_work_inc_info_record bulk collect into p_person(j).work_incidents;
+                    close csr_work_inc_info_record;
+                     --p_error := p_error||'after selecting the work incidents||';
+                    end if;
+
+                    if p_entity(m) = 'ASSIGNMENT_EXTRA_INFO' then
+                    open csr_ass_extra_info_record(p_srch_filter_tbl.person_id(j),p_srch_filter_tbl.business_group_id(j),p_srch_filter_tbl.p_srch_dt(j));
+                    fetch csr_ass_extra_info_record bulk collect into p_person(j).assignment_extra_information;
+                    close csr_ass_extra_info_record;
+                    -- p_error := p_error||'after selecting the ASSIGNMENT_EXTRA_INFO||';
+                    end if;
+
+                    if p_entity(m) = 'CONTACT_EXTRA_INFO' then
+                    open csr_con_extra_info_record(p_srch_filter_tbl.person_id(j),p_srch_filter_tbl.business_group_id(j),p_srch_filter_tbl.p_srch_dt(j));
+                    fetch csr_con_extra_info_record bulk collect into p_person(j).contact_extra_information;
+                    close csr_con_extra_info_record;
+                     --p_error := p_error||'after selecting the CONTACT_EXTRA_INFO||';
+                    end if;
+
+                    if p_entity(m) = 'PHONE' then
+                    open csr_phone_record(p_srch_filter_tbl.person_id(j),p_srch_filter_tbl.business_group_id(j),p_srch_filter_tbl.p_srch_dt(j));
+                    fetch csr_phone_record bulk collect into p_person(j).phone;
+                    close csr_phone_record;
+                    --p_error := p_error||'after selecting the PHONE||';
+                    end if;
+
+                    if p_entity(m) = 'QUALIFICATION' then
+                    p_cnt  := 1;
+                    open csr_qualification_record(p_srch_filter_tbl.person_id(j),p_srch_filter_tbl.business_group_id(j),p_srch_filter_tbl.p_srch_dt(j));
+                    LOOP
+
+                    fetch csr_qualification_record INTO  p_person(j).qualification(p_cnt).QUALIFICATIONS;
+                    exit when csr_qualification_record%NOTFOUND;
+
+
+
+                            open csr_subject_record(p_person(j).qualification(p_cnt).qualifications.qualification_id,p_srch_filter_tbl.p_srch_dt(j));
+                            fetch csr_subject_record bulk collect into p_person(j).qualification(p_cnt).subject;
+                            close csr_subject_record;
+                            p_cnt := p_cnt + 1;
+                    end loop;
+                    close csr_qualification_record;
+                    --p_error := p_error||'after selecting the QUALIFICATION||';
+                   end if;
+
+                    if p_entity(m) = 'REPORTEE' then
+                    open csr_reportee_record(p_srch_filter_tbl.person_id(j),p_srch_filter_tbl.business_group_id(j),p_srch_filter_tbl.p_srch_dt(j));
+                    fetch csr_reportee_record bulk collect into p_person(j).reportee;
+                    close csr_reportee_record;
+                    --p_error := p_error||'after selecting the REPORTEE||';
+                    end if;
+
+                    if p_entity(m) = 'ABSENCE' then
+                    p_cnt := 1;
+                    FOR accrual_details in  csr_abs_details(p_srch_filter_tbl.person_id(j),p_srch_filter_tbl.business_group_id(j),p_srch_filter_tbl.p_srch_dt(j))
+                    loop
+                                per_accrual_calc_functions.get_net_accrual(
+                                         P_assignment_id      => ACCRUAL_DETAILS.assignment_id,
+                                         P_plan_id            => ACCRUAL_DETAILS.ACCRUAL_PLAN_ID,
+                                         P_payroll_id         => ACCRUAL_DETAILS.payroll_id,
+                                         p_business_group_id  => p_srch_filter_tbl.business_group_id(j),
+                                         p_assignment_action_id => -1,
+                                         P_calculation_date   => p_srch_filter_tbl.p_srch_dt(j),
+                                         P_Accrual_Start_Date => Null,
+                                         P_Accrual_Latest_Balance => Null,
+                                         P_Start_Date         => L_Start_Date,
+                                         P_End_Date           => L_End_Date,
+                                         P_Accrual_End_Date   => L_Accrual_End_Date,
+                                         P_Accrual            => L_Accrual,
+                                         P_Net_Entitlement    => L_Entitlement
+                                            );
+                        SELECT ACCRUAL_DETAILS.ACCRUAL_PLAN_NAME,L_ENTITLEMENT,ACCRUAL_DETAILS.ACCRUAL_UNITS_OF_MEASURE_NAME,
+                        TO_CHAR(p_srch_filter_tbl.p_srch_dt(j),'YYYY-MM-DD')
+                        INTO p_person(j).ABSENCE(P_CNT) FROM DUAL;
+                        p_cnt := p_cnt + 1;
+                     end loop;
+
+                    --p_error := p_error||'after selecting the Absence||';
+                    end if;
+
+                    if p_entity(m) = 'BENEFITS' then
+
+                     ben_person_record.get_ben_details(p_person(j).benefit_details,p_srch_filter_tbl.person_id(j),p_srch_filter_tbl.p_srch_dt(j),p_srch_filter_tbl.business_group_id(j));
+
+                    end if;
+
+                    if p_entity(m) = 'PAYROLL' then
+
+                        open  csr_leg_code(p_srch_filter_tbl.business_group_id(j));
+                        fetch csr_leg_code into p_leg_code;
+                        close csr_leg_code;
+
+                        -- Process US Payroll since the legislationcode is US
+
+                         if p_leg_code = 'US' then
+
+                        PAY_US_HR_HELPDESK.GET_USPAY_DETAILS(p_per_id =>p_srch_filter_tbl.person_id(j),
+                        p_bg_id => p_srch_filter_tbl.business_group_id(j),
+                        p_eff_date => p_srch_filter_tbl.p_srch_dt(j),
+                        p_leg_code => p_leg_code,
+                        p_pyrl_dtls => p_person(j).payroll,
+                        p_error => p_error);
+                        end if;
+
+                         if p_leg_code = 'GB' then
+
+                        PAY_GB_HR_HELPDESK.GET_UKPAY_DETAILS(p_per_id =>p_srch_filter_tbl.person_id(j),
+                        p_bg_id => p_srch_filter_tbl.business_group_id(j),
+                        p_eff_date => p_srch_filter_tbl.p_srch_dt(j),
+                        p_leg_code => p_leg_code,
+                        p_pyrl_dtls => p_person(j).payroll,
+                        p_error => p_error);
+                        end if;
+
+                    end if;
+
+                end loop;
+              --  p_error := 'p_error||'Ended the options loop||';
+             end if;
+
+         end loop;
+         --p_error := p_error||'Ended the person search loop||';
+        end if;
+
+exception when others
+then
+p_error := p_error||substr(SQLERRM,1,1500);
+
+END GET_PERSON_DETAILS;
+end HR_PERSON_RECORD ;
+
+/

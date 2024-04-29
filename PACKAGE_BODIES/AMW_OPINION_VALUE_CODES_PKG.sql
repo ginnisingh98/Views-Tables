@@ -1,0 +1,142 @@
+--------------------------------------------------------
+--  DDL for Package Body AMW_OPINION_VALUE_CODES_PKG
+--------------------------------------------------------
+
+  CREATE OR REPLACE EDITIONABLE PACKAGE BODY "APPS"."AMW_OPINION_VALUE_CODES_PKG" as
+/*$Header: amwtopwb.pls 115.1 2003/10/30 03:08:10 qliu noship $*/
+procedure INSERT_ROW (
+  X_OPINION_VALUE_CODE_ID in NUMBER,
+  X_OPINION_VALUE_CODE_NAME in VARCHAR2,
+  X_ATTACHMENT_ID in NUMBER,
+  X_IMAGE_FILE_NAME in VARCHAR2,
+  X_SECURITY_GROUP_ID in NUMBER,
+  X_OBJECT_VERSION_NUMBER in NUMBER,
+  X_CREATION_DATE in DATE,
+  X_CREATED_BY in NUMBER,
+  X_LAST_UPDATE_DATE in DATE,
+  X_LAST_UPDATED_BY in NUMBER,
+  X_LAST_UPDATE_LOGIN in NUMBER
+) is
+begin
+  insert into AMW_OPINION_VALUE_CODES (
+    OPINION_VALUE_CODE_ID,
+    OPINION_VALUE_CODE_NAME,
+    ATTACHMENT_ID,
+    IMAGE_FILE_NAME,
+    SECURITY_GROUP_ID,
+    OBJECT_VERSION_NUMBER,
+    CREATED_BY,
+    CREATION_DATE,
+    LAST_UPDATED_BY,
+    LAST_UPDATE_DATE,
+    LAST_UPDATE_LOGIN
+  ) values (
+    X_OPINION_VALUE_CODE_ID,
+    X_OPINION_VALUE_CODE_NAME,
+    X_ATTACHMENT_ID,
+    X_IMAGE_FILE_NAME,
+    X_SECURITY_GROUP_ID,
+    X_OBJECT_VERSION_NUMBER,
+    X_CREATED_BY,
+    X_CREATION_DATE,
+    X_LAST_UPDATED_BY,
+    X_LAST_UPDATE_DATE,
+    X_LAST_UPDATE_LOGIN);
+end INSERT_ROW;
+
+procedure UPDATE_ROW (
+  X_OPINION_VALUE_CODE_ID in NUMBER,
+  X_OPINION_VALUE_CODE_NAME in VARCHAR2,
+  X_ATTACHMENT_ID in NUMBER,
+  X_IMAGE_FILE_NAME in VARCHAR2,
+  X_SECURITY_GROUP_ID in NUMBER,
+  X_OBJECT_VERSION_NUMBER in NUMBER,
+  X_LAST_UPDATE_DATE in DATE,
+  X_LAST_UPDATED_BY in NUMBER,
+  X_LAST_UPDATE_LOGIN in NUMBER
+) is
+begin
+  update AMW_OPINION_VALUE_CODES set
+    OPINION_VALUE_CODE_NAME = X_OPINION_VALUE_CODE_NAME,
+    ATTACHMENT_ID = X_ATTACHMENT_ID,
+    IMAGE_FILE_NAME = X_IMAGE_FILE_NAME,
+    SECURITY_GROUP_ID = X_SECURITY_GROUP_ID,
+    OBJECT_VERSION_NUMBER = X_OBJECT_VERSION_NUMBER,
+    LAST_UPDATE_DATE = X_LAST_UPDATE_DATE,
+    LAST_UPDATED_BY = X_LAST_UPDATED_BY,
+    LAST_UPDATE_LOGIN = X_LAST_UPDATE_LOGIN
+  where OPINION_VALUE_CODE_ID = X_OPINION_VALUE_CODE_ID;
+
+  if (sql%notfound) then
+    raise no_data_found;
+  end if;
+end UPDATE_ROW;
+
+procedure DELETE_ROW (
+  X_OPINION_VALUE_CODE_ID in NUMBER
+) is
+begin
+  delete from AMW_OPINION_VALUE_CODES
+  where OPINION_VALUE_CODE_ID = X_OPINION_VALUE_CODE_ID;
+
+  if (sql%notfound) then
+    raise no_data_found;
+  end if;
+
+end DELETE_ROW;
+
+procedure LOAD_ROW(
+	X_OPINION_VALUE_CODE_NAME	in VARCHAR2,
+	X_OPINION_VALUE_CODE_ID		in NUMBER,
+	X_ATTACHMENT_ID			in NUMBER,
+	X_IMAGE_FILE_NAME			in VARCHAR2,
+	X_LAST_UPDATE_DATE    		in VARCHAR2,
+	X_OWNER				in VARCHAR2,
+	X_CUSTOM_MODE			in VARCHAR2) is
+
+f_luby	number;	-- entity owner in file
+f_ludate	date;		-- entity update date in file
+db_luby	number;	-- entity owner in db
+db_ludate	date;		-- entity update date in db
+
+begin
+	-- Translate owner to file_last_updated_by
+	f_luby := fnd_load_util.owner_id(X_OWNER);
+
+	-- Translate char last_update_date to date
+	f_ludate := nvl(to_date(X_LAST_UPDATE_DATE, 'YYYY/MM/DD'), sysdate);
+
+	select last_updated_by, last_update_date into db_luby, db_ludate
+	from AMW_OPINION_VALUE_CODES
+	where opinion_value_code_name = X_OPINION_VALUE_CODE_NAME;
+
+	if (fnd_load_util.upload_test(f_luby, f_ludate, db_luby, db_ludate, X_CUSTOM_MODE))
+	then AMW_OPINION_VALUE_CODES_PKG.UPDATE_ROW(
+		X_OPINION_VALUE_CODE_ID		=> X_OPINION_VALUE_CODE_ID,
+		X_OPINION_VALUE_CODE_NAME	=> X_OPINION_VALUE_CODE_NAME,
+		X_ATTACHMENT_ID			=> X_ATTACHMENT_ID,
+		X_IMAGE_FILE_NAME			=> X_IMAGE_FILE_NAME,
+		X_SECURITY_GROUP_ID		=> null,
+		X_OBJECT_VERSION_NUMBER		=> 1,
+		X_LAST_UPDATE_DATE		=> f_ludate,
+		X_LAST_UPDATED_BY			=> f_luby,
+		X_LAST_UPDATE_LOGIN		=> 0);
+	end if;
+	exception when NO_DATA_FOUND
+	then AMW_OPINION_VALUE_CODES_PKG.INSERT_ROW(
+		X_OPINION_VALUE_CODE_ID		=> X_OPINION_VALUE_CODE_ID,
+		X_OPINION_VALUE_CODE_NAME	=> X_OPINION_VALUE_CODE_NAME,
+		X_ATTACHMENT_ID			=> X_ATTACHMENT_ID,
+		X_IMAGE_FILE_NAME			=> X_IMAGE_FILE_NAME,
+		X_SECURITY_GROUP_ID		=> null,
+		X_OBJECT_VERSION_NUMBER		=> 1,
+		X_CREATION_DATE			=> f_ludate,
+		X_CREATED_BY			=> f_luby,
+		X_LAST_UPDATE_DATE		=> f_ludate,
+		X_LAST_UPDATED_BY			=> f_luby,
+		X_LAST_UPDATE_LOGIN		=> 0);
+end LOAD_ROW;
+
+end AMW_OPINION_VALUE_CODES_PKG;
+
+/

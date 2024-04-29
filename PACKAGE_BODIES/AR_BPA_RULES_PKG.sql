@@ -1,0 +1,449 @@
+--------------------------------------------------------
+--  DDL for Package Body AR_BPA_RULES_PKG
+--------------------------------------------------------
+
+  CREATE OR REPLACE EDITIONABLE PACKAGE BODY "APPS"."AR_BPA_RULES_PKG" as
+/* $Header: ARBPRULB.pls 120.3 2005/10/30 04:13:43 appldev noship $ */
+procedure INSERT_ROW (
+  X_ROWID in out nocopy VARCHAR2,
+  X_RULE_ID in NUMBER,
+  X_SAME_PRINTING_TEMPLATE_FLAG in VARCHAR2,
+  X_PRIMARY_APP_ID in NUMBER,
+  X_SECONDARY_APP_ID in NUMBER,
+  X_RULE_SEARCH_ORDER in NUMBER,
+  X_MATCH_ALL_ATTRIBUTES in VARCHAR2,
+  X_SEEDED_FLAG in VARCHAR2,
+  X_RULE_NAME in VARCHAR2,
+  X_RULE_DESCRIPTION in VARCHAR2,
+  X_PRINT_RULE_SEARCH_ORDER in NUMBER,
+  X_CM_SAME_PRT_TMPLT_FLAG in VARCHAR2,
+  X_DM_SAME_PRT_TMPLT_FLAG in VARCHAR2,
+  X_CB_SAME_PRT_TMPLT_FLAG in VARCHAR2,
+  X_DEP_SAME_PRT_TMPLT_FLAG in VARCHAR2,
+  X_GUAR_SAME_PRT_TMPLT_FLAG in VARCHAR2,
+  X_CREATION_DATE in DATE,
+  X_CREATED_BY in NUMBER,
+  X_LAST_UPDATE_DATE in DATE,
+  X_LAST_UPDATED_BY in NUMBER,
+  X_LAST_UPDATE_LOGIN in NUMBER
+) is
+  cursor C is select ROWID from AR_BPA_RULES_B
+    where RULE_ID = X_RULE_ID
+    ;
+begin
+  insert into AR_BPA_RULES_B (
+    SAME_PRINTING_TEMPLATE_FLAG,
+    PRINT_RULE_SEARCH_ORDER,
+    RULE_ID,
+    PRIMARY_APP_ID,
+    SECONDARY_APP_ID,
+    RULE_SEARCH_ORDER,
+    MATCH_ALL_ATTRIBUTES,
+    SEEDED_FLAG,
+		CM_SAME_PRT_TMPLT_FLAG,
+	  DM_SAME_PRT_TMPLT_FLAG,
+		CB_SAME_PRT_TMPLT_FLAG,
+	  DEP_SAME_PRT_TMPLT_FLAG,
+	  GUAR_SAME_PRT_TMPLT_FLAG,
+    CREATION_DATE,
+    CREATED_BY,
+    LAST_UPDATE_DATE,
+    LAST_UPDATED_BY,
+    LAST_UPDATE_LOGIN
+  ) values (
+    X_SAME_PRINTING_TEMPLATE_FLAG,
+    X_PRINT_RULE_SEARCH_ORDER,
+    X_RULE_ID,
+    X_PRIMARY_APP_ID,
+    X_SECONDARY_APP_ID,
+    X_RULE_SEARCH_ORDER,
+    X_MATCH_ALL_ATTRIBUTES,
+    X_SEEDED_FLAG,
+		X_CM_SAME_PRT_TMPLT_FLAG,
+	  X_DM_SAME_PRT_TMPLT_FLAG,
+		X_CB_SAME_PRT_TMPLT_FLAG,
+	  X_DEP_SAME_PRT_TMPLT_FLAG,
+	  X_GUAR_SAME_PRT_TMPLT_FLAG,
+    X_CREATION_DATE,
+    X_CREATED_BY,
+    X_LAST_UPDATE_DATE,
+    X_LAST_UPDATED_BY,
+    X_LAST_UPDATE_LOGIN
+  );
+
+  insert into AR_BPA_RULES_TL (
+    RULE_ID,
+    RULE_NAME,
+    RULE_DESCRIPTION,
+    CREATED_BY,
+    CREATION_DATE,
+    LAST_UPDATED_BY,
+    LAST_UPDATE_DATE,
+    LAST_UPDATE_LOGIN,
+    LANGUAGE,
+    SOURCE_LANG
+  ) select
+    X_RULE_ID,
+    X_RULE_NAME,
+    X_RULE_DESCRIPTION,
+    X_CREATED_BY,
+    X_CREATION_DATE,
+    X_LAST_UPDATED_BY,
+    X_LAST_UPDATE_DATE,
+    X_LAST_UPDATE_LOGIN,
+    L.LANGUAGE_CODE,
+    userenv('LANG')
+  from FND_LANGUAGES L
+  where L.INSTALLED_FLAG in ('I', 'B')
+  and not exists
+    (select NULL
+    from AR_BPA_RULES_TL T
+    where T.RULE_ID = X_RULE_ID
+    and T.LANGUAGE = L.LANGUAGE_CODE);
+
+  open c;
+  fetch c into X_ROWID;
+  if (c%notfound) then
+    close c;
+    raise no_data_found;
+  end if;
+  close c;
+
+end INSERT_ROW;
+
+procedure LOCK_ROW (
+  X_RULE_ID in NUMBER,
+  X_SAME_PRINTING_TEMPLATE_FLAG in VARCHAR2,
+  X_PRIMARY_APP_ID in NUMBER,
+  X_SECONDARY_APP_ID in NUMBER,
+  X_RULE_SEARCH_ORDER in NUMBER,
+  X_MATCH_ALL_ATTRIBUTES in VARCHAR2,
+  X_SEEDED_FLAG in VARCHAR2,
+  X_RULE_NAME in VARCHAR2,
+  X_RULE_DESCRIPTION in VARCHAR2,
+  X_PRINT_RULE_SEARCH_ORDER IN NUMBER,
+  X_CM_SAME_PRT_TMPLT_FLAG in VARCHAR2,
+  X_DM_SAME_PRT_TMPLT_FLAG in VARCHAR2,
+  X_CB_SAME_PRT_TMPLT_FLAG in VARCHAR2,
+  X_DEP_SAME_PRT_TMPLT_FLAG in VARCHAR2,
+  X_GUAR_SAME_PRT_TMPLT_FLAG in VARCHAR2
+) is
+  cursor c is select
+      SAME_PRINTING_TEMPLATE_FLAG,
+      PRINT_RULE_SEARCH_ORDER,
+      PRIMARY_APP_ID,
+      SECONDARY_APP_ID,
+      RULE_SEARCH_ORDER,
+      MATCH_ALL_ATTRIBUTES,
+      SEEDED_FLAG,
+			CM_SAME_PRT_TMPLT_FLAG,
+		  DM_SAME_PRT_TMPLT_FLAG,
+			CB_SAME_PRT_TMPLT_FLAG,
+		  DEP_SAME_PRT_TMPLT_FLAG,
+		  GUAR_SAME_PRT_TMPLT_FLAG
+    from AR_BPA_RULES_B
+    where RULE_ID = X_RULE_ID
+    for update of RULE_ID nowait;
+  recinfo c%rowtype;
+
+  cursor c1 is select
+      RULE_NAME,
+      RULE_DESCRIPTION,
+      decode(LANGUAGE, userenv('LANG'), 'Y', 'N') BASELANG
+    from AR_BPA_RULES_TL
+    where RULE_ID = X_RULE_ID
+    and userenv('LANG') in (LANGUAGE, SOURCE_LANG)
+    for update of RULE_ID nowait;
+begin
+  open c;
+  fetch c into recinfo;
+  if (c%notfound) then
+    close c;
+    fnd_message.set_name('FND', 'FORM_RECORD_DELETED');
+    app_exception.raise_exception;
+  end if;
+  close c;
+  if (    ((recinfo.SAME_PRINTING_TEMPLATE_FLAG = X_SAME_PRINTING_TEMPLATE_FLAG)
+           OR ((recinfo.SAME_PRINTING_TEMPLATE_FLAG is null) AND (X_SAME_PRINTING_TEMPLATE_FLAG is null)))
+			AND	((recinfo.CM_SAME_PRT_TMPLT_FLAG = X_CM_SAME_PRT_TMPLT_FLAG)
+           OR ((recinfo.CM_SAME_PRT_TMPLT_FLAG is null) AND (X_CM_SAME_PRT_TMPLT_FLAG is null)))
+			AND	((recinfo.DM_SAME_PRT_TMPLT_FLAG = X_DM_SAME_PRT_TMPLT_FLAG)
+           OR ((recinfo.DM_SAME_PRT_TMPLT_FLAG is null) AND (X_DM_SAME_PRT_TMPLT_FLAG is null)))
+			AND	((recinfo.CB_SAME_PRT_TMPLT_FLAG = X_CB_SAME_PRT_TMPLT_FLAG)
+           OR ((recinfo.CB_SAME_PRT_TMPLT_FLAG is null) AND (X_CB_SAME_PRT_TMPLT_FLAG is null)))
+			AND	((recinfo.DEP_SAME_PRT_TMPLT_FLAG = X_DEP_SAME_PRT_TMPLT_FLAG)
+           OR ((recinfo.DEP_SAME_PRT_TMPLT_FLAG is null) AND (X_DEP_SAME_PRT_TMPLT_FLAG is null)))
+			AND	((recinfo.GUAR_SAME_PRT_TMPLT_FLAG = X_GUAR_SAME_PRT_TMPLT_FLAG)
+           OR ((recinfo.GUAR_SAME_PRT_TMPLT_FLAG is null) AND (X_GUAR_SAME_PRT_TMPLT_FLAG is null)))
+      AND (recinfo.PRIMARY_APP_ID = X_PRIMARY_APP_ID)
+      AND ((recinfo.SECONDARY_APP_ID = X_SECONDARY_APP_ID)
+           OR ((recinfo.SECONDARY_APP_ID is null) AND (X_SECONDARY_APP_ID is null)))
+      AND ( (recinfo.RULE_SEARCH_ORDER = X_RULE_SEARCH_ORDER )
+           OR ((recinfo.RULE_SEARCH_ORDER is null) AND (X_RULE_SEARCH_ORDER is null)))
+      AND (recinfo.MATCH_ALL_ATTRIBUTES = X_MATCH_ALL_ATTRIBUTES)
+      AND ((recinfo.SEEDED_FLAG = X_SEEDED_FLAG)
+           OR ((recinfo.SEEDED_FLAG is null) AND (X_SEEDED_FLAG is null)))
+      AND ((recinfo.PRINT_RULE_SEARCH_ORDER= X_PRINT_RULE_SEARCH_ORDER)
+           OR ((recinfo.PRINT_RULE_SEARCH_ORDER is null) AND (X_PRINT_RULE_SEARCH_ORDER is null)))
+
+  ) then
+    null;
+  else
+    fnd_message.set_name('FND', 'FORM_RECORD_CHANGED');
+    app_exception.raise_exception;
+  end if;
+
+  for tlinfo in c1 loop
+    if (tlinfo.BASELANG = 'Y') then
+      if (    (tlinfo.RULE_NAME = X_RULE_NAME)
+          AND ((tlinfo.RULE_DESCRIPTION = X_RULE_DESCRIPTION)
+               OR ((tlinfo.RULE_DESCRIPTION is null) AND (X_RULE_DESCRIPTION is null)))
+      ) then
+        null;
+      else
+        fnd_message.set_name('FND', 'FORM_RECORD_CHANGED');
+        app_exception.raise_exception;
+      end if;
+    end if;
+  end loop;
+  return;
+end LOCK_ROW;
+
+procedure UPDATE_ROW (
+  X_RULE_ID in NUMBER,
+  X_SAME_PRINTING_TEMPLATE_FLAG in VARCHAR2,
+  X_PRIMARY_APP_ID in NUMBER,
+  X_SECONDARY_APP_ID in NUMBER,
+  X_RULE_SEARCH_ORDER in NUMBER,
+  X_MATCH_ALL_ATTRIBUTES in VARCHAR2,
+  X_SEEDED_FLAG in VARCHAR2,
+  X_RULE_NAME in VARCHAR2,
+  X_RULE_DESCRIPTION in VARCHAR2,
+  X_PRINT_RULE_SEARCH_ORDER IN NUMBER,
+  X_CM_SAME_PRT_TMPLT_FLAG in VARCHAR2,
+  X_DM_SAME_PRT_TMPLT_FLAG in VARCHAR2,
+  X_CB_SAME_PRT_TMPLT_FLAG in VARCHAR2,
+  X_DEP_SAME_PRT_TMPLT_FLAG in VARCHAR2,
+  X_GUAR_SAME_PRT_TMPLT_FLAG in VARCHAR2,
+  X_LAST_UPDATE_DATE in DATE,
+  X_LAST_UPDATED_BY in NUMBER,
+  X_LAST_UPDATE_LOGIN in NUMBER
+) is
+begin
+  update AR_BPA_RULES_B set
+    SAME_PRINTING_TEMPLATE_FLAG = X_SAME_PRINTING_TEMPLATE_FLAG,
+    PRINT_RULE_SEARCH_ORDER = X_PRINT_RULE_SEARCH_ORDER,
+    PRIMARY_APP_ID = X_PRIMARY_APP_ID,
+    SECONDARY_APP_ID = X_SECONDARY_APP_ID,
+    RULE_SEARCH_ORDER = X_RULE_SEARCH_ORDER,
+    MATCH_ALL_ATTRIBUTES = X_MATCH_ALL_ATTRIBUTES,
+    SEEDED_FLAG = X_SEEDED_FLAG,
+    CM_SAME_PRT_TMPLT_FLAG = X_CM_SAME_PRT_TMPLT_FLAG,
+    DM_SAME_PRT_TMPLT_FLAG = X_DM_SAME_PRT_TMPLT_FLAG,
+    CB_SAME_PRT_TMPLT_FLAG = X_CB_SAME_PRT_TMPLT_FLAG,
+    DEP_SAME_PRT_TMPLT_FLAG = X_DEP_SAME_PRT_TMPLT_FLAG,
+    GUAR_SAME_PRT_TMPLT_FLAG = X_GUAR_SAME_PRT_TMPLT_FLAG,
+    LAST_UPDATE_DATE = X_LAST_UPDATE_DATE,
+    LAST_UPDATED_BY = X_LAST_UPDATED_BY,
+    LAST_UPDATE_LOGIN = X_LAST_UPDATE_LOGIN
+  where RULE_ID = X_RULE_ID;
+
+  if (sql%notfound) then
+    raise no_data_found;
+  end if;
+
+  update AR_BPA_RULES_TL set
+    RULE_NAME = X_RULE_NAME,
+    RULE_DESCRIPTION = X_RULE_DESCRIPTION,
+    LAST_UPDATE_DATE = X_LAST_UPDATE_DATE,
+    LAST_UPDATED_BY = X_LAST_UPDATED_BY,
+    LAST_UPDATE_LOGIN = X_LAST_UPDATE_LOGIN,
+    SOURCE_LANG = userenv('LANG')
+  where RULE_ID = X_RULE_ID
+  and userenv('LANG') in (LANGUAGE, SOURCE_LANG);
+
+  if (sql%notfound) then
+    raise no_data_found;
+  end if;
+end UPDATE_ROW;
+
+procedure DELETE_ROW (
+  X_RULE_ID in NUMBER
+) is
+begin
+  delete from AR_BPA_RULES_TL
+  where RULE_ID = X_RULE_ID;
+
+  if (sql%notfound) then
+    raise no_data_found;
+  end if;
+
+  delete from AR_BPA_RULES_B
+  where RULE_ID = X_RULE_ID;
+
+  if (sql%notfound) then
+    raise no_data_found;
+  end if;
+end DELETE_ROW;
+
+procedure ADD_LANGUAGE
+is
+begin
+  delete from AR_BPA_RULES_TL T
+  where not exists
+    (select NULL
+    from AR_BPA_RULES_B B
+    where B.RULE_ID = T.RULE_ID
+    );
+
+  update AR_BPA_RULES_TL T set (
+      RULE_NAME,
+      RULE_DESCRIPTION
+    ) = (select
+      B.RULE_NAME,
+      B.RULE_DESCRIPTION
+    from AR_BPA_RULES_TL B
+    where B.RULE_ID = T.RULE_ID
+    and B.LANGUAGE = T.SOURCE_LANG)
+  where (
+      T.RULE_ID,
+      T.LANGUAGE
+  ) in (select
+      SUBT.RULE_ID,
+      SUBT.LANGUAGE
+    from AR_BPA_RULES_TL SUBB, AR_BPA_RULES_TL SUBT
+    where SUBB.RULE_ID = SUBT.RULE_ID
+    and SUBB.LANGUAGE = SUBT.SOURCE_LANG
+    and (SUBB.RULE_NAME <> SUBT.RULE_NAME
+      or SUBB.RULE_DESCRIPTION <> SUBT.RULE_DESCRIPTION
+      or (SUBB.RULE_DESCRIPTION is null and SUBT.RULE_DESCRIPTION is not null)
+      or (SUBB.RULE_DESCRIPTION is not null and SUBT.RULE_DESCRIPTION is null)
+  ));
+
+  insert into AR_BPA_RULES_TL (
+    RULE_ID,
+    RULE_NAME,
+    RULE_DESCRIPTION,
+    CREATED_BY,
+    CREATION_DATE,
+    LAST_UPDATED_BY,
+    LAST_UPDATE_DATE,
+    LAST_UPDATE_LOGIN,
+    LANGUAGE,
+    SOURCE_LANG
+  ) select /*+ ORDERED */
+    B.RULE_ID,
+    B.RULE_NAME,
+    B.RULE_DESCRIPTION,
+    B.CREATED_BY,
+    B.CREATION_DATE,
+    B.LAST_UPDATED_BY,
+    B.LAST_UPDATE_DATE,
+    B.LAST_UPDATE_LOGIN,
+    L.LANGUAGE_CODE,
+    B.SOURCE_LANG
+  from AR_BPA_RULES_TL B, FND_LANGUAGES L
+  where L.INSTALLED_FLAG in ('I', 'B')
+  and B.LANGUAGE = userenv('LANG')
+  and not exists
+    (select NULL
+    from AR_BPA_RULES_TL T
+    where T.RULE_ID = B.RULE_ID
+    and T.LANGUAGE = L.LANGUAGE_CODE);
+end ADD_LANGUAGE;
+
+procedure TRANSLATE_ROW (
+  X_RULE_ID in NUMBER,
+  X_RULE_NAME in VARCHAR2,
+  X_RULE_DESCRIPTION in VARCHAR2,
+  X_OWNER in VARCHAR2) IS
+begin
+
+    update AR_BPA_RULES_TL
+      set RULE_NAME = X_RULE_NAME,
+          RULE_DESCRIPTION = X_RULE_DESCRIPTION,
+          source_lang = userenv('LANG'),
+          last_update_date = sysdate,
+          last_updated_by = decode(X_OWNER, 'SEED', 1, 0),
+          last_update_login = 0
+    where RULE_ID = X_RULE_ID
+    and   userenv('LANG') in (language, source_lang);
+
+end TRANSLATE_ROW;
+
+procedure LOAD_ROW (
+  X_RULE_ID in NUMBER,
+  X_PRIMARY_APP_ID in NUMBER,
+  X_SECONDARY_APP_ID in NUMBER,
+  X_RULE_SEARCH_ORDER in NUMBER,
+  X_MATCH_ALL_ATTRIBUTES in VARCHAR2,
+  X_SEEDED_FLAG in VARCHAR2,
+  X_RULE_NAME in VARCHAR2,
+  X_RULE_DESCRIPTION in VARCHAR2,
+  X_PRINT_RULE_SEARCH_ORDER in NUMBER,
+  X_SAME_PRINTING_TEMPLATE_FLAG IN VARCHAR2,
+  X_CM_SAME_PRT_TMPLT_FLAG in VARCHAR2,
+  X_DM_SAME_PRT_TMPLT_FLAG in VARCHAR2,
+  X_CB_SAME_PRT_TMPLT_FLAG in VARCHAR2,
+  X_DEP_SAME_PRT_TMPLT_FLAG in VARCHAR2,
+  X_GUAR_SAME_PRT_TMPLT_FLAG in VARCHAR2,
+  X_OWNER in VARCHAR2
+) IS
+  begin
+   declare
+     user_id            number := 0;
+     row_id             varchar2(64);
+   begin
+     if (X_OWNER = 'SEED') then
+        user_id := 1;
+    end if;
+
+    AR_BPA_RULES_PKG.UPDATE_ROW (
+        X_RULE_ID 		 		=> X_RULE_ID,
+        X_PRIMARY_APP_ID 		=> X_PRIMARY_APP_ID,
+        X_SECONDARY_APP_ID 		=> X_SECONDARY_APP_ID,
+        X_RULE_SEARCH_ORDER 	=> X_RULE_SEARCH_ORDER,
+        X_MATCH_ALL_ATTRIBUTES 	=> X_MATCH_ALL_ATTRIBUTES,
+        X_SEEDED_FLAG 			=> X_SEEDED_FLAG,
+        X_RULE_NAME 		 	=> X_RULE_NAME,
+        X_RULE_DESCRIPTION 		=> X_RULE_DESCRIPTION,
+        X_PRINT_RULE_SEARCH_ORDER 	=> X_PRINT_RULE_SEARCH_ORDER,
+        X_SAME_PRINTING_TEMPLATE_FLAG  => X_SAME_PRINTING_TEMPLATE_FLAG ,
+        X_CM_SAME_PRT_TMPLT_FLAG  => X_CM_SAME_PRT_TMPLT_FLAG ,
+        X_DM_SAME_PRT_TMPLT_FLAG  => X_DM_SAME_PRT_TMPLT_FLAG ,
+        X_CB_SAME_PRT_TMPLT_FLAG  => X_CB_SAME_PRT_TMPLT_FLAG ,
+        X_DEP_SAME_PRT_TMPLT_FLAG  => X_DEP_SAME_PRT_TMPLT_FLAG ,
+        X_GUAR_SAME_PRT_TMPLT_FLAG  => X_GUAR_SAME_PRT_TMPLT_FLAG ,
+        X_LAST_UPDATE_DATE 		=> sysdate,
+        X_LAST_UPDATED_BY 	 	=> user_id,
+        X_LAST_UPDATE_LOGIN 	=> 0);
+    exception
+       when NO_DATA_FOUND then
+           AR_BPA_RULES_PKG.INSERT_ROW (
+                X_ROWID 				=> row_id,
+		        X_RULE_ID 		 		=> X_RULE_ID,
+		        X_PRIMARY_APP_ID 		=> X_PRIMARY_APP_ID,
+		        X_SECONDARY_APP_ID 		=> X_SECONDARY_APP_ID,
+		        X_RULE_SEARCH_ORDER 	=> X_RULE_SEARCH_ORDER,
+		        X_MATCH_ALL_ATTRIBUTES 	=> X_MATCH_ALL_ATTRIBUTES,
+        		X_SEEDED_FLAG 			=> X_SEEDED_FLAG,
+		        X_RULE_NAME 		 	=> X_RULE_NAME,
+		        X_RULE_DESCRIPTION 		=> X_RULE_DESCRIPTION,
+                    X_PRINT_RULE_SEARCH_ORDER 	=> X_PRINT_RULE_SEARCH_ORDER,
+                    X_SAME_PRINTING_TEMPLATE_FLAG  => X_SAME_PRINTING_TEMPLATE_FLAG ,
+		        X_CM_SAME_PRT_TMPLT_FLAG  => X_CM_SAME_PRT_TMPLT_FLAG ,
+		        X_DM_SAME_PRT_TMPLT_FLAG  => X_DM_SAME_PRT_TMPLT_FLAG ,
+		        X_CB_SAME_PRT_TMPLT_FLAG  => X_CB_SAME_PRT_TMPLT_FLAG ,
+		        X_DEP_SAME_PRT_TMPLT_FLAG  => X_DEP_SAME_PRT_TMPLT_FLAG ,
+		        X_GUAR_SAME_PRT_TMPLT_FLAG  => X_GUAR_SAME_PRT_TMPLT_FLAG ,
+				X_CREATION_DATE 	    => sysdate,
+                X_CREATED_BY 			=> user_id,
+                X_LAST_UPDATE_DATE 		=> sysdate,
+                X_LAST_UPDATED_BY 		=> user_id,
+                X_LAST_UPDATE_LOGIN 	=> 0);
+    end;
+end LOAD_ROW;
+
+end AR_BPA_RULES_PKG;
+
+/

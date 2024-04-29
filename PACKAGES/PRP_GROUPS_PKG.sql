@@ -1,0 +1,123 @@
+--------------------------------------------------------
+--  DDL for Package PRP_GROUPS_PKG
+--------------------------------------------------------
+
+  CREATE OR REPLACE EDITIONABLE PACKAGE "APPS"."PRP_GROUPS_PKG" AUTHID CURRENT_USER as
+/* $Header: PRPTGRPS.pls 115.3 2002/12/04 23:55:20 vpalaiya noship $ */
+procedure INSERT_ROW (
+  X_ROWID in out nocopy VARCHAR2,
+  X_GROUP_ID in NUMBER,
+  X_OBJECT_VERSION_NUMBER in NUMBER,
+  X_ATTRIBUTE_CATEGORY in VARCHAR2,
+  X_ATTRIBUTE1 in VARCHAR2,
+  X_ATTRIBUTE2 in VARCHAR2,
+  X_ATTRIBUTE3 in VARCHAR2,
+  X_ATTRIBUTE4 in VARCHAR2,
+  X_ATTRIBUTE5 in VARCHAR2,
+  X_ATTRIBUTE6 in VARCHAR2,
+  X_ATTRIBUTE7 in VARCHAR2,
+  X_ATTRIBUTE8 in VARCHAR2,
+  X_ATTRIBUTE9 in VARCHAR2,
+  X_ATTRIBUTE10 in VARCHAR2,
+  X_ATTRIBUTE11 in VARCHAR2,
+  X_ATTRIBUTE12 in VARCHAR2,
+  X_ATTRIBUTE13 in VARCHAR2,
+  X_ATTRIBUTE14 in VARCHAR2,
+  X_ATTRIBUTE15 in VARCHAR2,
+  X_GROUP_NAME in VARCHAR2,
+  X_GROUP_DESC in VARCHAR2,
+  X_CREATION_DATE in DATE,
+  X_CREATED_BY in NUMBER,
+  X_LAST_UPDATE_DATE in DATE,
+  X_LAST_UPDATED_BY in NUMBER,
+  X_LAST_UPDATE_LOGIN in NUMBER);
+procedure LOCK_ROW (
+  X_GROUP_ID in NUMBER,
+  X_OBJECT_VERSION_NUMBER in NUMBER,
+  X_ATTRIBUTE_CATEGORY in VARCHAR2,
+  X_ATTRIBUTE1 in VARCHAR2,
+  X_ATTRIBUTE2 in VARCHAR2,
+  X_ATTRIBUTE3 in VARCHAR2,
+  X_ATTRIBUTE4 in VARCHAR2,
+  X_ATTRIBUTE5 in VARCHAR2,
+  X_ATTRIBUTE6 in VARCHAR2,
+  X_ATTRIBUTE7 in VARCHAR2,
+  X_ATTRIBUTE8 in VARCHAR2,
+  X_ATTRIBUTE9 in VARCHAR2,
+  X_ATTRIBUTE10 in VARCHAR2,
+  X_ATTRIBUTE11 in VARCHAR2,
+  X_ATTRIBUTE12 in VARCHAR2,
+  X_ATTRIBUTE13 in VARCHAR2,
+  X_ATTRIBUTE14 in VARCHAR2,
+  X_ATTRIBUTE15 in VARCHAR2,
+  X_GROUP_NAME in VARCHAR2,
+  X_GROUP_DESC in VARCHAR2
+);
+procedure UPDATE_ROW (
+  X_GROUP_ID in NUMBER,
+  X_OBJECT_VERSION_NUMBER in NUMBER,
+  X_ATTRIBUTE_CATEGORY in VARCHAR2,
+  X_ATTRIBUTE1 in VARCHAR2,
+  X_ATTRIBUTE2 in VARCHAR2,
+  X_ATTRIBUTE3 in VARCHAR2,
+  X_ATTRIBUTE4 in VARCHAR2,
+  X_ATTRIBUTE5 in VARCHAR2,
+  X_ATTRIBUTE6 in VARCHAR2,
+  X_ATTRIBUTE7 in VARCHAR2,
+  X_ATTRIBUTE8 in VARCHAR2,
+  X_ATTRIBUTE9 in VARCHAR2,
+  X_ATTRIBUTE10 in VARCHAR2,
+  X_ATTRIBUTE11 in VARCHAR2,
+  X_ATTRIBUTE12 in VARCHAR2,
+  X_ATTRIBUTE13 in VARCHAR2,
+  X_ATTRIBUTE14 in VARCHAR2,
+  X_ATTRIBUTE15 in VARCHAR2,
+  X_GROUP_NAME in VARCHAR2,
+  X_GROUP_DESC in VARCHAR2,
+  X_LAST_UPDATE_DATE in DATE,
+  X_LAST_UPDATED_BY in NUMBER,
+  X_LAST_UPDATE_LOGIN in NUMBER
+);
+procedure DELETE_ROW (
+  X_GROUP_ID in NUMBER
+);
+procedure ADD_LANGUAGE;
+
+procedure LOAD_ROW
+  (
+  p_owner                 IN VARCHAR2,
+  p_group_id              IN NUMBER,
+  p_object_version_number IN NUMBER,
+  p_attribute_category    IN VARCHAR2,
+  p_attribute1            IN VARCHAR2,
+  p_attribute2            IN VARCHAR2,
+  p_attribute3            IN VARCHAR2,
+  p_attribute4            IN VARCHAR2,
+  p_attribute5            IN VARCHAR2,
+  p_attribute6            IN VARCHAR2,
+  p_attribute7            IN VARCHAR2,
+  p_attribute8            IN VARCHAR2,
+  p_attribute9            IN VARCHAR2,
+  p_attribute10           IN VARCHAR2,
+  p_attribute11           IN VARCHAR2,
+  p_attribute12           IN VARCHAR2,
+  p_attribute13           IN VARCHAR2,
+  p_attribute14           IN VARCHAR2,
+  p_attribute15           IN VARCHAR2,
+  p_group_name            IN VARCHAR2,
+  p_group_desc            IN VARCHAR2
+  );
+
+procedure TRANSLATE_ROW
+  (
+   p_owner                              IN VARCHAR2,
+   p_group_id                           IN NUMBER,
+   p_group_name                         IN VARCHAR2,
+   p_group_desc                         IN VARCHAR2
+  );
+
+end PRP_GROUPS_PKG;
+
+ 
+
+/

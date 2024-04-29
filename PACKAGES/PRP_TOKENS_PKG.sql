@@ -1,0 +1,164 @@
+--------------------------------------------------------
+--  DDL for Package PRP_TOKENS_PKG
+--------------------------------------------------------
+
+  CREATE OR REPLACE EDITIONABLE PACKAGE "APPS"."PRP_TOKENS_PKG" AUTHID CURRENT_USER as
+/* $Header: PRPTTKNS.pls 115.4 2003/11/18 02:22:39 hekkiral ship $ */
+procedure INSERT_ROW (
+  X_ROWID in out nocopy VARCHAR2,
+  X_TOKEN_ID in NUMBER,
+  X_OBJECT_VERSION_NUMBER in NUMBER,
+  X_TOKEN_CODE in VARCHAR2,
+  X_TOKEN_TYPE in VARCHAR2,
+  X_NATIVE_OBJECT_TYPE in VARCHAR2,
+  X_USER_DEFINED_OPTIONS in VARCHAR2,
+  X_JAVA_PROGRAM_NAME in VARCHAR2,
+  X_DATA_TYPE in VARCHAR2,
+  X_DISPLAY_LENGTH in NUMBER,
+  X_START_DATE_ACTIVE in DATE,
+  X_END_DATE_ACTIVE in DATE,
+  X_ATTRIBUTE_CATEGORY in VARCHAR2,
+  X_ATTRIBUTE1 in VARCHAR2,
+  X_ATTRIBUTE2 in VARCHAR2,
+  X_ATTRIBUTE3 in VARCHAR2,
+  X_ATTRIBUTE4 in VARCHAR2,
+  X_ATTRIBUTE5 in VARCHAR2,
+  X_ATTRIBUTE6 in VARCHAR2,
+  X_ATTRIBUTE7 in VARCHAR2,
+  X_ATTRIBUTE8 in VARCHAR2,
+  X_ATTRIBUTE9 in VARCHAR2,
+  X_ATTRIBUTE10 in VARCHAR2,
+  X_ATTRIBUTE11 in VARCHAR2,
+  X_ATTRIBUTE12 in VARCHAR2,
+  X_ATTRIBUTE13 in VARCHAR2,
+  X_ATTRIBUTE14 in VARCHAR2,
+  X_ATTRIBUTE15 in VARCHAR2,
+  X_TOKEN_NAME in VARCHAR2,
+  X_TOKEN_PROMPT in VARCHAR2,
+  X_TOKEN_DESC in VARCHAR2,
+  X_CREATION_DATE in DATE,
+  X_CREATED_BY in NUMBER,
+  X_LAST_UPDATE_DATE in DATE,
+  X_LAST_UPDATED_BY in NUMBER,
+  X_LAST_UPDATE_LOGIN in NUMBER);
+procedure LOCK_ROW (
+  X_TOKEN_ID in NUMBER,
+  X_OBJECT_VERSION_NUMBER in NUMBER,
+  X_TOKEN_CODE in VARCHAR2,
+  X_TOKEN_TYPE in VARCHAR2,
+  X_NATIVE_OBJECT_TYPE in VARCHAR2,
+  X_USER_DEFINED_OPTIONS in VARCHAR2,
+  X_JAVA_PROGRAM_NAME in VARCHAR2,
+  X_DATA_TYPE in VARCHAR2,
+  X_DISPLAY_LENGTH in NUMBER,
+  X_START_DATE_ACTIVE in DATE,
+  X_END_DATE_ACTIVE in DATE,
+  X_ATTRIBUTE_CATEGORY in VARCHAR2,
+  X_ATTRIBUTE1 in VARCHAR2,
+  X_ATTRIBUTE2 in VARCHAR2,
+  X_ATTRIBUTE3 in VARCHAR2,
+  X_ATTRIBUTE4 in VARCHAR2,
+  X_ATTRIBUTE5 in VARCHAR2,
+  X_ATTRIBUTE6 in VARCHAR2,
+  X_ATTRIBUTE7 in VARCHAR2,
+  X_ATTRIBUTE8 in VARCHAR2,
+  X_ATTRIBUTE9 in VARCHAR2,
+  X_ATTRIBUTE10 in VARCHAR2,
+  X_ATTRIBUTE11 in VARCHAR2,
+  X_ATTRIBUTE12 in VARCHAR2,
+  X_ATTRIBUTE13 in VARCHAR2,
+  X_ATTRIBUTE14 in VARCHAR2,
+  X_ATTRIBUTE15 in VARCHAR2,
+  X_TOKEN_NAME in VARCHAR2,
+  X_TOKEN_PROMPT in VARCHAR2,
+  X_TOKEN_DESC in VARCHAR2
+);
+procedure UPDATE_ROW (
+  X_TOKEN_ID in NUMBER,
+  X_OBJECT_VERSION_NUMBER in NUMBER,
+  X_TOKEN_CODE in VARCHAR2,
+  X_TOKEN_TYPE in VARCHAR2,
+  X_NATIVE_OBJECT_TYPE in VARCHAR2,
+  X_USER_DEFINED_OPTIONS in VARCHAR2,
+  X_JAVA_PROGRAM_NAME in VARCHAR2,
+  X_DATA_TYPE in VARCHAR2,
+  X_DISPLAY_LENGTH in NUMBER,
+  X_START_DATE_ACTIVE in DATE,
+  X_END_DATE_ACTIVE in DATE,
+  X_ATTRIBUTE_CATEGORY in VARCHAR2,
+  X_ATTRIBUTE1 in VARCHAR2,
+  X_ATTRIBUTE2 in VARCHAR2,
+  X_ATTRIBUTE3 in VARCHAR2,
+  X_ATTRIBUTE4 in VARCHAR2,
+  X_ATTRIBUTE5 in VARCHAR2,
+  X_ATTRIBUTE6 in VARCHAR2,
+  X_ATTRIBUTE7 in VARCHAR2,
+  X_ATTRIBUTE8 in VARCHAR2,
+  X_ATTRIBUTE9 in VARCHAR2,
+  X_ATTRIBUTE10 in VARCHAR2,
+  X_ATTRIBUTE11 in VARCHAR2,
+  X_ATTRIBUTE12 in VARCHAR2,
+  X_ATTRIBUTE13 in VARCHAR2,
+  X_ATTRIBUTE14 in VARCHAR2,
+  X_ATTRIBUTE15 in VARCHAR2,
+  X_TOKEN_NAME in VARCHAR2,
+  X_TOKEN_PROMPT in VARCHAR2,
+  X_TOKEN_DESC in VARCHAR2,
+  X_LAST_UPDATE_DATE in DATE,
+  X_LAST_UPDATED_BY in NUMBER,
+  X_LAST_UPDATE_LOGIN in NUMBER
+);
+procedure DELETE_ROW (
+  X_TOKEN_ID in NUMBER
+);
+procedure ADD_LANGUAGE;
+
+procedure LOAD_ROW
+  (
+  p_owner                 IN VARCHAR2,
+  p_token_id              IN NUMBER,
+  p_object_version_number IN NUMBER,
+  p_token_code            IN VARCHAR2,
+  p_token_type            IN VARCHAR2,
+  p_native_object_type    IN VARCHAR2,
+  p_user_defined_options  IN VARCHAR2,
+  p_java_program_name     IN VARCHAR2,
+  p_data_type             IN VARCHAR2,
+  p_display_length        IN NUMBER,
+  p_start_date_active	 IN DATE,
+  p_end_date_active		 IN DATE,
+  p_attribute_category    IN VARCHAR2,
+  p_attribute1            IN VARCHAR2,
+  p_attribute2            IN VARCHAR2,
+  p_attribute3            IN VARCHAR2,
+  p_attribute4            IN VARCHAR2,
+  p_attribute5            IN VARCHAR2,
+  p_attribute6            IN VARCHAR2,
+  p_attribute7            IN VARCHAR2,
+  p_attribute8            IN VARCHAR2,
+  p_attribute9            IN VARCHAR2,
+  p_attribute10           IN VARCHAR2,
+  p_attribute11           IN VARCHAR2,
+  p_attribute12           IN VARCHAR2,
+  p_attribute13           IN VARCHAR2,
+  p_attribute14           IN VARCHAR2,
+  p_attribute15           IN VARCHAR2,
+  p_token_name            IN VARCHAR2,
+  p_token_prompt          IN VARCHAR2,
+  p_token_desc            IN VARCHAR2
+  );
+
+procedure TRANSLATE_ROW
+  (
+   p_owner                              IN VARCHAR2,
+   p_token_id                           IN NUMBER,
+   p_token_name                         IN VARCHAR2,
+   p_token_prompt                       IN VARCHAR2,
+   p_token_desc                         IN VARCHAR2
+  );
+
+end PRP_TOKENS_PKG;
+
+ 
+
+/

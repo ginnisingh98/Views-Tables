@@ -1,0 +1,20 @@
+--------------------------------------------------------
+--  DDL for Package CSL_MTL_SERIAL_NUMBERS_ACC_PKG
+--------------------------------------------------------
+
+  CREATE OR REPLACE EDITIONABLE PACKAGE "APPS"."CSL_MTL_SERIAL_NUMBERS_ACC_PKG" AUTHID CURRENT_USER AS
+/* $Header: cslsnacs.pls 120.0 2005/05/24 18:14:30 appldev noship $ */
+
+PROCEDURE INSERT_SERIAL_NUMBERS( p_resource_id IN NUMBER );
+
+PROCEDURE DELETE_SERIAL_NUMBERS;
+
+PROCEDURE UPDATE_SERIAL_NUMBERS( p_date IN DATE );
+
+PROCEDURE CON_REQUEST_SERIAL_NUMBERS;
+
+END CSL_MTL_SERIAL_NUMBERS_ACC_PKG;
+
+ 
+
+/

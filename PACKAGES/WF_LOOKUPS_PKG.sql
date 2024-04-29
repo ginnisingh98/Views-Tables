@@ -1,0 +1,41 @@
+--------------------------------------------------------
+--  DDL for Package WF_LOOKUPS_PKG
+--------------------------------------------------------
+
+  CREATE OR REPLACE EDITIONABLE PACKAGE "APPS"."WF_LOOKUPS_PKG" AUTHID CURRENT_USER as
+/* $Header: wflucs.pls 120.2 2005/10/05 00:40:37 anachatt ship $ */
+procedure INSERT_ROW (
+  X_ROWID in out NOCOPY VARCHAR2,
+  X_LOOKUP_TYPE in VARCHAR2,
+  X_LOOKUP_CODE in VARCHAR2,
+  X_PROTECT_LEVEL in NUMBER,
+  X_CUSTOM_LEVEL in NUMBER,
+  X_MEANING in VARCHAR2,
+  X_DESCRIPTION in VARCHAR2
+);
+procedure LOCK_ROW (
+  X_LOOKUP_TYPE in VARCHAR2,
+  X_LOOKUP_CODE in VARCHAR2,
+  X_PROTECT_LEVEL in NUMBER,
+  X_CUSTOM_LEVEL in NUMBER,
+  X_MEANING in VARCHAR2,
+  X_DESCRIPTION in VARCHAR2
+);
+procedure UPDATE_ROW (
+  X_LOOKUP_TYPE in VARCHAR2,
+  X_LOOKUP_CODE in VARCHAR2,
+  X_PROTECT_LEVEL in NUMBER,
+  X_CUSTOM_LEVEL in NUMBER,
+  X_MEANING in VARCHAR2,
+  X_DESCRIPTION in VARCHAR2
+);
+procedure DELETE_ROW (
+  X_LOOKUP_TYPE in VARCHAR2,
+  X_LOOKUP_CODE in VARCHAR2
+);
+procedure ADD_LANGUAGE;
+end WF_LOOKUPS_PKG;
+
+ 
+
+/

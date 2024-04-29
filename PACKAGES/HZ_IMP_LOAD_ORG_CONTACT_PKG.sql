@@ -1,0 +1,126 @@
+--------------------------------------------------------
+--  DDL for Package HZ_IMP_LOAD_ORG_CONTACT_PKG
+--------------------------------------------------------
+
+  CREATE OR REPLACE EDITIONABLE PACKAGE "APPS"."HZ_IMP_LOAD_ORG_CONTACT_PKG" AUTHID CURRENT_USER AS
+/*$Header: ARHLORCS.pls 120.8.12010000.2 2008/10/23 11:16:52 idali ship $*/
+
+  /* HZ_IMP_CONTACTS_INT columns */
+
+TYPE batch_id                  		IS TABLE OF HZ_IMP_CONTACTS_INT.BATCH_ID%TYPE;
+TYPE contact_orig_system                IS TABLE OF HZ_IMP_CONTACTS_INT.CONTACT_ORIG_SYSTEM%TYPE;
+TYPE contact_orig_system_reference      IS TABLE OF HZ_IMP_CONTACTS_INT.CONTACT_ORIG_SYSTEM_REFERENCE%TYPE;
+TYPE sub_orig_system                    IS TABLE OF HZ_IMP_CONTACTS_INT.SUB_ORIG_SYSTEM%TYPE;
+TYPE sub_orig_system_reference          IS TABLE OF HZ_IMP_CONTACTS_INT.SUB_ORIG_SYSTEM_REFERENCE%TYPE;
+TYPE obj_orig_system                    IS TABLE OF HZ_IMP_CONTACTS_INT.OBJ_ORIG_SYSTEM%TYPE;
+TYPE obj_orig_system_reference          IS TABLE OF HZ_IMP_CONTACTS_INT.OBJ_ORIG_SYSTEM_REFERENCE%TYPE;
+TYPE insert_update_flag                 IS TABLE OF HZ_IMP_CONTACTS_INT.INSERT_UPDATE_FLAG%TYPE;
+TYPE contact_number                     IS TABLE OF HZ_IMP_CONTACTS_INT.CONTACT_NUMBER%TYPE;
+TYPE department_code                    IS TABLE OF HZ_IMP_CONTACTS_INT.DEPARTMENT_CODE%TYPE;
+TYPE department                         IS TABLE OF HZ_IMP_CONTACTS_INT.DEPARTMENT%TYPE;
+TYPE title                              IS TABLE OF HZ_IMP_CONTACTS_INT.TITLE%TYPE;
+TYPE job_title                          IS TABLE OF HZ_IMP_CONTACTS_INT.JOB_TITLE%TYPE;
+TYPE job_title_code                     IS TABLE OF HZ_IMP_CONTACTS_INT.JOB_TITLE_CODE%TYPE;
+TYPE decision_maker_flag                IS TABLE OF HZ_IMP_CONTACTS_INT.DECISION_MAKER_FLAG%TYPE;
+TYPE reference_use_flag                 IS TABLE OF HZ_IMP_CONTACTS_INT.REFERENCE_USE_FLAG%TYPE;
+TYPE comments                		IS TABLE OF HZ_IMP_CONTACTS_INT.COMMENTS%TYPE;
+TYPE relationship_type                  IS TABLE OF HZ_IMP_CONTACTS_INT.RELATIONSHIP_TYPE%TYPE;
+TYPE relationship_code                  IS TABLE OF HZ_IMP_CONTACTS_INT.RELATIONSHIP_CODE%TYPE;
+TYPE start_date              		IS TABLE OF HZ_IMP_CONTACTS_INT.START_DATE%TYPE;
+TYPE end_date                		IS TABLE OF HZ_IMP_CONTACTS_INT.END_DATE%TYPE;
+TYPE rel_comments            	        IS TABLE OF HZ_IMP_CONTACTS_INT.REL_COMMENTS%TYPE;
+TYPE attribute_category                 IS TABLE OF HZ_IMP_CONTACTS_INT.ATTRIBUTE_CATEGORY%TYPE;
+TYPE attribute              		IS TABLE OF HZ_IMP_CONTACTS_INT.ATTRIBUTE1%TYPE;
+TYPE attribute2              		IS TABLE OF HZ_IMP_CONTACTS_INT.ATTRIBUTE2%TYPE;
+TYPE attribute3                         IS TABLE OF HZ_IMP_CONTACTS_INT.ATTRIBUTE3%TYPE;
+TYPE attribute4                         IS TABLE OF HZ_IMP_CONTACTS_INT.ATTRIBUTE4%TYPE;
+TYPE attribute5                         IS TABLE OF HZ_IMP_CONTACTS_INT.ATTRIBUTE5%TYPE;
+TYPE attribute6                         IS TABLE OF HZ_IMP_CONTACTS_INT.ATTRIBUTE6%TYPE;
+TYPE attribute7                         IS TABLE OF HZ_IMP_CONTACTS_INT.ATTRIBUTE7%TYPE;
+TYPE attribute8                         IS TABLE OF HZ_IMP_CONTACTS_INT.ATTRIBUTE8%TYPE;
+TYPE attribute9                         IS TABLE OF HZ_IMP_CONTACTS_INT.ATTRIBUTE9%TYPE;
+TYPE attribute10                        IS TABLE OF HZ_IMP_CONTACTS_INT.ATTRIBUTE10%TYPE;
+TYPE attribute11                        IS TABLE OF HZ_IMP_CONTACTS_INT.ATTRIBUTE11%TYPE;
+TYPE attribute12                        IS TABLE OF HZ_IMP_CONTACTS_INT.ATTRIBUTE12%TYPE;
+TYPE attribute13                        IS TABLE OF HZ_IMP_CONTACTS_INT.ATTRIBUTE13%TYPE;
+TYPE attribute14                        IS TABLE OF HZ_IMP_CONTACTS_INT.ATTRIBUTE14%TYPE;
+TYPE attribute15                        IS TABLE OF HZ_IMP_CONTACTS_INT.ATTRIBUTE15%TYPE;
+TYPE attribute16                        IS TABLE OF HZ_IMP_CONTACTS_INT.ATTRIBUTE16%TYPE;
+TYPE attribute17                        IS TABLE OF HZ_IMP_CONTACTS_INT.ATTRIBUTE17%TYPE;
+TYPE attribute18                        IS TABLE OF HZ_IMP_CONTACTS_INT.ATTRIBUTE18%TYPE;
+TYPE attribute19                        IS TABLE OF HZ_IMP_CONTACTS_INT.ATTRIBUTE19%TYPE;
+TYPE attribute20                        IS TABLE OF HZ_IMP_CONTACTS_INT.ATTRIBUTE20%TYPE;
+TYPE interface_status                   IS TABLE OF HZ_IMP_CONTACTS_INT.INTERFACE_STATUS%TYPE;
+TYPE error_id                           IS TABLE OF HZ_IMP_CONTACTS_INT.ERROR_ID%TYPE;
+TYPE created_by_module                  IS TABLE OF HZ_IMP_CONTACTS_INT.CREATED_BY_MODULE%TYPE;
+
+TYPE party_id                           IS TABLE OF HZ_PARTIES.PARTY_ID%TYPE;
+TYPE party_name                         IS TABLE OF HZ_PARTIES.PARTY_NAME%TYPE;
+TYPE party_type                         IS TABLE OF HZ_PARTIES.PARTY_TYPE%TYPE;
+TYPE party_number                       IS TABLE OF HZ_PARTIES.PARTY_NUMBER%TYPE;
+
+TYPE ORG_CONTACT_ID			IS TABLE OF HZ_ORG_CONTACTS.ORG_CONTACT_ID%TYPE;
+TYPE DIRECTION_CODE			IS TABLE OF HZ_RELATIONSHIPS.DIRECTION_CODE%TYPE;
+
+TYPE ROWID				IS TABLE OF VARCHAR2(50); --UROWID;
+TYPE TYPE_COLUMN			IS TABLE OF VARCHAR2(30);
+TYPE IND_COLUMN			        IS TABLE OF VARCHAR2(30);
+TYPE YEAR_COLUMN			IS TABLE OF NUMBER(4);
+TYPE NUMBER_COLUMN			IS TABLE OF NUMBER;
+TYPE FLAG_COLUMN			IS TABLE OF VARCHAR2(1);
+TYPE DATE_COLUMN			IS TABLE OF DATE;
+
+
+TYPE ERROR_MESSAGE_NAME		        IS TABLE OF HZ_IMP_ERRORS.MESSAGE_NAME%TYPE;
+TYPE ERROR_MESSAGE_TOKEN		IS TABLE OF HZ_IMP_ERRORS.TOKEN1_VALUE%TYPE;
+TYPE ERROR_MESSAGE_TOKEN_NAME		IS TABLE OF HZ_IMP_ERRORS.TOKEN1_NAME%TYPE;
+
+TYPE RefCurType IS REF CURSOR;
+
+
+/* Validation error columns */
+TYPE ERROR_IDS IS TABLE OF hz_imp_errors.error_id%TYPE;
+TYPE LOOKUP_ERROR IS TABLE OF ar_lookups.lookup_code%TYPE;
+TYPE FLAG_ERROR IS TABLE OF VARCHAR2(1);
+
+/* Data load G_MISS values */
+--G_MISS_NUM CONSTANT NUMBER := -9999;
+--G_MISS_CHAR CONSTANT VARCHAR2(1) := '!';
+--G_MISS_DATE CONSTANT DATE := to_date('01/01/4000', 'DD/MM/YYYY');
+
+
+PROCEDURE load_org_contacts (
+   P_DML_RECORD                IN            HZ_IMP_LOAD_WRAPPER.DML_RECORD_TYPE
+  ,X_RETURN_STATUS             OUT NOCOPY    VARCHAR2
+  ,X_MSG_COUNT                 OUT NOCOPY    NUMBER
+  ,X_MSG_DATA                  OUT NOCOPY    VARCHAR2 );
+
+FUNCTION validate_desc_flexfield_f(
+  p_attr_category  IN VARCHAR2,
+  p_attr1          IN VARCHAR2,
+  p_attr2          IN VARCHAR2,
+  p_attr3          IN VARCHAR2,
+  p_attr4          IN VARCHAR2,
+  p_attr5          IN VARCHAR2,
+  p_attr6          IN VARCHAR2,
+  p_attr7          IN VARCHAR2,
+  p_attr8          IN VARCHAR2,
+  p_attr9          IN VARCHAR2,
+  p_attr10         IN VARCHAR2,
+  p_attr11         IN VARCHAR2,
+  p_attr12         IN VARCHAR2,
+  p_attr13         IN VARCHAR2,
+  p_attr14         IN VARCHAR2,
+  p_attr15         IN VARCHAR2,
+  p_attr16         IN VARCHAR2,
+  p_attr17         IN VARCHAR2,
+  p_attr18         IN VARCHAR2,
+  p_attr19         IN VARCHAR2,
+  p_attr20         IN VARCHAR2,
+  p_validation_date IN DATE
+) RETURN VARCHAR2 ;
+
+
+END HZ_IMP_LOAD_ORG_CONTACT_PKG;
+
+/

@@ -1,0 +1,81 @@
+--------------------------------------------------------
+--  DDL for Package Body AMW_FIN_KEY_ACCOUNTS_PKG
+--------------------------------------------------------
+
+  CREATE OR REPLACE EDITIONABLE PACKAGE BODY "APPS"."AMW_FIN_KEY_ACCOUNTS_PKG" as
+/* $Header: amwtfkab.pls 120.0 2005/10/26 07:06:47 appldev noship $ */
+
+
+procedure ADD_LANGUAGE
+is
+begin
+  delete from AMW_FIN_KEY_ACCOUNTS_TL T
+  where not exists
+    (select NULL
+    from AMW_FIN_KEY_ACCOUNTS_B B
+    where B.ACCOUNT_GROUP_ID = T.ACCOUNT_GROUP_ID
+    and   B.NATURAL_ACCOUNT_ID = T.NATURAL_ACCOUNT_ID
+    );
+
+  update AMW_FIN_KEY_ACCOUNTS_TL T set (
+      NAME
+    ) = (select
+      B.NAME
+    from AMW_FIN_KEY_ACCOUNTS_TL B
+    where B.ACCOUNT_GROUP_ID = T.ACCOUNT_GROUP_ID
+    and   B.NATURAL_ACCOUNT_ID = T.NATURAL_ACCOUNT_ID
+    and B.LANGUAGE = T.SOURCE_LANG)
+  where (
+      T.ACCOUNT_GROUP_ID,
+      T.NATURAL_ACCOUNT_ID,
+      T.LANGUAGE
+  ) in (select
+      SUBT.ACCOUNT_GROUP_ID,
+      SUBT.NATURAL_ACCOUNT_ID,
+      SUBT.LANGUAGE
+    from AMW_FIN_KEY_ACCOUNTS_TL SUBB, AMW_FIN_KEY_ACCOUNTS_TL SUBT
+    where SUBB.ACCOUNT_GROUP_ID = SUBT.ACCOUNT_GROUP_ID
+    and   SUBB.NATURAL_ACCOUNT_ID = SUBT.NATURAL_ACCOUNT_ID
+    and SUBB.LANGUAGE = SUBT.SOURCE_LANG
+    and (SUBB.NAME <> SUBT.NAME
+  ));
+
+  insert into AMW_FIN_KEY_ACCOUNTS_TL (
+    OBJECT_VERSION_NUMBER,
+    LAST_UPDATED_BY,
+    LAST_UPDATE_DATE,
+    CREATED_BY,
+    SOURCE_LANG,
+    CREATION_DATE,
+    LAST_UPDATE_LOGIN,
+    ACCOUNT_GROUP_ID,
+    NATURAL_ACCOUNT_ID,
+    NAME,
+    LANGUAGE
+ ) select /*+ ORDERED */
+    B.OBJECT_VERSION_NUMBER,
+    B.LAST_UPDATED_BY,
+    B.LAST_UPDATE_DATE,
+    B.CREATED_BY,
+    B.SOURCE_LANG,
+    B.CREATION_DATE,
+    B.LAST_UPDATE_LOGIN,
+    B.ACCOUNT_GROUP_ID,
+    B.NATURAL_ACCOUNT_ID,
+    B.NAME,
+    L.LANGUAGE_CODE
+  from AMW_FIN_KEY_ACCOUNTS_TL B, FND_LANGUAGES L
+  where L.INSTALLED_FLAG in ('I', 'B')
+  and B.LANGUAGE = userenv('LANG')
+  and not exists
+    (select NULL
+    from AMW_FIN_KEY_ACCOUNTS_TL T
+    where T.ACCOUNT_GROUP_ID = B.ACCOUNT_GROUP_ID
+    and   T.NATURAL_ACCOUNT_ID = B.NATURAL_ACCOUNT_ID
+    and T.LANGUAGE = L.LANGUAGE_CODE);
+end ADD_LANGUAGE;
+
+
+end AMW_FIN_KEY_ACCOUNTS_PKG;
+
+/

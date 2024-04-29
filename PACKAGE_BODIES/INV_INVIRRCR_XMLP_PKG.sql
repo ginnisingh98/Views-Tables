@@ -1,0 +1,83 @@
+--------------------------------------------------------
+--  DDL for Package Body INV_INVIRRCR_XMLP_PKG
+--------------------------------------------------------
+
+  CREATE OR REPLACE EDITIONABLE PACKAGE BODY "APPS"."INV_INVIRRCR_XMLP_PKG" AS
+/* $Header: INVIRRCRB.pls 120.2 2007/12/25 10:29:15 dwkrishn noship $ */
+  FUNCTION C_FORMATTEDCURRENCYCODEFORMULA(CURRENCY_CODE IN VARCHAR2) RETURN VARCHAR2 IS
+  BEGIN
+    DECLARE
+      TEMP_C VARCHAR2(20);
+    BEGIN
+      TEMP_C := '(' || CURRENCY_CODE || ')';
+      RETURN (TEMP_C);
+    END;
+    RETURN NULL;
+  END C_FORMATTEDCURRENCYCODEFORMULA;
+
+  FUNCTION BEFOREREPORT RETURN BOOLEAN IS
+  BEGIN
+
+
+
+    BEGIN
+      P_CONC_REQUEST_ID := FND_GLOBAL.CONC_REQUEST_ID;
+      /*SRW.USER_EXIT('FND SRWINIT')*/NULL;
+    EXCEPTION
+      WHEN /*SRW.USER_EXIT_FAILURE*/OTHERS THEN
+        /*SRW.MESSAGE(1
+                   ,'Before Report: Init')*/NULL;
+        RAISE;
+    END;
+    SELECT
+      CHART_OF_ACCOUNTS_ID
+    INTO P_EXPENSEACCOUNT_FLEXNUM
+    FROM
+      ORG_ORGANIZATION_DEFINITIONS
+    WHERE ORGANIZATION_ID = P_ORG_ID;
+    BEGIN
+      NULL;
+    EXCEPTION
+      WHEN /*SRW.USER_EXIT_FAILURE*/OTHERS THEN
+        /*SRW.MESSAGE(1
+                   ,'Before Report:
+                                   ExpenseAccountFlex')*/NULL;
+        RAISE;
+    END;
+    BEGIN
+      NULL;
+    EXCEPTION
+      WHEN /*SRW.USER_EXIT_FAILURE*/OTHERS THEN
+        /*SRW.MESSAGE(1
+                   ,'Before Report: LocatorFlex')*/NULL;
+        RAISE;
+    END;
+    BEGIN
+      NULL;
+    EXCEPTION
+      WHEN /*SRW.USER_EXIT_FAILURE*/OTHERS THEN
+        /*SRW.MESSAGE(1
+                   ,'Before Report: ItemFlex')*/NULL;
+        RAISE;
+    END;
+    RETURN (TRUE);
+  END BEFOREREPORT;
+
+  FUNCTION AFTERREPORT RETURN BOOLEAN IS
+  BEGIN
+    BEGIN
+      /*SRW.USER_EXIT('FND SRWEXIT')*/NULL;
+      RETURN (TRUE);
+    END;
+    RETURN (TRUE);
+  END AFTERREPORT;
+
+  FUNCTION AFTERPFORM RETURN BOOLEAN IS
+  BEGIN
+    RETURN (TRUE);
+  END AFTERPFORM;
+
+END INV_INVIRRCR_XMLP_PKG;
+
+
+/

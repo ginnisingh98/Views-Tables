@@ -1,0 +1,305 @@
+--------------------------------------------------------
+--  DDL for Package Body AHL_OSP_ORDER_LINES_PKG
+--------------------------------------------------------
+
+  CREATE OR REPLACE EDITIONABLE PACKAGE BODY "APPS"."AHL_OSP_ORDER_LINES_PKG" as
+/* $Header: AHLLOSLB.pls 120.2 2008/01/30 22:20:13 jaramana ship $ */
+PROCEDURE INSERT_ROW (
+        P_X_OSP_ORDER_LINE_ID       IN OUT NOCOPY NUMBER,
+        P_OBJECT_VERSION_NUMBER     IN NUMBER,
+        P_LAST_UPDATE_DATE          IN DATE,
+        P_LAST_UPDATED_BY           IN NUMBER,
+        P_CREATION_DATE             IN DATE,
+        P_CREATED_BY                IN NUMBER,
+        P_LAST_UPDATE_LOGIN         IN NUMBER,
+        P_OSP_ORDER_ID              IN NUMBER,
+        P_OSP_LINE_NUMBER           IN NUMBER,
+        P_STATUS_CODE               IN VARCHAR2,
+        P_PO_LINE_TYPE_ID           IN NUMBER,
+        P_SERVICE_ITEM_ID           IN NUMBER,
+        P_SERVICE_ITEM_DESCRIPTION  IN VARCHAR2,
+        P_SERVICE_ITEM_UOM_CODE     IN VARCHAR2,
+        P_NEED_BY_DATE              IN DATE,
+        P_SHIP_BY_DATE              IN DATE,
+        P_PO_LINE_ID                IN NUMBER,
+        P_OE_SHIP_LINE_ID           IN NUMBER,
+        P_OE_RETURN_LINE_ID         IN NUMBER,
+        P_WORKORDER_ID              IN NUMBER,
+        P_OPERATION_ID              IN NUMBER,
+        P_QUANTITY                  IN NUMBER,
+        P_EXCHANGE_INSTANCE_ID      IN NUMBER,
+        P_ATTRIBUTE_CATEGORY        IN VARCHAR2,
+        P_ATTRIBUTE1                IN VARCHAR2,
+        P_ATTRIBUTE2                IN VARCHAR2,
+        P_ATTRIBUTE3                IN VARCHAR2,
+        P_ATTRIBUTE4                IN VARCHAR2,
+        P_ATTRIBUTE5                IN VARCHAR2,
+        P_ATTRIBUTE6                IN VARCHAR2,
+        P_ATTRIBUTE7                IN VARCHAR2,
+        P_ATTRIBUTE8                IN VARCHAR2,
+        P_ATTRIBUTE9                IN VARCHAR2,
+        P_ATTRIBUTE10               IN VARCHAR2,
+        P_ATTRIBUTE11               IN VARCHAR2,
+        P_ATTRIBUTE12               IN VARCHAR2,
+        P_ATTRIBUTE13               IN VARCHAR2,
+        P_ATTRIBUTE14               IN VARCHAR2,
+        P_ATTRIBUTE15               IN VARCHAR2,
+        P_INVENTORY_ITEM_ID         IN NUMBER,
+        P_INVENTORY_ORG_ID          IN NUMBER,
+        P_SUB_INVENTORY             IN VARCHAR2,
+        P_LOT_NUMBER                IN VARCHAR2,
+        P_SERIAL_NUMBER             IN VARCHAR2,
+        P_INVENTORY_ITEM_UOM        IN VARCHAR2,
+        P_INVENTORY_ITEM_QUANTITY   IN NUMBER,
+        P_PO_REQ_LINE_ID            IN NUMBER  -- Added by jaramana on January 14, 2008 for the Requisition ER 6034236
+) IS
+
+
+BEGIN
+  insert into AHL_OSP_ORDER_LINES (
+    OSP_ORDER_LINE_ID,
+    OBJECT_VERSION_NUMBER,
+    LAST_UPDATE_DATE,
+    LAST_UPDATED_BY,
+    CREATION_DATE,
+    CREATED_BY,
+    LAST_UPDATE_LOGIN,
+    OSP_ORDER_ID,
+    OSP_LINE_NUMBER,
+    STATUS_CODE,
+    PO_LINE_TYPE_ID,
+    SERVICE_ITEM_ID,
+    SERVICE_ITEM_DESCRIPTION,
+    SERVICE_ITEM_UOM_CODE,
+    NEED_BY_DATE,
+    SHIP_BY_DATE,
+    PO_LINE_ID,
+    OE_SHIP_LINE_ID,
+    OE_RETURN_LINE_ID,
+    WORKORDER_ID,
+    OPERATION_ID,
+    QUANTITY,
+    EXCHANGE_INSTANCE_ID,
+    ATTRIBUTE_CATEGORY,
+    ATTRIBUTE1,
+    ATTRIBUTE2,
+    ATTRIBUTE3,
+    ATTRIBUTE4,
+    ATTRIBUTE5,
+    ATTRIBUTE6,
+    ATTRIBUTE7,
+    ATTRIBUTE8,
+    ATTRIBUTE9,
+    ATTRIBUTE10,
+    ATTRIBUTE11,
+    ATTRIBUTE12,
+    ATTRIBUTE13,
+    ATTRIBUTE14,
+    ATTRIBUTE15,
+    INVENTORY_ITEM_ID,
+    INVENTORY_ORG_ID,
+    SUB_INVENTORY,
+    LOT_NUMBER,
+    SERIAL_NUMBER,
+    INVENTORY_ITEM_UOM,
+    INVENTORY_ITEM_QUANTITY,
+    PO_REQ_LINE_ID  -- Added by jaramana on January 14, 2008 for the Requisition ER 6034236
+   )  values (
+        P_X_OSP_ORDER_LINE_ID,
+        P_OBJECT_VERSION_NUMBER,
+        P_LAST_UPDATE_DATE,
+        P_LAST_UPDATED_BY,
+        P_CREATION_DATE,
+        P_CREATED_BY,
+        P_LAST_UPDATE_LOGIN,
+        P_OSP_ORDER_ID,
+        P_OSP_LINE_NUMBER,
+        P_STATUS_CODE,
+        P_PO_LINE_TYPE_ID,
+        P_SERVICE_ITEM_ID,
+        P_SERVICE_ITEM_DESCRIPTION,
+        P_SERVICE_ITEM_UOM_CODE,
+        P_NEED_BY_DATE,
+        P_SHIP_BY_DATE,
+        P_PO_LINE_ID,
+        P_OE_SHIP_LINE_ID,
+        P_OE_RETURN_LINE_ID,
+        P_WORKORDER_ID,
+        P_OPERATION_ID,
+        P_QUANTITY,
+        P_EXCHANGE_INSTANCE_ID,
+        P_ATTRIBUTE_CATEGORY,
+        P_ATTRIBUTE1,
+        P_ATTRIBUTE2,
+        P_ATTRIBUTE3,
+        P_ATTRIBUTE4,
+        P_ATTRIBUTE5,
+        P_ATTRIBUTE6,
+        P_ATTRIBUTE7,
+        P_ATTRIBUTE8,
+        P_ATTRIBUTE9,
+        P_ATTRIBUTE10,
+        P_ATTRIBUTE11,
+        P_ATTRIBUTE12,
+        P_ATTRIBUTE13,
+        P_ATTRIBUTE14,
+        P_ATTRIBUTE15,
+        P_INVENTORY_ITEM_ID,
+        P_INVENTORY_ORG_ID,
+        P_SUB_INVENTORY,
+        P_LOT_NUMBER,
+        P_SERIAL_NUMBER,
+        P_INVENTORY_ITEM_UOM,
+        P_INVENTORY_ITEM_QUANTITY,
+        P_PO_REQ_LINE_ID  -- Added by jaramana on January 14, 2008 for the Requisition ER 6034236
+) RETURNING OSP_ORDER_LINE_ID INTO P_X_OSP_ORDER_LINE_ID;
+
+EXCEPTION
+    WHEN OTHERS THEN
+        IF(SQLCODE = -1) THEN
+            FND_MESSAGE.Set_Name('AHL','AHL_OSP_DUP_ORDER_LINE');
+            FND_MESSAGE.Set_Token('OSP_ORDER_ID',P_OSP_ORDER_ID);
+            FND_MESSAGE.Set_Token('OSP_LINE_NUMBER',P_OSP_LINE_NUMBER);
+            FND_MSG_PUB.ADD;
+        ELSE
+            RAISE FND_API.G_EXC_UNEXPECTED_ERROR;
+        END IF;
+
+END INSERT_ROW;
+
+
+PROCEDURE UPDATE_ROW (
+        P_OSP_ORDER_LINE_ID         IN NUMBER,
+        P_OBJECT_VERSION_NUMBER     IN NUMBER,
+        P_LAST_UPDATE_DATE          IN DATE,
+        P_LAST_UPDATED_BY           IN NUMBER,
+        P_LAST_UPDATE_LOGIN         IN NUMBER,
+        P_OSP_ORDER_ID              IN NUMBER,
+        P_OSP_LINE_NUMBER           IN NUMBER,
+        P_STATUS_CODE               IN VARCHAR2,
+        P_PO_LINE_TYPE_ID           IN NUMBER,
+        P_SERVICE_ITEM_ID           IN NUMBER,
+        P_SERVICE_ITEM_DESCRIPTION  IN VARCHAR2,
+        P_SERVICE_ITEM_UOM_CODE     IN VARCHAR2,
+        P_NEED_BY_DATE              IN DATE,
+        P_SHIP_BY_DATE              IN DATE,
+        P_PO_LINE_ID                IN NUMBER,
+        P_OE_SHIP_LINE_ID           IN NUMBER,
+        P_OE_RETURN_LINE_ID         IN NUMBER,
+        P_WORKORDER_ID              IN NUMBER,
+        P_OPERATION_ID              IN NUMBER,
+        P_QUANTITY                  IN NUMBER,
+        P_EXCHANGE_INSTANCE_ID      IN NUMBER,
+        P_INVENTORY_ITEM_ID         IN NUMBER,
+        P_INVENTORY_ORG_ID          IN NUMBER,
+        P_INVENTORY_ITEM_UOM        IN VARCHAR2,
+        P_INVENTORY_ITEM_QUANTITY   IN NUMBER,
+        P_SUB_INVENTORY             IN VARCHAR2,
+        P_LOT_NUMBER                IN VARCHAR2,
+        P_SERIAL_NUMBER             IN VARCHAR2,
+        P_PO_REQ_LINE_ID            IN NUMBER,  -- Added by jaramana on January 14, 2008 for the Requisition ER 6034236
+        P_ATTRIBUTE_CATEGORY        IN VARCHAR2,
+        P_ATTRIBUTE1                IN VARCHAR2,
+        P_ATTRIBUTE2                IN VARCHAR2,
+        P_ATTRIBUTE3                IN VARCHAR2,
+        P_ATTRIBUTE4                IN VARCHAR2,
+        P_ATTRIBUTE5                IN VARCHAR2,
+        P_ATTRIBUTE6                IN VARCHAR2,
+        P_ATTRIBUTE7                IN VARCHAR2,
+        P_ATTRIBUTE8                IN VARCHAR2,
+        P_ATTRIBUTE9                IN VARCHAR2,
+        P_ATTRIBUTE10               IN VARCHAR2,
+        P_ATTRIBUTE11               IN VARCHAR2,
+        P_ATTRIBUTE12               IN VARCHAR2,
+        P_ATTRIBUTE13               IN VARCHAR2,
+        P_ATTRIBUTE14               IN VARCHAR2,
+        P_ATTRIBUTE15               IN VARCHAR2
+) IS
+
+
+BEGIN
+  update AHL_OSP_ORDER_LINES set
+        OSP_ORDER_LINE_ID = P_OSP_ORDER_LINE_ID,
+        OBJECT_VERSION_NUMBER = P_OBJECT_VERSION_NUMBER ,
+        LAST_UPDATE_DATE = P_LAST_UPDATE_DATE,
+        LAST_UPDATED_BY = P_LAST_UPDATED_BY,
+        LAST_UPDATE_LOGIN = P_LAST_UPDATE_LOGIN,
+        OSP_ORDER_ID = P_OSP_ORDER_ID,
+        OSP_LINE_NUMBER = P_OSP_LINE_NUMBER,
+        STATUS_CODE = P_STATUS_CODE,
+        PO_LINE_TYPE_ID = P_PO_LINE_TYPE_ID,
+        SERVICE_ITEM_ID = P_SERVICE_ITEM_ID,
+        SERVICE_ITEM_DESCRIPTION = P_SERVICE_ITEM_DESCRIPTION,
+        SERVICE_ITEM_UOM_CODE = P_SERVICE_ITEM_UOM_CODE,
+        NEED_BY_DATE = P_NEED_BY_DATE,
+        SHIP_BY_DATE = P_SHIP_BY_DATE,
+        PO_LINE_ID = P_PO_LINE_ID,
+        OE_SHIP_LINE_ID = P_OE_SHIP_LINE_ID,
+        OE_RETURN_LINE_ID = P_OE_RETURN_LINE_ID,
+        WORKORDER_ID = P_WORKORDER_ID,
+        OPERATION_ID = P_OPERATION_ID,
+        QUANTITY = P_QUANTITY,
+        EXCHANGE_INSTANCE_ID = P_EXCHANGE_INSTANCE_ID,
+        INVENTORY_ITEM_ID = P_INVENTORY_ITEM_ID,
+        INVENTORY_ORG_ID = P_INVENTORY_ORG_ID,
+        INVENTORY_ITEM_UOM = P_INVENTORY_ITEM_UOM,
+        INVENTORY_ITEM_QUANTITY = P_INVENTORY_ITEM_QUANTITY,
+        SUB_INVENTORY = P_SUB_INVENTORY,
+        LOT_NUMBER = P_LOT_NUMBER,
+        SERIAL_NUMBER = P_SERIAL_NUMBER,
+        PO_REQ_LINE_ID = P_PO_REQ_LINE_ID,  -- Added by jaramana on January 14, 2008 for the Requisition ER 6034236
+        ATTRIBUTE_CATEGORY = P_ATTRIBUTE_CATEGORY,
+        ATTRIBUTE1 = P_ATTRIBUTE1,
+        ATTRIBUTE2 = P_ATTRIBUTE2,
+        ATTRIBUTE3 = P_ATTRIBUTE3,
+        ATTRIBUTE4 = P_ATTRIBUTE4,
+        ATTRIBUTE5 = P_ATTRIBUTE5,
+        ATTRIBUTE6 = P_ATTRIBUTE6,
+        ATTRIBUTE7 = P_ATTRIBUTE7,
+        ATTRIBUTE8 = P_ATTRIBUTE8,
+        ATTRIBUTE9 = P_ATTRIBUTE9,
+        ATTRIBUTE10 = P_ATTRIBUTE10,
+        ATTRIBUTE11 = P_ATTRIBUTE11,
+        ATTRIBUTE12 = P_ATTRIBUTE12,
+        ATTRIBUTE13 = P_ATTRIBUTE13,
+        ATTRIBUTE14 = P_ATTRIBUTE14,
+        ATTRIBUTE15 = P_ATTRIBUTE15
+  where OSP_ORDER_LINE_ID = P_OSP_ORDER_LINE_ID
+  and OBJECT_VERSION_NUMBER = P_OBJECT_VERSION_NUMBER - 1;
+
+  IF (SQL%NOTFOUND) then
+    RAISE no_data_found;
+  END IF;
+
+EXCEPTION
+    WHEN OTHERS THEN
+        IF(SQLCODE = -1) THEN
+            FND_MESSAGE.Set_Name('AHL','AHL_OSP_DUP_ORDER_LINE');
+            FND_MESSAGE.Set_Token('OSP_ORDER_ID',P_OSP_ORDER_ID);
+            FND_MESSAGE.Set_Token('OSP_LINE_NUMBER',P_OSP_LINE_NUMBER);
+            FND_MSG_PUB.ADD;
+        ELSE
+            RAISE FND_API.G_EXC_UNEXPECTED_ERROR;
+        END IF;
+
+END UPDATE_ROW;
+
+PROCEDURE DELETE_ROW (
+  P_OSP_ORDER_LINE_ID in NUMBER
+) is
+
+BEGIN
+
+  delete from AHL_OSP_ORDER_LINES
+  where OSP_ORDER_LINE_ID = P_OSP_ORDER_LINE_ID;
+
+  IF (SQL%NOTFOUND) then
+    RAISE no_data_found;
+  END IF;
+
+END DELETE_ROW;
+
+END AHL_OSP_ORDER_LINES_PKG; -- Package spec
+
+
+/

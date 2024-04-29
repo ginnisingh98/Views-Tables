@@ -1,0 +1,31 @@
+--------------------------------------------------------
+--  DDL for Package MSC_CL_SETUP_ODS_LOAD
+--------------------------------------------------------
+
+  CREATE OR REPLACE EDITIONABLE PACKAGE "APPS"."MSC_CL_SETUP_ODS_LOAD" AUTHID CURRENT_USER AS -- specification
+/* $Header: MSCLSTPS.pls 120.0 2007/04/12 06:07:45 vpalla noship $ */
+TYPE NumTblTyp IS TABLE OF NUMBER;
+FUNCTION LINK_SUPPLY_TOP_LINK_ID RETURN BOOLEAN;
+FUNCTION CLEANSE_DATA RETURN BOOLEAN;
+FUNCTION TRANSFORM_KEYS RETURN BOOLEAN;
+ PROCEDURE LOAD_CALENDAR_SET_UP;
+ PROCEDURE LOAD_CALENDAR_DATE;
+ PROCEDURE LOAD_TRADING_PARTNER;
+ PROCEDURE LOAD_PARAMETER;
+ PROCEDURE LOAD_UOM;
+  /* Liability Changes Start */
+
+  PROCEDURE CLEAN_LIAB_AGREEMENT ; -- This procedure cleans the msc_asl_auth_details
+     /* Liability Change end */
+  PROCEDURE GENERATE_TRADING_PARTNER_KEYS (ERRBUF	OUT NOCOPY VARCHAR2,
+			     RETCODE		OUT NOCOPY NUMBER,
+                             pINSTANCE_ID 	IN NUMBER);
+  PROCEDURE GET_COLL_PARAM (p_instance_id NUMBER );
+  PROCEDURE GET_COLL_PARAM
+               (p_instance_id IN  NUMBER,
+                v_prec        OUT NOCOPY MSC_CL_EXCHANGE_PARTTBL.CollParamREC);
+
+
+END MSC_CL_SETUP_ODS_LOAD;
+
+/

@@ -1,0 +1,74 @@
+--------------------------------------------------------
+--  DDL for Package Body JL_JLBRPCDN_XMLP_PKG
+--------------------------------------------------------
+
+  CREATE OR REPLACE EDITIONABLE PACKAGE BODY "APPS"."JL_JLBRPCDN_XMLP_PKG" AS
+/* $Header: JLBRPCDNB.pls 120.1 2007/12/25 16:39:13 dwkrishn noship $ */
+  FUNCTION BEFOREREPORT RETURN BOOLEAN IS
+  BEGIN
+    P_CONC_REQUEST_ID := FND_GLOBAL.CONC_REQUEST_ID;
+    /*SRW.USER_EXIT('FND SRWINIT')*/NULL;
+    DECLARE
+      L_NAME VARCHAR2(30);
+    BEGIN
+      BEGIN
+        SELECT
+          SET_OF_BOOKS_ID
+        INTO P_SET_OF_BOOKS_ID
+        FROM
+          AP_SYSTEM_PARAMETERS;
+      EXCEPTION
+        WHEN OTHERS THEN
+          NULL;
+      END;
+      SELECT
+        SUBSTR(NAME
+              ,1
+              ,30),
+        CURRENCY_CODE
+      INTO L_NAME,C_CURRENCY_CODE
+      FROM
+        GL_SETS_OF_BOOKS
+      WHERE SET_OF_BOOKS_ID = P_SET_OF_BOOKS_ID;
+      C_COMPANY_NAME_HEADER := L_NAME;
+    EXCEPTION
+      WHEN OTHERS THEN
+        NULL;
+    END;
+    RETURN (TRUE);
+  END BEFOREREPORT;
+
+  FUNCTION P_DOCNO_SUP_DATEVALIDTRIGGER RETURN BOOLEAN IS
+  BEGIN
+    IF P_DOCNO_SUP_DATE = 'Document Number' THEN
+      P_DOCNO_SUP_DATE := 'doc.document_number';
+      P_INV_SORT := 'i.invoice_num';
+    ELSE
+      P_DOCNO_SUP_DATE := 'ven.vendor_name desc,doc.due_date';
+      P_INV_SORT := 'pov.vendor_name desc,i.due_date';
+    END IF;
+    RETURN (TRUE);
+  END P_DOCNO_SUP_DATEVALIDTRIGGER;
+
+  FUNCTION AFTERREPORT RETURN BOOLEAN IS
+  BEGIN
+    /*SRW.USER_EXIT('FND SRWEXIT')*/NULL;
+    RETURN (TRUE);
+  END AFTERREPORT;
+
+  FUNCTION C_COMPANY_NAME_HEADER_P RETURN VARCHAR2 IS
+  BEGIN
+    RETURN C_COMPANY_NAME_HEADER;
+  END C_COMPANY_NAME_HEADER_P;
+
+  FUNCTION C_CURRENCY_CODE_P RETURN VARCHAR2 IS
+  BEGIN
+    RETURN C_CURRENCY_CODE;
+  END C_CURRENCY_CODE_P;
+
+END JL_JLBRPCDN_XMLP_PKG;
+
+
+
+
+/

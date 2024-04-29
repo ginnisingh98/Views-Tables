@@ -1,0 +1,346 @@
+--------------------------------------------------------
+--  DDL for Package IEU_PVT
+--------------------------------------------------------
+
+  CREATE OR REPLACE EDITIONABLE PACKAGE "APPS"."IEU_PVT" AUTHID CURRENT_USER AS
+/* $Header: IEU_VS.pls 120.4 2008/02/29 10:53:31 majha ship $ */
+
+
+TYPE ClientClasses IS TABLE OF IEU_UWQ_CLI_MED_PLUGINS.CLI_PLUGIN_CLASS%TYPE
+INDEX BY BINARY_INTEGER;
+
+TYPE EligibleMediaInfo IS RECORD (
+  media_type_id     IEU_UWQ_MEDIA_TYPES_B.MEDIA_TYPE_ID%TYPE,
+  media_type_uuid   IEU_UWQ_MEDIA_TYPES_B.MEDIA_TYPE_UUID%TYPE
+  );
+
+TYPE EligibleMediaList IS TABLE OF EligibleMediaInfo
+INDEX BY BINARY_INTEGER;
+
+TYPE BindValInfo IS RECORD (
+ sel_rt_node_id     IEU_UWQ_RTNODE_BIND_VALS.SEL_RT_NODE_ID%TYPE,
+ node_id            IEU_UWQ_RTNODE_BIND_VALS.NODE_ID%TYPE,
+ bind_var_name      IEU_UWQ_RTNODE_BIND_VALS.BIND_VAR_NAME%TYPE,
+ bind_var_value     IEU_UWQ_RTNODE_BIND_VALS.BIND_VAR_VALUE%TYPE
+  );
+
+TYPE BindValList IS TABLE OF BindValInfo
+INDEX BY BINARY_INTEGER;
+
+/*Bug 6399243 Commented the code
+TYPE IEU_UWQ_SEL_RT_NODES_REC IS RECORD (
+ SEL_RT_NODE_ID         NUMBER,
+ CREATED_BY             NUMBER,
+ CREATION_DATE          DATE,
+ LAST_UPDATED_BY        NUMBER,
+ LAST_UPDATE_DATE       DATE,
+ LAST_UPDATE_LOGIN      NUMBER,
+ RESOURCE_ID            NUMBER,
+ SEL_ENUM_ID            NUMBER,
+ NODE_ID                NUMBER,
+ NODE_TYPE              NUMBER,
+ NODE_LABEL             IEU_UWQ_SEL_RT_NODES.NODE_LABEL%TYPE,
+ COUNT                  NUMBER,
+ DATA_SOURCE            IEU_UWQ_SEL_RT_NODES.DATA_SOURCE%TYPE,
+ VIEW_NAME              IEU_UWQ_SEL_RT_NODES.VIEW_NAME%TYPE,
+ MEDIA_TYPE_ID          NUMBER,
+ SEL_ENUM_PID           NUMBER,
+ NODE_PID               NUMBER,
+ NODE_WEIGHT            NUMBER,
+ WHERE_CLAUSE           IEU_UWQ_SEL_RT_NODES.WHERE_CLAUSE%TYPE,
+ HIDE_IF_EMPTY          IEU_UWQ_SEL_RT_NODES.HIDE_IF_EMPTY%TYPE,
+ NOT_VALID              IEU_UWQ_SEL_RT_NODES.NOT_VALID%TYPE,
+ SECURITY_GROUP_ID      NUMBER,
+ OBJECT_VERSION_NUMBER  NUMBER,
+ REFRESH_VIEW_NAME      IEU_UWQ_SEL_RT_NODES.REFRESH_VIEW_NAME%TYPE,
+ RES_CAT_ENUM_FLAG      IEU_UWQ_SEL_RT_NODES.RES_CAT_ENUM_FLAG%TYPE,
+ REFRESH_VIEW_SUM_COL   IEU_UWQ_SEL_RT_NODES.REFRESH_VIEW_SUM_COL%TYPE,
+ NODE_DEPTH             NUMBER
+);
+
+TYPE IEU_UWQ_SEL_RT_NODES_TAB IS TABLE OF IEU_UWQ_SEL_RT_NODES_REC
+ INDEX BY BINARY_INTEGER;
+ */
+
+TYPE IEU_UWQ_SEL_RT_NODES_TAB IS TABLE OF IEU_UWQ_SEL_RT_NODES%ROWTYPE
+ INDEX BY BINARY_INTEGER;
+
+
+/*Bug 6399243 Commented the code
+TYPE IEU_UWQ_RTNODE_BIND_VALS_REC IS RECORD (
+ RTNODE_BIND_VAR_ID     NUMBER,
+ OBJECT_VERSION_NUMBER  NUMBER,
+ CREATED_BY             NUMBER,
+ CREATION_DATE          DATE,
+ LAST_UPDATED_BY        NUMBER,
+ LAST_UPDATE_DATE       DATE,
+ LAST_UPDATE_LOGIN      NUMBER,
+ SECURITY_GROUP_ID      NUMBER,
+ SEL_RT_NODE_ID         NUMBER,
+ RESOURCE_ID            NUMBER,
+ NODE_ID                NUMBER,
+ BIND_VAR_NAME          IEU_UWQ_RTNODE_BIND_VALS.BIND_VAR_NAME%TYPE,
+ BIND_VAR_VALUE         IEU_UWQ_RTNODE_BIND_VALS.BIND_VAR_VALUE%TYPE,
+ BIND_VAR_DATATYPE      IEU_UWQ_RTNODE_BIND_VALS.BIND_VAR_DATATYPE%TYPE,
+ NOT_VALID_FLAG         IEU_UWQ_RTNODE_BIND_VALS.NOT_VALID_FLAG%TYPE
+);
+
+TYPE IEU_UWQ_RTNODE_BIND_VALS_TAB IS TABLE OF IEU_UWQ_RTNODE_BIND_VALS_REC
+ INDEX BY BINARY_INTEGER;
+*/
+
+TYPE IEU_UWQ_RTNODE_BIND_VALS_TAB IS TABLE OF IEU_UWQ_RTNODE_BIND_VALS%ROWTYPE
+ INDEX BY BINARY_INTEGER;
+
+TYPE NUMBER_TAB                IS TABLE OF NUMBER                                          INDEX BY BINARY_INTEGER;
+TYPE DATE_TAB                  IS TABLE OF DATE                                            INDEX BY BINARY_INTEGER;
+
+TYPE NODE_LABEL_TAB            IS TABLE OF IEU_UWQ_SEL_RT_NODES.NODE_LABEL%TYPE            INDEX BY BINARY_INTEGER;
+TYPE DATA_SOURCE_TAB           IS TABLE OF IEU_UWQ_SEL_RT_NODES.DATA_SOURCE%TYPE           INDEX BY BINARY_INTEGER;
+TYPE VIEW_NAME_TAB             IS TABLE OF IEU_UWQ_SEL_RT_NODES.VIEW_NAME%TYPE             INDEX BY BINARY_INTEGER;
+TYPE WHERE_CLAUSE_TAB          IS TABLE OF IEU_UWQ_SEL_RT_NODES.WHERE_CLAUSE%TYPE          INDEX BY BINARY_INTEGER;
+TYPE HIDE_IF_EMPTY_TAB         IS TABLE OF IEU_UWQ_SEL_RT_NODES.HIDE_IF_EMPTY%TYPE         INDEX BY BINARY_INTEGER;
+TYPE NOT_VALID_TAB             IS TABLE OF IEU_UWQ_SEL_RT_NODES.NOT_VALID%TYPE             INDEX BY BINARY_INTEGER;
+TYPE REFRESH_VIEW_NAME_TAB     IS TABLE OF IEU_UWQ_SEL_RT_NODES.REFRESH_VIEW_NAME%TYPE     INDEX BY BINARY_INTEGER;
+TYPE RES_CAT_ENUM_FLAG_TAB     IS TABLE OF IEU_UWQ_SEL_RT_NODES.RES_CAT_ENUM_FLAG%TYPE     INDEX BY BINARY_INTEGER;
+TYPE REFRESH_VIEW_SUM_COL_TAB  IS TABLE OF IEU_UWQ_SEL_RT_NODES.REFRESH_VIEW_SUM_COL%TYPE  INDEX BY BINARY_INTEGER;
+
+TYPE BIND_VAR_NAME_TAB         IS TABLE OF IEU_UWQ_RTNODE_BIND_VALS.BIND_VAR_NAME%TYPE     INDEX BY BINARY_INTEGER;
+TYPE BIND_VAR_VALUE_TAB        IS TABLE OF IEU_UWQ_RTNODE_BIND_VALS.BIND_VAR_VALUE%TYPE    INDEX BY BINARY_INTEGER;
+TYPE BIND_VAR_DATATYPE_TAB     IS TABLE OF IEU_UWQ_RTNODE_BIND_VALS.BIND_VAR_DATATYPE%TYPE INDEX BY BINARY_INTEGER;
+TYPE NOT_VALID_FLAG_TAB        IS TABLE OF IEU_UWQ_RTNODE_BIND_VALS.NOT_VALID_FLAG%TYPE    INDEX BY BINARY_INTEGER;
+
+/* Used to determine classes to load by the client plugin loader */
+PROCEDURE DETERMINE_CLI_PLUGINS
+  (P_RESOURCE_ID  IN  NUMBER
+  ,X_CLASSES      OUT NOCOPY ClientClasses
+  );
+
+
+/* Used to determine the eligible media types the resource can work on */
+PROCEDURE DETERMINE_ELIGIBLE_MEDIA_TYPES
+  (P_RESOURCE_ID  IN  NUMBER
+  ,X_PLUGINS      OUT NOCOPY EligibleMediaList
+  );
+
+
+/* Used to determine what style of WB is set for an agent */
+FUNCTION DETERMINE_WB_STYLE ( RESOURCE_ID IN NUMBER ) RETURN VARCHAR2;
+
+
+/* Used to determine if a particular media is eligible */
+FUNCTION IS_MEDIA_TYPE_ELIGIBLE
+  (P_RESOURCE_ID      IN  NUMBER
+  ,P_MEDIA_TYPE_UUID  IN  VARCHAR2
+  ) RETURN VARCHAR2;
+
+
+/* Used to determine if a particular media is eligible */
+FUNCTION IS_MEDIA_TYPE_ELIGIBLE
+  (P_RESOURCE_ID    IN  NUMBER
+  ,P_MEDIA_TYPE_ID  IN  NUMBER
+  ) RETURN BOOLEAN;
+
+
+/* Used to build nodes table for Forms tree view. */
+PROCEDURE ENUMERATE_WORK_NODES
+  (P_RESOURCE_ID IN NUMBER
+  ,P_LANGUAGE    IN VARCHAR2
+  ,P_SOURCE_LANG IN VARCHAR2
+  );
+
+
+/* Used to refresh nodes table for Forms tree view. */
+PROCEDURE REFRESH_WORK_NODE_COUNTS( P_RESOURCE_ID IN NUMBER );
+
+PROCEDURE REFRESH_NODE(p_node_id in number,
+       p_node_pid in number,
+       p_sel_enum_id in number,
+       p_where_clause in varchar2,
+       p_res_cat_enum_flag in varchar2,
+       p_refresh_view_name in varchar2,
+       p_refresh_view_sum_col in varchar2,
+       p_sel_rt_node_id in number,
+       p_count in number,
+       p_resource_id in number,
+       p_view_name in varchar2,
+       p_bindvallist in BindValList,
+       x_count out NOCOPY number);
+
+/* Returns information needed to connect UWQ Client to a UWQ Server. */
+PROCEDURE UWQ_CLIENT_LOCATE_UWQ_SERVER
+  (P_RESOURCE_ID            IN     NUMBER
+  ,P_WIRE_PROTOCOL          IN     VARCHAR2
+  ,P_COMP_DEF_NAME          IN     VARCHAR2
+  ,P_COMP_DEF_VERSION       IN     NUMBER
+  ,P_COMP_DEF_IMPL          IN     VARCHAR2
+  ,P_COMP_NAME              IN     VARCHAR2
+  ,X_COMP_NAME              OUT NOCOPY   VARCHAR2
+  ,X_SVR_USER_ADDRESS       OUT NOCOPY   VARCHAR2
+  ,X_SVR_IP_ADDRESS         OUT NOCOPY   VARCHAR2
+  ,X_SVR_DNS_NAME           OUT NOCOPY   VARCHAR2
+  ,X_SVR_PORT               OUT NOCOPY   NUMBER
+  ,X_USE_PROXY              OUT NOCOPY   VARCHAR2
+  ,X_SESSION_TIMEOUT        OUT NOCOPY   NUMBER
+  ,X_SYNC_TIMEOUT           OUT NOCOPY   NUMBER
+  ,X_RESPONSE_TIMEOUT       OUT NOCOPY   NUMBER
+  ,X_RECONNECT_RETRY_DELAY  OUT NOCOPY   NUMBER
+  ,X_HEART_RATE             OUT NOCOPY   NUMBER
+  );
+
+
+/* Used by UWQ Server to set an agent binding to a server. */
+PROCEDURE BIND_AGENT( P_RESOURCE_ID IN NUMBER, P_SERVER_ID IN NUMBER );
+
+
+/* Used by UWQ Server to unset an agent binding to a server. */
+PROCEDURE UNBIND_AGENT( P_RESOURCE_ID IN NUMBER, P_SERVER_ID IN NUMBER );
+
+/* Used by UWQ Server to unset an agent binding to all servers
+   and update uwq server load*/
+PROCEDURE CLEAR_ALL_AGENT_BINDINGS( P_RESOURCE_ID IN NUMBER
+                                   ,P_SERVER_ID IN NUMBER
+                                   ,P_MAJOR_LOAD_FACTOR IN NUMBER
+                                   ,P_MINOR_LOAD_FACTOR IN NUMBER );
+
+/* Used by servers to clear agent bindings of a particular server */
+TYPE BINDING_CURSOR  is REF CURSOR;
+
+PROCEDURE BIND_AGENT_AND_UPDATE_LOAD( P_RESOURCE_ID IN NUMBER
+                                     ,P_SERVER_ID IN NUMBER
+                                     ,P_MAJOR_LOAD_FACTOR IN NUMBER
+                                     ,P_MINOR_LOAD_FACTOR IN NUMBER
+                                     ,X_EXISTING_BINDINGS OUT NOCOPY BINDING_CURSOR );
+
+
+PROCEDURE UPDATE_SERVER_STARTUP_INFO( P_SERVER_ID IN NUMBER
+                                     ,P_IP_ADDRESS IN VARCHAR2
+                                     ,P_DNS_NAME IN VARCHAR2
+                                     ,P_USER_ADDRESS IN VARCHAR2 );
+
+
+/* Used by UWQ Server to communicate Queue information to client. */
+PROCEDURE FORCE_UPDATE_MRT_DATA
+  (P_RESOURCE_ID      IN IEU.IEU_UWQ_SEL_MRT_DATA.RESOURCE_ID%TYPE
+  ,P_SERVER_TYPE_ID   IN IEU.IEU_UWQ_SEL_MRT_DATA.SVR_TYPE_ID%TYPE
+  ,P_MEDIA_TYPE_ID    IN IEU.IEU_UWQ_SEL_MRT_DATA.MEDIA_TYPE_ID%TYPE
+  ,P_QUEUE_LIST       IN SYSTEM.IEU_UWQ_SEL_MRT_QUEUES_NST
+  );
+
+
+/* Used to determine if agent is eligible for ANY media */
+FUNCTION IS_AGENT_ELIGIBLE_FOR_MEDIA( P_RESOURCE_ID IN NUMBER )
+  RETURN BOOLEAN;
+
+
+/* Used to determine if a connection to the UWQ server is required */
+FUNCTION IS_UWQ_SERVER_REQUIRED( P_RESOURCE_ID IN NUMBER )
+  RETURN BOOLEAN;
+
+
+/* Used to enumerate while setting FND_GLOBAL session variables */
+PROCEDURE ENUMERATE_WORK_NODES_FOR_SVR
+  (P_RESOURCE_ID   IN NUMBER
+  ,P_USER_ID       IN NUMBER
+  ,P_RESP_ID       IN NUMBER
+  ,P_RESP_APPL_ID  IN NUMBER
+  ,P_LANGUAGE    IN VARCHAR2
+  ,P_SOURCE_LANG IN VARCHAR2
+  );
+
+
+/* Used to refresh while setting FND_GLOBAL session variables */
+PROCEDURE REFRESH_WORK_NODE_FOR_SVR
+  (P_RESOURCE_ID   IN NUMBER
+  ,P_USER_ID       IN NUMBER
+  ,P_RESP_ID       IN NUMBER
+  ,P_RESP_APPL_ID  IN NUMBER
+  );
+
+/* Used to add data to the UWQ nodes table */
+PROCEDURE ADD_UWQ_NODE_DATA
+  (P_RESOURCE_ID             IN NUMBER,
+   P_SEL_ENUM_ID             IN NUMBER,
+   P_ENUMERATOR_DATAREC_LIST IN IEU_PUB.EnumeratorDataRecordList
+  );
+PROCEDURE WALK_TREE_ADD( P_ENUM_REC_LIST          IN   IEU_PUB.EnumeratorDataRecordList,
+		  				 P_PID                    IN   PLS_INTEGER,
+						 P_CURR_NODE_ID           IN   PLS_INTEGER,
+						 P_REC_LIST_ITERATOR      IN   PLS_INTEGER,
+						 P_S_ENUM_ID			  IN   NUMBER,
+						 P_RESOURCE_ID			  IN   NUMBER,
+						 X_NEW_REC_LIST_ITERATOR  IN OUT NOCOPY  PLS_INTEGER,
+						 X_NEW_CURR_NODE_ID      IN  OUT NOCOPY PLS_INTEGER) ;
+
+PROCEDURE CHECK_AO_MANUAL_MODE(l_resource_id IN NUMBER,
+                               l_ret_val OUT NOCOPY BOOLEAN);
+
+-- Niraj, 26-May-2005, Added for Bug 4389449
+PROCEDURE REFRESH_CUR_NODE_CNTS_FOR_SVR (
+	P_RESOURCE_ID	IN NUMBER
+	,P_USER_ID 	IN NUMBER
+	,P_RESP_ID	IN NUMBER
+	,P_RESP_APPL_ID IN NUMBER
+	,p_node_id 	IN NUMBER
+	,x_node_id_list OUT NOCOPY varchar2);
+
+PROCEDURE REFRESH_CUR_NODE_COUNTS(p_resource_id in number, p_node_id in number, x_node_id_list OUT NOCOPY varchar2);
+
+TYPE EligibleAllMediaInfo IS RECORD (
+  media_type_id         IEU_UWQ_MEDIA_TYPES_B.MEDIA_TYPE_ID%TYPE,
+  media_type_uuid       IEU_UWQ_MEDIA_TYPES_B.MEDIA_TYPE_UUID%TYPE,
+  tel_reqd_flag         IEU_UWQ_MEDIA_TYPES_B.tel_reqd_flag%TYPE,
+  svr_connect_rule      IEU_UWQ_LOGIN_RULES_B.login_rule%TYPE,
+  tel_media_type        IEU_UWQ_LOGIN_RULES_B.login_rule%TYPE,
+  origin_flag           VARCHAR2(1)
+  );
+
+TYPE EligibleAllMediaList IS TABLE OF EligibleAllMediaInfo
+INDEX BY BINARY_INTEGER;
+
+PROCEDURE DETERMINE_ALL_MEDIA_TYPES_EXTN
+  (P_RESOURCE_ID    IN  NUMBER,
+   X_ALL_MEDIA_LIST OUT NOCOPY EligibleAllMediaList,
+   X_EXTN_FLAG      OUT NOCOPY VARCHAR2);
+
+PROCEDURE DETERMINE_ALL_MEDIA_TYPES
+  (P_RESOURCE_ID   IN  NUMBER,
+   X_ALL_MEDIA_LIST OUT NOCOPY EligibleAllMediaList);
+
+FUNCTION IS_TEL_EXTN_REQUIRED
+   (p_eligibleallmedialist IN EligibleAllMediaList)
+    RETURN VARCHAR2;
+
+PROCEDURE NEW_AO_TEL_CONNECT_RULE(
+ p_resource_id IN NUMBER,
+ p_elig_media_uuid  IN VARCHAR2,
+ x_login_media_uuid OUT NOCOPY varchar2);
+
+-- Niraj, 26-May-2005, Added for Bug 4389449
+PROCEDURE REFRESH_SEL_NODE_CNTS_FOR_SVR (
+	P_RESOURCE_ID		IN NUMBER
+	,P_USER_ID 		IN NUMBER
+	,P_RESP_ID      	IN NUMBER
+	,P_RESP_APPL_ID 	IN NUMBER
+	,p_node_id_string 	in varchar2
+	,x_node_id_list 	OUT NOCOPY varchar2);
+
+PROCEDURE REFRESH_SELECTIVE_NODE_COUNTS(
+p_resource_id in number,
+p_node_id_string in varchar2,
+x_node_id_list out NOCOPY varchar2 );
+
+
+PROCEDURE GET_WB_MEDIA_LOGIN_MEDIA_TYPES(
+   P_RESOURCE_ID  IN NUMBER
+  ,P_USER_ID      IN NUMBER
+  ,P_RESP_ID      IN NUMBER
+  ,P_RESP_APPL_ID IN NUMBER
+  ,X_MEDIA_TYPE_NST OUT NOCOPY SYSTEM.IEU_UWQ_MEDIA_TYPE_NST
+);
+
+
+END IEU_PVT;
+
+
+/

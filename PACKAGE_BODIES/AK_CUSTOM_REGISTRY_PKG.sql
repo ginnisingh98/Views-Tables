@@ -1,0 +1,162 @@
+--------------------------------------------------------
+--  DDL for Package Body AK_CUSTOM_REGISTRY_PKG
+--------------------------------------------------------
+
+  CREATE OR REPLACE EDITIONABLE PACKAGE BODY "APPS"."AK_CUSTOM_REGISTRY_PKG" as
+/* $Header: AKRGSTYB.pls 120.2 2005/10/14 14:24:40 tshort noship $ */
+
+procedure INSERT_ROW (
+X_ROWID                  in out NOCOPY VARCHAR2,
+X_CUSTOMIZATION_LEVEL_ID in     NUMBER,
+X_CUSTOM_LEVEL           in     VARCHAR2,
+X_PROPERTY_NAME          in     VARCHAR2,
+X_TRANSLATABLE           in     VARCHAR2,
+X_CREATED_BY             in     NUMBER,
+X_CREATION_DATE          in     DATE,
+X_LAST_UPDATED_BY        in     NUMBER,
+X_LAST_UPDATE_DATE       in     DATE,
+X_LAST_UPDATE_LOGIN      in     NUMBER
+) is
+cursor C is select ROWID from AK_CUSTOM_REGISTRY
+where CUSTOMIZATION_LEVEL_ID = X_CUSTOMIZATION_LEVEL_ID
+and   CUSTOM_LEVEL           = X_CUSTOM_LEVEL
+and   PROPERTY_NAME          = X_PROPERTY_NAME;
+begin
+insert into AK_CUSTOM_REGISTRY (
+CUSTOMIZATION_LEVEL_ID,
+CUSTOM_LEVEL,
+PROPERTY_NAME,
+TRANSLATABLE,
+CREATED_BY,
+CREATION_DATE,
+LAST_UPDATED_BY,
+LAST_UPDATE_DATE,
+LAST_UPDATE_LOGIN
+) values (
+X_CUSTOMIZATION_LEVEL_ID,
+X_CUSTOM_LEVEL,
+X_PROPERTY_NAME,
+X_TRANSLATABLE,
+X_CREATED_BY,
+X_CREATION_DATE,
+X_LAST_UPDATED_BY,
+X_LAST_UPDATE_DATE,
+X_LAST_UPDATE_LOGIN
+) ;
+
+open C;
+fetch C into X_ROWID;
+if (C%notfound) then
+close C;
+raise no_data_found;
+end if;
+close C;
+end INSERT_ROW;
+
+procedure LOCK_ROW (
+X_CUSTOMIZATION_LEVEL_ID in NUMBER,
+X_CUSTOM_LEVEL           in VARCHAR2,
+X_PROPERTY_NAME          in VARCHAR2,
+X_TRANSLATABLE           in VARCHAR2,
+X_CREATED_BY             in NUMBER,
+X_CREATION_DATE          in DATE,
+X_LAST_UPDATED_BY        in NUMBER,
+X_LAST_UPDATE_DATE       in DATE,
+X_LAST_UPDATE_LOGIN      in NUMBER
+) is
+cursor C is select
+CUSTOMIZATION_LEVEL_ID,
+CUSTOM_LEVEL,
+PROPERTY_NAME,
+TRANSLATABLE,
+CREATED_BY,
+CREATION_DATE,
+LAST_UPDATED_BY,
+LAST_UPDATE_DATE,
+LAST_UPDATE_LOGIN
+from AK_CUSTOM_REGISTRY
+where CUSTOMIZATION_LEVEL_ID = X_CUSTOMIZATION_LEVEL_ID
+and   CUSTOM_LEVEL           = X_CUSTOM_LEVEL
+and   PROPERTY_NAME          = X_PROPERTY_NAME
+for update of CUSTOMIZATION_LEVEL_ID nowait;
+recinfo C%rowtype;
+begin
+open C;
+fetch C into recinfo;
+if (C%notfound) then
+close C;
+fnd_message.set_name('FND', 'FORM_RECORD_DELETED');
+app_exception.raise_exception;
+end if;
+close C;
+
+if (((recinfo.CUSTOMIZATION_LEVEL_ID = X_CUSTOMIZATION_LEVEL_ID)
+OR ((recinfo.CUSTOMIZATION_LEVEL_ID is null)
+AND (X_CUSTOMIZATION_LEVEL_ID is null)))
+AND ((recinfo.CUSTOM_LEVEL = X_CUSTOM_LEVEL)
+OR ((recinfo.CUSTOM_LEVEL is null)
+AND (X_CUSTOM_LEVEL is null)))
+AND ((recinfo.PROPERTY_NAME = X_PROPERTY_NAME)
+OR ((recinfo.PROPERTY_NAME is null)
+AND (X_PROPERTY_NAME is null)))
+AND ((recinfo.TRANSLATABLE = X_TRANSLATABLE)
+OR ((recinfo.TRANSLATABLE is null)
+AND (X_TRANSLATABLE is null)))
+) then
+null;
+else
+fnd_message.set_name('FND', 'FORM_RECORD_CHANGED');
+app_exception.raise_exception;
+end if;
+end LOCK_ROW;
+
+procedure UPDATE_ROW (
+X_CUSTOMIZATION_LEVEL_ID in NUMBER,
+X_CUSTOM_LEVEL           in VARCHAR2,
+X_PROPERTY_NAME          in VARCHAR2,
+X_TRANSLATABLE           in VARCHAR2,
+X_CREATED_BY             in NUMBER,
+X_CREATION_DATE          in DATE,
+X_LAST_UPDATED_BY        in NUMBER,
+X_LAST_UPDATE_DATE       in DATE,
+X_LAST_UPDATE_LOGIN      in NUMBER
+) is
+begin
+update AK_CUSTOM_REGISTRY set
+CUSTOMIZATION_LEVEL_ID = X_CUSTOMIZATION_LEVEL_ID,
+CUSTOM_LEVEL           = X_CUSTOM_LEVEL,
+PROPERTY_NAME          = X_PROPERTY_NAME,
+TRANSLATABLE           = X_TRANSLATABLE,
+CREATED_BY             = X_CREATED_BY,
+CREATION_DATE          = X_CREATION_DATE,
+LAST_UPDATED_BY        = X_LAST_UPDATED_BY,
+LAST_UPDATE_DATE       = X_LAST_UPDATE_DATE,
+LAST_UPDATE_LOGIN      = X_LAST_UPDATE_LOGIN
+where CUSTOMIZATION_LEVEL_ID = X_CUSTOMIZATION_LEVEL_ID
+and   CUSTOM_LEVEL           = X_CUSTOM_LEVEL
+and   PROPERTY_NAME          = X_PROPERTY_NAME;
+
+if (sql%notfound) then
+raise no_data_found;
+end if;
+end UPDATE_ROW;
+
+procedure DELETE_ROW (
+X_CUSTOMIZATION_LEVEL_ID in NUMBER,
+X_CUSTOM_LEVEL           in VARCHAR2,
+X_PROPERTY_NAME          in VARCHAR2
+) is
+begin
+delete from AK_CUSTOM_REGISTRY
+where CUSTOMIZATION_LEVEL_ID = X_CUSTOMIZATION_LEVEL_ID
+and   CUSTOM_LEVEL           = X_CUSTOM_LEVEL
+and   PROPERTY_NAME          = X_PROPERTY_NAME;
+
+if (sql%notfound) then
+raise no_data_found;
+end if;
+end DELETE_ROW;
+
+end AK_CUSTOM_REGISTRY_PKG;
+
+/

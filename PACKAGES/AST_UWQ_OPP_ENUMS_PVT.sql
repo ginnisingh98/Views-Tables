@@ -1,0 +1,33 @@
+--------------------------------------------------------
+--  DDL for Package AST_UWQ_OPP_ENUMS_PVT
+--------------------------------------------------------
+
+  CREATE OR REPLACE EDITIONABLE PACKAGE "APPS"."AST_UWQ_OPP_ENUMS_PVT" AUTHID CURRENT_USER as
+/* $Header: ASTENOPS.pls 115.6 2002/06/07 21:32:36 pkm ship      $ */
+
+
+PROCEDURE ENUMERATE_OPP_NODES
+  (P_RESOURCE_ID      IN NUMBER
+  ,P_LANGUAGE         IN VARCHAR2
+  ,P_SOURCE_LANG      IN VARCHAR2
+  ,P_SEL_ENUM_ID      IN NUMBER
+  );
+
+
+PROCEDURE ENUMERATE_TEAM_OPP_NODES
+  (P_RESOURCE_ID      IN NUMBER
+  ,P_LANGUAGE         IN VARCHAR2
+  ,P_SOURCE_LANG      IN VARCHAR2
+  ,P_SEL_ENUM_ID      IN NUMBER
+
+ );
+
+AST_UWQ_ORG_ID VARCHAR2(20);
+AST_UWQ_OPP_ACCESS VARCHAR2(20);
+
+
+end AST_UWQ_OPP_ENUMS_PVT;
+
+ 
+
+/

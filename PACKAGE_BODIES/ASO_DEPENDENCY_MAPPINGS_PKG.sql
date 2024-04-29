@@ -1,0 +1,262 @@
+--------------------------------------------------------
+--  DDL for Package Body ASO_DEPENDENCY_MAPPINGS_PKG
+--------------------------------------------------------
+
+  CREATE OR REPLACE EDITIONABLE PACKAGE BODY "APPS"."ASO_DEPENDENCY_MAPPINGS_PKG" as
+/* $Header: asotdepb.pls 120.2 2005/12/06 09:48:56 hagrawal noship $ */
+-- Start of Comments
+-- Package name     : ASO_DEPENDENCY_MAPPINGS_PKG
+-- Purpose          :
+-- History          :
+--	  01-28-2005 hyang - created
+-- NOTE             :
+-- End of Comments
+
+
+G_PKG_NAME CONSTANT VARCHAR2(30):= 'ASO_DEPENDENCY_MAPPINGS_PKG';
+G_FILE_NAME CONSTANT VARCHAR2(12) := 'asotdepb.pls';
+
+PROCEDURE Insert_Row(
+    PX_DEPENDENCY_ID          IN OUT NOCOPY /* file.sql.39 change */  NUMBER
+  , P_TRIGGER_ATTRIBUTE_ID    IN      NUMBER
+  , P_DEPENDENT_ATTRIBUTE_ID  IN      NUMBER
+  , P_ENABLED_FLAG            IN      VARCHAR2
+  , P_DATABASE_OBJECT_NAME    IN      VARCHAR2
+  , P_APPLICATION_ID          IN      NUMBER
+  , P_SEED_TAG                IN      VARCHAR2
+  , P_CREATION_DATE           IN      DATE
+  , P_CREATED_BY              IN      NUMBER
+  , P_LAST_UPDATE_DATE        IN      DATE
+  , P_LAST_UPDATE_LOGIN       IN      NUMBER
+  , P_LAST_UPDATED_BY         IN      NUMBER
+  , P_REQUEST_ID              IN      NUMBER
+  , P_PROGRAM_APPLICATION_ID  IN      NUMBER
+  , P_PROGRAM_ID              IN      NUMBER
+  , P_PROGRAM_UPDATE_DATE     IN      DATE
+)
+IS
+   CURSOR C IS SELECT ASO_DEPENDENCY_MAPPINGS_S.nextval FROM sys.dual;
+BEGIN
+   If (PX_DEPENDENCY_ID IS NULL) OR (PX_DEPENDENCY_ID = FND_API.G_MISS_NUM) then
+       OPEN C;
+       FETCH C INTO PX_DEPENDENCY_ID;
+       CLOSE C;
+   End If;
+   INSERT INTO ASO_DEPENDENCY_MAPPINGS(
+           DEPENDENCY_ID,
+           TRIGGER_ATTRIBUTE_ID,
+           DEPENDENT_ATTRIBUTE_ID,
+           ENABLED_FLAG,
+           DATABASE_OBJECT_NAME,
+           APPLICATION_ID,
+           SEED_TAG,
+           CREATION_DATE,
+           CREATED_BY,
+           LAST_UPDATED_BY,
+           LAST_UPDATE_DATE,
+           LAST_UPDATE_LOGIN,
+           REQUEST_ID,
+           PROGRAM_APPLICATION_ID,
+           PROGRAM_ID,
+           PROGRAM_UPDATE_DATE
+          ) VALUES (
+           PX_DEPENDENCY_ID,
+           decode( P_TRIGGER_ATTRIBUTE_ID, FND_API.G_MISS_NUM, NULL, P_TRIGGER_ATTRIBUTE_ID),
+           decode( P_DEPENDENT_ATTRIBUTE_ID, FND_API.G_MISS_NUM, NULL, P_DEPENDENT_ATTRIBUTE_ID),
+           decode( P_ENABLED_FLAG, FND_API.G_MISS_CHAR, NULL, P_ENABLED_FLAG),
+           decode( P_DATABASE_OBJECT_NAME, FND_API.G_MISS_CHAR, NULL, P_DATABASE_OBJECT_NAME),
+           decode( P_APPLICATION_ID, FND_API.G_MISS_NUM, NULL, P_APPLICATION_ID),
+           decode( P_SEED_TAG, FND_API.G_MISS_CHAR, NULL, P_SEED_TAG),
+           ASO_UTILITY_PVT.decode( p_CREATION_DATE, FND_API.G_MISS_DATE, NULL, p_CREATION_DATE),
+           decode( p_CREATED_BY, FND_API.G_MISS_NUM, NULL, p_CREATED_BY),
+           decode( p_LAST_UPDATED_BY, FND_API.G_MISS_NUM, NULL, p_LAST_UPDATED_BY),
+           ASO_UTILITY_PVT.decode( p_LAST_UPDATE_DATE, FND_API.G_MISS_DATE, NULL, p_LAST_UPDATE_DATE),
+           decode( p_LAST_UPDATE_LOGIN, FND_API.G_MISS_NUM, NULL, p_LAST_UPDATE_LOGIN),
+           decode( p_REQUEST_ID, FND_API.G_MISS_NUM, NULL, p_REQUEST_ID),
+           decode( p_PROGRAM_APPLICATION_ID, FND_API.G_MISS_NUM, NULL, p_PROGRAM_APPLICATION_ID),
+           decode( p_PROGRAM_ID, FND_API.G_MISS_NUM, NULL, p_PROGRAM_ID),
+           ASO_UTILITY_PVT.decode( p_PROGRAM_UPDATE_DATE, FND_API.G_MISS_DATE, NULL, p_PROGRAM_UPDATE_DATE)
+          );
+
+END Insert_Row;
+
+PROCEDURE Update_Row(
+    P_DEPENDENCY_ID           IN      NUMBER
+  , P_TRIGGER_ATTRIBUTE_ID    IN      NUMBER
+  , P_DEPENDENT_ATTRIBUTE_ID  IN      NUMBER
+  , P_ENABLED_FLAG            IN      VARCHAR2
+  , P_DATABASE_OBJECT_NAME    IN      VARCHAR2
+  , P_APPLICATION_ID          IN      NUMBER
+  , P_SEED_TAG                IN      VARCHAR2
+  , P_CREATION_DATE           IN      DATE
+  , P_CREATED_BY              IN      NUMBER
+  , P_LAST_UPDATE_DATE        IN      DATE
+  , P_LAST_UPDATE_LOGIN       IN      NUMBER
+  , P_LAST_UPDATED_BY         IN      NUMBER
+  , P_REQUEST_ID              IN      NUMBER
+  , P_PROGRAM_APPLICATION_ID  IN      NUMBER
+  , P_PROGRAM_ID              IN      NUMBER
+  , P_PROGRAM_UPDATE_DATE     IN      DATE
+)
+IS
+BEGIN
+    Update ASO_DEPENDENCY_MAPPINGS
+    SET
+              TRIGGER_ATTRIBUTE_ID = decode( P_TRIGGER_ATTRIBUTE_ID, FND_API.G_MISS_NUM, TRIGGER_ATTRIBUTE_ID, P_TRIGGER_ATTRIBUTE_ID),
+              DEPENDENT_ATTRIBUTE_ID = decode( P_DEPENDENT_ATTRIBUTE_ID, FND_API.G_MISS_NUM, DEPENDENT_ATTRIBUTE_ID, P_DEPENDENT_ATTRIBUTE_ID),
+              ENABLED_FLAG = decode( P_ENABLED_FLAG, FND_API.G_MISS_CHAR, ENABLED_FLAG, P_ENABLED_FLAG),
+              DATABASE_OBJECT_NAME = decode( P_DATABASE_OBJECT_NAME, FND_API.G_MISS_CHAR, DATABASE_OBJECT_NAME, P_DATABASE_OBJECT_NAME),
+              APPLICATION_ID = decode( P_APPLICATION_ID, FND_API.G_MISS_NUM, APPLICATION_ID, P_APPLICATION_ID),
+              SEED_TAG = decode( P_SEED_TAG, FND_API.G_MISS_CHAR, SEED_TAG, P_SEED_TAG),
+              CREATION_DATE = ASO_UTILITY_PVT.decode( p_CREATION_DATE, FND_API.G_MISS_DATE, CREATION_DATE, p_CREATION_DATE),
+              CREATED_BY = decode( p_CREATED_BY, FND_API.G_MISS_NUM, CREATED_BY, p_CREATED_BY),
+              LAST_UPDATED_BY = decode( p_LAST_UPDATED_BY, FND_API.G_MISS_NUM, LAST_UPDATED_BY, p_LAST_UPDATED_BY),
+              LAST_UPDATE_DATE = ASO_UTILITY_PVT.decode( p_LAST_UPDATE_DATE, FND_API.G_MISS_DATE, LAST_UPDATE_DATE, p_LAST_UPDATE_DATE),
+              LAST_UPDATE_LOGIN = decode( p_LAST_UPDATE_LOGIN, FND_API.G_MISS_NUM, LAST_UPDATE_LOGIN, p_LAST_UPDATE_LOGIN),
+              REQUEST_ID = decode( p_REQUEST_ID, FND_API.G_MISS_NUM, REQUEST_ID, p_REQUEST_ID),
+              PROGRAM_APPLICATION_ID = decode( p_PROGRAM_APPLICATION_ID, FND_API.G_MISS_NUM, PROGRAM_APPLICATION_ID, p_PROGRAM_APPLICATION_ID),
+              PROGRAM_ID = decode( p_PROGRAM_ID, FND_API.G_MISS_NUM, PROGRAM_ID, p_PROGRAM_ID),
+              PROGRAM_UPDATE_DATE = ASO_UTILITY_PVT.decode( p_PROGRAM_UPDATE_DATE, FND_API.G_MISS_DATE, PROGRAM_UPDATE_DATE, p_PROGRAM_UPDATE_DATE)
+    where DEPENDENCY_ID = P_DEPENDENCY_ID;
+
+    If (SQL%NOTFOUND) then
+        RAISE NO_DATA_FOUND;
+    End If;
+
+END Update_Row;
+
+PROCEDURE Delete_Row(
+    P_DEPENDENCY_ID  NUMBER)
+IS
+BEGIN
+   DELETE FROM ASO_DEPENDENCY_MAPPINGS
+    WHERE DEPENDENCY_ID = P_DEPENDENCY_ID;
+   If (SQL%NOTFOUND) then
+       RAISE NO_DATA_FOUND;
+   End If;
+
+END Delete_Row;
+
+PROCEDURE Lock_Row(
+    P_DEPENDENCY_ID           IN      NUMBER
+  , P_TRIGGER_ATTRIBUTE_ID    IN      NUMBER
+  , P_DEPENDENT_ATTRIBUTE_ID  IN      NUMBER
+  , P_ENABLED_FLAG            IN      VARCHAR2
+  , P_DATABASE_OBJECT_NAME    IN      VARCHAR2
+  , P_APPLICATION_ID          IN      NUMBER
+  , P_SEED_TAG                IN      VARCHAR2
+  , P_CREATION_DATE           IN      DATE
+  , P_CREATED_BY              IN      NUMBER
+  , P_LAST_UPDATE_DATE        IN      DATE
+  , P_LAST_UPDATE_LOGIN       IN      NUMBER
+  , P_LAST_UPDATED_BY         IN      NUMBER
+  , P_REQUEST_ID              IN      NUMBER
+  , P_PROGRAM_APPLICATION_ID  IN      NUMBER
+  , P_PROGRAM_ID              IN      NUMBER
+  , P_PROGRAM_UPDATE_DATE     IN      DATE
+)
+IS
+   CURSOR C IS
+        SELECT *
+         FROM ASO_DEPENDENCY_MAPPINGS
+        WHERE DEPENDENCY_ID =  P_DEPENDENCY_ID
+        FOR UPDATE of DEPENDENCY_ID NOWAIT;
+  Recinfo C%ROWTYPE;
+
+BEGIN
+    OPEN C;
+    FETCH C INTO Recinfo;
+    If (C%NOTFOUND) then
+        CLOSE C;
+        FND_MESSAGE.SET_NAME('FND', 'FORM_RECORD_DELETED');
+        APP_EXCEPTION.RAISE_EXCEPTION;
+    End If;
+    CLOSE C;
+
+    IF(    ( Recinfo.LAST_UPDATE_DATE = p_LAST_UPDATE_DATE)
+            OR (    ( Recinfo.LAST_UPDATE_DATE IS NULL )
+                AND (  p_LAST_UPDATE_DATE IS NULL )))
+    THEN
+      RETURN;
+    ELSE
+      FND_MESSAGE.SET_NAME('FND', 'FORM_RECORD_CHANGED');
+      APP_EXCEPTION.RAISE_EXCEPTION;
+    END IF;
+
+END Lock_Row;
+
+PROCEDURE Load_Row (
+    X_DEPENDENCY_ID           IN      NUMBER
+  , X_TRIGGER_ATTRIBUTE_ID    IN      NUMBER
+  , X_DEPENDENT_ATTRIBUTE_ID  IN      NUMBER
+  , X_ENABLED_FLAG            IN      VARCHAR2
+  , X_DATABASE_OBJECT_NAME    IN      VARCHAR2
+  , X_APPLICATION_ID          IN      NUMBER
+  , X_SEED_TAG                IN      VARCHAR2
+  , X_OWNER                   IN      VARCHAR2
+) IS
+     l_user_id          NUMBER := 0;
+     l_dependency_id    NUMBER;
+
+     CURSOR C IS
+      SELECT DEPENDENCY_ID FROM ASO_DEPENDENCY_MAPPINGS
+      WHERE DEPENDENCY_ID =  X_DEPENDENCY_ID;
+
+BEGIN
+
+     if (X_OWNER = 'SEED') then
+        l_user_id := 1;
+     end if;
+
+    OPEN C;
+    FETCH C INTO l_dependency_id;
+    If (C%NOTFOUND)
+    THEN
+      INSERT_ROW (
+        PX_DEPENDENCY_ID          => l_dependency_id
+      , P_TRIGGER_ATTRIBUTE_ID    => X_TRIGGER_ATTRIBUTE_ID
+      , P_DEPENDENT_ATTRIBUTE_ID  => X_DEPENDENT_ATTRIBUTE_ID
+      , P_ENABLED_FLAG            => X_ENABLED_FLAG
+      , P_DATABASE_OBJECT_NAME    => X_DATABASE_OBJECT_NAME
+      , P_APPLICATION_ID          => X_APPLICATION_ID
+      , P_SEED_TAG                => X_SEED_TAG
+      , P_CREATION_DATE           => sysdate
+      , P_CREATED_BY              => l_user_id
+      , P_LAST_UPDATED_BY         => l_user_id
+      , P_LAST_UPDATE_DATE        => sysdate
+      , P_LAST_UPDATE_LOGIN       => 0
+      , P_REQUEST_ID              => FND_API.G_MISS_NUM
+      , P_PROGRAM_APPLICATION_ID  => FND_API.G_MISS_NUM
+      , P_PROGRAM_ID              => FND_API.G_MISS_NUM
+      , P_PROGRAM_UPDATE_DATE     => FND_API.G_MISS_DATE
+      );
+    ELSE
+      UPDATE_ROW (
+        P_DEPENDENCY_ID           => l_dependency_id
+      , P_TRIGGER_ATTRIBUTE_ID    => X_TRIGGER_ATTRIBUTE_ID
+      , P_DEPENDENT_ATTRIBUTE_ID  => X_DEPENDENT_ATTRIBUTE_ID
+      , P_ENABLED_FLAG            => X_ENABLED_FLAG
+      , P_DATABASE_OBJECT_NAME    => X_DATABASE_OBJECT_NAME
+      , P_APPLICATION_ID          => X_APPLICATION_ID
+      , P_SEED_TAG                => X_SEED_TAG
+      , P_CREATION_DATE           => sysdate
+      , P_CREATED_BY              => l_user_id
+      , P_LAST_UPDATED_BY         => l_user_id
+      , P_LAST_UPDATE_DATE        => sysdate
+      , P_LAST_UPDATE_LOGIN       => 0
+      , P_REQUEST_ID              => FND_API.G_MISS_NUM
+      , P_PROGRAM_APPLICATION_ID  => FND_API.G_MISS_NUM
+      , P_PROGRAM_ID              => FND_API.G_MISS_NUM
+      , P_PROGRAM_UPDATE_DATE     => FND_API.G_MISS_DATE
+      );
+    END IF;
+
+    CLOSE C;
+
+END LOAD_ROW;
+
+
+End ASO_DEPENDENCY_MAPPINGS_PKG;
+
+
+/

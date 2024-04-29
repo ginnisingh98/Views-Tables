@@ -1,0 +1,45 @@
+--------------------------------------------------------
+--  DDL for Package IGC_IGCBDTRR_XMLP_PKG
+--------------------------------------------------------
+
+  CREATE OR REPLACE EDITIONABLE PACKAGE "APPS"."IGC_IGCBDTRR_XMLP_PKG" AUTHID CURRENT_USER AS
+/* $Header: IGCBDTRRS.pls 120.0.12010000.1 2008/07/28 06:27:42 appldev ship $ */
+  P_CONC_REQUEST_ID NUMBER;
+
+  P_SET_OF_BOOKS_ID NUMBER;
+
+  P_HEADER_ID NUMBER;
+
+  P_PRINT_REPORT VARCHAR2(10);
+
+  STRUCT_NUM VARCHAR2(15);
+
+  SET_OF_BOOKS_NAME VARCHAR2(30);
+
+  FUNCTIONAL_CURRENCY VARCHAR2(15);
+
+  FLEX_SELECT_ALL VARCHAR2(1000) := '(SEGMENT1 || ''\n'' || SEGMENT2 || ''\n'' ||
+  SEGMENT3 || ''\n'' || SEGMENT4 || ''\n'' || SEGMENT5 || ''\n'' || SEGMENT6 ||
+  ''\n'' || SEGMENT7 || ''\n'' || SEGMENT8 || ''\n'' || SEGMENT9 || ''\n'' ||
+  SEGMENT10 || ''\n'' || SEGMENT11 || ''\n'' || SEGMENT12 || ''\n'' || SEGMENT13 ||
+  ''\n'' || SEGMENT14 || ''\n'' || SEGMENT15 || ''\n'' || SEGMENT16 || ''\n'' ||
+  SEGMENT17 || ''\n'' || SEGMENT18 || ''\n'' || SEGMENT19 || ''\n'' || SEGMENT20 ||
+  ''\n'' || SEGMENT21 || ''\n'' || SEGMENT22 || ''\n'' || SEGMENT23 || ''\n'' ||
+  SEGMENT24 || ''\n'' || SEGMENT25 || ''\n'' || SEGMENT26 || ''\n'' || SEGMENT27 ||
+  ''\n'' || SEGMENT28 || ''\n'' || SEGMENT29 || ''\n'' || SEGMENT30)';
+
+  FUNCTION AFTERREPORT RETURN BOOLEAN;
+
+  FUNCTION STRUCT_NUM_P RETURN VARCHAR2;
+
+  FUNCTION SET_OF_BOOKS_NAME_P RETURN VARCHAR2;
+
+  FUNCTION FUNCTIONAL_CURRENCY_P RETURN VARCHAR2;
+
+  FUNCTION FLEX_SELECT_ALL_P RETURN VARCHAR2;
+
+  FUNCTION BEFOREREPORT RETURN BOOLEAN;
+
+END IGC_IGCBDTRR_XMLP_PKG;
+
+/

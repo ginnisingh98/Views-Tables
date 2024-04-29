@@ -1,0 +1,471 @@
+--------------------------------------------------------
+--  DDL for Package Body AZ_SELECTION_SET_ENTITIES_PKG
+--------------------------------------------------------
+
+  CREATE OR REPLACE EDITIONABLE PACKAGE BODY "APPS"."AZ_SELECTION_SET_ENTITIES_PKG" as
+/* $Header: aztssetenb.pls 120.4 2006/09/18 12:39:36 sbandi noship $ */
+procedure INSERT_ROW (
+  X_ROWID in out NOCOPY VARCHAR2,
+  X_SELECTION_SET_CODE in VARCHAR2,
+  X_USER_ID in NUMBER,
+  X_ENTITY_OCCURANCE_CODE in VARCHAR2,
+  X_REF_ENTITY_OCCURANCE_CODE in VARCHAR2,
+  X_UPDATABLE_FLAG in VARCHAR2,
+  X_ALLOW_SET_TARGETVAL_FLAG in VARCHAR2,
+  X_ALLOW_FILTER_FLAG in VARCHAR2,
+  X_CHANGE_UPDATABLE_FLAG in VARCHAR2,
+  X_FILTER_SET_FLAG in VARCHAR2,
+  X_SEQ_NUM in NUMBER,
+  X_ENTITY_CODE in VARCHAR2,
+  X_FILTERING_PARAMETERS in CLOB,
+  X_INCLUDE_TYPE in VARCHAR2,
+  X_ENTITY_OCCURANCE_NAME in VARCHAR2,
+  X_CREATION_DATE in DATE,
+  X_CREATED_BY in NUMBER,
+  X_LAST_UPDATE_DATE in DATE,
+  X_LAST_UPDATED_BY in NUMBER,
+  X_LAST_UPDATE_LOGIN in NUMBER
+) is
+  cursor C is select ROWID from AZ_SELECTION_SET_ENTITIES_B
+    where SELECTION_SET_CODE = X_SELECTION_SET_CODE
+    and USER_ID = X_USER_ID
+    and ENTITY_OCCURANCE_CODE = X_ENTITY_OCCURANCE_CODE
+    ;
+begin
+  insert into AZ_SELECTION_SET_ENTITIES_B (
+    REF_ENTITY_OCCURANCE_CODE,
+    UPDATABLE_FLAG,
+    ALLOW_SET_TARGETVAL_FLAG,
+    ALLOW_FILTER_FLAG,
+    CHANGE_UPDATABLE_FLAG,
+    FILTER_SET_FLAG,
+    SEQ_NUM,
+    ENTITY_CODE,
+    FILTERING_PARAMETERS,
+    INCLUDE_TYPE,
+    ENTITY_OCCURANCE_CODE,
+    USER_ID,
+    SELECTION_SET_CODE,
+    CREATION_DATE,
+    CREATED_BY,
+    LAST_UPDATE_DATE,
+    LAST_UPDATED_BY,
+    LAST_UPDATE_LOGIN
+  ) values (
+    X_REF_ENTITY_OCCURANCE_CODE,
+    X_UPDATABLE_FLAG,
+    X_ALLOW_SET_TARGETVAL_FLAG,
+    X_ALLOW_FILTER_FLAG,
+    X_CHANGE_UPDATABLE_FLAG,
+    X_FILTER_SET_FLAG,
+    X_SEQ_NUM,
+    X_ENTITY_CODE,
+    X_FILTERING_PARAMETERS,
+    X_INCLUDE_TYPE,
+    X_ENTITY_OCCURANCE_CODE,
+    X_USER_ID,
+    X_SELECTION_SET_CODE,
+    X_CREATION_DATE,
+    X_CREATED_BY,
+    X_LAST_UPDATE_DATE,
+    X_LAST_UPDATED_BY,
+    X_LAST_UPDATE_LOGIN
+  );
+
+  insert into AZ_SELECTION_SET_ENTITIES_TL (
+    LAST_UPDATE_LOGIN,
+    ENTITY_OCCURANCE_CODE,
+    USER_ID,
+    LAST_UPDATE_DATE,
+    SELECTION_SET_CODE,
+    LAST_UPDATED_BY,
+    ENTITY_OCCURANCE_NAME,
+    CREATED_BY,
+    CREATION_DATE,
+    LANGUAGE,
+    SOURCE_LANG
+  ) select
+    X_LAST_UPDATE_LOGIN,
+    X_ENTITY_OCCURANCE_CODE,
+    X_USER_ID,
+    X_LAST_UPDATE_DATE,
+    X_SELECTION_SET_CODE,
+    X_LAST_UPDATED_BY,
+    X_ENTITY_OCCURANCE_NAME,
+    X_CREATED_BY,
+    X_CREATION_DATE,
+    L.LANGUAGE_CODE,
+    userenv('LANG')
+  from FND_LANGUAGES L
+  where L.INSTALLED_FLAG in ('I', 'B')
+  and not exists
+    (select NULL
+    from AZ_SELECTION_SET_ENTITIES_TL T
+    where T.SELECTION_SET_CODE = X_SELECTION_SET_CODE
+    and T.USER_ID = X_USER_ID
+    and T.ENTITY_OCCURANCE_CODE = X_ENTITY_OCCURANCE_CODE
+    and T.LANGUAGE = L.LANGUAGE_CODE);
+
+  open c;
+  fetch c into X_ROWID;
+  if (c%notfound) then
+    close c;
+    raise no_data_found;
+  end if;
+  close c;
+
+end INSERT_ROW;
+
+procedure LOCK_ROW (
+  X_SELECTION_SET_CODE in VARCHAR2,
+  X_USER_ID in NUMBER,
+  X_ENTITY_OCCURANCE_CODE in VARCHAR2,
+  X_REF_ENTITY_OCCURANCE_CODE in VARCHAR2,
+  X_UPDATABLE_FLAG in VARCHAR2,
+  X_ALLOW_SET_TARGETVAL_FLAG in VARCHAR2,
+  X_ALLOW_FILTER_FLAG in VARCHAR2,
+  X_CHANGE_UPDATABLE_FLAG in VARCHAR2,
+  X_ENTITY_CODE in VARCHAR2,
+  X_FILTERING_PARAMETERS in CLOB,
+  X_INCLUDE_TYPE in VARCHAR2,
+  X_ENTITY_OCCURANCE_NAME in VARCHAR2
+) is
+  cursor c is select
+      REF_ENTITY_OCCURANCE_CODE,
+      UPDATABLE_FLAG,
+      ALLOW_SET_TARGETVAL_FLAG,
+      ALLOW_FILTER_FLAG,
+      CHANGE_UPDATABLE_FLAG,
+      ENTITY_CODE,
+      FILTERING_PARAMETERS,
+      INCLUDE_TYPE
+    from AZ_SELECTION_SET_ENTITIES_B
+    where SELECTION_SET_CODE = X_SELECTION_SET_CODE
+    and USER_ID = X_USER_ID
+    and ENTITY_OCCURANCE_CODE = X_ENTITY_OCCURANCE_CODE
+    for update of SELECTION_SET_CODE nowait;
+  recinfo c%rowtype;
+
+  cursor c1 is select
+      ENTITY_OCCURANCE_NAME,
+      decode(LANGUAGE, userenv('LANG'), 'Y', 'N') BASELANG
+    from AZ_SELECTION_SET_ENTITIES_TL
+    where SELECTION_SET_CODE = X_SELECTION_SET_CODE
+    and USER_ID = X_USER_ID
+    and ENTITY_OCCURANCE_CODE = X_ENTITY_OCCURANCE_CODE
+    and userenv('LANG') in (LANGUAGE, SOURCE_LANG)
+    for update of SELECTION_SET_CODE nowait;
+
+begin
+  open c;
+  fetch c into recinfo;
+  if (c%notfound) then
+    close c;
+    fnd_message.set_name('FND', 'FORM_RECORD_DELETED');
+    app_exception.raise_exception;
+  end if;
+  close c;
+  if (    ((recinfo.REF_ENTITY_OCCURANCE_CODE = X_REF_ENTITY_OCCURANCE_CODE)
+           OR ((recinfo.REF_ENTITY_OCCURANCE_CODE is null) AND (X_REF_ENTITY_OCCURANCE_CODE is null)))
+      AND ((recinfo.UPDATABLE_FLAG = X_UPDATABLE_FLAG)
+           OR ((recinfo.UPDATABLE_FLAG is null) AND (X_UPDATABLE_FLAG is null)))
+      AND ((recinfo.ALLOW_SET_TARGETVAL_FLAG = X_ALLOW_SET_TARGETVAL_FLAG)
+           OR ((recinfo.ALLOW_SET_TARGETVAL_FLAG is null) AND (X_ALLOW_SET_TARGETVAL_FLAG is null)))
+      AND ((recinfo.ALLOW_FILTER_FLAG = X_ALLOW_FILTER_FLAG)
+           OR ((recinfo.ALLOW_FILTER_FLAG is null) AND (X_ALLOW_FILTER_FLAG is null)))
+      AND ((recinfo.CHANGE_UPDATABLE_FLAG = X_CHANGE_UPDATABLE_FLAG)
+           OR ((recinfo.CHANGE_UPDATABLE_FLAG is null) AND (X_CHANGE_UPDATABLE_FLAG is null)))
+      AND (recinfo.ENTITY_CODE = X_ENTITY_CODE)
+      AND ((recinfo.FILTERING_PARAMETERS = X_FILTERING_PARAMETERS)
+           OR ((recinfo.FILTERING_PARAMETERS is null) AND (X_FILTERING_PARAMETERS is null)))
+      AND ((recinfo.INCLUDE_TYPE = X_INCLUDE_TYPE)
+           OR ((recinfo.INCLUDE_TYPE is null) AND (X_INCLUDE_TYPE is null)))
+  ) then
+    null;
+  else
+    fnd_message.set_name('FND', 'FORM_RECORD_CHANGED');
+    app_exception.raise_exception;
+  end if;
+
+  for tlinfo in c1 loop
+    if (tlinfo.BASELANG = 'Y') then
+      if (    ((tlinfo.ENTITY_OCCURANCE_NAME = X_ENTITY_OCCURANCE_NAME)
+               OR ((tlinfo.ENTITY_OCCURANCE_NAME is null) AND (X_ENTITY_OCCURANCE_NAME is null)))
+      ) then
+        null;
+      else
+        fnd_message.set_name('FND', 'FORM_RECORD_CHANGED');
+        app_exception.raise_exception;
+      end if;
+    end if;
+  end loop;
+  return;
+end LOCK_ROW;
+
+procedure UPDATE_ROW (
+  X_SELECTION_SET_CODE in VARCHAR2,
+  X_USER_ID in NUMBER,
+  X_ENTITY_OCCURANCE_CODE in VARCHAR2,
+  X_REF_ENTITY_OCCURANCE_CODE in VARCHAR2,
+  X_UPDATABLE_FLAG in VARCHAR2,
+  X_ALLOW_SET_TARGETVAL_FLAG in VARCHAR2,
+  X_ALLOW_FILTER_FLAG in VARCHAR2,
+  X_CHANGE_UPDATABLE_FLAG in VARCHAR2,
+  X_FILTER_SET_FLAG in VARCHAR2,
+  X_SEQ_NUM in NUMBER,
+  X_ENTITY_CODE in VARCHAR2,
+  X_FILTERING_PARAMETERS in CLOB,
+  X_INCLUDE_TYPE in VARCHAR2,
+  X_ENTITY_OCCURANCE_NAME in VARCHAR2,
+  X_LAST_UPDATE_DATE in DATE,
+  X_LAST_UPDATED_BY in NUMBER,
+  X_LAST_UPDATE_LOGIN in NUMBER
+) is
+begin
+  update AZ_SELECTION_SET_ENTITIES_B set
+    REF_ENTITY_OCCURANCE_CODE = X_REF_ENTITY_OCCURANCE_CODE,
+    UPDATABLE_FLAG = X_UPDATABLE_FLAG,
+    ALLOW_SET_TARGETVAL_FLAG = X_ALLOW_SET_TARGETVAL_FLAG,
+    ALLOW_FILTER_FLAG = X_ALLOW_FILTER_FLAG,
+    CHANGE_UPDATABLE_FLAG = X_CHANGE_UPDATABLE_FLAG,
+    FILTER_SET_FLAG = X_FILTER_SET_FLAG,
+    SEQ_NUM = X_SEQ_NUM,
+    ENTITY_CODE = X_ENTITY_CODE,
+    FILTERING_PARAMETERS = X_FILTERING_PARAMETERS,
+    INCLUDE_TYPE = X_INCLUDE_TYPE,
+    LAST_UPDATE_DATE = X_LAST_UPDATE_DATE,
+    LAST_UPDATED_BY = X_LAST_UPDATED_BY,
+    LAST_UPDATE_LOGIN = X_LAST_UPDATE_LOGIN
+  where SELECTION_SET_CODE = X_SELECTION_SET_CODE
+  and USER_ID = X_USER_ID
+  and ENTITY_OCCURANCE_CODE = X_ENTITY_OCCURANCE_CODE;
+
+  if (sql%notfound) then
+    raise no_data_found;
+  end if;
+
+  update AZ_SELECTION_SET_ENTITIES_TL set
+    ENTITY_OCCURANCE_NAME = X_ENTITY_OCCURANCE_NAME,
+    LAST_UPDATE_DATE = X_LAST_UPDATE_DATE,
+    LAST_UPDATED_BY = X_LAST_UPDATED_BY,
+    LAST_UPDATE_LOGIN = X_LAST_UPDATE_LOGIN,
+    SOURCE_LANG = userenv('LANG')
+  where SELECTION_SET_CODE = X_SELECTION_SET_CODE
+  and USER_ID = X_USER_ID
+  and ENTITY_OCCURANCE_CODE = X_ENTITY_OCCURANCE_CODE
+  and userenv('LANG') in (LANGUAGE, SOURCE_LANG);
+
+  if (sql%notfound) then
+    raise no_data_found;
+  end if;
+end UPDATE_ROW;
+
+procedure DELETE_ROW (
+  X_SELECTION_SET_CODE in VARCHAR2,
+  X_USER_ID in NUMBER,
+  X_ENTITY_OCCURANCE_CODE in VARCHAR2
+) is
+begin
+  delete from AZ_SELECTION_SET_ENTITIES_TL
+  where SELECTION_SET_CODE = X_SELECTION_SET_CODE
+  and USER_ID = X_USER_ID
+  and ENTITY_OCCURANCE_CODE = X_ENTITY_OCCURANCE_CODE;
+
+  if (sql%notfound) then
+    raise no_data_found;
+  end if;
+
+  delete from AZ_SELECTION_SET_ENTITIES_B
+  where SELECTION_SET_CODE = X_SELECTION_SET_CODE
+  and USER_ID = X_USER_ID
+  and ENTITY_OCCURANCE_CODE = X_ENTITY_OCCURANCE_CODE;
+
+  if (sql%notfound) then
+    raise no_data_found;
+  end if;
+end DELETE_ROW;
+
+procedure ADD_LANGUAGE
+is
+begin
+  delete from AZ_SELECTION_SET_ENTITIES_TL T
+  where not exists
+    (select NULL
+    from AZ_SELECTION_SET_ENTITIES_B B
+    where B.SELECTION_SET_CODE = T.SELECTION_SET_CODE
+    and B.USER_ID = T.USER_ID
+    and B.ENTITY_OCCURANCE_CODE = T.ENTITY_OCCURANCE_CODE
+    );
+
+  update AZ_SELECTION_SET_ENTITIES_TL T set (
+      ENTITY_OCCURANCE_NAME
+    ) = (select
+      B.ENTITY_OCCURANCE_NAME
+    from AZ_SELECTION_SET_ENTITIES_TL B
+    where B.SELECTION_SET_CODE = T.SELECTION_SET_CODE
+    and B.USER_ID = T.USER_ID
+    and B.ENTITY_OCCURANCE_CODE = T.ENTITY_OCCURANCE_CODE
+    and B.LANGUAGE = T.SOURCE_LANG)
+  where (
+      T.SELECTION_SET_CODE,
+      T.USER_ID,
+      T.ENTITY_OCCURANCE_CODE,
+      T.LANGUAGE
+  ) in (select
+      SUBT.SELECTION_SET_CODE,
+      SUBT.USER_ID,
+      SUBT.ENTITY_OCCURANCE_CODE,
+      SUBT.LANGUAGE
+    from AZ_SELECTION_SET_ENTITIES_TL SUBB, AZ_SELECTION_SET_ENTITIES_TL SUBT
+    where SUBB.SELECTION_SET_CODE = SUBT.SELECTION_SET_CODE
+    and SUBB.USER_ID = SUBT.USER_ID
+    and SUBB.ENTITY_OCCURANCE_CODE = SUBT.ENTITY_OCCURANCE_CODE
+    and SUBB.LANGUAGE = SUBT.SOURCE_LANG
+    and (SUBB.ENTITY_OCCURANCE_NAME <> SUBT.ENTITY_OCCURANCE_NAME
+      or (SUBB.ENTITY_OCCURANCE_NAME is null and SUBT.ENTITY_OCCURANCE_NAME is not null)
+      or (SUBB.ENTITY_OCCURANCE_NAME is not null and SUBT.ENTITY_OCCURANCE_NAME is null)
+  ));
+
+  insert into AZ_SELECTION_SET_ENTITIES_TL (
+    LAST_UPDATE_LOGIN,
+    ENTITY_OCCURANCE_CODE,
+    USER_ID,
+    LAST_UPDATE_DATE,
+    SELECTION_SET_CODE,
+    LAST_UPDATED_BY,
+    ENTITY_OCCURANCE_NAME,
+    CREATED_BY,
+    CREATION_DATE,
+    LANGUAGE,
+    SOURCE_LANG
+  ) select
+    B.LAST_UPDATE_LOGIN,
+    B.ENTITY_OCCURANCE_CODE,
+    B.USER_ID,
+    B.LAST_UPDATE_DATE,
+    B.SELECTION_SET_CODE,
+    B.LAST_UPDATED_BY,
+    B.ENTITY_OCCURANCE_NAME,
+    B.CREATED_BY,
+    B.CREATION_DATE,
+    L.LANGUAGE_CODE,
+    B.SOURCE_LANG
+  from AZ_SELECTION_SET_ENTITIES_TL B, FND_LANGUAGES L
+  where L.INSTALLED_FLAG in ('I', 'B')
+  and B.LANGUAGE = userenv('LANG')
+  and not exists
+    (select NULL
+    from AZ_SELECTION_SET_ENTITIES_TL T
+    where T.SELECTION_SET_CODE = B.SELECTION_SET_CODE
+    and T.USER_ID = B.USER_ID
+    and T.ENTITY_OCCURANCE_CODE = B.ENTITY_OCCURANCE_CODE
+    and T.LANGUAGE = L.LANGUAGE_CODE);
+
+end ADD_LANGUAGE;
+
+procedure TRANSLATE_ROW (
+     X_SELECTION_SET_CODE      in VARCHAR2,
+     X_USER_ID                 in NUMBER ,
+     X_ENTITY_OCCURANCE_CODE   in VARCHAR2,
+     X_ENTITY_OCCURANCE_NAME   in VARCHAR2,
+     X_OWNER   		       in VARCHAR2 ) is
+begin
+     update AZ_SELECTION_SET_ENTITIES_TL set
+        ENTITY_OCCURANCE_NAME = X_ENTITY_OCCURANCE_NAME,
+        last_update_date   = sysdate,
+        last_updated_by    = decode(X_OWNER, 'SEED', 1, 0),
+        last_update_login  = 0,
+        source_lang        = userenv('LANG')
+      where SELECTION_SET_CODE = X_SELECTION_SET_CODE
+      and   USER_ID = X_USER_ID
+      and   ENTITY_OCCURANCE_CODE = X_ENTITY_OCCURANCE_CODE
+      and   userenv('LANG') in (language, source_lang);
+
+end TRANSLATE_ROW;
+
+procedure LOAD_ROW (
+        X_SELECTION_SET_CODE    in   VARCHAR2,
+        X_USER_ID               in   NUMBER,
+        X_ENTITY_OCCURANCE_CODE in   VARCHAR2,
+        X_OWNER                 in   VARCHAR2,
+        X_ENTITY_CODE           in   VARCHAR2,
+        X_FILTERING_PARAMETERS  in   CLOB,
+        X_INCLUDE_TYPE          in   VARCHAR2,
+        X_REF_ENTITY_OCCURANCE_CODE in VARCHAR2,
+        X_UPDATABLE_FLAG        in   VARCHAR2,
+        X_ALLOW_SET_TARGETVAL_FLAG in VARCHAR2,
+        X_ALLOW_FILTER_FLAG     in   VARCHAR2,
+        X_CHANGE_UPDATABLE_FLAG in   VARCHAR2,
+	X_FILTER_SET_FLAG	in   VARCHAR2,
+        X_SEQ_NUM               in   NUMBER,
+        X_ENTITY_OCCURANCE_NAME in   VARCHAR2) IS
+begin
+    declare
+        l_owner_id  number := 0;
+        l_row_id    varchar2(64);
+        luby        number := null;
+    begin
+     if (X_OWNER = 'SEED') then
+       l_owner_id := 1;
+     end if;
+
+     select created_by into luby
+     from AZ_SELECTION_SET_ENTITIES_B
+     where SELECTION_SET_CODE = X_SELECTION_SET_CODE
+     and   USER_ID = X_USER_ID
+     and   ENTITY_OCCURANCE_CODE = X_ENTITY_OCCURANCE_CODE;
+
+     IF luby = 1 THEN
+         AZ_SELECTION_SET_ENTITIES_PKG.UPDATE_ROW(
+                   X_SELECTION_SET_CODE => X_SELECTION_SET_CODE,
+                   X_USER_ID => X_USER_ID,
+                   X_ENTITY_OCCURANCE_CODE => X_ENTITY_OCCURANCE_CODE,
+                   X_REF_ENTITY_OCCURANCE_CODE => X_REF_ENTITY_OCCURANCE_CODE,
+                   X_UPDATABLE_FLAG => X_UPDATABLE_FLAG,
+                   X_ALLOW_SET_TARGETVAL_FLAG => X_ALLOW_SET_TARGETVAL_FLAG,
+                   X_ALLOW_FILTER_FLAG => X_ALLOW_FILTER_FLAG,
+                   X_CHANGE_UPDATABLE_FLAG => X_CHANGE_UPDATABLE_FLAG,
+		   X_FILTER_SET_FLAG => X_FILTER_SET_FLAG,
+                   X_SEQ_NUM => X_SEQ_NUM,
+                   X_ENTITY_CODE => X_ENTITY_CODE,
+                   X_FILTERING_PARAMETERS => X_FILTERING_PARAMETERS,
+                   X_INCLUDE_TYPE => X_INCLUDE_TYPE,
+                   X_ENTITY_OCCURANCE_NAME => X_ENTITY_OCCURANCE_NAME,
+                   X_LAST_UPDATE_DATE => sysdate,
+                   X_LAST_UPDATED_BY => l_owner_id,
+                   X_LAST_UPDATE_LOGIN => 0
+                );
+     END IF; -- if luby = 1
+
+    exception
+    when NO_DATA_FOUND then
+
+         AZ_SELECTION_SET_ENTITIES_PKG.INSERT_ROW(
+		   X_ROWID => l_row_id,
+		   X_SELECTION_SET_CODE => X_SELECTION_SET_CODE,
+		   X_USER_ID => X_USER_ID,
+		   X_ENTITY_OCCURANCE_CODE => X_ENTITY_OCCURANCE_CODE,
+                   X_REF_ENTITY_OCCURANCE_CODE => X_REF_ENTITY_OCCURANCE_CODE,
+                   X_UPDATABLE_FLAG => X_UPDATABLE_FLAG,
+                   X_ALLOW_SET_TARGETVAL_FLAG => X_ALLOW_SET_TARGETVAL_FLAG,
+                   X_ALLOW_FILTER_FLAG => X_ALLOW_FILTER_FLAG,
+                   X_CHANGE_UPDATABLE_FLAG => X_CHANGE_UPDATABLE_FLAG,
+		   X_FILTER_SET_FLAG => X_FILTER_SET_FLAG,
+                   X_SEQ_NUM => X_SEQ_NUM,
+                   X_ENTITY_CODE => X_ENTITY_CODE,
+                   X_FILTERING_PARAMETERS => X_FILTERING_PARAMETERS,
+                   X_INCLUDE_TYPE => X_INCLUDE_TYPE,
+                   X_ENTITY_OCCURANCE_NAME => X_ENTITY_OCCURANCE_NAME,
+                   X_CREATION_DATE => sysdate,
+                   X_CREATED_BY => l_owner_id,
+                   X_LAST_UPDATE_DATE => sysdate,
+                   X_LAST_UPDATED_BY => l_owner_id,
+                   X_LAST_UPDATE_LOGIN => 0
+                );
+    end;
+
+end LOAD_ROW;
+
+end AZ_SELECTION_SET_ENTITIES_PKG;
+
+/

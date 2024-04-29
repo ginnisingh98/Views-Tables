@@ -1,0 +1,39 @@
+--------------------------------------------------------
+--  DDL for Package PSP_EFFORT_MESSAGES_PKG
+--------------------------------------------------------
+
+  CREATE OR REPLACE EDITIONABLE PACKAGE "APPS"."PSP_EFFORT_MESSAGES_PKG" AUTHID CURRENT_USER as
+ /* $Header: PSPERMES.pls 115.5 2002/11/18 12:34:47 lveerubh ship $ */
+procedure INSERT_ROW (
+  X_ROWID in out NOCOPY VARCHAR2,
+  X_MESSAGE_ID in NUMBER,
+  X_EFFORT_REPORT_MESSAGE_TYPE in VARCHAR2,
+  X_TEXT in VARCHAR2,
+  X_MODE in VARCHAR2 default 'R'
+  );
+procedure LOCK_ROW (
+  X_MESSAGE_ID in NUMBER,
+  X_EFFORT_REPORT_MESSAGE_TYPE in VARCHAR2,
+  X_TEXT in VARCHAR2
+);
+procedure UPDATE_ROW (
+  X_MESSAGE_ID in NUMBER,
+  X_EFFORT_REPORT_MESSAGE_TYPE in VARCHAR2,
+  X_TEXT in VARCHAR2,
+  X_MODE in VARCHAR2 default 'R'
+  );
+procedure ADD_ROW (
+  X_ROWID in out NOCOPY VARCHAR2,
+  X_MESSAGE_ID in NUMBER,
+  X_EFFORT_REPORT_MESSAGE_TYPE in VARCHAR2,
+  X_TEXT in VARCHAR2,
+  X_MODE in VARCHAR2 default 'R'
+  );
+procedure DELETE_ROW (
+  X_MESSAGE_ID in NUMBER
+);
+end PSP_EFFORT_MESSAGES_PKG;
+
+ 
+
+/

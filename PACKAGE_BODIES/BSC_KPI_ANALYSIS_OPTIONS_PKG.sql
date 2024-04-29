@@ -1,0 +1,352 @@
+--------------------------------------------------------
+--  DDL for Package Body BSC_KPI_ANALYSIS_OPTIONS_PKG
+--------------------------------------------------------
+
+  CREATE OR REPLACE EDITIONABLE PACKAGE BODY "APPS"."BSC_KPI_ANALYSIS_OPTIONS_PKG" as
+/* $Header: BSCKAOPB.pls 115.6 2003/02/12 14:25:45 adrao ship $ */
+procedure INSERT_ROW (
+  X_ROWID in out NOCOPY VARCHAR2,
+  X_INDICATOR in NUMBER,
+  X_ANALYSIS_GROUP_ID in NUMBER,
+  X_OPTION_ID in NUMBER,
+  X_PARENT_OPTION_ID in NUMBER,
+  X_GRANDPARENT_OPTION_ID in NUMBER,
+  X_DIM_SET_ID in NUMBER,
+  X_USER_LEVEL0 in NUMBER,
+  X_USER_LEVEL1 in NUMBER,
+  X_USER_LEVEL1_DEFAULT in NUMBER,
+  X_USER_LEVEL2 in NUMBER,
+  X_USER_LEVEL2_DEFAULT in NUMBER,
+  X_NAME in VARCHAR2,
+  X_HELP in VARCHAR2
+) is
+  cursor C is select ROWID from BSC_KPI_ANALYSIS_OPTIONS_B
+    where INDICATOR = X_INDICATOR
+    and ANALYSIS_GROUP_ID = X_ANALYSIS_GROUP_ID
+    and OPTION_ID = X_OPTION_ID
+    and PARENT_OPTION_ID = X_PARENT_OPTION_ID
+    and GRANDPARENT_OPTION_ID = X_GRANDPARENT_OPTION_ID
+    ;
+begin
+  insert into BSC_KPI_ANALYSIS_OPTIONS_B (
+    INDICATOR,
+    ANALYSIS_GROUP_ID,
+    OPTION_ID,
+    PARENT_OPTION_ID,
+    GRANDPARENT_OPTION_ID,
+    DIM_SET_ID,
+    USER_LEVEL0,
+    USER_LEVEL1,
+    USER_LEVEL1_DEFAULT,
+    USER_LEVEL2,
+    USER_LEVEL2_DEFAULT
+  ) values (
+    X_INDICATOR,
+    X_ANALYSIS_GROUP_ID,
+    X_OPTION_ID,
+    X_PARENT_OPTION_ID,
+    X_GRANDPARENT_OPTION_ID,
+    X_DIM_SET_ID,
+    X_USER_LEVEL0,
+    X_USER_LEVEL1,
+    X_USER_LEVEL1_DEFAULT,
+    X_USER_LEVEL2,
+    X_USER_LEVEL2_DEFAULT
+  );
+
+  insert into BSC_KPI_ANALYSIS_OPTIONS_TL (
+    INDICATOR,
+    ANALYSIS_GROUP_ID,
+    OPTION_ID,
+    PARENT_OPTION_ID,
+    GRANDPARENT_OPTION_ID,
+    NAME,
+    HELP,
+    LANGUAGE,
+    SOURCE_LANG
+  ) select
+    X_INDICATOR,
+    X_ANALYSIS_GROUP_ID,
+    X_OPTION_ID,
+    X_PARENT_OPTION_ID,
+    X_GRANDPARENT_OPTION_ID,
+    X_NAME,
+    X_HELP,
+    L.LANGUAGE_CODE,
+    userenv('LANG')
+  from FND_LANGUAGES L
+  where L.INSTALLED_FLAG in ('I', 'B')
+  and not exists
+    (select NULL
+    from BSC_KPI_ANALYSIS_OPTIONS_TL T
+    where T.INDICATOR = X_INDICATOR
+    and T.ANALYSIS_GROUP_ID = X_ANALYSIS_GROUP_ID
+    and T.OPTION_ID = X_OPTION_ID
+    and T.PARENT_OPTION_ID = X_PARENT_OPTION_ID
+    and T.GRANDPARENT_OPTION_ID = X_GRANDPARENT_OPTION_ID
+    and T.LANGUAGE = L.LANGUAGE_CODE);
+
+  open c;
+  fetch c into X_ROWID;
+  if (c%notfound) then
+    close c;
+    raise no_data_found;
+  end if;
+  close c;
+
+end INSERT_ROW;
+
+procedure LOCK_ROW (
+  X_INDICATOR in NUMBER,
+  X_ANALYSIS_GROUP_ID in NUMBER,
+  X_OPTION_ID in NUMBER,
+  X_PARENT_OPTION_ID in NUMBER,
+  X_GRANDPARENT_OPTION_ID in NUMBER,
+  X_DIM_SET_ID in NUMBER,
+  X_USER_LEVEL0 in NUMBER,
+  X_USER_LEVEL1 in NUMBER,
+  X_USER_LEVEL1_DEFAULT in NUMBER,
+  X_USER_LEVEL2 in NUMBER,
+  X_USER_LEVEL2_DEFAULT in NUMBER,
+  X_NAME in VARCHAR2,
+  X_HELP in VARCHAR2
+) is
+  cursor c is select
+      DIM_SET_ID,
+      USER_LEVEL0,
+      USER_LEVEL1,
+      USER_LEVEL1_DEFAULT,
+      USER_LEVEL2,
+      USER_LEVEL2_DEFAULT
+    from BSC_KPI_ANALYSIS_OPTIONS_B
+    where INDICATOR = X_INDICATOR
+    and ANALYSIS_GROUP_ID = X_ANALYSIS_GROUP_ID
+    and OPTION_ID = X_OPTION_ID
+    and PARENT_OPTION_ID = X_PARENT_OPTION_ID
+    and GRANDPARENT_OPTION_ID = X_GRANDPARENT_OPTION_ID
+    for update of INDICATOR nowait;
+  recinfo c%rowtype;
+
+  cursor c1 is select
+      NAME,
+      HELP,
+      decode(LANGUAGE, userenv('LANG'), 'Y', 'N') BASELANG
+    from BSC_KPI_ANALYSIS_OPTIONS_TL
+    where INDICATOR = X_INDICATOR
+    and ANALYSIS_GROUP_ID = X_ANALYSIS_GROUP_ID
+    and OPTION_ID = X_OPTION_ID
+    and PARENT_OPTION_ID = X_PARENT_OPTION_ID
+    and GRANDPARENT_OPTION_ID = X_GRANDPARENT_OPTION_ID
+    and userenv('LANG') in (LANGUAGE, SOURCE_LANG)
+    for update of INDICATOR nowait;
+begin
+  open c;
+  fetch c into recinfo;
+  if (c%notfound) then
+    close c;
+    fnd_message.set_name('FND', 'FORM_RECORD_DELETED');
+    app_exception.raise_exception;
+  end if;
+  close c;
+  if (    (recinfo.DIM_SET_ID = X_DIM_SET_ID)
+      AND ((recinfo.USER_LEVEL0 = X_USER_LEVEL0)
+           OR ((recinfo.USER_LEVEL0 is null) AND (X_USER_LEVEL0 is null)))
+      AND ((recinfo.USER_LEVEL1 = X_USER_LEVEL1)
+           OR ((recinfo.USER_LEVEL1 is null) AND (X_USER_LEVEL1 is null)))
+      AND ((recinfo.USER_LEVEL1_DEFAULT = X_USER_LEVEL1_DEFAULT)
+           OR ((recinfo.USER_LEVEL1_DEFAULT is null) AND (X_USER_LEVEL1_DEFAULT is null)))
+      AND ((recinfo.USER_LEVEL2 = X_USER_LEVEL2)
+           OR ((recinfo.USER_LEVEL2 is null) AND (X_USER_LEVEL2 is null)))
+      AND ((recinfo.USER_LEVEL2_DEFAULT = X_USER_LEVEL2_DEFAULT)
+           OR ((recinfo.USER_LEVEL2_DEFAULT is null) AND (X_USER_LEVEL2_DEFAULT is null)))
+  ) then
+    null;
+  else
+    fnd_message.set_name('FND', 'FORM_RECORD_CHANGED');
+    app_exception.raise_exception;
+  end if;
+
+  for tlinfo in c1 loop
+    if (tlinfo.BASELANG = 'Y') then
+      if (    (tlinfo.NAME = X_NAME)
+          AND (tlinfo.HELP = X_HELP)
+      ) then
+        null;
+      else
+        fnd_message.set_name('FND', 'FORM_RECORD_CHANGED');
+        app_exception.raise_exception;
+      end if;
+    end if;
+  end loop;
+  return;
+end LOCK_ROW;
+
+procedure UPDATE_ROW (
+  X_INDICATOR in NUMBER,
+  X_ANALYSIS_GROUP_ID in NUMBER,
+  X_OPTION_ID in NUMBER,
+  X_PARENT_OPTION_ID in NUMBER,
+  X_GRANDPARENT_OPTION_ID in NUMBER,
+  X_DIM_SET_ID in NUMBER,
+  X_USER_LEVEL0 in NUMBER,
+  X_USER_LEVEL1 in NUMBER,
+  X_USER_LEVEL1_DEFAULT in NUMBER,
+  X_USER_LEVEL2 in NUMBER,
+  X_USER_LEVEL2_DEFAULT in NUMBER,
+  X_NAME in VARCHAR2,
+  X_HELP in VARCHAR2
+) is
+begin
+  update BSC_KPI_ANALYSIS_OPTIONS_B set
+    DIM_SET_ID = X_DIM_SET_ID,
+    USER_LEVEL0 = X_USER_LEVEL0,
+    USER_LEVEL1 = X_USER_LEVEL1,
+    USER_LEVEL1_DEFAULT = X_USER_LEVEL1_DEFAULT,
+    USER_LEVEL2 = X_USER_LEVEL2,
+    USER_LEVEL2_DEFAULT = X_USER_LEVEL2_DEFAULT
+  where INDICATOR = X_INDICATOR
+  and ANALYSIS_GROUP_ID = X_ANALYSIS_GROUP_ID
+  and OPTION_ID = X_OPTION_ID
+  and PARENT_OPTION_ID = X_PARENT_OPTION_ID
+  and GRANDPARENT_OPTION_ID = X_GRANDPARENT_OPTION_ID;
+
+  if (sql%notfound) then
+    raise no_data_found;
+  end if;
+
+  update BSC_KPI_ANALYSIS_OPTIONS_TL set
+    NAME = X_NAME,
+    HELP = X_HELP,
+    SOURCE_LANG = userenv('LANG')
+  where INDICATOR = X_INDICATOR
+  and ANALYSIS_GROUP_ID = X_ANALYSIS_GROUP_ID
+  and OPTION_ID = X_OPTION_ID
+  and PARENT_OPTION_ID = X_PARENT_OPTION_ID
+  and GRANDPARENT_OPTION_ID = X_GRANDPARENT_OPTION_ID
+  and userenv('LANG') in (LANGUAGE, SOURCE_LANG);
+
+  if (sql%notfound) then
+    raise no_data_found;
+  end if;
+end UPDATE_ROW;
+
+procedure DELETE_ROW (
+  X_INDICATOR in NUMBER,
+  X_ANALYSIS_GROUP_ID in NUMBER,
+  X_OPTION_ID in NUMBER,
+  X_PARENT_OPTION_ID in NUMBER,
+  X_GRANDPARENT_OPTION_ID in NUMBER
+) is
+begin
+  delete from BSC_KPI_ANALYSIS_OPTIONS_TL
+  where INDICATOR = X_INDICATOR
+  and ANALYSIS_GROUP_ID = X_ANALYSIS_GROUP_ID
+  and OPTION_ID = X_OPTION_ID
+  and PARENT_OPTION_ID = X_PARENT_OPTION_ID
+  and GRANDPARENT_OPTION_ID = X_GRANDPARENT_OPTION_ID;
+
+  if (sql%notfound) then
+    raise no_data_found;
+  end if;
+
+  delete from BSC_KPI_ANALYSIS_OPTIONS_B
+  where INDICATOR = X_INDICATOR
+  and ANALYSIS_GROUP_ID = X_ANALYSIS_GROUP_ID
+  and OPTION_ID = X_OPTION_ID
+  and PARENT_OPTION_ID = X_PARENT_OPTION_ID
+  and GRANDPARENT_OPTION_ID = X_GRANDPARENT_OPTION_ID;
+
+  if (sql%notfound) then
+    raise no_data_found;
+  end if;
+end DELETE_ROW;
+
+procedure ADD_LANGUAGE
+is
+begin
+  delete from BSC_KPI_ANALYSIS_OPTIONS_TL T
+  where not exists
+    (select NULL
+    from BSC_KPI_ANALYSIS_OPTIONS_B B
+    where B.INDICATOR = T.INDICATOR
+    and B.ANALYSIS_GROUP_ID = T.ANALYSIS_GROUP_ID
+    and B.OPTION_ID = T.OPTION_ID
+    and B.PARENT_OPTION_ID = T.PARENT_OPTION_ID
+    and B.GRANDPARENT_OPTION_ID = T.GRANDPARENT_OPTION_ID
+    );
+
+  update BSC_KPI_ANALYSIS_OPTIONS_TL T set (
+      NAME,
+      HELP
+    ) = (select
+      B.NAME,
+      B.HELP
+    from BSC_KPI_ANALYSIS_OPTIONS_TL B
+    where B.INDICATOR = T.INDICATOR
+    and B.ANALYSIS_GROUP_ID = T.ANALYSIS_GROUP_ID
+    and B.OPTION_ID = T.OPTION_ID
+    and B.PARENT_OPTION_ID = T.PARENT_OPTION_ID
+    and B.GRANDPARENT_OPTION_ID = T.GRANDPARENT_OPTION_ID
+    and B.LANGUAGE = T.SOURCE_LANG)
+  where (
+      T.INDICATOR,
+      T.ANALYSIS_GROUP_ID,
+      T.OPTION_ID,
+      T.PARENT_OPTION_ID,
+      T.GRANDPARENT_OPTION_ID,
+      T.LANGUAGE
+  ) in (select
+      SUBT.INDICATOR,
+      SUBT.ANALYSIS_GROUP_ID,
+      SUBT.OPTION_ID,
+      SUBT.PARENT_OPTION_ID,
+      SUBT.GRANDPARENT_OPTION_ID,
+      SUBT.LANGUAGE
+    from BSC_KPI_ANALYSIS_OPTIONS_TL SUBB, BSC_KPI_ANALYSIS_OPTIONS_TL SUBT
+    where SUBB.INDICATOR = SUBT.INDICATOR
+    and SUBB.ANALYSIS_GROUP_ID = SUBT.ANALYSIS_GROUP_ID
+    and SUBB.OPTION_ID = SUBT.OPTION_ID
+    and SUBB.PARENT_OPTION_ID = SUBT.PARENT_OPTION_ID
+    and SUBB.GRANDPARENT_OPTION_ID = SUBT.GRANDPARENT_OPTION_ID
+    and SUBB.LANGUAGE = SUBT.SOURCE_LANG
+    and (SUBB.NAME <> SUBT.NAME
+      or SUBB.HELP <> SUBT.HELP
+  ));
+
+  insert into BSC_KPI_ANALYSIS_OPTIONS_TL (
+    INDICATOR,
+    ANALYSIS_GROUP_ID,
+    OPTION_ID,
+    PARENT_OPTION_ID,
+    GRANDPARENT_OPTION_ID,
+    NAME,
+    HELP,
+    LANGUAGE,
+    SOURCE_LANG
+  ) select
+    B.INDICATOR,
+    B.ANALYSIS_GROUP_ID,
+    B.OPTION_ID,
+    B.PARENT_OPTION_ID,
+    B.GRANDPARENT_OPTION_ID,
+    B.NAME,
+    B.HELP,
+    L.LANGUAGE_CODE,
+    B.SOURCE_LANG
+  from BSC_KPI_ANALYSIS_OPTIONS_TL B, FND_LANGUAGES L
+  where L.INSTALLED_FLAG in ('I', 'B')
+  and B.LANGUAGE = userenv('LANG')
+  and not exists
+    (select NULL
+    from BSC_KPI_ANALYSIS_OPTIONS_TL T
+    where T.INDICATOR = B.INDICATOR
+    and T.ANALYSIS_GROUP_ID = B.ANALYSIS_GROUP_ID
+    and T.OPTION_ID = B.OPTION_ID
+    and T.PARENT_OPTION_ID = B.PARENT_OPTION_ID
+    and T.GRANDPARENT_OPTION_ID = B.GRANDPARENT_OPTION_ID
+    and T.LANGUAGE = L.LANGUAGE_CODE);
+end ADD_LANGUAGE;
+
+end BSC_KPI_ANALYSIS_OPTIONS_PKG;
+
+/

@@ -1,0 +1,56 @@
+--------------------------------------------------------
+--  DDL for Package BSC_TAB_VIEWS_PKG
+--------------------------------------------------------
+
+  CREATE OR REPLACE EDITIONABLE PACKAGE "APPS"."BSC_TAB_VIEWS_PKG" AUTHID CURRENT_USER as
+/* $Header: BSCTBVWS.pls 115.5 2003/02/12 14:30:02 adeulgao ship $ */
+PROCEDURE TRANSLATE_ROW
+(
+    X_TAB_ID            IN      NUMBER,
+    X_TAB_VIEW_ID       IN      NUMBER,
+    X_NAME              IN      VARCHAR2,
+    X_HELP              IN      VARCHAR2,
+    X_LAST_UPDATE_DATE  IN      DATE DEFAULT SYSDATE,
+    X_LAST_UPDATED_BY   IN      NUMBER,
+    X_LAST_UPDATE_LOGIN IN      NUMBER
+);
+procedure INSERT_ROW (
+  X_ROWID 		in out NOCOPY VARCHAR2,
+  X_TAB_ID 		in NUMBER,
+  X_TAB_VIEW_ID 	in NUMBER,
+  X_ENABLED_FLAG 	in NUMBER,
+  X_NAME 		in VARCHAR2,
+  X_HELP 		in VARCHAR2,
+  X_CREATION_DATE 	in DATE DEFAULT SYSDATE,
+  X_CREATED_BY 		in NUMBER,
+  X_LAST_UPDATE_DATE 	in DATE DEFAULT SYSDATE,
+  X_LAST_UPDATED_BY 	in NUMBER,
+  X_LAST_UPDATE_LOGIN 	in NUMBER
+);
+procedure LOCK_ROW (
+  X_TAB_ID 		in NUMBER,
+  X_TAB_VIEW_ID 	in NUMBER,
+  X_ENABLED_FLAG 	in NUMBER,
+  X_NAME 		in VARCHAR2,
+  X_HELP 		in VARCHAR2
+);
+procedure UPDATE_ROW (
+  X_TAB_ID 		in NUMBER,
+  X_TAB_VIEW_ID 	in NUMBER,
+  X_ENABLED_FLAG 	in NUMBER,
+  X_NAME 		in VARCHAR2,
+  X_HELP 		in VARCHAR2,
+  X_LAST_UPDATE_DATE 	in DATE DEFAULT SYSDATE,
+  X_LAST_UPDATED_BY 	in NUMBER,
+  X_LAST_UPDATE_LOGIN 	in NUMBER
+);
+procedure DELETE_ROW (
+   X_TAB_ID		in NUMBER,
+  X_TAB_VIEW_ID 	in NUMBER
+);
+procedure ADD_LANGUAGE;
+end BSC_TAB_VIEWS_PKG;
+
+ 
+
+/

@@ -1,0 +1,139 @@
+--------------------------------------------------------
+--  DDL for Package IGS_RE_THS_PNL_MBR_PKG
+--------------------------------------------------------
+
+  CREATE OR REPLACE EDITIONABLE PACKAGE "APPS"."IGS_RE_THS_PNL_MBR_PKG" AUTHID CURRENT_USER as
+/* $Header: IGSRI21S.pls 120.0 2005/06/01 15:26:01 appldev noship $ */
+procedure INSERT_ROW (
+  X_ROWID in out NOCOPY VARCHAR2,
+  X_CA_PERSON_ID in NUMBER,
+  X_CA_SEQUENCE_NUMBER in NUMBER,
+  X_THE_SEQUENCE_NUMBER in NUMBER,
+  X_CREATION_DT in DATE,
+  X_PERSON_ID in NUMBER,
+  X_PANEL_MEMBER_TYPE in VARCHAR2,
+  X_CONFIRMED_DT in DATE,
+  X_DECLINED_DT in DATE,
+  X_ANONYMITY_IND in VARCHAR2,
+  X_THESIS_RESULT_CD in VARCHAR2,
+  X_PAID_DT in DATE,
+  X_TRACKING_ID in NUMBER,
+  X_RECOMMENDATION_SUMMARY in VARCHAR2,
+  X_MODE in VARCHAR2 default 'R'
+  );
+procedure LOCK_ROW (
+  X_ROWID in VARCHAR2,
+  X_CA_PERSON_ID in NUMBER,
+  X_CA_SEQUENCE_NUMBER in NUMBER,
+  X_THE_SEQUENCE_NUMBER in NUMBER,
+  X_CREATION_DT in DATE,
+  X_PERSON_ID in NUMBER,
+  X_PANEL_MEMBER_TYPE in VARCHAR2,
+  X_CONFIRMED_DT in DATE,
+  X_DECLINED_DT in DATE,
+  X_ANONYMITY_IND in VARCHAR2,
+  X_THESIS_RESULT_CD in VARCHAR2,
+  X_PAID_DT in DATE,
+  X_TRACKING_ID in NUMBER,
+  X_RECOMMENDATION_SUMMARY in VARCHAR2
+);
+procedure UPDATE_ROW (
+  X_ROWID in VARCHAR2,
+  X_CA_PERSON_ID in NUMBER,
+  X_CA_SEQUENCE_NUMBER in NUMBER,
+  X_THE_SEQUENCE_NUMBER in NUMBER,
+  X_CREATION_DT in DATE,
+  X_PERSON_ID in NUMBER,
+  X_PANEL_MEMBER_TYPE in VARCHAR2,
+  X_CONFIRMED_DT in DATE,
+  X_DECLINED_DT in DATE,
+  X_ANONYMITY_IND in VARCHAR2,
+  X_THESIS_RESULT_CD in VARCHAR2,
+  X_PAID_DT in DATE,
+  X_TRACKING_ID in NUMBER,
+  X_RECOMMENDATION_SUMMARY in VARCHAR2,
+  X_MODE in VARCHAR2 default 'R'
+  );
+procedure ADD_ROW (
+  X_ROWID in out NOCOPY VARCHAR2,
+  X_CA_PERSON_ID in NUMBER,
+  X_CA_SEQUENCE_NUMBER in NUMBER,
+  X_THE_SEQUENCE_NUMBER in NUMBER,
+  X_CREATION_DT in DATE,
+  X_PERSON_ID in NUMBER,
+  X_PANEL_MEMBER_TYPE in VARCHAR2,
+  X_CONFIRMED_DT in DATE,
+  X_DECLINED_DT in DATE,
+  X_ANONYMITY_IND in VARCHAR2,
+  X_THESIS_RESULT_CD in VARCHAR2,
+  X_PAID_DT in DATE,
+  X_TRACKING_ID in NUMBER,
+  X_RECOMMENDATION_SUMMARY in VARCHAR2,
+  X_MODE in VARCHAR2 default 'R'
+  );
+procedure DELETE_ROW (
+  X_ROWID in VARCHAR2,
+  x_mode IN VARCHAR2 DEFAULT 'R'
+  );
+
+FUNCTION Get_PK_For_Validation (
+    x_ca_person_id IN NUMBER,
+    x_ca_sequence_number IN NUMBER,
+    x_the_sequence_number IN NUMBER,
+    x_creation_dt IN DATE,
+    x_person_id IN NUMBER
+    )RETURN BOOLEAN ;
+
+ PROCEDURE Check_Constraints(
+  Column_Name IN VARCHAR2 DEFAULT NULL,
+  Column_Value IN VARCHAR2 DEFAULT NULL
+ );
+
+  PROCEDURE Before_DML (
+    p_action IN VARCHAR2,
+    x_rowid IN VARCHAR2 DEFAULT NULL,
+    x_ca_person_id IN NUMBER DEFAULT NULL,
+    x_ca_sequence_number IN NUMBER DEFAULT NULL,
+    x_the_sequence_number IN NUMBER DEFAULT NULL,
+    x_creation_dt IN DATE DEFAULT NULL,
+    x_person_id IN NUMBER DEFAULT NULL,
+    x_panel_member_type IN VARCHAR2 DEFAULT NULL,
+    x_confirmed_dt IN DATE DEFAULT NULL,
+    x_declined_dt IN DATE DEFAULT NULL,
+    x_anonymity_ind IN VARCHAR2 DEFAULT NULL,
+    x_thesis_result_cd IN VARCHAR2 DEFAULT NULL,
+    x_paid_dt IN DATE DEFAULT NULL,
+    x_tracking_id IN NUMBER DEFAULT NULL,
+    x_recommendation_summary IN VARCHAR2 DEFAULT NULL,
+    x_creation_date IN DATE DEFAULT NULL,
+    x_created_by IN NUMBER DEFAULT NULL,
+    x_last_update_date IN DATE DEFAULT NULL,
+    x_last_updated_by IN NUMBER DEFAULT NULL,
+    x_last_update_login IN NUMBER DEFAULT NULL
+  ) ;
+
+  PROCEDURE GET_FK_IGS_PE_PERSON (
+    x_person_id IN NUMBER
+    );
+
+  PROCEDURE GET_FK_IGS_RE_THESIS_EXAM (
+    x_person_id IN NUMBER,
+    x_ca_sequence_number IN NUMBER,
+    x_the_sequence_number IN NUMBER,
+    x_creation_dt IN DATE
+    );
+
+  PROCEDURE GET_FK_IGS_RE_THESIS_RESULT (
+    x_thesis_result_cd IN VARCHAR2
+    );
+
+  PROCEDURE GET_FK_IGS_RE_THS_PNL_MR_TP (
+    x_panel_member_type IN VARCHAR2
+    );
+
+
+end IGS_RE_THS_PNL_MBR_PKG;
+
+ 
+
+/

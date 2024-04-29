@@ -1,0 +1,20 @@
+--------------------------------------------------------
+--  DDL for Package BOM_BOMRDBPR_XMLP_PKG
+--------------------------------------------------------
+
+  CREATE OR REPLACE EDITIONABLE PACKAGE "APPS"."BOM_BOMRDBPR_XMLP_PKG" AUTHID CURRENT_USER AS
+/* $Header: BOMRDBPRS.pls 120.0 2007/12/24 09:39:26 dwkrishn noship $ */
+  P_ORG_ID VARCHAR2(40);
+
+  P_CONC_REQUEST_ID NUMBER := 0;
+
+  P_CURRENCY_CODE VARCHAR2(15);
+
+  FUNCTION BEFOREREPORT RETURN BOOLEAN;
+
+  FUNCTION AFTERREPORT RETURN BOOLEAN;
+
+END BOM_BOMRDBPR_XMLP_PKG;
+
+
+/

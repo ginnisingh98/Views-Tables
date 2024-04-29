@@ -1,0 +1,41 @@
+--------------------------------------------------------
+--  DDL for Package PSP_AUTO_SEGMENTS_PKG
+--------------------------------------------------------
+
+  CREATE OR REPLACE EDITIONABLE PACKAGE "APPS"."PSP_AUTO_SEGMENTS_PKG" AUTHID CURRENT_USER as
+--$Header: PSPAUSGS.pls 115.9 2002/11/19 10:58:15 ddubey ship $
+ /* $HEADER$ */
+procedure INSERT_ROW (
+  X_ROWID in out NOCOPY VARCHAR2,
+  X_SET_OF_BOOKS_ID in NUMBER,
+  X_BUSINESS_GROUP_ID IN NUMBER,
+  X_SEGMENT_NUMBER in NUMBER,
+  X_MODE in VARCHAR2 default 'R'
+  );
+procedure LOCK_ROW (
+  X_SET_OF_BOOKS_ID in NUMBER,
+  X_BUSINESS_GROUP_ID IN NUMBER,
+  X_SEGMENT_NUMBER in NUMBER
+);
+procedure UPDATE_ROW (
+  X_SET_OF_BOOKS_ID in NUMBER,
+  X_BUSINESS_GROUP_ID IN NUMBER,
+  X_SEGMENT_NUMBER in NUMBER,
+  X_MODE in VARCHAR2 default 'R'
+  );
+procedure ADD_ROW (
+  X_ROWID in out NOCOPY VARCHAR2,
+  X_SET_OF_BOOKS_ID in NUMBER,
+  X_BUSINESS_GROUP_ID IN NUMBER,
+  X_SEGMENT_NUMBER in NUMBER,
+  X_MODE in VARCHAR2 default 'R'
+  );
+procedure DELETE_ROW (
+  X_SET_OF_BOOKS_ID in NUMBER,
+  X_BUSINESS_GROUP_ID IN NUMBER
+);
+end PSP_AUTO_SEGMENTS_PKG;
+
+ 
+
+/

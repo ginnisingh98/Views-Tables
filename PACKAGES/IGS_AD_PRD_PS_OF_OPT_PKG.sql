@@ -1,0 +1,140 @@
+--------------------------------------------------------
+--  DDL for Package IGS_AD_PRD_PS_OF_OPT_PKG
+--------------------------------------------------------
+
+  CREATE OR REPLACE EDITIONABLE PACKAGE "APPS"."IGS_AD_PRD_PS_OF_OPT_PKG" AUTHID CURRENT_USER AS
+/* $Header: IGSAI31S.pls 115.4 2002/11/28 22:02:22 nsidana ship $ */
+procedure INSERT_ROW (
+  X_ROWID in out NOCOPY VARCHAR2,
+  X_ADM_CAL_TYPE in VARCHAR2,
+  X_ADM_CI_SEQUENCE_NUMBER in NUMBER,
+  X_ADMISSION_CAT in VARCHAR2,
+  X_S_ADMISSION_PROCESS_TYPE in VARCHAR2,
+  X_COURSE_CD in VARCHAR2,
+  X_VERSION_NUMBER in NUMBER,
+  X_ACAD_CAL_TYPE in VARCHAR2,
+  X_SEQUENCE_NUMBER in NUMBER,
+  X_LOCATION_CD in VARCHAR2,
+  X_ATTENDANCE_MODE in VARCHAR2,
+  X_ATTENDANCE_TYPE in VARCHAR2,
+  X_ROLLOVER_INCLUSION_IND in VARCHAR2,
+  X_MODE in VARCHAR2 default 'R'
+  );
+procedure LOCK_ROW (
+  X_ROWID in VARCHAR2,
+  X_ADM_CAL_TYPE in VARCHAR2,
+  X_ADM_CI_SEQUENCE_NUMBER in NUMBER,
+  X_ADMISSION_CAT in VARCHAR2,
+  X_S_ADMISSION_PROCESS_TYPE in VARCHAR2,
+  X_COURSE_CD in VARCHAR2,
+  X_VERSION_NUMBER in NUMBER,
+  X_ACAD_CAL_TYPE in VARCHAR2,
+  X_SEQUENCE_NUMBER in NUMBER,
+  X_LOCATION_CD in VARCHAR2,
+  X_ATTENDANCE_MODE in VARCHAR2,
+  X_ATTENDANCE_TYPE in VARCHAR2,
+  X_ROLLOVER_INCLUSION_IND in VARCHAR2
+);
+procedure UPDATE_ROW (
+  X_ROWID in VARCHAR2,
+  X_ADM_CAL_TYPE in VARCHAR2,
+  X_ADM_CI_SEQUENCE_NUMBER in NUMBER,
+  X_ADMISSION_CAT in VARCHAR2,
+  X_S_ADMISSION_PROCESS_TYPE in VARCHAR2,
+  X_COURSE_CD in VARCHAR2,
+  X_VERSION_NUMBER in NUMBER,
+  X_ACAD_CAL_TYPE in VARCHAR2,
+  X_SEQUENCE_NUMBER in NUMBER,
+  X_LOCATION_CD in VARCHAR2,
+  X_ATTENDANCE_MODE in VARCHAR2,
+  X_ATTENDANCE_TYPE in VARCHAR2,
+  X_ROLLOVER_INCLUSION_IND in VARCHAR2,
+  X_MODE in VARCHAR2 default 'R'
+  );
+procedure ADD_ROW (
+  X_ROWID in out NOCOPY VARCHAR2,
+  X_ADM_CAL_TYPE in VARCHAR2,
+  X_ADM_CI_SEQUENCE_NUMBER in NUMBER,
+  X_ADMISSION_CAT in VARCHAR2,
+  X_S_ADMISSION_PROCESS_TYPE in VARCHAR2,
+  X_COURSE_CD in VARCHAR2,
+  X_VERSION_NUMBER in NUMBER,
+  X_ACAD_CAL_TYPE in VARCHAR2,
+  X_SEQUENCE_NUMBER in NUMBER,
+  X_LOCATION_CD in VARCHAR2,
+  X_ATTENDANCE_MODE in VARCHAR2,
+  X_ATTENDANCE_TYPE in VARCHAR2,
+  X_ROLLOVER_INCLUSION_IND in VARCHAR2,
+  X_MODE in VARCHAR2 default 'R'
+  );
+procedure DELETE_ROW (
+  X_ROWID in VARCHAR2
+);
+FUNCTION Get_PK_For_Validation (
+    x_adm_cal_type IN VARCHAR2,
+    x_adm_ci_sequence_number IN NUMBER,
+    x_admission_cat IN VARCHAR2,
+    x_s_admission_process_type IN VARCHAR2,
+    x_course_cd IN VARCHAR2,
+    x_version_number IN NUMBER,
+    x_acad_cal_type IN VARCHAR2,
+    x_sequence_number IN NUMBER
+    )
+RETURN BOOLEAN;
+
+PROCEDURE Check_constraints(
+  	Column_Name 	IN	VARCHAR2 DEFAULT NULL,
+	Column_Value 	IN	VARCHAR2 DEFAULT NULL
+	);
+
+  PROCEDURE Before_DML (
+    p_action IN VARCHAR2,
+    x_rowid IN VARCHAR2 DEFAULT NULL,
+    x_adm_cal_type IN VARCHAR2 DEFAULT NULL,
+    x_adm_ci_sequence_number IN NUMBER DEFAULT NULL,
+    x_admission_cat IN VARCHAR2 DEFAULT NULL,
+    x_s_admission_process_type IN VARCHAR2 DEFAULT NULL,
+    x_course_cd IN VARCHAR2 DEFAULT NULL,
+    x_version_number IN NUMBER DEFAULT NULL,
+    x_acad_cal_type IN VARCHAR2 DEFAULT NULL,
+    x_sequence_number IN NUMBER DEFAULT NULL,
+    x_location_cd IN VARCHAR2 DEFAULT NULL,
+    x_attendance_mode IN VARCHAR2 DEFAULT NULL,
+    x_attendance_type IN VARCHAR2 DEFAULT NULL,
+    x_rollover_inclusion_ind IN VARCHAR2 DEFAULT NULL,
+    x_creation_date IN DATE DEFAULT NULL,
+    x_created_by IN NUMBER DEFAULT NULL,
+    x_last_update_date IN DATE DEFAULT NULL,
+    x_last_updated_by IN NUMBER DEFAULT NULL,
+    x_last_update_login IN NUMBER DEFAULT NULL
+  );
+
+  PROCEDURE GET_FK_IGS_EN_ATD_MODE (
+    x_attendance_mode IN VARCHAR2
+    );
+
+  PROCEDURE GET_FK_IGS_AD_PRD_AD_PRC_CA (
+    x_adm_cal_type IN VARCHAR2,
+    x_adm_ci_sequence_number IN NUMBER,
+    x_admission_cat IN VARCHAR2,
+    x_s_admission_process_type IN VARCHAR2
+    );
+
+  PROCEDURE GET_FK_IGS_EN_ATD_TYPE (
+    x_attendance_type IN VARCHAR2
+    );
+
+  PROCEDURE GET_FK_IGS_PS_OFR (
+    x_course_cd IN VARCHAR2,
+    x_version_number IN NUMBER,
+    x_cal_type IN VARCHAR2
+    );
+
+  PROCEDURE GET_FK_IGS_AD_LOCATION (
+    x_location_cd IN VARCHAR2
+    );
+end IGS_AD_PRD_PS_OF_OPT_PKG;
+
+ 
+
+/

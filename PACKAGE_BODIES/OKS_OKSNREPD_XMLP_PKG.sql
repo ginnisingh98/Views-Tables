@@ -1,0 +1,149 @@
+--------------------------------------------------------
+--  DDL for Package Body OKS_OKSNREPD_XMLP_PKG
+--------------------------------------------------------
+
+  CREATE OR REPLACE EDITIONABLE PACKAGE BODY "APPS"."OKS_OKSNREPD_XMLP_PKG" AS
+/* $Header: OKSNREPDB.pls 120.2 2007/12/25 07:58:14 nchinnam noship $ */
+  FUNCTION CF_1FORMULA(CUSTOMER_PRODUCT_ID_v IN VARCHAR2) RETURN VARCHAR2 IS
+    L_CSI VARCHAR2(50);
+    CURSOR CUR_CSI IS
+      SELECT
+        CS.NAME
+      FROM
+        CS_SYSTEMS CS,
+        OKX_CUST_PROD_V CPV
+      WHERE CPV.CUSTOMER_PRODUCT_ID = CUSTOMER_PRODUCT_ID_v
+        AND CPV.SYSTEM_ID = CS.SYSTEM_ID;
+  BEGIN
+    FOR i_csi IN CUR_CSI LOOP
+      L_CSI := I_CSI.NAME;
+    END LOOP;
+    RETURN L_CSI;
+  EXCEPTION
+    WHEN NO_DATA_FOUND THEN
+      L_CSI := NULL;
+      RETURN L_CSI;
+    WHEN OTHERS THEN
+      L_CSI := NULL;
+      RETURN L_CSI;
+  END CF_1FORMULA;
+
+  FUNCTION CF_2FORMULA(CUSTOMER_PRODUCT_ID_v IN VARCHAR2
+                      ,ORGANIZATION_ID_v IN NUMBER) RETURN CHAR IS
+    L_PARTNO VARCHAR2(245);
+    CURSOR CUR_PARTNO IS
+      SELECT
+        MTL.SEGMENT1,
+        MTL.DESCRIPTION
+      FROM
+        MTL_SYSTEM_ITEMS_B MTL,
+        CS_CUSTOMER_PRODUCTS_ALL CP
+      WHERE CP.CUSTOMER_PRODUCT_ID = CUSTOMER_PRODUCT_ID_v
+        AND CP.INVENTORY_ITEM_ID = MTL.INVENTORY_ITEM_ID
+        AND MTL.ORGANIZATION_ID = ORGANIZATION_ID_v;
+  BEGIN
+    FOR i_partno IN CUR_PARTNO LOOP
+      L_PARTNO := I_PARTNO.SEGMENT1;
+      CP_DESCRIPTION := I_PARTNO.DESCRIPTION;
+    END LOOP;
+    RETURN L_PARTNO;
+  EXCEPTION
+    WHEN NO_DATA_FOUND THEN
+      L_PARTNO := NULL;
+      RETURN L_PARTNO;
+    WHEN OTHERS THEN
+      L_PARTNO := NULL;
+      RETURN L_PARTNO;
+  END CF_2FORMULA;
+
+  FUNCTION BEFOREREPORT RETURN BOOLEAN IS
+  BEGIN
+    RETURN (TRUE);
+  END BEFOREREPORT;
+
+  FUNCTION CF_SALESREP_NAMEFORMULA(SALESREP_ID_v IN VARCHAR2
+                                  ,ORG_ID_v IN NUMBER) RETURN CHAR IS
+    L_REP_NAME VARCHAR2(240);
+  BEGIN
+    SELECT
+      DISTINCT
+      NAME
+    INTO L_REP_NAME
+    FROM
+      JTF_RS_SALESREPS
+    WHERE SALESREP_ID = SALESREP_ID_v
+      AND ORG_ID = ORG_ID_v
+      AND ROWNUM < 2;
+    RETURN (L_REP_NAME);
+  EXCEPTION
+    WHEN NO_DATA_FOUND THEN
+      L_REP_NAME := NULL;
+      RETURN (L_REP_NAME);
+    WHEN OTHERS THEN
+      L_REP_NAME := NULL;
+      RETURN (L_REP_NAME);
+  END CF_SALESREP_NAMEFORMULA;
+
+  FUNCTION AFTERPFORM RETURN BOOLEAN IS
+    X_ORG_ID VARCHAR2(800);
+    X_SALESREP VARCHAR2(800);
+    X_CUSTOMER_NAME VARCHAR2(800);
+  BEGIN
+    BEGIN
+      P_CONC_REQUEST_ID := FND_GLOBAL.CONC_REQUEST_ID;
+      /*SRW.USER_EXIT('FND SRWINIT')*/NULL;
+    EXCEPTION
+      WHEN /*SRW.USER_EXIT_FAILURE*/OTHERS THEN
+        /*SRW.MESSAGE(1
+                   ,'srw_init')*/NULL;
+    END;
+    IF P_ORG_ID IS NULL AND FND_PROFILE.VALUE('OKC_VIEW_K_BY_ORG') = 'Y' THEN
+      P_ORG_ID := FND_PROFILE.VALUE('ORG_ID');
+    END IF;
+    IF P_ORG_ID IS NOT NULL THEN
+      X_ORG_ID := ' and exp.org_id = :p_org_id';
+      P_ORG_ID_WHERE := X_ORG_ID;
+    END IF;
+    IF P_SALESREP IS NOT NULL THEN
+      X_SALESREP := ' and exp.salesrep_id like :p_salesrep ';
+      P_SALESREP_WHERE := X_SALESREP;
+    END IF;
+    IF P_CUSTOMER_NAME IS NOT NULL THEN
+      X_CUSTOMER_NAME := ' and exp.customer_name like :p_customer_name';
+      P_CUSTOMER_NAME_WHERE := X_CUSTOMER_NAME;
+    END IF;
+    IF P_FROM_END_DATE IS NOT NULL THEN
+      P_FROM_END_DATE_WHERE := ' and exp.product_end_date >= :P_from_end_date ';
+    END IF;
+    IF P_TO_END_DATE IS NOT NULL THEN
+      P_TO_END_DATE_WHERE := ' and exp.product_end_date <= :P_to_end_date ';
+    END IF;
+    IF P_CONTRACT_GROUP IS NOT NULL THEN
+      P_CONTRACT_GROUP_WHERE := ' and exp.contract_id in ( select INCLUDED_CHR_ID from okc_k_grpings
+                                                                                    start with CGP_PARENT_ID = :p_contract_group
+                                                                                    connect by CGP_PARENT_ID = PRIOR INCLUDED_CGP_ID ) ';
+    END IF;
+    RETURN (TRUE);
+  END AFTERPFORM;
+
+  FUNCTION AFTERREPORT RETURN BOOLEAN IS
+  BEGIN
+    BEGIN
+      /*SRW.USER_EXIT('FND SRWEXIT')*/NULL;
+    EXCEPTION
+      WHEN /*SRW.USER_EXIT_FAILURE*/OTHERS THEN
+        /*SRW.MESSAGE(1
+                   ,'srw_exit')*/NULL;
+    END;
+    RETURN (TRUE);
+  END AFTERREPORT;
+
+  FUNCTION CP_DESCRIPTION_P RETURN VARCHAR2 IS
+  BEGIN
+    RETURN CP_DESCRIPTION;
+  END CP_DESCRIPTION_P;
+
+END OKS_OKSNREPD_XMLP_PKG;
+
+
+/

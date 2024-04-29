@@ -1,0 +1,76 @@
+--------------------------------------------------------
+--  DDL for Package Body BOM_CSTRPCGW_XMLP_PKG
+--------------------------------------------------------
+
+  CREATE OR REPLACE EDITIONABLE PACKAGE BODY "APPS"."BOM_CSTRPCGW_XMLP_PKG" AS
+/* $Header: CSTRPCGWB.pls 120.0 2007/12/24 10:09:42 dwkrishn noship $ */
+  FUNCTION BEFOREREPORT RETURN BOOLEAN IS
+  BEGIN
+    DECLARE
+      WMS_ORG_COUNT NUMBER;
+      PJM_ORG_COUNT NUMBER;
+    BEGIN
+      SELECT
+        count(*)
+      INTO WMS_ORG_COUNT
+      FROM
+        MTL_PARAMETERS
+      WHERE WMS_ENABLED_FLAG = 'Y'
+        AND ORGANIZATION_ID = P_ORG_ID;
+      SELECT
+        count(*)
+      INTO PJM_ORG_COUNT
+      FROM
+        MTL_PARAMETERS
+      WHERE COST_GROUP_ACCOUNTING = 1
+        AND PROJECT_REFERENCE_ENABLED = 1
+        AND ORGANIZATION_ID = P_ORG_ID;
+      IF WMS_ORG_COUNT < 1 AND PJM_ORG_COUNT < 1 THEN
+        FND_MESSAGE.SET_NAME('BOM'
+                            ,'CST_WMS_ORG_REPORT_ONLY');
+        /*SRW.MESSAGE(24200
+                   ,FND_MESSAGE.GET)*/NULL;
+        /*RETURN FALSE;*/NULL;
+      END IF;
+      IF P_SORT_ID = 1 THEN
+        C_ORDER_BY := 'order by 1,3';
+      ELSIF P_SORT_ID = 2 THEN
+        C_ORDER_BY := 'order by 3 ASC, 1';
+      ELSIF P_SORT_ID = 3 THEN
+        C_ORDER_BY := 'order by 3 DESC, 1';
+      ELSE
+        C_ORDER_BY := NULL;
+      END IF;
+      P_CONC_REQUEST_ID := FND_GLOBAL.CONC_REQUEST_ID;
+      /*SRW.USER_EXIT('FND SRWINIT')*/NULL;
+    EXCEPTION
+      WHEN /*SRW.USER_EXIT_FAILURE*/OTHERS THEN
+        /*SRW.MESSAGE(1
+                   ,'Failed in before report trigger:SRWINIT')*/NULL;
+        RAISE;
+    END;
+    LP_CLOSE_DATE:=to_char(P_CLOSE_DATE,'DD-MON-YYYY');
+    RETURN (TRUE);
+  END BEFOREREPORT;
+
+  FUNCTION AFTERREPORT RETURN BOOLEAN IS
+  BEGIN
+    BEGIN
+      /*SRW.USER_EXIT('FND SRWEXIT')*/NULL;
+    EXCEPTION
+      WHEN /*SRW.USER_EXIT_FAILURE*/OTHERS THEN
+        /*SRW.MESSAGE(1
+                   ,'SRWEXIT failed')*/NULL;
+    END;
+    RETURN (TRUE);
+  END AFTERREPORT;
+
+  FUNCTION C_CURRENCY_CODEFORMULA(R_CURRENCY_CODE IN VARCHAR2) RETURN CHAR IS
+  BEGIN
+    RETURN ('(' || R_CURRENCY_CODE || ')');
+  END C_CURRENCY_CODEFORMULA;
+
+END BOM_CSTRPCGW_XMLP_PKG;
+
+
+/

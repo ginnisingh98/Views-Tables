@@ -1,0 +1,151 @@
+--------------------------------------------------------
+--  DDL for Package Body JA_JAINMCENCG_EXC_XMLP_PKG
+--------------------------------------------------------
+
+  CREATE OR REPLACE EDITIONABLE PACKAGE BODY "APPS"."JA_JAINMCENCG_EXC_XMLP_PKG" AS
+/* $Header: JAINMCENCG_EXCB.pls 120.1 2007/12/25 16:22:52 dwkrishn noship $ */
+  /* $Header: JAINMCENCG_EXCB.pls 120.1 2007/12/25 16:22:52 dwkrishn noship $ */
+  FUNCTION BEFOREREPORT RETURN BOOLEAN IS
+    CURSOR C_PROGRAM_ID(P_REQUEST_ID IN NUMBER) IS
+      SELECT
+        CONCURRENT_PROGRAM_ID,
+        NVL(ENABLE_TRACE
+           ,'N')
+      FROM
+        FND_CONCURRENT_REQUESTS
+      WHERE REQUEST_ID = P_REQUEST_ID;
+    V_ENABLE_TRACE FND_CONCURRENT_PROGRAMS.ENABLE_TRACE%TYPE;
+    V_PROGRAM_ID FND_CONCURRENT_PROGRAMS.CONCURRENT_PROGRAM_ID%TYPE;
+  BEGIN
+    P_CONC_REQUEST_ID := FND_GLOBAL.CONC_REQUEST_ID;
+    /*SRW.USER_EXIT('FND SRWINIT')*/NULL;
+    /*SRW.MESSAGE(1275
+               ,'Report Version is 120.2 Last modified date is 25/07/2005')*/NULL;
+    BEGIN
+      OPEN C_PROGRAM_ID(P_CONC_REQUEST_ID);
+      FETCH C_PROGRAM_ID
+       INTO V_PROGRAM_ID,V_ENABLE_TRACE;
+      CLOSE C_PROGRAM_ID;
+      /*SRW.MESSAGE(1275
+                 ,'v_program_id -> ' || V_PROGRAM_ID || ', v_enable_trace -> ' || V_ENABLE_TRACE || ', request_id -> ' || P_CONC_REQUEST_ID)*/NULL;
+      IF V_ENABLE_TRACE = 'Y' THEN
+        EXECUTE IMMEDIATE
+          'ALTER SESSION SET EVENTS ''10046 trace name context forever, level 4''';
+      END IF;
+    EXCEPTION
+      WHEN OTHERS THEN
+        /*SRW.MESSAGE(1275
+                   ,'Error during enabling the trace. ErrCode -> ' || SQLCODE || ', ErrMesg -> ' || SQLERRM)*/NULL;
+    END;
+    FOR ORG_REC IN (SELECT
+                      ORGANIZATION_NAME
+                    FROM
+                      ORG_ORGANIZATION_DEFINITIONS
+                    WHERE ORGANIZATION_ID = P_ORGANIZATION_ID) LOOP
+      P_ORGANIZATION_NAME := ORG_REC.ORGANIZATION_NAME;
+    END LOOP;
+    FOR LOC_REC IN (SELECT
+                      DESCRIPTION,
+                      ADDRESS_LINE_1,
+                      ADDRESS_LINE_2,
+                      ADDRESS_LINE_3
+                    FROM
+                      HR_LOCATIONS
+                    WHERE LOCATION_ID = P_LOCATION_ID) LOOP
+      P_DESCRIPTION := LOC_REC.DESCRIPTION;
+      P_ADDRESS_LINE_1 := LOC_REC.ADDRESS_LINE_1;
+      P_ADDRESS_LINE_2 := LOC_REC.ADDRESS_LINE_2;
+      P_ADDRESS_LINE_3 := LOC_REC.ADDRESS_LINE_3;
+    END LOOP;
+    FOR EC_REC IN (SELECT
+                     EC_CODE,
+                     EXCISE_DUTY_COMM,
+                     EXCISE_DUTY_RANGE,
+                     EXCISE_DUTY_DIVISION,
+                     EXCISE_DUTY_CIRCLE
+                   FROM
+                     JAI_CMN_INVENTORY_ORGS
+                   WHERE ORGANIZATION_ID = P_ORGANIZATION_ID
+                     AND LOCATION_ID = P_LOCATION_ID) LOOP
+      P_EC_CODE := (EC_REC.EC_CODE);
+      P_COLLECT := (EC_REC.EXCISE_DUTY_COMM);
+      P_RANGE := (EC_REC.EXCISE_DUTY_RANGE);
+      P_DIVISION := (EC_REC.EXCISE_DUTY_DIVISION);
+      P_CIRCLE := (EC_REC.EXCISE_DUTY_CIRCLE);
+    END LOOP;
+    RETURN (TRUE);
+  END BEFOREREPORT;
+
+  FUNCTION CF_ASSESABLEVALUEFORMULA(RECEIPT_ID IN VARCHAR2) RETURN NUMBER IS
+    VAMT1 NUMBER := 0;
+    LV_TAX_TYPE_EXCISE CONSTANT VARCHAR2(15) DEFAULT 'EXCISE';
+    LV_TAX_TYPE_EXC_ADDITIONAL CONSTANT VARCHAR2(15) DEFAULT 'ADDL. EXCISE';
+    LV_TAX_TYPE_EXC_OTHER CONSTANT VARCHAR2(15) DEFAULT 'OTHER EXCISE';
+    LV_TAX_TYPE_CVD CONSTANT VARCHAR2(15) DEFAULT 'CVD';
+    LV_TAX_TYPE_EXC_EDU_CESS CONSTANT VARCHAR2(30) DEFAULT 'EXCISE_EDUCATION_CESS';
+    LV_TAX_TYPE_CVD_EDU_CESS CONSTANT VARCHAR2(30) DEFAULT 'CVD_EDUCATION_CESS';
+  BEGIN
+    IF RECEIPT_ID IS NOT NULL THEN
+      FOR c1 IN (SELECT
+                   RTL.TAX_AMOUNT,
+                   RTL.TAX_RATE TR,
+                   RT.SHIPMENT_LINE_ID,
+                   RTL.TAX_TYPE
+                 FROM
+                   RCV_TRANSACTIONS RT,
+                   JAI_RCV_LINE_TAXES RTL,
+                   JAI_CMN_TAXES_ALL JTC
+                 WHERE RT.TRANSACTION_ID = TO_NUMBER(RECEIPT_ID)
+                   AND JTC.TAX_ID = RTL.TAX_ID
+                   AND RT.SHIPMENT_LINE_ID = RTL.SHIPMENT_LINE_ID
+                   AND NVL(RTL.TAX_AMOUNT
+                    ,0) <> 0
+                   AND NVL(JTC.TAX_RATE
+                    ,0) <> 0
+                   AND NVL(RTL.MODVAT_FLAG
+                    ,'N') = 'Y'
+                   AND UPPER(RTL.TAX_TYPE) in ( LV_TAX_TYPE_EXCISE , LV_TAX_TYPE_EXC_ADDITIONAL , LV_TAX_TYPE_EXC_OTHER , LV_TAX_TYPE_CVD , LV_TAX_TYPE_EXC_EDU_CESS , LV_TAX_TYPE_CVD_EDU_CESS )
+                   AND NVL(JTC.MOD_CR_PERCENTAGE
+                    ,0) <> 0
+                   AND ROWNUM = 1) LOOP
+        VAMT1 := (C1.TAX_AMOUNT * 100) / C1.TR;
+      END LOOP;
+    END IF;
+    RETURN (VAMT1);
+  END CF_ASSESABLEVALUEFORMULA;
+
+  FUNCTION CF_QTYFORMULAFORMULA(RECEIPT_ID IN VARCHAR2
+                               ,REGISTER_ID IN NUMBER) RETURN NUMBER IS
+    V_QTY NUMBER;
+  BEGIN
+    IF RECEIPT_ID IS NOT NULL THEN
+      FOR qty_rec IN (SELECT
+                        PRIMARY_QUANTITY
+                      FROM
+                        RCV_TRANSACTIONS
+                      WHERE TRANSACTION_ID = TO_NUMBER(CF_QTYFORMULAFORMULA.RECEIPT_ID)) LOOP
+        V_QTY := QTY_REC.PRIMARY_QUANTITY;
+      END LOOP;
+    ELSE
+      FOR qty_rec IN (SELECT
+                        ( CLOSING_BALANCE_QTY - OPENING_BALANCE_QTY ) QTY
+                      FROM
+                        JAI_CMN_RG_23AC_I_TRXS
+                      WHERE REGISTER_ID_PART_II = CF_QTYFORMULAFORMULA.REGISTER_ID) LOOP
+        V_QTY := QTY_REC.QTY;
+      END LOOP;
+    END IF;
+    RETURN (V_QTY);
+  END CF_QTYFORMULAFORMULA;
+
+  FUNCTION AFTERREPORT RETURN BOOLEAN IS
+  BEGIN
+    /*SRW.USER_EXIT('FND SRWEXIT')*/NULL;
+    RETURN (TRUE);
+  END AFTERREPORT;
+
+END JA_JAINMCENCG_EXC_XMLP_PKG;
+
+
+
+/

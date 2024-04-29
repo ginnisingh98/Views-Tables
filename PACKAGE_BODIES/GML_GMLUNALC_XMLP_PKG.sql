@@ -1,0 +1,488 @@
+--------------------------------------------------------
+--  DDL for Package Body GML_GMLUNALC_XMLP_PKG
+--------------------------------------------------------
+
+  CREATE OR REPLACE EDITIONABLE PACKAGE BODY "APPS"."GML_GMLUNALC_XMLP_PKG" AS
+/* $Header: GMLUNALCB.pls 120.0 2007/12/24 13:19:58 nchinnam noship $ */
+  FUNCTION AFTERPFORM RETURN BOOLEAN IS
+    SORT4 VARCHAR2(20);
+  BEGIN
+    P_DEFAULT_LOCATION := FND_PROFILE.VALUE('IC$DEFAULT_LOCT');
+    PARAM_WHERE_CLAUSE := ' ';
+    IF (P_FROM_WHSE IS NOT NULL) THEN
+      PARAM_WHERE_CLAUSE := PARAM_WHERE_CLAUSE || ' and whse.whse_code >= :p_from_whse ';
+    END IF;
+    IF (P_TO_WHSE IS NOT NULL) THEN
+      PARAM_WHERE_CLAUSE := PARAM_WHERE_CLAUSE || ' and whse.whse_code <= :p_to_whse ';
+    END IF;
+    IF (P_FROM_ORDER_NO IS NOT NULL) THEN
+      PARAM_WHERE_CLAUSE := PARAM_WHERE_CLAUSE || ' and HDR.ORDER_NUMBER >= :p_from_order_no ';
+    END IF;
+    IF (P_TO_ORDER_NO IS NOT NULL) THEN
+      PARAM_WHERE_CLAUSE := PARAM_WHERE_CLAUSE || ' and HDR.ORDER_NUMBER <= :p_to_order_no ';
+    END IF;
+    IF (P_FROM_ITEM_NO IS NOT NULL) THEN
+      PARAM_WHERE_CLAUSE := PARAM_WHERE_CLAUSE || ' and itm.item_no >= :p_from_item_no ';
+    END IF;
+    IF (P_TO_ITEM_NO IS NOT NULL) THEN
+      PARAM_WHERE_CLAUSE := PARAM_WHERE_CLAUSE || ' and itm.item_no <= :p_to_item_no ';
+    END IF;
+    IF (P_FROM_CUST_NO IS NOT NULL) THEN
+      PARAM_WHERE_CLAUSE := PARAM_WHERE_CLAUSE || ' and dtl.ship_to_org_id >= :p_from_cust_no ';
+    END IF;
+    IF (P_TO_CUST_NO IS NOT NULL) THEN
+      PARAM_WHERE_CLAUSE := PARAM_WHERE_CLAUSE || ' and dtl.ship_to_org_id <= :p_to_cust_no ';
+    END IF;
+    IF (P_FROM_SHIPDATE IS NOT NULL) THEN
+      PARAM_WHERE_CLAUSE := PARAM_WHERE_CLAUSE || ' and TRUNC(DTL.SCHEDULE_SHIP_DATE) >= TRUNC(:p_from_shipdate) ';
+    END IF;
+    IF (P_TO_SHIPDATE IS NOT NULL) THEN
+      PARAM_WHERE_CLAUSE := PARAM_WHERE_CLAUSE || ' and TRUNC(DTL.SCHEDULE_SHIP_DATE) <= TRUNC(:p_to_shipdate) ';
+    END IF;
+    P_SORT := ' ';
+    IF P_SORT_1 = '5' THEN
+      P_SORT := P_SORT || ',WHSE_CODE';
+    ELSIF P_SORT_1 = '1' THEN
+      P_SORT := P_SORT || ',ITEM_NO';
+    ELSIF P_SORT_1 = '3' THEN
+      P_SORT := P_SORT || ',SHIP_DATE';
+    ELSIF P_SORT_1 = '2' THEN
+      P_SORT := P_SORT || ',ORDER_NO';
+    ELSIF P_SORT_1 = '4' THEN
+      P_SORT := P_SORT || ',CUSTOMER_NAME';
+    END IF;
+    IF P_SORT_2 = '5' THEN
+      P_SORT := P_SORT || ',WHSE_CODE';
+    ELSIF P_SORT_2 = '1' THEN
+      P_SORT := P_SORT || ',ITEM_NO';
+    ELSIF P_SORT_2 = '3' THEN
+      P_SORT := P_SORT || ',SHIP_DATE';
+    ELSIF P_SORT_2 = '2' THEN
+      P_SORT := P_SORT || ',ORDER_NO';
+    ELSIF P_SORT_2 = '4' THEN
+      P_SORT := P_SORT || ',CUSTOMER_NAME';
+    END IF;
+    IF P_SORT_3 = '5' THEN
+      P_SORT := P_SORT || ',WHSE_CODE';
+    ELSIF P_SORT_3 = '1' THEN
+      P_SORT := P_SORT || ',ITEM_NO';
+    ELSIF P_SORT_3 = '3' THEN
+      P_SORT := P_SORT || ',SHIP_DATE';
+    ELSIF P_SORT_3 = '2' THEN
+      P_SORT := P_SORT || ',ORDER_NO';
+    ELSIF P_SORT_3 = '4' THEN
+      P_SORT := P_SORT || ',CUSTOMER_NAME';
+    END IF;
+    IF P_SORT_4 = '5' THEN
+      P_SORT := P_SORT || ',WHSE_CODE';
+    ELSIF P_SORT_4 = '1' THEN
+      P_SORT := P_SORT || ',ITEM_NO';
+    ELSIF P_SORT_4 = '3' THEN
+      P_SORT := P_SORT || ',SHIP_DATE';
+    ELSIF P_SORT_4 = '2' THEN
+      P_SORT := P_SORT || ',ORDER_NO';
+    ELSIF P_SORT_4 = '4' THEN
+      P_SORT := P_SORT || ',CUSTOMER_NAME';
+    END IF;
+    RETURN (TRUE);
+  END AFTERPFORM;
+
+  FUNCTION CF_1FORMULA(ITEM_ID IN NUMBER
+                      ,WHSE_CODE IN VARCHAR2
+                      ,QC_GRADE IN VARCHAR2
+                      ,UOM IN VARCHAR2) RETURN NUMBER IS
+  BEGIN
+    DECLARE
+      V_SHIP_QTY NUMBER;
+      V_COMMITTEDSALES_QTY NUMBER;
+      V_COMMITTEDPROD_QTY NUMBER;
+      V_INVENTORY_AVAIL NUMBER;
+      V_TEMP NUMBER;
+      L_GRADE_CTL NUMBER;
+      L_QTY_RESERVED_REAL NUMBER;
+      L_QTY2_RESERVED_REAL NUMBER;
+      L_ONHAND_QTY1 NUMBER := 0;
+      L_ONHAND_QTY2 NUMBER := 0;
+      L_COMMITTEDSALES_QTY1 NUMBER := 0;
+      L_COMMITTEDSALES_QTY2 NUMBER := 0;
+      L_ITEM_UOM VARCHAR2(4);
+      L_ORDER_UM VARCHAR2(4);
+      L_CONVERTED_UOM VARCHAR2(4);
+      L_CONVERTED_INVENTORY_AVAIL NUMBER;
+      CURSOR RESERVED_QUANTITY_FOR_GRD IS
+        SELECT
+          SUM(NVL(TRANS_QTY
+                 ,0)),
+          SUM(NVL(TRANS_QTY2
+                 ,0))
+        FROM
+          IC_TRAN_PND
+        WHERE ITEM_ID = CF_1FORMULA.ITEM_ID
+          AND WHSE_CODE = CF_1FORMULA.WHSE_CODE
+          AND COMPLETED_IND = 0
+          AND DELETE_MARK = 0
+          AND DOC_TYPE = 'OMSO'
+          AND QC_GRADE = CF_1FORMULA.QC_GRADE
+          AND ( LOT_ID <> 0
+        OR LOCATION <> FND_PROFILE.VALUE('IC$DEFAULT_LOCT') );
+      CURSOR RESERVED_QUANTITY_FOR_ATP IS
+        SELECT
+          SUM(NVL(TRANS_QTY
+                 ,0)),
+          SUM(NVL(TRANS_QTY2
+                 ,0))
+        FROM
+          IC_TRAN_PND
+        WHERE ITEM_ID = CF_1FORMULA.ITEM_ID
+          AND WHSE_CODE = CF_1FORMULA.WHSE_CODE
+          AND COMPLETED_IND = 0
+          AND DELETE_MARK = 0
+          AND ( LOT_ID <> 0
+        OR LOCATION <> FND_PROFILE.VALUE('IC$DEFAULT_LOCT') );
+      CURSOR QTY_ON_HAND IS
+        SELECT
+          SUM(NVL(S.ONHAND_ORDER_QTY
+                 ,0)),
+          SUM(NVL(S.ONHAND_ORDER_QTY2
+                 ,0)),
+          SUM(NVL(S.COMMITTEDSALES_QTY
+                 ,0)),
+          SUM(NVL(S.COMMITTEDSALES_QTY2
+                 ,0))
+        FROM
+          IC_SUMM_INV S
+        WHERE S.ITEM_ID = CF_1FORMULA.ITEM_ID
+          AND S.WHSE_CODE = CF_1FORMULA.WHSE_CODE;
+      CURSOR QTY_ON_HAND_GRADE IS
+        SELECT
+          SUM(NVL(S.ONHAND_ORDER_QTY
+                 ,0)),
+          SUM(NVL(S.ONHAND_ORDER_QTY2
+                 ,0)),
+          SUM(NVL(S.COMMITTEDSALES_QTY
+                 ,0)),
+          SUM(NVL(S.COMMITTEDSALES_QTY2
+                 ,0))
+        FROM
+          IC_SUMM_INV S
+        WHERE S.ITEM_ID = CF_1FORMULA.ITEM_ID
+          AND S.WHSE_CODE = CF_1FORMULA.WHSE_CODE
+          AND S.QC_GRADE = CF_1FORMULA.QC_GRADE;
+      CURSOR GET_GRADE_CTL IS
+        SELECT
+          GRADE_CTL
+        FROM
+          IC_ITEM_MST
+        WHERE ITEM_ID = CF_1FORMULA.ITEM_ID;
+      CURSOR GET_ITEM_UOM IS
+        SELECT
+          ITEM_UM
+        FROM
+          IC_ITEM_MST
+        WHERE ITEM_ID = CF_1FORMULA.ITEM_ID;
+    BEGIN
+      OPEN GET_GRADE_CTL;
+      FETCH GET_GRADE_CTL
+       INTO L_GRADE_CTL;
+      CLOSE GET_GRADE_CTL;
+      IF (L_GRADE_CTL > 0 AND CF_1FORMULA.QC_GRADE IS NOT NULL) THEN
+        OPEN RESERVED_QUANTITY_FOR_GRD;
+        FETCH RESERVED_QUANTITY_FOR_GRD
+         INTO L_QTY_RESERVED_REAL,L_QTY2_RESERVED_REAL;
+        CLOSE RESERVED_QUANTITY_FOR_GRD;
+      ELSE
+        OPEN RESERVED_QUANTITY_FOR_ATP;
+        FETCH RESERVED_QUANTITY_FOR_ATP
+         INTO L_QTY_RESERVED_REAL,L_QTY2_RESERVED_REAL;
+        CLOSE RESERVED_QUANTITY_FOR_ATP;
+      END IF;
+      L_QTY_RESERVED_REAL := NVL(L_QTY_RESERVED_REAL
+                                ,0);
+      L_QTY2_RESERVED_REAL := NVL(L_QTY2_RESERVED_REAL
+                                 ,0);
+      IF (L_GRADE_CTL > 0 AND CF_1FORMULA.QC_GRADE IS NOT NULL) THEN
+        OPEN QTY_ON_HAND_GRADE;
+        FETCH QTY_ON_HAND_GRADE
+         INTO L_ONHAND_QTY1,L_ONHAND_QTY2,L_COMMITTEDSALES_QTY1,L_COMMITTEDSALES_QTY2;
+        CLOSE QTY_ON_HAND_GRADE;
+      ELSE
+        OPEN QTY_ON_HAND;
+        FETCH QTY_ON_HAND
+         INTO L_ONHAND_QTY1,L_ONHAND_QTY2,L_COMMITTEDSALES_QTY1,L_COMMITTEDSALES_QTY2;
+        CLOSE QTY_ON_HAND;
+      END IF;
+      L_ONHAND_QTY1 := NVL(L_ONHAND_QTY1
+                          ,0);
+      L_ONHAND_QTY2 := NVL(L_ONHAND_QTY2
+                          ,0);
+      L_COMMITTEDSALES_QTY1 := NVL(L_COMMITTEDSALES_QTY1
+                                  ,0);
+      L_COMMITTEDSALES_QTY2 := NVL(L_COMMITTEDSALES_QTY2
+                                  ,0);
+      V_INVENTORY_AVAIL := L_ONHAND_QTY1 + L_QTY_RESERVED_REAL;
+      OPEN GET_ITEM_UOM;
+      FETCH GET_ITEM_UOM
+       INTO L_ITEM_UOM;
+      CLOSE GET_ITEM_UOM;
+      /*SRW.MESSAGE('9'
+                 ,'l_item_uom =  ' || L_ITEM_UOM)*/NULL;
+      /*SRW.MESSAGE('2'
+                 ,'just b4 uom call uom =  ' || UOM)*/NULL;
+      /*SRW.MESSAGE('3'
+                 ,'just b4 uom item_id =  ' || ITEM_ID)*/NULL;
+      /*SRW.MESSAGE('4'
+                 ,'v_inventory_avail = ' || V_INVENTORY_AVAIL)*/NULL;
+      SELECT
+        UM_CODE
+      INTO L_ORDER_UM
+      FROM
+        SY_UOMS_MST
+      WHERE UOM_CODE = CF_1FORMULA.UOM;
+      GMICUOM.ICUOMCV(CF_1FORMULA.ITEM_ID
+                     ,0
+                     ,V_INVENTORY_AVAIL
+                     ,L_ITEM_UOM
+                     ,L_ORDER_UM
+                     ,L_CONVERTED_INVENTORY_AVAIL);
+      /*SRW.MESSAGE('4'
+                 ,'l_converted_inventory_avail = ' || L_CONVERTED_INVENTORY_AVAIL)*/NULL;
+      V_INVENTORY_AVAIL := L_CONVERTED_INVENTORY_AVAIL;
+      IF (V_INVENTORY_AVAIL < 0) THEN
+        RETURN 0;
+      ELSE
+        RETURN V_INVENTORY_AVAIL;
+      END IF;
+    END;
+    RETURN NULL;
+  END CF_1FORMULA;
+
+  FUNCTION CF_SORT_DESCFORMULA RETURN VARCHAR2 IS
+  BEGIN
+    IF P_SORT_1 IS NOT NULL THEN
+      SELECT
+        MEANING
+      INTO CP_SORT_1
+      FROM
+        GEM_LOOKUP_VALUES
+      WHERE LOOKUP_TYPE like 'GEMMS_OP_ORUARPJ'
+        AND LOOKUP_CODE = P_SORT_1;
+    END IF;
+    IF P_SORT_2 IS NOT NULL THEN
+      SELECT
+        MEANING
+      INTO CP_SORT_2
+      FROM
+        GEM_LOOKUP_VALUES
+      WHERE LOOKUP_TYPE like 'GEMMS_OP_ORUARPJ'
+        AND LOOKUP_CODE = P_SORT_2;
+    END IF;
+    IF P_SORT_3 IS NOT NULL THEN
+      SELECT
+        MEANING
+      INTO CP_SORT_3
+      FROM
+        GEM_LOOKUP_VALUES
+      WHERE LOOKUP_TYPE like 'GEMMS_OP_ORUARPJ'
+        AND LOOKUP_CODE = P_SORT_3;
+    END IF;
+    IF P_SORT_4 IS NOT NULL THEN
+      SELECT
+        MEANING
+      INTO CP_SORT_4
+      FROM
+        GEM_LOOKUP_VALUES
+      WHERE LOOKUP_TYPE like 'GEMMS_OP_ORUARPJ'
+        AND LOOKUP_CODE = P_SORT_4;
+    END IF;
+    RETURN NULL;
+  EXCEPTION
+    WHEN OTHERS THEN
+      RETURN NULL;
+  END CF_SORT_DESCFORMULA;
+
+  FUNCTION BEFOREREPORT RETURN BOOLEAN IS
+  BEGIN
+    P_CONC_REQUEST_ID := FND_GLOBAL.CONC_REQUEST_ID;
+    /*SRW.USER_EXIT('FND SRWINIT')*/NULL;
+    SELECT
+      NAME
+    INTO CP_ORGN_NAME
+    FROM
+      HR_OPERATING_UNITS
+    WHERE ORGANIZATION_ID = FND_PROFILE.VALUE('ORG_ID');
+    SELECT
+      USER_NAME
+    INTO CP_USER
+    FROM
+      FND_USER
+    WHERE P_DEFAULT_USER = USER_ID;
+    IF P_SORT_1 IS NOT NULL THEN
+      SELECT
+        MEANING
+      INTO CP_SORT_1
+      FROM
+        GEM_LOOKUPS
+      WHERE LOOKUP_TYPE like 'GEMMS_OP_ORUARPJ'
+        AND LOOKUP_CODE = P_SORT_1;
+    END IF;
+    IF P_SORT_2 IS NOT NULL THEN
+      SELECT
+        MEANING
+      INTO CP_SORT_2
+      FROM
+        GEM_LOOKUPS
+      WHERE LOOKUP_TYPE like 'GEMMS_OP_ORUARPJ'
+        AND LOOKUP_CODE = P_SORT_2;
+    END IF;
+    IF P_SORT_3 IS NOT NULL THEN
+      SELECT
+        MEANING
+      INTO CP_SORT_3
+      FROM
+        GEM_LOOKUPS
+      WHERE LOOKUP_TYPE like 'GEMMS_OP_ORUARPJ'
+        AND LOOKUP_CODE = P_SORT_3;
+    END IF;
+    IF P_SORT_4 IS NOT NULL THEN
+      SELECT
+        MEANING
+      INTO CP_SORT_4
+      FROM
+        GEM_LOOKUPS
+      WHERE LOOKUP_TYPE like 'GEMMS_OP_ORUARPJ'
+        AND LOOKUP_CODE = P_SORT_4;
+    END IF;
+    RETURN (TRUE);
+  EXCEPTION
+    WHEN OTHERS THEN
+      RETURN TRUE;
+  END BEFOREREPORT;
+
+  FUNCTION CF_LINE_NUMBERFORMULA(LINE_NUMBER IN NUMBER
+                                ,SHIPMENT_NUMBER IN NUMBER) RETURN NUMBER IS
+  BEGIN
+    DECLARE
+      L_LINE_NUMBER NUMBER;
+      L_SHIPMENT_NUMBER NUMBER;
+    BEGIN
+      L_LINE_NUMBER := LINE_NUMBER || '.' || SHIPMENT_NUMBER;
+      RETURN L_LINE_NUMBER;
+    END;
+    RETURN NULL;
+  END CF_LINE_NUMBERFORMULA;
+
+  FUNCTION CF_UNALLOCATED_INVENTORYFORMUL(ITEM_ID IN NUMBER
+                                         ,LINE_ID IN NUMBER
+                                         ,UNALLOCATED_INVENTORY IN NUMBER
+                                         ,UOM IN VARCHAR2) RETURN NUMBER IS
+  BEGIN
+    DECLARE
+      L_ITEM_UOM VARCHAR2(4);
+      L_CONVERTED_UNALLOCATED_INV NUMBER;
+      V_UNALLOCATED_INVENTORY NUMBER;
+      L_LINE_ID NUMBER;
+      L_UNALLOCATED_INVENTORY NUMBER;
+      L_ORDER_UM VARCHAR2(4);
+      CURSOR GET_ITEM_UOM IS
+        SELECT
+          ITEM_UM
+        FROM
+          IC_ITEM_MST
+        WHERE ITEM_ID = CF_UNALLOCATED_INVENTORYFORMUL.ITEM_ID;
+      CURSOR CHECK_IC_TRAN_PND IS
+        SELECT
+          PND.LINE_ID
+        FROM
+          IC_TRAN_PND PND
+        WHERE PND.DOC_TYPE = 'OMSO'
+          AND PND.COMPLETED_IND = 0
+          AND PND.DELETE_MARK = 0
+          AND PND.TRANS_QTY < 0
+          AND LINE_ID = CF_UNALLOCATED_INVENTORYFORMUL.LINE_ID;
+    BEGIN
+      /*SRW.MESSAGE('1'
+                 ,'in unallocated_inventory conversion function')*/NULL;
+      OPEN CHECK_IC_TRAN_PND;
+      FETCH CHECK_IC_TRAN_PND
+       INTO L_LINE_ID;
+      CLOSE CHECK_IC_TRAN_PND;
+      IF (NVL(L_LINE_ID
+         ,0) = 0) THEN
+        RETURN (CF_UNALLOCATED_INVENTORYFORMUL.UNALLOCATED_INVENTORY);
+      ELSE
+        OPEN GET_ITEM_UOM;
+        FETCH GET_ITEM_UOM
+         INTO L_ITEM_UOM;
+        CLOSE GET_ITEM_UOM;
+        /*SRW.MESSAGE('9'
+                   ,'zzl_item_uom =  ' || L_ITEM_UOM)*/NULL;
+        /*SRW.MESSAGE('2'
+                   ,'zzjust b4 uom call uom =  ' || UOM)*/NULL;
+        /*SRW.MESSAGE('3'
+                   ,'zzjust b4 uom item_id =  ' || ITEM_ID)*/NULL;
+        /*SRW.MESSAGE('4'
+                   ,'zzunallocated_inventory = ' || UNALLOCATED_INVENTORY)*/NULL;
+        SELECT
+          UM_CODE
+        INTO L_ORDER_UM
+        FROM
+          SY_UOMS_MST
+        WHERE UOM_CODE = UOM;
+        GMICUOM.ICUOMCV(CF_UNALLOCATED_INVENTORYFORMUL.ITEM_ID
+                       ,0
+                       ,CF_UNALLOCATED_INVENTORYFORMUL.UNALLOCATED_INVENTORY
+                       ,L_ITEM_UOM
+                       ,L_ORDER_UM
+                       ,L_CONVERTED_UNALLOCATED_INV);
+        /*SRW.MESSAGE('4'
+                   ,'l_converted_iunallocated_inventory = ' || L_CONVERTED_UNALLOCATED_INV)*/NULL;
+        V_UNALLOCATED_INVENTORY := L_CONVERTED_UNALLOCATED_INV;
+        IF (V_UNALLOCATED_INVENTORY < 0) THEN
+          RETURN 0;
+        ELSE
+          RETURN V_UNALLOCATED_INVENTORY;
+        END IF;
+      END IF;
+    END;
+  END CF_UNALLOCATED_INVENTORYFORMUL;
+
+  FUNCTION AFTERREPORT RETURN BOOLEAN IS
+  BEGIN
+    /*SRW.USER_EXIT('FND SRWEXIT')*/NULL;
+    RETURN (TRUE);
+  END AFTERREPORT;
+
+  FUNCTION CP_ORGN_NAME_P RETURN VARCHAR2 IS
+  BEGIN
+    RETURN CP_ORGN_NAME;
+  END CP_ORGN_NAME_P;
+
+  FUNCTION CP_USER_P RETURN VARCHAR2 IS
+  BEGIN
+    RETURN CP_USER;
+  END CP_USER_P;
+
+  FUNCTION CP_SORT_4_P RETURN VARCHAR2 IS
+  BEGIN
+    RETURN CP_SORT_4;
+  END CP_SORT_4_P;
+
+  FUNCTION CP_SORT_3_P RETURN VARCHAR2 IS
+  BEGIN
+    RETURN CP_SORT_3;
+  END CP_SORT_3_P;
+
+  FUNCTION CP_SORT_2_P RETURN VARCHAR2 IS
+  BEGIN
+    RETURN CP_SORT_2;
+  END CP_SORT_2_P;
+
+  FUNCTION CP_SORT_1_P RETURN VARCHAR2 IS
+  BEGIN
+    RETURN CP_SORT_1;
+  END CP_SORT_1_P;
+
+END GML_GMLUNALC_XMLP_PKG;
+
+
+/

@@ -1,0 +1,389 @@
+--------------------------------------------------------
+--  DDL for Package Body HZ_TIMEZONE_PKG
+--------------------------------------------------------
+
+  CREATE OR REPLACE EDITIONABLE PACKAGE BODY "APPS"."HZ_TIMEZONE_PKG" as
+/*$Header: ARHTZTHB.pls 115.4 2003/09/05 22:14:21 awu ship $ */
+procedure INSERT_ROW (
+  X_ROWID in out nocopy VARCHAR2,
+  X_TIMEZONE_ID in NUMBER,
+  X_GLOBAL_TIMEZONE_NAME in VARCHAR2,
+  X_STANDARD_TIME_SHORT_CODE in VARCHAR2,
+  X_DAYLIGHT_SAVINGS_SHORT_CODE in VARCHAR2,
+  X_GMT_DEVIATION_HOURS in NUMBER,
+  X_DAYLIGHT_SAVINGS_TIME_FLAG in VARCHAR2,
+  X_BEGIN_DST_MONTH in VARCHAR2,
+  X_BEGIN_DST_DAY in NUMBER,
+  X_BEGIN_DST_WEEK_OF_MONTH in NUMBER,
+  X_BEGIN_DST_DAY_OF_WEEK in NUMBER,
+  X_BEGIN_DST_HOUR in NUMBER,
+  X_END_DST_MONTH in VARCHAR2,
+  X_END_DST_DAY in NUMBER,
+  X_END_DST_WEEK_OF_MONTH in NUMBER,
+  X_END_DST_DAY_OF_WEEK in NUMBER,
+  X_END_DST_HOUR in NUMBER,
+  X_PRIMARY_ZONE_FLAG in VARCHAR2,
+  X_NAME in VARCHAR2,
+  X_DESCRIPTION in VARCHAR2,
+  X_CREATION_DATE in DATE,
+  X_CREATED_BY in NUMBER,
+  X_LAST_UPDATE_DATE in DATE,
+  X_LAST_UPDATED_BY in NUMBER,
+  X_LAST_UPDATE_LOGIN in NUMBER
+) is
+  cursor C is select ROWID from HZ_TIMEZONES
+    where TIMEZONE_ID = X_TIMEZONE_ID
+    ;
+begin
+  insert into HZ_TIMEZONES (
+    TIMEZONE_ID,
+    GLOBAL_TIMEZONE_NAME,
+    STANDARD_TIME_SHORT_CODE,
+    DAYLIGHT_SAVINGS_SHORT_CODE,
+    GMT_DEVIATION_HOURS,
+    DAYLIGHT_SAVINGS_TIME_FLAG,
+    BEGIN_DST_MONTH,
+    BEGIN_DST_DAY,
+    BEGIN_DST_WEEK_OF_MONTH,
+    BEGIN_DST_DAY_OF_WEEK,
+    BEGIN_DST_HOUR,
+    END_DST_MONTH,
+    END_DST_DAY,
+    END_DST_WEEK_OF_MONTH,
+    END_DST_DAY_OF_WEEK,
+    END_DST_HOUR,
+    PRIMARY_ZONE_FLAG,
+    CREATION_DATE,
+    CREATED_BY,
+    LAST_UPDATE_DATE,
+    LAST_UPDATED_BY,
+    LAST_UPDATE_LOGIN
+  ) values (
+    X_TIMEZONE_ID,
+    X_GLOBAL_TIMEZONE_NAME,
+    X_STANDARD_TIME_SHORT_CODE,
+    X_DAYLIGHT_SAVINGS_SHORT_CODE,
+    X_GMT_DEVIATION_HOURS,
+    X_DAYLIGHT_SAVINGS_TIME_FLAG,
+    X_BEGIN_DST_MONTH,
+    X_BEGIN_DST_DAY,
+    X_BEGIN_DST_WEEK_OF_MONTH,
+    X_BEGIN_DST_DAY_OF_WEEK,
+    X_BEGIN_DST_HOUR,
+    X_END_DST_MONTH,
+    X_END_DST_DAY,
+    X_END_DST_WEEK_OF_MONTH,
+    X_END_DST_DAY_OF_WEEK,
+    X_END_DST_HOUR,
+    X_PRIMARY_ZONE_FLAG,
+    X_CREATION_DATE,
+    X_CREATED_BY,
+    X_LAST_UPDATE_DATE,
+    X_LAST_UPDATED_BY,
+    X_LAST_UPDATE_LOGIN
+  );
+
+  insert into HZ_TIMEZONES_TL (
+    CREATION_DATE,
+    CREATED_BY,
+    LAST_UPDATE_DATE,
+    LAST_UPDATED_BY,
+    LAST_UPDATE_LOGIN,
+    TIMEZONE_ID,
+    NAME,
+    DESCRIPTION,
+    LANGUAGE,
+    SOURCE_LANG
+  ) select
+    X_CREATION_DATE,
+    X_CREATED_BY,
+    X_LAST_UPDATE_DATE,
+    X_LAST_UPDATED_BY,
+    X_LAST_UPDATE_LOGIN,
+    X_TIMEZONE_ID,
+    X_NAME,
+    X_DESCRIPTION,
+    L.LANGUAGE_CODE,
+    userenv('LANG')
+  from FND_LANGUAGES L
+  where L.INSTALLED_FLAG in ('I', 'B')
+  and not exists
+    (select NULL
+    from HZ_TIMEZONES_TL T
+    where T.TIMEZONE_ID = X_TIMEZONE_ID
+    and T.LANGUAGE = L.LANGUAGE_CODE);
+
+  open c;
+  fetch c into X_ROWID;
+  if (c%notfound) then
+    close c;
+    raise no_data_found;
+  end if;
+  close c;
+
+end INSERT_ROW;
+
+procedure LOCK_ROW (
+  X_TIMEZONE_ID in NUMBER,
+  X_GLOBAL_TIMEZONE_NAME in VARCHAR2,
+  X_STANDARD_TIME_SHORT_CODE in VARCHAR2,
+  X_DAYLIGHT_SAVINGS_SHORT_CODE in VARCHAR2,
+  X_GMT_DEVIATION_HOURS in NUMBER,
+  X_DAYLIGHT_SAVINGS_TIME_FLAG in VARCHAR2,
+  X_BEGIN_DST_MONTH in VARCHAR2,
+  X_BEGIN_DST_DAY in NUMBER,
+  X_BEGIN_DST_WEEK_OF_MONTH in NUMBER,
+  X_BEGIN_DST_DAY_OF_WEEK in NUMBER,
+  X_BEGIN_DST_HOUR in NUMBER,
+  X_END_DST_MONTH in VARCHAR2,
+  X_END_DST_DAY in NUMBER,
+  X_END_DST_WEEK_OF_MONTH in NUMBER,
+  X_END_DST_DAY_OF_WEEK in NUMBER,
+  X_END_DST_HOUR in NUMBER,
+  X_PRIMARY_ZONE_FLAG in VARCHAR2,
+  X_NAME in VARCHAR2,
+  X_DESCRIPTION in VARCHAR2
+) is
+  cursor c is select
+      GLOBAL_TIMEZONE_NAME,
+      STANDARD_TIME_SHORT_CODE,
+      DAYLIGHT_SAVINGS_SHORT_CODE,
+      GMT_DEVIATION_HOURS,
+      DAYLIGHT_SAVINGS_TIME_FLAG,
+      BEGIN_DST_MONTH,
+      BEGIN_DST_DAY,
+      BEGIN_DST_WEEK_OF_MONTH,
+      BEGIN_DST_DAY_OF_WEEK,
+      BEGIN_DST_HOUR,
+      END_DST_MONTH,
+      END_DST_DAY,
+      END_DST_WEEK_OF_MONTH,
+      END_DST_DAY_OF_WEEK,
+      END_DST_HOUR,
+      PRIMARY_ZONE_FLAG
+    from HZ_TIMEZONES
+    where TIMEZONE_ID = X_TIMEZONE_ID
+    for update of TIMEZONE_ID nowait;
+  recinfo c%rowtype;
+
+  cursor c1 is select
+      NAME,
+      DESCRIPTION,
+      decode(LANGUAGE, userenv('LANG'), 'Y', 'N') BASELANG
+    from HZ_TIMEZONES_TL
+    where TIMEZONE_ID = X_TIMEZONE_ID
+    and userenv('LANG') in (LANGUAGE, SOURCE_LANG)
+    for update of TIMEZONE_ID nowait;
+begin
+  open c;
+  fetch c into recinfo;
+  if (c%notfound) then
+    close c;
+    fnd_message.set_name('FND', 'FORM_RECORD_DELETED');
+    app_exception.raise_exception;
+  end if;
+  close c;
+  if (    (recinfo.GLOBAL_TIMEZONE_NAME = X_GLOBAL_TIMEZONE_NAME)
+      AND (recinfo.STANDARD_TIME_SHORT_CODE = X_STANDARD_TIME_SHORT_CODE)
+      AND ((recinfo.DAYLIGHT_SAVINGS_SHORT_CODE = X_DAYLIGHT_SAVINGS_SHORT_CODE)
+           OR ((recinfo.DAYLIGHT_SAVINGS_SHORT_CODE is null) AND (X_DAYLIGHT_SAVINGS_SHORT_CODE is null)))
+      AND (recinfo.DAYLIGHT_SAVINGS_TIME_FLAG = X_DAYLIGHT_SAVINGS_TIME_FLAG)
+      AND ((recinfo.BEGIN_DST_MONTH = X_BEGIN_DST_MONTH)
+           OR ((recinfo.BEGIN_DST_MONTH is null) AND (X_BEGIN_DST_MONTH is null)))
+      AND ((recinfo.BEGIN_DST_DAY = X_BEGIN_DST_DAY)
+           OR ((recinfo.BEGIN_DST_DAY is null) AND (X_BEGIN_DST_DAY is null)))
+      AND ((recinfo.BEGIN_DST_WEEK_OF_MONTH = X_BEGIN_DST_WEEK_OF_MONTH)
+           OR ((recinfo.BEGIN_DST_WEEK_OF_MONTH is null) AND (X_BEGIN_DST_WEEK_OF_MONTH is null)))
+      AND ((recinfo.BEGIN_DST_DAY_OF_WEEK = X_BEGIN_DST_DAY_OF_WEEK)
+           OR ((recinfo.BEGIN_DST_DAY_OF_WEEK is null) AND (X_BEGIN_DST_DAY_OF_WEEK is null)))
+      AND ((recinfo.BEGIN_DST_HOUR = X_BEGIN_DST_HOUR)
+           OR ((recinfo.BEGIN_DST_HOUR is null) AND (X_BEGIN_DST_HOUR is null)))
+      AND ((recinfo.END_DST_MONTH = X_END_DST_MONTH)
+           OR ((recinfo.END_DST_MONTH is null) AND (X_END_DST_MONTH is null)))
+      AND ((recinfo.END_DST_DAY = X_END_DST_DAY)
+           OR ((recinfo.END_DST_DAY is null) AND (X_END_DST_DAY is null)))
+      AND ((recinfo.END_DST_WEEK_OF_MONTH = X_END_DST_WEEK_OF_MONTH)
+           OR ((recinfo.END_DST_WEEK_OF_MONTH is null) AND (X_END_DST_WEEK_OF_MONTH is null)))
+      AND ((recinfo.END_DST_DAY_OF_WEEK = X_END_DST_DAY_OF_WEEK)
+           OR ((recinfo.END_DST_DAY_OF_WEEK is null) AND (X_END_DST_DAY_OF_WEEK is null)))
+      AND ((recinfo.END_DST_HOUR = X_END_DST_HOUR)
+           OR ((recinfo.END_DST_HOUR is null) AND (X_END_DST_HOUR is null)))
+      AND ((recinfo.PRIMARY_ZONE_FLAG = X_PRIMARY_ZONE_FLAG)
+           OR ((recinfo.PRIMARY_ZONE_FLAG is null) AND (X_PRIMARY_ZONE_FLAG is null)))
+  ) then
+    null;
+  else
+    fnd_message.set_name('FND', 'FORM_RECORD_CHANGED');
+    app_exception.raise_exception;
+  end if;
+
+  for tlinfo in c1 loop
+    if (tlinfo.BASELANG = 'Y') then
+      if (    (tlinfo.NAME = X_NAME)
+          AND ((tlinfo.DESCRIPTION = X_DESCRIPTION)
+               OR ((tlinfo.DESCRIPTION is null) AND (X_DESCRIPTION is null)))
+      ) then
+        null;
+      else
+        fnd_message.set_name('FND', 'FORM_RECORD_CHANGED');
+        app_exception.raise_exception;
+      end if;
+    end if;
+  end loop;
+  return;
+end LOCK_ROW;
+
+procedure UPDATE_ROW (
+  X_TIMEZONE_ID in NUMBER,
+  X_GLOBAL_TIMEZONE_NAME in VARCHAR2,
+  X_STANDARD_TIME_SHORT_CODE in VARCHAR2,
+  X_DAYLIGHT_SAVINGS_SHORT_CODE in VARCHAR2,
+  X_GMT_DEVIATION_HOURS in NUMBER,
+  X_DAYLIGHT_SAVINGS_TIME_FLAG in VARCHAR2,
+  X_BEGIN_DST_MONTH in VARCHAR2,
+  X_BEGIN_DST_DAY in NUMBER,
+  X_BEGIN_DST_WEEK_OF_MONTH in NUMBER,
+  X_BEGIN_DST_DAY_OF_WEEK in NUMBER,
+  X_BEGIN_DST_HOUR in NUMBER,
+  X_END_DST_MONTH in VARCHAR2,
+  X_END_DST_DAY in NUMBER,
+  X_END_DST_WEEK_OF_MONTH in NUMBER,
+  X_END_DST_DAY_OF_WEEK in NUMBER,
+  X_END_DST_HOUR in NUMBER,
+  X_PRIMARY_ZONE_FLAG in VARCHAR2,
+  X_NAME in VARCHAR2,
+  X_DESCRIPTION in VARCHAR2,
+  X_LAST_UPDATE_DATE in DATE,
+  X_LAST_UPDATED_BY in NUMBER,
+  X_LAST_UPDATE_LOGIN in NUMBER
+) is
+begin
+  update HZ_TIMEZONES set
+    GLOBAL_TIMEZONE_NAME = X_GLOBAL_TIMEZONE_NAME,
+    STANDARD_TIME_SHORT_CODE = X_STANDARD_TIME_SHORT_CODE,
+    DAYLIGHT_SAVINGS_SHORT_CODE = X_DAYLIGHT_SAVINGS_SHORT_CODE,
+    GMT_DEVIATION_HOURS = X_GMT_DEVIATION_HOURS,
+    DAYLIGHT_SAVINGS_TIME_FLAG = X_DAYLIGHT_SAVINGS_TIME_FLAG,
+    BEGIN_DST_MONTH = X_BEGIN_DST_MONTH,
+    BEGIN_DST_DAY = X_BEGIN_DST_DAY,
+    BEGIN_DST_WEEK_OF_MONTH = X_BEGIN_DST_WEEK_OF_MONTH,
+    BEGIN_DST_DAY_OF_WEEK = X_BEGIN_DST_DAY_OF_WEEK,
+    BEGIN_DST_HOUR = X_BEGIN_DST_HOUR,
+    END_DST_MONTH = X_END_DST_MONTH,
+    END_DST_DAY = X_END_DST_DAY,
+    END_DST_WEEK_OF_MONTH = X_END_DST_WEEK_OF_MONTH,
+    END_DST_DAY_OF_WEEK = X_END_DST_DAY_OF_WEEK,
+    END_DST_HOUR = X_END_DST_HOUR,
+    PRIMARY_ZONE_FLAG = X_PRIMARY_ZONE_FLAG,
+    LAST_UPDATE_DATE = X_LAST_UPDATE_DATE,
+    LAST_UPDATED_BY = X_LAST_UPDATED_BY,
+    LAST_UPDATE_LOGIN = X_LAST_UPDATE_LOGIN
+  where TIMEZONE_ID = X_TIMEZONE_ID;
+
+  if (sql%notfound) then
+    raise no_data_found;
+  end if;
+
+  update HZ_TIMEZONES_TL set
+    NAME = X_NAME,
+    DESCRIPTION = X_DESCRIPTION,
+    LAST_UPDATE_DATE = X_LAST_UPDATE_DATE,
+    LAST_UPDATED_BY = X_LAST_UPDATED_BY,
+    LAST_UPDATE_LOGIN = X_LAST_UPDATE_LOGIN,
+    SOURCE_LANG = userenv('LANG')
+  where TIMEZONE_ID = X_TIMEZONE_ID
+  and userenv('LANG') in (LANGUAGE, SOURCE_LANG);
+
+  if (sql%notfound) then
+    raise no_data_found;
+  end if;
+end UPDATE_ROW;
+
+procedure DELETE_ROW (
+  X_TIMEZONE_ID in NUMBER
+) is
+begin
+  delete from HZ_TIMEZONES_TL
+  where TIMEZONE_ID = X_TIMEZONE_ID;
+
+  if (sql%notfound) then
+    raise no_data_found;
+  end if;
+
+  delete from HZ_TIMEZONES
+  where TIMEZONE_ID = X_TIMEZONE_ID;
+
+  if (sql%notfound) then
+    raise no_data_found;
+  end if;
+end DELETE_ROW;
+
+procedure ADD_LANGUAGE
+is
+begin
+  delete from HZ_TIMEZONES_TL T
+  where not exists
+    (select NULL
+    from HZ_TIMEZONES B
+    where B.TIMEZONE_ID = T.TIMEZONE_ID
+    );
+
+  update HZ_TIMEZONES_TL T set (
+      NAME,
+      DESCRIPTION
+    ) = (select
+      B.NAME,
+      B.DESCRIPTION
+    from HZ_TIMEZONES_TL B
+    where B.TIMEZONE_ID = T.TIMEZONE_ID
+    and B.LANGUAGE = T.SOURCE_LANG)
+  where (
+      T.TIMEZONE_ID,
+      T.LANGUAGE
+  ) in (select
+      SUBT.TIMEZONE_ID,
+      SUBT.LANGUAGE
+    from HZ_TIMEZONES_TL SUBB, HZ_TIMEZONES_TL SUBT
+    where SUBB.TIMEZONE_ID = SUBT.TIMEZONE_ID
+    and SUBB.LANGUAGE = SUBT.SOURCE_LANG
+    and (SUBB.NAME <> SUBT.NAME
+      or SUBB.DESCRIPTION <> SUBT.DESCRIPTION
+      or (SUBB.DESCRIPTION is null and SUBT.DESCRIPTION is not null)
+      or (SUBB.DESCRIPTION is not null and SUBT.DESCRIPTION is null)
+  ));
+
+  insert into HZ_TIMEZONES_TL (
+    CREATION_DATE,
+    CREATED_BY,
+    LAST_UPDATE_DATE,
+    LAST_UPDATED_BY,
+    LAST_UPDATE_LOGIN,
+    TIMEZONE_ID,
+    NAME,
+    DESCRIPTION,
+    LANGUAGE,
+    SOURCE_LANG
+  ) select
+    B.CREATION_DATE,
+    B.CREATED_BY,
+    B.LAST_UPDATE_DATE,
+    B.LAST_UPDATED_BY,
+    B.LAST_UPDATE_LOGIN,
+    B.TIMEZONE_ID,
+    B.NAME,
+    B.DESCRIPTION,
+    L.LANGUAGE_CODE,
+    B.SOURCE_LANG
+  from HZ_TIMEZONES_TL B, FND_LANGUAGES L
+  where L.INSTALLED_FLAG in ('I', 'B')
+  and B.LANGUAGE = userenv('LANG')
+  and not exists
+    (select NULL
+    from HZ_TIMEZONES_TL T
+    where T.TIMEZONE_ID = B.TIMEZONE_ID
+    and T.LANGUAGE = L.LANGUAGE_CODE);
+end ADD_LANGUAGE;
+
+end HZ_TIMEZONE_PKG;
+
+/

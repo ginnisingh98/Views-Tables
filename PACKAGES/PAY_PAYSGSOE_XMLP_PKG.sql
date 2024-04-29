@@ -1,0 +1,91 @@
+--------------------------------------------------------
+--  DDL for Package PAY_PAYSGSOE_XMLP_PKG
+--------------------------------------------------------
+
+  CREATE OR REPLACE EDITIONABLE PACKAGE "APPS"."PAY_PAYSGSOE_XMLP_PKG" AUTHID CURRENT_USER AS
+/* $Header: PAYSGSOES.pls 120.0 2007/12/13 12:13:28 amakrish noship $ */
+	P_ASSIGNMENT_ID	number;
+	P_BUSINESS_GROUP_ID	number;
+	P_LOCATION_ID	number;
+	P_ORGANIZATION_NAME	varchar2(80);
+	P_PAYROLL_ACTION_ID	number;
+	P_PAYROLL_ID	number;
+	P_SORT_ORDER_1	varchar2(32767);
+	P_SORT_ORDER_2	varchar2(32767);
+	P_SORT_ORDER_3	varchar2(32767);
+	P_SORT_ORDER_4	varchar2(32767);
+	P_CONC_REQUEST_ID	number;
+	CP_ADDRESS_LINE2	varchar2(100);
+	CP_ADDRESS_LINE3	varchar2(100);
+	CP_TOWN	varchar2(100);
+	CP_POST_CODE	varchar2(100);
+	CP_COUNTRY	varchar2(100);
+	CP_GROSS_PAY_YTD	number := 0 ;
+	CP_STAT_DED_CURR	number := 0 ;
+	CP_STAT_DED_YTD	number := 0 ;
+	CP_OTHER_CURR	number := 0 ;
+	CP_OTHER_YTD	number := 0 ;
+	CP_NON_PAY_CURR	number := 0 ;
+	CP_NON_PAY_YTD	number := 0 ;
+	CP_NET_PAY_CURR	number := 0 ;
+	CP_NET_PAY_YTD	number := 0 ;
+	CP_EMPLOYEE_CPF_CURR	number := 0 ;
+	CP_EMPLOYEE_CPF_YTD	number := 0 ;
+	CP_EMPLOYER_CPF_CURR	number := 0 ;
+	CP_EMPLOYER_CPF_YTD	number := 0 ;
+	CP_TOTAL_CPF_CURR	number := 0 ;
+	CP_TOTAL_CPF_YTD	number := 0 ;
+	CP_ABS_THIS_PERIOD	number;
+	CP_NET_ACCRUAL	number;
+	CP_WHERE_CLAUSE	varchar2(2000);
+	CP_ORDER_BY	varchar2(2000);
+	CP_DISPLAY_EARNINGS	varchar2(20);
+	CP_DISPLAY_DEDUCTIONS	varchar2(20);
+	CP_DISPLAY_MESSAGES	varchar2(20);
+	function cf_gross_pay_currformula(assignment_action_id in number, person_id in number) return number  ;
+	function cf_address_line1formula(expense_check_send_to_address in varchar2, person_id in number, location_id in number) return char  ;
+	function cf_get_absence_detailsformula(assignment_id_l in number, accrual_plan_id_l in number, period_end_date in date, period_start_date in date, payroll_id_l in number, business_group_id_l in number, effective_date_l in date) return number  ;
+	function cf_hourly_rateformula(hours in number, amount in number) return number  ;
+	function CF_CURRENCY_FORMAT_MASKFormula return Char  ;
+	function CF_PERCENT_FORMAT_MASKFormula return Char  ;
+	function CF_HOURS_FORMAT_MASKFormula return Char  ;
+	function CF_RATE_FORMAT_MASKFormula return Char  ;
+	function CF_FX_RATE_FORMAT_MASKFormula return Char  ;
+	function BeforeReport return boolean  ;
+	PROCEDURE construct_where_clause  ;
+	PROCEDURE construct_order_by  ;
+	function AfterReport return boolean  ;
+	function cf_1formula(ELEMENT_REPORTING_NAME in varchar2) return char  ;
+	function cf_deductions_existformula(ELEMENT_REPORTING_NAME1 in varchar2) return char  ;
+	function cf_messages_existformula(PAY_ADVICE_MESSAGE in varchar2) return char  ;
+	function cf_fx_amountformula(exchange_rate in number, amount in number) return number  ;
+	Function CP_ADDRESS_LINE2_p return varchar2;
+	Function CP_ADDRESS_LINE3_p return varchar2;
+	Function CP_TOWN_p return varchar2;
+	Function CP_POST_CODE_p return varchar2;
+	Function CP_COUNTRY_p return varchar2;
+	Function CP_GROSS_PAY_YTD_p return number;
+	Function CP_STAT_DED_CURR_p return number;
+	Function CP_STAT_DED_YTD_p return number;
+	Function CP_OTHER_CURR_p return number;
+	Function CP_OTHER_YTD_p return number;
+	Function CP_NON_PAY_CURR_p return number;
+	Function CP_NON_PAY_YTD_p return number;
+	Function CP_NET_PAY_CURR_p return number;
+	Function CP_NET_PAY_YTD_p return number;
+	Function CP_EMPLOYEE_CPF_CURR_p return number;
+	Function CP_EMPLOYEE_CPF_YTD_p return number;
+	Function CP_EMPLOYER_CPF_CURR_p return number;
+	Function CP_EMPLOYER_CPF_YTD_p return number;
+	Function CP_TOTAL_CPF_CURR_p return number;
+	Function CP_TOTAL_CPF_YTD_p return number;
+	Function CP_ABS_THIS_PERIOD_p return number;
+	Function CP_NET_ACCRUAL_p return number;
+	Function CP_WHERE_CLAUSE_p return varchar2;
+	Function CP_ORDER_BY_p return varchar2;
+	Function CP_DISPLAY_EARNINGS_p return varchar2;
+	Function CP_DISPLAY_DEDUCTIONS_p return varchar2;
+	Function CP_DISPLAY_MESSAGES_p return varchar2;
+END PAY_PAYSGSOE_XMLP_PKG;
+
+/

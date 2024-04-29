@@ -1,0 +1,37 @@
+--------------------------------------------------------
+--  DDL for Package Body ONT_OEXSEVAL_XMLP_PKG
+--------------------------------------------------------
+
+  CREATE OR REPLACE EDITIONABLE PACKAGE BODY "APPS"."ONT_OEXSEVAL_XMLP_PKG" AS
+/* $Header: OEXSEVALB.pls 120.1 2007/12/25 07:33:41 npannamp noship $ */
+  FUNCTION BEFOREREPORT RETURN BOOLEAN IS
+  BEGIN
+    BEGIN
+      P_CONC_REQUEST_ID := FND_GLOBAL.CONC_REQUEST_ID;
+      /*SRW.USER_EXIT('FND SRWINIT')*/NULL;
+    EXCEPTION
+      WHEN /*SRW.USER_EXIT_FAILURE*/OTHERS THEN
+        /*SRW.MESSAGE(1000
+                   ,'Failed in BEFORE REPORT trigger')*/NULL;
+        RETURN (FALSE);
+    END;
+    RETURN (TRUE);
+  END BEFOREREPORT;
+
+  FUNCTION AFTERREPORT RETURN BOOLEAN IS
+  BEGIN
+    BEGIN
+      /*SRW.USER_EXIT('FND SRWEXIT')*/NULL;
+    EXCEPTION
+      WHEN /*SRW.USER_EXIT_FAILURE*/OTHERS THEN
+        /*SRW.MESSAGE(1
+                   ,'Failed in AFTER REPORT TRIGGER')*/NULL;
+        RETURN (FALSE);
+    END;
+    RETURN (TRUE);
+  END AFTERREPORT;
+
+END ONT_OEXSEVAL_XMLP_PKG;
+
+
+/

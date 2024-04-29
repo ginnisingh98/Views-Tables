@@ -1,0 +1,109 @@
+--------------------------------------------------------
+--  DDL for Package IGS_AD_OS_SEC_EDU_PKG
+--------------------------------------------------------
+
+  CREATE OR REPLACE EDITIONABLE PACKAGE "APPS"."IGS_AD_OS_SEC_EDU_PKG" AUTHID CURRENT_USER as
+/* $Header: IGSAI42S.pls 115.3 2002/11/28 22:05:36 nsidana ship $ */
+procedure INSERT_ROW (
+  X_ROWID in out NOCOPY VARCHAR2,
+  X_PERSON_ID in NUMBER,
+  X_SEQUENCE_NUMBER in NUMBER,
+  X_RESULT_OBTAINED_YR in NUMBER,
+  X_OS_SCNDRY_EDU_QUALIFICATION in VARCHAR2,
+  X_RESULT in VARCHAR2,
+  X_CANDIDATE_NUMBER in NUMBER,
+  X_SCHOOL_NAME in VARCHAR2,
+  X_COUNTRY_CD in VARCHAR2,
+  X_COMMENTS in VARCHAR2,
+  X_MODE in VARCHAR2 default 'R'
+  );
+procedure LOCK_ROW (
+  X_ROWID   in  VARCHAR2,
+  X_PERSON_ID in NUMBER,
+  X_SEQUENCE_NUMBER in NUMBER,
+  X_RESULT_OBTAINED_YR in NUMBER,
+  X_OS_SCNDRY_EDU_QUALIFICATION in VARCHAR2,
+  X_RESULT in VARCHAR2,
+  X_CANDIDATE_NUMBER in NUMBER,
+  X_SCHOOL_NAME in VARCHAR2,
+  X_COUNTRY_CD in VARCHAR2,
+  X_COMMENTS in VARCHAR2
+);
+procedure UPDATE_ROW (
+  X_ROWID   in  VARCHAR2,
+  X_PERSON_ID in NUMBER,
+  X_SEQUENCE_NUMBER in NUMBER,
+  X_RESULT_OBTAINED_YR in NUMBER,
+  X_OS_SCNDRY_EDU_QUALIFICATION in VARCHAR2,
+  X_RESULT in VARCHAR2,
+  X_CANDIDATE_NUMBER in NUMBER,
+  X_SCHOOL_NAME in VARCHAR2,
+  X_COUNTRY_CD in VARCHAR2,
+  X_COMMENTS in VARCHAR2,
+  X_MODE in VARCHAR2 default 'R'
+  );
+procedure ADD_ROW (
+  X_ROWID in out NOCOPY VARCHAR2,
+  X_PERSON_ID in NUMBER,
+  X_SEQUENCE_NUMBER in NUMBER,
+  X_RESULT_OBTAINED_YR in NUMBER,
+  X_OS_SCNDRY_EDU_QUALIFICATION in VARCHAR2,
+  X_RESULT in VARCHAR2,
+  X_CANDIDATE_NUMBER in NUMBER,
+  X_SCHOOL_NAME in VARCHAR2,
+  X_COUNTRY_CD in VARCHAR2,
+  X_COMMENTS in VARCHAR2,
+  X_MODE in VARCHAR2 default 'R'
+  );
+procedure DELETE_ROW (
+  X_ROWID   in  VARCHAR2
+);
+ FUNCTION Get_PK_For_Validation (
+    x_person_id IN NUMBER,
+    x_sequence_number IN NUMBER
+    )
+RETURN BOOLEAN ;
+
+  PROCEDURE GET_FK_IGS_PE_COUNTRY_CD (
+    x_country_cd IN VARCHAR2
+    );
+
+  PROCEDURE GET_FK_IGS_AD_OS_SEC_EDU_QF (
+    x_os_scndry_edu_qualification IN VARCHAR2
+    );
+
+  PROCEDURE GET_FK_IGS_PE_PERSON (
+    x_person_id IN NUMBER
+    );
+
+PROCEDURE Check_Constraints (
+  Column_Name IN VARCHAR2 DEFAULT NULL,
+  Column_Value IN VARCHAR2 DEFAULT NULL
+);
+
+  PROCEDURE Before_DML (
+    p_action IN VARCHAR2,
+    x_rowid IN  VARCHAR2 DEFAULT NULL,
+    x_person_id IN NUMBER DEFAULT NULL,
+    x_sequence_number IN NUMBER DEFAULT NULL,
+    x_result_obtained_yr IN NUMBER DEFAULT NULL,
+    x_os_scndry_edu_qualification IN VARCHAR2 DEFAULT NULL,
+    x_result IN VARCHAR2 DEFAULT NULL,
+    x_candidate_number IN NUMBER DEFAULT NULL,
+    x_school_name IN VARCHAR2 DEFAULT NULL,
+    x_country_cd IN VARCHAR2 DEFAULT NULL,
+    x_comments IN VARCHAR2 DEFAULT NULL,
+    x_creation_date IN DATE DEFAULT NULL,
+    x_created_by IN NUMBER DEFAULT NULL,
+    x_last_update_date IN DATE DEFAULT NULL,
+    x_last_updated_by IN NUMBER DEFAULT NULL,
+    x_last_update_login IN NUMBER DEFAULT NULL
+  ) ;
+
+
+
+end IGS_AD_OS_SEC_EDU_PKG;
+
+ 
+
+/

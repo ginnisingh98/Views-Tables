@@ -1,0 +1,35 @@
+--------------------------------------------------------
+--  DDL for Package IEX_COLLECTORS_TO_RESOURCE
+--------------------------------------------------------
+
+  CREATE OR REPLACE EDITIONABLE PACKAGE "APPS"."IEX_COLLECTORS_TO_RESOURCE" AUTHID CURRENT_USER AS
+/* $Header: iexctras.pls 120.0 2005/06/15 17:26:40 acaraujo noship $ */
+
+
+PROCEDURE UPDATE_COLLECTORS
+  (ERRBUF     OUT NOCOPY VARCHAR2,
+   RETCODE    OUT NOCOPY VARCHAR2,
+   P_RESP1     IN  VARCHAR2,
+   P_RESP2     IN  VARCHAR2,
+   P_RESP3     IN  VARCHAR2,
+   P_RESP4     IN  VARCHAR2,
+   P_RESP5     IN  VARCHAR2,
+   p_debug     IN VARCHAR2);
+
+PROCEDURE UPDATE_COLLECTORS_PVT
+(
+p_resp     IN  VARCHAR2,
+P_debug    IN  VARCHAR2
+);
+
+
+PROCEDURE UPDATE_RESOURCES
+  (ERRBUF     OUT NOCOPY VARCHAR2,
+   RETCODE    OUT NOCOPY VARCHAR2,
+   p_debug IN VARCHAR2);
+
+End IEX_COLLECTORS_TO_RESOURCE ;
+
+ 
+
+/

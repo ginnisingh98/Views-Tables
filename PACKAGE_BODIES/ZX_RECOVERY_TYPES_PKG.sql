@@ -1,0 +1,437 @@
+--------------------------------------------------------
+--  DDL for Package Body ZX_RECOVERY_TYPES_PKG
+--------------------------------------------------------
+
+  CREATE OR REPLACE EDITIONABLE PACKAGE BODY "APPS"."ZX_RECOVERY_TYPES_PKG" as
+/* $Header: zxdrectypesb.pls 120.2 2005/10/27 17:01:27 pla ship $ */
+procedure INSERT_ROW (
+  X_ROWID in out nocopy VARCHAR2,
+  X_RECOVERY_TYPE_ID in NUMBER,
+  X_RECOVERY_TYPE_CODE in VARCHAR2,
+  X_TAX_REGIME_CODE in VARCHAR2,
+  X_TAX in VARCHAR2,
+  X_Enabled_Flag in VARCHAR2,
+  X_START_DATE in DATE,
+  X_END_DATE in DATE,
+  X_REQUEST_ID in NUMBER,
+  X_ATTRIBUTE_CATEGORY in VARCHAR2,
+  X_ATTRIBUTE1 in VARCHAR2,
+  X_ATTRIBUTE2 in VARCHAR2,
+  X_ATTRIBUTE3 in VARCHAR2,
+  X_ATTRIBUTE4 in VARCHAR2,
+  X_ATTRIBUTE5 in VARCHAR2,
+  X_ATTRIBUTE6 in VARCHAR2,
+  X_ATTRIBUTE7 in VARCHAR2,
+  X_ATTRIBUTE8 in VARCHAR2,
+  X_ATTRIBUTE9 in VARCHAR2,
+  X_ATTRIBUTE10 in VARCHAR2,
+  X_ATTRIBUTE11 in VARCHAR2,
+  X_ATTRIBUTE12 in VARCHAR2,
+  X_ATTRIBUTE13 in VARCHAR2,
+  X_ATTRIBUTE14 in VARCHAR2,
+  X_ATTRIBUTE15 in VARCHAR2,
+  X_RECOVERY_TYPE_NAME in VARCHAR2,
+  X_RECOVERY_TYPE_DESC in VARCHAR2,
+  X_CREATION_DATE in DATE,
+  X_CREATED_BY in NUMBER,
+  X_LAST_UPDATE_DATE in DATE,
+  X_LAST_UPDATED_BY in NUMBER,
+  X_LAST_UPDATE_LOGIN in NUMBER
+) is
+  cursor C is select ROWID from ZX_RECOVERY_TYPES_B
+    where RECOVERY_TYPE_ID = X_RECOVERY_TYPE_ID
+    ;
+begin
+  insert into ZX_RECOVERY_TYPES_B (
+    RECOVERY_TYPE_ID,
+    RECOVERY_TYPE_CODE,
+    TAX_REGIME_CODE,
+    TAX,
+    Enabled_Flag,
+    START_DATE,
+    END_DATE,
+    REQUEST_ID,
+    ATTRIBUTE_CATEGORY,
+    ATTRIBUTE1,
+    ATTRIBUTE2,
+    ATTRIBUTE3,
+    ATTRIBUTE4,
+    ATTRIBUTE5,
+    ATTRIBUTE6,
+    ATTRIBUTE7,
+    ATTRIBUTE8,
+    ATTRIBUTE9,
+    ATTRIBUTE10,
+    ATTRIBUTE11,
+    ATTRIBUTE12,
+    ATTRIBUTE13,
+    ATTRIBUTE14,
+    ATTRIBUTE15,
+    CREATION_DATE,
+    CREATED_BY,
+    LAST_UPDATE_DATE,
+    LAST_UPDATED_BY,
+    LAST_UPDATE_LOGIN
+  ) values (
+    X_RECOVERY_TYPE_ID,
+    X_RECOVERY_TYPE_CODE,
+    X_TAX_REGIME_CODE,
+    X_TAX,
+    X_Enabled_Flag,
+    X_START_DATE,
+    X_END_DATE,
+    X_REQUEST_ID,
+    X_ATTRIBUTE_CATEGORY,
+    X_ATTRIBUTE1,
+    X_ATTRIBUTE2,
+    X_ATTRIBUTE3,
+    X_ATTRIBUTE4,
+    X_ATTRIBUTE5,
+    X_ATTRIBUTE6,
+    X_ATTRIBUTE7,
+    X_ATTRIBUTE8,
+    X_ATTRIBUTE9,
+    X_ATTRIBUTE10,
+    X_ATTRIBUTE11,
+    X_ATTRIBUTE12,
+    X_ATTRIBUTE13,
+    X_ATTRIBUTE14,
+    X_ATTRIBUTE15,
+    X_CREATION_DATE,
+    X_CREATED_BY,
+    X_LAST_UPDATE_DATE,
+    X_LAST_UPDATED_BY,
+    X_LAST_UPDATE_LOGIN
+  );
+  insert into ZX_RECOVERY_TYPES_TL (
+    RECOVERY_TYPE_ID,
+    RECOVERY_TYPE_NAME,
+    RECOVERY_TYPE_DESC,
+    CREATION_DATE,
+    CREATED_BY,
+    LAST_UPDATE_DATE,
+    LAST_UPDATED_BY,
+    LAST_UPDATE_LOGIN,
+    LANGUAGE,
+    SOURCE_LANG
+  ) select
+    X_RECOVERY_TYPE_ID,
+    X_RECOVERY_TYPE_NAME,
+    X_RECOVERY_TYPE_DESC,
+    X_CREATION_DATE,
+    X_CREATED_BY,
+    X_LAST_UPDATE_DATE,
+    X_LAST_UPDATED_BY,
+    X_LAST_UPDATE_LOGIN,
+    L.LANGUAGE_CODE,
+    userenv('LANG')
+  from FND_LANGUAGES L
+  where L.INSTALLED_FLAG in ('I', 'B')
+  and not exists
+    (select NULL
+    from ZX_RECOVERY_TYPES_TL T
+    where T.RECOVERY_TYPE_ID = X_RECOVERY_TYPE_ID
+    and T.LANGUAGE = L.LANGUAGE_CODE);
+  open c;
+  fetch c into X_ROWID;
+  if (c%notfound) then
+    close c;
+    raise no_data_found;
+  end if;
+  close c;
+end INSERT_ROW;
+procedure LOCK_ROW (
+  X_RECOVERY_TYPE_ID in NUMBER,
+  X_RECOVERY_TYPE_CODE in VARCHAR2,
+  X_TAX_REGIME_CODE in VARCHAR2,
+  X_TAX in VARCHAR2,
+  X_Enabled_Flag in VARCHAR2,
+  X_START_DATE in DATE,
+  X_END_DATE in DATE,
+  X_REQUEST_ID in NUMBER,
+  X_ATTRIBUTE_CATEGORY in VARCHAR2,
+  X_ATTRIBUTE1 in VARCHAR2,
+  X_ATTRIBUTE2 in VARCHAR2,
+  X_ATTRIBUTE3 in VARCHAR2,
+  X_ATTRIBUTE4 in VARCHAR2,
+  X_ATTRIBUTE5 in VARCHAR2,
+  X_ATTRIBUTE6 in VARCHAR2,
+  X_ATTRIBUTE7 in VARCHAR2,
+  X_ATTRIBUTE8 in VARCHAR2,
+  X_ATTRIBUTE9 in VARCHAR2,
+  X_ATTRIBUTE10 in VARCHAR2,
+  X_ATTRIBUTE11 in VARCHAR2,
+  X_ATTRIBUTE12 in VARCHAR2,
+  X_ATTRIBUTE13 in VARCHAR2,
+  X_ATTRIBUTE14 in VARCHAR2,
+  X_ATTRIBUTE15 in VARCHAR2,
+  X_RECOVERY_TYPE_NAME in VARCHAR2,
+  X_RECOVERY_TYPE_DESC in VARCHAR2
+) is
+  cursor c is select
+      RECOVERY_TYPE_CODE,
+      TAX_REGIME_CODE,
+      TAX,
+      Enabled_Flag,
+      START_DATE,
+      END_DATE,
+      REQUEST_ID,
+      ATTRIBUTE_CATEGORY,
+      ATTRIBUTE1,
+      ATTRIBUTE2,
+      ATTRIBUTE3,
+      ATTRIBUTE4,
+      ATTRIBUTE5,
+      ATTRIBUTE6,
+      ATTRIBUTE7,
+      ATTRIBUTE8,
+      ATTRIBUTE9,
+      ATTRIBUTE10,
+      ATTRIBUTE11,
+      ATTRIBUTE12,
+      ATTRIBUTE13,
+      ATTRIBUTE14,
+      ATTRIBUTE15
+    from ZX_RECOVERY_TYPES_B
+    where RECOVERY_TYPE_ID = X_RECOVERY_TYPE_ID
+    for update of RECOVERY_TYPE_ID nowait;
+  recinfo c%rowtype;
+  cursor c1 is select
+      RECOVERY_TYPE_NAME,
+      RECOVERY_TYPE_DESC,
+      decode(LANGUAGE, userenv('LANG'), 'Y', 'N') BASELANG
+    from ZX_RECOVERY_TYPES_TL
+    where RECOVERY_TYPE_ID = X_RECOVERY_TYPE_ID
+    and userenv('LANG') in (LANGUAGE, SOURCE_LANG)
+    for update of RECOVERY_TYPE_ID nowait;
+begin
+  open c;
+  fetch c into recinfo;
+  if (c%notfound) then
+    close c;
+    fnd_message.set_name('FND', 'FORM_RECORD_DELETED');
+    app_exception.raise_exception;
+  end if;
+  close c;
+  if (    (recinfo.RECOVERY_TYPE_CODE = X_RECOVERY_TYPE_CODE)
+      AND (recinfo.TAX_REGIME_CODE = X_TAX_REGIME_CODE)
+      AND (recinfo.TAX = X_TAX)
+      AND ((recinfo.Enabled_Flag = X_Enabled_Flag)
+           OR ((recinfo.Enabled_Flag is null) AND (X_Enabled_Flag is null)))
+      AND ((recinfo.START_DATE = X_START_DATE)
+           OR ((recinfo.START_DATE is null) AND (X_START_DATE is null)))
+      AND ((recinfo.END_DATE = X_END_DATE)
+           OR ((recinfo.END_DATE is null) AND (X_END_DATE is null)))
+      AND ((recinfo.REQUEST_ID = X_REQUEST_ID)
+           OR ((recinfo.REQUEST_ID is null) AND (X_REQUEST_ID is null)))
+      AND ((recinfo.ATTRIBUTE_CATEGORY = X_ATTRIBUTE_CATEGORY)
+           OR ((recinfo.ATTRIBUTE_CATEGORY is null) AND (X_ATTRIBUTE_CATEGORY is null)))
+      AND ((recinfo.ATTRIBUTE1 = X_ATTRIBUTE1)
+           OR ((recinfo.ATTRIBUTE1 is null) AND (X_ATTRIBUTE1 is null)))
+      AND ((recinfo.ATTRIBUTE2 = X_ATTRIBUTE2)
+           OR ((recinfo.ATTRIBUTE2 is null) AND (X_ATTRIBUTE2 is null)))
+      AND ((recinfo.ATTRIBUTE3 = X_ATTRIBUTE3)
+           OR ((recinfo.ATTRIBUTE3 is null) AND (X_ATTRIBUTE3 is null)))
+      AND ((recinfo.ATTRIBUTE4 = X_ATTRIBUTE4)
+           OR ((recinfo.ATTRIBUTE4 is null) AND (X_ATTRIBUTE4 is null)))
+      AND ((recinfo.ATTRIBUTE5 = X_ATTRIBUTE5)
+           OR ((recinfo.ATTRIBUTE5 is null) AND (X_ATTRIBUTE5 is null)))
+      AND ((recinfo.ATTRIBUTE6 = X_ATTRIBUTE6)
+           OR ((recinfo.ATTRIBUTE6 is null) AND (X_ATTRIBUTE6 is null)))
+      AND ((recinfo.ATTRIBUTE7 = X_ATTRIBUTE7)
+           OR ((recinfo.ATTRIBUTE7 is null) AND (X_ATTRIBUTE7 is null)))
+      AND ((recinfo.ATTRIBUTE8 = X_ATTRIBUTE8)
+           OR ((recinfo.ATTRIBUTE8 is null) AND (X_ATTRIBUTE8 is null)))
+      AND ((recinfo.ATTRIBUTE9 = X_ATTRIBUTE9)
+           OR ((recinfo.ATTRIBUTE9 is null) AND (X_ATTRIBUTE9 is null)))
+      AND ((recinfo.ATTRIBUTE10 = X_ATTRIBUTE10)
+           OR ((recinfo.ATTRIBUTE10 is null) AND (X_ATTRIBUTE10 is null)))
+      AND ((recinfo.ATTRIBUTE11 = X_ATTRIBUTE11)
+           OR ((recinfo.ATTRIBUTE11 is null) AND (X_ATTRIBUTE11 is null)))
+      AND ((recinfo.ATTRIBUTE12 = X_ATTRIBUTE12)
+           OR ((recinfo.ATTRIBUTE12 is null) AND (X_ATTRIBUTE12 is null)))
+      AND ((recinfo.ATTRIBUTE13 = X_ATTRIBUTE13)
+           OR ((recinfo.ATTRIBUTE13 is null) AND (X_ATTRIBUTE13 is null)))
+      AND ((recinfo.ATTRIBUTE14 = X_ATTRIBUTE14)
+           OR ((recinfo.ATTRIBUTE14 is null) AND (X_ATTRIBUTE14 is null)))
+      AND ((recinfo.ATTRIBUTE15 = X_ATTRIBUTE15)
+           OR ((recinfo.ATTRIBUTE15 is null) AND (X_ATTRIBUTE15 is null)))
+  ) then
+    null;
+  else
+    fnd_message.set_name('FND', 'FORM_RECORD_CHANGED');
+    app_exception.raise_exception;
+  end if;
+  for tlinfo in c1 loop
+    if (tlinfo.BASELANG = 'Y') then
+      if (    (tlinfo.RECOVERY_TYPE_NAME = X_RECOVERY_TYPE_NAME)
+          AND ((tlinfo.RECOVERY_TYPE_DESC = X_RECOVERY_TYPE_DESC)
+               OR ((tlinfo.RECOVERY_TYPE_DESC is null) AND (X_RECOVERY_TYPE_DESC is null)))
+      ) then
+        null;
+      else
+        fnd_message.set_name('FND', 'FORM_RECORD_CHANGED');
+        app_exception.raise_exception;
+      end if;
+    end if;
+  end loop;
+  return;
+end LOCK_ROW;
+procedure UPDATE_ROW (
+  X_RECOVERY_TYPE_ID in NUMBER,
+  X_RECOVERY_TYPE_CODE in VARCHAR2,
+  X_TAX_REGIME_CODE in VARCHAR2,
+  X_TAX in VARCHAR2,
+  X_Enabled_Flag in VARCHAR2,
+  X_START_DATE in DATE,
+  X_END_DATE in DATE,
+  X_REQUEST_ID in NUMBER,
+  X_ATTRIBUTE_CATEGORY in VARCHAR2,
+  X_ATTRIBUTE1 in VARCHAR2,
+  X_ATTRIBUTE2 in VARCHAR2,
+  X_ATTRIBUTE3 in VARCHAR2,
+  X_ATTRIBUTE4 in VARCHAR2,
+  X_ATTRIBUTE5 in VARCHAR2,
+  X_ATTRIBUTE6 in VARCHAR2,
+  X_ATTRIBUTE7 in VARCHAR2,
+  X_ATTRIBUTE8 in VARCHAR2,
+  X_ATTRIBUTE9 in VARCHAR2,
+  X_ATTRIBUTE10 in VARCHAR2,
+  X_ATTRIBUTE11 in VARCHAR2,
+  X_ATTRIBUTE12 in VARCHAR2,
+  X_ATTRIBUTE13 in VARCHAR2,
+  X_ATTRIBUTE14 in VARCHAR2,
+  X_ATTRIBUTE15 in VARCHAR2,
+  X_RECOVERY_TYPE_NAME in VARCHAR2,
+  X_RECOVERY_TYPE_DESC in VARCHAR2,
+  X_LAST_UPDATE_DATE in DATE,
+  X_LAST_UPDATED_BY in NUMBER,
+  X_LAST_UPDATE_LOGIN in NUMBER
+) is
+begin
+  update ZX_RECOVERY_TYPES_B set
+    RECOVERY_TYPE_CODE = X_RECOVERY_TYPE_CODE,
+    TAX_REGIME_CODE = X_TAX_REGIME_CODE,
+    TAX = X_TAX,
+    Enabled_Flag = X_Enabled_Flag,
+    START_DATE = X_START_DATE,
+    END_DATE = X_END_DATE,
+    REQUEST_ID = X_REQUEST_ID,
+    ATTRIBUTE_CATEGORY = X_ATTRIBUTE_CATEGORY,
+    ATTRIBUTE1 = X_ATTRIBUTE1,
+    ATTRIBUTE2 = X_ATTRIBUTE2,
+    ATTRIBUTE3 = X_ATTRIBUTE3,
+    ATTRIBUTE4 = X_ATTRIBUTE4,
+    ATTRIBUTE5 = X_ATTRIBUTE5,
+    ATTRIBUTE6 = X_ATTRIBUTE6,
+    ATTRIBUTE7 = X_ATTRIBUTE7,
+    ATTRIBUTE8 = X_ATTRIBUTE8,
+    ATTRIBUTE9 = X_ATTRIBUTE9,
+    ATTRIBUTE10 = X_ATTRIBUTE10,
+    ATTRIBUTE11 = X_ATTRIBUTE11,
+    ATTRIBUTE12 = X_ATTRIBUTE12,
+    ATTRIBUTE13 = X_ATTRIBUTE13,
+    ATTRIBUTE14 = X_ATTRIBUTE14,
+    ATTRIBUTE15 = X_ATTRIBUTE15,
+    LAST_UPDATE_DATE = X_LAST_UPDATE_DATE,
+    LAST_UPDATED_BY = X_LAST_UPDATED_BY,
+    LAST_UPDATE_LOGIN = X_LAST_UPDATE_LOGIN
+  where RECOVERY_TYPE_ID = X_RECOVERY_TYPE_ID;
+  if (sql%notfound) then
+    raise no_data_found;
+  end if;
+  update ZX_RECOVERY_TYPES_TL set
+    RECOVERY_TYPE_NAME = X_RECOVERY_TYPE_NAME,
+    RECOVERY_TYPE_DESC = X_RECOVERY_TYPE_DESC,
+    LAST_UPDATE_DATE = X_LAST_UPDATE_DATE,
+    LAST_UPDATED_BY = X_LAST_UPDATED_BY,
+    LAST_UPDATE_LOGIN = X_LAST_UPDATE_LOGIN,
+    SOURCE_LANG = userenv('LANG')
+  where RECOVERY_TYPE_ID = X_RECOVERY_TYPE_ID
+  and userenv('LANG') in (LANGUAGE, SOURCE_LANG);
+  if (sql%notfound) then
+    raise no_data_found;
+  end if;
+end UPDATE_ROW;
+procedure DELETE_ROW (
+  X_RECOVERY_TYPE_ID in NUMBER
+) is
+begin
+  delete from ZX_RECOVERY_TYPES_TL
+  where RECOVERY_TYPE_ID = X_RECOVERY_TYPE_ID;
+  if (sql%notfound) then
+    raise no_data_found;
+  end if;
+  delete from ZX_RECOVERY_TYPES_B
+  where RECOVERY_TYPE_ID = X_RECOVERY_TYPE_ID;
+  if (sql%notfound) then
+    raise no_data_found;
+  end if;
+end DELETE_ROW;
+procedure ADD_LANGUAGE
+is
+begin
+  delete from ZX_RECOVERY_TYPES_TL T
+  where not exists
+    (select NULL
+    from ZX_RECOVERY_TYPES_B B
+    where B.RECOVERY_TYPE_ID = T.RECOVERY_TYPE_ID
+    );
+  update ZX_RECOVERY_TYPES_TL T set (
+      RECOVERY_TYPE_NAME,
+      RECOVERY_TYPE_DESC
+    ) = (select
+      B.RECOVERY_TYPE_NAME,
+      B.RECOVERY_TYPE_DESC
+    from ZX_RECOVERY_TYPES_TL B
+    where B.RECOVERY_TYPE_ID = T.RECOVERY_TYPE_ID
+    and B.LANGUAGE = T.SOURCE_LANG)
+  where (
+      T.RECOVERY_TYPE_ID,
+      T.LANGUAGE
+  ) in (select
+      SUBT.RECOVERY_TYPE_ID,
+      SUBT.LANGUAGE
+    from ZX_RECOVERY_TYPES_TL SUBB, ZX_RECOVERY_TYPES_TL SUBT
+    where SUBB.RECOVERY_TYPE_ID = SUBT.RECOVERY_TYPE_ID
+    and SUBB.LANGUAGE = SUBT.SOURCE_LANG
+    and (SUBB.RECOVERY_TYPE_NAME <> SUBT.RECOVERY_TYPE_NAME
+      or SUBB.RECOVERY_TYPE_DESC <> SUBT.RECOVERY_TYPE_DESC
+      or (SUBB.RECOVERY_TYPE_DESC is null and SUBT.RECOVERY_TYPE_DESC is not null)
+      or (SUBB.RECOVERY_TYPE_DESC is not null and SUBT.RECOVERY_TYPE_DESC is null)
+  ));
+  insert into ZX_RECOVERY_TYPES_TL (
+    RECOVERY_TYPE_ID,
+    RECOVERY_TYPE_NAME,
+    RECOVERY_TYPE_DESC,
+    CREATION_DATE,
+    CREATED_BY,
+    LAST_UPDATE_DATE,
+    LAST_UPDATED_BY,
+    LAST_UPDATE_LOGIN,
+    LANGUAGE,
+    SOURCE_LANG
+  ) select
+    B.RECOVERY_TYPE_ID,
+    B.RECOVERY_TYPE_NAME,
+    B.RECOVERY_TYPE_DESC,
+    B.CREATION_DATE,
+    B.CREATED_BY,
+    B.LAST_UPDATE_DATE,
+    B.LAST_UPDATED_BY,
+    B.LAST_UPDATE_LOGIN,
+    L.LANGUAGE_CODE,
+    B.SOURCE_LANG
+  from ZX_RECOVERY_TYPES_TL B, FND_LANGUAGES L
+  where L.INSTALLED_FLAG in ('I', 'B')
+  and B.LANGUAGE = userenv('LANG')
+  and not exists
+    (select NULL
+    from ZX_RECOVERY_TYPES_TL T
+    where T.RECOVERY_TYPE_ID = B.RECOVERY_TYPE_ID
+    and T.LANGUAGE = L.LANGUAGE_CODE);
+end ADD_LANGUAGE;
+end ZX_RECOVERY_TYPES_PKG;
+
+
+/

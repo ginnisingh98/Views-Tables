@@ -1,0 +1,304 @@
+--------------------------------------------------------
+--  DDL for Package Body PSP_EFFORT_REPORT_DETAILS_PKG
+--------------------------------------------------------
+
+  CREATE OR REPLACE EDITIONABLE PACKAGE BODY "APPS"."PSP_EFFORT_REPORT_DETAILS_PKG" as
+ /* $Header: PSPERDEB.pls 115.7 2002/11/18 12:28:54 lveerubh ship $ */
+procedure INSERT_ROW (
+  X_ROWID in out NOCOPY VARCHAR2,
+  X_EFFORT_REPORT_ID in NUMBER,
+  X_VERSION_NUM in NUMBER,
+  X_EFFORT_REPORT_LINE_NUM in NUMBER,
+  X_ASSIGNMENT_ID in NUMBER,
+  X_ELEMENT_TYPE_ID in NUMBER,
+  X_GL_CODE_COMBINATION_ID in NUMBER,
+  X_PROJECT_ID in NUMBER,
+  X_EXPENDITURE_ORGANIZATION_ID in NUMBER,
+  X_EXPENDITURE_TYPE in VARCHAR2,
+  X_TASK_ID in NUMBER,
+  X_AWARD_ID in NUMBER,
+  X_TOTAL_AMOUNT in NUMBER,
+  X_MODE in VARCHAR2 default 'R'
+  ) is
+    cursor C is select ROWID from PSP_EFFORT_REPORT_DETAILS
+      where EFFORT_REPORT_ID = X_EFFORT_REPORT_ID
+      and VERSION_NUM = X_VERSION_NUM
+      and EFFORT_REPORT_LINE_NUM = X_EFFORT_REPORT_LINE_NUM;
+    X_LAST_UPDATE_DATE DATE;
+    X_LAST_UPDATED_BY NUMBER;
+    X_LAST_UPDATE_LOGIN NUMBER;
+begin
+  X_LAST_UPDATE_DATE := SYSDATE;
+  if(X_MODE = 'I') then
+    X_LAST_UPDATED_BY := 1;
+    X_LAST_UPDATE_LOGIN := 0;
+  elsif (X_MODE = 'R') then
+    X_LAST_UPDATED_BY := FND_GLOBAL.USER_ID;
+    if X_LAST_UPDATED_BY is NULL then
+      X_LAST_UPDATED_BY := -1;
+    end if;
+    X_LAST_UPDATE_LOGIN :=FND_GLOBAL.LOGIN_ID;
+    if X_LAST_UPDATE_LOGIN is NULL then
+      X_LAST_UPDATE_LOGIN := -1;
+    end if;
+  else
+    FND_MESSAGE.SET_NAME( 'FND', 'SYSTEM-INVALID ARGS');
+    app_exception.raise_exception;
+  end if;
+  insert into PSP_EFFORT_REPORT_DETAILS (
+    EFFORT_REPORT_ID,
+    VERSION_NUM,
+    EFFORT_REPORT_LINE_NUM,
+    ASSIGNMENT_ID,
+    ELEMENT_TYPE_ID,
+    GL_CODE_COMBINATION_ID,
+    PROJECT_ID,
+    EXPENDITURE_ORGANIZATION_ID,
+    EXPENDITURE_TYPE,
+    TASK_ID,
+    AWARD_ID,
+    TOTAL_AMOUNT,
+    CREATION_DATE,
+    CREATED_BY,
+    LAST_UPDATE_DATE,
+    LAST_UPDATED_BY,
+    LAST_UPDATE_LOGIN
+  ) values (
+    X_EFFORT_REPORT_ID,
+    X_VERSION_NUM,
+    X_EFFORT_REPORT_LINE_NUM,
+    X_ASSIGNMENT_ID,
+    X_ELEMENT_TYPE_ID,
+    X_GL_CODE_COMBINATION_ID,
+    X_PROJECT_ID,
+    X_EXPENDITURE_ORGANIZATION_ID,
+    X_EXPENDITURE_TYPE,
+    X_TASK_ID,
+    X_AWARD_ID,
+    X_TOTAL_AMOUNT,
+    X_LAST_UPDATE_DATE,
+    X_LAST_UPDATED_BY,
+    X_LAST_UPDATE_DATE,
+    X_LAST_UPDATED_BY,
+    X_LAST_UPDATE_LOGIN
+  );
+
+  open c;
+  fetch c into X_ROWID;
+  if (c%notfound) then
+    close c;
+    raise no_data_found;
+  end if;
+  close c;
+
+end INSERT_ROW;
+
+procedure LOCK_ROW (
+  X_EFFORT_REPORT_ID in NUMBER,
+  X_VERSION_NUM in NUMBER,
+  X_EFFORT_REPORT_LINE_NUM in NUMBER,
+  X_ASSIGNMENT_ID in NUMBER,
+  X_ELEMENT_TYPE_ID in NUMBER,
+  X_GL_CODE_COMBINATION_ID in NUMBER,
+  X_PROJECT_ID in NUMBER,
+  X_EXPENDITURE_ORGANIZATION_ID in NUMBER,
+  X_EXPENDITURE_TYPE in VARCHAR2,
+  X_TASK_ID in NUMBER,
+  X_AWARD_ID in NUMBER,
+  X_TOTAL_AMOUNT in NUMBER
+) is
+  cursor c1 is select
+      ASSIGNMENT_ID,
+      ELEMENT_TYPE_ID,
+      GL_CODE_COMBINATION_ID,
+      PROJECT_ID,
+      EXPENDITURE_ORGANIZATION_ID,
+      EXPENDITURE_TYPE,
+      TASK_ID,
+      AWARD_ID,
+      TOTAL_AMOUNT
+    from PSP_EFFORT_REPORT_DETAILS
+    where EFFORT_REPORT_ID = X_EFFORT_REPORT_ID
+    and VERSION_NUM = X_VERSION_NUM
+    and EFFORT_REPORT_LINE_NUM = X_EFFORT_REPORT_LINE_NUM
+    for update of EFFORT_REPORT_ID nowait;
+  tlinfo c1%rowtype;
+
+begin
+  open c1;
+  fetch c1 into tlinfo;
+  if (c1%notfound) then
+    fnd_message.set_name('FND', 'FORM_RECORD_CHANGED');
+    app_exception.raise_exception;
+    close c1;
+    return;
+  end if;
+  close c1;
+
+  if ( (tlinfo.ASSIGNMENT_ID = X_ASSIGNMENT_ID)
+      AND (tlinfo.ELEMENT_TYPE_ID = X_ELEMENT_TYPE_ID)
+      AND ((tlinfo.GL_CODE_COMBINATION_ID = X_GL_CODE_COMBINATION_ID)
+           OR ((tlinfo.GL_CODE_COMBINATION_ID is null)
+               AND (X_GL_CODE_COMBINATION_ID is null)))
+      AND ((tlinfo.PROJECT_ID = X_PROJECT_ID)
+           OR ((tlinfo.PROJECT_ID is null)
+               AND (X_PROJECT_ID is null)))
+      AND ((tlinfo.EXPENDITURE_ORGANIZATION_ID = X_EXPENDITURE_ORGANIZATION_ID)
+           OR ((tlinfo.EXPENDITURE_ORGANIZATION_ID is null)
+               AND (X_EXPENDITURE_ORGANIZATION_ID is null)))
+      AND ((tlinfo.EXPENDITURE_TYPE = X_EXPENDITURE_TYPE)
+           OR ((tlinfo.EXPENDITURE_TYPE is null)
+               AND (X_EXPENDITURE_TYPE is null)))
+      AND ((tlinfo.TASK_ID = X_TASK_ID)
+           OR ((tlinfo.TASK_ID is null)
+               AND (X_TASK_ID is null)))
+      AND ((tlinfo.AWARD_ID = X_AWARD_ID)
+           OR ((tlinfo.AWARD_ID is null)
+               AND (X_AWARD_ID is null)))
+      AND (tlinfo.TOTAL_AMOUNT = X_TOTAL_AMOUNT)
+  ) then
+    null;
+  else
+    fnd_message.set_name('FND', 'FORM_RECORD_CHANGED');
+    app_exception.raise_exception;
+  end if;
+  return;
+end LOCK_ROW;
+
+procedure UPDATE_ROW (
+  X_EFFORT_REPORT_ID in NUMBER,
+  X_VERSION_NUM in NUMBER,
+  X_EFFORT_REPORT_LINE_NUM in NUMBER,
+  X_ASSIGNMENT_ID in NUMBER,
+  X_ELEMENT_TYPE_ID in NUMBER,
+  X_GL_CODE_COMBINATION_ID in NUMBER,
+  X_PROJECT_ID in NUMBER,
+  X_EXPENDITURE_ORGANIZATION_ID in NUMBER,
+  X_EXPENDITURE_TYPE in VARCHAR2,
+  X_TASK_ID in NUMBER,
+  X_AWARD_ID in NUMBER,
+  X_TOTAL_AMOUNT in NUMBER,
+  X_MODE in VARCHAR2 default 'R'
+  ) is
+    X_LAST_UPDATE_DATE DATE;
+    X_LAST_UPDATED_BY NUMBER;
+    X_LAST_UPDATE_LOGIN NUMBER;
+begin
+  X_LAST_UPDATE_DATE := SYSDATE;
+  if(X_MODE = 'I') then
+    X_LAST_UPDATED_BY := 1;
+    X_LAST_UPDATE_LOGIN := 0;
+  elsif (X_MODE = 'R') then
+    X_LAST_UPDATED_BY := FND_GLOBAL.USER_ID;
+    if X_LAST_UPDATED_BY is NULL then
+      X_LAST_UPDATED_BY := -1;
+    end if;
+    X_LAST_UPDATE_LOGIN :=FND_GLOBAL.LOGIN_ID;
+    if X_LAST_UPDATE_LOGIN is NULL then
+      X_LAST_UPDATE_LOGIN := -1;
+    end if;
+  else
+    FND_MESSAGE.SET_NAME('FND', 'SYSTEM-INVALID ARGS');
+    app_exception.raise_exception;
+  end if;
+  update PSP_EFFORT_REPORT_DETAILS set
+    ASSIGNMENT_ID = X_ASSIGNMENT_ID,
+    ELEMENT_TYPE_ID = X_ELEMENT_TYPE_ID,
+    GL_CODE_COMBINATION_ID = X_GL_CODE_COMBINATION_ID,
+    PROJECT_ID = X_PROJECT_ID,
+    EXPENDITURE_ORGANIZATION_ID = X_EXPENDITURE_ORGANIZATION_ID,
+    EXPENDITURE_TYPE = X_EXPENDITURE_TYPE,
+    TASK_ID = X_TASK_ID,
+    AWARD_ID = X_AWARD_ID,
+    TOTAL_AMOUNT = X_TOTAL_AMOUNT,
+    LAST_UPDATE_DATE = X_LAST_UPDATE_DATE,
+    LAST_UPDATED_BY = X_LAST_UPDATED_BY,
+    LAST_UPDATE_LOGIN = X_LAST_UPDATE_LOGIN
+  where EFFORT_REPORT_ID = X_EFFORT_REPORT_ID
+  and VERSION_NUM = X_VERSION_NUM
+  and EFFORT_REPORT_LINE_NUM = X_EFFORT_REPORT_LINE_NUM
+  ;
+  ---if (sql%notfound) then
+    ---raise no_data_found;
+  ---end if;
+end UPDATE_ROW;
+
+procedure ADD_ROW (
+  X_ROWID in out NOCOPY VARCHAR2,
+  X_EFFORT_REPORT_ID in NUMBER,
+  X_VERSION_NUM in NUMBER,
+  X_EFFORT_REPORT_LINE_NUM in NUMBER,
+  X_ASSIGNMENT_ID in NUMBER,
+  X_ELEMENT_TYPE_ID in NUMBER,
+  X_GL_CODE_COMBINATION_ID in NUMBER,
+  X_PROJECT_ID in NUMBER,
+  X_EXPENDITURE_ORGANIZATION_ID in NUMBER,
+  X_EXPENDITURE_TYPE in VARCHAR2,
+  X_TASK_ID in NUMBER,
+  X_AWARD_ID in NUMBER,
+  X_TOTAL_AMOUNT in NUMBER,
+  X_MODE in VARCHAR2 default 'R'
+  ) is
+  cursor c1 is select rowid from PSP_EFFORT_REPORT_DETAILS
+     where EFFORT_REPORT_ID = X_EFFORT_REPORT_ID
+     and VERSION_NUM = X_VERSION_NUM
+     and EFFORT_REPORT_LINE_NUM = X_EFFORT_REPORT_LINE_NUM
+  ;
+  dummy c1%rowtype;
+begin
+  open c1;
+  fetch c1 into dummy;
+  if (c1%notfound) then
+    close c1;
+    INSERT_ROW (
+     X_ROWID,
+     X_EFFORT_REPORT_ID,
+     X_VERSION_NUM,
+     X_EFFORT_REPORT_LINE_NUM,
+     X_ASSIGNMENT_ID,
+     X_ELEMENT_TYPE_ID,
+     X_GL_CODE_COMBINATION_ID,
+     X_PROJECT_ID,
+     X_EXPENDITURE_ORGANIZATION_ID,
+     X_EXPENDITURE_TYPE,
+     X_TASK_ID,
+     X_AWARD_ID,
+     X_TOTAL_AMOUNT,
+     X_MODE);
+    return;
+  end if;
+  close c1;
+  UPDATE_ROW (
+   X_EFFORT_REPORT_ID,
+   X_VERSION_NUM,
+   X_EFFORT_REPORT_LINE_NUM,
+   X_ASSIGNMENT_ID,
+   X_ELEMENT_TYPE_ID,
+   X_GL_CODE_COMBINATION_ID,
+   X_PROJECT_ID,
+   X_EXPENDITURE_ORGANIZATION_ID,
+   X_EXPENDITURE_TYPE,
+   X_TASK_ID,
+   X_AWARD_ID,
+   X_TOTAL_AMOUNT,
+   X_MODE);
+end ADD_ROW;
+
+procedure DELETE_ROW (
+  X_EFFORT_REPORT_ID in NUMBER,
+  X_VERSION_NUM in NUMBER,
+  X_EFFORT_REPORT_LINE_NUM in NUMBER
+) is
+begin
+  delete from PSP_EFFORT_REPORT_DETAILS
+  where EFFORT_REPORT_ID = X_EFFORT_REPORT_ID
+  and VERSION_NUM = X_VERSION_NUM
+  and EFFORT_REPORT_LINE_NUM = X_EFFORT_REPORT_LINE_NUM;
+  ---if (sql%notfound) then
+    ---raise no_data_found;
+  ---end if;
+end DELETE_ROW;
+
+end PSP_EFFORT_REPORT_DETAILS_PKG;
+
+/

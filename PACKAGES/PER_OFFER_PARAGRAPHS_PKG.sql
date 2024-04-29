@@ -1,0 +1,43 @@
+--------------------------------------------------------
+--  DDL for Package PER_OFFER_PARAGRAPHS_PKG
+--------------------------------------------------------
+
+  CREATE OR REPLACE EDITIONABLE PACKAGE "APPS"."PER_OFFER_PARAGRAPHS_PKG" AUTHID CURRENT_USER as
+/* $Header: hrltrlct.pkh 115.0 99/08/05 04:02:17 porting  $ */
+procedure INSERT_ROW (
+  X_PARAGRAPH_NO in VARCHAR2,
+  X_BODY_TEXT    in VARCHAR2,
+  X_CREATION_DATE in DATE,
+  X_CREATED_BY in VARCHAR2,
+  X_LAST_UPDATE_DATE in DATE,
+  X_LAST_UPDATED_BY in VARCHAR2,
+  X_LAST_UPDATE_LOGIN in NUMBER
+);
+procedure LOCK_ROW (
+  X_PARAGRAPH_NO in VARCHAR2
+);
+procedure UPDATE_ROW (
+  X_PARAGRAPH_NO in VARCHAR2,
+  X_BODY_TEXT    in VARCHAR2,
+  X_LAST_UPDATE_DATE in DATE,
+  X_LAST_UPDATED_BY in VARCHAR2,
+  X_LAST_UPDATE_LOGIN in NUMBER
+);
+procedure DELETE_ROW (
+  X_PARAGRAPH_NO in VARCHAR2
+);
+procedure LOAD_ROW (
+  X_PARAGRAPH_NO in VARCHAR2,
+  X_BODY_TEXT    in VARCHAR2,
+  X_OWNER in VARCHAR2
+);
+procedure TRANSLATE_ROW (
+  X_PARAGRAPH_NO in VARCHAR2,
+  X_BODY_TEXT    in VARCHAR2,
+  X_OWNER in VARCHAR2
+);
+end PER_OFFER_PARAGRAPHS_PKG;
+
+ 
+
+/

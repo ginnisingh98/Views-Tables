@@ -1,0 +1,430 @@
+--------------------------------------------------------
+--  DDL for Package Body OKE_COMM_ACTIONS_PKG
+--------------------------------------------------------
+
+  CREATE OR REPLACE EDITIONABLE PACKAGE BODY "APPS"."OKE_COMM_ACTIONS_PKG" as
+/* $Header: OKEOCAXB.pls 115.5 2002/11/21 23:04:07 ybchen ship $ */
+procedure INSERT_ROW (
+  X_ROWID 			in out NOCOPY VARCHAR2
+, X_COMM_ACTION_CODE 		in 	VARCHAR2
+, X_CREATION_DATE 		in 	DATE
+, X_CREATED_BY 			in 	NUMBER
+, X_LAST_UPDATE_DATE 		in 	DATE
+, X_LAST_UPDATED_BY 		in 	NUMBER
+, X_LAST_UPDATE_LOGIN 		in 	NUMBER
+, X_COMM_ACTION_NAME 		in 	VARCHAR2
+, X_OWNER_ID 			in 	NUMBER
+, X_WF_ITEM_TYPE		in 	VARCHAR2
+, X_WF_PROCESS  		in 	VARCHAR2
+, X_DESCRIPTION 		in 	VARCHAR2
+, X_START_DATE_ACTIVE 		in 	DATE
+, X_END_DATE_ACTIVE   		in 	DATE
+, X_ATTRIBUTE_CATEGORY 		in 	VARCHAR2
+, X_ATTRIBUTE1 			in 	VARCHAR2
+, X_ATTRIBUTE2 			in 	VARCHAR2
+, X_ATTRIBUTE3 			in 	VARCHAR2
+, X_ATTRIBUTE4 			in 	VARCHAR2
+, X_ATTRIBUTE5 			in 	VARCHAR2
+, X_ATTRIBUTE6 			in 	VARCHAR2
+, X_ATTRIBUTE7 			in 	VARCHAR2
+, X_ATTRIBUTE8 			in 	VARCHAR2
+, X_ATTRIBUTE9 			in 	VARCHAR2
+, X_ATTRIBUTE10 		in 	VARCHAR2
+, X_ATTRIBUTE11 		in 	VARCHAR2
+, X_ATTRIBUTE12 		in 	VARCHAR2
+, X_ATTRIBUTE13 		in 	VARCHAR2
+, X_ATTRIBUTE14 		in 	VARCHAR2
+, X_ATTRIBUTE15 		in 	VARCHAR2
+) is
+  cursor C is select ROWID from OKE_COMM_ACTIONS_B
+    where COMM_ACTION_CODE = X_COMM_ACTION_CODE
+    ;
+begin
+  insert into OKE_COMM_ACTIONS_B (
+  COMM_ACTION_CODE
+, CREATION_DATE
+, CREATED_BY
+, LAST_UPDATE_DATE
+, LAST_UPDATED_BY
+, LAST_UPDATE_LOGIN
+, OWNER_ID
+, WF_ITEM_TYPE
+, WF_PROCESS
+, START_DATE_ACTIVE
+, END_DATE_ACTIVE
+, ATTRIBUTE_CATEGORY
+, ATTRIBUTE1
+, ATTRIBUTE2
+, ATTRIBUTE3
+, ATTRIBUTE4
+, ATTRIBUTE5
+, ATTRIBUTE6
+, ATTRIBUTE7
+, ATTRIBUTE8
+, ATTRIBUTE9
+, ATTRIBUTE10
+, ATTRIBUTE11
+, ATTRIBUTE12
+, ATTRIBUTE13
+, ATTRIBUTE14
+, ATTRIBUTE15
+  ) values (
+  X_COMM_ACTION_CODE
+, X_CREATION_DATE
+, X_CREATED_BY
+, X_LAST_UPDATE_DATE
+, X_LAST_UPDATED_BY
+, X_LAST_UPDATE_LOGIN
+, X_OWNER_ID
+, X_WF_ITEM_TYPE
+, X_WF_PROCESS
+, X_START_DATE_ACTIVE
+, X_END_DATE_ACTIVE
+, X_ATTRIBUTE_CATEGORY
+, X_ATTRIBUTE1
+, X_ATTRIBUTE2
+, X_ATTRIBUTE3
+, X_ATTRIBUTE4
+, X_ATTRIBUTE5
+, X_ATTRIBUTE6
+, X_ATTRIBUTE7
+, X_ATTRIBUTE8
+, X_ATTRIBUTE9
+, X_ATTRIBUTE10
+, X_ATTRIBUTE11
+, X_ATTRIBUTE12
+, X_ATTRIBUTE13
+, X_ATTRIBUTE14
+, X_ATTRIBUTE15
+);
+
+  insert into OKE_COMM_ACTIONS_TL (
+  COMM_ACTION_CODE
+, LANGUAGE
+, CREATION_DATE
+, CREATED_BY
+, LAST_UPDATE_DATE
+, LAST_UPDATED_BY
+, LAST_UPDATE_LOGIN
+, COMM_ACTION_NAME
+, DESCRIPTION
+, SOURCE_LANG
+  ) select
+  X_COMM_ACTION_CODE
+, L.LANGUAGE_CODE
+, X_CREATION_DATE
+, X_CREATED_BY
+, X_LAST_UPDATE_DATE
+, X_LAST_UPDATED_BY
+, X_LAST_UPDATE_LOGIN
+, X_COMM_ACTION_NAME
+, X_DESCRIPTION
+, userenv('LANG')
+  from FND_LANGUAGES L
+ where L.INSTALLED_FLAG in ('I', 'B')
+   and not exists
+    (select NULL
+    from OKE_COMM_ACTIONS_TL T
+   where T.COMM_ACTION_CODE = X_COMM_ACTION_CODE
+     and T.LANGUAGE = L.LANGUAGE_CODE)
+;
+
+  open c;
+  fetch c into X_ROWID;
+  if (c%notfound) then
+    close c;
+    raise no_data_found;
+  end if;
+  close c;
+
+end INSERT_ROW;
+
+procedure LOCK_ROW (
+  X_COMM_ACTION_CODE		in 	VARCHAR2
+, X_COMM_ACTION_NAME 		in 	VARCHAR2
+, X_OWNER_ID 			in 	NUMBER
+, X_WF_ITEM_TYPE		in 	VARCHAR2
+, X_WF_PROCESS  		in 	VARCHAR2
+, X_DESCRIPTION 		in 	VARCHAR2
+, X_START_DATE_ACTIVE 		in 	DATE
+, X_END_DATE_ACTIVE   		in 	DATE
+, X_ATTRIBUTE_CATEGORY 		in 	VARCHAR2
+, X_ATTRIBUTE1 			in 	VARCHAR2
+, X_ATTRIBUTE2 			in 	VARCHAR2
+, X_ATTRIBUTE3 			in 	VARCHAR2
+, X_ATTRIBUTE4 			in 	VARCHAR2
+, X_ATTRIBUTE5 			in 	VARCHAR2
+, X_ATTRIBUTE6 			in 	VARCHAR2
+, X_ATTRIBUTE7 			in 	VARCHAR2
+, X_ATTRIBUTE8 			in 	VARCHAR2
+, X_ATTRIBUTE9 			in 	VARCHAR2
+, X_ATTRIBUTE10 		in 	VARCHAR2
+, X_ATTRIBUTE11 		in 	VARCHAR2
+, X_ATTRIBUTE12 		in 	VARCHAR2
+, X_ATTRIBUTE13 		in 	VARCHAR2
+, X_ATTRIBUTE14 		in 	VARCHAR2
+, X_ATTRIBUTE15 		in 	VARCHAR2
+) is
+  cursor c is select
+       COMM_ACTION_CODE
+     , OWNER_ID
+     , WF_ITEM_TYPE
+     , WF_PROCESS
+     , START_DATE_ACTIVE
+     , END_DATE_ACTIVE
+     , ATTRIBUTE_CATEGORY
+     , ATTRIBUTE1
+     , ATTRIBUTE2
+     , ATTRIBUTE3
+     , ATTRIBUTE4
+     , ATTRIBUTE5
+     , ATTRIBUTE6
+     , ATTRIBUTE7
+     , ATTRIBUTE8
+     , ATTRIBUTE9
+     , ATTRIBUTE10
+     , ATTRIBUTE11
+     , ATTRIBUTE12
+     , ATTRIBUTE13
+     , ATTRIBUTE14
+     , ATTRIBUTE15
+    from OKE_COMM_ACTIONS_B
+    where COMM_ACTION_CODE = X_COMM_ACTION_CODE
+    for update of COMM_ACTION_CODE nowait;
+  recinfo c%rowtype;
+
+  cursor c1 is select
+      COMM_ACTION_NAME
+     ,DESCRIPTION
+     ,decode(LANGUAGE, userenv('LANG'), 'Y', 'N') BASELANG
+    from OKE_COMM_ACTIONS_TL
+    where COMM_ACTION_CODE= X_COMM_ACTION_CODE
+    and userenv('LANG') in (LANGUAGE, SOURCE_LANG)
+    for update of COMM_ACTION_CODE nowait;
+  tlinfo c1%rowtype;
+
+begin
+  open c;
+  fetch c into recinfo;
+  if (c%notfound) then
+    close c;
+    fnd_message.set_name('FND', 'FORM_RECORD_DELETED');
+    app_exception.raise_exception;
+  end if;
+  close c;
+
+  if (    (recinfo.COMM_ACTION_CODE = X_COMM_ACTION_CODE)
+      AND ((recinfo.OWNER_ID = X_OWNER_ID)
+           OR ((recinfo.OWNER_ID is null) AND (X_OWNER_ID is null)))
+      AND ((recinfo.WF_ITEM_TYPE = X_WF_ITEM_TYPE)
+           OR ((recinfo.WF_ITEM_TYPE is null) AND (X_WF_ITEM_TYPE is null)))
+      AND ((recinfo.WF_PROCESS = X_WF_PROCESS)
+           OR ((recinfo.WF_PROCESS is null) AND (X_WF_PROCESS is null)))
+      AND ((recinfo.START_DATE_ACTIVE = X_START_DATE_ACTIVE)
+           OR ((recinfo.START_DATE_ACTIVE is null) AND (X_START_DATE_ACTIVE is null)))
+      AND ((recinfo.END_DATE_ACTIVE = X_END_DATE_ACTIVE)
+           OR ((recinfo.END_DATE_ACTIVE is null) AND (X_END_DATE_ACTIVE is null)))
+      AND ((recinfo.ATTRIBUTE_CATEGORY = X_ATTRIBUTE_CATEGORY)
+           OR ((recinfo.ATTRIBUTE_CATEGORY is null) AND (X_ATTRIBUTE_CATEGORY is null)))
+      AND ((recinfo.ATTRIBUTE1 = X_ATTRIBUTE1)
+           OR ((recinfo.ATTRIBUTE1 is null) AND (X_ATTRIBUTE1 is null)))
+      AND ((recinfo.ATTRIBUTE2 = X_ATTRIBUTE2)
+           OR ((recinfo.ATTRIBUTE2 is null) AND (X_ATTRIBUTE2 is null)))
+      AND ((recinfo.ATTRIBUTE3 = X_ATTRIBUTE3)
+           OR ((recinfo.ATTRIBUTE3 is null) AND (X_ATTRIBUTE3 is null)))
+      AND ((recinfo.ATTRIBUTE4 = X_ATTRIBUTE4)
+           OR ((recinfo.ATTRIBUTE4 is null) AND (X_ATTRIBUTE4 is null)))
+      AND ((recinfo.ATTRIBUTE5 = X_ATTRIBUTE5)
+           OR ((recinfo.ATTRIBUTE5 is null) AND (X_ATTRIBUTE5 is null)))
+      AND ((recinfo.ATTRIBUTE6 = X_ATTRIBUTE6)
+           OR ((recinfo.ATTRIBUTE6 is null) AND (X_ATTRIBUTE6 is null)))
+      AND ((recinfo.ATTRIBUTE7 = X_ATTRIBUTE7)
+           OR ((recinfo.ATTRIBUTE7 is null) AND (X_ATTRIBUTE7 is null)))
+      AND ((recinfo.ATTRIBUTE8 = X_ATTRIBUTE8)
+           OR ((recinfo.ATTRIBUTE8 is null) AND (X_ATTRIBUTE8 is null)))
+      AND ((recinfo.ATTRIBUTE9 = X_ATTRIBUTE9)
+           OR ((recinfo.ATTRIBUTE9 is null) AND (X_ATTRIBUTE9 is null)))
+      AND ((recinfo.ATTRIBUTE10 = X_ATTRIBUTE10)
+           OR ((recinfo.ATTRIBUTE10 is null) AND (X_ATTRIBUTE10 is null)))
+      AND ((recinfo.ATTRIBUTE11 = X_ATTRIBUTE11)
+           OR ((recinfo.ATTRIBUTE11 is null) AND (X_ATTRIBUTE11 is null)))
+      AND ((recinfo.ATTRIBUTE12 = X_ATTRIBUTE12)
+           OR ((recinfo.ATTRIBUTE12 is null) AND (X_ATTRIBUTE12 is null)))
+      AND ((recinfo.ATTRIBUTE13 = X_ATTRIBUTE13)
+           OR ((recinfo.ATTRIBUTE13 is null) AND (X_ATTRIBUTE13 is null)))
+      AND ((recinfo.ATTRIBUTE14 = X_ATTRIBUTE14)
+           OR ((recinfo.ATTRIBUTE14 is null) AND (X_ATTRIBUTE14 is null)))
+      AND ((recinfo.ATTRIBUTE15 = X_ATTRIBUTE15)
+           OR ((recinfo.ATTRIBUTE15 is null) AND (X_ATTRIBUTE15 is null)))
+  ) then
+    null;
+  else
+    fnd_message.set_name('FND', 'FORM_RECORD_CHANGED');
+    app_exception.raise_exception;
+  end if;
+
+  for tlinfo in c1 loop
+    if (tlinfo.BASELANG = 'Y') then
+      if (    ((tlinfo.COMM_ACTION_NAME = X_COMM_ACTION_NAME)
+               OR ((tlinfo.COMM_ACTION_NAME is null) AND (X_COMM_ACTION_NAME is null)))
+          AND ((tlinfo.DESCRIPTION = X_DESCRIPTION)
+               OR ((tlinfo.DESCRIPTION is null) AND (X_DESCRIPTION is null)))
+      ) then
+        null;
+      else
+        fnd_message.set_name('FND', 'FORM_RECORD_CHANGED');
+        app_exception.raise_exception;
+      end if;
+    end if;
+  end loop;
+
+  return;
+end LOCK_ROW;
+
+procedure UPDATE_ROW (
+  X_COMM_ACTION_CODE 		in 	VARCHAR2
+, X_LAST_UPDATE_DATE 		in 	DATE
+, X_LAST_UPDATED_BY 		in 	NUMBER
+, X_LAST_UPDATE_LOGIN 		in 	NUMBER
+, X_COMM_ACTION_NAME 		in 	VARCHAR2
+, X_OWNER_ID 			in 	NUMBER
+, X_WF_ITEM_TYPE		in 	VARCHAR2
+, X_WF_PROCESS  		in 	VARCHAR2
+, X_DESCRIPTION 		in 	VARCHAR2
+, X_START_DATE_ACTIVE 		in 	DATE
+, X_END_DATE_ACTIVE   		in 	DATE
+, X_ATTRIBUTE_CATEGORY 		in 	VARCHAR2
+, X_ATTRIBUTE1 			in 	VARCHAR2
+, X_ATTRIBUTE2 			in 	VARCHAR2
+, X_ATTRIBUTE3 			in 	VARCHAR2
+, X_ATTRIBUTE4 			in 	VARCHAR2
+, X_ATTRIBUTE5 			in 	VARCHAR2
+, X_ATTRIBUTE6 			in 	VARCHAR2
+, X_ATTRIBUTE7 			in 	VARCHAR2
+, X_ATTRIBUTE8 			in 	VARCHAR2
+, X_ATTRIBUTE9 			in 	VARCHAR2
+, X_ATTRIBUTE10 		in 	VARCHAR2
+, X_ATTRIBUTE11 		in 	VARCHAR2
+, X_ATTRIBUTE12 		in 	VARCHAR2
+, X_ATTRIBUTE13 		in 	VARCHAR2
+, X_ATTRIBUTE14 		in 	VARCHAR2
+, X_ATTRIBUTE15 		in 	VARCHAR2
+) is
+begin
+  update OKE_COMM_ACTIONS_B set
+  LAST_UPDATE_DATE      	= X_LAST_UPDATE_DATE
+, LAST_UPDATED_BY 		= X_LAST_UPDATED_BY
+, LAST_UPDATE_LOGIN   		= X_LAST_UPDATE_LOGIN
+, OWNER_ID 			= X_OWNER_ID
+, WF_ITEM_TYPE			= X_WF_ITEM_TYPE
+, WF_PROCESS  			= X_WF_PROCESS
+, START_DATE_ACTIVE 		= X_START_DATE_ACTIVE
+, END_DATE_ACTIVE   		= X_END_DATE_ACTIVE
+, ATTRIBUTE_CATEGORY		= X_ATTRIBUTE_CATEGORY
+, ATTRIBUTE1            	= X_ATTRIBUTE1
+, ATTRIBUTE2			= X_ATTRIBUTE2
+, ATTRIBUTE3    		= X_ATTRIBUTE3
+, ATTRIBUTE4        		= X_ATTRIBUTE4
+, ATTRIBUTE5            	= X_ATTRIBUTE5
+, ATTRIBUTE6			= X_ATTRIBUTE6
+, ATTRIBUTE7    		= X_ATTRIBUTE7
+, ATTRIBUTE8        		= X_ATTRIBUTE8
+, ATTRIBUTE9            	= X_ATTRIBUTE9
+, ATTRIBUTE10           	= X_ATTRIBUTE10
+, ATTRIBUTE11			= X_ATTRIBUTE11
+, ATTRIBUTE12    		= X_ATTRIBUTE12
+, ATTRIBUTE13        		= X_ATTRIBUTE13
+, ATTRIBUTE14           	= X_ATTRIBUTE14
+, ATTRIBUTE15           	= X_ATTRIBUTE15
+where COMM_ACTION_CODE 		= X_COMM_ACTION_CODE
+;
+
+  if (sql%notfound) then
+    raise no_data_found;
+  end if;
+
+  update OKE_COMM_ACTIONS_TL set
+  LAST_UPDATE_DATE      = X_LAST_UPDATE_DATE
+, LAST_UPDATED_BY 	= X_LAST_UPDATED_BY
+, LAST_UPDATE_LOGIN   	= X_LAST_UPDATE_LOGIN
+, COMM_ACTION_NAME 	= X_COMM_ACTION_NAME
+, DESCRIPTION       	= X_DESCRIPTION
+, SOURCE_LANG 		= userenv('LANG')
+where COMM_ACTION_CODE= X_COMM_ACTION_CODE
+  and userenv('LANG') in (LANGUAGE, SOURCE_LANG)
+;
+
+  if (sql%notfound) then
+    raise no_data_found;
+  end if;
+end UPDATE_ROW;
+
+procedure ADD_LANGUAGE
+is
+begin
+  delete from OKE_COMM_ACTIONS_TL T
+  where not exists
+    (select NULL
+    from OKE_COMM_ACTIONS_B B
+    where B.COMM_ACTION_CODE = T.COMM_ACTION_CODE
+    );
+
+  update OKE_COMM_ACTIONS_TL T set (
+      COMM_ACTION_NAME,
+      DESCRIPTION
+    ) = (select
+      B.COMM_ACTION_NAME,
+      B.DESCRIPTION
+    from OKE_COMM_ACTIONS_TL B
+    where B.COMM_ACTION_CODE = T.COMM_ACTION_CODE
+    and B.LANGUAGE = T.SOURCE_LANG)
+  where (
+      T.COMM_ACTION_CODE,
+      T.LANGUAGE
+  ) in (select
+      SUBT.COMM_ACTION_CODE,
+      SUBT.LANGUAGE
+    from OKE_COMM_ACTIONS_TL SUBB, OKE_COMM_ACTIONS_TL SUBT
+    where SUBB.COMM_ACTION_CODE = SUBT.COMM_ACTION_CODE
+    and SUBB.LANGUAGE = SUBT.SOURCE_LANG
+    and (SUBB.COMM_ACTION_NAME <> SUBT.COMM_ACTION_NAME
+      or SUBB.DESCRIPTION <> SUBT.DESCRIPTION
+      or (SUBB.DESCRIPTION is null and SUBT.DESCRIPTION is not null)
+      or (SUBB.DESCRIPTION is not null and SUBT.DESCRIPTION is null)
+  ));
+
+  insert into OKE_COMM_ACTIONS_TL (
+    LAST_UPDATED_BY,
+    LAST_UPDATE_LOGIN,
+    COMM_ACTION_NAME,
+    DESCRIPTION,
+    LAST_UPDATE_DATE,
+    COMM_ACTION_CODE,
+    CREATION_DATE,
+    CREATED_BY,
+    LANGUAGE,
+    SOURCE_LANG
+  ) select
+    B.LAST_UPDATED_BY,
+    B.LAST_UPDATE_LOGIN,
+    B.COMM_ACTION_NAME,
+    B.DESCRIPTION,
+    B.LAST_UPDATE_DATE,
+    B.COMM_ACTION_CODE,
+    B.CREATION_DATE,
+    B.CREATED_BY,
+    L.LANGUAGE_CODE,
+    B.SOURCE_LANG
+  from OKE_COMM_ACTIONS_TL B, FND_LANGUAGES L
+  where L.INSTALLED_FLAG in ('I', 'B')
+  and B.LANGUAGE = userenv('LANG')
+  and not exists
+    (select NULL
+    from OKE_COMM_ACTIONS_TL T
+    where T.COMM_ACTION_CODE = B.COMM_ACTION_CODE
+    and T.LANGUAGE = L.LANGUAGE_CODE);
+end ADD_LANGUAGE;
+
+end OKE_COMM_ACTIONS_PKG;
+
+/

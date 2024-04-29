@@ -1,0 +1,38 @@
+--------------------------------------------------------
+--  DDL for Package BSC_SYS_DIM_GROUPS_PKG
+--------------------------------------------------------
+
+  CREATE OR REPLACE EDITIONABLE PACKAGE "APPS"."BSC_SYS_DIM_GROUPS_PKG" AUTHID CURRENT_USER as
+/* $Header: BSCSDMGS.pls 120.0 2005/06/01 16:50:48 appldev noship $ */
+procedure INSERT_ROW (
+  X_ROWID in out NOCOPY VARCHAR2,
+  X_DIM_GROUP_ID in NUMBER,
+  X_SHORT_NAME in VARCHAR2,
+  X_NAME in VARCHAR2,
+  X_CREATION_DATE in DATE,
+  X_CREATED_BY in NUMBER,
+  X_LAST_UPDATE_DATE in DATE,
+  X_LAST_UPDATED_BY in NUMBER,
+  X_LAST_UPDATE_LOGIN in NUMBER);
+procedure LOCK_ROW (
+  X_DIM_GROUP_ID in NUMBER,
+  X_NAME in VARCHAR2
+);
+procedure UPDATE_ROW (
+  X_DIM_GROUP_ID in NUMBER,
+  X_NAME in VARCHAR2,
+  X_CREATION_DATE in DATE,
+  X_CREATED_BY in NUMBER,
+  X_LAST_UPDATE_DATE in DATE,
+  X_LAST_UPDATED_BY in NUMBER,
+  X_LAST_UPDATE_LOGIN in NUMBER
+);
+procedure DELETE_ROW (
+  X_DIM_GROUP_ID in NUMBER
+);
+procedure ADD_LANGUAGE;
+end BSC_SYS_DIM_GROUPS_PKG;
+
+ 
+
+/

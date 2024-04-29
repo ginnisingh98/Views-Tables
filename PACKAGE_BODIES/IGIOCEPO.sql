@@ -1,0 +1,32 @@
+--------------------------------------------------------
+--  DDL for Package Body IGIOCEPO
+--------------------------------------------------------
+
+  CREATE OR REPLACE EDITIONABLE PACKAGE BODY "APPS"."IGIOCEPO" 
+-- $Header: igicecbb.pls 115.10 2003/05/08 15:54:41 nkazi ship $
+AS
+    PROCEDURE PO_DISTRIBUTION_SPREAD(
+	P_PO_HEADER_ID	PO_DISTRIBUTIONS.PO_HEADER_ID%TYPE,
+	P_SOB_ID	GL_PERIOD_STATUSES.SET_OF_BOOKS_ID%TYPE
+	)  IS
+
+
+    BEGIN
+
+        NULL;
+
+    END PO_DISTRIBUTION_SPREAD;
+
+
+    PROCEDURE ROUND_DISTRIBUTIONS(PARAM_HEADER_ID  PO_DISTRIBUTIONS.PO_HEADER_ID%TYPE )
+    IS
+
+    BEGIN
+
+        NULL;
+
+    END ROUND_DISTRIBUTIONS;
+
+END IGIOCEPO;
+
+/

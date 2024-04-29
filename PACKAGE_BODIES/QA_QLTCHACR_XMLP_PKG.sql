@@ -1,0 +1,47 @@
+--------------------------------------------------------
+--  DDL for Package Body QA_QLTCHACR_XMLP_PKG
+--------------------------------------------------------
+
+  CREATE OR REPLACE EDITIONABLE PACKAGE BODY "APPS"."QA_QLTCHACR_XMLP_PKG" AS
+/* $Header: QLTCHACRB.pls 120.0 2007/12/24 10:31:44 krreddy noship $ */
+  FUNCTION AFTERPFORM RETURN BOOLEAN IS
+  BEGIN
+    IF (P_CHAR_NAME IS NOT NULL) THEN
+      SELECT
+        NAME
+      INTO P_CHAR_NAME
+      FROM
+        QA_CHARS
+      WHERE CHAR_ID = P_CHAR_NAME;
+      P_CHAR_LIMITER := 'and  qcatv.char_name = ''' || P_CHAR_NAME || '''';
+    END IF;
+    IF (P_ENABLED IS NOT NULL) THEN
+      P_ENABLED_LIMITER := 'and ml.lookup_code = ''' || P_ENABLED || '''';
+      SELECT
+        MEANING
+      INTO P_ENABLED_MEANING
+      FROM
+        MFG_LOOKUPS
+      WHERE LOOKUP_CODE = P_ENABLED
+        AND LOOKUP_TYPE = 'SYS_YES_NO';
+    END IF;
+    RETURN (TRUE);
+  END AFTERPFORM;
+
+  FUNCTION BEFOREREPORT RETURN BOOLEAN IS
+  BEGIN
+    P_CONC_REQUEST_ID := FND_GLOBAL.CONC_REQUEST_ID;
+    /*SRW.USER_EXIT('FND SRWINIT')*/NULL;
+    RETURN (TRUE);
+  END BEFOREREPORT;
+
+  FUNCTION AFTERREPORT RETURN BOOLEAN IS
+  BEGIN
+    /*SRW.USER_EXIT('FND SRWEXIT')*/NULL;
+    RETURN (TRUE);
+  END AFTERREPORT;
+
+END QA_QLTCHACR_XMLP_PKG;
+
+
+/

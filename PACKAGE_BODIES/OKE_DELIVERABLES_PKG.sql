@@ -1,0 +1,523 @@
+--------------------------------------------------------
+--  DDL for Package Body OKE_DELIVERABLES_PKG
+--------------------------------------------------------
+
+  CREATE OR REPLACE EDITIONABLE PACKAGE BODY "APPS"."OKE_DELIVERABLES_PKG" as
+/* $Header: OKEKDTSB.pls 120.1 2005/12/21 12:07:16 ausmani noship $ */
+
+procedure INSERT_ROW (
+  X_ROWID in out NOCOPY VARCHAR2,
+  X_DELIVERABLE_ID in NUMBER,
+  X_DELIVERABLE_NUMBER in VARCHAR2,
+  X_SOURCE_CODE in VARCHAR2,
+  X_UNIT_PRICE in NUMBER,
+  X_UOM_CODE in VARCHAR2,
+  X_QUANTITY in NUMBER,
+  X_UNIT_NUMBER in VARCHAR2,
+  X_ATTRIBUTE_CATEGORY in VARCHAR2,
+  X_ATTRIBUTE1 in VARCHAR2,
+  X_ATTRIBUTE2 in VARCHAR2,
+  X_ATTRIBUTE3 in VARCHAR2,
+  X_ATTRIBUTE4 in VARCHAR2,
+  X_ATTRIBUTE5 in VARCHAR2,
+  X_ATTRIBUTE6 in VARCHAR2,
+  X_ATTRIBUTE7 in VARCHAR2,
+  X_ATTRIBUTE8 in VARCHAR2,
+  X_ATTRIBUTE9 in VARCHAR2,
+  X_ATTRIBUTE10 in VARCHAR2,
+  X_ATTRIBUTE11 in VARCHAR2,
+  X_ATTRIBUTE12 in VARCHAR2,
+  X_ATTRIBUTE13 in VARCHAR2,
+  X_ATTRIBUTE14 in VARCHAR2,
+  X_ATTRIBUTE15 in VARCHAR2,
+  X_SOURCE_HEADER_ID in NUMBER,
+  X_SOURCE_LINE_ID in NUMBER,
+  X_SOURCE_DELIVERABLE_ID in NUMBER,
+  X_PROJECT_ID in NUMBER,
+  X_CURRENCY_CODE in VARCHAR2,
+  X_INVENTORY_ORG_ID in NUMBER,
+  X_DELIVERY_DATE in DATE,
+  X_ITEM_ID in NUMBER,
+  X_DESCRIPTION in VARCHAR2,
+  X_COMMENTS in VARCHAR2,
+  X_CREATION_DATE in DATE,
+  X_CREATED_BY in NUMBER,
+  X_LAST_UPDATE_DATE in DATE,
+  X_LAST_UPDATED_BY in NUMBER,
+  X_LAST_UPDATE_LOGIN in NUMBER
+ ) is
+  cursor C is select ROWID from OKE_DELIVERABLES_B
+    where DELIVERABLE_ID = X_DELIVERABLE_ID
+    ;
+begin
+  insert into OKE_DELIVERABLES_B (
+    CURRENCY_CODE,
+    UNIT_PRICE,
+    UNIT_NUMBER,
+    UOM_CODE,
+    QUANTITY,
+    DELIVERABLE_ID,
+    DELIVERABLE_NUMBER,
+    PROJECT_ID,
+    ITEM_ID,
+    SOURCE_HEADER_ID,
+    SOURCE_LINE_ID,
+    DELIVERY_DATE,
+    SOURCE_DELIVERABLE_ID,
+    INVENTORY_ORG_ID,
+    SOURCE_CODE,
+    ATTRIBUTE_CATEGORY,
+    ATTRIBUTE1,
+    ATTRIBUTE2,
+    ATTRIBUTE3,
+    ATTRIBUTE4,
+    ATTRIBUTE5,
+    ATTRIBUTE6,
+    ATTRIBUTE7,
+    ATTRIBUTE8,
+    ATTRIBUTE9,
+    ATTRIBUTE10,
+    ATTRIBUTE11,
+    ATTRIBUTE12,
+    ATTRIBUTE13,
+    ATTRIBUTE14,
+    ATTRIBUTE15,
+    CREATION_DATE,
+    CREATED_BY,
+    LAST_UPDATE_DATE,
+    LAST_UPDATED_BY,
+    LAST_UPDATE_LOGIN
+  ) values (
+    X_CURRENCY_CODE,
+    X_UNIT_PRICE,
+    X_UNIT_NUMBER,
+    X_UOM_CODE,
+    X_QUANTITY,
+    X_DELIVERABLE_ID,
+    X_DELIVERABLE_NUMBER,
+    X_PROJECT_ID,
+    X_ITEM_ID,
+    X_SOURCE_HEADER_ID,
+    X_SOURCE_LINE_ID,
+    X_DELIVERY_DATE,
+    X_SOURCE_DELIVERABLE_ID,
+    X_INVENTORY_ORG_ID,
+    X_SOURCE_CODE,
+    X_ATTRIBUTE_CATEGORY,
+    X_ATTRIBUTE1,
+    X_ATTRIBUTE2,
+    X_ATTRIBUTE3,
+    X_ATTRIBUTE4,
+    X_ATTRIBUTE5,
+    X_ATTRIBUTE6,
+    X_ATTRIBUTE7,
+    X_ATTRIBUTE8,
+    X_ATTRIBUTE9,
+    X_ATTRIBUTE10,
+    X_ATTRIBUTE11,
+    X_ATTRIBUTE12,
+    X_ATTRIBUTE13,
+    X_ATTRIBUTE14,
+    X_ATTRIBUTE15,
+    X_CREATION_DATE,
+    X_CREATED_BY,
+    X_LAST_UPDATE_DATE,
+    X_LAST_UPDATED_BY,
+    X_LAST_UPDATE_LOGIN
+  );
+
+  insert into OKE_DELIVERABLES_TL (
+    DELIVERABLE_ID,
+    CREATION_DATE,
+    CREATED_BY,
+    LAST_UPDATE_DATE,
+    LAST_UPDATED_BY,
+    LAST_UPDATE_LOGIN,
+    DESCRIPTION,
+    COMMENTS,
+    LANGUAGE,
+    SOURCE_LANG
+  ) select
+    X_DELIVERABLE_ID,
+    X_CREATION_DATE,
+    X_CREATED_BY,
+    X_LAST_UPDATE_DATE,
+    X_LAST_UPDATED_BY,
+    X_LAST_UPDATE_LOGIN,
+    X_DESCRIPTION,
+    X_COMMENTS,
+    L.LANGUAGE_CODE,
+    userenv('LANG')
+  from FND_LANGUAGES L
+  where L.INSTALLED_FLAG in ('I', 'B')
+  and not exists
+    (select NULL
+    from OKE_DELIVERABLES_TL T
+    where T.DELIVERABLE_ID = X_DELIVERABLE_ID
+    and T.LANGUAGE = L.LANGUAGE_CODE);
+
+  open c;
+  fetch c into X_ROWID;
+  if (c%notfound) then
+    close c;
+    raise no_data_found;
+  end if;
+  close c;
+
+end INSERT_ROW;
+
+procedure LOCK_ROW (
+  X_DELIVERABLE_ID in NUMBER,
+  X_DELIVERABLE_NUMBER in VARCHAR2,
+  X_SOURCE_CODE in VARCHAR2,
+  X_UNIT_PRICE in NUMBER,
+  X_UOM_CODE in VARCHAR2,
+  X_QUANTITY in NUMBER,
+  X_UNIT_NUMBER in VARCHAR2,
+  X_ATTRIBUTE_CATEGORY in VARCHAR2,
+  X_ATTRIBUTE1 in VARCHAR2,
+  X_ATTRIBUTE2 in VARCHAR2,
+  X_ATTRIBUTE3 in VARCHAR2,
+  X_ATTRIBUTE4 in VARCHAR2,
+  X_ATTRIBUTE5 in VARCHAR2,
+  X_ATTRIBUTE6 in VARCHAR2,
+  X_ATTRIBUTE7 in VARCHAR2,
+  X_ATTRIBUTE8 in VARCHAR2,
+  X_ATTRIBUTE9 in VARCHAR2,
+  X_ATTRIBUTE10 in VARCHAR2,
+  X_ATTRIBUTE11 in VARCHAR2,
+  X_ATTRIBUTE12 in VARCHAR2,
+  X_ATTRIBUTE13 in VARCHAR2,
+  X_ATTRIBUTE14 in VARCHAR2,
+  X_ATTRIBUTE15 in VARCHAR2,
+  X_SOURCE_HEADER_ID in NUMBER,
+  X_SOURCE_LINE_ID in NUMBER,
+  X_SOURCE_DELIVERABLE_ID in NUMBER,
+  X_PROJECT_ID in NUMBER,
+  X_CURRENCY_CODE in VARCHAR2,
+  X_INVENTORY_ORG_ID in NUMBER,
+  X_DELIVERY_DATE in DATE,
+  X_ITEM_ID in NUMBER,
+  X_DESCRIPTION in VARCHAR2,
+  X_COMMENTS in VARCHAR2
+) is
+  cursor c is select
+      CURRENCY_CODE,
+      UNIT_PRICE,
+      UOM_CODE,
+      QUANTITY,
+      UNIT_NUMBER,
+      DELIVERABLE_NUMBER,
+      PROJECT_ID,
+      ITEM_ID,
+      SOURCE_HEADER_ID,
+      SOURCE_LINE_ID,
+      DELIVERY_DATE,
+      SOURCE_DELIVERABLE_ID,
+      INVENTORY_ORG_ID,
+      SOURCE_CODE,
+      ATTRIBUTE_CATEGORY,
+      ATTRIBUTE1,
+      ATTRIBUTE2,
+      ATTRIBUTE3,
+      ATTRIBUTE4,
+      ATTRIBUTE5,
+      ATTRIBUTE6,
+      ATTRIBUTE7,
+      ATTRIBUTE8,
+      ATTRIBUTE9,
+      ATTRIBUTE10,
+      ATTRIBUTE11,
+      ATTRIBUTE12,
+      ATTRIBUTE13,
+      ATTRIBUTE14,
+      ATTRIBUTE15
+    from OKE_DELIVERABLES_B
+    where DELIVERABLE_ID = X_DELIVERABLE_ID
+    for update of DELIVERABLE_ID nowait;
+  recinfo c%rowtype;
+
+  cursor c1 is select
+      DESCRIPTION,
+      COMMENTS,
+      decode(LANGUAGE, userenv('LANG'), 'Y', 'N') BASELANG
+    from OKE_DELIVERABLES_TL
+    where DELIVERABLE_ID = X_DELIVERABLE_ID
+    and userenv('LANG') in (LANGUAGE, SOURCE_LANG)
+    for update of DELIVERABLE_ID nowait;
+begin
+  open c;
+  fetch c into recinfo;
+  if (c%notfound) then
+    close c;
+    fnd_message.set_name('FND', 'FORM_RECORD_DELETED');
+    app_exception.raise_exception;
+  end if;
+  close c;
+
+  if (    ((recinfo.CURRENCY_CODE = X_CURRENCY_CODE)
+           OR ((recinfo.CURRENCY_CODE is null) AND (X_CURRENCY_CODE is null)))
+      AND ((recinfo.UNIT_PRICE = X_UNIT_PRICE)
+           OR ((recinfo.UNIT_PRICE is null) AND (X_UNIT_PRICE is null)))
+      AND ((recinfo.UOM_CODE = X_UOM_CODE)
+           OR ((recinfo.UOM_CODE is null) AND (X_UOM_CODE is null)))
+      AND ((recinfo.UNIT_NUMBER = X_UNIT_NUMBER)
+           OR ((recinfo.UNIT_NUMBER is null) AND (X_UNIT_NUMBER is null)))
+      AND ((recinfo.QUANTITY = X_QUANTITY)
+           OR ((recinfo.QUANTITY is null) AND (X_QUANTITY is null)))
+      AND ((recinfo.ATTRIBUTE_CATEGORY = X_ATTRIBUTE_CATEGORY)
+           OR ((recinfo.ATTRIBUTE_CATEGORY is null) AND (X_ATTRIBUTE_CATEGORY is null)))
+      AND ((recinfo.ATTRIBUTE1 = X_ATTRIBUTE1)
+           OR ((recinfo.ATTRIBUTE1 is null) AND (X_ATTRIBUTE1 is null)))
+      AND ((recinfo.ATTRIBUTE2 = X_ATTRIBUTE2)
+           OR ((recinfo.ATTRIBUTE2 is null) AND (X_ATTRIBUTE2 is null)))
+      AND ((recinfo.ATTRIBUTE3 = X_ATTRIBUTE3)
+           OR ((recinfo.ATTRIBUTE3 is null) AND (X_ATTRIBUTE3 is null)))
+      AND ((recinfo.ATTRIBUTE4 = X_ATTRIBUTE4)
+           OR ((recinfo.ATTRIBUTE4 is null) AND (X_ATTRIBUTE4 is null)))
+      AND ((recinfo.ATTRIBUTE5 = X_ATTRIBUTE5)
+           OR ((recinfo.ATTRIBUTE5 is null) AND (X_ATTRIBUTE5 is null)))
+      AND ((recinfo.ATTRIBUTE6 = X_ATTRIBUTE6)
+           OR ((recinfo.ATTRIBUTE6 is null) AND (X_ATTRIBUTE6 is null)))
+      AND ((recinfo.ATTRIBUTE7 = X_ATTRIBUTE7)
+           OR ((recinfo.ATTRIBUTE7 is null) AND (X_ATTRIBUTE7 is null)))
+      AND ((recinfo.ATTRIBUTE8 = X_ATTRIBUTE8)
+           OR ((recinfo.ATTRIBUTE8 is null) AND (X_ATTRIBUTE8 is null)))
+      AND ((recinfo.ATTRIBUTE9 = X_ATTRIBUTE9)
+           OR ((recinfo.ATTRIBUTE9 is null) AND (X_ATTRIBUTE9 is null)))
+      AND ((recinfo.ATTRIBUTE10 = X_ATTRIBUTE10)
+           OR ((recinfo.ATTRIBUTE10 is null) AND (X_ATTRIBUTE10 is null)))
+      AND ((recinfo.ATTRIBUTE11 = X_ATTRIBUTE11)
+           OR ((recinfo.ATTRIBUTE11 is null) AND (X_ATTRIBUTE11 is null)))
+      AND ((recinfo.ATTRIBUTE12 = X_ATTRIBUTE12)
+           OR ((recinfo.ATTRIBUTE12 is null) AND (X_ATTRIBUTE12 is null)))
+      AND ((recinfo.ATTRIBUTE13 = X_ATTRIBUTE13)
+           OR ((recinfo.ATTRIBUTE13 is null) AND (X_ATTRIBUTE13 is null)))
+      AND ((recinfo.ATTRIBUTE14 = X_ATTRIBUTE14)
+           OR ((recinfo.ATTRIBUTE14 is null) AND (X_ATTRIBUTE14 is null)))
+      AND ((recinfo.ATTRIBUTE15 = X_ATTRIBUTE15)
+           OR ((recinfo.ATTRIBUTE15 is null) AND (X_ATTRIBUTE15 is null)))
+      AND (recinfo.DELIVERABLE_NUMBER = X_DELIVERABLE_NUMBER)
+      AND ((recinfo.PROJECT_ID = X_PROJECT_ID)
+           OR ((recinfo.PROJECT_ID is null) AND (X_PROJECT_ID is null)))
+      AND ((recinfo.ITEM_ID = X_ITEM_ID)
+           OR ((recinfo.ITEM_ID is null) AND (X_ITEM_ID is null)))
+      AND (recinfo.SOURCE_HEADER_ID = X_SOURCE_HEADER_ID)
+      AND (recinfo.SOURCE_CODE = X_SOURCE_CODE)
+      AND ((recinfo.SOURCE_LINE_ID = X_SOURCE_LINE_ID)
+           OR ((recinfo.SOURCE_LINE_ID is null) AND (X_SOURCE_LINE_ID is null)))
+      AND ((recinfo.SOURCE_DELIVERABLE_ID = X_SOURCE_DELIVERABLE_ID)
+           OR ((recinfo.SOURCE_DELIVERABLE_ID is null) AND (X_SOURCE_DELIVERABLE_ID is null)))
+      AND ((recinfo.DELIVERY_DATE = X_DELIVERY_DATE)
+           OR ((recinfo.DELIVERY_DATE is null) AND (X_DELIVERY_DATE is null)))
+      AND ((recinfo.INVENTORY_ORG_ID = X_INVENTORY_ORG_ID)
+           OR ((recinfo.INVENTORY_ORG_ID is null) AND (X_INVENTORY_ORG_ID is null)))
+  ) then
+    null;
+  else
+    fnd_message.set_name('FND', 'FORM_RECORD_CHANGED');
+    app_exception.raise_exception;
+  end if;
+
+  for tlinfo in c1 loop
+    if (tlinfo.BASELANG = 'Y') then
+      if (    ((tlinfo.DESCRIPTION = X_DESCRIPTION)
+               OR ((tlinfo.DESCRIPTION is null) AND (X_DESCRIPTION is null)))
+          AND ((tlinfo.COMMENTS = X_COMMENTS)
+               OR ((tlinfo.COMMENTS is null) AND (X_COMMENTS is null)))
+      ) then
+        null;
+      else
+        fnd_message.set_name('FND', 'FORM_RECORD_CHANGED');
+        app_exception.raise_exception;
+      end if;
+    end if;
+  end loop;
+  return;
+end LOCK_ROW;
+
+procedure UPDATE_ROW (
+  X_DELIVERABLE_ID in NUMBER,
+  X_DELIVERABLE_NUMBER in VARCHAR2,
+  X_SOURCE_CODE in VARCHAR2,
+  X_UNIT_PRICE in NUMBER,
+  X_UOM_CODE in VARCHAR2,
+  X_QUANTITY in NUMBER,
+  X_UNIT_NUMBER in VARCHAR2,
+  X_ATTRIBUTE_CATEGORY in VARCHAR2,
+  X_ATTRIBUTE1 in VARCHAR2,
+  X_ATTRIBUTE2 in VARCHAR2,
+  X_ATTRIBUTE3 in VARCHAR2,
+  X_ATTRIBUTE4 in VARCHAR2,
+  X_ATTRIBUTE5 in VARCHAR2,
+  X_ATTRIBUTE6 in VARCHAR2,
+  X_ATTRIBUTE7 in VARCHAR2,
+  X_ATTRIBUTE8 in VARCHAR2,
+  X_ATTRIBUTE9 in VARCHAR2,
+  X_ATTRIBUTE10 in VARCHAR2,
+  X_ATTRIBUTE11 in VARCHAR2,
+  X_ATTRIBUTE12 in VARCHAR2,
+  X_ATTRIBUTE13 in VARCHAR2,
+  X_ATTRIBUTE14 in VARCHAR2,
+  X_ATTRIBUTE15 in VARCHAR2,
+  X_SOURCE_HEADER_ID in NUMBER,
+  X_SOURCE_LINE_ID in NUMBER,
+  X_SOURCE_DELIVERABLE_ID in NUMBER,
+  X_PROJECT_ID in NUMBER,
+  X_CURRENCY_CODE in VARCHAR2,
+  X_INVENTORY_ORG_ID in NUMBER,
+  X_DELIVERY_DATE in DATE,
+  X_ITEM_ID in NUMBER,
+  X_DESCRIPTION in VARCHAR2,
+  X_COMMENTS in VARCHAR2,
+  X_LAST_UPDATE_DATE in DATE,
+  X_LAST_UPDATED_BY in NUMBER,
+  X_LAST_UPDATE_LOGIN in NUMBER
+) is
+begin
+  update OKE_DELIVERABLES_B
+  set
+    CURRENCY_CODE = X_CURRENCY_CODE,
+    UNIT_PRICE = X_UNIT_PRICE,
+    UOM_CODE = X_UOM_CODE,
+    QUANTITY = X_QUANTITY,
+    UNIT_NUMBER = X_UNIT_NUMBER,
+    ATTRIBUTE_CATEGORY = X_ATTRIBUTE_CATEGORY,
+    ATTRIBUTE1 = X_ATTRIBUTE1,
+    ATTRIBUTE2 = X_ATTRIBUTE2,
+    ATTRIBUTE3 = X_ATTRIBUTE3,
+    ATTRIBUTE4 = X_ATTRIBUTE4,
+    ATTRIBUTE5 = X_ATTRIBUTE5,
+    ATTRIBUTE6 = X_ATTRIBUTE6,
+    ATTRIBUTE7 = X_ATTRIBUTE7,
+    ATTRIBUTE8 = X_ATTRIBUTE8,
+    ATTRIBUTE9 = X_ATTRIBUTE9,
+    ATTRIBUTE10 = X_ATTRIBUTE10,
+    ATTRIBUTE11 = X_ATTRIBUTE11,
+    ATTRIBUTE12 = X_ATTRIBUTE12,
+    ATTRIBUTE13 = X_ATTRIBUTE13,
+    ATTRIBUTE14 = X_ATTRIBUTE14,
+    ATTRIBUTE15 = X_ATTRIBUTE15,
+    DELIVERABLE_NUMBER = X_DELIVERABLE_NUMBER,
+    PROJECT_ID = X_PROJECT_ID,
+    ITEM_ID = X_ITEM_ID,
+    SOURCE_HEADER_ID = X_SOURCE_HEADER_ID,
+    SOURCE_LINE_ID = X_SOURCE_LINE_ID,
+    DELIVERY_DATE = X_DELIVERY_DATE,
+    INVENTORY_ORG_ID = X_INVENTORY_ORG_ID,
+    SOURCE_CODE = X_SOURCE_CODE,
+    SOURCE_DELIVERABLE_ID = X_SOURCE_DELIVERABLE_ID,
+    LAST_UPDATE_DATE = X_LAST_UPDATE_DATE,
+    LAST_UPDATED_BY = X_LAST_UPDATED_BY,
+    LAST_UPDATE_LOGIN = X_LAST_UPDATE_LOGIN
+  where DELIVERABLE_ID = X_DELIVERABLE_ID;
+
+  if (sql%notfound) then
+    raise no_data_found;
+  end if;
+
+  update OKE_DELIVERABLES_TL set
+    DESCRIPTION = X_DESCRIPTION,
+    COMMENTS = X_COMMENTS,
+    LAST_UPDATE_DATE = X_LAST_UPDATE_DATE,
+    LAST_UPDATED_BY = X_LAST_UPDATED_BY,
+    LAST_UPDATE_LOGIN = X_LAST_UPDATE_LOGIN,
+    SOURCE_LANG = userenv('LANG')
+  where DELIVERABLE_ID = X_DELIVERABLE_ID
+  and userenv('LANG') in (LANGUAGE, SOURCE_LANG);
+
+  if (sql%notfound) then
+    raise no_data_found;
+  end if;
+end UPDATE_ROW;
+
+procedure DELETE_ROW (
+  X_DELIVERABLE_ID in NUMBER
+) is
+begin
+  delete from OKE_DELIVERABLES_TL
+  where DELIVERABLE_ID = X_DELIVERABLE_ID;
+
+  if (sql%notfound) then
+    raise no_data_found;
+  end if;
+
+  delete from OKE_DELIVERABLES_B
+  where DELIVERABLE_ID = X_DELIVERABLE_ID;
+
+  if (sql%notfound) then
+    raise no_data_found;
+  end if;
+end DELETE_ROW;
+
+procedure ADD_LANGUAGE
+is
+begin
+  delete from OKE_DELIVERABLES_TL T
+  where not exists
+    (select NULL
+    from OKE_DELIVERABLES_B B
+    where B.DELIVERABLE_ID = T.DELIVERABLE_ID
+    );
+
+  update OKE_DELIVERABLES_TL T set (
+      DESCRIPTION,
+      COMMENTS
+    ) = (select
+      B.DESCRIPTION,
+      B.COMMENTS
+    from OKE_DELIVERABLES_TL B
+    where B.DELIVERABLE_ID = T.DELIVERABLE_ID
+    and B.LANGUAGE = T.SOURCE_LANG)
+  where (
+      T.DELIVERABLE_ID,
+      T.LANGUAGE
+  ) in (select
+      SUBT.DELIVERABLE_ID,
+      SUBT.LANGUAGE
+    from OKE_DELIVERABLES_TL SUBB, OKE_DELIVERABLES_TL SUBT
+    where SUBB.DELIVERABLE_ID = SUBT.DELIVERABLE_ID
+    and SUBB.LANGUAGE = SUBT.SOURCE_LANG
+    and (SUBB.DESCRIPTION <> SUBT.DESCRIPTION
+      or (SUBB.DESCRIPTION is null and SUBT.DESCRIPTION is not null)
+      or (SUBB.DESCRIPTION is not null and SUBT.DESCRIPTION is null)
+      or SUBB.COMMENTS <> SUBT.COMMENTS
+      or (SUBB.COMMENTS is null and SUBT.COMMENTS is not null)
+      or (SUBB.COMMENTS is not null and SUBT.COMMENTS is null)
+  ));
+
+  insert into OKE_DELIVERABLES_TL (
+    DELIVERABLE_ID,
+    CREATION_DATE,
+    CREATED_BY,
+    LAST_UPDATE_DATE,
+    LAST_UPDATED_BY,
+    LAST_UPDATE_LOGIN,
+    DESCRIPTION,
+    COMMENTS,
+    LANGUAGE,
+    SOURCE_LANG
+  ) select
+    B.DELIVERABLE_ID,
+    B.CREATION_DATE,
+    B.CREATED_BY,
+    B.LAST_UPDATE_DATE,
+    B.LAST_UPDATED_BY,
+    B.LAST_UPDATE_LOGIN,
+    B.DESCRIPTION,
+    B.COMMENTS,
+    L.LANGUAGE_CODE,
+    B.SOURCE_LANG
+  from OKE_DELIVERABLES_TL B, FND_LANGUAGES L
+  where L.INSTALLED_FLAG in ('I', 'B')
+  and B.LANGUAGE = userenv('LANG')
+  and not exists
+    (select NULL
+    from OKE_DELIVERABLES_TL T
+    where T.DELIVERABLE_ID = B.DELIVERABLE_ID
+    and T.LANGUAGE = L.LANGUAGE_CODE);
+end ADD_LANGUAGE;
+
+end OKE_DELIVERABLES_PKG;
+
+/

@@ -1,0 +1,2661 @@
+--------------------------------------------------------
+--  DDL for Package Body MSC_CL_ROUTING_ODS_LOAD
+--------------------------------------------------------
+
+  CREATE OR REPLACE EDITIONABLE PACKAGE BODY "APPS"."MSC_CL_ROUTING_ODS_LOAD" AS -- specification
+/* $Header: MSCLRTGB.pls 120.3.12010000.6 2010/01/22 19:14:32 ahoque ship $ */
+
+   v_sub_str                     VARCHAR2(32767):=NULL;
+   c_count                       NUMBER:= 0;
+ --  v_warning_flag                NUMBER:= MSC_UTIL.SYS_NO;  --2 be changed
+
+--   G_COLLECT_SRP_DATA       VARCHAR2(1) :=  NVL(FND_PROFILE.VALUE('MSC_SRP_ENABLED'),'N');
+   -- To collect SRP Data when this profile is set to Yes   neds to be deleted
+--   v_is_cont_refresh             BOOLEAN;
+   v_chr9                        VARCHAR2(1) := FND_GLOBAL.LOCAL_CHR(9);
+   v_chr10                       VARCHAR2(1) := FND_GLOBAL.LOCAL_CHR(10);
+   v_chr13                       VARCHAR2(1) := FND_GLOBAL.LOCAL_CHR(13);
+
+
+
+
+PROCEDURE LOAD_STD_OP_RESOURCES
+IS
+  CURSOR std_op_res IS
+  SELECT
+     std_op_res.SR_INSTANCE_ID,
+     std_op_res.STANDARD_OPERATION_ID,
+     std_op_res.RESOURCE_ID,
+     std_op_res.OPERATION_CODE,
+     std_op_res.ORGANIZATION_ID,
+     std_op_res.DEPARTMENT_ID,
+     std_op_res.RESOURCE_SEQ_NUM,
+     std_op_res.RESOURCE_USAGE,
+     std_op_res.BASIS_TYPE,
+     std_op_res.RESOURCE_UNITS,
+     std_op_res.SUBSTITUTE_GROUP_NUM,
+     std_op_res.UOM_CODE,
+     std_op_res.SCHEDULE_FLAG
+ FROM MSC_ST_STD_OP_RESOURCES std_op_res
+ WHERE std_op_res.SR_INSTANCE_ID= MSC_CL_COLLECTION.v_instance_id;
+
+ lv_cnt          NUMBER;
+ lv_pbs          NUMBER;
+ c_count         NUMBER := 0;
+ total_count         NUMBER := 0;
+
+BEGIN
+
+IF ((MSC_CL_COLLECTION.v_is_complete_refresh) OR (MSC_CL_COLLECTION.v_is_partial_refresh)) THEN
+   IF MSC_CL_COLLECTION.v_coll_prec.org_group_flag = MSC_UTIL.G_ALL_ORGANIZATIONS THEN
+      MSC_CL_COLLECTION.DELETE_MSC_TABLE( 'MSC_STD_OP_RESOURCES', MSC_CL_COLLECTION.v_instance_id, -1);
+   ELSE
+      MSC_CL_COLLECTION.DELETE_MSC_TABLE( 'MSC_STD_OP_RESOURCES', MSC_CL_COLLECTION.v_instance_id, -1,v_sub_str);  /* ds change change */
+   END IF;
+
+  c_count := 0;
+  total_count := 0;
+
+  FOR c_rec IN std_op_res LOOP
+      BEGIN
+       INSERT INTO MSC_STD_OP_RESOURCES
+        ( PLAN_ID,
+        SR_INSTANCE_ID,
+        STANDARD_OPERATION_ID  ,
+        RESOURCE_ID,
+        OPERATION_CODE,
+        ORGANIZATION_ID,
+        DEPARTMENT_ID,
+        RESOURCE_SEQ_NUM,
+        RESOURCE_USAGE,
+        BASIS_TYPE,
+        RESOURCE_UNITS,
+	SUBSTITUTE_GROUP_NUM,
+	UOM_CODE,
+	SCHEDULE_FLAG,
+	REFRESH_NUMBER,
+        LAST_UPDATE_DATE,
+        LAST_UPDATED_BY,
+        CREATION_DATE,
+        CREATED_BY)
+      VALUES
+        ( -1,
+        c_rec.SR_INSTANCE_ID,
+        c_rec.STANDARD_OPERATION_ID  ,
+        c_rec.RESOURCE_ID,
+        c_rec.OPERATION_CODE,
+        c_rec.ORGANIZATION_ID,
+        c_rec.DEPARTMENT_ID,
+        c_rec.RESOURCE_SEQ_NUM,
+        c_rec.RESOURCE_USAGE,
+        c_rec.BASIS_TYPE,
+        c_rec.RESOURCE_UNITS,
+        c_rec.SUBSTITUTE_GROUP_NUM,
+        c_rec.UOM_CODE,
+        c_rec.SCHEDULE_FLAG,
+        MSC_CL_COLLECTION.v_last_collection_id,
+        MSC_CL_COLLECTION.v_current_date,
+        MSC_CL_COLLECTION.v_current_user,
+        MSC_CL_COLLECTION.v_current_date,
+        MSC_CL_COLLECTION.v_current_user );
+
+       c_count:= c_count+1;
+       total_count := total_count+1;
+
+    IF c_count> MSC_CL_COLLECTION.PBS THEN
+       COMMIT;
+       c_count:= 0;
+    END IF;
+
+  EXCEPTION
+
+   WHEN OTHERS THEN
+
+    IF SQLCODE IN (-01683,-01653,-01650,-01562) THEN
+
+      MSC_UTIL.LOG_MSG(MSC_UTIL.G_D_STATUS, '========================================');
+      FND_MESSAGE.SET_NAME('MSC', 'MSC_OL_DATA_ERR_HEADER');
+      FND_MESSAGE.SET_TOKEN('PROCEDURE', 'LOAD_STD_OP_RESOURCES');
+      FND_MESSAGE.SET_TOKEN('TABLE', 'MSC_SETUP_TRANSITIONS');
+      MSC_UTIL.LOG_MSG(MSC_UTIL.G_D_STATUS, FND_MESSAGE.GET);
+
+      MSC_UTIL.LOG_MSG(MSC_UTIL.G_D_STATUS, SQLERRM);
+      RAISE;
+    ELSE
+      MSC_CL_COLLECTION.v_warning_flag := MSC_UTIL.SYS_YES;
+
+       MSC_UTIL.LOG_MSG(MSC_UTIL.G_D_STATUS, '========================================');
+      FND_MESSAGE.SET_NAME('MSC', 'MSC_OL_DATA_ERR_HEADER');
+      FND_MESSAGE.SET_TOKEN('PROCEDURE', 'LOAD_STD_OP_RESOURCES');
+      FND_MESSAGE.SET_TOKEN('TABLE', 'MSC_SETUP_TRANSITIONS');
+      MSC_UTIL.LOG_MSG(MSC_UTIL.G_D_STATUS, FND_MESSAGE.GET);
+
+      FND_MESSAGE.SET_NAME('MSC','MSC_OL_DATA_ERR_DETAIL');
+      FND_MESSAGE.SET_TOKEN('COLUMN', 'OPERATION_CODE');
+      FND_MESSAGE.SET_TOKEN('VALUE',c_rec.OPERATION_CODE);
+      MSC_UTIL.LOG_MSG(MSC_UTIL.G_D_STATUS, FND_MESSAGE.GET);
+
+      FND_MESSAGE.SET_NAME('MSC','MSC_OL_DATA_ERR_DETAIL');
+      FND_MESSAGE.SET_TOKEN('COLUMN', 'RESOURCE_ID');
+      FND_MESSAGE.SET_TOKEN('VALUE', c_rec.RESOURCE_ID);
+      MSC_UTIL.LOG_MSG(MSC_UTIL.G_D_STATUS, FND_MESSAGE.GET);
+
+      FND_MESSAGE.SET_NAME('MSC','MSC_OL_DATA_ERR_DETAIL');
+      FND_MESSAGE.SET_TOKEN('COLUMN', 'RESOURCE_SEQ_NUM');
+      FND_MESSAGE.SET_TOKEN('VALUE', c_rec.RESOURCE_SEQ_NUM);
+      MSC_UTIL.LOG_MSG(MSC_UTIL.G_D_STATUS, FND_MESSAGE.GET);
+
+
+      FND_MESSAGE.SET_NAME('MSC','MSC_OL_DATA_ERR_DETAIL');
+      FND_MESSAGE.SET_TOKEN('COLUMN', 'ORGANIZATION_ID');
+      FND_MESSAGE.SET_TOKEN('VALUE', MSC_GET_NAME.ORG_CODE( c_rec.ORGANIZATION_ID,
+                                                   MSC_CL_COLLECTION.v_instance_id));
+      MSC_UTIL.LOG_MSG(MSC_UTIL.G_D_STATUS, FND_MESSAGE.GET);
+      MSC_UTIL.LOG_MSG(MSC_UTIL.G_D_STATUS, SQLERRM);
+    END IF;
+
+   END;
+
+  END LOOP;
+    MSC_UTIL.LOG_MSG(MSC_UTIL.G_D_STATUS, 'Total std op resources = '||  to_char(total_count));
+ COMMIT;
+
+ END IF; /* MSC_CL_COLLECTION.v_is_complete_refresh) OR (MSC_CL_COLLECTION.v_is_partial_refresh */
+
+END LOAD_STD_OP_RESOURCES;
+
+
+   PROCEDURE LOAD_OPERATION_NETWORKS IS
+
+Cursor c10
+is
+Select
+mon.FROM_OP_SEQ_ID,
+mon.TO_OP_SEQ_ID,
+mon.TRANSITION_TYPE,
+mon.PLANNING_PCT,
+mon.CUMMULATIVE_PCT,
+mon.EFECTIVITY_DATE,
+mon.DISABLE_DATE,
+mon.PLAN_ID,
+mon.CREATED_BY,
+mon.CREATION_DATE,
+mon.DELETED_FLAG,
+mon.LAST_UPDATED_BY,
+mon.LAST_UPDATE_DATE,
+mon.LAST_UPDATE_LOGIN,
+mon.ATTRIBUTE_CATEGORY,
+mon.ATTRIBUTE1,
+mon.ATTRIBUTE2,
+mon.ATTRIBUTE3,
+mon.ATTRIBUTE4,
+mon.ATTRIBUTE5,
+mon.ATTRIBUTE6,
+mon.ATTRIBUTE7,
+mon.ATTRIBUTE8,
+mon.ATTRIBUTE9,
+mon.ATTRIBUTE10,
+mon.ATTRIBUTE11,
+mon.ATTRIBUTE12,
+mon.ATTRIBUTE13,
+mon.ATTRIBUTE14,
+mon.ATTRIBUTE15,
+mon.routing_sequence_id,
+mon.FROM_OP_SEQ_NUM,
+mon.TO_OP_SEQ_NUM,
+mon.TO_ROUTING_SEQUENCE_ID,  /*ds change change start */
+t1.INVENTORY_ITEM_ID   FROM_ITEM_ID,
+mon.ORGANIZATION_ID,
+mon.MINIMUM_TRANSFER_QTY,
+mon.MINIMUM_TIME_OFFSET,
+mon.MAXIMUM_TIME_OFFSET,
+mon.DEPENDENCY_TYPE,
+mon.APPLY_TO_CHARGES,
+mon.TRANSFER_PCT,
+mon.TRANSFER_QTY,
+mon.TRANSFER_UOM,		/*ds change change end */
+mon.REFRESH_ID,
+mon.SR_INSTANCE_ID
+from MSC_ST_OPERATION_NETWORKS mon,
+MSC_ITEM_ID_LID t1	  /* ds change change */
+WHERE mon.SR_INSTANCE_ID = MSC_CL_COLLECTION.v_instance_id
+AND   mon.DELETED_FLAG	= MSC_UTIL.SYS_NO
+AND   mon.FROM_ITEM_ID =  t1.SR_INVENTORY_ITEM_ID(+)	/* ds change change */
+AND   mon.sr_instance_id =  t1.sr_instance_id(+) ;     /* ds change change */
+
+
+Cursor c10_d is
+select
+mon.FROM_OP_SEQ_ID,
+mon.TO_OP_SEQ_ID,
+mon.DELETED_FLAG,
+mon.REFRESH_ID,
+mon.SR_INSTANCE_ID
+FROM MSC_ST_OPERATION_NETWORKS mon
+WHERE mon.SR_INSTANCE_ID= MSC_CL_COLLECTION.v_instance_id
+and mon.DELETED_FLAG= MSC_UTIL.SYS_YES;
+
+c_count NUMBER:= 0;
+   lv_tbl      VARCHAR2(30);
+   lv_sql_stmt VARCHAR2(5000);
+
+BEGIN
+
+IF (MSC_CL_COLLECTION.v_is_complete_refresh OR MSC_CL_COLLECTION.v_is_partial_refresh) THEN
+
+ IF MSC_CL_COLLECTION.v_coll_prec.org_group_flag = MSC_UTIL.G_ALL_ORGANIZATIONS THEN
+    MSC_CL_COLLECTION.DELETE_MSC_TABLE( 'MSC_OPERATION_NETWORKS', MSC_CL_COLLECTION.v_instance_id, -1);
+ ELSE
+    v_sub_str :=' AND ORGANIZATION_ID '||MSC_UTIL.v_in_org_str;
+    MSC_CL_COLLECTION.DELETE_MSC_TABLE( 'MSC_OPERATION_NETWORKS', MSC_CL_COLLECTION.v_instance_id, -1,v_sub_str);
+ END IF;
+
+END IF;   -- MSC_CL_COLLECTION.v_is_complete_refresh
+
+IF MSC_CL_COLLECTION.v_is_incremental_refresh THEN
+
+  -- set SR_INSTANCE_ID to negative to indicate a SOFT delete
+
+FOR c_rec IN c10_d LOOP
+
+DELETE MSC_OPERATION_NETWORKS
+ WHERE PLAN_ID= -1
+   AND FROM_OP_SEQ_ID = c_rec.from_op_seq_id
+   AND TO_OP_SEQ_ID =   c_rec.to_op_seq_id
+   AND SR_INSTANCE_ID=  c_rec.SR_INSTANCE_ID;
+
+/* for opm , hard wnk and mtqs we don't have to worry as opm doesn't support incremental */
+END LOOP;
+
+END IF;
+
+c_count:= 0;
+
+FOR c_rec IN c10 LOOP
+
+BEGIN
+
+IF MSC_CL_COLLECTION.v_is_incremental_refresh THEN
+
+UPDATE MSC_OPERATION_NETWORKS
+SET
+FROM_OP_SEQ_ID = c_rec.from_op_seq_id,
+TO_OP_SEQ_ID  = c_rec.to_op_seq_id,
+--routing_sequence_id = c_rec.routing_sequence_id,
+TRANSITION_TYPE = c_rec.transition_type,
+PLANNING_PCT   = c_rec.planning_pct,
+CUMMULATIVE_PCT = c_rec. cummulative_pct,
+EFFECTIVITY_DATE  = c_Rec.efectivity_date,
+DISABLE_DATE     = c_Rec.disable_date,
+PLAN_ID          = -1,
+LAST_UPDATED_BY = MSC_CL_COLLECTION.v_current_user,
+LAST_UPDATE_DATE = MSC_CL_COLLECTION.v_current_date,
+ATTRIBUTE_CATEGORY = c_rec.attribute_category,
+ATTRIBUTE1  = c_rec.attribute1,
+ATTRIBUTE2  = c_rec.attribute2,
+ATTRIBUTE3  = c_Rec.attribute3,
+ATTRIBUTE4  = c_rec.attribute4,
+ATTRIBUTE5  = c_rec.attribute5,
+ATTRIBUTE6  = c_rec.attribute6,
+ATTRIBUTE7  = c_rec.attribute7,
+ATTRIBUTE8  = c_rec.attribute8,
+ATTRIBUTE9  = c_rec.attribute9,
+ATTRIBUTE10  = c_rec.attribute10,
+ATTRIBUTE11  = c_rec.attribute11,
+ATTRIBUTE12   = c_rec.attribute12,
+ATTRIBUTE13   = c_rec.attribute13,
+ATTRIBUTE14   = c_Rec.attribute14,
+ATTRIBUTE15   = c_rec.attribute15,
+FROM_OP_SEQ_NUM= c_rec.FROM_OP_SEQ_NUM,
+TO_OP_SEQ_NUM = c_rec.TO_OP_SEQ_NUM,
+DEPENDENCY_TYPE = c_rec.DEPENDENCY_TYPE,   /* ds change other new attr not added as they are for opm */
+REFRESH_NUMBER= MSC_CL_COLLECTION.v_last_collection_id
+WHERE PLAN_ID= -1
+AND FROM_OP_SEQ_ID= c_rec.FROM_OP_SEQ_ID
+AND TO_OP_SEQ_ID=   c_rec.TO_OP_SEQ_ID
+AND SR_INSTANCE_ID= c_rec.SR_INSTANCE_ID
+AND routing_sequence_id = c_rec.routing_sequence_id;
+
+END IF;
+
+IF (MSC_CL_COLLECTION.v_is_complete_refresh OR MSC_CL_COLLECTION.v_is_partial_refresh) OR SQL%NOTFOUND THEN
+
+insert into MSC_OPERATION_NETWORKS
+( FROM_OP_SEQ_ID,
+ TO_OP_SEQ_ID,
+ ROUTING_SEQUENCE_ID,
+ TRANSITION_TYPE,
+ PLANNING_PCT,
+ CUMMULATIVE_PCT,
+ EFFECTIVITY_DATE,
+ DISABLE_DATE,
+ PLAN_ID,
+ TO_ROUTING_SEQUENCE_ID,  /*ds change change start */
+ FROM_ITEM_ID,
+ ORGANIZATION_ID,
+ MINIMUM_TRANSFER_QTY,
+ MINIMUM_TIME_OFFSET,
+ MAXIMUM_TIME_OFFSET,
+ DEPENDENCY_TYPE,
+ APPLY_TO_CHARGES,
+ TRANSFER_PCT,
+ TRANSFER_QTY,
+ TRANSFER_UOM,		/*ds change change end */
+ CREATED_BY,
+ CREATION_DATE,
+ LAST_UPDATED_BY,
+ LAST_UPDATE_DATE,
+ ATTRIBUTE_CATEGORY,
+ ATTRIBUTE1,
+ ATTRIBUTE2,
+ ATTRIBUTE3,
+ ATTRIBUTE4,
+ ATTRIBUTE5,
+ ATTRIBUTE6,
+ ATTRIBUTE7,
+ ATTRIBUTE8,
+ ATTRIBUTE9,
+ ATTRIBUTE10,
+ ATTRIBUTE11,
+ ATTRIBUTE12,
+ ATTRIBUTE13,
+ ATTRIBUTE14,
+ ATTRIBUTE15,
+ FROM_OP_SEQ_NUM,
+ TO_OP_SEQ_NUM,
+ REFRESH_NUMBER,
+ SR_INSTANCE_ID)
+ values( c_rec.FROM_OP_SEQ_ID,
+ c_rec.TO_OP_SEQ_ID,
+ c_rec.ROUTING_SEQUENCE_ID,
+ c_rec.TRANSITION_TYPE,
+ c_rec.PLANNING_PCT,
+ c_rec.CUMMULATIVE_PCT,
+ c_rec.EFECTIVITY_DATE,
+ c_rec.DISABLE_DATE,
+ -1,
+ c_rec.TO_ROUTING_SEQUENCE_ID,  /*ds change change start */
+ c_rec.FROM_ITEM_ID   ,
+ c_rec.ORGANIZATION_ID,
+ c_rec.MINIMUM_TRANSFER_QTY,
+ c_rec.MINIMUM_TIME_OFFSET,
+ c_rec.MAXIMUM_TIME_OFFSET,
+ c_rec.DEPENDENCY_TYPE,
+ c_rec.APPLY_TO_CHARGES,
+ c_rec.TRANSFER_PCT,
+ c_rec.TRANSFER_QTY,
+ c_rec.TRANSFER_UOM,		/*ds change change end */
+ MSC_CL_COLLECTION.v_current_user,
+ MSC_CL_COLLECTION.v_current_date,
+ MSC_CL_COLLECTION.v_current_user,
+ MSC_CL_COLLECTION.v_current_date,
+ c_rec.ATTRIBUTE_CATEGORY,
+ c_rec.ATTRIBUTE1,
+ c_rec.ATTRIBUTE2,
+ c_Rec.ATTRIBUTE3,
+ c_rec.ATTRIBUTE4,
+ c_rec.ATTRIBUTE5,
+ c_rec.ATTRIBUTE6,
+ c_rec.ATTRIBUTE7,
+ c_rec.ATTRIBUTE8,
+ c_rec.ATTRIBUTE9,
+ c_rec.ATTRIBUTE10,
+ c_rec.ATTRIBUTE11,
+ c_rec.ATTRIBUTE12,
+ c_rec.ATTRIBUTE13,
+ c_rec.ATTRIBUTE14,
+ c_rec.ATTRIBUTE15,
+ c_rec.FROM_OP_SEQ_NUM,
+ c_rec.TO_OP_SEQ_NUM,
+ MSC_CL_COLLECTION.v_last_collection_id,
+ MSC_CL_COLLECTION.v_instance_id );
+
+
+END IF; -- SQL%NOTFOUND
+
+  c_count:= c_count+1;
+
+  IF c_count> MSC_CL_COLLECTION.PBS THEN
+     COMMIT;
+     c_count:= 0;
+  END IF;
+
+EXCEPTION
+   WHEN OTHERS THEN
+
+    IF SQLCODE IN (-01653,-01650,-01562,-01683) THEN
+
+      MSC_UTIL.LOG_MSG(MSC_UTIL.G_D_STATUS, '========================================');
+      FND_MESSAGE.SET_NAME('MSC', 'MSC_OL_DATA_ERR_HEADER');
+      FND_MESSAGE.SET_TOKEN('PROCEDURE', 'LOAD_OPERATION_NETWORKS');
+      FND_MESSAGE.SET_TOKEN('TABLE', 'MSC_OPERATION_NETWORKS');
+      MSC_UTIL.LOG_MSG(MSC_UTIL.G_D_STATUS, FND_MESSAGE.GET);
+
+      MSC_UTIL.LOG_MSG(MSC_UTIL.G_D_STATUS, SQLERRM);
+      RAISE;
+
+    ELSE
+      MSC_CL_COLLECTION.v_warning_flag := MSC_UTIL.SYS_YES;
+
+      MSC_UTIL.LOG_MSG(MSC_UTIL.G_D_STATUS, '========================================');
+      FND_MESSAGE.SET_NAME('MSC', 'MSC_OL_DATA_ERR_HEADER');
+      FND_MESSAGE.SET_TOKEN('PROCEDURE', 'LOAD_OPERATION_NETWORKS');
+      FND_MESSAGE.SET_TOKEN('TABLE', 'MSC_OPERATION_NETWORKS');
+      MSC_UTIL.LOG_MSG(MSC_UTIL.G_D_STATUS, FND_MESSAGE.GET);
+
+      FND_MESSAGE.SET_NAME('MSC','MSC_OL_DATA_ERR_DETAIL');
+      FND_MESSAGE.SET_TOKEN('COLUMN', 'FROM_OP_SEQ_ID');
+      FND_MESSAGE.SET_TOKEN('VALUE', TO_CHAR( c_rec.FROM_OP_SEQ_ID));
+      MSC_UTIL.LOG_MSG(MSC_UTIL.G_D_STATUS, FND_MESSAGE.GET);
+
+      FND_MESSAGE.SET_NAME('MSC','MSC_OL_DATA_ERR_DETAIL');
+      FND_MESSAGE.SET_TOKEN('COLUMN', 'TO_OP_SEQ_ID');
+      FND_MESSAGE.SET_TOKEN('VALUE', TO_CHAR( c_rec.TO_OP_SEQ_ID));
+      MSC_UTIL.LOG_MSG(MSC_UTIL.G_D_STATUS, FND_MESSAGE.GET);
+
+      FND_MESSAGE.SET_NAME('MSC','MSC_OL_DATA_ERR_DETAIL');
+      FND_MESSAGE.SET_TOKEN('COLUMN', 'FROM_OP_SEQ_NUM');
+      FND_MESSAGE.SET_TOKEN('VALUE', TO_CHAR( c_rec.FROM_OP_SEQ_NUM));
+      MSC_UTIL.LOG_MSG(MSC_UTIL.G_D_STATUS, FND_MESSAGE.GET);
+
+      FND_MESSAGE.SET_NAME('MSC','MSC_OL_DATA_ERR_DETAIL');
+      FND_MESSAGE.SET_TOKEN('COLUMN', 'TO_OP_SEQ_NUM');
+      FND_MESSAGE.SET_TOKEN('VALUE', TO_CHAR( c_rec.TO_OP_SEQ_NUM));
+      MSC_UTIL.LOG_MSG(MSC_UTIL.G_D_STATUS, FND_MESSAGE.GET);
+
+      MSC_UTIL.LOG_MSG(MSC_UTIL.G_D_STATUS, SQLERRM);
+    END IF;
+END;
+
+END LOOP;
+
+COMMIT;
+   END LOAD_OPERATION_NETWORKS;
+
+-- ===============================================================
+
+   PROCEDURE LOAD_ROUTING IS
+
+   CURSOR c4 IS
+SELECT
+  msr.ROUTING_SEQUENCE_ID,
+  msr.ROUTING_TYPE,
+  REPLACE(REPLACE(substrb(msr.ROUTING_COMMENT,1,240),v_chr10,' '),v_chr13,' ') ROUTING_COMMENT,
+  msr.ALTERNATE_ROUTING_DESIGNATOR,
+  msr.PROJECT_ID,
+  msr.TASK_ID,
+  msr.LINE_ID,
+  msr.UOM_CODE,
+  nvl(msr.CFM_ROUTING_FLAG,2) CFM_ROUTING_FLAG,
+  msr.CTP_FLAG,
+  t1.INVENTORY_ITEM_ID ASSEMBLY_ITEM_ID,    -- msr.ASSEMBLY_ITEM_ID,
+  msr.ORGANIZATION_ID,
+  msr.ROUTING_QUANTITY,
+  msr.DELETED_FLAG,
+  msr.SR_INSTANCE_ID,
+  msr.FIRST_OP_SEQ_NUM,
+  msr.LAST_OP_SEQ_NUM,
+  msr.common_routing_sequence_id,
+  msr.auto_step_qty_flag
+FROM MSC_ITEM_ID_LID t1,
+     MSC_ST_ROUTINGS msr
+WHERE t1.SR_INVENTORY_ITEM_ID= msr.assembly_item_id
+  AND t1.sr_instance_id= msr.sr_instance_id
+  AND msr.SR_INSTANCE_ID= MSC_CL_COLLECTION.v_instance_id
+  AND msr.DELETED_FLAG= MSC_UTIL.SYS_NO;
+
+   CURSOR c4_d IS
+SELECT
+  msr.ROUTING_SEQUENCE_ID,
+  msr.SR_INSTANCE_ID
+ FROM MSC_ST_ROUTINGS msr
+WHERE msr.SR_INSTANCE_ID= MSC_CL_COLLECTION.v_instance_id
+  AND msr.DELETED_FLAG= MSC_UTIL.SYS_YES;
+
+
+c_count NUMBER:= 0;
+   lv_tbl      VARCHAR2(30);
+   lv_sql_stmt VARCHAR2(5000);
+   lv_sql_ins  VARCHAR2(6000);
+   lb_refresh_failed BOOLEAN:= FALSE;
+
+BEGIN
+
+IF (MSC_CL_COLLECTION.v_is_complete_refresh OR MSC_CL_COLLECTION.v_is_partial_refresh) THEN
+         -- We want to delete all ROUTING related data and get new stuff.
+
+--MSC_CL_COLLECTION.DELETE_MSC_TABLE( 'MSC_ROUTINGS', MSC_CL_COLLECTION.v_instance_id, -1);
+
+  IF MSC_CL_COLLECTION.v_coll_prec.org_group_flag = MSC_UTIL.G_ALL_ORGANIZATIONS THEN
+    MSC_CL_COLLECTION.DELETE_MSC_TABLE( 'MSC_ROUTINGS', MSC_CL_COLLECTION.v_instance_id, -1);
+  ELSE
+    v_sub_str :=' AND ORGANIZATION_ID '||MSC_UTIL.v_in_org_str;
+    MSC_CL_COLLECTION.DELETE_MSC_TABLE( 'MSC_ROUTINGS', MSC_CL_COLLECTION.v_instance_id, -1,v_sub_str);
+  END IF;
+
+  BEGIN
+  lv_sql_ins:=
+  'INSERT INTO MSC_ROUTINGS'
+  ||' (PLAN_ID,'
+  ||'  ROUTING_SEQUENCE_ID,'
+  ||'  ROUTING_TYPE,'
+  ||'  ROUTING_COMMENT,'
+  ||'  ALTERNATE_ROUTING_DESIGNATOR,'
+  ||'  PROJECT_ID,'
+  ||'  TASK_ID,'
+  ||'  LINE_ID,'
+  ||'  UOM_CODE,'
+  ||'  CFM_ROUTING_FLAG,'
+  ||'  CTP_FLAG,'
+  ||'  ASSEMBLY_ITEM_ID,'
+  ||'  ORGANIZATION_ID,'
+  ||'  ROUTING_QUANTITY,'
+  ||'  SR_INSTANCE_ID,'
+  ||'  REFRESH_NUMBER,'
+  ||'  LAST_UPDATE_DATE,'
+  ||'  LAST_UPDATED_BY,'
+  ||'  CREATION_DATE,'
+  ||'  CREATED_BY,'
+  ||'  FIRST_OP_SEQ_NUM,'
+  ||'  LAST_OP_SEQ_NUM,'
+  ||'  COMMON_ROUTING_SEQUENCE_ID,'
+  ||'  AUTO_STEP_QTY_FLAG)'
+  ||' SELECT '
+  ||'  -1,'
+  ||'  msr.ROUTING_SEQUENCE_ID,'
+  ||'  msr.ROUTING_TYPE,'
+  ||'  REPLACE(REPLACE(substrb(msr.ROUTING_COMMENT,1,240),:v_chr10,'' ''),:v_chr13,'' '') ROUTING_COMMENT,'
+  ||'  msr.ALTERNATE_ROUTING_DESIGNATOR,'
+  ||'  msr.PROJECT_ID,'
+  ||'  msr.TASK_ID,'
+  ||'  msr.LINE_ID,'
+  ||'  msr.UOM_CODE,'
+  ||'  nvl(msr.CFM_ROUTING_FLAG,2) CFM_ROUTING_FLAG,'
+  ||'  msr.CTP_FLAG,'
+  ||'  t1.INVENTORY_ITEM_ID ASSEMBLY_ITEM_ID,'
+  ||'  msr.ORGANIZATION_ID,'
+  ||'  msr.ROUTING_QUANTITY,'
+  ||'  msr.SR_INSTANCE_ID,'
+  ||'  :v_last_collection_id,'
+  ||'  :v_current_date,'
+  ||'  :v_current_user,'
+  ||'  :v_current_date,'
+  ||'  :v_current_user, '
+  ||'  msr.FIRST_OP_SEQ_NUM,'
+  ||'  msr.LAST_OP_SEQ_NUM,'
+  ||'  msr.COMMON_ROUTING_SEQUENCE_ID,'
+  ||'  msr.AUTO_STEP_QTY_FLAG '
+  ||' FROM MSC_ITEM_ID_LID t1,'
+  ||'     MSC_ST_ROUTINGS msr'
+  ||' WHERE t1.SR_INVENTORY_ITEM_ID= msr.assembly_item_id'
+  ||'   AND t1.sr_instance_id= msr.sr_instance_id'
+  ||'   AND msr.SR_INSTANCE_ID=  '||MSC_CL_COLLECTION.v_instance_id
+  ||'   AND msr.DELETED_FLAG= '||MSC_UTIL.SYS_NO;
+
+  EXECUTE IMMEDIATE lv_sql_ins
+  USING   v_chr10, v_chr13, MSC_CL_COLLECTION.v_last_collection_id,MSC_CL_COLLECTION.v_current_date,MSC_CL_COLLECTION.v_current_user,MSC_CL_COLLECTION.v_current_date,MSC_CL_COLLECTION.v_current_user;
+
+  COMMIT;
+  MSC_UTIL.LOG_MSG(MSC_UTIL.G_D_STATUS, 'routings loaded');
+
+  EXCEPTION
+     WHEN OTHERS THEN
+      IF SQLCODE IN (-01653,-01650,-01562,-01683) THEN
+
+        MSC_UTIL.LOG_MSG(MSC_UTIL.G_D_STATUS, '========================================');
+        FND_MESSAGE.SET_NAME('MSC', 'MSC_OL_DATA_ERR_HEADER');
+        FND_MESSAGE.SET_TOKEN('PROCEDURE', 'LOAD_ROUTING');
+        FND_MESSAGE.SET_TOKEN('TABLE', 'MSC_ROUTINGS');
+        MSC_UTIL.LOG_MSG(MSC_UTIL.G_D_STATUS, FND_MESSAGE.GET);
+
+        MSC_UTIL.LOG_MSG(MSC_UTIL.G_D_STATUS, SQLERRM);
+        RAISE;
+
+      ELSE
+        MSC_UTIL.LOG_MSG(MSC_UTIL.G_D_STATUS, '========================================');
+        FND_MESSAGE.SET_NAME('MSC', 'MSC_OL_DATA_ERR_HEADER');
+        FND_MESSAGE.SET_TOKEN('PROCEDURE', 'LOAD_ROUTING');
+        FND_MESSAGE.SET_TOKEN('TABLE', 'MSC_ROUTINGS');
+        MSC_UTIL.LOG_MSG(MSC_UTIL.G_D_STATUS, FND_MESSAGE.GET);
+
+        MSC_UTIL.LOG_MSG(MSC_UTIL.G_D_STATUS, SQLERRM);
+
+        --If Direct path load results in warning then the processing has to be
+        --switched back to row by row processing. This will help to identify the
+        --erroneous record and will also help in processing the rest of the records.
+        MSC_UTIL.LOG_MSG(MSC_UTIL.G_D_STATUS, 'bulk insert failed - routings');
+        lb_refresh_failed := TRUE;
+      END IF;
+  END;
+
+END IF;   -- MSC_CL_COLLECTION.v_is_complete_refresh
+
+IF MSC_CL_COLLECTION.v_is_incremental_refresh OR lb_refresh_failed THEN
+
+IF MSC_CL_COLLECTION.v_is_incremental_refresh THEN
+
+FOR c_rec IN c4_d LOOP
+
+  -- set SR_INSTANCE_ID to negative to indicate a SOFT delete
+
+DELETE MSC_ROUTINGS
+ WHERE PLAN_ID= -1
+   AND ROUTING_SEQUENCE_ID= c_rec.ROUTING_SEQUENCE_ID
+   AND SR_INSTANCE_ID= c_rec.SR_INSTANCE_ID;
+
+END LOOP;
+
+END IF;
+
+
+c_count:= 0;
+
+FOR c_rec IN c4 LOOP
+
+BEGIN
+
+IF MSC_CL_COLLECTION.v_is_incremental_refresh THEN
+
+UPDATE MSC_ROUTINGS
+SET
+ ROUTING_TYPE= c_rec.ROUTING_TYPE,
+ ROUTING_COMMENT= c_rec.ROUTING_COMMENT,
+ ALTERNATE_ROUTING_DESIGNATOR= c_rec.ALTERNATE_ROUTING_DESIGNATOR,
+ PROJECT_ID= c_rec.PROJECT_ID,
+ TASK_ID= c_rec.TASK_ID,
+ LINE_ID= c_rec.LINE_ID,
+ UOM_CODE= c_rec.UOM_CODE,
+ CFM_ROUTING_FLAG= c_rec.CFM_ROUTING_FLAG,
+ FIRST_OP_SEQ_NUM = c_rec.FIRST_OP_SEQ_NUM,
+ LAST_OP_SEQ_NUM = c_rec.LAST_OP_SEQ_NUM,
+ common_routing_sequence_id=c_rec.common_routing_sequence_id,
+ CTP_FLAG= c_rec.CTP_FLAG,
+ ASSEMBLY_ITEM_ID= c_rec.ASSEMBLY_ITEM_ID,
+ ORGANIZATION_ID= c_rec.ORGANIZATION_ID,
+ ROUTING_QUANTITY= c_rec.ROUTING_QUANTITY,
+ REFRESH_NUMBER= MSC_CL_COLLECTION.v_last_collection_id,
+ LAST_UPDATE_DATE= MSC_CL_COLLECTION.v_current_date,
+ LAST_UPDATED_BY= MSC_CL_COLLECTION.v_current_user
+WHERE PLAN_ID= -1
+  AND ROUTING_SEQUENCE_ID= c_rec.ROUTING_SEQUENCE_ID
+  AND SR_INSTANCE_ID= c_rec.SR_INSTANCE_ID;
+
+END IF;
+
+IF (MSC_CL_COLLECTION.v_is_complete_refresh OR MSC_CL_COLLECTION.v_is_partial_refresh) OR SQL%NOTFOUND THEN
+
+INSERT INTO MSC_ROUTINGS
+( PLAN_ID,
+  ROUTING_SEQUENCE_ID,
+  ROUTING_TYPE,
+  ROUTING_COMMENT,
+  ALTERNATE_ROUTING_DESIGNATOR,
+  PROJECT_ID,
+  TASK_ID,
+  LINE_ID,
+  UOM_CODE,
+  CFM_ROUTING_FLAG,
+  CTP_FLAG,
+  ASSEMBLY_ITEM_ID,
+  ORGANIZATION_ID,
+  ROUTING_QUANTITY,
+  SR_INSTANCE_ID,
+  REFRESH_NUMBER,
+  LAST_UPDATE_DATE,
+  LAST_UPDATED_BY,
+  CREATION_DATE,
+  CREATED_BY,
+  FIRST_OP_SEQ_NUM,
+  LAST_OP_SEQ_NUM,
+  common_routing_sequence_id,
+  auto_step_qty_flag)
+VALUES
+( -1,
+  c_rec.ROUTING_SEQUENCE_ID,
+  c_rec.ROUTING_TYPE,
+  c_rec.ROUTING_COMMENT,
+  c_rec.ALTERNATE_ROUTING_DESIGNATOR,
+  c_rec.PROJECT_ID,
+  c_rec.TASK_ID,
+  c_rec.LINE_ID,
+  c_rec.UOM_CODE,
+  c_rec.CFM_ROUTING_FLAG,
+  c_rec.CTP_FLAG,
+  c_rec.ASSEMBLY_ITEM_ID,
+  c_rec.ORGANIZATION_ID,
+  c_rec.ROUTING_QUANTITY,
+  c_rec.SR_INSTANCE_ID,
+  MSC_CL_COLLECTION.v_last_collection_id,
+  MSC_CL_COLLECTION.v_current_date,
+  MSC_CL_COLLECTION.v_current_user,
+  MSC_CL_COLLECTION.v_current_date,
+  MSC_CL_COLLECTION.v_current_user,
+  c_rec.first_op_seq_num,
+  c_rec.last_op_seq_num,
+  c_rec.common_routing_sequence_id,
+  c_rec.auto_step_qty_flag);
+
+END IF;  -- SQL%NOTFOUND
+
+  c_count:= c_count+1;
+
+  IF c_count> MSC_CL_COLLECTION.PBS THEN
+     COMMIT;
+     c_count:= 0;
+  END IF;
+
+EXCEPTION
+
+   WHEN OTHERS THEN
+
+    IF SQLCODE IN (-01653,-01650,-01562,-01683) THEN
+
+      MSC_UTIL.LOG_MSG(MSC_UTIL.G_D_STATUS, '========================================');
+      FND_MESSAGE.SET_NAME('MSC', 'MSC_OL_DATA_ERR_HEADER');
+      FND_MESSAGE.SET_TOKEN('PROCEDURE', 'LOAD_ROUTING');
+      FND_MESSAGE.SET_TOKEN('TABLE', 'MSC_ROUTINGS');
+      MSC_UTIL.LOG_MSG(MSC_UTIL.G_D_STATUS, FND_MESSAGE.GET);
+
+      MSC_UTIL.LOG_MSG(MSC_UTIL.G_D_STATUS, SQLERRM);
+      RAISE;
+
+    ELSE
+      MSC_CL_COLLECTION.v_warning_flag := MSC_UTIL.SYS_YES;
+
+      MSC_UTIL.LOG_MSG(MSC_UTIL.G_D_STATUS, '========================================');
+      FND_MESSAGE.SET_NAME('MSC', 'MSC_OL_DATA_ERR_HEADER');
+      FND_MESSAGE.SET_TOKEN('PROCEDURE', 'LOAD_ROUTING');
+      FND_MESSAGE.SET_TOKEN('TABLE', 'MSC_ROUTINGS');
+      MSC_UTIL.LOG_MSG(MSC_UTIL.G_D_STATUS, FND_MESSAGE.GET);
+
+      FND_MESSAGE.SET_NAME('MSC','MSC_OL_DATA_ERR_DETAIL');
+      FND_MESSAGE.SET_TOKEN('COLUMN', 'ASSEMBLY_ITEM_NAME');
+      FND_MESSAGE.SET_TOKEN('VALUE', MSC_CL_ITEM_ODS_LOAD.ITEM_NAME(c_rec.ASSEMBLY_ITEM_ID));
+      MSC_UTIL.LOG_MSG(MSC_UTIL.G_D_STATUS, FND_MESSAGE.GET);
+
+      FND_MESSAGE.SET_NAME('MSC','MSC_OL_DATA_ERR_DETAIL');
+      FND_MESSAGE.SET_TOKEN('COLUMN', 'ROUTING_SEQUENCE_ID');
+      FND_MESSAGE.SET_TOKEN('VALUE', TO_CHAR( c_rec.ROUTING_SEQUENCE_ID));
+      MSC_UTIL.LOG_MSG(MSC_UTIL.G_D_STATUS, FND_MESSAGE.GET);
+
+      MSC_UTIL.LOG_MSG(MSC_UTIL.G_D_STATUS, SQLERRM);
+    END IF;
+END;
+
+END LOOP;
+END IF; -- MSC_CL_COLLECTION.v_is_incremental_refresh
+
+COMMIT;
+
+   END LOAD_ROUTING;
+
+--==================================================================
+
+   PROCEDURE LOAD_OPERATION_COMPONENTS IS
+
+   CURSOR c9 IS
+SELECT
+  ORGANIZATION_ID,
+  OPERATION_SEQUENCE_ID,
+  COMPONENT_SEQUENCE_ID,
+  BILL_SEQUENCE_ID,
+  ROUTING_SEQUENCE_ID,
+  SR_INSTANCE_ID
+FROM MSC_ST_OPERATION_COMPONENTS msoc
+WHERE msoc.SR_INSTANCE_ID= MSC_CL_COLLECTION.v_instance_id
+  AND msoc.DELETED_FLAG= MSC_UTIL.SYS_NO;
+
+   CURSOR c9_d IS
+SELECT
+  OPERATION_SEQUENCE_ID,
+  COMPONENT_SEQUENCE_ID,
+  BILL_SEQUENCE_ID,
+  ROUTING_SEQUENCE_ID,
+  SR_INSTANCE_ID,
+  ORGANIZATION_ID
+FROM MSC_ST_OPERATION_COMPONENTS msoc
+WHERE msoc.SR_INSTANCE_ID= MSC_CL_COLLECTION.v_instance_id
+  AND msoc.DELETED_FLAG= MSC_UTIL.SYS_YES
+UNION ALL
+SELECT DISTINCT
+  TO_NUMBER(NULL),
+  TO_NUMBER(NULL),
+  moc.BILL_SEQUENCE_ID,
+  moc.ROUTING_SEQUENCE_ID,
+  moc.SR_INSTANCE_ID,
+  moc.ORGANIZATION_ID
+FROM MSC_OPERATION_COMPONENTS moc,
+     MSC_ST_OPERATION_COMPONENTS msoc
+WHERE msoc.Bill_Sequence_ID= moc.Bill_Sequence_ID
+  AND msoc.Routing_Sequence_ID <> moc.Routing_Sequence_ID
+  AND msoc.Organization_ID= moc.Organization_ID
+  AND msoc.SR_INSTANCE_ID= MSC_CL_COLLECTION.v_instance_id
+  AND moc.SR_INSTANCE_ID= MSC_CL_COLLECTION.v_instance_id
+  AND msoc.DELETED_FLAG= MSC_UTIL.SYS_NO
+  AND moc.PLAN_ID= -1;
+
+
+c_count NUMBER:= 0;
+   lv_tbl      VARCHAR2(30);
+   lv_sql_stmt VARCHAR2(5000);
+   lv_sql_stmt1       VARCHAR2(5000);
+   lb_refresh_failed Boolean:= FALSE;
+   lv_delete_flag BOOLEAN:= FALSE;
+
+BEGIN
+
+IF (MSC_CL_COLLECTION.v_is_complete_refresh OR MSC_CL_COLLECTION.v_is_partial_refresh) THEN
+         -- We want to delete all BOM related data and get new stuff.
+
+--MSC_CL_COLLECTION.DELETE_MSC_TABLE( 'MSC_OPERATION_COMPONENTS', MSC_CL_COLLECTION.v_instance_id, -1);
+
+  IF MSC_CL_COLLECTION.v_coll_prec.org_group_flag = MSC_UTIL.G_ALL_ORGANIZATIONS THEN
+    MSC_CL_COLLECTION.DELETE_MSC_TABLE( 'MSC_OPERATION_COMPONENTS', MSC_CL_COLLECTION.v_instance_id, -1);
+  ELSE
+    v_sub_str :=' AND ORGANIZATION_ID '||MSC_UTIL.v_in_org_str;
+    MSC_CL_COLLECTION.DELETE_MSC_TABLE( 'MSC_OPERATION_COMPONENTS', MSC_CL_COLLECTION.v_instance_id, -1,v_sub_str);
+  END IF;
+BEGIN
+INSERT /*+ append  */
+INTO MSC_OPERATION_COMPONENTS
+  (PLAN_ID,
+  ORGANIZATION_ID,
+  OPERATION_SEQUENCE_ID,
+  COMPONENT_SEQUENCE_ID,
+  SR_INSTANCE_ID,
+  BILL_SEQUENCE_ID,
+  ROUTING_SEQUENCE_ID,
+  REFRESH_NUMBER,
+  LAST_UPDATE_DATE,
+  LAST_UPDATED_BY,
+  CREATION_DATE,
+  CREATED_BY)
+  SELECT
+  -1,
+  ORGANIZATION_ID,
+  OPERATION_SEQUENCE_ID,
+  COMPONENT_SEQUENCE_ID,
+  SR_INSTANCE_ID,
+  BILL_SEQUENCE_ID,
+  ROUTING_SEQUENCE_ID,
+  MSC_CL_COLLECTION.v_last_collection_id,
+  MSC_CL_COLLECTION.v_current_date,
+  MSC_CL_COLLECTION.v_current_user,
+  MSC_CL_COLLECTION.v_current_date,
+  MSC_CL_COLLECTION.v_current_user
+FROM MSC_ST_OPERATION_COMPONENTS msoc
+WHERE msoc.SR_INSTANCE_ID= MSC_CL_COLLECTION.v_instance_id
+  AND msoc.DELETED_FLAG= MSC_UTIL.SYS_NO;
+
+COMMIT;
+EXCEPTION
+   WHEN OTHERS THEN
+
+    IF SQLCODE IN (-01653,-01650,-01562,-01683) THEN
+
+      MSC_UTIL.LOG_MSG(MSC_UTIL.G_D_STATUS, '========================================');
+      FND_MESSAGE.SET_NAME('MSC', 'MSC_OL_DATA_ERR_HEADER');
+      FND_MESSAGE.SET_TOKEN('PROCEDURE', 'LOAD_OPERATION_COMPONENTS');
+      FND_MESSAGE.SET_TOKEN('TABLE', 'MSC_OPERATION_COMPONENTS');
+      MSC_UTIL.LOG_MSG(MSC_UTIL.G_D_STATUS, FND_MESSAGE.GET);
+
+      MSC_UTIL.LOG_MSG(MSC_UTIL.G_D_STATUS, SQLERRM);
+      RAISE;
+    ELSE
+      MSC_CL_COLLECTION.v_warning_flag := MSC_UTIL.SYS_YES;
+      MSC_UTIL.LOG_MSG(MSC_UTIL.G_D_STATUS, '========================================');
+      FND_MESSAGE.SET_NAME('MSC', 'MSC_OL_DATA_ERR_HEADER');
+      FND_MESSAGE.SET_TOKEN('PROCEDURE', 'LOAD_OPERATION_COMPONENTS');
+      FND_MESSAGE.SET_TOKEN('TABLE', 'MSC_OPERATION_COMPONENTS');
+      MSC_UTIL.LOG_MSG(MSC_UTIL.G_D_STATUS, FND_MESSAGE.GET);
+
+      MSC_UTIL.LOG_MSG(MSC_UTIL.G_D_STATUS, SQLERRM);
+      lb_refresh_failed := TRUE;
+    END IF;
+END;
+END IF;   -- MSC_CL_COLLECTION.v_is_complete_refresh
+
+IF MSC_CL_COLLECTION.v_is_incremental_refresh OR lb_refresh_failed THEN
+
+  -- set SR_INSTANCE_ID to negative to indicate a SOFT delete
+IF MSC_CL_COLLECTION.v_is_incremental_refresh THEN
+FOR c_rec IN c9_d LOOP
+
+BEGIN
+
+---5470477
+lv_sql_stmt1 := ' DELETE MSC_OPERATION_COMPONENTS '
+		||'  WHERE PLAN_ID= -1 '
+		||'   AND SR_INSTANCE_ID= :SR_INSTANCE_ID ';
+
+  lv_delete_flag := FALSE;
+
+	IF (c_rec.ORGANIZATION_ID IS NOT NULL) THEN
+		lv_sql_stmt1 := lv_sql_stmt1 || '  AND ORGANIZATION_ID= ' || c_rec.ORGANIZATION_ID  ;
+		lv_delete_flag := FALSE;
+	END IF;
+
+	IF (c_rec.BILL_SEQUENCE_ID IS NOT NULL) THEN
+		lv_sql_stmt1 := lv_sql_stmt1 ||'   AND BILL_SEQUENCE_ID= ' || c_rec.BILL_SEQUENCE_ID   ;
+		lv_delete_flag := FALSE;
+	END IF;
+
+	IF (c_rec.ROUTING_SEQUENCE_ID IS NOT NULL) THEN
+		lv_sql_stmt1 := lv_sql_stmt1 ||'   AND ROUTING_SEQUENCE_ID= ' || c_rec.ROUTING_SEQUENCE_ID  ;
+		lv_delete_flag := FALSE;
+	END IF;
+
+	IF (c_rec.COMPONENT_SEQUENCE_ID IS NOT NULL) THEN
+		lv_sql_stmt1 := lv_sql_stmt1 ||'   AND COMPONENT_SEQUENCE_ID= ' || c_rec.COMPONENT_SEQUENCE_ID  ;
+		lv_delete_flag := FALSE;
+	END IF;
+
+	IF (c_rec.OPERATION_SEQUENCE_ID IS NOT NULL) THEN
+		lv_sql_stmt1 := lv_sql_stmt1 ||'   AND OPERATION_SEQUENCE_ID= ' || c_rec.OPERATION_SEQUENCE_ID  ;
+		lv_delete_flag := FALSE;
+	END IF;
+if (lv_delete_flag = FALSE) then
+EXECUTE IMMEDIATE lv_sql_stmt1 USING c_rec.SR_INSTANCE_ID;
+end if;
+/* bug 988700 fix : change UPDATE to DELETE */
+/*
+DELETE MSC_OPERATION_COMPONENTS
+ WHERE PLAN_ID= -1
+   AND BILL_SEQUENCE_ID= NVL( c_rec.BILL_SEQUENCE_ID, BILL_SEQUENCE_ID)
+   AND ROUTING_SEQUENCE_ID= NVL( c_rec.ROUTING_SEQUENCE_ID, ROUTING_SEQUENCE_ID)
+   AND COMPONENT_SEQUENCE_ID= NVL( c_rec.COMPONENT_SEQUENCE_ID, COMPONENT_SEQUENCE_ID)
+   AND OPERATION_SEQUENCE_ID= NVL( c_rec.OPERATION_SEQUENCE_ID, OPERATION_SEQUENCE_ID)
+   AND SR_INSTANCE_ID= c_rec.SR_INSTANCE_ID;
+*/
+EXCEPTION
+  WHEN OTHERS THEN
+      MSC_UTIL.LOG_MSG(MSC_UTIL.G_D_STATUS, '========================================');
+      FND_MESSAGE.SET_NAME('MSC', 'MSC_OL_DATA_ERR_HEADER');
+      FND_MESSAGE.SET_TOKEN('PROCEDURE', 'LOAD_OPERATION_COMPONENTS');
+      FND_MESSAGE.SET_TOKEN('TABLE', 'MSC_OPERATION_COMPONENTS');
+      MSC_UTIL.LOG_MSG(MSC_UTIL.G_D_STATUS, FND_MESSAGE.GET);
+
+      FND_MESSAGE.SET_NAME('MSC','MSC_OL_DATA_ERR_DETAIL');
+      FND_MESSAGE.SET_TOKEN('COLUMN', 'OPERATION_SEQUENCE_ID');
+      FND_MESSAGE.SET_TOKEN('VALUE', TO_CHAR( c_rec.OPERATION_SEQUENCE_ID));
+      MSC_UTIL.LOG_MSG(MSC_UTIL.G_D_STATUS, FND_MESSAGE.GET);
+
+      FND_MESSAGE.SET_NAME('MSC','MSC_OL_DATA_ERR_DETAIL');
+      FND_MESSAGE.SET_TOKEN('COLUMN', 'COMPONENT_SEQUENCE_ID');
+      FND_MESSAGE.SET_TOKEN('VALUE', TO_CHAR( c_rec.COMPONENT_SEQUENCE_ID));
+      MSC_UTIL.LOG_MSG(MSC_UTIL.G_D_STATUS, FND_MESSAGE.GET);
+
+      FND_MESSAGE.SET_NAME('MSC','MSC_OL_DATA_ERR_DETAIL');
+      FND_MESSAGE.SET_TOKEN('COLUMN', 'ROUTING_SEQUENCE_ID');
+      FND_MESSAGE.SET_TOKEN('VALUE', TO_CHAR( c_rec.ROUTING_SEQUENCE_ID));
+      MSC_UTIL.LOG_MSG(MSC_UTIL.G_D_STATUS, FND_MESSAGE.GET);
+
+      FND_MESSAGE.SET_NAME('MSC','MSC_OL_DATA_ERR_DETAIL');
+      FND_MESSAGE.SET_TOKEN('COLUMN', 'BILL_SEQUENCE_ID');
+      FND_MESSAGE.SET_TOKEN('VALUE', TO_CHAR( c_rec.BILL_SEQUENCE_ID));
+      MSC_UTIL.LOG_MSG(MSC_UTIL.G_D_STATUS, FND_MESSAGE.GET);
+
+      MSC_UTIL.LOG_MSG(MSC_UTIL.G_D_STATUS, SQLERRM);
+
+END;
+
+END LOOP;
+
+END IF;
+
+
+c_count:= 0;
+
+FOR c_rec IN c9 LOOP
+
+BEGIN
+
+IF MSC_CL_COLLECTION.v_is_incremental_refresh THEN
+
+UPDATE MSC_OPERATION_COMPONENTS
+   SET PLAN_ID= -1,
+       LAST_UPDATE_DATE= MSC_CL_COLLECTION.v_current_date,
+       LAST_UPDATED_BY= MSC_CL_COLLECTION.v_current_user
+   WHERE PLAN_ID= -1
+   AND SR_INSTANCE_ID= c_rec.SR_INSTANCE_ID
+   AND ORGANIZATION_ID= c_rec.ORGANIZATION_ID
+   AND BILL_SEQUENCE_ID = c_rec.BILL_SEQUENCE_ID
+   AND ROUTING_SEQUENCE_ID = c_rec.ROUTING_SEQUENCE_ID
+   AND COMPONENT_SEQUENCE_ID= c_rec.COMPONENT_SEQUENCE_ID
+   AND OPERATION_SEQUENCE_ID= c_rec.OPERATION_SEQUENCE_ID;
+
+END IF;
+
+IF (MSC_CL_COLLECTION.v_is_complete_refresh OR MSC_CL_COLLECTION.v_is_partial_refresh) OR SQL%NOTFOUND THEN
+
+INSERT INTO MSC_OPERATION_COMPONENTS
+( PLAN_ID,
+  ORGANIZATION_ID,
+  OPERATION_SEQUENCE_ID,
+  COMPONENT_SEQUENCE_ID,
+  SR_INSTANCE_ID,
+  BILL_SEQUENCE_ID,
+  ROUTING_SEQUENCE_ID,
+  REFRESH_NUMBER,
+  LAST_UPDATE_DATE,
+  LAST_UPDATED_BY,
+  CREATION_DATE,
+  CREATED_BY)
+VALUES
+( -1,
+  c_rec.ORGANIZATION_ID,
+  c_rec.OPERATION_SEQUENCE_ID,
+  c_rec.COMPONENT_SEQUENCE_ID,
+  c_rec.SR_INSTANCE_ID,
+  c_rec.BILL_SEQUENCE_ID,
+  c_rec.ROUTING_SEQUENCE_ID,
+  MSC_CL_COLLECTION.v_last_collection_id,
+  MSC_CL_COLLECTION.v_current_date,
+  MSC_CL_COLLECTION.v_current_user,
+  MSC_CL_COLLECTION.v_current_date,
+  MSC_CL_COLLECTION.v_current_user);
+
+END IF;
+
+  c_count:= c_count+1;
+
+  IF c_count> MSC_CL_COLLECTION.PBS THEN
+     COMMIT;
+     c_count:= 0;
+  END IF;
+
+EXCEPTION
+   WHEN OTHERS THEN
+
+    IF SQLCODE IN (-01653,-01650,-01562,-01683) THEN
+
+      MSC_UTIL.LOG_MSG(MSC_UTIL.G_D_STATUS, '========================================');
+      FND_MESSAGE.SET_NAME('MSC', 'MSC_OL_DATA_ERR_HEADER');
+      FND_MESSAGE.SET_TOKEN('PROCEDURE', 'LOAD_OPERATION_COMPONENTS');
+      FND_MESSAGE.SET_TOKEN('TABLE', 'MSC_OPERATION_COMPONENTS');
+      MSC_UTIL.LOG_MSG(MSC_UTIL.G_D_STATUS, FND_MESSAGE.GET);
+
+      MSC_UTIL.LOG_MSG(MSC_UTIL.G_D_STATUS, SQLERRM);
+      RAISE;
+
+    ELSE
+      MSC_CL_COLLECTION.v_warning_flag := MSC_UTIL.SYS_YES;
+
+      MSC_UTIL.LOG_MSG(MSC_UTIL.G_D_STATUS, '========================================');
+      FND_MESSAGE.SET_NAME('MSC', 'MSC_OL_DATA_ERR_HEADER');
+      FND_MESSAGE.SET_TOKEN('PROCEDURE', 'LOAD_OPERATION_COMPONENTS');
+      FND_MESSAGE.SET_TOKEN('TABLE', 'MSC_OPERATION_COMPONENTS');
+      MSC_UTIL.LOG_MSG(MSC_UTIL.G_D_STATUS, FND_MESSAGE.GET);
+
+      FND_MESSAGE.SET_NAME('MSC','MSC_OL_DATA_ERR_DETAIL');
+      FND_MESSAGE.SET_TOKEN('COLUMN', 'ORGANIZATION_CODE');
+      FND_MESSAGE.SET_TOKEN('VALUE', MSC_GET_NAME.ORG_CODE( c_rec.ORGANIZATION_ID, MSC_CL_COLLECTION.v_instance_id));
+      MSC_UTIL.LOG_MSG(MSC_UTIL.G_D_STATUS, FND_MESSAGE.GET);
+
+      FND_MESSAGE.SET_NAME('MSC','MSC_OL_DATA_ERR_DETAIL');
+      FND_MESSAGE.SET_TOKEN('COLUMN', 'OPERATION_SEQUENCE_ID');
+      FND_MESSAGE.SET_TOKEN('VALUE', TO_CHAR( c_rec.OPERATION_SEQUENCE_ID));
+      MSC_UTIL.LOG_MSG(MSC_UTIL.G_D_STATUS, FND_MESSAGE.GET);
+
+      FND_MESSAGE.SET_NAME('MSC','MSC_OL_DATA_ERR_DETAIL');
+      FND_MESSAGE.SET_TOKEN('COLUMN', 'COMPONENT_SEQUENCE_ID');
+      FND_MESSAGE.SET_TOKEN('VALUE', TO_CHAR( c_rec.COMPONENT_SEQUENCE_ID));
+      MSC_UTIL.LOG_MSG(MSC_UTIL.G_D_STATUS, FND_MESSAGE.GET);
+
+      MSC_UTIL.LOG_MSG(MSC_UTIL.G_D_STATUS, SQLERRM);
+    END IF;
+
+END;
+
+END LOOP;
+
+COMMIT;
+END IF;
+
+   END LOAD_OPERATION_COMPONENTS;
+
+--=====================================================================
+
+   PROCEDURE LOAD_OP_RESOURCE_SEQ IS
+
+   CURSOR c7 IS
+SELECT
+  msors.ROUTING_SEQUENCE_ID,
+  msors.OPERATION_SEQUENCE_ID,
+  msors.RESOURCE_SEQ_NUM,
+  msors.SCHEDULE_FLAG,
+  msors.RESOURCE_OFFSET_PERCENT,
+  msors.DEPARTMENT_ID,
+  msors.ACTIVITY_GROUP_ID,
+  msors.SR_INSTANCE_ID,
+  msors.ORGANIZATION_ID
+FROM MSC_ST_OPERATION_RESOURCE_SEQS msors
+WHERE msors.SR_INSTANCE_ID= MSC_CL_COLLECTION.v_instance_id
+  AND msors.DELETED_FLAG= MSC_UTIL.SYS_NO;
+
+   CURSOR c7_d IS
+SELECT
+  msors.ROUTING_SEQUENCE_ID,
+  msors.OPERATION_SEQUENCE_ID,
+  msors.RESOURCE_SEQ_NUM,
+  msors.SR_INSTANCE_ID
+FROM MSC_ST_OPERATION_RESOURCE_SEQS msors
+WHERE msors.SR_INSTANCE_ID= MSC_CL_COLLECTION.v_instance_id
+  AND msors.DELETED_FLAG= MSC_UTIL.SYS_YES;
+
+
+c_count NUMBER:= 0;
+   lv_tbl      VARCHAR2(30);
+   lv_sql_stmt VARCHAR2(5000);
+   lv_sql_ins  VARCHAR2(6000);
+   lb_refresh_failed Boolean:= FALSE;
+
+  lv_errbuf			VARCHAR2(240);
+  lv_retcode			NUMBER;
+
+BEGIN
+
+IF MSC_CL_COLLECTION.v_exchange_mode=MSC_UTIL.SYS_YES THEN
+   lv_tbl:= 'OPERATION_RESOURCE_SEQS_'||MSC_CL_COLLECTION.v_instance_code;
+ELSE
+   lv_tbl:= 'MSC_OPERATION_RESOURCE_SEQS';
+END IF;
+
+IF (MSC_CL_COLLECTION.v_is_complete_refresh OR MSC_CL_COLLECTION.v_is_partial_refresh) THEN
+-- We want to delete all BOM related data and get new stuff.
+--MSC_CL_COLLECTION.DELETE_MSC_TABLE( 'MSC_OPERATION_RESOURCE_SEQS', MSC_CL_COLLECTION.v_instance_id, -1);
+
+  IF MSC_CL_COLLECTION.v_exchange_mode=MSC_UTIL.SYS_NO THEN
+     IF MSC_CL_COLLECTION.v_coll_prec.org_group_flag = MSC_UTIL.G_ALL_ORGANIZATIONS THEN
+       MSC_CL_COLLECTION.DELETE_MSC_TABLE( 'MSC_OPERATION_RESOURCE_SEQS', MSC_CL_COLLECTION.v_instance_id, -1);
+     ELSE
+       v_sub_str :=' AND ORGANIZATION_ID '||MSC_UTIL.v_in_org_str;
+       MSC_CL_COLLECTION.DELETE_MSC_TABLE( 'MSC_OPERATION_RESOURCE_SEQS', MSC_CL_COLLECTION.v_instance_id, -1,v_sub_str);
+     END IF;
+  END IF;
+
+  BEGIN
+
+  lv_sql_ins:=
+  ' INSERT INTO  '||lv_tbl
+  ||' ( PLAN_ID, '
+  ||'   ROUTING_SEQUENCE_ID, '
+  ||'   OPERATION_SEQUENCE_ID, '
+  ||'   RESOURCE_SEQ_NUM, '
+  ||'   SCHEDULE_FLAG, '
+  ||'   RESOURCE_OFFSET_PERCENT, '
+  ||'   DEPARTMENT_ID, '
+  ||'   ACTIVITY_GROUP_ID, '
+  ||'   SR_INSTANCE_ID, '
+  ||'   ORGANIZATION_ID, '
+  ||'   REFRESH_NUMBER, '
+  ||'   LAST_UPDATE_DATE, '
+  ||'   LAST_UPDATED_BY, '
+  ||'   CREATION_DATE, '
+  ||'   CREATED_BY) '
+  ||'SELECT '
+  ||'  -1,'
+  ||'  msors.ROUTING_SEQUENCE_ID,'
+  ||'  msors.OPERATION_SEQUENCE_ID,'
+  ||'  msors.RESOURCE_SEQ_NUM,'
+  ||'  max(msors.SCHEDULE_FLAG),'
+  ||'  max(msors.RESOURCE_OFFSET_PERCENT),'
+  ||'  max(msors.DEPARTMENT_ID),'
+  ||'  max(msors.ACTIVITY_GROUP_ID),'
+  ||'  msors.SR_INSTANCE_ID,'
+  ||'  max(msors.ORGANIZATION_ID), '
+  ||'  :v_last_collection_id,'
+  ||'  :v_current_date,'
+  ||'  :v_current_user,'
+  ||'  :v_current_date,'
+  ||'  :v_current_user '
+  ||' FROM MSC_ST_OPERATION_RESOURCE_SEQS msors'
+  ||' WHERE msors.SR_INSTANCE_ID= '||MSC_CL_COLLECTION.v_instance_id
+  ||'   AND msors.DELETED_FLAG= '||MSC_UTIL.SYS_NO
+  ||'   GROUP BY '
+  ||'   msors.ROUTING_SEQUENCE_ID,  '
+  ||'   msors.OPERATION_SEQUENCE_ID, '
+  ||'   msors.RESOURCE_SEQ_NUM,'
+  ||'   msors.SR_INSTANCE_ID';
+
+  EXECUTE IMMEDIATE lv_sql_ins
+  USING   MSC_CL_COLLECTION.v_last_collection_id,MSC_CL_COLLECTION.v_current_date,MSC_CL_COLLECTION.v_current_user,MSC_CL_COLLECTION.v_current_date,MSC_CL_COLLECTION.v_current_user;
+
+  COMMIT;
+  MSC_UTIL.LOG_MSG(MSC_UTIL.G_D_STATUS, 'operation resource seqs loaded');
+
+  EXCEPTION
+     WHEN OTHERS THEN
+      IF SQLCODE IN (-01653,-01650,-01562,-01683) THEN
+
+        MSC_UTIL.LOG_MSG(MSC_UTIL.G_D_STATUS, '========================================');
+        FND_MESSAGE.SET_NAME('MSC', 'MSC_OL_DATA_ERR_HEADER');
+        FND_MESSAGE.SET_TOKEN('PROCEDURE', 'LOAD_OP_RESOURCE_SEQ');
+        FND_MESSAGE.SET_TOKEN('TABLE', 'MSC_OPERATION_RESOURCE_SEQS');
+        MSC_UTIL.LOG_MSG(MSC_UTIL.G_D_STATUS, FND_MESSAGE.GET);
+
+        MSC_UTIL.LOG_MSG(MSC_UTIL.G_D_STATUS, SQLERRM);
+        RAISE;
+
+      ELSE
+        MSC_UTIL.LOG_MSG(MSC_UTIL.G_D_STATUS, '========================================');
+        FND_MESSAGE.SET_NAME('MSC', 'MSC_OL_DATA_ERR_HEADER');
+        FND_MESSAGE.SET_TOKEN('PROCEDURE', 'LOAD_OP_RESOURCE_SEQ');
+        FND_MESSAGE.SET_TOKEN('TABLE', 'MSC_OPERATION_RESOURCE_SEQS');
+        MSC_UTIL.LOG_MSG(MSC_UTIL.G_D_STATUS, FND_MESSAGE.GET);
+
+        MSC_UTIL.LOG_MSG(MSC_UTIL.G_D_STATUS, SQLERRM);
+
+        --If Direct path load results in warning then the processing has to be
+        --switched back to row by row processing. This will help to identify the
+        --erroneous record and will also help in processing the rest of the records.
+        MSC_UTIL.LOG_MSG(MSC_UTIL.G_D_STATUS, 'bulk insert failed - operation resource seqs');
+        lb_refresh_failed := TRUE;
+      END IF;
+  END;
+
+END IF;   -- MSC_CL_COLLECTION.v_is_complete_refresh
+
+lv_sql_stmt :=
+' INSERT INTO  '||lv_tbl
+||' ( PLAN_ID, '
+||'   ROUTING_SEQUENCE_ID, '
+||'   OPERATION_SEQUENCE_ID, '
+||'   RESOURCE_SEQ_NUM, '
+||'   SCHEDULE_FLAG, '
+||'   RESOURCE_OFFSET_PERCENT, '
+||'   DEPARTMENT_ID, '
+||'   ACTIVITY_GROUP_ID, '
+||'   SR_INSTANCE_ID, '
+||'   ORGANIZATION_ID, '
+||'   REFRESH_NUMBER, '
+||'   LAST_UPDATE_DATE, '
+||'   LAST_UPDATED_BY, '
+||'   CREATION_DATE, '
+||'   CREATED_BY) '
+||' VALUES '
+||' ( -1, '
+||'   :ROUTING_SEQUENCE_ID, '
+||'   :OPERATION_SEQUENCE_ID, '
+||'   :RESOURCE_SEQ_NUM, '
+||'   :SCHEDULE_FLAG, '
+||'   :RESOURCE_OFFSET_PERCENT, '
+||'   :DEPARTMENT_ID, '
+||'   :ACTIVITY_GROUP_ID, '
+||'   :SR_INSTANCE_ID, '
+||'   :ORGANIZATION_ID, '
+||'   :v_last_collection_id, '
+||'   :v_current_date, '
+||'   :v_current_user, '
+||'   :v_current_date, '
+||'   :v_current_user ) ';
+
+IF MSC_CL_COLLECTION.v_is_incremental_refresh OR lb_refresh_failed THEN
+
+IF MSC_CL_COLLECTION.v_is_incremental_refresh THEN
+
+FOR c_rec IN c7_d LOOP
+
+IF c_rec.OPERATION_SEQUENCE_ID IS NOT NULL THEN
+    DELETE MSC_OPERATION_RESOURCE_SEQS
+     WHERE PLAN_ID= -1
+       AND ROUTING_SEQUENCE_ID= c_rec.ROUTING_SEQUENCE_ID
+       AND OPERATION_SEQUENCE_ID= c_rec.OPERATION_SEQUENCE_ID
+       AND RESOURCE_SEQ_NUM= c_rec.RESOURCE_SEQ_NUM
+       AND SR_INSTANCE_ID= c_rec.SR_INSTANCE_ID;
+ELSE
+    DELETE MSC_OPERATION_RESOURCE_SEQS
+     WHERE PLAN_ID= -1
+       AND ROUTING_SEQUENCE_ID= c_rec.ROUTING_SEQUENCE_ID
+       AND SR_INSTANCE_ID= c_rec.SR_INSTANCE_ID;
+END IF;
+
+END LOOP;
+
+END IF;
+
+
+c_count:= 0;
+
+FOR c_rec IN c7 LOOP
+
+BEGIN
+
+IF MSC_CL_COLLECTION.v_is_incremental_refresh THEN
+
+UPDATE MSC_OPERATION_RESOURCE_SEQS
+SET
+ SCHEDULE_FLAG= c_rec.SCHEDULE_FLAG,
+ RESOURCE_OFFSET_PERCENT= c_rec.RESOURCE_OFFSET_PERCENT,
+ DEPARTMENT_ID= c_rec.DEPARTMENT_ID,
+ ACTIVITY_GROUP_ID= c_rec.ACTIVITY_GROUP_ID,
+ ORGANIZATION_ID=c_rec.ORGANIZATION_ID,
+ REFRESH_NUMBER= MSC_CL_COLLECTION.v_last_collection_id,
+ LAST_UPDATE_DATE= MSC_CL_COLLECTION.v_current_date,
+ LAST_UPDATED_BY= MSC_CL_COLLECTION.v_current_user
+WHERE PLAN_ID= -1
+  AND ROUTING_SEQUENCE_ID= c_rec.ROUTING_SEQUENCE_ID
+  AND OPERATION_SEQUENCE_ID= c_rec.OPERATION_SEQUENCE_ID
+  AND RESOURCE_SEQ_NUM= c_rec.RESOURCE_SEQ_NUM
+  AND SR_INSTANCE_ID= c_rec.SR_INSTANCE_ID;
+
+END IF;
+
+IF (MSC_CL_COLLECTION.v_is_complete_refresh OR MSC_CL_COLLECTION.v_is_partial_refresh) OR SQL%NOTFOUND THEN
+
+EXECUTE IMMEDIATE lv_sql_stmt USING
+   c_rec.ROUTING_SEQUENCE_ID,
+   c_rec.OPERATION_SEQUENCE_ID,
+   c_rec.RESOURCE_SEQ_NUM,
+   c_rec.SCHEDULE_FLAG,
+   c_rec.RESOURCE_OFFSET_PERCENT,
+   c_rec.DEPARTMENT_ID,
+   c_rec.ACTIVITY_GROUP_ID,
+   c_rec.SR_INSTANCE_ID,
+   c_rec.ORGANIZATION_ID,
+   MSC_CL_COLLECTION.v_last_collection_id,
+   MSC_CL_COLLECTION.v_current_date,
+   MSC_CL_COLLECTION.v_current_user,
+   MSC_CL_COLLECTION.v_current_date,
+   MSC_CL_COLLECTION.v_current_user  ;
+
+END IF;  -- SQL%NOTFOUND
+
+  c_count:= c_count+1;
+
+  IF c_count> MSC_CL_COLLECTION.PBS THEN
+     COMMIT;
+     c_count:= 0;
+  END IF;
+
+
+EXCEPTION
+
+   WHEN DUP_VAL_ON_INDEX THEN
+        NULL;
+
+   WHEN OTHERS THEN
+
+    IF SQLCODE IN (-01653,-01650,-01562,-01683) THEN
+
+      MSC_UTIL.LOG_MSG(MSC_UTIL.G_D_STATUS, '========================================');
+      FND_MESSAGE.SET_NAME('MSC', 'MSC_OL_DATA_ERR_HEADER');
+      FND_MESSAGE.SET_TOKEN('PROCEDURE', 'LOAD_OP_RESOURCE_SEQ');
+      FND_MESSAGE.SET_TOKEN('TABLE', 'MSC_OPERATION_RESOURCE_SEQS');
+      MSC_UTIL.LOG_MSG(MSC_UTIL.G_D_STATUS, FND_MESSAGE.GET);
+
+      MSC_UTIL.LOG_MSG(MSC_UTIL.G_D_STATUS, SQLERRM);
+      RAISE;
+
+    ELSE
+      MSC_CL_COLLECTION.v_warning_flag := MSC_UTIL.SYS_YES;
+
+      MSC_UTIL.LOG_MSG(MSC_UTIL.G_D_STATUS, '========================================');
+      FND_MESSAGE.SET_NAME('MSC', 'MSC_OL_DATA_ERR_HEADER');
+      FND_MESSAGE.SET_TOKEN('PROCEDURE', 'LOAD_OP_RESOURCE_SEQ');
+      FND_MESSAGE.SET_TOKEN('TABLE', 'MSC_OPERATION_RESOURCE_SEQS');
+      MSC_UTIL.LOG_MSG(MSC_UTIL.G_D_STATUS, FND_MESSAGE.GET);
+
+      FND_MESSAGE.SET_NAME('MSC','MSC_OL_DATA_ERR_DETAIL');
+      FND_MESSAGE.SET_TOKEN('COLUMN', 'ROUTING_SEQUENCE_ID');
+      FND_MESSAGE.SET_TOKEN('VALUE', TO_CHAR( c_rec.ROUTING_SEQUENCE_ID));
+      MSC_UTIL.LOG_MSG(MSC_UTIL.G_D_STATUS, FND_MESSAGE.GET);
+
+      FND_MESSAGE.SET_NAME('MSC','MSC_OL_DATA_ERR_DETAIL');
+      FND_MESSAGE.SET_TOKEN('COLUMN', 'OPERATION_SEQUENCE_ID');
+      FND_MESSAGE.SET_TOKEN('VALUE', TO_CHAR( c_rec.OPERATION_SEQUENCE_ID));
+      MSC_UTIL.LOG_MSG(MSC_UTIL.G_D_STATUS, FND_MESSAGE.GET);
+
+      FND_MESSAGE.SET_NAME('MSC','MSC_OL_DATA_ERR_DETAIL');
+      FND_MESSAGE.SET_TOKEN('COLUMN', 'RESOURCE_SEQ_NUM');
+      FND_MESSAGE.SET_TOKEN('VALUE', TO_CHAR( c_rec.RESOURCE_SEQ_NUM));
+      MSC_UTIL.LOG_MSG(MSC_UTIL.G_D_STATUS, FND_MESSAGE.GET);
+
+      MSC_UTIL.LOG_MSG(MSC_UTIL.G_D_STATUS, SQLERRM);
+
+    END IF;
+END;
+
+END LOOP;
+END IF; -- MSC_CL_COLLECTION.v_is_incremental_refresh
+
+COMMIT;
+
+BEGIN
+
+IF ((MSC_CL_COLLECTION.v_coll_prec.org_group_flag <> MSC_UTIL.G_ALL_ORGANIZATIONS ) AND (MSC_CL_COLLECTION.v_exchange_mode=MSC_UTIL.SYS_YES)) THEN
+
+lv_tbl:= 'OPERATION_RESOURCE_SEQS_'||MSC_CL_COLLECTION.v_instance_code;
+
+lv_sql_stmt:=
+         'INSERT INTO '||lv_tbl
+          ||' SELECT * from MSC_OPERATION_RESOURCE_SEQS'
+          ||' WHERE sr_instance_id = '||MSC_CL_COLLECTION.v_instance_id
+          ||' AND plan_id = -1 '
+          ||' AND organization_id not '||MSC_UTIL.v_in_org_str;
+
+   MSC_UTIL.LOG_MSG(MSC_UTIL.G_D_STATUS, 'The sql statement is '||lv_sql_stmt);
+   EXECUTE IMMEDIATE lv_sql_stmt;
+
+   COMMIT;
+
+END IF;
+
+IF MSC_CL_COLLECTION.v_exchange_mode=MSC_UTIL.SYS_YES THEN
+   MSC_CL_COLLECTION.alter_temp_table (lv_errbuf,
+   	              lv_retcode,
+                      'MSC_OPERATION_RESOURCE_SEQS',
+                      MSC_CL_COLLECTION.v_instance_code,
+                      MSC_UTIL.G_WARNING
+                     );
+
+   IF lv_retcode = MSC_UTIL.G_ERROR THEN
+      MSC_UTIL.LOG_MSG(MSC_UTIL.G_D_STATUS, lv_errbuf);
+      RAISE MSC_CL_COLLECTION.ALTER_TEMP_TABLE_ERROR;
+   ELSIF lv_retcode = MSC_UTIL.G_WARNING THEN
+      MSC_CL_COLLECTION.v_warning_flag := MSC_UTIL.SYS_YES;
+   END IF;
+
+END IF;
+
+EXCEPTION
+  WHEN OTHERS THEN
+
+      MSC_UTIL.LOG_MSG(MSC_UTIL.G_D_STATUS, SQLERRM);
+      RAISE;
+END;
+
+   END LOAD_OP_RESOURCE_SEQ;
+
+--======================================================================
+   PROCEDURE LOAD_ROUTING_OPERATIONS IS
+
+   CURSOR c5 IS
+SELECT
+  msro.ROUTING_SEQUENCE_ID,
+  msro.OPERATION_SEQ_NUM,
+  msro.OPERATION_SEQUENCE_ID,
+  REPLACE(REPLACE(substrb(msro.OPERATION_DESCRIPTION,1,240),v_chr10,'-'),v_chr13,'-') OPERATION_DESCRIPTION,
+  msro.EFFECTIVITY_DATE,
+  msro.DISABLE_DATE,
+  msro.FROM_UNIT_NUMBER,
+  msro.TO_UNIT_NUMBER,
+  msro.OPTION_DEPENDENT_FLAG,
+  msro.OPERATION_TYPE,
+  msro.MINIMUM_TRANSFER_QUANTITY,
+  msro.YIELD,
+  msro.DEPARTMENT_ID,
+  msro.DEPARTMENT_CODE,
+  msro.OPERATION_LEAD_TIME_PERCENT,
+  msro.CUMULATIVE_YIELD,
+  msro.REVERSE_CUMULATIVE_YIELD,
+  msro.NET_PLANNING_PERCENT,
+  msro.SETUP_DURATION,
+  msro.TEAR_DOWN_DURATION,
+  msro.UOM_CODE,
+  msro.STANDARD_OPERATION_CODE,
+  msro.STEP_QUANTITY,
+  msro.STEP_QUANTITY_UOM,
+  msro.DELETED_FLAG,
+  msro.SR_INSTANCE_ID,
+  msro.ORGANIZATION_ID
+ FROM MSC_ST_ROUTING_OPERATIONS msro
+WHERE msro.SR_INSTANCE_ID= MSC_CL_COLLECTION.v_instance_id
+  AND msro.DELETED_FLAG= MSC_UTIL.SYS_NO;
+
+   CURSOR c5_d IS
+SELECT
+  msro.ROUTING_SEQUENCE_ID,
+  msro.OPERATION_SEQUENCE_ID,
+  msro.SR_INSTANCE_ID
+ FROM MSC_ST_ROUTING_OPERATIONS msro
+WHERE msro.SR_INSTANCE_ID= MSC_CL_COLLECTION.v_instance_id
+  AND msro.DELETED_FLAG= MSC_UTIL.SYS_YES;
+
+
+c_count NUMBER:= 0;
+   lv_tbl      VARCHAR2(30);
+   lv_sql_stmt VARCHAR2(5000);
+   lv_sql_ins  VARCHAR2(6000);
+   lb_refresh_failed BOOLEAN:= FALSE;
+
+  lv_errbuf			VARCHAR2(240);
+  lv_retcode			NUMBER;
+
+BEGIN
+
+IF MSC_CL_COLLECTION.v_exchange_mode=MSC_UTIL.SYS_YES THEN
+   lv_tbl:= 'ROUTING_OPERATIONS_'||MSC_CL_COLLECTION.v_instance_code;
+ELSE
+   lv_tbl:= 'MSC_ROUTING_OPERATIONS';
+END IF;
+
+IF MSC_CL_COLLECTION.v_is_complete_refresh OR MSC_CL_COLLECTION.v_is_partial_refresh THEN
+-- We want to delete all BOM related data and get new stuff
+--MSC_CL_COLLECTION.DELETE_MSC_TABLE( 'MSC_ROUTING_OPERATIONS', MSC_CL_COLLECTION.v_instance_id, -1);
+
+  IF MSC_CL_COLLECTION.v_exchange_mode=MSC_UTIL.SYS_NO THEN
+     IF MSC_CL_COLLECTION.v_coll_prec.org_group_flag = MSC_UTIL.G_ALL_ORGANIZATIONS THEN
+       MSC_CL_COLLECTION.DELETE_MSC_TABLE( 'MSC_ROUTING_OPERATIONS', MSC_CL_COLLECTION.v_instance_id, -1);
+     ELSE
+       v_sub_str :=' AND ORGANIZATION_ID '||MSC_UTIL.v_in_org_str;
+       MSC_CL_COLLECTION.DELETE_MSC_TABLE( 'MSC_ROUTING_OPERATIONS', MSC_CL_COLLECTION.v_instance_id, -1,v_sub_str);
+     END IF;
+  END IF;
+
+  BEGIN
+     lv_sql_ins:=
+     ' INSERT INTO '||lv_tbl
+     ||' ( PLAN_ID, '
+     ||'   ROUTING_SEQUENCE_ID, '
+     ||'   OPERATION_SEQ_NUM, '
+     ||'   OPERATION_SEQUENCE_ID, '
+     ||'   OPERATION_DESCRIPTION, '
+     ||'   EFFECTIVITY_DATE, '
+     ||'   DISABLE_DATE, '
+     ||'   FROM_UNIT_NUMBER, '
+     ||'   TO_UNIT_NUMBER, '
+     ||'   OPTION_DEPENDENT_FLAG, '
+     ||'   OPERATION_TYPE, '
+     ||'   MINIMUM_TRANSFER_QUANTITY, '
+     ||'   YIELD, '
+     ||'   DEPARTMENT_ID, '
+     ||'   DEPARTMENT_CODE, '
+     ||'   OPERATION_LEAD_TIME_PERCENT, '
+     ||'   CUMULATIVE_YIELD, '
+     ||'   REVERSE_CUMULATIVE_YIELD, '
+     ||'   NET_PLANNING_PERCENT, '
+     ||'   SETUP_DURATION, '
+     ||'   TEAR_DOWN_DURATION, '
+     ||'   UOM_CODE, '
+     ||'   STANDARD_OPERATION_CODE, '
+     ||'   STEP_QUANTITY, '
+     ||'   STEP_QUANTITY_UOM, '
+     ||'   SR_INSTANCE_ID, '
+     ||'   ORGANIZATION_ID, '
+     ||'   REFRESH_NUMBER, '
+     ||'   LAST_UPDATE_DATE, '
+     ||'   LAST_UPDATED_BY, '
+     ||'   CREATION_DATE, '
+     ||'   CREATED_BY) '
+     ||' SELECT '
+     ||'   -1, '
+     ||'   msro.ROUTING_SEQUENCE_ID, '
+     ||'   msro.OPERATION_SEQ_NUM, '
+     ||'   msro.OPERATION_SEQUENCE_ID, '
+     ||'   REPLACE(REPLACE(substrb(msro.OPERATION_DESCRIPTION,1,240),:v_chr10,''-''),:v_chr13,''-'') OPERATION_DESCRIPTION, '
+     ||'   msro.EFFECTIVITY_DATE, '
+     ||'   msro.DISABLE_DATE, '
+     ||'   msro.FROM_UNIT_NUMBER, '
+     ||'   msro.TO_UNIT_NUMBER, '
+     ||'   msro.OPTION_DEPENDENT_FLAG, '
+     ||'   msro.OPERATION_TYPE, '
+     ||'   msro.MINIMUM_TRANSFER_QUANTITY, '
+     ||'   msro.YIELD, '
+     ||'   msro.DEPARTMENT_ID, '
+     ||'   msro.DEPARTMENT_CODE, '
+     ||'   msro.OPERATION_LEAD_TIME_PERCENT, '
+     ||'   msro.CUMULATIVE_YIELD, '
+     ||'   msro.REVERSE_CUMULATIVE_YIELD, '
+     ||'   msro.NET_PLANNING_PERCENT, '
+     ||'   msro.SETUP_DURATION, '
+     ||'   msro.TEAR_DOWN_DURATION, '
+     ||'   msro.UOM_CODE, '
+     ||'   msro.STANDARD_OPERATION_CODE, '
+     ||'   msro.STEP_QUANTITY, '
+     ||'   msro.STEP_QUANTITY_UOM, '
+     ||'   msro.SR_INSTANCE_ID, '
+     ||'   msro.ORGANIZATION_ID, '
+     ||'   :v_last_collection_id, '
+     ||'   :v_current_date, '
+     ||'   :v_current_user, '
+     ||'   :v_current_date, '
+     ||'   :v_current_user '
+     ||'   FROM MSC_ST_ROUTING_OPERATIONS msro '
+     ||'   WHERE msro.SR_INSTANCE_ID= ' || MSC_CL_COLLECTION.v_instance_id
+     ||'   AND msro.DELETED_FLAG= ' || MSC_UTIL.SYS_NO;
+
+     EXECUTE IMMEDIATE lv_sql_ins
+     USING   v_chr10, v_chr13, MSC_CL_COLLECTION.v_last_collection_id,MSC_CL_COLLECTION.v_current_date,MSC_CL_COLLECTION.v_current_user,MSC_CL_COLLECTION.v_current_date,MSC_CL_COLLECTION.v_current_user;
+
+     COMMIT;
+     MSC_UTIL.LOG_MSG(MSC_UTIL.G_D_STATUS, 'routing operations loaded');
+
+  EXCEPTION
+     WHEN OTHERS THEN
+        IF SQLCODE IN (-01653,-01650,-01562,-01683) THEN
+
+          MSC_UTIL.LOG_MSG(MSC_UTIL.G_D_STATUS, '========================================');
+          FND_MESSAGE.SET_NAME('MSC', 'MSC_OL_DATA_ERR_HEADER');
+          FND_MESSAGE.SET_TOKEN('PROCEDURE', 'LOAD_ROUTING_OPERATIONS');
+          FND_MESSAGE.SET_TOKEN('TABLE', 'MSC_ROUTING_OPERATIONS');
+          MSC_UTIL.LOG_MSG(MSC_UTIL.G_D_STATUS, FND_MESSAGE.GET);
+
+          MSC_UTIL.LOG_MSG(MSC_UTIL.G_D_STATUS, SQLERRM);
+          RAISE;
+
+        ELSE
+          MSC_UTIL.LOG_MSG(MSC_UTIL.G_D_STATUS, '========================================');
+          FND_MESSAGE.SET_NAME('MSC', 'MSC_OL_DATA_ERR_HEADER');
+          FND_MESSAGE.SET_TOKEN('PROCEDURE', 'LOAD_ROUTING_OPERATIONS');
+          FND_MESSAGE.SET_TOKEN('TABLE', 'MSC_ROUTING_OPERATIONS');
+          MSC_UTIL.LOG_MSG(MSC_UTIL.G_D_STATUS, FND_MESSAGE.GET);
+
+          MSC_UTIL.LOG_MSG(MSC_UTIL.G_D_STATUS, SQLERRM);
+
+          --If Direct path load results in warning then the processing has to be
+          --switched back to row by row processing. This will help to identify the
+          --erroneous record and will also help in processing the rest of the records.
+          MSC_UTIL.LOG_MSG(MSC_UTIL.G_D_STATUS, 'bulk insert failed - routing operations');
+          lb_refresh_failed := TRUE;
+        END IF;
+  END;
+
+END IF;   -- MSC_CL_COLLECTION.v_is_complete_refresh
+
+
+lv_sql_stmt:=
+' INSERT INTO '||lv_tbl
+||' ( PLAN_ID, '
+||'   ROUTING_SEQUENCE_ID, '
+||'   OPERATION_SEQ_NUM, '
+||'   OPERATION_SEQUENCE_ID, '
+||'   OPERATION_DESCRIPTION, '
+||'   EFFECTIVITY_DATE, '
+||'   DISABLE_DATE, '
+||'   FROM_UNIT_NUMBER, '
+||'   TO_UNIT_NUMBER, '
+||'   OPTION_DEPENDENT_FLAG, '
+||'   OPERATION_TYPE, '
+||'   MINIMUM_TRANSFER_QUANTITY, '
+||'   YIELD, '
+||'   DEPARTMENT_ID, '
+||'   DEPARTMENT_CODE, '
+||'   OPERATION_LEAD_TIME_PERCENT, '
+||'   CUMULATIVE_YIELD, '
+||'   REVERSE_CUMULATIVE_YIELD, '
+||'   NET_PLANNING_PERCENT, '
+||'   SETUP_DURATION, '
+||'   TEAR_DOWN_DURATION, '
+||'   UOM_CODE, '
+||'   STANDARD_OPERATION_CODE, '
+||'   STEP_QUANTITY, '
+||'   STEP_QUANTITY_UOM, '
+||'   SR_INSTANCE_ID, '
+||'   ORGANIZATION_ID, '
+||'   REFRESH_NUMBER, '
+||'   LAST_UPDATE_DATE, '
+||'   LAST_UPDATED_BY, '
+||'   CREATION_DATE, '
+||'   CREATED_BY) '
+||' VALUES '
+||' ( -1, '
+||'   :ROUTING_SEQUENCE_ID, '
+||'   :OPERATION_SEQ_NUM, '
+||'   :OPERATION_SEQUENCE_ID, '
+||'   :OPERATION_DESCRIPTION, '
+||'   :EFFECTIVITY_DATE, '
+||'   :DISABLE_DATE, '
+||'   :FROM_UNIT_NUMBER, '
+||'   :TO_UNIT_NUMBER, '
+||'   :OPTION_DEPENDENT_FLAG, '
+||'   :OPERATION_TYPE, '
+||'   :MINIMUM_TRANSFER_QUANTITY, '
+||'   :YIELD, '
+||'   :DEPARTMENT_ID, '
+||'   :DEPARTMENT_CODE, '
+||'   :OPERATION_LEAD_TIME_PERCENT, '
+||'   :CUMULATIVE_YIELD, '
+||'   :REVERSE_CUMULATIVE_YIELD, '
+||'   :NET_PLANNING_PERCENT, '
+||'   :SETUP_DURATION, '
+||'   :TEAR_DOWN_DURATION, '
+||'   :UOM_CODE, '
+||'   :STANDARD_OPERATION_CODE, '
+||'   :STEP_QUANTITY, '
+||'   :STEP_QUANTITY_UOM, '
+||'   :SR_INSTANCE_ID, '
+||'   :ORGANIZATION_ID, '
+||'   :v_last_collection_id, '
+||'   :v_current_date, '
+||'   :v_current_user, '
+||'   :v_current_date, '
+||'   :v_current_user ) ';
+
+IF MSC_CL_COLLECTION.v_is_incremental_refresh OR lb_refresh_failed THEN
+
+  -- set SR_INSTANCE_ID to negative to indicate a SOFT delete
+
+IF MSC_CL_COLLECTION.v_is_incremental_refresh THEN
+FOR c_rec IN c5_d LOOP
+
+DELETE MSC_ROUTING_OPERATIONS
+ WHERE PLAN_ID= -1
+   AND ROUTING_SEQUENCE_ID= NVL(c_rec.ROUTING_SEQUENCE_ID,ROUTING_SEQUENCE_ID)
+   AND OPERATION_SEQUENCE_ID= NVL(c_rec.OPERATION_SEQUENCE_ID,OPERATION_SEQUENCE_ID)
+   AND SR_INSTANCE_ID= c_rec.SR_INSTANCE_ID;
+
+END LOOP;
+END IF;
+
+c_count:= 0;
+
+FOR c_rec IN c5 LOOP
+
+BEGIN
+
+IF MSC_CL_COLLECTION.v_is_incremental_refresh THEN
+UPDATE MSC_ROUTING_OPERATIONS
+SET
+ OPERATION_SEQ_NUM= c_rec.OPERATION_SEQ_NUM,
+ OPERATION_DESCRIPTION= c_rec.OPERATION_DESCRIPTION,
+ EFFECTIVITY_DATE= c_rec.EFFECTIVITY_DATE,
+ DISABLE_DATE= c_rec.DISABLE_DATE,
+ FROM_UNIT_NUMBER= c_rec.FROM_UNIT_NUMBER,
+ TO_UNIT_NUMBER= c_rec.TO_UNIT_NUMBER,
+ OPTION_DEPENDENT_FLAG= c_rec.OPTION_DEPENDENT_FLAG,
+ OPERATION_TYPE= c_rec.OPERATION_TYPE,
+ MINIMUM_TRANSFER_QUANTITY= c_rec.MINIMUM_TRANSFER_QUANTITY,
+ YIELD= c_rec.YIELD,
+ DEPARTMENT_ID= c_rec.DEPARTMENT_ID,
+ DEPARTMENT_CODE= c_rec.DEPARTMENT_CODE,
+ OPERATION_LEAD_TIME_PERCENT= c_rec.OPERATION_LEAD_TIME_PERCENT,
+ CUMULATIVE_YIELD= c_rec.CUMULATIVE_YIELD,
+ REVERSE_CUMULATIVE_YIELD= c_rec.REVERSE_CUMULATIVE_YIELD,
+ NET_PLANNING_PERCENT= c_rec.NET_PLANNING_PERCENT,
+ SETUP_DURATION= c_rec.SETUP_DURATION,
+ TEAR_DOWN_DURATION= c_rec.TEAR_DOWN_DURATION,
+ UOM_CODE= c_rec.UOM_CODE,
+ STANDARD_OPERATION_CODE= c_rec.STANDARD_OPERATION_CODE,
+ STEP_QUANTITY= c_rec.STEP_QUANTITY,
+ STEP_QUANTITY_UOM= c_rec.STEP_QUANTITY_UOM,
+ ORGANIZATION_ID = c_rec.ORGANIZATION_ID,
+ REFRESH_NUMBER= MSC_CL_COLLECTION.v_last_collection_id,
+ LAST_UPDATE_DATE= MSC_CL_COLLECTION.v_current_date,
+ LAST_UPDATED_BY= MSC_CL_COLLECTION.v_current_user
+WHERE PLAN_ID= -1
+  AND ROUTING_SEQUENCE_ID= c_rec.ROUTING_SEQUENCE_ID
+  AND OPERATION_SEQUENCE_ID= c_rec.OPERATION_SEQUENCE_ID
+  AND SR_INSTANCE_ID= c_rec.SR_INSTANCE_ID;
+END IF;
+
+IF (MSC_CL_COLLECTION.v_is_complete_refresh OR MSC_CL_COLLECTION.v_is_partial_refresh) OR SQL%NOTFOUND THEN
+EXECUTE IMMEDIATE lv_sql_stmt USING
+   c_rec.ROUTING_SEQUENCE_ID,
+   c_rec.OPERATION_SEQ_NUM,
+   c_rec.OPERATION_SEQUENCE_ID,
+   c_rec.OPERATION_DESCRIPTION,
+   c_rec.EFFECTIVITY_DATE,
+   c_rec.DISABLE_DATE,
+   c_rec.FROM_UNIT_NUMBER,
+   c_rec.TO_UNIT_NUMBER,
+   c_rec.OPTION_DEPENDENT_FLAG,
+   c_rec.OPERATION_TYPE,
+   c_rec.MINIMUM_TRANSFER_QUANTITY,
+   c_rec.YIELD,
+   c_rec.DEPARTMENT_ID,
+   c_rec.DEPARTMENT_CODE,
+   c_rec.OPERATION_LEAD_TIME_PERCENT,
+   c_rec.CUMULATIVE_YIELD,
+   c_rec.REVERSE_CUMULATIVE_YIELD,
+   c_rec.NET_PLANNING_PERCENT,
+   c_rec.SETUP_DURATION,
+   c_rec.TEAR_DOWN_DURATION,
+   c_rec.UOM_CODE,
+   c_rec.STANDARD_OPERATION_CODE,
+   c_rec.STEP_QUANTITY,
+   c_rec.STEP_QUANTITY_UOM,
+   c_rec.SR_INSTANCE_ID,
+   c_rec.ORGANIZATION_ID,
+   MSC_CL_COLLECTION.v_last_collection_id,
+   MSC_CL_COLLECTION.v_current_date,
+   MSC_CL_COLLECTION.v_current_user,
+   MSC_CL_COLLECTION.v_current_date,
+   MSC_CL_COLLECTION.v_current_user  ;
+
+END IF; -- SQL%NOTFOUND
+
+  c_count:= c_count+1;
+
+  IF c_count> MSC_CL_COLLECTION.PBS THEN
+     COMMIT;
+     c_count:= 0;
+  END IF;
+
+
+EXCEPTION
+   WHEN OTHERS THEN
+
+    IF SQLCODE IN (-01653,-01650,-01562,-01683) THEN
+
+      MSC_UTIL.LOG_MSG(MSC_UTIL.G_D_STATUS, '========================================');
+      FND_MESSAGE.SET_NAME('MSC', 'MSC_OL_DATA_ERR_HEADER');
+      FND_MESSAGE.SET_TOKEN('PROCEDURE', 'LOAD_ROUTING_OPERATIONS');
+      FND_MESSAGE.SET_TOKEN('TABLE', 'MSC_ROUTING_OPERATIONS');
+      MSC_UTIL.LOG_MSG(MSC_UTIL.G_D_STATUS, FND_MESSAGE.GET);
+
+      MSC_UTIL.LOG_MSG(MSC_UTIL.G_D_STATUS, SQLERRM);
+      RAISE;
+
+    ELSE
+      MSC_CL_COLLECTION.v_warning_flag := MSC_UTIL.SYS_YES;
+
+      MSC_UTIL.LOG_MSG(MSC_UTIL.G_D_STATUS, '========================================');
+      FND_MESSAGE.SET_NAME('MSC', 'MSC_OL_DATA_ERR_HEADER');
+      FND_MESSAGE.SET_TOKEN('PROCEDURE', 'LOAD_ROUTING_OPERATIONS');
+      FND_MESSAGE.SET_TOKEN('TABLE', 'MSC_ROUTING_OPERATIONS');
+      MSC_UTIL.LOG_MSG(MSC_UTIL.G_D_STATUS, FND_MESSAGE.GET);
+
+      FND_MESSAGE.SET_NAME('MSC','MSC_OL_DATA_ERR_DETAIL');
+      FND_MESSAGE.SET_TOKEN('COLUMN', 'ROUTING_SEQUENCE_ID');
+      FND_MESSAGE.SET_TOKEN('VALUE', TO_CHAR( c_rec.ROUTING_SEQUENCE_ID));
+      MSC_UTIL.LOG_MSG(MSC_UTIL.G_D_STATUS, FND_MESSAGE.GET);
+
+      FND_MESSAGE.SET_NAME('MSC','MSC_OL_DATA_ERR_DETAIL');
+      FND_MESSAGE.SET_TOKEN('COLUMN', 'OPERATION_SEQ_NUM');
+      FND_MESSAGE.SET_TOKEN('VALUE', TO_CHAR( c_rec.OPERATION_SEQ_NUM));
+      MSC_UTIL.LOG_MSG(MSC_UTIL.G_D_STATUS, FND_MESSAGE.GET);
+
+      FND_MESSAGE.SET_NAME('MSC','MSC_OL_DATA_ERR_DETAIL');
+      FND_MESSAGE.SET_TOKEN('COLUMN', 'OPERATION_SEQUENCE_ID');
+      FND_MESSAGE.SET_TOKEN('VALUE', TO_CHAR( c_rec.OPERATION_SEQUENCE_ID));
+      MSC_UTIL.LOG_MSG(MSC_UTIL.G_D_STATUS, FND_MESSAGE.GET);
+
+      MSC_UTIL.LOG_MSG(MSC_UTIL.G_D_STATUS, SQLERRM);
+    END IF;
+END;
+
+END LOOP;
+END IF; -- MSC_CL_COLLECTION.v_is_incremental_refresh
+
+COMMIT;
+
+BEGIN
+
+IF ((MSC_CL_COLLECTION.v_coll_prec.org_group_flag <> MSC_UTIL.G_ALL_ORGANIZATIONS ) AND (MSC_CL_COLLECTION.v_exchange_mode=MSC_UTIL.SYS_YES)) THEN
+
+lv_tbl:= 'ROUTING_OPERATIONS_'||MSC_CL_COLLECTION.v_instance_code;
+
+lv_sql_stmt:=
+         'INSERT INTO '||lv_tbl
+          ||' SELECT * from MSC_ROUTING_OPERATIONS'
+          ||' WHERE sr_instance_id = '||MSC_CL_COLLECTION.v_instance_id
+          ||' AND plan_id = -1 '
+          ||' AND organization_id not '||MSC_UTIL.v_in_org_str;
+
+   MSC_UTIL.LOG_MSG(MSC_UTIL.G_D_STATUS, 'The sql statement is '||lv_sql_stmt);
+   EXECUTE IMMEDIATE lv_sql_stmt;
+
+   COMMIT;
+
+END IF;
+
+IF MSC_CL_COLLECTION.v_exchange_mode=MSC_UTIL.SYS_YES THEN
+   MSC_CL_COLLECTION.alter_temp_table (lv_errbuf,
+   	              lv_retcode,
+                      'MSC_ROUTING_OPERATIONS',
+                      MSC_CL_COLLECTION.v_instance_code,
+                      MSC_UTIL.G_WARNING
+                     );
+
+   IF lv_retcode = MSC_UTIL.G_ERROR THEN
+      MSC_UTIL.LOG_MSG(MSC_UTIL.G_D_STATUS, lv_errbuf);
+      RAISE MSC_CL_COLLECTION.ALTER_TEMP_TABLE_ERROR;
+   ELSIF lv_retcode = MSC_UTIL.G_WARNING THEN
+      MSC_CL_COLLECTION.v_warning_flag := MSC_UTIL.SYS_YES;
+   END IF;
+
+END IF;
+
+EXCEPTION
+  WHEN OTHERS THEN
+
+      MSC_UTIL.LOG_MSG(MSC_UTIL.G_D_STATUS, SQLERRM);
+      RAISE;
+END;
+
+
+   END LOAD_ROUTING_OPERATIONS;
+
+--====================================================================
+   PROCEDURE LOAD_OPERATION_RESOURCES IS
+
+
+   CURSOR c6 IS
+SELECT
+  msor.ROUTING_SEQUENCE_ID,
+  msor.OPERATION_SEQUENCE_ID,
+  msor.RESOURCE_SEQ_NUM,
+  msor.RESOURCE_ID,
+  msor.ALTERNATE_NUMBER,
+  nvl(msor.PRINCIPAL_FLAG,1) PRINCIPAL_FLAG,
+  msor.BASIS_TYPE,
+  msor.RESOURCE_USAGE,
+  msor.MAX_RESOURCE_UNITS,
+  msor.RESOURCE_UNITS,
+  msor.UOM_CODE,
+  msor.RESOURCE_TYPE,
+  msor.SR_INSTANCE_ID,
+  msor.ORGANIZATION_ID,
+  msor.SETUP_ID,		/*ds change change start */
+  msor.MINIMUM_CAPACITY,
+  msor.MAXIMUM_CAPACITY ,
+  msor.orig_resource_seq_num,
+  msor.BREAKABLE_ACTIVITY_FLAG  /*ds change change end */
+FROM MSC_ST_OPERATION_RESOURCES msor
+WHERE msor.SR_INSTANCE_ID= MSC_CL_COLLECTION.v_instance_id
+  AND msor.DELETED_FLAG= MSC_UTIL.SYS_NO;
+
+   CURSOR c6_d IS
+SELECT
+  msor.ROUTING_SEQUENCE_ID,
+  msor.OPERATION_SEQUENCE_ID,
+  msor.RESOURCE_SEQ_NUM,
+  msor.RESOURCE_ID,
+  msor.ALTERNATE_NUMBER,
+  msor.SR_INSTANCE_ID
+FROM MSC_ST_OPERATION_RESOURCES msor
+WHERE msor.SR_INSTANCE_ID= MSC_CL_COLLECTION.v_instance_id
+  AND msor.DELETED_FLAG= MSC_UTIL.SYS_YES;
+
+CURSOR c6_corrupt_data IS
+SELECT
+  msor.ROUTING_SEQUENCE_ID,
+  msor.RESOURCE_ID,
+  msor.RESOURCE_SEQ_NUM
+FROM MSC_ST_OPERATION_RESOURCES msor
+WHERE msor.SR_INSTANCE_ID= MSC_CL_COLLECTION.v_instance_id
+  AND msor.DELETED_FLAG= MSC_UTIL.SYS_NO
+  AND nvl(msor.RESOURCE_SEQ_NUM,0)=0
+  AND msor.ALTERNATE_NUMBER > 0;
+
+  c_count NUMBER:= 0;
+   lv_tbl      VARCHAR2(30);
+   lv_sql_stmt VARCHAR2(5000);
+   lv_sql_stmt1 VARCHAR2(5000);
+   lv_sql_ins  VARCHAR2(6000);
+   lb_refresh_failed BOOLEAN:= FALSE;
+
+  lv_errbuf			VARCHAR2(240);
+  lv_retcode			NUMBER;
+  lv_delete_flag BOOLEAN:= FALSE;
+
+BEGIN
+
+IF MSC_CL_COLLECTION.v_exchange_mode=MSC_UTIL.SYS_YES THEN
+   lv_tbl:= 'OPERATION_RESOURCES_'||MSC_CL_COLLECTION.v_instance_code;
+ELSE
+   lv_tbl:= 'MSC_OPERATION_RESOURCES';
+END IF;
+
+IF (MSC_CL_COLLECTION.v_is_complete_refresh or MSC_CL_COLLECTION.v_is_partial_refresh) THEN
+
+-- We want to delete all BOM related data and get new stuff.
+--MSC_CL_COLLECTION.DELETE_MSC_TABLE( 'MSC_OPERATION_RESOURCES', MSC_CL_COLLECTION.v_instance_id, -1);
+
+  IF MSC_CL_COLLECTION.v_exchange_mode=MSC_UTIL.SYS_NO THEN
+     IF MSC_CL_COLLECTION.v_coll_prec.org_group_flag = MSC_UTIL.G_ALL_ORGANIZATIONS THEN
+       MSC_CL_COLLECTION.DELETE_MSC_TABLE( 'MSC_OPERATION_RESOURCES', MSC_CL_COLLECTION.v_instance_id, -1);
+     ELSE
+       v_sub_str :=' AND ORGANIZATION_ID '||MSC_UTIL.v_in_org_str;
+       MSC_CL_COLLECTION.DELETE_MSC_TABLE( 'MSC_OPERATION_RESOURCES', MSC_CL_COLLECTION.v_instance_id, -1,v_sub_str);
+     END IF;
+  END IF;
+
+  BEGIN
+    lv_sql_ins :=
+    ' INSERT INTO '||lv_tbl
+    ||' ( PLAN_ID, '
+    ||'   ROUTING_SEQUENCE_ID, '
+    ||'   OPERATION_SEQUENCE_ID, '
+    ||'   RESOURCE_SEQ_NUM, '
+    ||'   RESOURCE_ID, '
+    ||'   ALTERNATE_NUMBER, '
+    ||'   PRINCIPAL_FLAG, '
+    ||'   BASIS_TYPE, '
+    ||'   RESOURCE_USAGE, '
+    ||'   MAX_RESOURCE_UNITS, '
+    ||'   RESOURCE_UNITS, '
+    ||'   UOM_CODE, '
+    ||'   RESOURCE_TYPE, '
+    ||'   SR_INSTANCE_ID, '
+    ||'   ORGANIZATION_ID, '
+    ||'   SETUP_ID, '   	     /*ds change change start */
+    ||'   MINIMUM_CAPACITY, '
+    ||'   MAXIMUM_CAPACITY, '
+    ||'   orig_resource_seq_num, '
+    ||'   BREAKABLE_ACTIVITY_FLAG, ' /*ds change change end */
+    ||'   REFRESH_NUMBER, '
+    ||'   LAST_UPDATE_DATE, '
+    ||'   LAST_UPDATED_BY, '
+    ||'   CREATION_DATE, '
+    ||'   CREATED_BY) '
+    ||' SELECT '
+    ||'   -1, '
+    ||'   msor.ROUTING_SEQUENCE_ID, '
+    ||'   msor.OPERATION_SEQUENCE_ID, '
+    ||'   msor.RESOURCE_SEQ_NUM, '
+    ||'   msor.RESOURCE_ID, '
+    ||'   msor.ALTERNATE_NUMBER, '
+    ||'   nvl(msor.PRINCIPAL_FLAG,1), '
+    ||'   msor.BASIS_TYPE, '
+    ||'   msor.RESOURCE_USAGE, '
+    ||'   msor.MAX_RESOURCE_UNITS, '
+    ||'   msor.RESOURCE_UNITS, '
+    ||'   msor.UOM_CODE, '
+    ||'   msor.RESOURCE_TYPE, '
+    ||'   msor.SR_INSTANCE_ID, '
+    ||'   msor.ORGANIZATION_ID,'
+    ||'   msor.SETUP_ID, '   		  /*ds change change start */
+    ||'   msor.MINIMUM_CAPACITY, '
+    ||'   msor.MAXIMUM_CAPACITY, '
+    ||'   msor.ORIG_RESOURCE_SEQ_NUM, '
+    ||'   msor.BREAKABLE_ACTIVITY_FLAG, ' /*ds change change end */
+    ||'   :v_last_collection_id, '
+    ||'   :v_current_date, '
+    ||'   :v_current_user, '
+    ||'   :v_current_date, '
+    ||'   :v_current_user  '
+    ||'   FROM MSC_ST_OPERATION_RESOURCES msor'
+    ||'   WHERE msor.SR_INSTANCE_ID= '||MSC_CL_COLLECTION.v_instance_id
+    ||'     AND msor.DELETED_FLAG= '||MSC_UTIL.SYS_NO
+    ||'     AND NOT(nvl(msor.RESOURCE_SEQ_NUM,0)=0 AND msor.ALTERNATE_NUMBER > 0)';
+
+    EXECUTE IMMEDIATE lv_sql_ins
+    USING   MSC_CL_COLLECTION.v_last_collection_id,MSC_CL_COLLECTION.v_current_date,MSC_CL_COLLECTION.v_current_user,MSC_CL_COLLECTION.v_current_date,MSC_CL_COLLECTION.v_current_user;
+
+    COMMIT;
+    MSC_UTIL.LOG_MSG(MSC_UTIL.G_D_STATUS, 'operation resources loaded');
+
+    FOR c_rec IN c6_corrupt_data LOOP
+
+       MSC_CL_COLLECTION.v_warning_flag := MSC_UTIL.SYS_YES;
+
+       MSC_UTIL.LOG_MSG(MSC_UTIL.G_D_STATUS, '========================================');
+
+       FND_MESSAGE.SET_NAME('MSC', 'MSC_OL_DATA_ERR_HEADER');
+       FND_MESSAGE.SET_TOKEN('PROCEDURE', 'LOAD_OPERATION_RESOURCES');
+       FND_MESSAGE.SET_TOKEN('TABLE', 'MSC_OPERATION_RESOURCES');
+       MSC_UTIL.LOG_MSG(MSC_UTIL.G_D_STATUS, FND_MESSAGE.GET);
+
+       FND_MESSAGE.SET_NAME('MSC','MSC_OL_DATA_ERR_DETAIL');
+       FND_MESSAGE.SET_TOKEN('COLUMN', 'RESOURCE_SEQ_NUM');
+       FND_MESSAGE.SET_TOKEN('VALUE', TO_CHAR(c_rec.RESOURCE_SEQ_NUM));
+       MSC_UTIL.LOG_MSG(MSC_UTIL.G_D_STATUS, FND_MESSAGE.GET);
+
+       FND_MESSAGE.SET_NAME('MSC','MSC_INVALID_RES_SEQ_NUM');
+       FND_MESSAGE.SET_TOKEN('ROUTING_SEQUENCE_ID', TO_CHAR(c_rec.ROUTING_SEQUENCE_ID));
+       FND_MESSAGE.SET_TOKEN('RESOURCE_ID', TO_CHAR(c_rec.RESOURCE_ID));
+       MSC_UTIL.LOG_MSG(MSC_UTIL.G_D_STATUS, FND_MESSAGE.GET);
+
+    END LOOP;
+
+  EXCEPTION
+     WHEN OTHERS THEN
+      IF SQLCODE IN (-01653,-01650,-01562,-01683) THEN
+
+        MSC_UTIL.LOG_MSG(MSC_UTIL.G_D_STATUS, '========================================');
+        FND_MESSAGE.SET_NAME('MSC', 'MSC_OL_DATA_ERR_HEADER');
+        FND_MESSAGE.SET_TOKEN('PROCEDURE', 'LOAD_OPERATION_RESOURCES');
+        FND_MESSAGE.SET_TOKEN('TABLE', 'MSC_OPERATION_RESOURCES');
+        MSC_UTIL.LOG_MSG(MSC_UTIL.G_D_STATUS, FND_MESSAGE.GET);
+
+        MSC_UTIL.LOG_MSG(MSC_UTIL.G_D_STATUS, SQLERRM);
+        RAISE;
+
+      ELSE
+        MSC_UTIL.LOG_MSG(MSC_UTIL.G_D_STATUS, '========================================');
+        FND_MESSAGE.SET_NAME('MSC', 'MSC_OL_DATA_ERR_HEADER');
+        FND_MESSAGE.SET_TOKEN('PROCEDURE', 'LOAD_OPERATION_RESOURCES');
+        FND_MESSAGE.SET_TOKEN('TABLE', 'MSC_OPERATION_RESOURCES');
+        MSC_UTIL.LOG_MSG(MSC_UTIL.G_D_STATUS, FND_MESSAGE.GET);
+
+        MSC_UTIL.LOG_MSG(MSC_UTIL.G_D_STATUS, SQLERRM);
+
+        --If Direct path load results in warning then the processing has to be
+        --switched back to row by row processing. This will help to identify the
+        --erroneous record and will also help in processing the rest of the records.
+        MSC_UTIL.LOG_MSG(MSC_UTIL.G_D_STATUS, 'bulk insert failed - operation resources');
+        lb_refresh_failed := TRUE;
+      END IF;
+
+  END;
+
+END IF;   -- MSC_CL_COLLECTION.v_is_complete_refresh
+
+IF MSC_CL_COLLECTION.v_is_incremental_refresh OR lb_refresh_failed THEN
+
+lv_sql_stmt :=
+' INSERT INTO '||lv_tbl
+||' ( PLAN_ID, '
+||'   ROUTING_SEQUENCE_ID, '
+||'   OPERATION_SEQUENCE_ID, '
+||'   RESOURCE_SEQ_NUM, '
+||'   RESOURCE_ID, '
+||'   ALTERNATE_NUMBER, '
+||'   PRINCIPAL_FLAG, '
+||'   BASIS_TYPE, '
+||'   RESOURCE_USAGE, '
+||'   MAX_RESOURCE_UNITS, '
+||'   RESOURCE_UNITS, '
+||'   UOM_CODE, '
+||'   RESOURCE_TYPE, '
+||'   SR_INSTANCE_ID, '
+||'   ORGANIZATION_ID, '
+||'   SETUP_ID, '   		 /*ds change change start */
+||'   MINIMUM_CAPACITY, '
+||'   MAXIMUM_CAPACITY, '
+||'   orig_resource_seq_num, '
+||'   BREAKABLE_ACTIVITY_FLAG, ' /*ds change change end */
+||'   REFRESH_NUMBER, '
+||'   LAST_UPDATE_DATE, '
+||'   LAST_UPDATED_BY, '
+||'   CREATION_DATE, '
+||'   CREATED_BY) '
+||' VALUES '
+||' ( -1, '
+||'   :ROUTING_SEQUENCE_ID, '
+||'   :OPERATION_SEQUENCE_ID, '
+||'   :RESOURCE_SEQ_NUM, '
+||'   :RESOURCE_ID, '
+||'   :ALTERNATE_NUMBER, '
+||'   :PRINCIPAL_FLAG, '
+||'   :BASIS_TYPE, '
+||'   :RESOURCE_USAGE, '
+||'   :MAX_RESOURCE_UNITS, '
+||'   :RESOURCE_UNITS, '
+||'   :UOM_CODE, '
+||'   :RESOURCE_TYPE, '
+||'   :SR_INSTANCE_ID, '
+||'   :ORGANIZATION_ID,'
+||'   :SETUP_ID, '   		 /*ds change change start */
+||'   :MINIMUM_CAPACITY, '
+||'   :MAXIMUM_CAPACITY, '
+||'   :orig_resource_seq_num, '
+||'   :BREAKABLE_ACTIVITY_FLAG, ' /*ds change change end */
+||'   :v_last_collection_id, '
+||'   :v_current_date, '
+||'   :v_current_user, '
+||'   :v_current_date, '
+||'   :v_current_user ) ';
+
+
+  -- set RESOURCE_USAGE to 0 to indicate a SOFT delete
+IF MSC_CL_COLLECTION.v_is_incremental_refresh THEN
+FOR c_rec IN c6_d LOOP
+---5470477
+		lv_delete_flag := FALSE;
+lv_sql_stmt1 := ' UPDATE MSC_OPERATION_RESOURCES '
+		||'   SET RESOURCE_USAGE= 0, '
+		||'   REFRESH_NUMBER=   :v_last_collection_id, '
+		||'   LAST_UPDATE_DATE= :v_current_date, '
+		||'   LAST_UPDATED_BY=  :v_current_user '
+		||'  WHERE PLAN_ID= -1 '
+		||' AND SR_INSTANCE_ID= :SR_INSTANCE_ID ';
+
+	IF (c_rec.ROUTING_SEQUENCE_ID IS NOT NULL) THEN
+		lv_sql_stmt1 := lv_sql_stmt1 || ' AND ROUTING_SEQUENCE_ID= ' || c_rec.ROUTING_SEQUENCE_ID ;
+		lv_delete_flag := TRUE;
+	END IF;
+
+	IF (c_rec.OPERATION_SEQUENCE_ID IS NOT NULL) THEN
+		lv_sql_stmt1 := lv_sql_stmt1 || ' AND OPERATION_SEQUENCE_ID= ' || c_rec.OPERATION_SEQUENCE_ID ;
+		lv_delete_flag := TRUE;
+	END IF;
+
+	IF (c_rec.RESOURCE_SEQ_NUM IS NOT NULL) THEN
+		lv_sql_stmt1 := lv_sql_stmt1 || ' AND RESOURCE_SEQ_NUM= ' || c_rec.RESOURCE_SEQ_NUM ;
+		lv_delete_flag := TRUE;
+	END IF;
+
+	IF (c_rec.RESOURCE_ID IS NOT NULL) THEN
+		lv_sql_stmt1 := lv_sql_stmt1 || ' AND RESOURCE_ID= ' || c_rec.RESOURCE_ID ;
+		lv_delete_flag := TRUE;
+	END IF;
+
+	IF (c_rec.ALTERNATE_NUMBER IS NOT NULL) THEN
+		lv_sql_stmt1 := lv_sql_stmt1 || ' AND ALTERNATE_NUMBER= ' || c_rec.ALTERNATE_NUMBER ;
+		lv_delete_flag := TRUE;
+	END IF;
+
+BEGIN
+If (lv_delete_flag) then
+    EXECUTE IMMEDIATE lv_sql_stmt1 USING MSC_CL_COLLECTION.v_last_collection_id, MSC_CL_COLLECTION.v_current_date, MSC_CL_COLLECTION.v_current_user, c_rec.SR_INSTANCE_ID ;
+end if;
+EXCEPTION
+   WHEN OTHERS THEN
+      MSC_UTIL.LOG_MSG(MSC_UTIL.G_D_STATUS, '------------------------------');
+      MSC_UTIL.LOG_MSG(MSC_UTIL.G_D_STATUS, 'SQL Executed: ' || lv_sql_stmt1);
+      MSC_UTIL.LOG_MSG(MSC_UTIL.G_D_STATUS, 'Routing Sequence Id: ' || c_rec.ROUTING_SEQUENCE_ID);
+      MSC_UTIL.LOG_MSG(MSC_UTIL.G_D_STATUS, 'Operation Sequence Id: ' || c_rec.OPERATION_SEQUENCE_ID );
+      MSC_UTIL.LOG_MSG(MSC_UTIL.G_D_STATUS, 'Resource Seq Num: ' || c_rec.RESOURCE_SEQ_NUM);
+      MSC_UTIL.LOG_MSG(MSC_UTIL.G_D_STATUS, 'Resource Id: ' || c_rec.RESOURCE_ID);
+      MSC_UTIL.LOG_MSG(MSC_UTIL.G_D_STATUS, 'Alternate Number: ' || c_rec.ALTERNATE_NUMBER);
+      MSC_UTIL.LOG_MSG(MSC_UTIL.G_D_STATUS, '------------------------------');
+END;
+
+/*
+UPDATE MSC_OPERATION_RESOURCES
+   SET RESOURCE_USAGE= 0,
+       REFRESH_NUMBER= v_last_collection_id,
+       LAST_UPDATE_DATE= MSC_CL_COLLECTION.v_current_date,
+       LAST_UPDATED_BY= MSC_CL_COLLECTION.v_current_user
+ WHERE PLAN_ID= -1
+   AND ROUTING_SEQUENCE_ID= NVL(c_rec.ROUTING_SEQUENCE_ID,ROUTING_SEQUENCE_ID)
+   AND OPERATION_SEQUENCE_ID= NVL(c_rec.OPERATION_SEQUENCE_ID,OPERATION_SEQUENCE_ID)
+   AND RESOURCE_SEQ_NUM= NVL(c_rec.RESOURCE_SEQ_NUM,RESOURCE_SEQ_NUM)
+   AND RESOURCE_ID= NVL(c_rec.RESOURCE_ID,RESOURCE_ID)
+   AND ALTERNATE_NUMBER= NVL( c_rec.ALTERNATE_NUMBER,ALTERNATE_NUMBER)
+   AND SR_INSTANCE_ID= c_rec.SR_INSTANCE_ID;
+*/
+END LOOP;
+
+END IF;
+
+
+c_count:= 0;
+
+FOR c_rec IN c6 LOOP
+
+BEGIN
+
+IF MSC_CL_COLLECTION.v_is_incremental_refresh THEN
+
+UPDATE MSC_OPERATION_RESOURCES
+SET
+ PRINCIPAL_FLAG= c_rec.PRINCIPAL_FLAG,
+ BASIS_TYPE= c_rec.BASIS_TYPE,
+ RESOURCE_USAGE= c_rec.RESOURCE_USAGE,
+ MAX_RESOURCE_UNITS= c_rec.MAX_RESOURCE_UNITS,
+ RESOURCE_UNITS= c_rec.RESOURCE_UNITS,
+ UOM_CODE= c_rec.UOM_CODE,
+ RESOURCE_TYPE= c_rec.RESOURCE_TYPE,
+ REFRESH_NUMBER= MSC_CL_COLLECTION.v_last_collection_id,
+ LAST_UPDATE_DATE= MSC_CL_COLLECTION.v_current_date,
+ LAST_UPDATED_BY= MSC_CL_COLLECTION.v_current_user,
+ ALTERNATE_NUMBER= c_rec.ALTERNATE_NUMBER,
+ ORGANIZATION_ID= c_rec.ORGANIZATION_ID  ,
+ SETUP_ID= c_rec.SETUP_ID  ,               /* ds change change start*/
+ MINIMUM_CAPACITY = c_rec.MINIMUM_CAPACITY  ,
+ MAXIMUM_CAPACITY = c_rec.MAXIMUM_CAPACITY ,
+ orig_resource_seq_num = c_rec.orig_resource_seq_num ,
+ BREAKABLE_ACTIVITY_FLAG = c_rec.BREAKABLE_ACTIVITY_FLAG  /* ds change change end */
+WHERE PLAN_ID= -1
+  AND ROUTING_SEQUENCE_ID= c_rec.ROUTING_SEQUENCE_ID
+  AND OPERATION_SEQUENCE_ID= c_rec.OPERATION_SEQUENCE_ID
+  AND RESOURCE_SEQ_NUM= c_rec.RESOURCE_SEQ_NUM
+  AND RESOURCE_ID= c_rec.RESOURCE_ID
+/*  AND ALTERNATE_NUMBER= c_rec.ALTERNATE_NUMBER
+    Moving this to update */
+  AND SR_INSTANCE_ID= c_rec.SR_INSTANCE_ID;
+
+END IF;
+
+IF (MSC_CL_COLLECTION.v_is_complete_refresh OR MSC_CL_COLLECTION.v_is_partial_refresh) OR SQL%NOTFOUND THEN
+  /* Start changes for 3586386*/
+  IF nvl(c_rec.RESOURCE_SEQ_NUM,0)=0 AND c_rec.ALTERNATE_NUMBER > 0 THEN
+
+    MSC_CL_COLLECTION.v_warning_flag := MSC_UTIL.SYS_YES;
+
+    MSC_UTIL.LOG_MSG(MSC_UTIL.G_D_STATUS, '========================================');
+
+    FND_MESSAGE.SET_NAME('MSC', 'MSC_OL_DATA_ERR_HEADER');
+    FND_MESSAGE.SET_TOKEN('PROCEDURE', 'LOAD_OPERATION_RESOURCES');
+    FND_MESSAGE.SET_TOKEN('TABLE', 'MSC_OPERATION_RESOURCES');
+    MSC_UTIL.LOG_MSG(MSC_UTIL.G_D_STATUS, FND_MESSAGE.GET);
+
+    FND_MESSAGE.SET_NAME('MSC','MSC_OL_DATA_ERR_DETAIL');
+    FND_MESSAGE.SET_TOKEN('COLUMN', 'RESOURCE_SEQ_NUM');
+    FND_MESSAGE.SET_TOKEN('VALUE', TO_CHAR(c_rec.RESOURCE_SEQ_NUM));
+    MSC_UTIL.LOG_MSG(MSC_UTIL.G_D_STATUS, FND_MESSAGE.GET);
+
+    FND_MESSAGE.SET_NAME('MSC','MSC_INVALID_RES_SEQ_NUM');
+    FND_MESSAGE.SET_TOKEN('ROUTING_SEQUENCE_ID', TO_CHAR(c_rec.ROUTING_SEQUENCE_ID));
+    FND_MESSAGE.SET_TOKEN('RESOURCE_ID', TO_CHAR(c_rec.RESOURCE_ID));
+    MSC_UTIL.LOG_MSG(MSC_UTIL.G_D_STATUS, FND_MESSAGE.GET);
+
+    /* End changes for 3586386*/
+  ELSE
+    EXECUTE IMMEDIATE lv_sql_stmt USING
+    c_rec.ROUTING_SEQUENCE_ID,
+    c_rec.OPERATION_SEQUENCE_ID,
+    c_rec.RESOURCE_SEQ_NUM,
+    c_rec.RESOURCE_ID,
+    c_rec.ALTERNATE_NUMBER,
+    c_rec.PRINCIPAL_FLAG,
+    c_rec.BASIS_TYPE,
+    c_rec.RESOURCE_USAGE,
+    c_rec.MAX_RESOURCE_UNITS,
+    c_rec.RESOURCE_UNITS,
+    c_rec.UOM_CODE,
+    c_rec.RESOURCE_TYPE,
+    c_rec.SR_INSTANCE_ID,
+    c_rec.ORGANIZATION_ID,
+    c_rec.SETUP_ID,  	 /* ds change change start*/
+    c_rec.MINIMUM_CAPACITY,
+    c_rec.MAXIMUM_CAPACITY,
+    c_rec.orig_resource_seq_num,
+    c_rec.BREAKABLE_ACTIVITY_FLAG,  /* ds change change end */
+    MSC_CL_COLLECTION.v_last_collection_id,
+    MSC_CL_COLLECTION.v_current_date,
+    MSC_CL_COLLECTION.v_current_user,
+    MSC_CL_COLLECTION.v_current_date,
+    MSC_CL_COLLECTION.v_current_user ;
+  END IF;
+
+END IF;  -- SQL%NOTFOUND
+
+  c_count:= c_count+1;
+
+  IF c_count> MSC_CL_COLLECTION.PBS THEN
+     COMMIT;
+     c_count:= 0;
+  END IF;
+
+EXCEPTION
+   WHEN OTHERS THEN
+
+    IF SQLCODE IN (-01653,-01650,-01562,-01683) THEN
+
+      MSC_UTIL.LOG_MSG(MSC_UTIL.G_D_STATUS, '========================================');
+      FND_MESSAGE.SET_NAME('MSC', 'MSC_OL_DATA_ERR_HEADER');
+      FND_MESSAGE.SET_TOKEN('PROCEDURE', 'LOAD_OPERATION_RESOURCES');
+      FND_MESSAGE.SET_TOKEN('TABLE', 'MSC_OPERATION_RESOURCES');
+      MSC_UTIL.LOG_MSG(MSC_UTIL.G_D_STATUS, FND_MESSAGE.GET);
+
+      MSC_UTIL.LOG_MSG(MSC_UTIL.G_D_STATUS, SQLERRM);
+      RAISE;
+
+    ELSE
+      MSC_CL_COLLECTION.v_warning_flag := MSC_UTIL.SYS_YES;
+
+      MSC_UTIL.LOG_MSG(MSC_UTIL.G_D_STATUS, '========================================');
+      FND_MESSAGE.SET_NAME('MSC', 'MSC_OL_DATA_ERR_HEADER');
+      FND_MESSAGE.SET_TOKEN('PROCEDURE', 'LOAD_OPERATION_RESOURCES');
+      FND_MESSAGE.SET_TOKEN('TABLE', 'MSC_OPERATION_RESOURCES');
+      MSC_UTIL.LOG_MSG(MSC_UTIL.G_D_STATUS, FND_MESSAGE.GET);
+
+      FND_MESSAGE.SET_NAME('MSC','MSC_OL_DATA_ERR_DETAIL');
+      FND_MESSAGE.SET_TOKEN('COLUMN', 'ROUTING_SEQUENCE_ID');
+      FND_MESSAGE.SET_TOKEN('VALUE', TO_CHAR( c_rec.ROUTING_SEQUENCE_ID));
+      MSC_UTIL.LOG_MSG(MSC_UTIL.G_D_STATUS, FND_MESSAGE.GET);
+
+      FND_MESSAGE.SET_NAME('MSC','MSC_OL_DATA_ERR_DETAIL');
+      FND_MESSAGE.SET_TOKEN('COLUMN', 'OPERATION_SEQUENCE_ID');
+      FND_MESSAGE.SET_TOKEN('VALUE', TO_CHAR( c_rec.OPERATION_SEQUENCE_ID));
+      MSC_UTIL.LOG_MSG(MSC_UTIL.G_D_STATUS, FND_MESSAGE.GET);
+
+      FND_MESSAGE.SET_NAME('MSC','MSC_OL_DATA_ERR_DETAIL');
+      FND_MESSAGE.SET_TOKEN('COLUMN', 'RESOURCE_SEQ_NUM');
+      FND_MESSAGE.SET_TOKEN('VALUE', TO_CHAR( c_rec.RESOURCE_SEQ_NUM));
+      MSC_UTIL.LOG_MSG(MSC_UTIL.G_D_STATUS, FND_MESSAGE.GET);
+
+      FND_MESSAGE.SET_NAME('MSC','MSC_OL_DATA_ERR_DETAIL');
+      FND_MESSAGE.SET_TOKEN('COLUMN', 'RESOURCE_ID');
+      FND_MESSAGE.SET_TOKEN('VALUE', TO_CHAR( c_rec.RESOURCE_ID));
+      MSC_UTIL.LOG_MSG(MSC_UTIL.G_D_STATUS, FND_MESSAGE.GET);
+
+      MSC_UTIL.LOG_MSG(MSC_UTIL.G_D_STATUS, SQLERRM);
+    END IF;
+END;
+
+END LOOP;
+END IF;
+
+COMMIT;
+
+BEGIN
+
+IF ((MSC_CL_COLLECTION.v_coll_prec.org_group_flag <> MSC_UTIL.G_ALL_ORGANIZATIONS ) AND (MSC_CL_COLLECTION.v_exchange_mode=MSC_UTIL.SYS_YES)) THEN
+
+lv_tbl:= 'OPERATION_RESOURCES_'||MSC_CL_COLLECTION.v_instance_code;
+
+lv_sql_stmt:=
+         'INSERT INTO '||lv_tbl
+          ||' SELECT * from MSC_OPERATION_RESOURCES'
+          ||' WHERE sr_instance_id = '||MSC_CL_COLLECTION.v_instance_id
+          ||' AND plan_id = -1 '
+          ||' AND organization_id not '||MSC_UTIL.v_in_org_str;
+
+   MSC_UTIL.LOG_MSG(MSC_UTIL.G_D_STATUS, 'The sql statement is '||lv_sql_stmt);
+   EXECUTE IMMEDIATE lv_sql_stmt;
+
+   COMMIT;
+
+END IF;
+
+IF MSC_CL_COLLECTION.v_exchange_mode=MSC_UTIL.SYS_YES THEN
+   MSC_CL_COLLECTION.alter_temp_table (lv_errbuf,
+   	              lv_retcode,
+                      'MSC_OPERATION_RESOURCES',
+                      MSC_CL_COLLECTION.v_instance_code,
+                      MSC_UTIL.G_WARNING
+                     );
+
+   IF lv_retcode = MSC_UTIL.G_ERROR THEN
+      MSC_UTIL.LOG_MSG(MSC_UTIL.G_D_STATUS, lv_errbuf);
+      RAISE MSC_CL_COLLECTION.ALTER_TEMP_TABLE_ERROR;
+   ELSIF lv_retcode = MSC_UTIL.G_WARNING THEN
+      MSC_CL_COLLECTION.v_warning_flag := MSC_UTIL.SYS_YES;
+   END IF;
+
+END IF;
+
+EXCEPTION
+  WHEN OTHERS THEN
+
+      MSC_UTIL.LOG_MSG(MSC_UTIL.G_D_STATUS, SQLERRM);
+      RAISE;
+END;
+
+END LOAD_OPERATION_RESOURCES;
+/* Bug 9194726 starts */
+PROCEDURE GET_START_END_OP
+IS
+
+cursor c1 IS
+select distinct mr.ROUTING_SEQUENCE_ID,trunc(mn.effectivity_date) effectivity_date
+from MSC_ROUTINGS mr,MSC_ROUTING_OPERATIONS mn
+where
+mr.sr_instance_id=mn.sr_instance_id
+and mr.routing_sequence_id= mn.routing_sequence_id
+and mr.CFM_ROUTING_FLAG=3
+and mn.plan_id = -1
+and mr.SR_INSTANCE_ID = MSC_CL_COLLECTION.v_instance_id
+and (mr.first_op_seq_num is null or mr.last_op_seq_num is null);
+
+BEGIN
+
+MSC_UTIL.LOG_MSG(MSC_UTIL.G_D_STATUS,'.. In procedure GET_START_END_OP ..');
+FOR c_rec IN c1 LOOP
+
+ FND_MESSAGE.SET_NAME('MSC','MSC_OL_DATA_ERR_DETAIL');
+      FND_MESSAGE.SET_TOKEN('COLUMN', 'ROUTING_SEQUENCE_ID');
+      FND_MESSAGE.SET_TOKEN('VALUE',c_rec.ROUTING_SEQUENCE_ID);
+      MSC_UTIL.LOG_MSG(MSC_UTIL.G_D_STATUS, FND_MESSAGE.GET);
+FND_MESSAGE.SET_NAME('MSC','MSC_OL_DATA_ERR_DETAIL');
+      FND_MESSAGE.SET_TOKEN('COLUMN', 'effectivity_date');
+      FND_MESSAGE.SET_TOKEN('VALUE',c_rec.effectivity_date);
+      MSC_UTIL.LOG_MSG(MSC_UTIL.G_D_STATUS, FND_MESSAGE.GET);
+
+UPDATE MSC_ROUTINGS mr
+set mr.first_op_seq_num =get_start_op(MSC_CL_COLLECTION.v_instance_id,c_rec.ROUTING_SEQUENCE_ID,c_rec.effectivity_date),
+mr.last_op_seq_num =get_last_op(MSC_CL_COLLECTION.v_instance_id,c_rec.ROUTING_SEQUENCE_ID,c_rec.effectivity_date)
+where mr.sr_instance_id=MSC_CL_COLLECTION.v_instance_id
+and mr.ROUTING_SEQUENCE_ID = c_rec.ROUTING_SEQUENCE_ID
+and mr.CFM_ROUTING_FLAG=3
+and mr.plan_id=-1;
+
+commit;
+
+
+END LOOP;
+
+
+
+EXCEPTION
+ WHEN OTHERS THEN
+    ROLLBACK;
+
+    MSC_UTIL.LOG_MSG(MSC_UTIL.G_D_STATUS,SQLERRM);
+END GET_START_END_OP;
+
+
+PROCEDURE GET_START_END_OP_PARTIAL
+IS
+
+cursor c1 IS
+select distinct mr.ROUTING_SEQUENCE_ID,trunc(mn.effectivity_date) effectivity_date
+from MSC_ST_ROUTINGS mr,MSC_ROUTING_OPERATIONS mn
+where
+mr.sr_instance_id=mn.sr_instance_id
+and mr.routing_sequence_id= mn.routing_sequence_id
+and mr.CFM_ROUTING_FLAG=3
+and mn.plan_id = -1
+and mr.deleted_flag = MSC_UTIL.SYS_NO
+and mr.SR_INSTANCE_ID = MSC_CL_COLLECTION.v_instance_id
+and (mr.first_op_seq_num is null or mr.last_op_seq_num is null);
+
+BEGIN
+
+MSC_UTIL.LOG_MSG(MSC_UTIL.G_D_STATUS,'.. In procedure GET_START_END_OP ..');
+FOR c_rec IN c1 LOOP
+
+ FND_MESSAGE.SET_NAME('MSC','MSC_OL_DATA_ERR_DETAIL');
+      FND_MESSAGE.SET_TOKEN('COLUMN', 'ROUTING_SEQUENCE_ID');
+      FND_MESSAGE.SET_TOKEN('VALUE',c_rec.ROUTING_SEQUENCE_ID);
+      MSC_UTIL.LOG_MSG(MSC_UTIL.G_D_STATUS, FND_MESSAGE.GET);
+
+FND_MESSAGE.SET_NAME('MSC','MSC_OL_DATA_ERR_DETAIL');
+      FND_MESSAGE.SET_TOKEN('COLUMN', 'effectivity_date');
+      FND_MESSAGE.SET_TOKEN('VALUE',c_rec.effectivity_date);
+      MSC_UTIL.LOG_MSG(MSC_UTIL.G_D_STATUS, FND_MESSAGE.GET);
+
+UPDATE MSC_ROUTINGS mr
+set mr.first_op_seq_num =get_start_op(MSC_CL_COLLECTION.v_instance_id,c_rec.ROUTING_SEQUENCE_ID,c_rec.effectivity_date),
+mr.last_op_seq_num =get_last_op(MSC_CL_COLLECTION.v_instance_id,c_rec.ROUTING_SEQUENCE_ID,c_rec.effectivity_date)
+where mr.sr_instance_id=MSC_CL_COLLECTION.v_instance_id
+and mr.ROUTING_SEQUENCE_ID = c_rec.ROUTING_SEQUENCE_ID
+and mr.CFM_ROUTING_FLAG=3
+and mr.plan_id=-1;
+
+commit;
+
+
+END LOOP;
+
+
+
+EXCEPTION
+ WHEN OTHERS THEN
+    ROLLBACK;
+    MSC_UTIL.LOG_MSG(MSC_UTIL.G_D_STATUS,SQLERRM);
+END GET_START_END_OP_PARTIAL;
+
+
+FUNCTION get_start_op(v_instance_id in number, v_routing_sequence_id in number, v_routing_effdate in date)
+return number
+IS
+l_from_op_seqid number;
+l_from_op_seqnum number;
+l_effdate  DATE;
+l_disabdate  DATE;
+
+BEGIN
+
+SELECT unique mon.FROM_OP_SEQ_ID, trunc(mro.EFFECTIVITY_DATE), trunc(nvl(mro.DISABLE_DATE,sysdate + 2))
+INTO l_from_op_seqid, l_effdate, l_disabdate
+FROM  MSC_OPERATION_NETWORKS mon,
+      MSC_ROUTING_OPERATIONS mro
+WHERE mon.PLAN_ID= -1
+  AND mon.SR_INSTANCE_ID = v_instance_id
+  AND mon.ROUTING_SEQUENCE_ID = v_routing_sequence_id
+  AND NOT EXISTS (SELECT 1 FROM MSC_OPERATION_NETWORKS mon2
+                  WHERE mon2.PLAN_ID= -1
+                    AND mon2.SR_INSTANCE_ID = v_instance_id
+                    AND mon2.ROUTING_SEQUENCE_ID = v_routing_sequence_id
+                    AND mon2.TO_OP_SEQ_ID = mon.FROM_OP_SEQ_ID)
+  AND mro.PLAN_ID= -1
+  AND mro.SR_INSTANCE_ID = v_instance_id
+  AND mro.ROUTING_SEQUENCE_ID = v_routing_sequence_id
+  AND mro.OPERATION_SEQUENCE_ID = mon.FROM_OP_SEQ_ID;
+
+/* IF v_routing_effdate BETWEEN l_effdate AND l_disabdate THEN */ --6792068
+
+    select distinct FROM_OP_SEQ_NUM
+    into   l_from_op_seqnum
+    from   MSC_OPERATION_NETWORKS
+    where  from_op_seq_id = l_from_op_seqid
+    and routing_sequence_id= v_routing_sequence_id
+    and sr_instance_id = v_instance_id
+    and plan_id= -1;
+
+  RETURN l_from_op_seqnum;
+
+ /* END IF; */   --6792068
+
+RETURN NULL;
+
+EXCEPTION
+ WHEN OTHERS THEN
+    return null;
+END;
+
+
+FUNCTION get_last_op(v_instance_id in number, v_routing_sequence_id in number, v_routing_effdate in date)
+return number
+IS
+l_to_op_seqid number;
+l_to_op_seqnum number;
+l_effdate  DATE;
+l_disabdate  DATE;
+
+BEGIN
+
+SELECT unique mon.TO_OP_SEQ_ID, trunc(mro.EFFECTIVITY_DATE), trunc(nvl(mro.DISABLE_DATE,sysdate + 2))
+INTO l_to_op_seqid, l_effdate, l_disabdate
+FROM  MSC_OPERATION_NETWORKS mon,
+      MSC_ROUTING_OPERATIONS mro
+WHERE mon.PLAN_ID= -1
+  AND mon.SR_INSTANCE_ID = v_instance_id
+  AND mon.ROUTING_SEQUENCE_ID = v_routing_sequence_id
+  AND NOT EXISTS (SELECT 1 FROM MSC_OPERATION_NETWORKS mon2
+                  WHERE mon2.PLAN_ID= -1
+                    AND mon2.SR_INSTANCE_ID = MSC_CL_COLLECTION.v_instance_id
+                    AND mon2.ROUTING_SEQUENCE_ID = v_routing_sequence_id
+                    AND mon.TO_OP_SEQ_ID = mon2.FROM_OP_SEQ_ID)
+  AND mro.PLAN_ID= -1
+  AND mro.SR_INSTANCE_ID = v_instance_id
+  AND mro.ROUTING_SEQUENCE_ID = v_routing_sequence_id
+  AND mro.OPERATION_SEQUENCE_ID = mon.TO_OP_SEQ_ID;
+
+/* IF v_routing_effdate BETWEEN l_effdate AND l_disabdate THEN */ --6793068
+
+  select distinct TO_OP_SEQ_NUM
+    into   l_to_op_seqnum
+    from   MSC_OPERATION_NETWORKS
+    where  to_op_seq_id = l_to_op_seqid
+    and routing_sequence_id= v_routing_sequence_id
+    and sr_instance_id = v_instance_id
+    and plan_id= -1;
+
+  RETURN l_to_op_seqnum;
+
+/* END IF; */  --6792068
+
+RETURN NULL;
+
+EXCEPTION
+ WHEN OTHERS THEN
+    return null;
+END;
+
+
+
+/* Bug 9194726 ends */
+---============================================================
+
+
+END MSC_CL_ROUTING_ODS_LOAD;
+
+/

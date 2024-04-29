@@ -1,0 +1,72 @@
+--------------------------------------------------------
+--  DDL for Package FND_LOOKUP_ASSIGNMENTS_PKG
+--------------------------------------------------------
+
+  CREATE OR REPLACE EDITIONABLE PACKAGE "APPS"."FND_LOOKUP_ASSIGNMENTS_PKG" AUTHID CURRENT_USER as
+/* $Header: AFLVFLAS.pls 115.0 2004/08/04 21:03:20 stopiwal noship $ */
+procedure INSERT_ROW (
+  X_ROWID in out nocopy VARCHAR2,
+  X_LOOKUP_ASSIGNMENT_ID in NUMBER,
+  X_INSTANCE_PK1_VALUE in VARCHAR2,
+  X_OBJ_NAME in VARCHAR2,
+  X_INSTANCE_PK4_VALUE in VARCHAR2,
+  X_INSTANCE_PK5_VALUE in VARCHAR2,
+  X_DISPLAY_SEQUENCE in NUMBER,
+  X_LOOKUP_CODE in VARCHAR2,
+  X_LOOKUP_TYPE in VARCHAR2,
+  X_INSTANCE_PK2_VALUE in VARCHAR2,
+  X_INSTANCE_PK3_VALUE in VARCHAR2,
+  X_CREATION_DATE in DATE,
+  X_CREATED_BY in NUMBER,
+  X_LAST_UPDATE_DATE in DATE,
+  X_LAST_UPDATED_BY in NUMBER,
+  X_LAST_UPDATE_LOGIN in NUMBER);
+procedure LOCK_ROW (
+  X_LOOKUP_ASSIGNMENT_ID in NUMBER,
+  X_INSTANCE_PK1_VALUE in VARCHAR2,
+  X_OBJ_NAME in VARCHAR2,
+  X_INSTANCE_PK4_VALUE in VARCHAR2,
+  X_INSTANCE_PK5_VALUE in VARCHAR2,
+  X_DISPLAY_SEQUENCE in NUMBER,
+  X_LOOKUP_CODE in VARCHAR2,
+  X_LOOKUP_TYPE in VARCHAR2,
+  X_INSTANCE_PK2_VALUE in VARCHAR2,
+  X_INSTANCE_PK3_VALUE in VARCHAR2
+);
+procedure UPDATE_ROW (
+  X_LOOKUP_ASSIGNMENT_ID in NUMBER,
+  X_INSTANCE_PK1_VALUE in VARCHAR2,
+  X_OBJ_NAME in VARCHAR2,
+  X_INSTANCE_PK4_VALUE in VARCHAR2,
+  X_INSTANCE_PK5_VALUE in VARCHAR2,
+  X_DISPLAY_SEQUENCE in NUMBER,
+  X_LOOKUP_CODE in VARCHAR2,
+  X_LOOKUP_TYPE in VARCHAR2,
+  X_INSTANCE_PK2_VALUE in VARCHAR2,
+  X_INSTANCE_PK3_VALUE in VARCHAR2,
+  X_LAST_UPDATE_DATE in DATE,
+  X_LAST_UPDATED_BY in NUMBER,
+  X_LAST_UPDATE_LOGIN in NUMBER
+);
+procedure DELETE_ROW (
+  X_LOOKUP_ASSIGNMENT_ID in NUMBER
+);
+procedure Load_Row (
+  x_lookup_type           in varchar2,
+  x_lookup_code           in varchar2,
+  x_obj_name              in varchar2,
+  x_display_sequence      in varchar2,
+  X_INSTANCE_PK1_VALUE    in varchar2,
+  X_INSTANCE_PK2_VALUE    in varchar2,
+  X_INSTANCE_PK3_VALUE    in varchar2,
+  X_INSTANCE_PK4_VALUE    in varchar2,
+  X_INSTANCE_PK5_VALUE    in varchar2,
+  x_last_update_date      in varchar2,
+  x_owner                 in varchar2,
+  x_custom_mode           in varchar2
+);
+end FND_LOOKUP_ASSIGNMENTS_PKG;
+
+ 
+
+/

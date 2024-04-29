@@ -1,0 +1,287 @@
+--------------------------------------------------------
+--  DDL for Package Body AP_APXBCRPT_XMLP_PKG
+--------------------------------------------------------
+
+  CREATE OR REPLACE EDITIONABLE PACKAGE BODY "APPS"."AP_APXBCRPT_XMLP_PKG" AS
+/* $Header: APXBCRPTB.pls 120.0 2007/12/27 07:29:52 vjaganat noship $ */
+  FUNCTION BEFOREREPORT RETURN BOOLEAN IS
+  BEGIN
+    BEGIN
+      BEGIN
+        P_CONC_REQUEST_ID := FND_GLOBAL.CONC_REQUEST_ID;
+        /*SRW.USER_EXIT('FND SRWINIT')*/NULL;
+      EXCEPTION
+        WHEN /*SRW.USER_EXIT_FAILURE*/OTHERS THEN
+          /*SRW.MESSAGE('10'
+                     ,'Failed in SRWINIT')*/NULL;
+          RAISE;
+      END;
+      H_APPLICATION_ID := TO_NUMBER(VALUE('PROG_APPL_ID'));
+      IF H_APPLICATION_ID = 200 THEN
+        BEGIN
+          SELECT
+            SORT_BY_ALTERNATE_FIELD
+          INTO H_SORT_BY_PHONETIC
+          FROM
+            AP_SYSTEM_PARAMETERS;
+          H_SORT_BY_PHONETIC := VALUE('AP_SORT_BY_ALTERNATE');
+        EXCEPTION
+          WHEN /*SRW.USER_EXIT_FAILURE*/OTHERS THEN
+            /*SRW.MESSAGE('11'
+                       ,'Failed in Profile Options Init.')*/NULL;
+            RAISE;
+        END;
+      ELSIF H_APPLICATION_ID = 222 THEN
+        BEGIN
+          H_SORT_BY_PHONETIC := VALUE('RA_CUSTOMERS_SORT_BY_PHONETICS');
+        EXCEPTION
+          WHEN /*SRW.USER_EXIT_FAILURE*/OTHERS THEN
+            /*SRW.MESSAGE('12'
+                       ,'Failed in Profile Options Init.')*/NULL;
+            RAISE;
+        END;
+      END IF;
+      IF H_APPLICATION_ID = 200 THEN
+        BEGIN
+          SELECT
+            GSB.NAME,
+            GSB.CURRENCY_CODE
+          INTO H_COMPANY_NAME,H_CURRENCY_CODE
+          FROM
+            GL_SETS_OF_BOOKS GSB,
+            AP_SYSTEM_PARAMETERS ASP
+          WHERE GSB.SET_OF_BOOKS_ID = ASP.SET_OF_BOOKS_ID
+            AND ROWNUM < 2;
+        EXCEPTION
+          WHEN NO_DATA_FOUND THEN
+            /*SRW.MESSAGE('13'
+                       ,'Failed in Set_of_books Initialization')*/NULL;
+            RAISE;
+        END;
+      ELSIF H_APPLICATION_ID = 222 THEN
+        BEGIN
+          SELECT
+            GSB.NAME,
+            GSB.CURRENCY_CODE
+          INTO H_COMPANY_NAME,H_CURRENCY_CODE
+          FROM
+            GL_SETS_OF_BOOKS GSB,
+            AR_SYSTEM_PARAMETERS ASP
+          WHERE GSB.SET_OF_BOOKS_ID = ASP.SET_OF_BOOKS_ID
+            AND ROWNUM < 2;
+        EXCEPTION
+          WHEN NO_DATA_FOUND THEN
+            /*SRW.MESSAGE('14'
+                       ,'Failed in Set_of_books Initialization')*/NULL;
+            RAISE;
+        END;
+      END IF;
+      /*SRW.MESSAGE('15'
+                 ,'Setting Where Clause based on Application')*/NULL;
+      IF (H_APPLICATION_ID = 200) THEN
+        LP_AP_AR_TAB := ', ap_lookup_codes alc ';
+        LP_AP_AR_WHERE := ' and alc.lookup_type = ''TRANSFER_PRIORITY''' || ' and abc.transfer_priority = alc.lookup_code ';
+      ELSIF (H_APPLICATION_ID = 222) THEN
+        LP_AP_AR_TAB := ' ';
+        LP_AP_AR_WHERE := ' ';
+      END IF;
+      /*SRW.MESSAGE('16'
+                 ,'Table Clause: ' || LP_AP_AR_TAB)*/NULL;
+      /*SRW.MESSAGE('17'
+                 ,'Where Caluse: ' || LP_AP_AR_WHERE)*/NULL;
+    END;
+    RETURN (TRUE);
+  END BEFOREREPORT;
+
+  FUNCTION AFTERREPORT RETURN BOOLEAN IS
+  BEGIN
+    BEGIN
+      /*SRW.USER_EXIT('FND SRWEXIT')*/NULL;
+    EXCEPTION
+      WHEN /*SRW.USER_EXIT_FAILURE*/OTHERS THEN
+        /*SRW.MESSAGE(1
+                   ,'Failed in SRWEXIT')*/NULL;
+    END;
+    RETURN (TRUE);
+  END AFTERREPORT;
+
+  FUNCTION C_LINE_TRANSFER_PRIORITYFORMUL(C_TRANSFER_PRIORITY IN VARCHAR2) RETURN VARCHAR2 IS
+    L_TRANSFER_PRIORITY VARCHAR2(80);
+  BEGIN
+    /*SRW.REFERENCE(C_TRANSFER_PRIORITY)*/NULL;
+    /*SRW.MESSAGE('20'
+               ,C_TRANSFER_PRIORITY)*/NULL;
+    IF (H_APPLICATION_ID = 200) THEN
+      SELECT
+        DISPLAYED_FIELD
+      INTO L_TRANSFER_PRIORITY
+      FROM
+        AP_LOOKUP_CODES
+      WHERE LOOKUP_TYPE = 'TRANSFER_PRIORITY'
+        AND LOOKUP_CODE = C_TRANSFER_PRIORITY;
+    END IF;
+    RETURN (L_TRANSFER_PRIORITY);
+  END C_LINE_TRANSFER_PRIORITYFORMUL;
+
+  FUNCTION H_APPLICATION_ID_P RETURN NUMBER IS
+  BEGIN
+    RETURN H_APPLICATION_ID;
+  END H_APPLICATION_ID_P;
+
+  FUNCTION H_COMPANY_NAME_P RETURN VARCHAR2 IS
+  BEGIN
+    RETURN H_COMPANY_NAME;
+  END H_COMPANY_NAME_P;
+
+  FUNCTION H_CURRENCY_CODE_P RETURN VARCHAR2 IS
+  BEGIN
+    RETURN H_CURRENCY_CODE;
+  END H_CURRENCY_CODE_P;
+
+  FUNCTION H_SORT_BY_PHONETIC_P RETURN VARCHAR2 IS
+  BEGIN
+    RETURN H_SORT_BY_PHONETIC;
+  END H_SORT_BY_PHONETIC_P;
+
+  PROCEDURE PUT(NAME IN VARCHAR2
+               ,VAL IN VARCHAR2) IS
+  BEGIN
+	begin FND_PROFILE.PUT(NAME, VAL); end;
+
+  END PUT;
+
+  FUNCTION DEFINED(NAME IN VARCHAR2) RETURN BOOLEAN IS
+    X0 BOOLEAN;
+  BEGIN
+/*    STPROC.INIT('declare X0rv BOOLEAN; begin X0rv := FND_PROFILE.DEFINED(:NAME); :X0 := sys.diutil.bool_to_int(X0rv); end;');
+    STPROC.BIND_I(NAME);
+    STPROC.BIND_O(X0);
+    STPROC.EXECUTE;
+    STPROC.RETRIEVE(2
+                   ,X0);*/ null;
+    RETURN X0;
+  END DEFINED;
+
+  PROCEDURE GET(NAME IN VARCHAR2
+               ,VAL OUT NOCOPY VARCHAR2) IS
+  BEGIN
+	begin FND_PROFILE.GET(NAME, VAL); end;
+
+  END GET;
+
+  FUNCTION VALUE(NAME IN VARCHAR2) RETURN VARCHAR2 IS
+    X0 VARCHAR2(2000);
+  BEGIN
+	begin X0 := FND_PROFILE.VALUE(NAME); end;
+    RETURN X0;
+  END VALUE;
+
+  FUNCTION VALUE_WNPS(NAME IN VARCHAR2) RETURN VARCHAR2 IS
+    X0 VARCHAR2(2000);
+  BEGIN
+	begin X0 := FND_PROFILE.VALUE_WNPS(NAME); end;
+	RETURN X0;
+  END VALUE_WNPS;
+
+  FUNCTION SAVE_USER(X_NAME IN VARCHAR2
+                    ,X_VALUE IN VARCHAR2) RETURN BOOLEAN IS
+    X0 BOOLEAN;
+  BEGIN
+   /* STPROC.INIT('declare X0rv BOOLEAN; begin X0rv := FND_PROFILE.SAVE_USER(:X_NAME, :X_VALUE); :X0 := sys.diutil.bool_to_int(X0rv); end;');
+    STPROC.BIND_I(X_NAME);
+    STPROC.BIND_I(X_VALUE);
+    STPROC.BIND_O(X0);
+    STPROC.EXECUTE;
+    STPROC.RETRIEVE(3
+                   ,X0);*/ null;
+    RETURN X0;
+  END SAVE_USER;
+
+  FUNCTION SAVE(X_NAME IN VARCHAR2
+               ,X_VALUE IN VARCHAR2
+               ,X_LEVEL_NAME IN VARCHAR2
+               ,X_LEVEL_VALUE IN VARCHAR2
+               ,X_LEVEL_VALUE_APP_ID IN VARCHAR2) RETURN BOOLEAN IS
+    X0 BOOLEAN;
+  BEGIN
+ /*   STPROC.INIT('declare X0rv BOOLEAN; begin X0rv := FND_PROFILE.SAVE(:X_NAME, :X_VALUE, :X_LEVEL_NAME, :X_LEVEL_VALUE, :X_LEVEL_VALUE_APP_ID); :X0 := sys.diutil.bool_to_int(X0rv); end;');
+    STPROC.BIND_I(X_NAME);
+    STPROC.BIND_I(X_VALUE);
+    STPROC.BIND_I(X_LEVEL_NAME);
+    STPROC.BIND_I(X_LEVEL_VALUE);
+    STPROC.BIND_I(X_LEVEL_VALUE_APP_ID);
+    STPROC.BIND_O(X0);
+    STPROC.EXECUTE;
+    STPROC.RETRIEVE(6
+                   ,X0);*/ null;
+    RETURN X0;
+  END SAVE;
+
+  PROCEDURE GET_SPECIFIC(NAME_Z IN VARCHAR2
+                        ,USER_ID_Z IN NUMBER
+                        ,RESPONSIBILITY_ID_Z IN NUMBER
+                        ,APPLICATION_ID_Z IN NUMBER
+                        ,VAL_Z OUT NOCOPY VARCHAR2
+                        ,DEFINED_Z OUT NOCOPY BOOLEAN) IS
+  BEGIN
+    /*
+    STPROC.BIND_O(DEFINED_Z);
+    STPROC.BIND_I(NAME_Z);
+    STPROC.BIND_I(USER_ID_Z);
+    STPROC.BIND_I(RESPONSIBILITY_ID_Z);
+    STPROC.BIND_I(APPLICATION_ID_Z);
+    STPROC.BIND_O(VAL_Z);
+    STPROC.EXECUTE;
+    STPROC.RETRIEVE(1
+                   ,DEFINED_Z);
+    STPROC.RETRIEVE(6
+                   ,VAL_Z)*/ null;
+  END GET_SPECIFIC;
+
+  FUNCTION VALUE_SPECIFIC(NAME IN VARCHAR2
+                         ,USER_ID IN NUMBER
+                         ,RESPONSIBILITY_ID IN NUMBER
+                         ,APPLICATION_ID IN NUMBER) RETURN VARCHAR2 IS
+    X0 VARCHAR2(2000);
+  BEGIN
+    /*STPROC.INIT('begin :X0 := FND_PROFILE.VALUE_SPECIFIC(:NAME, :USER_ID, :RESPONSIBILITY_ID, :APPLICATION_ID); end;');
+    STPROC.BIND_O(X0);
+    STPROC.BIND_I(NAME);
+    STPROC.BIND_I(USER_ID);
+    STPROC.BIND_I(RESPONSIBILITY_ID);
+    STPROC.BIND_I(APPLICATION_ID);
+    STPROC.EXECUTE;
+    STPROC.RETRIEVE(1
+                   ,X0);*/ null;
+    RETURN X0;
+  END VALUE_SPECIFIC;
+
+  PROCEDURE INITIALIZE(USER_ID_Z IN NUMBER
+                      ,RESPONSIBILITY_ID_Z IN NUMBER
+                      ,APPLICATION_ID_Z IN NUMBER
+                      ,SITE_ID_Z IN NUMBER) IS
+  BEGIN
+   /* STPROC.INIT('begin FND_PROFILE.INITIALIZE(:USER_ID_Z, :RESPONSIBILITY_ID_Z, :APPLICATION_ID_Z, :SITE_ID_Z); end;');
+    STPROC.BIND_I(USER_ID_Z);
+    STPROC.BIND_I(RESPONSIBILITY_ID_Z);
+    STPROC.BIND_I(APPLICATION_ID_Z);
+    STPROC.BIND_I(SITE_ID_Z);
+    STPROC.EXECUTE;*/ null;
+  END INITIALIZE;
+
+  PROCEDURE PUTMULTIPLE(NAMES IN VARCHAR2
+                       ,VALS IN VARCHAR2
+                       ,NUM IN NUMBER) IS
+  BEGIN
+/*    STPROC.INIT('begin FND_PROFILE.PUTMULTIPLE(:NAMES, :VALS, :NUM); end;');
+    STPROC.BIND_I(NAMES);
+    STPROC.BIND_I(VALS);
+    STPROC.BIND_I(NUM);
+    STPROC.EXECUTE;*/ null;
+  END PUTMULTIPLE;
+
+END AP_APXBCRPT_XMLP_PKG;
+
+
+
+/

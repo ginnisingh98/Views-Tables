@@ -1,0 +1,372 @@
+--------------------------------------------------------
+--  DDL for Package Body ZX_REPORTING_TYPES_PKG
+--------------------------------------------------------
+
+  CREATE OR REPLACE EDITIONABLE PACKAGE BODY "APPS"."ZX_REPORTING_TYPES_PKG" as
+/* $Header: zxcreptypesb.pls 120.4 2005/03/16 13:55:24 scsharma ship $ */
+procedure INSERT_ROW (
+  X_ROWID in out nocopy VARCHAR2,
+  X_REPORTING_TYPE_ID in NUMBER,
+  X_REQUEST_ID in NUMBER,
+  X_PROGRAM_LOGIN_ID in NUMBER,
+  X_REPORTING_TYPE_CODE in VARCHAR2,
+  X_REPORTING_TYPE_DATATYPE_CODE in VARCHAR2,
+  X_TAX_REGIME_CODE in VARCHAR2,
+  X_TAX in VARCHAR2,
+  X_FORMAT_MASK in VARCHAR2,
+  X_MIN_LENGTH in NUMBER,
+  X_MAX_LENGTH in NUMBER,
+  X_LEGAL_MESSAGE_FLAG in VARCHAR2,
+  X_EFFECTIVE_FROM in DATE,
+  X_EFFECTIVE_TO in DATE,
+  X_RECORD_TYPE_CODE in VARCHAR2,
+  X_REPORTING_TYPE_NAME in VARCHAR2,
+  X_HAS_REPORTING_CODES_FLAG in VARCHAR2,
+  X_CREATION_DATE in DATE,
+  X_CREATED_BY in NUMBER,
+  X_LAST_UPDATE_DATE in DATE,
+  X_LAST_UPDATED_BY in NUMBER,
+  X_LAST_UPDATE_LOGIN in NUMBER,
+  X_PROGRAM_APPLICATION_ID in NUMBER,
+  X_PROGRAM_ID in NUMBER,
+  X_OBJECT_VERSION_NUMBER in NUMBER
+) is
+  cursor C is select ROWID from ZX_REPORTING_TYPES_B
+    where REPORTING_TYPE_ID = X_REPORTING_TYPE_ID
+    ;
+begin
+  insert into ZX_REPORTING_TYPES_B (
+    REQUEST_ID,
+    PROGRAM_LOGIN_ID,
+    REPORTING_TYPE_ID,
+    REPORTING_TYPE_CODE,
+    REPORTING_TYPE_DATATYPE_CODE,
+    TAX_REGIME_CODE,
+    TAX,
+    FORMAT_MASK,
+    MIN_LENGTH,
+    MAX_LENGTH,
+    LEGAL_MESSAGE_FLAG,
+    EFFECTIVE_FROM,
+    EFFECTIVE_TO,
+    RECORD_TYPE_CODE,
+    CREATION_DATE,
+    CREATED_BY,
+    LAST_UPDATE_DATE,
+    LAST_UPDATED_BY,
+    LAST_UPDATE_LOGIN,
+    HAS_REPORTING_CODES_FLAG,
+    OBJECT_VERSION_NUMBER
+  ) values (
+    X_REQUEST_ID,
+    X_PROGRAM_LOGIN_ID,
+    X_REPORTING_TYPE_ID,
+    X_REPORTING_TYPE_CODE,
+    X_REPORTING_TYPE_DATATYPE_CODE,
+    X_TAX_REGIME_CODE,
+    X_TAX,
+    X_FORMAT_MASK,
+    X_MIN_LENGTH,
+    X_MAX_LENGTH,
+    X_LEGAL_MESSAGE_FLAG,
+    X_EFFECTIVE_FROM,
+    X_EFFECTIVE_TO,
+    X_RECORD_TYPE_CODE,
+    X_CREATION_DATE,
+    X_CREATED_BY,
+    X_LAST_UPDATE_DATE,
+    X_LAST_UPDATED_BY,
+    X_LAST_UPDATE_LOGIN,
+    X_HAS_REPORTING_CODES_FLAG,
+    X_OBJECT_VERSION_NUMBER
+  );
+
+  insert into ZX_REPORTING_TYPES_TL (
+    REPORTING_TYPE_ID,
+    REPORTING_TYPE_NAME,
+    CREATED_BY,
+    CREATION_DATE,
+    LAST_UPDATED_BY,
+    LAST_UPDATE_DATE,
+    LAST_UPDATE_LOGIN,
+    LANGUAGE,
+    SOURCE_LANG
+  ) select
+    X_REPORTING_TYPE_ID,
+    X_REPORTING_TYPE_NAME,
+    X_CREATED_BY,
+    X_CREATION_DATE,
+    X_LAST_UPDATED_BY,
+    X_LAST_UPDATE_DATE,
+    X_LAST_UPDATE_LOGIN,
+    L.LANGUAGE_CODE,
+    userenv('LANG')
+  from FND_LANGUAGES L
+  where L.INSTALLED_FLAG in ('I', 'B')
+  and not exists
+    (select NULL
+    from ZX_REPORTING_TYPES_TL T
+    where T.REPORTING_TYPE_ID = X_REPORTING_TYPE_ID
+    and T.LANGUAGE = L.LANGUAGE_CODE);
+
+  open c;
+  fetch c into X_ROWID;
+  if (c%notfound) then
+    close c;
+    raise no_data_found;
+  end if;
+  close c;
+
+end INSERT_ROW;
+
+procedure LOCK_ROW (
+  X_REPORTING_TYPE_ID in NUMBER,
+  X_REQUEST_ID in NUMBER,
+  X_PROGRAM_LOGIN_ID in NUMBER,
+  X_REPORTING_TYPE_CODE in VARCHAR2,
+  X_REPORTING_TYPE_DATATYPE_CODE in VARCHAR2,
+  X_TAX_REGIME_CODE in VARCHAR2,
+  X_TAX in VARCHAR2,
+  X_FORMAT_MASK in VARCHAR2,
+  X_MIN_LENGTH in NUMBER,
+  X_MAX_LENGTH in NUMBER,
+  X_LEGAL_MESSAGE_FLAG in VARCHAR2,
+  X_EFFECTIVE_FROM in DATE,
+  X_EFFECTIVE_TO in DATE,
+  X_RECORD_TYPE_CODE in VARCHAR2,
+  X_REPORTING_TYPE_NAME in VARCHAR2,
+  X_HAS_REPORTING_CODES_FLAG in VARCHAR2,
+  X_PROGRAM_APPLICATION_ID in NUMBER,
+  X_PROGRAM_ID in NUMBER,
+  X_OBJECT_VERSION_NUMBER in NUMBER
+) is
+  cursor c is select
+      REQUEST_ID,
+      PROGRAM_LOGIN_ID,
+      REPORTING_TYPE_CODE,
+      REPORTING_TYPE_DATATYPE_CODE,
+      TAX_REGIME_CODE,
+      TAX,
+      FORMAT_MASK,
+      MIN_LENGTH,
+      MAX_LENGTH,
+      LEGAL_MESSAGE_FLAG,
+      EFFECTIVE_FROM,
+      EFFECTIVE_TO,
+      RECORD_TYPE_CODE,
+      OBJECT_VERSION_NUMBER
+    from ZX_REPORTING_TYPES_B
+    where REPORTING_TYPE_ID = X_REPORTING_TYPE_ID
+    for update of REPORTING_TYPE_ID nowait;
+  recinfo c%rowtype;
+
+  cursor c1 is select
+      REPORTING_TYPE_NAME,
+      decode(LANGUAGE, userenv('LANG'), 'Y', 'N') BASELANG
+    from ZX_REPORTING_TYPES_TL
+    where REPORTING_TYPE_ID = X_REPORTING_TYPE_ID
+    and userenv('LANG') in (LANGUAGE, SOURCE_LANG)
+    for update of REPORTING_TYPE_ID nowait;
+begin
+  open c;
+  fetch c into recinfo;
+  if (c%notfound) then
+    close c;
+    fnd_message.set_name('FND', 'FORM_RECORD_DELETED');
+    app_exception.raise_exception;
+  end if;
+  close c;
+  if (    ((recinfo.REQUEST_ID = X_REQUEST_ID)
+           OR ((recinfo.REQUEST_ID is null) AND (X_REQUEST_ID is null)))
+      AND ((recinfo.PROGRAM_LOGIN_ID = X_PROGRAM_LOGIN_ID)
+           OR ((recinfo.PROGRAM_LOGIN_ID is null) AND (X_PROGRAM_LOGIN_ID is null)))
+      AND (recinfo.REPORTING_TYPE_CODE = X_REPORTING_TYPE_CODE)
+      AND ((recinfo.REPORTING_TYPE_DATATYPE_CODE = X_REPORTING_TYPE_DATATYPE_CODE)
+           OR ((recinfo.REPORTING_TYPE_DATATYPE_CODE is null) AND (X_REPORTING_TYPE_DATATYPE_CODE is null)))
+      AND ((recinfo.TAX_REGIME_CODE = X_TAX_REGIME_CODE)
+           OR ((recinfo.TAX_REGIME_CODE is null) AND (X_TAX_REGIME_CODE is null)))
+      AND ((recinfo.TAX = X_TAX)
+           OR ((recinfo.TAX is null) AND (X_TAX is null)))
+      AND ((recinfo.FORMAT_MASK = X_FORMAT_MASK)
+           OR ((recinfo.FORMAT_MASK is null) AND (X_FORMAT_MASK is null)))
+      AND ((recinfo.MIN_LENGTH = X_MIN_LENGTH)
+           OR ((recinfo.MIN_LENGTH is null) AND (X_MIN_LENGTH is null)))
+      AND ((recinfo.MAX_LENGTH = X_MAX_LENGTH)
+           OR ((recinfo.MAX_LENGTH is null) AND (X_MAX_LENGTH is null)))
+      AND ((recinfo.LEGAL_MESSAGE_FLAG = X_LEGAL_MESSAGE_FLAG)
+           OR ((recinfo.LEGAL_MESSAGE_FLAG is null) AND (X_LEGAL_MESSAGE_FLAG is null)))
+      AND (recinfo.EFFECTIVE_FROM = X_EFFECTIVE_FROM)
+      AND ((recinfo.EFFECTIVE_TO = X_EFFECTIVE_TO)
+           OR ((recinfo.EFFECTIVE_TO is null) AND (X_EFFECTIVE_TO is null)))
+      AND ((recinfo.RECORD_TYPE_CODE = X_RECORD_TYPE_CODE)
+           OR ((recinfo.RECORD_TYPE_CODE is null) AND (X_RECORD_TYPE_CODE is null)))
+      AND (recinfo.OBJECT_VERSION_NUMBER = X_OBJECT_VERSION_NUMBER)
+  ) then
+    null;
+  else
+    fnd_message.set_name('FND', 'FORM_RECORD_CHANGED');
+    app_exception.raise_exception;
+  end if;
+
+  for tlinfo in c1 loop
+    if (tlinfo.BASELANG = 'Y') then
+      if (    ((tlinfo.REPORTING_TYPE_NAME = X_REPORTING_TYPE_NAME)
+               OR ((tlinfo.REPORTING_TYPE_NAME is null) AND (X_REPORTING_TYPE_NAME is null)))
+      ) then
+        null;
+      else
+        fnd_message.set_name('FND', 'FORM_RECORD_CHANGED');
+        app_exception.raise_exception;
+      end if;
+    end if;
+  end loop;
+  return;
+end LOCK_ROW;
+
+procedure UPDATE_ROW (
+  X_REPORTING_TYPE_ID in NUMBER,
+  X_REQUEST_ID in NUMBER,
+  X_PROGRAM_LOGIN_ID in NUMBER,
+  X_REPORTING_TYPE_CODE in VARCHAR2,
+  X_REPORTING_TYPE_DATATYPE_CODE in VARCHAR2,
+  X_TAX_REGIME_CODE in VARCHAR2,
+  X_TAX in VARCHAR2,
+  X_FORMAT_MASK in VARCHAR2,
+  X_MIN_LENGTH in NUMBER,
+  X_MAX_LENGTH in NUMBER,
+  X_LEGAL_MESSAGE_FLAG in VARCHAR2,
+  X_EFFECTIVE_FROM in DATE,
+  X_EFFECTIVE_TO in DATE,
+  X_RECORD_TYPE_CODE in VARCHAR2,
+  X_REPORTING_TYPE_NAME in VARCHAR2,
+  X_HAS_REPORTING_CODES_FLAG in VARCHAR2,
+  X_LAST_UPDATE_DATE in DATE,
+  X_LAST_UPDATED_BY in NUMBER,
+  X_LAST_UPDATE_LOGIN in NUMBER,
+  X_PROGRAM_APPLICATION_ID in NUMBER,
+  X_PROGRAM_ID in NUMBER,
+  X_OBJECT_VERSION_NUMBER in NUMBER
+) is
+begin
+  update ZX_REPORTING_TYPES_B set
+    REQUEST_ID = X_REQUEST_ID,
+    PROGRAM_LOGIN_ID = X_PROGRAM_LOGIN_ID,
+    REPORTING_TYPE_CODE = X_REPORTING_TYPE_CODE,
+    REPORTING_TYPE_DATATYPE_CODE = X_REPORTING_TYPE_DATATYPE_CODE,
+    TAX_REGIME_CODE = X_TAX_REGIME_CODE,
+    TAX = X_TAX,
+    FORMAT_MASK = X_FORMAT_MASK,
+    MIN_LENGTH = X_MIN_LENGTH,
+    MAX_LENGTH = X_MAX_LENGTH,
+    LEGAL_MESSAGE_FLAG = X_LEGAL_MESSAGE_FLAG,
+    EFFECTIVE_FROM = X_EFFECTIVE_FROM,
+    EFFECTIVE_TO = X_EFFECTIVE_TO,
+    RECORD_TYPE_CODE = X_RECORD_TYPE_CODE,
+    LAST_UPDATE_DATE = X_LAST_UPDATE_DATE,
+    LAST_UPDATED_BY = X_LAST_UPDATED_BY,
+    LAST_UPDATE_LOGIN = X_LAST_UPDATE_LOGIN,
+    HAS_REPORTING_CODES_FLAG = X_HAS_REPORTING_CODES_FLAG,
+    OBJECT_VERSION_NUMBER = X_OBJECT_VERSION_NUMBER
+  where REPORTING_TYPE_ID = X_REPORTING_TYPE_ID;
+
+  if (sql%notfound) then
+    raise no_data_found;
+  end if;
+
+  update ZX_REPORTING_TYPES_TL set
+    REPORTING_TYPE_NAME = X_REPORTING_TYPE_NAME,
+    LAST_UPDATE_DATE = X_LAST_UPDATE_DATE,
+    LAST_UPDATED_BY = X_LAST_UPDATED_BY,
+    LAST_UPDATE_LOGIN = X_LAST_UPDATE_LOGIN,
+    SOURCE_LANG = userenv('LANG')
+  where REPORTING_TYPE_ID = X_REPORTING_TYPE_ID
+  and userenv('LANG') in (LANGUAGE, SOURCE_LANG);
+
+  if (sql%notfound) then
+    raise no_data_found;
+  end if;
+end UPDATE_ROW;
+
+procedure DELETE_ROW (
+  X_REPORTING_TYPE_ID in NUMBER
+) is
+begin
+  delete from ZX_REPORTING_TYPES_TL
+  where REPORTING_TYPE_ID = X_REPORTING_TYPE_ID;
+
+  if (sql%notfound) then
+    raise no_data_found;
+  end if;
+
+  delete from ZX_REPORTING_TYPES_B
+  where REPORTING_TYPE_ID = X_REPORTING_TYPE_ID;
+
+  if (sql%notfound) then
+    raise no_data_found;
+  end if;
+end DELETE_ROW;
+
+procedure ADD_LANGUAGE
+is
+begin
+  delete from ZX_REPORTING_TYPES_TL T
+  where not exists
+    (select NULL
+    from ZX_REPORTING_TYPES_B B
+    where B.REPORTING_TYPE_ID = T.REPORTING_TYPE_ID
+    );
+
+  update ZX_REPORTING_TYPES_TL T set (
+      REPORTING_TYPE_NAME
+    ) = (select
+      B.REPORTING_TYPE_NAME
+    from ZX_REPORTING_TYPES_TL B
+    where B.REPORTING_TYPE_ID = T.REPORTING_TYPE_ID
+    and B.LANGUAGE = T.SOURCE_LANG)
+  where (
+      T.REPORTING_TYPE_ID,
+      T.LANGUAGE
+  ) in (select
+      SUBT.REPORTING_TYPE_ID,
+      SUBT.LANGUAGE
+    from ZX_REPORTING_TYPES_TL SUBB, ZX_REPORTING_TYPES_TL SUBT
+    where SUBB.REPORTING_TYPE_ID = SUBT.REPORTING_TYPE_ID
+    and SUBB.LANGUAGE = SUBT.SOURCE_LANG
+    and (SUBB.REPORTING_TYPE_NAME <> SUBT.REPORTING_TYPE_NAME
+      or (SUBB.REPORTING_TYPE_NAME is null and SUBT.REPORTING_TYPE_NAME is not null)
+      or (SUBB.REPORTING_TYPE_NAME is not null and SUBT.REPORTING_TYPE_NAME is null)
+  ));
+
+  insert into ZX_REPORTING_TYPES_TL (
+    REPORTING_TYPE_ID,
+    REPORTING_TYPE_NAME,
+    CREATED_BY,
+    CREATION_DATE,
+    LAST_UPDATED_BY,
+    LAST_UPDATE_DATE,
+    LAST_UPDATE_LOGIN,
+    LANGUAGE,
+    SOURCE_LANG
+  ) select /*+ ORDERED */
+    B.REPORTING_TYPE_ID,
+    B.REPORTING_TYPE_NAME,
+    B.CREATED_BY,
+    B.CREATION_DATE,
+    B.LAST_UPDATED_BY,
+    B.LAST_UPDATE_DATE,
+    B.LAST_UPDATE_LOGIN,
+    L.LANGUAGE_CODE,
+    B.SOURCE_LANG
+  from ZX_REPORTING_TYPES_TL B, FND_LANGUAGES L
+  where L.INSTALLED_FLAG in ('I', 'B')
+  and B.LANGUAGE = userenv('LANG')
+  and not exists
+    (select NULL
+    from ZX_REPORTING_TYPES_TL T
+    where T.REPORTING_TYPE_ID = B.REPORTING_TYPE_ID
+    and T.LANGUAGE = L.LANGUAGE_CODE);
+end ADD_LANGUAGE;
+
+end ZX_REPORTING_TYPES_PKG;
+
+/

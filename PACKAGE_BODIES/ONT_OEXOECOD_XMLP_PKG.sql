@@ -1,0 +1,2176 @@
+--------------------------------------------------------
+--  DDL for Package Body ONT_OEXOECOD_XMLP_PKG
+--------------------------------------------------------
+
+  CREATE OR REPLACE EDITIONABLE PACKAGE BODY "APPS"."ONT_OEXOECOD_XMLP_PKG" AS
+/* $Header: OEXOECODB.pls 120.2 2008/05/05 09:02:28 dwkrishn noship $ */
+  FUNCTION C_ORDER_BY_DISPLAYFORMULA RETURN VARCHAR2 IS
+  BEGIN
+    DECLARE
+      ORDER_BY_DISPLAY VARCHAR2(80);
+    BEGIN
+      SELECT
+        MEANING
+      INTO ORDER_BY_DISPLAY
+      FROM
+        OE_LOOKUPS
+      WHERE LOOKUP_TYPE = 'OEXOAPOA ORDER BY'
+        AND LOOKUP_CODE = P_ORDER_BY;
+      RETURN (ORDER_BY_DISPLAY);
+    END;
+    RETURN NULL;
+  END C_ORDER_BY_DISPLAYFORMULA;
+
+  FUNCTION AFTERREPORT RETURN BOOLEAN IS
+  BEGIN
+    /*SRW.USER_EXIT('FND SRWEXIT')*/NULL;
+    RETURN (TRUE);
+  EXCEPTION
+    WHEN /*SRW.USER_EXIT_FAILURE*/OTHERS THEN
+      /*SRW.MESSAGE(1
+                 ,'FAILED IN AFTER REPORT TRIGGER')*/NULL;
+      RETURN (FALSE);
+  END AFTERREPORT;
+
+  FUNCTION C_ORDER_NUM_WHERE RETURN VARCHAR2 IS
+  BEGIN
+    IF P_ORDER_NUM_LO IS NOT NULL AND P_ORDER_NUM_HI IS NOT NULL THEN
+      RETURN ('and h.order_number between to_number(''' || P_ORDER_NUM_LO || ''') and to_number(''' || P_ORDER_NUM_HI || ''') ');
+    ELSE
+      IF P_ORDER_NUM_LO IS NULL AND P_ORDER_NUM_HI IS NOT NULL THEN
+        RETURN ('and h.order_number <= to_number(''' || P_ORDER_NUM_HI || ''') ');
+      ELSE
+        IF P_ORDER_NUM_LO IS NOT NULL AND P_ORDER_NUM_HI IS NULL THEN
+          RETURN ('and h.order_number >= to_number(''' || P_ORDER_NUM_LO || ''') ');
+        ELSE
+          RETURN (NULL);
+        END IF;
+      END IF;
+    END IF;
+    RETURN NULL;
+  END C_ORDER_NUM_WHERE;
+
+  FUNCTION GET_SOB_NAME RETURN VARCHAR2 IS
+    SOB_NAME VARCHAR2(30);
+  BEGIN
+    SELECT
+      NAME
+    INTO SOB_NAME
+    FROM
+      GL_SETS_OF_BOOKS
+    WHERE SET_OF_BOOKS_ID = P_SOB_ID;
+    RETURN (SOB_NAME);
+    RETURN NULL;
+  EXCEPTION
+    WHEN NO_DATA_FOUND THEN
+      RETURN (NULL);
+  END GET_SOB_NAME;
+
+  FUNCTION C_OPEN_ORDERS_DISPLAYFORMULA RETURN VARCHAR2 IS
+  BEGIN
+    DECLARE
+      OPEN_ORDERS VARCHAR2(80);
+    BEGIN
+      SELECT
+        MEANING
+      INTO OPEN_ORDERS
+      FROM
+        OE_LOOKUPS
+      WHERE LOOKUP_TYPE = 'YES_NO'
+        AND LOOKUP_CODE = P_OPEN_ORDERS;
+      RETURN (OPEN_ORDERS);
+    EXCEPTION
+      WHEN NO_DATA_FOUND THEN
+        RETURN (NULL);
+    END;
+    RETURN NULL;
+  END C_OPEN_ORDERS_DISPLAYFORMULA;
+
+  FUNCTION CONTACT_PHONE(CONTACT_ID IN NUMBER) RETURN VARCHAR2 IS
+    PHONE VARCHAR2(25);
+  BEGIN
+    SELECT
+      MIN(PHONE_AREA_CODE || '-' || PHONE_NUMBER)
+    INTO PHONE
+    FROM
+      HZ_CONTACT_POINTS
+    WHERE CONTACT_POINT_ID = CONTACT_ID;
+    RETURN (PHONE);
+    RETURN NULL;
+  EXCEPTION
+    WHEN NO_DATA_FOUND THEN
+      RETURN (NULL);
+  END CONTACT_PHONE;
+
+  FUNCTION C_BASE_CURRENCYFORMULA RETURN VARCHAR2 IS
+  BEGIN
+    DECLARE
+      BASE_CURRENCY VARCHAR2(30);
+    BEGIN
+      SELECT
+        CURRENCY_CODE
+      INTO BASE_CURRENCY
+      FROM
+        GL_SETS_OF_BOOKS
+      WHERE SET_OF_BOOKS_ID = P_SOB_ID;
+      RETURN (BASE_CURRENCY);
+    EXCEPTION
+      WHEN OTHERS THEN
+        NULL;
+    END;
+    RETURN NULL;
+  END C_BASE_CURRENCYFORMULA;
+
+  FUNCTION C_SALES_CREDITS_DISPLAYFORMULA RETURN VARCHAR2 IS
+  BEGIN
+    DECLARE
+      SC_DISPLAY VARCHAR2(80);
+    BEGIN
+      SELECT
+        MEANING
+      INTO SC_DISPLAY
+      FROM
+        OE_LOOKUPS
+      WHERE LOOKUP_TYPE = 'YES_NO'
+        AND LOOKUP_CODE = P_SALES_CREDITS;
+      RETURN (SC_DISPLAY);
+    EXCEPTION
+      WHEN NO_DATA_FOUND THEN
+        RETURN (NULL);
+    END;
+    RETURN NULL;
+  END C_SALES_CREDITS_DISPLAYFORMULA;
+
+  FUNCTION C_ADJUSTMENTS_DISPLAYFORMULA RETURN VARCHAR2 IS
+  BEGIN
+    DECLARE
+      PA_DISPLAY VARCHAR2(80);
+    BEGIN
+      SELECT
+        MEANING
+      INTO PA_DISPLAY
+      FROM
+        OE_LOOKUPS
+      WHERE LOOKUP_TYPE = 'YES_NO'
+        AND LOOKUP_CODE = P_ADJUSTMENTS;
+      RETURN (PA_DISPLAY);
+    EXCEPTION
+      WHEN NO_DATA_FOUND THEN
+        RETURN (NULL);
+    END;
+    RETURN NULL;
+  END C_ADJUSTMENTS_DISPLAYFORMULA;
+
+  FUNCTION C_FUNCTIONAL_CURRENCY_DISPFORM RETURN VARCHAR2 IS
+  BEGIN
+    DECLARE
+      FC_DISPLAY VARCHAR2(80);
+    BEGIN
+      SELECT
+        MEANING
+      INTO FC_DISPLAY
+      FROM
+        OE_LOOKUPS
+      WHERE LOOKUP_TYPE = 'YES_NO'
+        AND LOOKUP_CODE = P_FUNCTIONAL_CURRENCY;
+      RETURN (FC_DISPLAY);
+    EXCEPTION
+      WHEN NO_DATA_FOUND THEN
+        RETURN (NULL);
+    END;
+    RETURN NULL;
+  END C_FUNCTIONAL_CURRENCY_DISPFORM;
+
+  FUNCTION C_GL_CONV_RATEFORMULA(CURRENCY1 IN VARCHAR2
+                                ,C_BASE_CURRENCY IN VARCHAR2
+                                ,CONVERSION_RATE IN NUMBER
+                                ,ORDER_DATE IN DATE
+                                ,CONVERSION_TYPE_CODE IN VARCHAR2) RETURN NUMBER IS
+  BEGIN
+    DECLARE
+      GL_RATE NUMBER;
+    BEGIN
+      IF P_FUNCTIONAL_CURRENCY = 'Y' THEN
+        IF CURRENCY1 = C_BASE_CURRENCY THEN
+          RETURN (1);
+        ELSE
+          IF CONVERSION_RATE IS NULL THEN
+            GL_RATE := GET_RATE(P_SOB_ID
+                               ,CURRENCY1
+                               ,ORDER_DATE
+                               ,CONVERSION_TYPE_CODE);
+            RETURN (GL_RATE);
+          ELSE
+            RETURN (CONVERSION_RATE);
+          END IF;
+        END IF;
+      ELSE
+        RETURN (1);
+      END IF;
+    EXCEPTION
+      WHEN NO_DATA_FOUND THEN
+        RETURN (-1);
+    END;
+    RETURN NULL;
+  END C_GL_CONV_RATEFORMULA;
+
+  FUNCTION C_FC_ORDER_VALUEFORMULA(C_GL_CONV_RATE IN NUMBER
+                                  ,HEADER_ID IN NUMBER) RETURN NUMBER IS
+  BEGIN
+    DECLARE
+      FC_ORDER_VALUE NUMBER;
+      L_ORDER_VALUE NUMBER;
+    BEGIN
+      IF P_FUNCTIONAL_CURRENCY = 'Y' THEN
+        SELECT
+          C_GL_CONV_RATE * OE_OE_TOTALS_SUMMARY.PRT_ORDER_TOTAL(HEADER_ID)
+        INTO FC_ORDER_VALUE
+        FROM
+          DUAL;
+        /*SRW.MESSAGE(1
+                   ,'Order Value' || FC_ORDER_VALUE)*/NULL;
+        IF (RP_CURR_PROFILE = 'EXTENDED') THEN
+          FC_ORDER_VALUE := ROUND(FC_ORDER_VALUE
+                                 ,CP_EXT_PRECISION);
+        ELSE
+          FC_ORDER_VALUE := ROUND(FC_ORDER_VALUE
+                                 ,CP_STD_PRECISION);
+        END IF;
+        RETURN (FC_ORDER_VALUE);
+      ELSE
+        L_ORDER_VALUE := OE_OE_TOTALS_SUMMARY.PRT_ORDER_TOTAL(HEADER_ID);
+        IF (RP_CURR_PROFILE = 'EXTENDED') THEN
+          L_ORDER_VALUE := ROUND(L_ORDER_VALUE
+                                ,CP_EXT_PRECISION);
+        ELSE
+          L_ORDER_VALUE := ROUND(L_ORDER_VALUE
+                                ,CP_STD_PRECISION);
+        END IF;
+        RETURN (L_ORDER_VALUE);
+      END IF;
+    END;
+    RETURN NULL;
+  END C_FC_ORDER_VALUEFORMULA;
+
+  FUNCTION C_FC_HDR_PA_AMOUNTFORMULA(C_GL_CONV_RATE IN NUMBER
+                                    ,HDR_PA_AMOUNT IN NUMBER) RETURN NUMBER IS
+  BEGIN
+    DECLARE
+      FC_PA_AMOUNT NUMBER;
+    BEGIN
+      IF P_FUNCTIONAL_CURRENCY = 'Y' THEN
+        SELECT
+          C_GL_CONV_RATE * HDR_PA_AMOUNT
+        INTO FC_PA_AMOUNT
+        FROM
+          DUAL;
+        RETURN (FC_PA_AMOUNT);
+      ELSE
+        RETURN (HDR_PA_AMOUNT);
+      END IF;
+    END;
+    RETURN NULL;
+  END C_FC_HDR_PA_AMOUNTFORMULA;
+
+  FUNCTION C_FC_LIST_PRICEFORMULA(C_GL_CONV_RATE IN NUMBER
+                                 ,LIST_PRICE IN NUMBER) RETURN NUMBER IS
+  BEGIN
+    DECLARE
+      FC_LIST_PRICE NUMBER;
+      L_LIST_PRICE NUMBER;
+    BEGIN
+      IF P_FUNCTIONAL_CURRENCY = 'Y' THEN
+        SELECT
+          C_GL_CONV_RATE * LIST_PRICE
+        INTO FC_LIST_PRICE
+        FROM
+          DUAL;
+        IF (RP_CURR_PROFILE = 'EXTENDED') THEN
+          FC_LIST_PRICE := ROUND(FC_LIST_PRICE
+                                ,CP_EXT_PRECISION);
+        ELSE
+          FC_LIST_PRICE := ROUND(FC_LIST_PRICE
+                                ,CP_STD_PRECISION);
+        END IF;
+        RETURN (FC_LIST_PRICE);
+      ELSE
+        L_LIST_PRICE := LIST_PRICE;
+        IF (RP_CURR_PROFILE = 'EXTENDED') THEN
+          L_LIST_PRICE := ROUND(L_LIST_PRICE
+                               ,CP_EXT_PRECISION);
+        ELSE
+          L_LIST_PRICE := ROUND(L_LIST_PRICE
+                               ,CP_STD_PRECISION);
+        END IF;
+        RETURN (L_LIST_PRICE);
+      END IF;
+    END;
+    RETURN NULL;
+  END C_FC_LIST_PRICEFORMULA;
+
+  FUNCTION C_FC_SELLING_PRICEFORMULA(C_GL_CONV_RATE IN NUMBER
+                                    ,SELLING_PRICE IN NUMBER) RETURN NUMBER IS
+  BEGIN
+    DECLARE
+      FC_SELLING_PRICE NUMBER;
+      L_SELLING_PRICE NUMBER;
+    BEGIN
+      IF P_FUNCTIONAL_CURRENCY = 'Y' THEN
+        SELECT
+          C_GL_CONV_RATE * SELLING_PRICE
+        INTO FC_SELLING_PRICE
+        FROM
+          DUAL;
+        IF (RP_CURR_PROFILE = 'EXTENDED') THEN
+          FC_SELLING_PRICE := ROUND(FC_SELLING_PRICE
+                                   ,CP_EXT_PRECISION);
+        ELSE
+          FC_SELLING_PRICE := ROUND(FC_SELLING_PRICE
+                                   ,CP_STD_PRECISION);
+        END IF;
+        RETURN (FC_SELLING_PRICE);
+      ELSE
+        L_SELLING_PRICE := SELLING_PRICE;
+        IF (RP_CURR_PROFILE = 'EXTENDED') THEN
+          L_SELLING_PRICE := ROUND(L_SELLING_PRICE
+                                  ,CP_EXT_PRECISION);
+        ELSE
+          L_SELLING_PRICE := ROUND(L_SELLING_PRICE
+                                  ,CP_STD_PRECISION);
+        END IF;
+        RETURN (L_SELLING_PRICE);
+      END IF;
+    END;
+    RETURN NULL;
+  END C_FC_SELLING_PRICEFORMULA;
+
+  FUNCTION C_FC_EXTENDED_PRICEFORMULA(C_GL_CONV_RATE IN NUMBER
+                                     ,EXTENDED_PRICE IN NUMBER) RETURN NUMBER IS
+  BEGIN
+    DECLARE
+      FC_EXTENDED_PRICE NUMBER;
+      L_EXTENDED_PRICE NUMBER;
+    BEGIN
+      IF P_FUNCTIONAL_CURRENCY = 'Y' THEN
+        SELECT
+          C_GL_CONV_RATE * EXTENDED_PRICE
+        INTO FC_EXTENDED_PRICE
+        FROM
+          DUAL;
+        IF (RP_CURR_PROFILE = 'EXTENDED') THEN
+          FC_EXTENDED_PRICE := ROUND(FC_EXTENDED_PRICE
+                                    ,CP_EXT_PRECISION);
+        ELSE
+          FC_EXTENDED_PRICE := ROUND(FC_EXTENDED_PRICE
+                                    ,CP_STD_PRECISION);
+        END IF;
+        RETURN (FC_EXTENDED_PRICE);
+      ELSE
+        L_EXTENDED_PRICE := EXTENDED_PRICE;
+        IF (RP_CURR_PROFILE = 'EXTENDED') THEN
+          FC_EXTENDED_PRICE := ROUND(FC_EXTENDED_PRICE
+                                    ,CP_EXT_PRECISION);
+        ELSE
+          FC_EXTENDED_PRICE := ROUND(FC_EXTENDED_PRICE
+                                    ,CP_STD_PRECISION);
+        END IF;
+        RETURN (L_EXTENDED_PRICE);
+      END IF;
+    END;
+    RETURN NULL;
+  END C_FC_EXTENDED_PRICEFORMULA;
+
+  FUNCTION C_FC_L_PA_AMOUNTFORMULA(C_GL_CONV_RATE IN NUMBER
+                                  ,L_PA_AMOUNT IN NUMBER) RETURN NUMBER IS
+  BEGIN
+    DECLARE
+      FC_PA_AMOUNT NUMBER;
+    BEGIN
+      IF P_FUNCTIONAL_CURRENCY = 'Y' THEN
+        SELECT
+          C_GL_CONV_RATE * L_PA_AMOUNT
+        INTO FC_PA_AMOUNT
+        FROM
+          DUAL;
+        RETURN (FC_PA_AMOUNT);
+      ELSE
+        RETURN (L_PA_AMOUNT);
+      END IF;
+    END;
+    RETURN NULL;
+  END C_FC_L_PA_AMOUNTFORMULA;
+
+  FUNCTION C_OPEN_ORDERS_WHERE RETURN VARCHAR2 IS
+    FLAG_VALUE VARCHAR2(2);
+  BEGIN
+    FLAG_VALUE := 'Y';
+    IF P_OPEN_ORDERS = 'Y' THEN
+      RETURN ('and h.open_flag = ''' || FLAG_VALUE || ''' ');
+    ELSE
+      RETURN (NULL);
+    END IF;
+    RETURN NULL;
+  END C_OPEN_ORDERS_WHERE;
+
+  FUNCTION C_USE_CURRENCYFORMULA(C_BASE_CURRENCY IN VARCHAR2
+                                ,CURRENCY1 IN VARCHAR2) RETURN VARCHAR2 IS
+  BEGIN
+    /*SRW.REFERENCE(C_BASE_CURRENCY)*/NULL;
+    /*SRW.REFERENCE(CURRENCY1)*/NULL;
+    IF P_FUNCTIONAL_CURRENCY = 'Y' THEN
+      FND_CURRENCY.GET_INFO(C_BASE_CURRENCY
+                           ,CP_STD_PRECISION
+                           ,CP_EXT_PRECISION
+                           ,CP_MIN_ACCT_UNIT);
+      RETURN (C_BASE_CURRENCY);
+    ELSE
+      IF CURRENCY1 IS NULL THEN
+        FND_CURRENCY.GET_INFO(C_BASE_CURRENCY
+                             ,CP_STD_PRECISION
+                             ,CP_EXT_PRECISION
+                             ,CP_MIN_ACCT_UNIT);
+        RETURN (C_BASE_CURRENCY);
+      ELSE
+        FND_CURRENCY.GET_INFO(C_BASE_CURRENCY
+                             ,CP_STD_PRECISION
+                             ,CP_EXT_PRECISION
+                             ,CP_MIN_ACCT_UNIT);
+        RETURN (CURRENCY1);
+      END IF;
+    END IF;
+    RETURN NULL;
+  END C_USE_CURRENCYFORMULA;
+
+  FUNCTION RP_ORDER_CATEGORYFORMULA RETURN VARCHAR2 IS
+  BEGIN
+    DECLARE
+      L_MEANING VARCHAR2(80);
+    BEGIN
+      SELECT
+        MEANING
+      INTO L_MEANING
+      FROM
+        OE_LOOKUPS
+      WHERE LOOKUP_TYPE = 'REPORT_ORDER_CATEGORY'
+        AND LOOKUP_CODE = P_ORDER_CATEGORY;
+      RETURN (L_MEANING);
+    EXCEPTION
+      WHEN NO_DATA_FOUND THEN
+        RETURN (NULL);
+    END;
+    RETURN NULL;
+  END RP_ORDER_CATEGORYFORMULA;
+
+function BeforeReport return boolean is
+ apf boolean;
+BEGIN
+   apf := afterpform;
+   LP_ORGANIZATION_ID := P_ORGANIZATION_ID;
+   LP_ORGANIZATION_ID:= MO_GLOBAL.GET_CURRENT_ORG_ID();
+   fnd_profile.get('ONT_UNIT_PRICE_PRECISION_TYPE', RP_CURR_PROFILE);
+   P_ORDER_DATE_HI_T := to_char(P_ORDER_DATE_HI,'DD-MON-YY');
+   P_ORDER_DATE_LO_T := to_char(P_ORDER_DATE_LO,'DD-MON-YY');
+return (TRUE);
+end;
+
+  FUNCTION AFTERPFORM RETURN BOOLEAN IS
+  BEGIN
+    /*SRW.MESSAGE(99999
+               ,'$Header: OEXOECODB.pls 120.2 2008/05/05 09:02:28 dwkrishn noship $')*/NULL;
+    BEGIN
+      IF P_ORDER_NUM_LO = P_ORDER_NUM_HI THEN
+        NULL;
+      ELSE
+        IF P_ORDER_CATEGORY IS NOT NULL THEN
+          IF P_ORDER_CATEGORY = 'SALES' THEN
+            LP_ORDER_CATEGORY := 'and h.order_category_code in (''ORDER'', ''MIXED'') ';
+          ELSIF P_ORDER_CATEGORY = 'CREDIT' THEN
+            LP_ORDER_CATEGORY := 'and h.order_category_code in (''RETURN'', ''MIXED'') ';
+          ELSIF P_ORDER_CATEGORY = 'ALL' THEN
+            LP_ORDER_CATEGORY := ' ';
+          END IF;
+        ELSE
+          LP_ORDER_CATEGORY := 'and h.order_category_code in (''ORDER'', ''MIXED'') ';
+        END IF;
+      END IF;
+      IF (P_ORDER_NUM_LO IS NOT NULL) AND (P_ORDER_NUM_HI IS NOT NULL) THEN
+        IF (P_ORDER_NUM_LO = P_ORDER_NUM_HI) THEN
+          LP_ORDER_NUM := ' and h.order_number = :p_order_num_lo ';
+        ELSE
+          LP_ORDER_NUM := ' and (h.order_number between :p_order_num_lo and :p_order_num_hi) ';
+        END IF;
+      ELSIF (P_ORDER_NUM_LO IS NOT NULL) THEN
+        LP_ORDER_NUM := ' and h.order_number >= :p_order_num_lo ';
+      ELSIF (P_ORDER_NUM_HI IS NOT NULL) THEN
+        LP_ORDER_NUM := ' and h.order_number <= :p_order_num_hi ';
+      END IF;
+      IF P_LINE_CATEGORY IS NOT NULL THEN
+        IF P_LINE_CATEGORY = 'SALES' THEN
+          LP_LINE_CATEGORY := 'and l.line_category_code = ''ORDER'' ';
+        ELSIF P_LINE_CATEGORY = 'CREDIT' THEN
+          LP_LINE_CATEGORY := 'and l.line_category_code = ''RETURN'' ';
+        ELSIF P_LINE_CATEGORY = 'ALL' THEN
+          LP_LINE_CATEGORY := ' ';
+        END IF;
+      ELSE
+        LP_LINE_CATEGORY := 'and l.line_category_code = ''ORDER'' ';
+      END IF;
+      IF P_ORDER_TYPE_LO IS NOT NULL AND P_ORDER_TYPE_HI IS NOT NULL THEN
+        LP_ORDER_TYPE := 'and ot.TRANSACTION_TYPE_ID between :P_order_type_lo and :P_order_type_hi ';
+        SELECT
+          OEOT.NAME
+        INTO L_ORDER_TYPE_LOW
+        FROM
+          OE_TRANSACTION_TYPES_TL OEOT
+        WHERE OEOT.TRANSACTION_TYPE_ID = P_ORDER_TYPE_LO
+          AND OEOT.LANGUAGE = USERENV('LANG');
+        SELECT
+          OEOT.NAME
+        INTO L_ORDER_TYPE_HIGH
+        FROM
+          OE_TRANSACTION_TYPES_TL OEOT
+        WHERE OEOT.TRANSACTION_TYPE_ID = P_ORDER_TYPE_HI
+          AND OEOT.LANGUAGE = USERENV('LANG');
+      ELSE
+        IF P_ORDER_TYPE_LO IS NULL AND P_ORDER_TYPE_HI IS NOT NULL THEN
+          LP_ORDER_TYPE := 'and ot.TRANSACTION_TYPE_ID <= :P_order_type_hi ';
+          SELECT
+            OEOT.NAME
+          INTO L_ORDER_TYPE_HIGH
+          FROM
+            OE_TRANSACTION_TYPES_TL OEOT
+          WHERE OEOT.TRANSACTION_TYPE_ID = P_ORDER_TYPE_HI
+            AND OEOT.LANGUAGE = USERENV('LANG');
+        ELSE
+          IF P_ORDER_TYPE_LO IS NOT NULL AND P_ORDER_TYPE_HI IS NULL THEN
+            LP_ORDER_TYPE := 'and ot.TRANSACTION_TYPE_ID >= :P_order_type_lo ';
+            SELECT
+              OEOT.NAME
+            INTO L_ORDER_TYPE_LOW
+            FROM
+              OE_TRANSACTION_TYPES_TL OEOT
+            WHERE OEOT.TRANSACTION_TYPE_ID = P_ORDER_TYPE_LO
+              AND OEOT.LANGUAGE = USERENV('LANG');
+          ELSE
+            LP_ORDER_TYPE := ' ';
+          END IF;
+        END IF;
+      END IF;
+      IF P_ORDER_DATE_LO IS NOT NULL AND P_ORDER_DATE_HI IS NOT NULL THEN
+        LP_ORDER_DATE := 'and h.ordered_date between :P_order_date_lo and (:P_order_date_hi+1) ';
+      ELSE
+        IF P_ORDER_DATE_LO IS NULL AND P_ORDER_DATE_HI IS NOT NULL THEN
+          LP_ORDER_DATE := 'and h.ordered_date <= (:P_order_date_hi+1) ';
+        ELSE
+          IF P_ORDER_DATE_LO IS NOT NULL AND P_ORDER_DATE_HI IS NULL THEN
+            LP_ORDER_DATE := 'and h.ordered_date >= :P_order_date_lo ';
+          ELSE
+            LP_ORDER_DATE := ' ';
+          END IF;
+        END IF;
+      END IF;
+      IF P_LINE_TYPE_LO IS NOT NULL AND P_LINE_TYPE_HI IS NOT NULL THEN
+        LP_LINE_TYPE := 'and ol.transaction_type_id between :P_line_type_lo and :P_line_type_hi ';
+        SELECT
+          OEOT.NAME
+        INTO L_LINE_TYPE_HIGH
+        FROM
+          OE_TRANSACTION_TYPES_TL OEOT
+        WHERE OEOT.TRANSACTION_TYPE_ID = P_LINE_TYPE_HI
+          AND OEOT.LANGUAGE = USERENV('LANG');
+        SELECT
+          OEOT.NAME
+        INTO L_LINE_TYPE_LOW
+        FROM
+          OE_TRANSACTION_TYPES_TL OEOT
+        WHERE OEOT.TRANSACTION_TYPE_ID = P_LINE_TYPE_LO
+          AND OEOT.LANGUAGE = USERENV('LANG');
+      ELSE
+        IF P_LINE_TYPE_LO IS NULL AND P_LINE_TYPE_HI IS NOT NULL THEN
+          LP_LINE_TYPE := 'and ol.transaction_type_id <= :P_line_type_hi ';
+          SELECT
+            OEOT.NAME
+          INTO L_LINE_TYPE_HIGH
+          FROM
+            OE_TRANSACTION_TYPES_TL OEOT
+          WHERE OEOT.TRANSACTION_TYPE_ID = P_LINE_TYPE_HI
+            AND OEOT.LANGUAGE = USERENV('LANG');
+        ELSE
+          IF P_LINE_TYPE_LO IS NOT NULL AND P_LINE_TYPE_HI IS NULL THEN
+            LP_LINE_TYPE := 'and ol.transaction_type_id >= :P_line_type_lo ';
+            SELECT
+              OEOT.NAME
+            INTO L_LINE_TYPE_LOW
+            FROM
+              OE_TRANSACTION_TYPES_TL OEOT
+            WHERE OEOT.TRANSACTION_TYPE_ID = P_LINE_TYPE_LO
+              AND OEOT.LANGUAGE = USERENV('LANG');
+          ELSE
+            LP_LINE_TYPE := ' ';
+          END IF;
+        END IF;
+      END IF;
+      IF P_CUSTOMER_LO IS NOT NULL AND P_CUSTOMER_HI IS NOT NULL THEN
+        LP_CUSTOMER_NAME := 'and sold_to_org.name between :P_customer_lo and :P_customer_hi ';
+      ELSE
+        IF P_CUSTOMER_LO IS NULL AND P_CUSTOMER_HI IS NOT NULL THEN
+          LP_CUSTOMER_NAME := 'and sold_to_org.name <= :P_customer_hi ';
+        ELSE
+          IF P_CUSTOMER_LO IS NOT NULL AND P_CUSTOMER_HI IS NULL THEN
+            LP_CUSTOMER_NAME := 'and sold_To_org.name >= :P_customer_lo ';
+          ELSE
+            LP_CUSTOMER_NAME := ' ';
+          END IF;
+        END IF;
+      END IF;
+      IF P_CUST_NUM_LO IS NOT NULL AND P_CUST_NUM_HI IS NOT NULL THEN
+        LP_CUSTOMER_NUMBER := 'and sold_to_org.customer_number between :P_cust_num_lo and :P_cust_num_hi ';
+      ELSE
+        IF P_CUST_NUM_LO IS NULL AND P_CUST_NUM_HI IS NOT NULL THEN
+          LP_CUSTOMER_NUMBER := 'and sold_to_org.customer_number <= :P_cust_num_hi ';
+        ELSE
+          IF P_CUST_NUM_LO IS NOT NULL AND P_CUST_NUM_HI IS NULL THEN
+            LP_CUSTOMER_NUMBER := 'and sold_to_org.customer_number >= :P_cust_num_lo ';
+          ELSE
+            LP_CUSTOMER_NUMBER := ' ';
+          END IF;
+        END IF;
+      END IF;
+      IF P_SALESREP_LO IS NOT NULL AND P_SALESREP_HI IS NOT NULL THEN
+        LP_SALESREP_NAME := 'and sr.name between :P_salesrep_lo and :P_salesrep_hi ';
+      ELSE
+        IF P_SALESREP_LO IS NULL AND P_SALESREP_HI IS NOT NULL THEN
+          LP_SALESREP_NAME := 'and sr.name <= :P_salesrep_hi ';
+        ELSE
+          IF P_SALESREP_LO IS NOT NULL AND P_SALESREP_HI IS NULL THEN
+            LP_SALESREP_NAME := 'and sr.name >= :P_salesrep_lo ';
+          ELSE
+            LP_SALESREP_NAME := ' ';
+          END IF;
+        END IF;
+      END IF;
+      IF P_ORDER_BY = 'CUSTOMER' THEN
+        LP_ORDER_BY := ' sold_to_org.name,';
+      ELSE
+        IF P_ORDER_BY = 'SALESREP' THEN
+          LP_ORDER_BY := ' sr.name,';
+        ELSE
+          IF P_ORDER_BY = 'ORDER_TYPE' THEN
+            LP_ORDER_BY := ' ot.name,';
+          ELSE
+            IF P_ORDER_BY = 'AGREEMENT' THEN
+              LP_ORDER_BY := ' agree.name,';
+            ELSE
+              IF P_ORDER_BY = 'ORDER_NUMBER' THEN
+                LP_ORDER_BY := ' h.order_number,';
+              ELSE
+                IF P_ORDER_BY = 'ORDER_DATE' THEN
+                  LP_ORDER_BY := ' h.ordered_date,';
+                ELSE
+                  IF P_ORDER_BY = 'SHIP_TO_COUNTRY' THEN
+                    LP_ORDER_BY := ' loc.country,';
+                  ELSE
+                    LP_ORDER_BY := ' ';
+                  END IF;
+                END IF;
+              END IF;
+            END IF;
+          END IF;
+        END IF;
+      END IF;
+      IF P_ENTERED_BY_LO IS NOT NULL AND P_ENTERED_BY_HI IS NOT NULL THEN
+        LP_ENTERED_BY := 'and u.user_name between :P_entered_by_lo and :P_entered_by_hi ';
+      ELSE
+        IF P_ENTERED_BY_LO IS NULL AND P_ENTERED_BY_HI IS NOT NULL THEN
+          LP_ENTERED_BY := 'and u.user_name <= :P_entered_by_hi ';
+        ELSE
+          IF P_ENTERED_BY_LO IS NOT NULL AND P_ENTERED_BY_HI IS NULL THEN
+            LP_ENTERED_BY := 'and u.user_name >= :P_entered_by_lo ';
+          ELSE
+            LP_ENTERED_BY := ' ';
+          END IF;
+        END IF;
+      END IF;
+    END;
+    RETURN (TRUE);
+  END AFTERPFORM;
+
+  FUNCTION C_FC_TAXFORMULA(C_GL_CONV_RATE IN NUMBER
+                          ,TAX_ON_LINE IN NUMBER) RETURN NUMBER IS
+  BEGIN
+    DECLARE
+      FC_TAX NUMBER;
+    BEGIN
+      IF P_FUNCTIONAL_CURRENCY = 'Y' THEN
+        SELECT
+          C_GL_CONV_RATE * NVL(TAX_ON_LINE
+             ,0)
+        INTO FC_TAX
+        FROM
+          DUAL;
+        RETURN (FC_TAX);
+      ELSE
+        RETURN (TAX_ON_LINE);
+      END IF;
+    END;
+    RETURN NULL;
+  END C_FC_TAXFORMULA;
+
+  FUNCTION C_FC_LINE_CHARGEFORMULA(C_GL_CONV_RATE IN NUMBER
+                                  ,LINE_CHARGE IN NUMBER) RETURN NUMBER IS
+  BEGIN
+    DECLARE
+      FC_LINE_CHARGE NUMBER;
+    BEGIN
+      IF P_FUNCTIONAL_CURRENCY = 'Y' THEN
+        SELECT
+          C_GL_CONV_RATE * ROUND(LINE_CHARGE
+               ,2)
+        INTO FC_LINE_CHARGE
+        FROM
+          DUAL;
+        RETURN (FC_LINE_CHARGE);
+      ELSE
+        FC_LINE_CHARGE := ROUND(LINE_CHARGE
+                               ,2);
+        RETURN (FC_LINE_CHARGE);
+      END IF;
+    END;
+    RETURN NULL;
+  END C_FC_LINE_CHARGEFORMULA;
+
+  FUNCTION C_LINE_BILL_TO_CUSTFORMULA(LINE_BILL_TO_ORG_ID IN NUMBER
+                                     ,INVOICE_TO_ORG_ID IN NUMBER
+                                     ,L_BILL_ADDRESS IN VARCHAR2) RETURN CHAR IS
+  BEGIN
+    BEGIN
+      IF LINE_BILL_TO_ORG_ID IS NULL THEN
+        RETURN (NULL);
+      END IF;
+      IF NVL(INVOICE_TO_ORG_ID
+         ,0) <> NVL(LINE_BILL_TO_ORG_ID
+         ,0) THEN
+        RETURN (L_BILL_ADDRESS);
+      ELSE
+        RETURN (NULL);
+      END IF;
+    END;
+    RETURN NULL;
+  END C_LINE_BILL_TO_CUSTFORMULA;
+
+  FUNCTION C_LINE_SHIP_TO_CUSTFORMULA(LINE_SHIP_TO_ORG_ID IN NUMBER
+                                     ,HDR_SHIP_SITE_USE_ID IN NUMBER
+                                     ,L_SHIP_ADDRESS IN VARCHAR2) RETURN CHAR IS
+  BEGIN
+    BEGIN
+      IF LINE_SHIP_TO_ORG_ID IS NULL THEN
+        RETURN (NULL);
+      END IF;
+      IF NVL(HDR_SHIP_SITE_USE_ID
+         ,0) <> NVL(LINE_SHIP_TO_ORG_ID
+         ,0) THEN
+        RETURN (L_SHIP_ADDRESS);
+      ELSE
+        RETURN (NULL);
+      END IF;
+    END;
+    RETURN NULL;
+  END C_LINE_SHIP_TO_CUSTFORMULA;
+
+  FUNCTION C_LINE_AGREEMENTFORMULA(LINE_AGREEMENT IN VARCHAR2
+                                  ,AGREEMENT1 IN VARCHAR2) RETURN CHAR IS
+  BEGIN
+    BEGIN
+      IF LINE_AGREEMENT IS NULL THEN
+        RETURN (NULL);
+      END IF;
+      IF NVL(AGREEMENT1
+         ,' ') <> NVL(LINE_AGREEMENT
+         ,' ') THEN
+        RETURN (LINE_AGREEMENT);
+      ELSE
+        RETURN (NULL);
+      END IF;
+    END;
+    RETURN NULL;
+  END C_LINE_AGREEMENTFORMULA;
+
+  FUNCTION C_LINE_POFORMULA(LINE_PO IN VARCHAR2
+                           ,PURCHASE_ORDER IN VARCHAR2) RETURN CHAR IS
+  BEGIN
+    BEGIN
+      IF LINE_PO IS NULL THEN
+        RETURN (NULL);
+      END IF;
+      IF NVL(PURCHASE_ORDER
+         ,' ') <> NVL(LINE_PO
+         ,' ') THEN
+        RETURN (LINE_PO);
+      ELSE
+        RETURN (NULL);
+      END IF;
+    END;
+    RETURN NULL;
+  END C_LINE_POFORMULA;
+
+  FUNCTION C_LINE_TERMSFORMULA(LINE_TERMS IN VARCHAR2
+                              ,TERMS1 IN VARCHAR2) RETURN CHAR IS
+  BEGIN
+    BEGIN
+      IF LINE_TERMS IS NULL THEN
+        RETURN (NULL);
+      END IF;
+      IF NVL(TERMS1
+         ,' ') <> NVL(LINE_TERMS
+         ,' ') THEN
+        RETURN (LINE_TERMS);
+      ELSE
+        RETURN (NULL);
+      END IF;
+    END;
+    RETURN NULL;
+  END C_LINE_TERMSFORMULA;
+
+  FUNCTION C_ITEM_REVISIONFORMULA(ITEM_REVISION IN VARCHAR2) RETURN CHAR IS
+  BEGIN
+    BEGIN
+      IF ITEM_REVISION IS NULL THEN
+        RETURN (NULL);
+      ELSE
+        RETURN (ITEM_REVISION);
+      END IF;
+    END;
+    RETURN NULL;
+  END C_ITEM_REVISIONFORMULA;
+
+  FUNCTION P_ITEM_FLEX_CODEVALIDTRIGGER RETURN BOOLEAN IS
+  BEGIN
+    RETURN (TRUE);
+  END P_ITEM_FLEX_CODEVALIDTRIGGER;
+
+  FUNCTION C_FC_EXTEND_PRICEFORMULA(C_GL_CONV_RATE IN NUMBER
+                                   ,SVC_EXTENDED_PRICE IN NUMBER) RETURN NUMBER IS
+  BEGIN
+    DECLARE
+      FC_SVC_EXTENDED_PRICE NUMBER;
+    BEGIN
+      IF P_FUNCTIONAL_CURRENCY = 'Y' THEN
+        SELECT
+          C_GL_CONV_RATE * SVC_EXTENDED_PRICE
+        INTO FC_SVC_EXTENDED_PRICE
+        FROM
+          DUAL;
+        RETURN (FC_SVC_EXTENDED_PRICE);
+      ELSE
+        RETURN (SVC_EXTENDED_PRICE);
+      END IF;
+    END;
+    RETURN NULL;
+  END C_FC_EXTEND_PRICEFORMULA;
+
+  FUNCTION C_FC_SALE_PRICEFORMULA(C_GL_CONV_RATE IN NUMBER
+                                 ,SVC_SELLING_PRICE IN NUMBER) RETURN NUMBER IS
+  BEGIN
+    DECLARE
+      FC_SVC_SELLING_PRICE NUMBER;
+    BEGIN
+      IF P_FUNCTIONAL_CURRENCY = 'Y' THEN
+        SELECT
+          C_GL_CONV_RATE * SVC_SELLING_PRICE
+        INTO FC_SVC_SELLING_PRICE
+        FROM
+          DUAL;
+        RETURN (FC_SVC_SELLING_PRICE);
+      ELSE
+        RETURN (SVC_SELLING_PRICE);
+      END IF;
+    END;
+    RETURN NULL;
+  END C_FC_SALE_PRICEFORMULA;
+
+  FUNCTION C_FMT_EXTEND_PRICEFORMULA(C_FC_EXTEND_PRICE IN NUMBER) RETURN NUMBER IS
+  BEGIN
+    RETURN (C_FC_EXTEND_PRICE);
+  END C_FMT_EXTEND_PRICEFORMULA;
+
+  FUNCTION RP_LINE_CATEGORYFORMULA RETURN VARCHAR2 IS
+  BEGIN
+    DECLARE
+      L_MEANING VARCHAR2(80);
+    BEGIN
+      SELECT
+        MEANING
+      INTO L_MEANING
+      FROM
+        OE_LOOKUPS
+      WHERE LOOKUP_TYPE = 'REPORT_LINE_DISPLAY'
+        AND LOOKUP_CODE = P_LINE_CATEGORY;
+      RETURN (L_MEANING);
+    EXCEPTION
+      WHEN NO_DATA_FOUND THEN
+        RETURN (NULL);
+    END;
+    RETURN NULL;
+  END RP_LINE_CATEGORYFORMULA;
+
+  FUNCTION RP_ITEM_DISPLAYFORMULA RETURN VARCHAR2 IS
+  BEGIN
+    DECLARE
+      L_MEANING VARCHAR2(80);
+    BEGIN
+      SELECT
+        MEANING
+      INTO L_MEANING
+      FROM
+        OE_LOOKUPS
+      WHERE LOOKUP_TYPE = 'ITEM_DISPLAY_CODE'
+        AND LOOKUP_CODE = P_PRINT_DESCRIPTION;
+      RETURN (L_MEANING);
+    EXCEPTION
+      WHEN NO_DATA_FOUND THEN
+        RETURN (NULL);
+    END;
+    RETURN NULL;
+  END RP_ITEM_DISPLAYFORMULA;
+
+  FUNCTION C_FC_AMOUNTFORMULA(C_GL_CONV_RATE IN NUMBER
+                             ,AMOUNT IN NUMBER
+                             ,C_USE_CURRENCY IN VARCHAR2) RETURN NUMBER IS
+  BEGIN
+    DECLARE
+      FC_AMOUNT NUMBER;
+      L_STD_PRECISION NUMBER;
+      L_EXT_PRECISION NUMBER;
+      L_MIN_ACCT_UNIT NUMBER;
+    BEGIN
+      IF P_FUNCTIONAL_CURRENCY = 'Y' THEN
+        SELECT
+          C_GL_CONV_RATE * AMOUNT
+        INTO FC_AMOUNT
+        FROM
+          DUAL;
+        IF C_GL_CONV_RATE <> 1 THEN
+          FND_CURRENCY.GET_INFO(C_USE_CURRENCY
+                               ,L_STD_PRECISION
+                               ,L_EXT_PRECISION
+                               ,L_MIN_ACCT_UNIT);
+          IF (RP_CURR_PROFILE = 'EXTENDED') THEN
+            FC_AMOUNT := ROUND(FC_AMOUNT
+                              ,L_EXT_PRECISION);
+          ELSE
+            FC_AMOUNT := ROUND(FC_AMOUNT
+                              ,L_STD_PRECISION);
+          END IF;
+        END IF;
+        RETURN (FC_AMOUNT);
+      ELSE
+        RETURN (AMOUNT);
+      END IF;
+    END;
+    RETURN NULL;
+  END C_FC_AMOUNTFORMULA;
+
+  FUNCTION C_MASTER_ORGFORMULA RETURN CHAR IS
+    V_MASTER_ORG VARCHAR2(20);
+  BEGIN
+    V_MASTER_ORG := NVL(OE_SYS_PARAMETERS.VALUE('MASTER_ORGANIZATION_ID'
+                                               ,MO_GLOBAL.GET_CURRENT_ORG_ID)
+                       ,0);
+    RETURN V_MASTER_ORG;
+  END C_MASTER_ORGFORMULA;
+
+  FUNCTION C_SHIP_HDR_ADDRESS4FORMULA(S_ADDRESS4 IN VARCHAR2
+                                     ,HDR_SHIP_SITE_USE_ID IN NUMBER) RETURN CHAR IS
+  BEGIN
+    /*SRW.REFERENCE(S_ADDRESS4)*/NULL;
+    /*SRW.REFERENCE(HDR_SHIP_SITE_USE_ID)*/NULL;
+    IF HDR_SHIP_SITE_USE_ID IS NOT NULL THEN
+      RETURN (S_ADDRESS4);
+    ELSE
+      RETURN NULL;
+    END IF;
+  END C_SHIP_HDR_ADDRESS4FORMULA;
+
+  FUNCTION C_BILL_HDR_ADDRESS4FORMULA(B_ADDRESS4 IN VARCHAR2
+                                     ,INVOICE_TO_ORG_ID IN NUMBER) RETURN CHAR IS
+  BEGIN
+    /*SRW.REFERENCE(B_ADDRESS4)*/NULL;
+    /*SRW.REFERENCE(INVOICE_TO_ORG_ID)*/NULL;
+    IF INVOICE_TO_ORG_ID IS NOT NULL THEN
+      RETURN (B_ADDRESS4);
+    ELSE
+      RETURN NULL;
+    END IF;
+  END C_BILL_HDR_ADDRESS4FORMULA;
+
+  FUNCTION CF_HDR_PERCENTFORMULA(PREPAID_AMOUNT IN NUMBER
+                                ,C_FC_ORDER_VALUE IN NUMBER) RETURN NUMBER IS
+    L_PERCENT NUMBER;
+  BEGIN
+    /*SRW.MESSAGE(1
+               ,'in cf_hdr_percent')*/NULL;
+    /*SRW.MESSAGE(1
+               ,'prepaid amount : ' || PREPAID_AMOUNT)*/NULL;
+    /*SRW.MESSAGE(1
+               ,'order value : ' || C_FC_ORDER_VALUE)*/NULL;
+    L_PERCENT := PREPAID_AMOUNT / C_FC_ORDER_VALUE * 100;
+    /*SRW.MESSAGE(1
+               ,'percent : ' || L_PERCENT)*/NULL;
+    RETURN (ROUND(L_PERCENT
+                ,2));
+  END CF_HDR_PERCENTFORMULA;
+
+  FUNCTION CF_LINE_PERCENTFORMULA(PREPAID_AMOUNT1 IN NUMBER
+                                 ,C_FC_ORDER_VALUE IN NUMBER) RETURN NUMBER IS
+    L_LINE_PERCENT NUMBER;
+  BEGIN
+    L_LINE_PERCENT := PREPAID_AMOUNT1 / C_FC_ORDER_VALUE * 100;
+    RETURN (ROUND(L_LINE_PERCENT
+                ,2));
+  END CF_LINE_PERCENTFORMULA;
+
+  FUNCTION C_CHARGE_PERIODICITYFORMULA(CHARGE_PERIODICITY_CODE IN VARCHAR2) RETURN CHAR IS
+    L_PERIODICITY VARCHAR2(60);
+  BEGIN
+    IF CHARGE_PERIODICITY_CODE IS NOT NULL THEN
+      SELECT
+        UNIT_OF_MEASURE
+      INTO L_PERIODICITY
+      FROM
+        MTL_UNITS_OF_MEASURE_VL
+      WHERE UOM_CODE = CHARGE_PERIODICITY_CODE
+        AND UOM_CLASS = FND_PROFILE.VALUE('ONT_UOM_CLASS_CHARGE_PERIODICITY');
+      RETURN (L_PERIODICITY);
+    ELSE
+      RETURN (P_CHARGE_PERIODICITY);
+    END IF;
+    RETURN NULL;
+  EXCEPTION
+    WHEN NO_DATA_FOUND THEN
+      RETURN NULL;
+  END C_CHARGE_PERIODICITYFORMULA;
+
+  FUNCTION CF_INITIAL_DUE_TOTALFORMULA(HEADER_ID IN NUMBER) RETURN NUMBER IS
+    L_PAY_NOW_SUBTOTAL NUMBER;
+    L_PAY_NOW_TAX NUMBER;
+    L_PAY_NOW_CHARGES NUMBER;
+    L_PAY_NOW_TOTAL NUMBER;
+    L_PAY_NOW_COMMITMENT NUMBER;
+    L_MSG_COUNT NUMBER;
+    L_MSG_DATA VARCHAR2(30);
+    L_RETURN_STATUS VARCHAR2(30);
+  BEGIN
+    IF OE_PREPAYMENT_UTIL.GET_INSTALLMENT_OPTIONS in ('ENABLE_PAY_NOW','AUTHORIZE_FIRST_INSTALLMENT') THEN
+      /*SRW.REFERENCE(HEADER_ID)*/NULL;
+      OE_PREPAYMENT_PVT.GET_PAY_NOW_AMOUNTS(P_HEADER_ID => HEADER_ID
+                                           ,P_LINE_ID => NULL
+                                           ,X_PAY_NOW_SUBTOTAL => L_PAY_NOW_SUBTOTAL
+                                           ,X_PAY_NOW_TAX => L_PAY_NOW_TAX
+                                           ,X_PAY_NOW_CHARGES => L_PAY_NOW_CHARGES
+                                           ,X_PAY_NOW_TOTAL => L_PAY_NOW_TOTAL
+                                           ,X_PAY_NOW_COMMITMENT => L_PAY_NOW_COMMITMENT
+                                           ,X_MSG_COUNT => L_MSG_COUNT
+                                           ,X_MSG_DATA => L_MSG_DATA
+                                           ,X_RETURN_STATUS => L_RETURN_STATUS);
+      IF L_PAY_NOW_COMMITMENT <> 0 THEN
+        CP_COMMITMENT := L_PAY_NOW_COMMITMENT;
+      ELSE
+        CP_COMMITMENT := NULL;
+      END IF;
+      RETURN L_PAY_NOW_TOTAL;
+    ELSE
+      RETURN 0;
+    END IF;
+  EXCEPTION
+    WHEN OTHERS THEN
+      RETURN 0;
+  END CF_INITIAL_DUE_TOTALFORMULA;
+
+  FUNCTION CF_INITIAL_DUE_BALANCEFORMULA(CF_INITIAL_DUE_TOTAL IN NUMBER
+                                        ,CS_PREPAID_AMOUNT IN NUMBER) RETURN NUMBER IS
+    L_BALANCE_DUE NUMBER;
+  BEGIN
+    /*SRW.REFERENCE(CF_INITIAL_DUE_TOTAL)*/NULL;
+    /*SRW.REFERENCE(CP_COMMITMENT)*/NULL;
+    /*SRW.REFERENCE(CS_PREPAID_AMOUNT)*/NULL;
+    /*SRW.MESSAGE(1
+               ,'prepaid_amount' || CS_PREPAID_AMOUNT)*/NULL;
+    /*SRW.MESSAGE(1
+               ,'commitment' || CP_COMMITMENT)*/NULL;
+    L_BALANCE_DUE := NVL(CF_INITIAL_DUE_TOTAL
+                        ,0) - NVL(CP_COMMITMENT
+                        ,0) - NVL(CS_PREPAID_AMOUNT
+                        ,0);
+    IF L_BALANCE_DUE >= 0 THEN
+      RETURN L_BALANCE_DUE;
+    ELSE
+      RETURN 0;
+    END IF;
+  END CF_INITIAL_DUE_BALANCEFORMULA;
+
+  FUNCTION CF_AUTHORIZED_AMOUNTFORMULA(HEADER_ID IN NUMBER) RETURN NUMBER IS
+    CURSOR CC_TRXN_EXTN_IDS_CUR(P_HEADER_ID IN NUMBER) IS
+      SELECT
+        TRXN_EXTENSION_ID,
+        TANGIBLE_ID
+      FROM
+        OE_PAYMENTS
+      WHERE HEADER_ID = P_HEADER_ID
+        AND NVL(PAYMENT_TYPE_CODE
+         ,'COMMITMENT') = 'CREDIT_CARD';
+    L_TRXN_EXTENSION_ID VARCHAR2(80);
+    L_TANGIBLE_ID NUMBER;
+    L_AUTHORIZED_AMOUNT NUMBER := 0;
+    L_AUTHORIZED_AMOUNT_SUM NUMBER := 0;
+  BEGIN
+    /*SRW.REFERENCE(HEADER_ID)*/NULL;
+    FOR cc_trxn_extn_ids IN cc_trxn_extn_ids_cur(header_id) LOOP
+      L_TRXN_EXTENSION_ID := CC_TRXN_EXTN_IDS.TRXN_EXTENSION_ID;
+      L_TANGIBLE_ID := CC_TRXN_EXTN_IDS.TANGIBLE_ID;
+      BEGIN
+        IF L_TRXN_EXTENSION_ID IS NOT NULL THEN
+          SELECT
+            AUTHORIZATION_AMOUNT
+          INTO L_AUTHORIZED_AMOUNT
+          FROM
+            IBY_TRXN_EXT_AUTHS_V
+          WHERE TRXN_EXTENSION_ID = L_TRXN_EXTENSION_ID
+            AND AUTHORIZATION_STATUS = 0;
+        ELSE
+          IF L_TANGIBLE_ID IS NOT NULL THEN
+            SELECT
+              AMOUNT
+            INTO L_AUTHORIZED_AMOUNT
+            FROM
+              IBY_TRXN_SUMMARIES_ALL
+            WHERE TANGIBLEID = L_TANGIBLE_ID
+              AND REQTYPE = 'ORAPMTREQ';
+          ELSE
+            L_AUTHORIZED_AMOUNT := 0;
+          END IF;
+        END IF;
+      EXCEPTION
+        WHEN OTHERS THEN
+          L_AUTHORIZED_AMOUNT := 0;
+      END;
+      L_AUTHORIZED_AMOUNT_SUM := L_AUTHORIZED_AMOUNT_SUM + L_AUTHORIZED_AMOUNT;
+    END LOOP;
+    RETURN L_AUTHORIZED_AMOUNT_SUM;
+  EXCEPTION
+    WHEN OTHERS THEN
+      RETURN 0;
+  END CF_AUTHORIZED_AMOUNTFORMULA;
+
+  FUNCTION CF_LINE_INITIAL_DUE_TOTALFORMU(HEADER_ID IN NUMBER
+                                         ,LINE_ID IN NUMBER) RETURN NUMBER IS
+    L_PAY_NOW_SUBTOTAL NUMBER;
+    L_PAY_NOW_TAX NUMBER;
+    L_PAY_NOW_CHARGES NUMBER;
+    L_PAY_NOW_TOTAL NUMBER;
+    L_PAY_NOW_COMMITMENT NUMBER;
+    L_MSG_COUNT NUMBER;
+    L_MSG_DATA VARCHAR2(30);
+    L_RETURN_STATUS VARCHAR2(30);
+  BEGIN
+    IF OE_PREPAYMENT_UTIL.GET_INSTALLMENT_OPTIONS in ('ENABLE_PAY_NOW','AUTHORIZE_FIRST_INSTALLMENT') THEN
+      /*SRW.REFERENCE(HEADER_ID)*/NULL;
+      /*SRW.REFERENCE(LINE_ID)*/NULL;
+      OE_PREPAYMENT_PVT.GET_PAY_NOW_AMOUNTS(P_HEADER_ID => HEADER_ID
+                                           ,P_LINE_ID => LINE_ID
+                                           ,X_PAY_NOW_SUBTOTAL => L_PAY_NOW_SUBTOTAL
+                                           ,X_PAY_NOW_TAX => L_PAY_NOW_TAX
+                                           ,X_PAY_NOW_CHARGES => L_PAY_NOW_CHARGES
+                                           ,X_PAY_NOW_TOTAL => L_PAY_NOW_TOTAL
+                                           ,X_PAY_NOW_COMMITMENT => L_PAY_NOW_COMMITMENT
+                                           ,X_MSG_COUNT => L_MSG_COUNT
+                                           ,X_MSG_DATA => L_MSG_DATA
+                                           ,X_RETURN_STATUS => L_RETURN_STATUS);
+      CP_LINE_COMMITMENT := L_PAY_NOW_COMMITMENT;
+      RETURN L_PAY_NOW_TOTAL;
+    ELSE
+      RETURN 0;
+    END IF;
+  EXCEPTION
+    WHEN OTHERS THEN
+      RETURN 0;
+  END CF_LINE_INITIAL_DUE_TOTALFORMU;
+
+  FUNCTION CF_LINE_INITIAL_DUE_BALFORMULA(CF_LINE_INITIAL_DUE_TOTAL IN NUMBER) RETURN NUMBER IS
+    L_BALANCE_DUE NUMBER;
+  BEGIN
+    /*SRW.REFERENCE(CF_LINE_INITIAL_DUE_TOTAL)*/NULL;
+    /*SRW.REFERENCE(CP_LINE_COMMITMENT)*/NULL;
+    L_BALANCE_DUE := NVL(CF_LINE_INITIAL_DUE_TOTAL
+                        ,0) - NVL(CP_LINE_COMMITMENT
+                        ,0);
+    IF L_BALANCE_DUE >= 0 THEN
+      RETURN L_BALANCE_DUE;
+    ELSE
+      RETURN 0;
+    END IF;
+  END CF_LINE_INITIAL_DUE_BALFORMULA;
+
+  FUNCTION CF_LINE_AUTHORIZED_AMOUNTFORMU(LINE_ID IN NUMBER) RETURN NUMBER IS
+    CURSOR CC_TRXN_EXTN_IDS_CUR(P_LINE_ID IN NUMBER) IS
+      SELECT
+        TRXN_EXTENSION_ID,
+        TANGIBLE_ID
+      FROM
+        OE_PAYMENTS
+      WHERE LINE_ID = P_LINE_ID
+        AND NVL(PAYMENT_TYPE_CODE
+         ,'COMMITMENT') = 'CREDIT_CARD';
+    L_TRXN_EXTENSION_ID VARCHAR2(80);
+    L_TANGIBLE_ID NUMBER;
+    L_AUTHORIZED_AMOUNT NUMBER := 0;
+    L_AUTHORIZED_AMOUNT_SUM NUMBER := 0;
+  BEGIN
+    /*SRW.REFERENCE(LINE_ID)*/NULL;
+    FOR cc_trxn_extn_ids IN cc_trxn_extn_ids_cur(line_id) LOOP
+      L_TRXN_EXTENSION_ID := CC_TRXN_EXTN_IDS.TRXN_EXTENSION_ID;
+      L_TANGIBLE_ID := CC_TRXN_EXTN_IDS.TANGIBLE_ID;
+      BEGIN
+        IF L_TRXN_EXTENSION_ID IS NOT NULL THEN
+          SELECT
+            AUTHORIZATION_AMOUNT
+          INTO L_AUTHORIZED_AMOUNT
+          FROM
+            IBY_TRXN_EXT_AUTHS_V
+          WHERE TRXN_EXTENSION_ID = L_TRXN_EXTENSION_ID
+            AND AUTHORIZATION_STATUS = 0;
+        ELSE
+          IF L_TANGIBLE_ID IS NOT NULL THEN
+            SELECT
+              AMOUNT
+            INTO L_AUTHORIZED_AMOUNT
+            FROM
+              IBY_TRXN_SUMMARIES_ALL
+            WHERE TANGIBLEID = L_TANGIBLE_ID
+              AND REQTYPE = 'ORAPMTREQ';
+          ELSE
+            L_AUTHORIZED_AMOUNT := 0;
+          END IF;
+        END IF;
+      EXCEPTION
+        WHEN OTHERS THEN
+          L_AUTHORIZED_AMOUNT := 0;
+      END;
+      L_AUTHORIZED_AMOUNT_SUM := L_AUTHORIZED_AMOUNT_SUM + L_AUTHORIZED_AMOUNT;
+    END LOOP;
+    RETURN L_AUTHORIZED_AMOUNT_SUM;
+  EXCEPTION
+    WHEN OTHERS THEN
+      RETURN 0;
+  END CF_LINE_AUTHORIZED_AMOUNTFORMU;
+
+  FUNCTION CF_END_CUSTOMERFORMULA(END_CUSTOMER_ID IN NUMBER) RETURN CHAR IS
+    L_END_CUSTOMER VARCHAR2(150);
+  BEGIN
+    IF END_CUSTOMER_ID IS NOT NULL THEN
+      SELECT
+        PARTY.PARTY_NAME
+      INTO L_END_CUSTOMER
+      FROM
+        HZ_PARTIES PARTY,
+        HZ_CUST_ACCOUNTS CUST_ACCT
+      WHERE cust_acct.cust_account_id (+) = END_CUSTOMER_ID
+        AND CUST_ACCT.PARTY_ID = party.party_id (+);
+      RETURN (L_END_CUSTOMER);
+    ELSE
+      RETURN NULL;
+    END IF;
+  EXCEPTION
+    WHEN NO_DATA_FOUND THEN
+      RETURN NULL;
+  END CF_END_CUSTOMERFORMULA;
+
+  FUNCTION CF_END_CUSTOMER_ADDRESS1FORMUL(END_CUSTOMER_SITE_USE_ID IN NUMBER) RETURN CHAR IS
+    L_END_CUSTOMER_ADDRESS1 VARCHAR2(50);
+  BEGIN
+    IF END_CUSTOMER_SITE_USE_ID IS NOT NULL THEN
+      SELECT
+        LOC.ADDRESS1
+      INTO L_END_CUSTOMER_ADDRESS1
+      FROM
+        HZ_LOCATIONS LOC,
+        HZ_PARTY_SITES SITE,
+        HZ_CUST_SITE_USES_ALL SITE_USE,
+        HZ_CUST_ACCT_SITES_ALL ACCT_SITE
+      WHERE SITE_USE.SITE_USE_ID = END_CUSTOMER_SITE_USE_ID
+        AND SITE_USE.CUST_ACCT_SITE_ID = ACCT_SITE.CUST_ACCT_SITE_ID
+        AND ACCT_SITE.PARTY_SITE_ID = SITE.PARTY_SITE_ID
+        AND SITE.LOCATION_ID = LOC.LOCATION_ID;
+      RETURN (L_END_CUSTOMER_ADDRESS1);
+    ELSE
+      RETURN NULL;
+    END IF;
+  EXCEPTION
+    WHEN NO_DATA_FOUND THEN
+      RETURN NULL;
+  END CF_END_CUSTOMER_ADDRESS1FORMUL;
+
+  FUNCTION CF_END_CUSTOMER_ADDRESS5FORMUL(END_CUSTOMER_SITE_USE_ID IN NUMBER) RETURN CHAR IS
+    L_END_CUSTOMER_CITY VARCHAR2(50);
+    L_END_CUSTOMER_STATE VARCHAR2(50);
+    L_END_CUSTOMER_POSTAL_CODE VARCHAR2(50);
+    L_END_CUSTOMER_COUNTRY VARCHAR2(50);
+    L_END_CUSTOMER_ADDRESS5 VARCHAR2(240);
+  BEGIN
+    IF END_CUSTOMER_SITE_USE_ID IS NOT NULL THEN
+      SELECT
+        LOC.CITY,
+        NVL(LOC.STATE
+           ,LOC.PROVINCE),
+        LOC.POSTAL_CODE,
+        LOC.COUNTRY
+      INTO L_END_CUSTOMER_CITY,L_END_CUSTOMER_STATE,L_END_CUSTOMER_POSTAL_CODE,L_END_CUSTOMER_COUNTRY
+      FROM
+        HZ_LOCATIONS LOC,
+        HZ_PARTY_SITES SITE,
+        HZ_CUST_SITE_USES SITE_USE,
+        HZ_CUST_ACCT_SITES ACCT_SITE
+      WHERE SITE_USE.SITE_USE_ID = END_CUSTOMER_SITE_USE_ID
+        AND SITE_USE.CUST_ACCT_SITE_ID = ACCT_SITE.CUST_ACCT_SITE_ID
+        AND ACCT_SITE.PARTY_SITE_ID = SITE.PARTY_SITE_ID
+        AND SITE.LOCATION_ID = LOC.LOCATION_ID;
+      SELECT
+        DECODE(L_END_CUSTOMER_CITY
+              ,NULL
+              ,NULL
+              ,L_END_CUSTOMER_CITY || ', ') || DECODE(L_END_CUSTOMER_STATE
+              ,NULL
+              ,NULL
+              ,L_END_CUSTOMER_STATE || ', ') || DECODE(L_END_CUSTOMER_POSTAL_CODE
+              ,NULL
+              ,NULL
+              ,L_END_CUSTOMER_POSTAL_CODE || ',') || DECODE(L_END_CUSTOMER_COUNTRY
+              ,NULL
+              ,NULL
+              ,L_END_CUSTOMER_COUNTRY)
+      INTO L_END_CUSTOMER_ADDRESS5
+      FROM
+        DUAL;
+      RETURN (L_END_CUSTOMER_ADDRESS5);
+    ELSE
+      RETURN NULL;
+    END IF;
+  EXCEPTION
+    WHEN NO_DATA_FOUND THEN
+      RETURN NULL;
+  END CF_END_CUSTOMER_ADDRESS5FORMUL;
+
+  FUNCTION CF_END_CUSTOMER_CONTACTFORMULA(END_CUSTOMER_CONTACT_ID IN NUMBER) RETURN CHAR IS
+    L_END_CUSTOMER_CONTACT VARCHAR2(400);
+  BEGIN
+    IF END_CUSTOMER_CONTACT_ID IS NOT NULL THEN
+      SELECT
+        NAME
+      INTO L_END_CUSTOMER_CONTACT
+      FROM
+        OE_CONTACTS_V
+      WHERE CONTACT_ID = END_CUSTOMER_CONTACT_ID;
+      RETURN L_END_CUSTOMER_CONTACT;
+    ELSE
+      RETURN NULL;
+    END IF;
+  EXCEPTION
+    WHEN NO_DATA_FOUND THEN
+      RETURN NULL;
+  END CF_END_CUSTOMER_CONTACTFORMULA;
+
+  FUNCTION CF_END_CUSTOMER_COUNTRYFORMULA(END_CUSTOMER_SITE_USE_ID IN NUMBER) RETURN CHAR IS
+    L_END_CUSTOMER_COUNTRY VARCHAR2(20);
+  BEGIN
+    IF END_CUSTOMER_SITE_USE_ID IS NOT NULL THEN
+      SELECT
+        LOC.COUNTRY
+      INTO L_END_CUSTOMER_COUNTRY
+      FROM
+        HZ_LOCATIONS LOC,
+        HZ_PARTY_SITES SITE,
+        HZ_CUST_SITE_USES_ALL SITE_USE,
+        HZ_CUST_ACCT_SITES_ALL ACCT_SITE
+      WHERE SITE_USE.SITE_USE_ID = END_CUSTOMER_SITE_USE_ID
+        AND SITE_USE.CUST_ACCT_SITE_ID = ACCT_SITE.CUST_ACCT_SITE_ID
+        AND ACCT_SITE.PARTY_SITE_ID = SITE.PARTY_SITE_ID
+        AND SITE.LOCATION_ID = LOC.LOCATION_ID;
+      RETURN (L_END_CUSTOMER_COUNTRY);
+    ELSE
+      RETURN NULL;
+    END IF;
+  EXCEPTION
+    WHEN NO_DATA_FOUND THEN
+      RETURN NULL;
+  END CF_END_CUSTOMER_COUNTRYFORMULA;
+
+  FUNCTION CF_END_CUSTOMER_NUMBERFORMULA(END_CUSTOMER_ID IN NUMBER) RETURN NUMBER IS
+    L_END_CUSTOMER NUMBER;
+  BEGIN
+    IF END_CUSTOMER_ID IS NOT NULL THEN
+      SELECT
+        PARTY.PARTY_NUMBER
+      INTO L_END_CUSTOMER
+      FROM
+        HZ_PARTIES PARTY,
+        HZ_CUST_ACCOUNTS CUST_ACCT
+      WHERE cust_acct.cust_account_id (+) = END_CUSTOMER_ID
+        AND CUST_ACCT.PARTY_ID = party.party_id (+);
+      RETURN (L_END_CUSTOMER);
+    ELSE
+      RETURN NULL;
+    END IF;
+  EXCEPTION
+    WHEN NO_DATA_FOUND THEN
+      RETURN NULL;
+  END CF_END_CUSTOMER_NUMBERFORMULA;
+
+  FUNCTION CF_IB_CURRENT_ADDRESS1FORMULA(IB_CURRENT_LOCATION IN VARCHAR2
+                                        ,L_SHIP_ADDRESS IN VARCHAR2
+                                        ,L_BILL_ADDRESS IN VARCHAR2
+                                        ,DELIVER_TO_ORG_ID IN NUMBER
+                                        ,HEADER_ID IN NUMBER
+                                        ,END_CUSTOMER_SITE_USE_ID IN NUMBER) RETURN CHAR IS
+    L_ADDRESS1 VARCHAR2(40);
+  BEGIN
+    IF IB_CURRENT_LOCATION = 'SHIP_TO' THEN
+      RETURN (L_SHIP_ADDRESS);
+    ELSIF IB_CURRENT_LOCATION = 'BILL_TO' THEN
+      RETURN (L_BILL_ADDRESS);
+    ELSIF IB_CURRENT_LOCATION = 'DELIVER_TO' THEN
+      SELECT
+        L.ADDRESS_LINE_1
+      INTO L_ADDRESS1
+      FROM
+        OE_DELIVER_TO_ORGS_V L
+      WHERE L.ORGANIZATION_ID = DELIVER_TO_ORG_ID;
+      RETURN (L_ADDRESS1);
+    ELSIF IB_CURRENT_LOCATION = 'SOLD_TO' THEN
+      SELECT
+        LOC.ADDRESS1
+      INTO L_ADDRESS1
+      FROM
+        HZ_LOCATIONS LOC,
+        HZ_PARTY_SITES SITE,
+        HZ_CUST_SITE_USES_ALL SITE_USE,
+        HZ_CUST_ACCT_SITES_ALL ACCT_SITE
+      WHERE SITE_USE.SITE_USE_ID = (
+        SELECT
+          SOLD_TO_SITE_USE_ID
+        FROM
+          OE_ORDER_HEADERS_ALL
+        WHERE HEADER_ID = HEADER_ID )
+        AND SITE_USE.CUST_ACCT_SITE_ID = ACCT_SITE.CUST_ACCT_SITE_ID
+        AND ACCT_SITE.PARTY_SITE_ID = SITE.PARTY_SITE_ID
+        AND SITE.LOCATION_ID = LOC.LOCATION_ID;
+      RETURN (L_ADDRESS1);
+    ELSIF IB_CURRENT_LOCATION = 'END_CUSTOMER' THEN
+      SELECT
+        LOC.ADDRESS1
+      INTO L_ADDRESS1
+      FROM
+        HZ_LOCATIONS LOC,
+        HZ_PARTY_SITES SITE,
+        HZ_CUST_SITE_USES_ALL SITE_USE,
+        HZ_CUST_ACCT_SITES_ALL ACCT_SITE
+      WHERE SITE_USE.SITE_USE_ID = END_CUSTOMER_SITE_USE_ID
+        AND SITE_USE.CUST_ACCT_SITE_ID = ACCT_SITE.CUST_ACCT_SITE_ID
+        AND ACCT_SITE.PARTY_SITE_ID = SITE.PARTY_SITE_ID
+        AND SITE.LOCATION_ID = LOC.LOCATION_ID;
+      RETURN (L_ADDRESS1);
+    ELSE
+      RETURN NULL;
+    END IF;
+  EXCEPTION
+    WHEN NO_DATA_FOUND THEN
+      RETURN NULL;
+  END CF_IB_CURRENT_ADDRESS1FORMULA;
+
+  FUNCTION CF_IB_CURRENT_ADDRESS5FORMULA(IB_CURRENT_LOCATION IN VARCHAR2
+                                        ,SHIP_TO_ADDRESS5 IN VARCHAR2
+                                        ,INVOICE_TO_ADDRESS5 IN VARCHAR2
+                                        ,DELIVER_TO_ORG_ID IN NUMBER
+                                        ,HEADER_ID IN NUMBER
+                                        ,END_CUSTOMER_SITE_USE_ID IN NUMBER) RETURN CHAR IS
+    L_CITY VARCHAR2(20);
+    L_STATE VARCHAR2(20);
+    L_POSTAL_CODE VARCHAR2(20);
+    L_COUNTRY VARCHAR2(20);
+    L_ADDRESS5 VARCHAR2(240);
+  BEGIN
+    IF IB_CURRENT_LOCATION = 'SHIP_TO' THEN
+      RETURN (SHIP_TO_ADDRESS5);
+    ELSIF IB_CURRENT_LOCATION = 'BILL_TO' THEN
+      RETURN (INVOICE_TO_ADDRESS5);
+    ELSIF IB_CURRENT_LOCATION = 'DELIVER_TO' THEN
+      SELECT
+        L.TOWN_OR_CITY,
+        L.STATE,
+        L.POSTAL_CODE,
+        L.COUNTRY
+      INTO L_CITY,L_STATE,L_POSTAL_CODE,L_COUNTRY
+      FROM
+        OE_DELIVER_TO_ORGS_V L
+      WHERE L.ORGANIZATION_ID = DELIVER_TO_ORG_ID;
+      SELECT
+        DECODE(L_CITY
+              ,NULL
+              ,NULL
+              ,L_CITY || ', ') || DECODE(L_STATE
+              ,NULL
+              ,NULL
+              ,L_STATE || ', ') || DECODE(L_POSTAL_CODE
+              ,NULL
+              ,NULL
+              ,L_POSTAL_CODE || ',') || DECODE(L_COUNTRY
+              ,NULL
+              ,NULL
+              ,L_COUNTRY)
+      INTO L_ADDRESS5
+      FROM
+        DUAL;
+      RETURN (L_ADDRESS5);
+    ELSIF IB_CURRENT_LOCATION = 'SOLD_TO' THEN
+      SELECT
+        LOC.CITY,
+        LOC.STATE,
+        LOC.POSTAL_CODE,
+        LOC.COUNTRY
+      INTO L_CITY,L_STATE,L_POSTAL_CODE,L_COUNTRY
+      FROM
+        HZ_LOCATIONS LOC,
+        HZ_PARTY_SITES SITE,
+        HZ_CUST_SITE_USES_ALL SITE_USE,
+        HZ_CUST_ACCT_SITES_ALL ACCT_SITE
+      WHERE SITE_USE.SITE_USE_ID = (
+        SELECT
+          SOLD_TO_SITE_USE_ID
+        FROM
+          OE_ORDER_HEADERS_ALL
+        WHERE HEADER_ID = HEADER_ID )
+        AND SITE_USE.CUST_ACCT_SITE_ID = ACCT_SITE.CUST_ACCT_SITE_ID
+        AND ACCT_SITE.PARTY_SITE_ID = SITE.PARTY_SITE_ID
+        AND SITE.LOCATION_ID = LOC.LOCATION_ID;
+      SELECT
+        DECODE(L_CITY
+              ,NULL
+              ,NULL
+              ,L_CITY || ', ') || DECODE(L_STATE
+              ,NULL
+              ,NULL
+              ,L_STATE || ', ') || DECODE(L_POSTAL_CODE
+              ,NULL
+              ,NULL
+              ,L_POSTAL_CODE || ',') || DECODE(L_COUNTRY
+              ,NULL
+              ,NULL
+              ,L_COUNTRY)
+      INTO L_ADDRESS5
+      FROM
+        DUAL;
+      RETURN (L_ADDRESS5);
+    ELSIF IB_CURRENT_LOCATION = 'END_CUSTOMER' THEN
+      SELECT
+        LOC.CITY,
+        LOC.STATE,
+        LOC.POSTAL_CODE,
+        LOC.COUNTRY
+      INTO L_CITY,L_STATE,L_POSTAL_CODE,L_COUNTRY
+      FROM
+        HZ_LOCATIONS LOC,
+        HZ_PARTY_SITES SITE,
+        HZ_CUST_SITE_USES_ALL SITE_USE,
+        HZ_CUST_ACCT_SITES_ALL ACCT_SITE
+      WHERE SITE_USE.SITE_USE_ID = END_CUSTOMER_SITE_USE_ID
+        AND SITE_USE.CUST_ACCT_SITE_ID = ACCT_SITE.CUST_ACCT_SITE_ID
+        AND ACCT_SITE.PARTY_SITE_ID = SITE.PARTY_SITE_ID
+        AND SITE.LOCATION_ID = LOC.LOCATION_ID;
+      SELECT
+        DECODE(L_CITY
+              ,NULL
+              ,NULL
+              ,L_CITY || ', ') || DECODE(L_STATE
+              ,NULL
+              ,NULL
+              ,L_STATE || ', ') || DECODE(L_POSTAL_CODE
+              ,NULL
+              ,NULL
+              ,L_POSTAL_CODE || ',') || DECODE(L_COUNTRY
+              ,NULL
+              ,NULL
+              ,L_COUNTRY)
+      INTO L_ADDRESS5
+      FROM
+        DUAL;
+      RETURN (L_ADDRESS5);
+    ELSE
+      RETURN NULL;
+    END IF;
+  EXCEPTION
+    WHEN NO_DATA_FOUND THEN
+      RETURN NULL;
+  END CF_IB_CURRENT_ADDRESS5FORMULA;
+
+  FUNCTION CF_IB_INSTALLED_AT_ADDRESS1FOR(IB_INSTALLED_AT_LOCATION IN VARCHAR2
+                                         ,L_SHIP_ADDRESS IN VARCHAR2
+                                         ,L_BILL_ADDRESS IN VARCHAR2
+                                         ,DELIVER_TO_ORG_ID IN NUMBER
+                                         ,HEADER_ID IN NUMBER
+                                         ,END_CUSTOMER_SITE_USE_ID IN NUMBER) RETURN CHAR IS
+    L_ADDRESS1 VARCHAR2(40);
+  BEGIN
+    IF IB_INSTALLED_AT_LOCATION = 'SHIP_TO' THEN
+      RETURN (L_SHIP_ADDRESS);
+    ELSIF IB_INSTALLED_AT_LOCATION = 'BILL_TO' THEN
+      RETURN (L_BILL_ADDRESS);
+    ELSIF IB_INSTALLED_AT_LOCATION = 'DELIVER_TO' THEN
+      SELECT
+        L.ADDRESS_LINE_1
+      INTO L_ADDRESS1
+      FROM
+        OE_DELIVER_TO_ORGS_V L
+      WHERE L.ORGANIZATION_ID = DELIVER_TO_ORG_ID;
+      RETURN (L_ADDRESS1);
+    ELSIF IB_INSTALLED_AT_LOCATION = 'SOLD_TO' THEN
+      SELECT
+        LOC.ADDRESS1
+      INTO L_ADDRESS1
+      FROM
+        HZ_LOCATIONS LOC,
+        HZ_PARTY_SITES SITE,
+        HZ_CUST_SITE_USES_ALL SITE_USE,
+        HZ_CUST_ACCT_SITES_ALL ACCT_SITE
+      WHERE SITE_USE.SITE_USE_ID = (
+        SELECT
+          SOLD_TO_SITE_USE_ID
+        FROM
+          OE_ORDER_HEADERS_ALL
+        WHERE HEADER_ID = HEADER_ID )
+        AND SITE_USE.CUST_ACCT_SITE_ID = ACCT_SITE.CUST_ACCT_SITE_ID
+        AND ACCT_SITE.PARTY_SITE_ID = SITE.PARTY_SITE_ID
+        AND SITE.LOCATION_ID = LOC.LOCATION_ID;
+      RETURN (L_ADDRESS1);
+    ELSIF IB_INSTALLED_AT_LOCATION = 'END_CUSTOMER' THEN
+      SELECT
+        LOC.ADDRESS1
+      INTO L_ADDRESS1
+      FROM
+        HZ_LOCATIONS LOC,
+        HZ_PARTY_SITES SITE,
+        HZ_CUST_SITE_USES_ALL SITE_USE,
+        HZ_CUST_ACCT_SITES_ALL ACCT_SITE
+      WHERE SITE_USE.SITE_USE_ID = END_CUSTOMER_SITE_USE_ID
+        AND SITE_USE.CUST_ACCT_SITE_ID = ACCT_SITE.CUST_ACCT_SITE_ID
+        AND ACCT_SITE.PARTY_SITE_ID = SITE.PARTY_SITE_ID
+        AND SITE.LOCATION_ID = LOC.LOCATION_ID;
+      RETURN (L_ADDRESS1);
+    ELSE
+      RETURN NULL;
+    END IF;
+  EXCEPTION
+    WHEN NO_DATA_FOUND THEN
+      RETURN NULL;
+  END CF_IB_INSTALLED_AT_ADDRESS1FOR;
+
+  FUNCTION CF_INSTALLED_AT_ADDRESS5FORMUL(IB_INSTALLED_AT_LOCATION IN VARCHAR2
+                                         ,SHIP_TO_ADDRESS5 IN VARCHAR2
+                                         ,INVOICE_TO_ADDRESS5 IN VARCHAR2
+                                         ,DELIVER_TO_ORG_ID IN NUMBER
+                                         ,HEADER_ID IN NUMBER
+                                         ,END_CUSTOMER_SITE_USE_ID IN NUMBER) RETURN CHAR IS
+    L_CITY VARCHAR2(20);
+    L_STATE VARCHAR2(20);
+    L_POSTAL_CODE VARCHAR2(20);
+    L_COUNTRY VARCHAR2(20);
+    L_ADDRESS5 VARCHAR2(240);
+  BEGIN
+    IF IB_INSTALLED_AT_LOCATION = 'SHIP_TO' THEN
+      RETURN (SHIP_TO_ADDRESS5);
+    ELSIF IB_INSTALLED_AT_LOCATION = 'BILL_TO' THEN
+      RETURN (INVOICE_TO_ADDRESS5);
+    ELSIF IB_INSTALLED_AT_LOCATION = 'DELIVER_TO' THEN
+      SELECT
+        L.TOWN_OR_CITY,
+        L.STATE,
+        L.POSTAL_CODE,
+        L.COUNTRY
+      INTO L_CITY,L_STATE,L_POSTAL_CODE,L_COUNTRY
+      FROM
+        OE_DELIVER_TO_ORGS_V L
+      WHERE L.ORGANIZATION_ID = DELIVER_TO_ORG_ID;
+      SELECT
+        DECODE(L_CITY
+              ,NULL
+              ,NULL
+              ,L_CITY || ', ') || DECODE(L_STATE
+              ,NULL
+              ,NULL
+              ,L_STATE || ', ') || DECODE(L_POSTAL_CODE
+              ,NULL
+              ,NULL
+              ,L_POSTAL_CODE || ',') || DECODE(L_COUNTRY
+              ,NULL
+              ,NULL
+              ,L_COUNTRY)
+      INTO L_ADDRESS5
+      FROM
+        DUAL;
+      RETURN (L_ADDRESS5);
+    ELSIF IB_INSTALLED_AT_LOCATION = 'SOLD_TO' THEN
+      SELECT
+        LOC.CITY,
+        LOC.STATE,
+        LOC.POSTAL_CODE,
+        LOC.COUNTRY
+      INTO L_CITY,L_STATE,L_POSTAL_CODE,L_COUNTRY
+      FROM
+        HZ_LOCATIONS LOC,
+        HZ_PARTY_SITES SITE,
+        HZ_CUST_SITE_USES_ALL SITE_USE,
+        HZ_CUST_ACCT_SITES_ALL ACCT_SITE
+      WHERE SITE_USE.SITE_USE_ID = (
+        SELECT
+          SOLD_TO_SITE_USE_ID
+        FROM
+          OE_ORDER_HEADERS_ALL
+        WHERE HEADER_ID = HEADER_ID )
+        AND SITE_USE.CUST_ACCT_SITE_ID = ACCT_SITE.CUST_ACCT_SITE_ID
+        AND ACCT_SITE.PARTY_SITE_ID = SITE.PARTY_SITE_ID
+        AND SITE.LOCATION_ID = LOC.LOCATION_ID;
+      SELECT
+        DECODE(L_CITY
+              ,NULL
+              ,NULL
+              ,L_CITY || ', ') || DECODE(L_STATE
+              ,NULL
+              ,NULL
+              ,L_STATE || ', ') || DECODE(L_POSTAL_CODE
+              ,NULL
+              ,NULL
+              ,L_POSTAL_CODE || ',') || DECODE(L_COUNTRY
+              ,NULL
+              ,NULL
+              ,L_COUNTRY)
+      INTO L_ADDRESS5
+      FROM
+        DUAL;
+      RETURN (L_ADDRESS5);
+    ELSIF IB_INSTALLED_AT_LOCATION = 'END_CUSTOMER' THEN
+      SELECT
+        LOC.CITY,
+        LOC.STATE,
+        LOC.POSTAL_CODE,
+        LOC.COUNTRY
+      INTO L_CITY,L_STATE,L_POSTAL_CODE,L_COUNTRY
+      FROM
+        HZ_LOCATIONS LOC,
+        HZ_PARTY_SITES SITE,
+        HZ_CUST_SITE_USES_ALL SITE_USE,
+        HZ_CUST_ACCT_SITES_ALL ACCT_SITE
+      WHERE SITE_USE.SITE_USE_ID = END_CUSTOMER_SITE_USE_ID
+        AND SITE_USE.CUST_ACCT_SITE_ID = ACCT_SITE.CUST_ACCT_SITE_ID
+        AND ACCT_SITE.PARTY_SITE_ID = SITE.PARTY_SITE_ID
+        AND SITE.LOCATION_ID = LOC.LOCATION_ID;
+      SELECT
+        DECODE(L_CITY
+              ,NULL
+              ,NULL
+              ,L_CITY || ', ') || DECODE(L_STATE
+              ,NULL
+              ,NULL
+              ,L_STATE || ', ') || DECODE(L_POSTAL_CODE
+              ,NULL
+              ,NULL
+              ,L_POSTAL_CODE || ',') || DECODE(L_COUNTRY
+              ,NULL
+              ,NULL
+              ,L_COUNTRY)
+      INTO L_ADDRESS5
+      FROM
+        DUAL;
+      RETURN (L_ADDRESS5);
+    ELSE
+      RETURN NULL;
+    END IF;
+  EXCEPTION
+    WHEN NO_DATA_FOUND THEN
+      RETURN NULL;
+  END CF_INSTALLED_AT_ADDRESS5FORMUL;
+
+  FUNCTION CF_IB_OWNERFORMULA(IB_OWNER IN VARCHAR2
+                             ,HEADER_ID IN NUMBER
+                             ,END_CUSTOMER_ID IN NUMBER) RETURN CHAR IS
+    L_SOLD_TO VARCHAR2(50);
+    L_END_CUSTOMER VARCHAR2(50);
+  BEGIN
+    IF IB_OWNER = 'SOLD_TO' THEN
+      SELECT
+        SOLD_TO
+      INTO L_SOLD_TO
+      FROM
+        OE_ORDER_HEADERS_V H
+      WHERE H.HEADER_ID = HEADER_ID;
+      RETURN (L_SOLD_TO);
+    ELSIF IB_OWNER = 'END_CUSTOMER' THEN
+      SELECT
+        PARTY.PARTY_NAME
+      INTO L_END_CUSTOMER
+      FROM
+        HZ_PARTIES PARTY,
+        HZ_CUST_ACCOUNTS CUST_ACCT
+      WHERE cust_acct.cust_account_id (+) = END_CUSTOMER_ID
+        AND CUST_ACCT.PARTY_ID = party.party_id (+);
+      RETURN (L_END_CUSTOMER);
+    ELSE
+      RETURN NULL;
+    END IF;
+  EXCEPTION
+    WHEN NO_DATA_FOUND THEN
+      RETURN NULL;
+  END CF_IB_OWNERFORMULA;
+
+  FUNCTION CF_END_DISPLAYFORMULA RETURN CHAR IS
+    PA_END_DISPLAY VARCHAR2(80);
+  BEGIN
+    SELECT
+      MEANING
+    INTO PA_END_DISPLAY
+    FROM
+      OE_LOOKUPS
+    WHERE LOOKUP_TYPE = 'YES_NO'
+      AND LOOKUP_CODE = P_END_CUST;
+    RETURN (PA_END_DISPLAY);
+  EXCEPTION
+    WHEN NO_DATA_FOUND THEN
+      RETURN (NULL);
+  END CF_END_DISPLAYFORMULA;
+
+  FUNCTION CP_STD_PRECISION_P RETURN NUMBER IS
+  BEGIN
+    RETURN CP_STD_PRECISION;
+  END CP_STD_PRECISION_P;
+
+  FUNCTION CP_EXT_PRECISION_P RETURN NUMBER IS
+  BEGIN
+    RETURN CP_EXT_PRECISION;
+  END CP_EXT_PRECISION_P;
+
+  FUNCTION CP_MIN_ACCT_UNIT_P RETURN NUMBER IS
+  BEGIN
+    RETURN CP_MIN_ACCT_UNIT;
+  END CP_MIN_ACCT_UNIT_P;
+
+  FUNCTION CP_COMMITMENT_P RETURN NUMBER IS
+  BEGIN
+    RETURN CP_COMMITMENT;
+  END CP_COMMITMENT_P;
+
+  FUNCTION CP_LINE_COMMITMENT_P RETURN NUMBER IS
+  BEGIN
+    RETURN CP_LINE_COMMITMENT;
+  END CP_LINE_COMMITMENT_P;
+
+  FUNCTION RP_CURR_PROFILE_P RETURN VARCHAR2 IS
+  BEGIN
+    RETURN RP_CURR_PROFILE;
+  END RP_CURR_PROFILE_P;
+
+  FUNCTION RP_ITEM_FLEX_ALL_SEG_P RETURN VARCHAR2 IS
+  BEGIN
+    RETURN RP_ITEM_FLEX_ALL_SEG;
+  END RP_ITEM_FLEX_ALL_SEG_P;
+
+  FUNCTION RP_ITEM_FLEX_SEG_VAL_P RETURN VARCHAR2 IS
+  BEGIN
+    RETURN RP_ITEM_FLEX_SEG_VAL;
+  END RP_ITEM_FLEX_SEG_VAL_P;
+
+  FUNCTION IS_FIXED_RATE(X_FROM_CURRENCY IN VARCHAR2
+                        ,X_TO_CURRENCY IN VARCHAR2
+                        ,X_EFFECTIVE_DATE IN DATE) RETURN VARCHAR2 IS
+    X0 VARCHAR2(2000);
+  BEGIN
+    /*STPROC.INIT('begin :X0 := GL_CURRENCY_API.IS_FIXED_RATE(:X_FROM_CURRENCY, :X_TO_CURRENCY, :X_EFFECTIVE_DATE); end;');
+    STPROC.BIND_O(X0);
+    STPROC.BIND_I(X_FROM_CURRENCY);
+    STPROC.BIND_I(X_TO_CURRENCY);
+    STPROC.BIND_I(X_EFFECTIVE_DATE);
+    STPROC.EXECUTE;
+    STPROC.RETRIEVE(1
+                   ,X0);*/
+
+    X0 := GL_CURRENCY_API.IS_FIXED_RATE(X_FROM_CURRENCY, X_TO_CURRENCY, X_EFFECTIVE_DATE);
+    RETURN X0;
+  END IS_FIXED_RATE;
+
+  PROCEDURE GET_RELATION(X_FROM_CURRENCY IN VARCHAR2
+                        ,X_TO_CURRENCY IN VARCHAR2
+                        ,X_EFFECTIVE_DATE IN DATE
+                        ,X_FIXED_RATE IN OUT NOCOPY BOOLEAN
+                        ,X_RELATIONSHIP IN OUT NOCOPY VARCHAR2) IS
+  BEGIN
+    /*STPROC.INIT('declare X_FIXED_RATE BOOLEAN;
+    begin X_FIXED_RATE := sys.diutil.int_to_bool(:X_FIXED_RATE);
+GL_CURRENCY_API.GET_RELATION(:X_FROM_CURRENCY, :X_TO_CURRENCY, :X_EFFECTIVE_DATE, X_FIXED_RATE, :X_RELATIONSHIP);
+:X_FIXED_RATE := sys.diutil.bool_to_int(X_FIXED_RATE); end;');
+    STPROC.BIND_IO(X_FIXED_RATE);
+    STPROC.BIND_I(X_FROM_CURRENCY);
+    STPROC.BIND_I(X_TO_CURRENCY);
+    STPROC.BIND_I(X_EFFECTIVE_DATE);
+    STPROC.BIND_IO(X_RELATIONSHIP);
+    STPROC.EXECUTE;
+    STPROC.RETRIEVE(1
+                   ,X_FIXED_RATE);
+    STPROC.RETRIEVE(5
+                   ,X_RELATIONSHIP);*/
+
+    declare
+     X_FIXED_RATE BOOLEAN;
+     X_FIXED_RATE1 number;
+    begin
+     X_FIXED_RATE1 := sys.diutil.bool_to_int(X_FIXED_RATE);
+     X_FIXED_RATE := sys.diutil.int_to_bool(X_FIXED_RATE1);
+     GL_CURRENCY_API.GET_RELATION(X_FROM_CURRENCY, X_TO_CURRENCY, X_EFFECTIVE_DATE, X_FIXED_RATE, X_RELATIONSHIP);
+     X_FIXED_RATE1 := sys.diutil.bool_to_int(X_FIXED_RATE);
+    end;
+  END GET_RELATION;
+
+  FUNCTION GET_EURO_CODE RETURN VARCHAR2 IS
+    X0 VARCHAR2(2000);
+  BEGIN
+    /*STPROC.INIT('begin :X0 := GL_CURRENCY_API.GET_EURO_CODE; end;');
+    STPROC.BIND_O(X0);
+    STPROC.EXECUTE;
+    STPROC.RETRIEVE(1
+                   ,X0);*/
+    X0 := GL_CURRENCY_API.GET_EURO_CODE;
+    RETURN X0;
+  END GET_EURO_CODE;
+
+  FUNCTION GET_RATE(X_FROM_CURRENCY IN VARCHAR2
+                   ,X_TO_CURRENCY IN VARCHAR2
+                   ,X_CONVERSION_DATE IN DATE
+                   ,X_CONVERSION_TYPE IN VARCHAR2) RETURN NUMBER IS
+    X0 NUMBER;
+  BEGIN
+    /*STPROC.INIT('begin :X0 := GL_CURRENCY_API.GET_RATE(:X_FROM_CURRENCY, :X_TO_CURRENCY, :X_CONVERSION_DATE, :X_CONVERSION_TYPE); end;');
+    STPROC.BIND_O(X0);
+    STPROC.BIND_I(X_FROM_CURRENCY);
+    STPROC.BIND_I(X_TO_CURRENCY);
+    STPROC.BIND_I(X_CONVERSION_DATE);
+    STPROC.BIND_I(X_CONVERSION_TYPE);
+    STPROC.EXECUTE;
+    STPROC.RETRIEVE(1
+                   ,X0);*/
+
+    X0 := GL_CURRENCY_API.GET_RATE(X_FROM_CURRENCY, X_TO_CURRENCY, X_CONVERSION_DATE, X_CONVERSION_TYPE);
+    RETURN X0;
+  END GET_RATE;
+
+  FUNCTION GET_RATE(X_SET_OF_BOOKS_ID IN NUMBER
+                   ,X_FROM_CURRENCY IN VARCHAR2
+                   ,X_CONVERSION_DATE IN DATE
+                   ,X_CONVERSION_TYPE IN VARCHAR2) RETURN NUMBER IS
+    X0 NUMBER;
+  BEGIN
+    /*STPROC.INIT('begin :X0 := GL_CURRENCY_API.GET_RATE(:X_SET_OF_BOOKS_ID, :X_FROM_CURRENCY, :X_CONVERSION_DATE, :X_CONVERSION_TYPE); end;');
+    STPROC.BIND_O(X0);
+    STPROC.BIND_I(X_SET_OF_BOOKS_ID);
+    STPROC.BIND_I(X_FROM_CURRENCY);
+    STPROC.BIND_I(X_CONVERSION_DATE);
+    STPROC.BIND_I(X_CONVERSION_TYPE);
+    STPROC.EXECUTE;
+    STPROC.RETRIEVE(1
+                   ,X0);*/
+
+    X0 := GL_CURRENCY_API.GET_RATE(X_SET_OF_BOOKS_ID, X_FROM_CURRENCY, X_CONVERSION_DATE, X_CONVERSION_TYPE);
+    RETURN X0;
+  END GET_RATE;
+
+  FUNCTION CONVERT_AMOUNT(X_FROM_CURRENCY IN VARCHAR2
+                         ,X_TO_CURRENCY IN VARCHAR2
+                         ,X_CONVERSION_DATE IN DATE
+                         ,X_CONVERSION_TYPE IN VARCHAR2
+                         ,X_AMOUNT IN NUMBER) RETURN NUMBER IS
+    X0 NUMBER;
+  BEGIN
+    /*STPROC.INIT('begin :X0 := GL_CURRENCY_API.CONVERT_AMOUNT(:X_FROM_CURRENCY, :X_TO_CURRENCY, :X_CONVERSION_DATE, :X_CONVERSION_TYPE, :X_AMOUNT); end;');
+    STPROC.BIND_O(X0);
+    STPROC.BIND_I(X_FROM_CURRENCY);
+    STPROC.BIND_I(X_TO_CURRENCY);
+    STPROC.BIND_I(X_CONVERSION_DATE);
+    STPROC.BIND_I(X_CONVERSION_TYPE);
+    STPROC.BIND_I(X_AMOUNT);
+    STPROC.EXECUTE;
+    STPROC.RETRIEVE(1
+                   ,X0);*/
+
+    X0 := GL_CURRENCY_API.CONVERT_AMOUNT(X_FROM_CURRENCY, X_TO_CURRENCY, X_CONVERSION_DATE, X_CONVERSION_TYPE, X_AMOUNT);
+    RETURN X0;
+  END CONVERT_AMOUNT;
+
+  FUNCTION CONVERT_AMOUNT(X_SET_OF_BOOKS_ID IN NUMBER
+                         ,X_FROM_CURRENCY IN VARCHAR2
+                         ,X_CONVERSION_DATE IN DATE
+                         ,X_CONVERSION_TYPE IN VARCHAR2
+                         ,X_AMOUNT IN NUMBER) RETURN NUMBER IS
+    X0 NUMBER;
+  BEGIN
+    /*STPROC.INIT('begin :X0 := GL_CURRENCY_API.CONVERT_AMOUNT(:X_SET_OF_BOOKS_ID, :X_FROM_CURRENCY, :X_CONVERSION_DATE, :X_CONVERSION_TYPE, :X_AMOUNT); end;');
+    STPROC.BIND_O(X0);
+    STPROC.BIND_I(X_SET_OF_BOOKS_ID);
+    STPROC.BIND_I(X_FROM_CURRENCY);
+    STPROC.BIND_I(X_CONVERSION_DATE);
+    STPROC.BIND_I(X_CONVERSION_TYPE);
+    STPROC.BIND_I(X_AMOUNT);
+    STPROC.EXECUTE;
+    STPROC.RETRIEVE(1
+                   ,X0);*/
+
+    X0 := GL_CURRENCY_API.CONVERT_AMOUNT(X_SET_OF_BOOKS_ID, X_FROM_CURRENCY, X_CONVERSION_DATE, X_CONVERSION_TYPE, X_AMOUNT);
+    RETURN X0;
+  END CONVERT_AMOUNT;
+
+  FUNCTION GET_DERIVE_TYPE(SOB_ID IN NUMBER
+                          ,PERIOD IN VARCHAR2
+                          ,CURR_CODE IN VARCHAR2) RETURN VARCHAR2 IS
+    X0 VARCHAR2(2000);
+  BEGIN
+    /*STPROC.INIT('begin :X0 := GL_CURRENCY_API.GET_DERIVE_TYPE(:SOB_ID, :PERIOD, :CURR_CODE); end;');
+    STPROC.BIND_O(X0);
+    STPROC.BIND_I(SOB_ID);
+    STPROC.BIND_I(PERIOD);
+    STPROC.BIND_I(CURR_CODE);
+    STPROC.EXECUTE;
+    STPROC.RETRIEVE(1
+                   ,X0);*/
+
+    X0 := GL_CURRENCY_API.GET_DERIVE_TYPE(SOB_ID, PERIOD, CURR_CODE);
+    RETURN X0;
+  END GET_DERIVE_TYPE;
+
+  FUNCTION RATE_EXISTS(X_FROM_CURRENCY IN VARCHAR2
+                      ,X_TO_CURRENCY IN VARCHAR2
+                      ,X_CONVERSION_DATE IN DATE
+                      ,X_CONVERSION_TYPE IN VARCHAR2) RETURN VARCHAR2 IS
+    X0 VARCHAR2(2000);
+  BEGIN
+    /*STPROC.INIT('begin :X0 := GL_CURRENCY_API.RATE_EXISTS(:X_FROM_CURRENCY, :X_TO_CURRENCY, :X_CONVERSION_DATE, :X_CONVERSION_TYPE); end;');
+    STPROC.BIND_O(X0);
+    STPROC.BIND_I(X_FROM_CURRENCY);
+    STPROC.BIND_I(X_TO_CURRENCY);
+    STPROC.BIND_I(X_CONVERSION_DATE);
+    STPROC.BIND_I(X_CONVERSION_TYPE);
+    STPROC.EXECUTE;
+    STPROC.RETRIEVE(1
+                   ,X0);*/
+
+    X0 := GL_CURRENCY_API.RATE_EXISTS(X_FROM_CURRENCY, X_TO_CURRENCY, X_CONVERSION_DATE, X_CONVERSION_TYPE);
+    RETURN X0;
+  END RATE_EXISTS;
+
+function Item_dspFormula
+(
+ITEM_IDENTIFIER_TYPE in varchar,
+C_MASTER_ORG in varchar,
+INVENTORY_ITEM_ID_T in number,
+ORDERED_ITEM_ID_T in number,
+ORDERED_ITEM in varchar2,
+SI_ORGANIZATION_ID in number,
+SI_INVENTORY_ITEM_ID in number
+)
+return Char is
+v_item varchar2(2000);
+v_description varchar2(500);
+begin
+  if (ITEM_IDENTIFIER_TYPE is null or ITEM_IDENTIFIER_TYPE = 'INT')
+       or (P_PRINT_DESCRIPTION in ('I','D','F')) then
+    select sitems.concatenated_segments item,
+    	   sitems.description description
+    into   v_item,v_description
+    from   mtl_system_items_vl sitems
+    where    nvl(sitems.organization_id,0) = C_MASTER_ORG
+    and    sitems.inventory_item_id = INVENTORY_ITEM_ID_T;
+       /*  srw.reference (:p_item_flex_code);
+         srw.reference (:Item_dsp);
+         srw.reference (:p_item_structure_num);
+         srw.user_exit (' FND FLEXIDVAL
+		    CODE=":p_item_flex_code"
+		    NUM=":p_item_structure_num"
+		    APPL_SHORT_NAME="INV"
+		    DATA= ":item_flex"
+		    VALUE=":Item_dsp"
+		    DISPLAY="ALL"'
+		);*/
+    v_item := fnd_flex_xml_publisher_apis.process_kff_combination_1('Item_dsp', 'INV', p_item_flex_code, p_item_structure_num, SI_ORGANIZATION_ID, SI_INVENTORY_ITEM_ID, 'ALL', 'Y', 'VALUE');
+  elsif (ITEM_IDENTIFIER_TYPE = 'CUST' and P_PRINT_DESCRIPTION in ('C','P','O')) then
+    select citems.customer_item_number item,
+    	   nvl(citems.customer_item_desc,sitems.description) description
+    into   v_item,v_description
+    from   mtl_customer_items citems,
+           mtl_customer_item_xrefs cxref,
+           mtl_system_items_vl sitems
+    where  citems.customer_item_id = cxref.customer_item_id
+    and    cxref.inventory_item_id = sitems.inventory_item_id
+    and    citems.customer_item_id = ORDERED_ITEM_ID_T
+    and    nvl(sitems.organization_id,0) = C_MASTER_ORG
+    and    sitems.inventory_item_id = INVENTORY_ITEM_ID_T;
+  elsif (P_PRINT_DESCRIPTION in ('C','P','O')) then
+    Begin
+    select items.cross_reference item,
+    	   nvl(items.description,sitems.description) description
+    into   v_item,v_description
+    from   mtl_cross_reference_types xtypes,
+           mtl_cross_references items,
+           mtl_system_items_vl sitems
+    where  xtypes.cross_reference_type = items.cross_reference_type
+    and    items.inventory_item_id = sitems.inventory_item_id
+    and    items.cross_reference = ORDERED_ITEM
+    and    items.cross_reference_type = ITEM_IDENTIFIER_TYPE
+    and    nvl(sitems.organization_id,0) = C_MASTER_ORG
+    and    sitems.inventory_item_id = INVENTORY_ITEM_ID_T
+    --Bug 3433353 Begin
+    and items.org_independent_flag = 'N'
+    and  items.organization_id = C_MASTER_ORG;
+    Exception When NO_DATA_FOUND Then
+    select items.cross_reference item,
+    nvl(items.description,sitems.description) description
+    into v_item, v_description
+    from mtl_cross_reference_types xtypes,
+    mtl_cross_references items,
+    mtl_system_items_vl sitems
+    where xtypes.cross_reference_type =
+    items.cross_reference_type
+    and items.inventory_item_id = sitems.inventory_item_id
+    and items.cross_reference = ORDERED_ITEM
+    and items.cross_reference_type = ITEM_IDENTIFIER_TYPE
+    and nvl(sitems.organization_id,0) = C_MASTER_ORG
+    and sitems.inventory_item_id = INVENTORY_ITEM_ID_T
+    and items.org_independent_flag = 'Y';
+    End;
+  -- Bug 3433353 End
+  end if;
+
+  if (P_PRINT_DESCRIPTION in ('I','C')) then
+    return(v_item||' - '||v_description);
+  elsif (P_PRINT_DESCRIPTION in ('D','P')) then
+    return(v_description);
+  else
+    return(v_item);
+  end if;
+
+
+
+
+
+RETURN NULL;
+Exception
+   When Others Then
+        return('Item Not Found');
+end;
+
+
+END ONT_OEXOECOD_XMLP_PKG;
+
+
+
+/

@@ -1,0 +1,439 @@
+--------------------------------------------------------
+--  DDL for Package Body CSP_ITEM_SUB_INVENTORIES_PKG
+--------------------------------------------------------
+
+  CREATE OR REPLACE EDITIONABLE PACKAGE BODY "APPS"."CSP_ITEM_SUB_INVENTORIES_PKG" as
+/* $Header: csptpaub.pls 115.9 2002/11/26 07:15:48 hhaugeru ship $ */
+-- Start of Comments
+-- Package name     : CSP_ITEM_SUB_INVENTORIES_PKG
+-- Purpose          :
+-- History          :
+-- NOTE             :
+-- End of Comments
+
+
+G_PKG_NAME CONSTANT VARCHAR2(30):= 'CSP_ITEM_SUB_INVENTORIES_PKG';
+G_FILE_NAME CONSTANT VARCHAR2(12) := 'csptausb.pls';
+
+PROCEDURE Insert_Row(
+          px_INVENTORY_ITEM_ID   IN OUT NOCOPY NUMBER,
+          p_ORGANIZATION_ID    NUMBER,
+          p_SECONDARY_INVENTORY    VARCHAR2,
+          p_LAST_UPDATE_DATE    DATE,
+          p_LAST_UPDATED_BY    NUMBER,
+          p_CREATION_DATE    DATE,
+          p_CREATED_BY    NUMBER,
+          p_LAST_UPDATE_LOGIN    NUMBER,
+          p_PRIMARY_SUBINVENTORY_FLAG    NUMBER,
+          p_PICKING_ORDER    NUMBER,
+          p_MIN_MINMAX_QUANTITY    NUMBER,
+          p_MAX_MINMAX_QUANTITY    NUMBER,
+          p_INVENTORY_PLANNING_CODE    NUMBER,
+          p_FIXED_LOT_MULTIPLE    NUMBER,
+          p_MINIMUM_ORDER_QUANTITY    NUMBER,
+          p_MAXIMUM_ORDER_QUANTITY    NUMBER,
+          p_SOURCE_TYPE    NUMBER,
+          p_SOURCE_ORGANIZATION_ID    NUMBER,
+          p_SOURCE_SUBINVENTORY    VARCHAR2,
+          p_ATTRIBUTE_CATEGORY    VARCHAR2,
+          p_ATTRIBUTE1    VARCHAR2,
+          p_ATTRIBUTE2    VARCHAR2,
+          p_ATTRIBUTE3    VARCHAR2,
+          p_ATTRIBUTE4    VARCHAR2,
+          p_ATTRIBUTE5    VARCHAR2,
+          p_ATTRIBUTE6    VARCHAR2,
+          p_ATTRIBUTE7    VARCHAR2,
+          p_ATTRIBUTE8    VARCHAR2,
+          p_ATTRIBUTE9    VARCHAR2,
+          p_ATTRIBUTE10    VARCHAR2,
+          p_ATTRIBUTE11    VARCHAR2,
+          p_ATTRIBUTE12    VARCHAR2,
+          p_ATTRIBUTE13    VARCHAR2,
+          p_ATTRIBUTE14    VARCHAR2,
+          p_ATTRIBUTE15    VARCHAR2,
+          p_ENCUMBRANCE_ACCOUNT    NUMBER,
+          p_PREPROCESSING_LEAD_TIME    NUMBER,
+          p_PROCESSING_LEAD_TIME    NUMBER,
+          p_POSTPROCESSING_LEAD_TIME    NUMBER)
+
+ IS
+BEGIN
+
+   INSERT INTO MTL_ITEM_SUB_INVENTORIES(
+           INVENTORY_ITEM_ID,
+           ORGANIZATION_ID,
+           SECONDARY_INVENTORY,
+           LAST_UPDATE_DATE,
+           LAST_UPDATED_BY,
+           CREATION_DATE,
+           CREATED_BY,
+           LAST_UPDATE_LOGIN,
+           PRIMARY_SUBINVENTORY_FLAG,
+           PICKING_ORDER,
+           MIN_MINMAX_QUANTITY,
+           MAX_MINMAX_QUANTITY,
+           INVENTORY_PLANNING_CODE,
+           FIXED_LOT_MULTIPLE,
+           MINIMUM_ORDER_QUANTITY,
+           MAXIMUM_ORDER_QUANTITY,
+           SOURCE_TYPE,
+           SOURCE_ORGANIZATION_ID,
+           SOURCE_SUBINVENTORY,
+           ATTRIBUTE_CATEGORY,
+           ATTRIBUTE1,
+           ATTRIBUTE2,
+           ATTRIBUTE3,
+           ATTRIBUTE4,
+           ATTRIBUTE5,
+           ATTRIBUTE6,
+           ATTRIBUTE7,
+           ATTRIBUTE8,
+           ATTRIBUTE9,
+           ATTRIBUTE10,
+           ATTRIBUTE11,
+           ATTRIBUTE12,
+           ATTRIBUTE13,
+           ATTRIBUTE14,
+           ATTRIBUTE15,
+           ENCUMBRANCE_ACCOUNT,
+           PREPROCESSING_LEAD_TIME,
+           PROCESSING_LEAD_TIME,
+           POSTPROCESSING_LEAD_TIME
+          ) VALUES (
+           px_INVENTORY_ITEM_ID,
+           decode( p_ORGANIZATION_ID, FND_API.G_MISS_NUM, NULL, p_ORGANIZATION_ID),
+           decode( p_SECONDARY_INVENTORY, FND_API.G_MISS_CHAR, NULL, p_SECONDARY_INVENTORY),
+           decode( p_LAST_UPDATE_DATE, fnd_api.g_miss_date, to_date(null), p_last_update_date),
+           decode( p_LAST_UPDATED_BY, FND_API.G_MISS_NUM, NULL, p_LAST_UPDATED_BY),
+           decode(p_CREATION_DATE, fnd_api.g_miss_date,to_date(null),p_creation_date),
+           decode( p_CREATED_BY, FND_API.G_MISS_NUM, NULL, p_CREATED_BY),
+           decode( p_LAST_UPDATE_LOGIN, FND_API.G_MISS_NUM, NULL, p_LAST_UPDATE_LOGIN),
+           decode( p_PRIMARY_SUBINVENTORY_FLAG, FND_API.G_MISS_NUM, NULL, p_PRIMARY_SUBINVENTORY_FLAG),
+           decode( p_PICKING_ORDER, FND_API.G_MISS_NUM, NULL, p_PICKING_ORDER),
+           decode( p_MIN_MINMAX_QUANTITY, FND_API.G_MISS_NUM, NULL, p_MIN_MINMAX_QUANTITY),
+           decode( p_MAX_MINMAX_QUANTITY, FND_API.G_MISS_NUM, NULL, p_MAX_MINMAX_QUANTITY),
+           decode( p_INVENTORY_PLANNING_CODE, FND_API.G_MISS_NUM, NULL, p_INVENTORY_PLANNING_CODE),
+           decode( p_FIXED_LOT_MULTIPLE, FND_API.G_MISS_NUM, NULL, p_FIXED_LOT_MULTIPLE),
+           decode( p_MINIMUM_ORDER_QUANTITY, FND_API.G_MISS_NUM, NULL, p_MINIMUM_ORDER_QUANTITY),
+           decode( p_MAXIMUM_ORDER_QUANTITY, FND_API.G_MISS_NUM, NULL, p_MAXIMUM_ORDER_QUANTITY),
+           decode( p_SOURCE_TYPE, FND_API.G_MISS_NUM, NULL, p_SOURCE_TYPE),
+           decode( p_SOURCE_ORGANIZATION_ID, FND_API.G_MISS_NUM, NULL, p_SOURCE_ORGANIZATION_ID),
+           decode( p_SOURCE_SUBINVENTORY, FND_API.G_MISS_CHAR, NULL, p_SOURCE_SUBINVENTORY),
+           decode( p_ATTRIBUTE_CATEGORY, FND_API.G_MISS_CHAR, NULL, p_ATTRIBUTE_CATEGORY),
+           decode( p_ATTRIBUTE1, FND_API.G_MISS_CHAR, NULL, p_ATTRIBUTE1),
+           decode( p_ATTRIBUTE2, FND_API.G_MISS_CHAR, NULL, p_ATTRIBUTE2),
+           decode( p_ATTRIBUTE3, FND_API.G_MISS_CHAR, NULL, p_ATTRIBUTE3),
+           decode( p_ATTRIBUTE4, FND_API.G_MISS_CHAR, NULL, p_ATTRIBUTE4),
+           decode( p_ATTRIBUTE5, FND_API.G_MISS_CHAR, NULL, p_ATTRIBUTE5),
+           decode( p_ATTRIBUTE6, FND_API.G_MISS_CHAR, NULL, p_ATTRIBUTE6),
+           decode( p_ATTRIBUTE7, FND_API.G_MISS_CHAR, NULL, p_ATTRIBUTE7),
+           decode( p_ATTRIBUTE8, FND_API.G_MISS_CHAR, NULL, p_ATTRIBUTE8),
+           decode( p_ATTRIBUTE9, FND_API.G_MISS_CHAR, NULL, p_ATTRIBUTE9),
+           decode( p_ATTRIBUTE10, FND_API.G_MISS_CHAR, NULL, p_ATTRIBUTE10),
+           decode( p_ATTRIBUTE11, FND_API.G_MISS_CHAR, NULL, p_ATTRIBUTE11),
+           decode( p_ATTRIBUTE12, FND_API.G_MISS_CHAR, NULL, p_ATTRIBUTE12),
+           decode( p_ATTRIBUTE13, FND_API.G_MISS_CHAR, NULL, p_ATTRIBUTE13),
+           decode( p_ATTRIBUTE14, FND_API.G_MISS_CHAR, NULL, p_ATTRIBUTE14),
+           decode( p_ATTRIBUTE15, FND_API.G_MISS_CHAR, NULL, p_ATTRIBUTE15),
+           decode( p_ENCUMBRANCE_ACCOUNT, FND_API.G_MISS_NUM, NULL, p_ENCUMBRANCE_ACCOUNT),
+           decode( p_PREPROCESSING_LEAD_TIME, FND_API.G_MISS_NUM, NULL, p_PREPROCESSING_LEAD_TIME),
+           decode( p_PROCESSING_LEAD_TIME, FND_API.G_MISS_NUM, NULL, p_PROCESSING_LEAD_TIME),
+           decode( p_POSTPROCESSING_LEAD_TIME, FND_API.G_MISS_NUM, NULL, p_POSTPROCESSING_LEAD_TIME));
+End Insert_Row;
+
+PROCEDURE Update_Row(
+          p_ROW_ID  VARCHAR2,
+          p_INVENTORY_ITEM_ID    NUMBER,
+          p_ORGANIZATION_ID    NUMBER,
+          p_SECONDARY_INVENTORY    VARCHAR2,
+          p_LAST_UPDATE_DATE    DATE,
+          p_LAST_UPDATED_BY    NUMBER,
+          p_CREATION_DATE    DATE,
+          p_CREATED_BY    NUMBER,
+          p_LAST_UPDATE_LOGIN    NUMBER,
+          p_PRIMARY_SUBINVENTORY_FLAG    NUMBER,
+          p_PICKING_ORDER    NUMBER,
+          p_MIN_MINMAX_QUANTITY    NUMBER,
+          p_MAX_MINMAX_QUANTITY    NUMBER,
+          p_INVENTORY_PLANNING_CODE    NUMBER,
+          p_FIXED_LOT_MULTIPLE    NUMBER,
+          p_MINIMUM_ORDER_QUANTITY    NUMBER,
+          p_MAXIMUM_ORDER_QUANTITY    NUMBER,
+          p_SOURCE_TYPE    NUMBER,
+          p_SOURCE_ORGANIZATION_ID    NUMBER,
+          p_SOURCE_SUBINVENTORY    VARCHAR2,
+          p_ATTRIBUTE_CATEGORY    VARCHAR2,
+          p_ATTRIBUTE1    VARCHAR2,
+          p_ATTRIBUTE2    VARCHAR2,
+          p_ATTRIBUTE3    VARCHAR2,
+          p_ATTRIBUTE4    VARCHAR2,
+          p_ATTRIBUTE5    VARCHAR2,
+          p_ATTRIBUTE6    VARCHAR2,
+          p_ATTRIBUTE7    VARCHAR2,
+          p_ATTRIBUTE8    VARCHAR2,
+          p_ATTRIBUTE9    VARCHAR2,
+          p_ATTRIBUTE10    VARCHAR2,
+          p_ATTRIBUTE11    VARCHAR2,
+          p_ATTRIBUTE12    VARCHAR2,
+          p_ATTRIBUTE13    VARCHAR2,
+          p_ATTRIBUTE14    VARCHAR2,
+          p_ATTRIBUTE15    VARCHAR2,
+          p_ENCUMBRANCE_ACCOUNT    NUMBER,
+          p_PREPROCESSING_LEAD_TIME    NUMBER,
+          p_PROCESSING_LEAD_TIME    NUMBER,
+          p_POSTPROCESSING_LEAD_TIME    NUMBER)
+
+ IS
+ BEGIN
+    Update MTL_ITEM_SUB_INVENTORIES
+    SET
+              ORGANIZATION_ID = decode( p_ORGANIZATION_ID, FND_API.G_MISS_NUM, ORGANIZATION_ID, p_ORGANIZATION_ID),
+              SECONDARY_INVENTORY = decode( p_SECONDARY_INVENTORY, FND_API.G_MISS_CHAR, SECONDARY_INVENTORY, p_SECONDARY_INVENTORY),
+              LAST_UPDATE_DATE = decode(p_last_update_date,fnd_api.g_miss_date,last_update_date,p_last_update_date),
+              LAST_UPDATED_BY = decode( p_LAST_UPDATED_BY, FND_API.G_MISS_NUM, LAST_UPDATED_BY, p_LAST_UPDATED_BY),
+              CREATION_DATE = decode(p_creation_date,fnd_api.g_miss_date,creation_date,p_creation_date),
+              CREATED_BY = decode( p_CREATED_BY, FND_API.G_MISS_NUM, CREATED_BY, p_CREATED_BY),
+              LAST_UPDATE_LOGIN = decode( p_LAST_UPDATE_LOGIN, FND_API.G_MISS_NUM, LAST_UPDATE_LOGIN, p_LAST_UPDATE_LOGIN),
+              PRIMARY_SUBINVENTORY_FLAG = decode( p_PRIMARY_SUBINVENTORY_FLAG, FND_API.G_MISS_NUM, PRIMARY_SUBINVENTORY_FLAG, p_PRIMARY_SUBINVENTORY_FLAG),
+              PICKING_ORDER = decode( p_PICKING_ORDER, FND_API.G_MISS_NUM, PICKING_ORDER, p_PICKING_ORDER),
+              MIN_MINMAX_QUANTITY = decode( p_MIN_MINMAX_QUANTITY, FND_API.G_MISS_NUM, MIN_MINMAX_QUANTITY, p_MIN_MINMAX_QUANTITY),
+              MAX_MINMAX_QUANTITY = decode( p_MAX_MINMAX_QUANTITY, FND_API.G_MISS_NUM, MAX_MINMAX_QUANTITY, p_MAX_MINMAX_QUANTITY),
+              INVENTORY_PLANNING_CODE = decode( p_INVENTORY_PLANNING_CODE, FND_API.G_MISS_NUM, INVENTORY_PLANNING_CODE, p_INVENTORY_PLANNING_CODE),
+              FIXED_LOT_MULTIPLE = decode( p_FIXED_LOT_MULTIPLE, FND_API.G_MISS_NUM, FIXED_LOT_MULTIPLE, p_FIXED_LOT_MULTIPLE),
+              MINIMUM_ORDER_QUANTITY = decode( p_MINIMUM_ORDER_QUANTITY, FND_API.G_MISS_NUM, MINIMUM_ORDER_QUANTITY, p_MINIMUM_ORDER_QUANTITY),
+              MAXIMUM_ORDER_QUANTITY = decode( p_MAXIMUM_ORDER_QUANTITY, FND_API.G_MISS_NUM, MAXIMUM_ORDER_QUANTITY, p_MAXIMUM_ORDER_QUANTITY),
+              SOURCE_TYPE = decode( p_SOURCE_TYPE, FND_API.G_MISS_NUM, SOURCE_TYPE, p_SOURCE_TYPE),
+              SOURCE_ORGANIZATION_ID = decode( p_SOURCE_ORGANIZATION_ID, FND_API.G_MISS_NUM, SOURCE_ORGANIZATION_ID, p_SOURCE_ORGANIZATION_ID),
+              SOURCE_SUBINVENTORY = decode( p_SOURCE_SUBINVENTORY, FND_API.G_MISS_CHAR, SOURCE_SUBINVENTORY, p_SOURCE_SUBINVENTORY),
+              ATTRIBUTE_CATEGORY = decode( p_ATTRIBUTE_CATEGORY, FND_API.G_MISS_CHAR, ATTRIBUTE_CATEGORY, p_ATTRIBUTE_CATEGORY),
+              ATTRIBUTE1 = decode( p_ATTRIBUTE1, FND_API.G_MISS_CHAR, ATTRIBUTE1, p_ATTRIBUTE1),
+              ATTRIBUTE2 = decode( p_ATTRIBUTE2, FND_API.G_MISS_CHAR, ATTRIBUTE2, p_ATTRIBUTE2),
+              ATTRIBUTE3 = decode( p_ATTRIBUTE3, FND_API.G_MISS_CHAR, ATTRIBUTE3, p_ATTRIBUTE3),
+              ATTRIBUTE4 = decode( p_ATTRIBUTE4, FND_API.G_MISS_CHAR, ATTRIBUTE4, p_ATTRIBUTE4),
+              ATTRIBUTE5 = decode( p_ATTRIBUTE5, FND_API.G_MISS_CHAR, ATTRIBUTE5, p_ATTRIBUTE5),
+              ATTRIBUTE6 = decode( p_ATTRIBUTE6, FND_API.G_MISS_CHAR, ATTRIBUTE6, p_ATTRIBUTE6),
+              ATTRIBUTE7 = decode( p_ATTRIBUTE7, FND_API.G_MISS_CHAR, ATTRIBUTE7, p_ATTRIBUTE7),
+              ATTRIBUTE8 = decode( p_ATTRIBUTE8, FND_API.G_MISS_CHAR, ATTRIBUTE8, p_ATTRIBUTE8),
+              ATTRIBUTE9 = decode( p_ATTRIBUTE9, FND_API.G_MISS_CHAR, ATTRIBUTE9, p_ATTRIBUTE9),
+              ATTRIBUTE10 = decode( p_ATTRIBUTE10, FND_API.G_MISS_CHAR, ATTRIBUTE10, p_ATTRIBUTE10),
+              ATTRIBUTE11 = decode( p_ATTRIBUTE11, FND_API.G_MISS_CHAR, ATTRIBUTE11, p_ATTRIBUTE11),
+              ATTRIBUTE12 = decode( p_ATTRIBUTE12, FND_API.G_MISS_CHAR, ATTRIBUTE12, p_ATTRIBUTE12),
+              ATTRIBUTE13 = decode( p_ATTRIBUTE13, FND_API.G_MISS_CHAR, ATTRIBUTE13, p_ATTRIBUTE13),
+              ATTRIBUTE14 = decode( p_ATTRIBUTE14, FND_API.G_MISS_CHAR, ATTRIBUTE14, p_ATTRIBUTE14),
+              ATTRIBUTE15 = decode( p_ATTRIBUTE15, FND_API.G_MISS_CHAR, ATTRIBUTE15, p_ATTRIBUTE15),
+              ENCUMBRANCE_ACCOUNT = decode( p_ENCUMBRANCE_ACCOUNT, FND_API.G_MISS_NUM, ENCUMBRANCE_ACCOUNT, p_ENCUMBRANCE_ACCOUNT),
+              PREPROCESSING_LEAD_TIME = decode( p_PREPROCESSING_LEAD_TIME, FND_API.G_MISS_NUM, PREPROCESSING_LEAD_TIME, p_PREPROCESSING_LEAD_TIME),
+              PROCESSING_LEAD_TIME = decode( p_PROCESSING_LEAD_TIME, FND_API.G_MISS_NUM, PROCESSING_LEAD_TIME, p_PROCESSING_LEAD_TIME),
+              POSTPROCESSING_LEAD_TIME = decode( p_POSTPROCESSING_LEAD_TIME, FND_API.G_MISS_NUM, POSTPROCESSING_LEAD_TIME, p_POSTPROCESSING_LEAD_TIME)
+where inventory_item_id = p_INVENTORY_ITEM_ID
+and   secondary_inventory = p_SECONDARY_INVENTORY
+and   organization_id = p_ORGANIZATION_ID;
+
+    If (SQL%NOTFOUND) then
+        RAISE NO_DATA_FOUND;
+    End If;
+END Update_Row;
+
+
+PROCEDURE Delete_Row(
+          p_INVENTORY_ITEM_ID    NUMBER,
+          p_ORGANIZATION_ID    NUMBER,
+          p_SECONDARY_INVENTORY    VARCHAR2)
+ IS
+ BEGIN
+   DELETE FROM MTL_ITEM_SUB_INVENTORIES
+   where inventory_item_id = p_INVENTORY_ITEM_ID
+   and   secondary_inventory = p_SECONDARY_INVENTORY
+   and   organization_id = p_ORGANIZATION_ID;
+   If (SQL%NOTFOUND) then
+       RAISE NO_DATA_FOUND;
+   End If;
+ END Delete_Row;
+
+PROCEDURE Lock_Row(
+          p_ROW_ID  VARCHAR2,
+          p_INVENTORY_ITEM_ID    NUMBER,
+          p_ORGANIZATION_ID    NUMBER,
+          p_SECONDARY_INVENTORY    VARCHAR2,
+          p_LAST_UPDATE_DATE    DATE,
+          p_LAST_UPDATED_BY    NUMBER,
+          p_CREATION_DATE    DATE,
+          p_CREATED_BY    NUMBER,
+          p_LAST_UPDATE_LOGIN    NUMBER,
+          p_PRIMARY_SUBINVENTORY_FLAG    NUMBER,
+          p_PICKING_ORDER    NUMBER,
+          p_MIN_MINMAX_QUANTITY    NUMBER,
+          p_MAX_MINMAX_QUANTITY    NUMBER,
+          p_INVENTORY_PLANNING_CODE    NUMBER,
+          p_FIXED_LOT_MULTIPLE    NUMBER,
+          p_MINIMUM_ORDER_QUANTITY    NUMBER,
+          p_MAXIMUM_ORDER_QUANTITY    NUMBER,
+          p_SOURCE_TYPE    NUMBER,
+          p_SOURCE_ORGANIZATION_ID    NUMBER,
+          p_SOURCE_SUBINVENTORY    VARCHAR2,
+          p_ATTRIBUTE_CATEGORY    VARCHAR2,
+          p_ATTRIBUTE1    VARCHAR2,
+          p_ATTRIBUTE2    VARCHAR2,
+          p_ATTRIBUTE3    VARCHAR2,
+          p_ATTRIBUTE4    VARCHAR2,
+          p_ATTRIBUTE5    VARCHAR2,
+          p_ATTRIBUTE6    VARCHAR2,
+          p_ATTRIBUTE7    VARCHAR2,
+          p_ATTRIBUTE8    VARCHAR2,
+          p_ATTRIBUTE9    VARCHAR2,
+          p_ATTRIBUTE10    VARCHAR2,
+          p_ATTRIBUTE11    VARCHAR2,
+          p_ATTRIBUTE12    VARCHAR2,
+          p_ATTRIBUTE13    VARCHAR2,
+          p_ATTRIBUTE14    VARCHAR2,
+          p_ATTRIBUTE15    VARCHAR2,
+          p_ENCUMBRANCE_ACCOUNT    NUMBER,
+          p_PREPROCESSING_LEAD_TIME    NUMBER,
+          p_PROCESSING_LEAD_TIME    NUMBER,
+          p_POSTPROCESSING_LEAD_TIME    NUMBER)
+
+ IS
+   CURSOR C IS
+        SELECT *
+         FROM MTL_ITEM_SUB_INVENTORIES
+	    where inventory_item_id = p_INVENTORY_ITEM_ID
+	    and   secondary_inventory = p_SECONDARY_INVENTORY
+         and   organization_id = p_ORGANIZATION_ID
+         FOR UPDATE of INVENTORY_ITEM_ID NOWAIT;
+   Recinfo C%ROWTYPE;
+ BEGIN
+    OPEN C;
+    FETCH C INTO Recinfo;
+    If (C%NOTFOUND) then
+        CLOSE C;
+        FND_MESSAGE.SET_NAME('FND', 'FORM_RECORD_DELETED');
+        APP_EXCEPTION.RAISE_EXCEPTION;
+    End If;
+    CLOSE C;
+    if (
+           (      Recinfo.INVENTORY_ITEM_ID = p_INVENTORY_ITEM_ID)
+       AND (    ( Recinfo.ORGANIZATION_ID = p_ORGANIZATION_ID)
+            OR (    ( Recinfo.ORGANIZATION_ID IS NULL )
+                AND (  p_ORGANIZATION_ID IS NULL )))
+       AND (    ( Recinfo.SECONDARY_INVENTORY = p_SECONDARY_INVENTORY)
+            OR (    ( Recinfo.SECONDARY_INVENTORY IS NULL )
+                AND (  p_SECONDARY_INVENTORY IS NULL )))
+       AND (    ( Recinfo.LAST_UPDATE_DATE = p_LAST_UPDATE_DATE)
+            OR (    ( Recinfo.LAST_UPDATE_DATE IS NULL )
+                AND (  p_LAST_UPDATE_DATE IS NULL )))
+       AND (    ( Recinfo.LAST_UPDATED_BY = p_LAST_UPDATED_BY)
+            OR (    ( Recinfo.LAST_UPDATED_BY IS NULL )
+                AND (  p_LAST_UPDATED_BY IS NULL )))
+       AND (    ( Recinfo.CREATION_DATE = p_CREATION_DATE)
+            OR (    ( Recinfo.CREATION_DATE IS NULL )
+                AND (  p_CREATION_DATE IS NULL )))
+       AND (    ( Recinfo.CREATED_BY = p_CREATED_BY)
+            OR (    ( Recinfo.CREATED_BY IS NULL )
+                AND (  p_CREATED_BY IS NULL )))
+       AND (    ( Recinfo.LAST_UPDATE_LOGIN = p_LAST_UPDATE_LOGIN)
+            OR (    ( Recinfo.LAST_UPDATE_LOGIN IS NULL )
+                AND (  p_LAST_UPDATE_LOGIN IS NULL )))
+       AND (    ( Recinfo.PRIMARY_SUBINVENTORY_FLAG = p_PRIMARY_SUBINVENTORY_FLAG)
+            OR (    ( Recinfo.PRIMARY_SUBINVENTORY_FLAG IS NULL )
+                AND (  p_PRIMARY_SUBINVENTORY_FLAG IS NULL )))
+       AND (    ( Recinfo.PICKING_ORDER = p_PICKING_ORDER)
+            OR (    ( Recinfo.PICKING_ORDER IS NULL )
+                AND (  p_PICKING_ORDER IS NULL )))
+       AND (    ( Recinfo.MIN_MINMAX_QUANTITY = p_MIN_MINMAX_QUANTITY)
+            OR (    ( Recinfo.MIN_MINMAX_QUANTITY IS NULL )
+                AND (  p_MIN_MINMAX_QUANTITY IS NULL )))
+       AND (    ( Recinfo.MAX_MINMAX_QUANTITY = p_MAX_MINMAX_QUANTITY)
+            OR (    ( Recinfo.MAX_MINMAX_QUANTITY IS NULL )
+                AND (  p_MAX_MINMAX_QUANTITY IS NULL )))
+       AND (    ( Recinfo.INVENTORY_PLANNING_CODE = p_INVENTORY_PLANNING_CODE)
+            OR (    ( Recinfo.INVENTORY_PLANNING_CODE IS NULL )
+                AND (  p_INVENTORY_PLANNING_CODE IS NULL )))
+       AND (    ( Recinfo.FIXED_LOT_MULTIPLE = p_FIXED_LOT_MULTIPLE)
+            OR (    ( Recinfo.FIXED_LOT_MULTIPLE IS NULL )
+                AND (  p_FIXED_LOT_MULTIPLE IS NULL )))
+       AND (    ( Recinfo.MINIMUM_ORDER_QUANTITY = p_MINIMUM_ORDER_QUANTITY)
+            OR (    ( Recinfo.MINIMUM_ORDER_QUANTITY IS NULL )
+                AND (  p_MINIMUM_ORDER_QUANTITY IS NULL )))
+       AND (    ( Recinfo.MAXIMUM_ORDER_QUANTITY = p_MAXIMUM_ORDER_QUANTITY)
+            OR (    ( Recinfo.MAXIMUM_ORDER_QUANTITY IS NULL )
+                AND (  p_MAXIMUM_ORDER_QUANTITY IS NULL )))
+       AND (    ( Recinfo.SOURCE_TYPE = p_SOURCE_TYPE)
+            OR (    ( Recinfo.SOURCE_TYPE IS NULL )
+                AND (  p_SOURCE_TYPE IS NULL )))
+       AND (    ( Recinfo.SOURCE_ORGANIZATION_ID = p_SOURCE_ORGANIZATION_ID)
+            OR (    ( Recinfo.SOURCE_ORGANIZATION_ID IS NULL )
+                AND (  p_SOURCE_ORGANIZATION_ID IS NULL )))
+       AND (    ( Recinfo.SOURCE_SUBINVENTORY = p_SOURCE_SUBINVENTORY)
+            OR (    ( Recinfo.SOURCE_SUBINVENTORY IS NULL )
+                AND (  p_SOURCE_SUBINVENTORY IS NULL )))
+       AND (    ( Recinfo.ATTRIBUTE_CATEGORY = p_ATTRIBUTE_CATEGORY)
+            OR (    ( Recinfo.ATTRIBUTE_CATEGORY IS NULL )
+                AND (  p_ATTRIBUTE_CATEGORY IS NULL )))
+       AND (    ( Recinfo.ATTRIBUTE1 = p_ATTRIBUTE1)
+            OR (    ( Recinfo.ATTRIBUTE1 IS NULL )
+                AND (  p_ATTRIBUTE1 IS NULL )))
+       AND (    ( Recinfo.ATTRIBUTE2 = p_ATTRIBUTE2)
+            OR (    ( Recinfo.ATTRIBUTE2 IS NULL )
+                AND (  p_ATTRIBUTE2 IS NULL )))
+       AND (    ( Recinfo.ATTRIBUTE3 = p_ATTRIBUTE3)
+            OR (    ( Recinfo.ATTRIBUTE3 IS NULL )
+                AND (  p_ATTRIBUTE3 IS NULL )))
+       AND (    ( Recinfo.ATTRIBUTE4 = p_ATTRIBUTE4)
+            OR (    ( Recinfo.ATTRIBUTE4 IS NULL )
+                AND (  p_ATTRIBUTE4 IS NULL )))
+       AND (    ( Recinfo.ATTRIBUTE5 = p_ATTRIBUTE5)
+            OR (    ( Recinfo.ATTRIBUTE5 IS NULL )
+                AND (  p_ATTRIBUTE5 IS NULL )))
+       AND (    ( Recinfo.ATTRIBUTE6 = p_ATTRIBUTE6)
+            OR (    ( Recinfo.ATTRIBUTE6 IS NULL )
+                AND (  p_ATTRIBUTE6 IS NULL )))
+       AND (    ( Recinfo.ATTRIBUTE7 = p_ATTRIBUTE7)
+            OR (    ( Recinfo.ATTRIBUTE7 IS NULL )
+                AND (  p_ATTRIBUTE7 IS NULL )))
+       AND (    ( Recinfo.ATTRIBUTE8 = p_ATTRIBUTE8)
+            OR (    ( Recinfo.ATTRIBUTE8 IS NULL )
+                AND (  p_ATTRIBUTE8 IS NULL )))
+       AND (    ( Recinfo.ATTRIBUTE9 = p_ATTRIBUTE9)
+            OR (    ( Recinfo.ATTRIBUTE9 IS NULL )
+                AND (  p_ATTRIBUTE9 IS NULL )))
+       AND (    ( Recinfo.ATTRIBUTE10 = p_ATTRIBUTE10)
+            OR (    ( Recinfo.ATTRIBUTE10 IS NULL )
+                AND (  p_ATTRIBUTE10 IS NULL )))
+       AND (    ( Recinfo.ATTRIBUTE11 = p_ATTRIBUTE11)
+            OR (    ( Recinfo.ATTRIBUTE11 IS NULL )
+                AND (  p_ATTRIBUTE11 IS NULL )))
+       AND (    ( Recinfo.ATTRIBUTE12 = p_ATTRIBUTE12)
+            OR (    ( Recinfo.ATTRIBUTE12 IS NULL )
+                AND (  p_ATTRIBUTE12 IS NULL )))
+       AND (    ( Recinfo.ATTRIBUTE13 = p_ATTRIBUTE13)
+            OR (    ( Recinfo.ATTRIBUTE13 IS NULL )
+                AND (  p_ATTRIBUTE13 IS NULL )))
+       AND (    ( Recinfo.ATTRIBUTE14 = p_ATTRIBUTE14)
+            OR (    ( Recinfo.ATTRIBUTE14 IS NULL )
+                AND (  p_ATTRIBUTE14 IS NULL )))
+       AND (    ( Recinfo.ATTRIBUTE15 = p_ATTRIBUTE15)
+            OR (    ( Recinfo.ATTRIBUTE15 IS NULL )
+                AND (  p_ATTRIBUTE15 IS NULL )))
+       AND (    ( Recinfo.ENCUMBRANCE_ACCOUNT = p_ENCUMBRANCE_ACCOUNT)
+            OR (    ( Recinfo.ENCUMBRANCE_ACCOUNT IS NULL )
+                AND (  p_ENCUMBRANCE_ACCOUNT IS NULL )))
+       AND (    ( Recinfo.PREPROCESSING_LEAD_TIME = p_PREPROCESSING_LEAD_TIME)
+            OR (    ( Recinfo.PREPROCESSING_LEAD_TIME IS NULL )
+                AND (  p_PREPROCESSING_LEAD_TIME IS NULL )))
+       AND (    ( Recinfo.PROCESSING_LEAD_TIME = p_PROCESSING_LEAD_TIME)
+            OR (    ( Recinfo.PROCESSING_LEAD_TIME IS NULL )
+                AND (  p_PROCESSING_LEAD_TIME IS NULL )))
+       AND (    ( Recinfo.POSTPROCESSING_LEAD_TIME = p_POSTPROCESSING_LEAD_TIME)
+            OR (    ( Recinfo.POSTPROCESSING_LEAD_TIME IS NULL )
+                AND (  p_POSTPROCESSING_LEAD_TIME IS NULL )))
+       ) then
+       return;
+   else
+       FND_MESSAGE.SET_NAME('FND', 'FORM_RECORD_CHANGED');
+       APP_EXCEPTION.RAISE_EXCEPTION;
+   End If;
+END Lock_Row;
+
+End CSP_ITEM_SUB_INVENTORIES_PKG;
+
+/

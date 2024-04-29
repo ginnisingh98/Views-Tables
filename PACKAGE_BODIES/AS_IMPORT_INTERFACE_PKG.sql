@@ -1,0 +1,2632 @@
+--------------------------------------------------------
+--  DDL for Package Body AS_IMPORT_INTERFACE_PKG
+--------------------------------------------------------
+
+  CREATE OR REPLACE EDITIONABLE PACKAGE BODY "APPS"."AS_IMPORT_INTERFACE_PKG" as
+/*  $Header: asxtlimb.pls 115.8 2004/01/19 11:30:22 rramakri ship $ */
+-- Start of Comments
+-- Package name     : AS_IMPORT_INTERFACE_PKG
+-- Purpose          :
+-- History          : added 7 new columns manually
+-- NOTE             : Due to bug in JDBC, The G_MISS_DATE value
+--                    passed from UI is not matching with
+--                    FND_API.G_MISS_DATE. So after discussion
+--                    with Monica, Madhu and George and Shrinivas
+--                    in Update_Row , FND_API.G_MISS_DATE has
+--                    been replaced by rosetta like parameter.
+--                    Whenever the bug gets closed and ETF team
+--                    asks to regenerate the java wrapper, the
+--                    similar variable needs to be applied again.
+-- End of Comments
+
+
+G_PKG_NAME CONSTANT VARCHAR2(30):= 'AS_IMPORT_INTERFACE_PKG';
+G_FILE_NAME CONSTANT VARCHAR2(12) := 'asxtlimb.pls';
+
+PROCEDURE Insert_Row(
+          px_IMPORT_INTERFACE_ID   IN OUT NOCOPY NUMBER,
+          p_LAST_UPDATE_DATE    DATE,
+          p_LAST_UPDATED_BY    NUMBER,
+          p_CREATION_DATE    DATE,
+          p_CREATED_BY    NUMBER,
+          p_LAST_UPDATE_LOGIN    NUMBER,
+          p_REQUEST_ID    NUMBER,
+          p_PROGRAM_APPLICATION_ID    NUMBER,
+          p_PROGRAM_ID    NUMBER,
+          p_PROGRAM_UPDATE_DATE    DATE,
+          p_IMP_LIST_HEADER_NUMBER    VARCHAR2,
+          p_LOAD_TYPE    VARCHAR2,
+          p_LOAD_DATE    DATE,
+          p_LOAD_STATUS    VARCHAR2,
+          p_LOAD_ERROR_MESSAGE    VARCHAR2,
+          p_PROMOTION_ID    NUMBER,
+          p_PROMOTION_CODE    VARCHAR2,
+          p_CUSTOMER_ID    NUMBER,
+          p_CUSTOMER_NAME    VARCHAR2,
+          p_CUSTOMER_NUMBER    VARCHAR2,
+          p_CUSTOMER_STATUS    VARCHAR2,
+          p_CUSTOMER_TYPE    VARCHAR2,
+          p_CUSTOMER_PROSPECT_CODE    VARCHAR2,
+          p_CUSTOMER_CLASS_CODE    VARCHAR2,
+          p_SALES_CHANNEL_CODE    VARCHAR2,
+          p_SIC_CODE    VARCHAR2,
+          p_ANALYSIS_FY    VARCHAR2,
+          p_CUSTOMER_CATEGORY_CODE    VARCHAR2,
+          p_CUSTOMER_GROUP_CODE    VARCHAR2,
+          p_CUSTOMER_KEY    VARCHAR2,
+          p_CUSTOMER_SUBGROUP_CODE    VARCHAR2,
+          p_FISCAL_YEAREND_MONTH    VARCHAR2,
+          p_NET_WORTH    NUMBER,
+          p_NUM_OF_EMPLOYEES    NUMBER,
+          p_POTENTIAL_REVENUE_CURR_FY    NUMBER,
+          p_POTENTIAL_REVENUE_NEXT_FY    NUMBER,
+          p_CUSTOMER_RANK    VARCHAR2,
+          p_REFERENCE_USE_FLAG    VARCHAR2,
+          p_TAX_CODE    VARCHAR2,
+          p_TAX_REFERENCE    VARCHAR2,
+          p_THIRD_PARTY_FLAG    VARCHAR2,
+          p_COMPETITOR_FLAG    VARCHAR2,
+          p_YEAR_ESTABLISHED    NUMBER,
+          p_ADDR_DO_NOT_MAIL_FLAG    VARCHAR2,
+          p_URL    VARCHAR2,
+          p_ADDRESS_ID    NUMBER,
+          p_CONT_DO_NOT_MAIL_FLAG    VARCHAR2,
+          p_ADDRESS_STATUS    VARCHAR2,
+          p_COUNTRY    VARCHAR2,
+          p_ADDRESS1    VARCHAR2,
+          p_ADDRESS2    VARCHAR2,
+          p_ADDRESS3    VARCHAR2,
+          p_ADDRESS4    VARCHAR2,
+          p_CITY    VARCHAR2,
+          p_POSTAL_CODE    VARCHAR2,
+          p_STATE    VARCHAR2,
+          p_PROVINCE    VARCHAR2,
+          p_COUNTY    VARCHAR2,
+          p_SITE_CONTACT_ID    NUMBER,
+          p_EMAIL_ADDRESS    VARCHAR2,
+          p_SEX_CODE    VARCHAR2,
+          p_SALUTATION    VARCHAR2,
+          p_LAST_NAME    VARCHAR2,
+          p_TITLE    VARCHAR2,
+          p_FIRST_NAME    VARCHAR2,
+          p_JOB_TITLE    VARCHAR2,
+          p_PHONE_ID    NUMBER,
+          p_PHONE_NUMBER    VARCHAR2,
+          p_PHONE_STATUS    VARCHAR2,
+          p_PHONE_TYPE    VARCHAR2,
+          p_AREA_CODE    VARCHAR2,
+          p_EXTENSION    VARCHAR2,
+          p_LEAD_NUMBER    VARCHAR2,
+          p_STATUS_CODE    VARCHAR2,
+          p_SOURCE_PROMOTION_ID    NUMBER,
+          p_INITIATING_CONTACT_ID    NUMBER,
+          p_CONTACT_ROLE_CODE    VARCHAR2,
+          p_CHANNEL_CODE    VARCHAR2,
+          p_BUDGET_AMOUNT    NUMBER,
+          p_BUDGET_STATUS_CODE    VARCHAR2,
+          p_CURRENCY_CODE    VARCHAR2,
+          p_DECISION_TIMEFRAME_CODE    VARCHAR2,
+          p_CLOSE_REASON    VARCHAR2,
+          p_LEAD_RANK_CODE    VARCHAR2,
+          p_PARENT_PROJECT    VARCHAR2,
+          p_DESCRIPTION    VARCHAR2,
+          p_STATUS_CODE_1    VARCHAR2,
+          p_INTEREST_TYPE_ID_1    NUMBER,
+          p_PRIMARY_INTEREST_CODE_ID_1    NUMBER,
+          p_SECONDARY_INTEREST_CODE_ID_1    NUMBER,
+          p_INVENTORY_ITEM_ID_1    NUMBER,
+          p_ORGANIZATION_ID_1    NUMBER,
+          p_UOM_CODE_1    VARCHAR2,
+          p_QUANTITY_1    NUMBER,
+          p_BUDGET_AMOUNT_1    NUMBER,
+          p_STATUS_CODE_2    VARCHAR2,
+          p_INTEREST_TYPE_ID_2    NUMBER,
+          p_PRIMARY_INTEREST_CODE_ID_2    NUMBER,
+          p_SECONDARY_INTEREST_CODE_ID_2    NUMBER,
+          p_INVENTORY_ITEM_ID_2    NUMBER,
+          p_ORGANIZATION_ID_2    NUMBER,
+          p_UOM_CODE_2    VARCHAR2,
+          p_QUANTITY_2    NUMBER,
+          p_BUDGET_AMOUNT_2    NUMBER,
+          p_STATUS_CODE_3    VARCHAR2,
+          p_INTEREST_TYPE_ID_3    NUMBER,
+          p_PRIMARY_INTEREST_CODE_ID_3    NUMBER,
+          p_SECONDARY_INTEREST_CODE_ID_3    NUMBER,
+          p_INVENTORY_ITEM_ID_3    NUMBER,
+          p_ORGANIZATION_ID_3    NUMBER,
+          p_UOM_CODE_3    VARCHAR2,
+          p_QUANTITY_3    NUMBER,
+          p_BUDGET_AMOUNT_3    NUMBER,
+          p_STATUS_CODE_4    VARCHAR2,
+          p_INTEREST_TYPE_ID_4    NUMBER,
+          p_PRIMARY_INTEREST_CODE_ID_4    NUMBER,
+          p_SECONDARY_INTEREST_CODE_ID_4    NUMBER,
+          p_INVENTORY_ITEM_ID_4    NUMBER,
+          p_ORGANIZATION_ID_4    NUMBER,
+          p_UOM_CODE_4    VARCHAR2,
+          p_QUANTITY_4    NUMBER,
+          p_BUDGET_AMOUNT_4    NUMBER,
+          p_STATUS_CODE_5    VARCHAR2,
+          p_INTEREST_TYPE_ID_5    NUMBER,
+          p_PRIMARY_INTEREST_CODE_ID_5    NUMBER,
+          p_SECONDARY_INTEREST_CODE_ID_5    NUMBER,
+          p_INVENTORY_ITEM_ID_5    NUMBER,
+          p_ORGANIZATION_ID_5    NUMBER,
+          p_UOM_CODE_5    VARCHAR2,
+          p_QUANTITY_5    NUMBER,
+          p_BUDGET_AMOUNT_5    NUMBER,
+          p_INTERACTION_NOTES_1    VARCHAR2,
+          p_PRIORITY_1    NUMBER,
+          p_TODO_DATE_1    DATE,
+          p_TODO_START_TIME_1    VARCHAR2,
+          p_ACTIVITY_CODE_1    VARCHAR2,
+          p_INTERACTION_NOTES_2    VARCHAR2,
+          p_PRIORITY_2    NUMBER,
+          p_TODO_DATE_2    DATE,
+          p_TODO_START_TIME_2    VARCHAR2,
+          p_ACTIVITY_CODE_2    VARCHAR2,
+          p_INTERACTION_NOTES_3    VARCHAR2,
+          p_PRIORITY_3    NUMBER,
+          p_TODO_DATE_3    DATE,
+          p_TODO_START_TIME_3    VARCHAR2,
+          p_ACTIVITY_CODE_3    VARCHAR2,
+          p_INTERACTION_NOTES_4    VARCHAR2,
+          p_PRIORITY_4    NUMBER,
+          p_TODO_DATE_4    DATE,
+          p_TODO_START_TIME_4    VARCHAR2,
+          p_ACTIVITY_CODE_4    VARCHAR2,
+          p_INTERACTION_NOTES_5    VARCHAR2,
+          p_PRIORITY_5    NUMBER,
+          p_TODO_DATE_5    DATE,
+          p_TODO_START_TIME_5    VARCHAR2,
+          p_ACTIVITY_CODE_5    VARCHAR2,
+          p_INTERACTION_NOTES_6    VARCHAR2,
+          p_PRIORITY_6    NUMBER,
+          p_TODO_DATE_6    DATE,
+          p_TODO_START_TIME_6    VARCHAR2,
+          p_ACTIVITY_CODE_6    VARCHAR2,
+          p_INTERACTION_NOTES_7    VARCHAR2,
+          p_PRIORITY_7    NUMBER,
+          p_TODO_DATE_7    DATE,
+          p_TODO_START_TIME_7    VARCHAR2,
+          p_ACTIVITY_CODE_7    VARCHAR2,
+          p_INTERACTION_NOTES_8    VARCHAR2,
+          p_PRIORITY_8    NUMBER,
+          p_TODO_DATE_8    DATE,
+          p_TODO_START_TIME_8    VARCHAR2,
+          p_ACTIVITY_CODE_8    VARCHAR2,
+          p_INTERACTION_NOTES_9    VARCHAR2,
+          p_PRIORITY_9    NUMBER,
+          p_TODO_DATE_9    DATE,
+          p_TODO_START_TIME_9    VARCHAR2,
+          p_ACTIVITY_CODE_9    VARCHAR2,
+          p_INTERACTION_NOTES_10    VARCHAR2,
+          p_PRIORITY_10    NUMBER,
+          p_TODO_DATE_10    DATE,
+          p_TODO_START_TIME_10    VARCHAR2,
+          p_ACTIVITY_CODE_10    VARCHAR2,
+          p_LEAD_NOTE    VARCHAR2,
+          p_MIDDLE_INITIAL    VARCHAR2,
+          p_FAX_NUMBER    VARCHAR2,
+          p_FAX_AREA_CODE    VARCHAR2,
+          p_MAIL_STOP    VARCHAR2,
+          p_NUM_ENROLLED    NUMBER,
+          p_CONFIRMED_FLAG    VARCHAR2,
+          p_PAYMENT_AMOUNT    NUMBER,
+          p_NUM_ATTENDED    NUMBER,
+          p_PROMOTION_NAME    VARCHAR2,
+          p_STATUS_CHANGE_FLAG    VARCHAR2,
+          p_VEHICLE_RESPONSE_CODE    VARCHAR2,
+          p_SOURCE_SYSTEM    VARCHAR2,
+          p_CONTACT_PARTY_ID    NUMBER,
+          p_PRM_SALES_LEAD_TYPE    VARCHAR2,
+          p_PRM_EXEC_SPONSOR_FLAG    VARCHAR2,
+          p_PRM_PRJ_LEAD_IN_PLACE_FLAG    VARCHAR2,
+          p_INC_PARTNER_PARTY_ID    NUMBER,
+          p_INC_PARTNER_RESOURCE_ID    NUMBER,
+          p_OFFER_ID    NUMBER,
+          p_PRM_IND_CLASSIFICATION_CODE    VARCHAR2,
+          p_PARTY_TYPE    VARCHAR2,
+          p_BATCH_ID    NUMBER,
+          p_PARTY_ID    NUMBER,
+          p_PARTY_SITE_ID    NUMBER,
+          p_LOCATION_ID    NUMBER,
+          p_REL_PARTY_ID    NUMBER,
+          p_SALES_LEAD_ID    NUMBER,
+          p_ADDRESS_KEY    VARCHAR2,
+          p_CONTACT_KEY    VARCHAR2,
+          p_JOB_TITLE_CODE    VARCHAR2,
+          p_DO_NOT_PHONE_FLAG    VARCHAR2,
+          p_DO_NOT_FAX_FLAG    VARCHAR2,
+          p_DO_NOT_EMAIL_FLAG    VARCHAR2,
+          p_ORIG_SYSTEM_REFERENCE    VARCHAR2,
+          p_LEAD_RANK_ID    NUMBER,
+          p_NEW_PARTY_FLAG    NUMBER,
+          p_NEW_LOC_FLAG    NUMBER,
+          p_NEW_PS_FLAG    NUMBER,
+          p_NEW_REL_FLAG    NUMBER,
+          p_NEW_CON_FLAG    NUMBER,
+          p_ORIG_SYSTEM_CODE    VARCHAR2,
+          p_URGENT_FLAG    VARCHAR2,
+          p_SIC_CODE_TYPE    VARCHAR2,
+          p_SITE_USE_TYPE    VARCHAR2,
+          p_PRIMARY_CONTACT_FLAG    VARCHAR2,
+          p_RANK    VARCHAR2,
+          p_ADDRESS_STYLE    VARCHAR2,
+          p_PRIMARY_PER_TYPE    VARCHAR2,
+          p_DEPARTMENT_CODE    VARCHAR2)
+
+ IS
+   CURSOR C2 IS SELECT AS_IMPORT_INTERFACE_S.nextval FROM sys.dual;
+BEGIN
+   If (px_IMPORT_INTERFACE_ID IS NULL) OR (px_IMPORT_INTERFACE_ID = FND_API.G_MISS_NUM) then
+       OPEN C2;
+       FETCH C2 INTO px_IMPORT_INTERFACE_ID;
+       CLOSE C2;
+   End If;
+   INSERT INTO AS_IMPORT_INTERFACE(
+           IMPORT_INTERFACE_ID,
+           LAST_UPDATE_DATE,
+           LAST_UPDATED_BY,
+           CREATION_DATE,
+           CREATED_BY,
+           LAST_UPDATE_LOGIN,
+           REQUEST_ID,
+           PROGRAM_APPLICATION_ID,
+           PROGRAM_ID,
+           PROGRAM_UPDATE_DATE,
+           IMP_LIST_HEADER_NUMBER,
+           LOAD_TYPE,
+           LOAD_DATE,
+           LOAD_STATUS,
+           LOAD_ERROR_MESSAGE,
+           PROMOTION_ID,
+           PROMOTION_CODE,
+           CUSTOMER_ID,
+           CUSTOMER_NAME,
+           CUSTOMER_NUMBER,
+           CUSTOMER_STATUS,
+           CUSTOMER_TYPE,
+           CUSTOMER_PROSPECT_CODE,
+           CUSTOMER_CLASS_CODE,
+           SALES_CHANNEL_CODE,
+           SIC_CODE,
+           ANALYSIS_FY,
+           CUSTOMER_CATEGORY_CODE,
+           CUSTOMER_GROUP_CODE,
+           CUSTOMER_KEY,
+           CUSTOMER_SUBGROUP_CODE,
+           FISCAL_YEAREND_MONTH,
+           NET_WORTH,
+           NUM_OF_EMPLOYEES,
+           POTENTIAL_REVENUE_CURR_FY,
+           POTENTIAL_REVENUE_NEXT_FY,
+           CUSTOMER_RANK,
+           REFERENCE_USE_FLAG,
+           TAX_CODE,
+           TAX_REFERENCE,
+           THIRD_PARTY_FLAG,
+           COMPETITOR_FLAG,
+           YEAR_ESTABLISHED,
+           ADDR_DO_NOT_MAIL_FLAG,
+           URL,
+           ADDRESS_ID,
+           CONT_DO_NOT_MAIL_FLAG,
+           ADDRESS_STATUS,
+           COUNTRY,
+           ADDRESS1,
+           ADDRESS2,
+           ADDRESS3,
+           ADDRESS4,
+           CITY,
+           POSTAL_CODE,
+           STATE,
+           PROVINCE,
+           COUNTY,
+           SITE_CONTACT_ID,
+           EMAIL_ADDRESS,
+           SEX_CODE,
+           SALUTATION,
+           LAST_NAME,
+           TITLE,
+           FIRST_NAME,
+           JOB_TITLE,
+           PHONE_ID,
+           PHONE_NUMBER,
+           PHONE_STATUS,
+           PHONE_TYPE,
+           AREA_CODE,
+           EXTENSION,
+           LEAD_NUMBER,
+           STATUS_CODE,
+           SOURCE_PROMOTION_ID,
+           INITIATING_CONTACT_ID,
+           CONTACT_ROLE_CODE,
+           CHANNEL_CODE,
+           BUDGET_AMOUNT,
+           BUDGET_STATUS_CODE,
+           CURRENCY_CODE,
+           DECISION_TIMEFRAME_CODE,
+           CLOSE_REASON,
+           LEAD_RANK_CODE,
+           PARENT_PROJECT,
+           DESCRIPTION,
+           STATUS_CODE_1,
+           INTEREST_TYPE_ID_1,
+           PRIMARY_INTEREST_CODE_ID_1,
+           SECONDARY_INTEREST_CODE_ID_1,
+           INVENTORY_ITEM_ID_1,
+           ORGANIZATION_ID_1,
+           UOM_CODE_1,
+           QUANTITY_1,
+           BUDGET_AMOUNT_1,
+           STATUS_CODE_2,
+           INTEREST_TYPE_ID_2,
+           PRIMARY_INTEREST_CODE_ID_2,
+           SECONDARY_INTEREST_CODE_ID_2,
+           INVENTORY_ITEM_ID_2,
+           ORGANIZATION_ID_2,
+           UOM_CODE_2,
+           QUANTITY_2,
+           BUDGET_AMOUNT_2,
+           STATUS_CODE_3,
+           INTEREST_TYPE_ID_3,
+           PRIMARY_INTEREST_CODE_ID_3,
+           SECONDARY_INTEREST_CODE_ID_3,
+           INVENTORY_ITEM_ID_3,
+           ORGANIZATION_ID_3,
+           UOM_CODE_3,
+           QUANTITY_3,
+           BUDGET_AMOUNT_3,
+           STATUS_CODE_4,
+           INTEREST_TYPE_ID_4,
+           PRIMARY_INTEREST_CODE_ID_4,
+           SECONDARY_INTEREST_CODE_ID_4,
+           INVENTORY_ITEM_ID_4,
+           ORGANIZATION_ID_4,
+           UOM_CODE_4,
+           QUANTITY_4,
+           BUDGET_AMOUNT_4,
+           STATUS_CODE_5,
+           INTEREST_TYPE_ID_5,
+           PRIMARY_INTEREST_CODE_ID_5,
+           SECONDARY_INTEREST_CODE_ID_5,
+           INVENTORY_ITEM_ID_5,
+           ORGANIZATION_ID_5,
+           UOM_CODE_5,
+           QUANTITY_5,
+           BUDGET_AMOUNT_5,
+           INTERACTION_NOTES_1,
+           PRIORITY_1,
+           TODO_DATE_1,
+           TODO_START_TIME_1,
+           ACTIVITY_CODE_1,
+           INTERACTION_NOTES_2,
+           PRIORITY_2,
+           TODO_DATE_2,
+           TODO_START_TIME_2,
+           ACTIVITY_CODE_2,
+           INTERACTION_NOTES_3,
+           PRIORITY_3,
+           TODO_DATE_3,
+           TODO_START_TIME_3,
+           ACTIVITY_CODE_3,
+           INTERACTION_NOTES_4,
+           PRIORITY_4,
+           TODO_DATE_4,
+           TODO_START_TIME_4,
+           ACTIVITY_CODE_4,
+           INTERACTION_NOTES_5,
+           PRIORITY_5,
+           TODO_DATE_5,
+           TODO_START_TIME_5,
+           ACTIVITY_CODE_5,
+           INTERACTION_NOTES_6,
+           PRIORITY_6,
+           TODO_DATE_6,
+           TODO_START_TIME_6,
+           ACTIVITY_CODE_6,
+           INTERACTION_NOTES_7,
+           PRIORITY_7,
+           TODO_DATE_7,
+           TODO_START_TIME_7,
+           ACTIVITY_CODE_7,
+           INTERACTION_NOTES_8,
+           PRIORITY_8,
+           TODO_DATE_8,
+           TODO_START_TIME_8,
+           ACTIVITY_CODE_8,
+           INTERACTION_NOTES_9,
+           PRIORITY_9,
+           TODO_DATE_9,
+           TODO_START_TIME_9,
+           ACTIVITY_CODE_9,
+           INTERACTION_NOTES_10,
+           PRIORITY_10,
+           TODO_DATE_10,
+           TODO_START_TIME_10,
+           ACTIVITY_CODE_10,
+           LEAD_NOTE,
+           MIDDLE_INITIAL,
+           FAX_NUMBER,
+           FAX_AREA_CODE,
+           MAIL_STOP,
+           NUM_ENROLLED,
+           CONFIRMED_FLAG,
+           PAYMENT_AMOUNT,
+           NUM_ATTENDED,
+           PROMOTION_NAME,
+           STATUS_CHANGE_FLAG,
+           VEHICLE_RESPONSE_CODE,
+           SOURCE_SYSTEM,
+           CONTACT_PARTY_ID,
+           PRM_SALES_LEAD_TYPE,
+           PRM_EXEC_SPONSOR_FLAG,
+           PRM_PRJ_LEAD_IN_PLACE_FLAG,
+           INCUMBENT_PARTNER_PARTY_ID,
+           INCUMBENT_PARTNER_RESOURCE_ID,
+           OFFER_ID,
+           PRM_IND_CLASSIFICATION_CODE,
+           PARTY_TYPE,
+           BATCH_ID,
+           PARTY_ID,
+           PARTY_SITE_ID,
+           LOCATION_ID,
+           REL_PARTY_ID,
+           SALES_LEAD_ID,
+           ADDRESS_KEY,
+           CONTACT_KEY,
+           JOB_TITLE_CODE,
+           DO_NOT_PHONE_FLAG,
+           DO_NOT_FAX_FLAG,
+           DO_NOT_EMAIL_FLAG,
+           ORIG_SYSTEM_REFERENCE,
+           LEAD_RANK_ID,
+           NEW_PARTY_FLAG,
+           NEW_LOC_FLAG,
+           NEW_PS_FLAG,
+           NEW_REL_FLAG,
+           NEW_CON_FLAG,
+           ORIG_SYSTEM_CODE,
+           URGENT_FLAG
+          ) VALUES (
+           px_IMPORT_INTERFACE_ID,
+           decode( p_LAST_UPDATE_DATE, FND_API.G_MISS_DATE, TO_DATE(NULL), p_LAST_UPDATE_DATE),
+           decode( p_LAST_UPDATED_BY, FND_API.G_MISS_NUM, NULL, p_LAST_UPDATED_BY),
+           decode( p_CREATION_DATE, FND_API.G_MISS_DATE, TO_DATE(NULL), p_CREATION_DATE),
+           decode( p_CREATED_BY, FND_API.G_MISS_NUM, NULL, p_CREATED_BY),
+           decode( p_LAST_UPDATE_LOGIN, FND_API.G_MISS_NUM, NULL, p_LAST_UPDATE_LOGIN),
+           decode( p_REQUEST_ID, FND_API.G_MISS_NUM, NULL, p_REQUEST_ID),
+           decode( p_PROGRAM_APPLICATION_ID, FND_API.G_MISS_NUM, NULL, p_PROGRAM_APPLICATION_ID),
+           decode( p_PROGRAM_ID, FND_API.G_MISS_NUM, NULL, p_PROGRAM_ID),
+           decode( p_PROGRAM_UPDATE_DATE, FND_API.G_MISS_DATE, TO_DATE(NULL), p_PROGRAM_UPDATE_DATE),
+           decode( p_IMP_LIST_HEADER_NUMBER, FND_API.G_MISS_CHAR, NULL, p_IMP_LIST_HEADER_NUMBER),
+           decode( p_LOAD_TYPE, FND_API.G_MISS_CHAR, NULL, p_LOAD_TYPE),
+           decode( p_LOAD_DATE, FND_API.G_MISS_DATE, TO_DATE(NULL), p_LOAD_DATE),
+           decode( p_LOAD_STATUS, FND_API.G_MISS_CHAR, NULL, p_LOAD_STATUS),
+           decode( p_LOAD_ERROR_MESSAGE, FND_API.G_MISS_CHAR, NULL, p_LOAD_ERROR_MESSAGE),
+           decode( p_PROMOTION_ID, FND_API.G_MISS_NUM, NULL, p_PROMOTION_ID),
+           decode( p_PROMOTION_CODE, FND_API.G_MISS_CHAR, NULL, p_PROMOTION_CODE),
+           decode( p_CUSTOMER_ID, FND_API.G_MISS_NUM, NULL, p_CUSTOMER_ID),
+           decode( p_CUSTOMER_NAME, FND_API.G_MISS_CHAR, NULL, p_CUSTOMER_NAME),
+           decode( p_CUSTOMER_NUMBER, FND_API.G_MISS_CHAR, NULL, p_CUSTOMER_NUMBER),
+           decode( p_CUSTOMER_STATUS, FND_API.G_MISS_CHAR, NULL, p_CUSTOMER_STATUS),
+           decode( p_CUSTOMER_TYPE, FND_API.G_MISS_CHAR, NULL, p_CUSTOMER_TYPE),
+           decode( p_CUSTOMER_PROSPECT_CODE, FND_API.G_MISS_CHAR, NULL, p_CUSTOMER_PROSPECT_CODE),
+           decode( p_CUSTOMER_CLASS_CODE, FND_API.G_MISS_CHAR, NULL, p_CUSTOMER_CLASS_CODE),
+           decode( p_SALES_CHANNEL_CODE, FND_API.G_MISS_CHAR, NULL, p_SALES_CHANNEL_CODE),
+           decode( p_SIC_CODE, FND_API.G_MISS_CHAR, NULL, p_SIC_CODE),
+           decode( p_ANALYSIS_FY, FND_API.G_MISS_CHAR, NULL, p_ANALYSIS_FY),
+           decode( p_CUSTOMER_CATEGORY_CODE, FND_API.G_MISS_CHAR, NULL, p_CUSTOMER_CATEGORY_CODE),
+           decode( p_CUSTOMER_GROUP_CODE, FND_API.G_MISS_CHAR, NULL, p_CUSTOMER_GROUP_CODE),
+           decode( p_CUSTOMER_KEY, FND_API.G_MISS_CHAR, NULL, p_CUSTOMER_KEY),
+           decode( p_CUSTOMER_SUBGROUP_CODE, FND_API.G_MISS_CHAR, NULL, p_CUSTOMER_SUBGROUP_CODE),
+           decode( p_FISCAL_YEAREND_MONTH, FND_API.G_MISS_CHAR, NULL, p_FISCAL_YEAREND_MONTH),
+           decode( p_NET_WORTH, FND_API.G_MISS_NUM, NULL, p_NET_WORTH),
+           decode( p_NUM_OF_EMPLOYEES, FND_API.G_MISS_NUM, NULL, p_NUM_OF_EMPLOYEES),
+           decode( p_POTENTIAL_REVENUE_CURR_FY, FND_API.G_MISS_NUM, NULL, p_POTENTIAL_REVENUE_CURR_FY),
+           decode( p_POTENTIAL_REVENUE_NEXT_FY, FND_API.G_MISS_NUM, NULL, p_POTENTIAL_REVENUE_NEXT_FY),
+           decode( p_CUSTOMER_RANK, FND_API.G_MISS_CHAR, NULL, p_CUSTOMER_RANK),
+           decode( p_REFERENCE_USE_FLAG, FND_API.G_MISS_CHAR, NULL, p_REFERENCE_USE_FLAG),
+           decode( p_TAX_CODE, FND_API.G_MISS_CHAR, NULL, p_TAX_CODE),
+           decode( p_TAX_REFERENCE, FND_API.G_MISS_CHAR, NULL, p_TAX_REFERENCE),
+           decode( p_THIRD_PARTY_FLAG, FND_API.G_MISS_CHAR, NULL, p_THIRD_PARTY_FLAG),
+           decode( p_COMPETITOR_FLAG, FND_API.G_MISS_CHAR, NULL, p_COMPETITOR_FLAG),
+           decode( p_YEAR_ESTABLISHED, FND_API.G_MISS_NUM, NULL, p_YEAR_ESTABLISHED),
+           decode( p_ADDR_DO_NOT_MAIL_FLAG, FND_API.G_MISS_CHAR, NULL, p_ADDR_DO_NOT_MAIL_FLAG),
+           decode( p_URL, FND_API.G_MISS_CHAR, NULL, p_URL),
+           decode( p_ADDRESS_ID, FND_API.G_MISS_NUM, NULL, p_ADDRESS_ID),
+           decode( p_CONT_DO_NOT_MAIL_FLAG, FND_API.G_MISS_CHAR, NULL, p_CONT_DO_NOT_MAIL_FLAG),
+           decode( p_ADDRESS_STATUS, FND_API.G_MISS_CHAR, NULL, p_ADDRESS_STATUS),
+           decode( p_COUNTRY, FND_API.G_MISS_CHAR, NULL, p_COUNTRY),
+           decode( p_ADDRESS1, FND_API.G_MISS_CHAR, NULL, p_ADDRESS1),
+           decode( p_ADDRESS2, FND_API.G_MISS_CHAR, NULL, p_ADDRESS2),
+           decode( p_ADDRESS3, FND_API.G_MISS_CHAR, NULL, p_ADDRESS3),
+           decode( p_ADDRESS4, FND_API.G_MISS_CHAR, NULL, p_ADDRESS4),
+           decode( p_CITY, FND_API.G_MISS_CHAR, NULL, p_CITY),
+           decode( p_POSTAL_CODE, FND_API.G_MISS_CHAR, NULL, p_POSTAL_CODE),
+           decode( p_STATE, FND_API.G_MISS_CHAR, NULL, p_STATE),
+           decode( p_PROVINCE, FND_API.G_MISS_CHAR, NULL, p_PROVINCE),
+           decode( p_COUNTY, FND_API.G_MISS_CHAR, NULL, p_COUNTY),
+           decode( p_SITE_CONTACT_ID, FND_API.G_MISS_NUM, NULL, p_SITE_CONTACT_ID),
+           decode( p_EMAIL_ADDRESS, FND_API.G_MISS_CHAR, NULL, p_EMAIL_ADDRESS),
+           decode( p_SEX_CODE, FND_API.G_MISS_CHAR, NULL, p_SEX_CODE),
+           decode( p_SALUTATION, FND_API.G_MISS_CHAR, NULL, p_SALUTATION),
+           decode( p_LAST_NAME, FND_API.G_MISS_CHAR, NULL, p_LAST_NAME),
+           decode( p_TITLE, FND_API.G_MISS_CHAR, NULL, p_TITLE),
+           decode( p_FIRST_NAME, FND_API.G_MISS_CHAR, NULL, p_FIRST_NAME),
+           decode( p_JOB_TITLE, FND_API.G_MISS_CHAR, NULL, p_JOB_TITLE),
+           decode( p_PHONE_ID, FND_API.G_MISS_NUM, NULL, p_PHONE_ID),
+           decode( p_PHONE_NUMBER, FND_API.G_MISS_CHAR, NULL, p_PHONE_NUMBER),
+           decode( p_PHONE_STATUS, FND_API.G_MISS_CHAR, NULL, p_PHONE_STATUS),
+           decode( p_PHONE_TYPE, FND_API.G_MISS_CHAR, NULL, p_PHONE_TYPE),
+           decode( p_AREA_CODE, FND_API.G_MISS_CHAR, NULL, p_AREA_CODE),
+           decode( p_EXTENSION, FND_API.G_MISS_CHAR, NULL, p_EXTENSION),
+           decode( p_LEAD_NUMBER, FND_API.G_MISS_CHAR, NULL, p_LEAD_NUMBER),
+           decode( p_STATUS_CODE, FND_API.G_MISS_CHAR, NULL, p_STATUS_CODE),
+           decode( p_SOURCE_PROMOTION_ID, FND_API.G_MISS_NUM, NULL, p_SOURCE_PROMOTION_ID),
+           decode( p_INITIATING_CONTACT_ID, FND_API.G_MISS_NUM, NULL, p_INITIATING_CONTACT_ID),
+           decode( p_CONTACT_ROLE_CODE, FND_API.G_MISS_CHAR, NULL, p_CONTACT_ROLE_CODE),
+           decode( p_CHANNEL_CODE, FND_API.G_MISS_CHAR, NULL, p_CHANNEL_CODE),
+           decode( p_BUDGET_AMOUNT, FND_API.G_MISS_NUM, NULL, p_BUDGET_AMOUNT),
+           decode( p_BUDGET_STATUS_CODE, FND_API.G_MISS_CHAR, NULL, p_BUDGET_STATUS_CODE),
+           decode( p_CURRENCY_CODE, FND_API.G_MISS_CHAR, NULL, p_CURRENCY_CODE),
+           decode( p_DECISION_TIMEFRAME_CODE, FND_API.G_MISS_CHAR, NULL, p_DECISION_TIMEFRAME_CODE),
+           decode( p_CLOSE_REASON, FND_API.G_MISS_CHAR, NULL, p_CLOSE_REASON),
+           decode( p_LEAD_RANK_CODE, FND_API.G_MISS_CHAR, NULL, p_LEAD_RANK_CODE),
+           decode( p_PARENT_PROJECT, FND_API.G_MISS_CHAR, NULL, p_PARENT_PROJECT),
+           decode( p_DESCRIPTION, FND_API.G_MISS_CHAR, NULL, p_DESCRIPTION),
+           decode( p_STATUS_CODE_1, FND_API.G_MISS_CHAR, NULL, p_STATUS_CODE_1),
+           decode( p_INTEREST_TYPE_ID_1, FND_API.G_MISS_NUM, NULL, p_INTEREST_TYPE_ID_1),
+           decode( p_PRIMARY_INTEREST_CODE_ID_1, FND_API.G_MISS_NUM, NULL, p_PRIMARY_INTEREST_CODE_ID_1),
+           decode( p_SECONDARY_INTEREST_CODE_ID_1, FND_API.G_MISS_NUM, NULL, p_SECONDARY_INTEREST_CODE_ID_1),
+           decode( p_INVENTORY_ITEM_ID_1, FND_API.G_MISS_NUM, NULL, p_INVENTORY_ITEM_ID_1),
+           decode( p_ORGANIZATION_ID_1, FND_API.G_MISS_NUM, NULL, p_ORGANIZATION_ID_1),
+           decode( p_UOM_CODE_1, FND_API.G_MISS_CHAR, NULL, p_UOM_CODE_1),
+           decode( p_QUANTITY_1, FND_API.G_MISS_NUM, NULL, p_QUANTITY_1),
+           decode( p_BUDGET_AMOUNT_1, FND_API.G_MISS_NUM, NULL, p_BUDGET_AMOUNT_1),
+           decode( p_STATUS_CODE_2, FND_API.G_MISS_CHAR, NULL, p_STATUS_CODE_2),
+           decode( p_INTEREST_TYPE_ID_2, FND_API.G_MISS_NUM, NULL, p_INTEREST_TYPE_ID_2),
+           decode( p_PRIMARY_INTEREST_CODE_ID_2, FND_API.G_MISS_NUM, NULL, p_PRIMARY_INTEREST_CODE_ID_2),
+           decode( p_SECONDARY_INTEREST_CODE_ID_2, FND_API.G_MISS_NUM, NULL, p_SECONDARY_INTEREST_CODE_ID_2),
+           decode( p_INVENTORY_ITEM_ID_2, FND_API.G_MISS_NUM, NULL, p_INVENTORY_ITEM_ID_2),
+           decode( p_ORGANIZATION_ID_2, FND_API.G_MISS_NUM, NULL, p_ORGANIZATION_ID_2),
+           decode( p_UOM_CODE_2, FND_API.G_MISS_CHAR, NULL, p_UOM_CODE_2),
+           decode( p_QUANTITY_2, FND_API.G_MISS_NUM, NULL, p_QUANTITY_2),
+           decode( p_BUDGET_AMOUNT_2, FND_API.G_MISS_NUM, NULL, p_BUDGET_AMOUNT_2),
+           decode( p_STATUS_CODE_3, FND_API.G_MISS_CHAR, NULL, p_STATUS_CODE_3),
+           decode( p_INTEREST_TYPE_ID_3, FND_API.G_MISS_NUM, NULL, p_INTEREST_TYPE_ID_3),
+           decode( p_PRIMARY_INTEREST_CODE_ID_3, FND_API.G_MISS_NUM, NULL, p_PRIMARY_INTEREST_CODE_ID_3),
+           decode( p_SECONDARY_INTEREST_CODE_ID_3, FND_API.G_MISS_NUM, NULL, p_SECONDARY_INTEREST_CODE_ID_3),
+           decode( p_INVENTORY_ITEM_ID_3, FND_API.G_MISS_NUM, NULL, p_INVENTORY_ITEM_ID_3),
+           decode( p_ORGANIZATION_ID_3, FND_API.G_MISS_NUM, NULL, p_ORGANIZATION_ID_3),
+           decode( p_UOM_CODE_3, FND_API.G_MISS_CHAR, NULL, p_UOM_CODE_3),
+           decode( p_QUANTITY_3, FND_API.G_MISS_NUM, NULL, p_QUANTITY_3),
+           decode( p_BUDGET_AMOUNT_3, FND_API.G_MISS_NUM, NULL, p_BUDGET_AMOUNT_3),
+           decode( p_STATUS_CODE_4, FND_API.G_MISS_CHAR, NULL, p_STATUS_CODE_4),
+           decode( p_INTEREST_TYPE_ID_4, FND_API.G_MISS_NUM, NULL, p_INTEREST_TYPE_ID_4),
+           decode( p_PRIMARY_INTEREST_CODE_ID_4, FND_API.G_MISS_NUM, NULL, p_PRIMARY_INTEREST_CODE_ID_4),
+           decode( p_SECONDARY_INTEREST_CODE_ID_4, FND_API.G_MISS_NUM, NULL, p_SECONDARY_INTEREST_CODE_ID_4),
+           decode( p_INVENTORY_ITEM_ID_4, FND_API.G_MISS_NUM, NULL, p_INVENTORY_ITEM_ID_4),
+           decode( p_ORGANIZATION_ID_4, FND_API.G_MISS_NUM, NULL, p_ORGANIZATION_ID_4),
+           decode( p_UOM_CODE_4, FND_API.G_MISS_CHAR, NULL, p_UOM_CODE_4),
+           decode( p_QUANTITY_4, FND_API.G_MISS_NUM, NULL, p_QUANTITY_4),
+           decode( p_BUDGET_AMOUNT_4, FND_API.G_MISS_NUM, NULL, p_BUDGET_AMOUNT_4),
+           decode( p_STATUS_CODE_5, FND_API.G_MISS_CHAR, NULL, p_STATUS_CODE_5),
+           decode( p_INTEREST_TYPE_ID_5, FND_API.G_MISS_NUM, NULL, p_INTEREST_TYPE_ID_5),
+           decode( p_PRIMARY_INTEREST_CODE_ID_5, FND_API.G_MISS_NUM, NULL, p_PRIMARY_INTEREST_CODE_ID_5),
+           decode( p_SECONDARY_INTEREST_CODE_ID_5, FND_API.G_MISS_NUM, NULL, p_SECONDARY_INTEREST_CODE_ID_5),
+           decode( p_INVENTORY_ITEM_ID_5, FND_API.G_MISS_NUM, NULL, p_INVENTORY_ITEM_ID_5),
+           decode( p_ORGANIZATION_ID_5, FND_API.G_MISS_NUM, NULL, p_ORGANIZATION_ID_5),
+           decode( p_UOM_CODE_5, FND_API.G_MISS_CHAR, NULL, p_UOM_CODE_5),
+           decode( p_QUANTITY_5, FND_API.G_MISS_NUM, NULL, p_QUANTITY_5),
+           decode( p_BUDGET_AMOUNT_5, FND_API.G_MISS_NUM, NULL, p_BUDGET_AMOUNT_5),
+           decode( p_INTERACTION_NOTES_1, FND_API.G_MISS_CHAR, NULL, p_INTERACTION_NOTES_1),
+           decode( p_PRIORITY_1, FND_API.G_MISS_NUM, NULL, p_PRIORITY_1),
+           decode( p_TODO_DATE_1, FND_API.G_MISS_DATE, TO_DATE(NULL), p_TODO_DATE_1),
+           decode( p_TODO_START_TIME_1, FND_API.G_MISS_CHAR, NULL, p_TODO_START_TIME_1),
+           decode( p_ACTIVITY_CODE_1, FND_API.G_MISS_CHAR, NULL, p_ACTIVITY_CODE_1),
+           decode( p_INTERACTION_NOTES_2, FND_API.G_MISS_CHAR, NULL, p_INTERACTION_NOTES_2),
+           decode( p_PRIORITY_2, FND_API.G_MISS_NUM, NULL, p_PRIORITY_2),
+           decode( p_TODO_DATE_2, FND_API.G_MISS_DATE, TO_DATE(NULL), p_TODO_DATE_2),
+           decode( p_TODO_START_TIME_2, FND_API.G_MISS_CHAR, NULL, p_TODO_START_TIME_2),
+           decode( p_ACTIVITY_CODE_2, FND_API.G_MISS_CHAR, NULL, p_ACTIVITY_CODE_2),
+           decode( p_INTERACTION_NOTES_3, FND_API.G_MISS_CHAR, NULL, p_INTERACTION_NOTES_3),
+           decode( p_PRIORITY_3, FND_API.G_MISS_NUM, NULL, p_PRIORITY_3),
+           decode( p_TODO_DATE_3, FND_API.G_MISS_DATE, TO_DATE(NULL), p_TODO_DATE_3),
+           decode( p_TODO_START_TIME_3, FND_API.G_MISS_CHAR, NULL, p_TODO_START_TIME_3),
+           decode( p_ACTIVITY_CODE_3, FND_API.G_MISS_CHAR, NULL, p_ACTIVITY_CODE_3),
+           decode( p_INTERACTION_NOTES_4, FND_API.G_MISS_CHAR, NULL, p_INTERACTION_NOTES_4),
+           decode( p_PRIORITY_4, FND_API.G_MISS_NUM, NULL, p_PRIORITY_4),
+           decode( p_TODO_DATE_4, FND_API.G_MISS_DATE, TO_DATE(NULL), p_TODO_DATE_4),
+           decode( p_TODO_START_TIME_4, FND_API.G_MISS_CHAR, NULL, p_TODO_START_TIME_4),
+           decode( p_ACTIVITY_CODE_4, FND_API.G_MISS_CHAR, NULL, p_ACTIVITY_CODE_4),
+           decode( p_INTERACTION_NOTES_5, FND_API.G_MISS_CHAR, NULL, p_INTERACTION_NOTES_5),
+           decode( p_PRIORITY_5, FND_API.G_MISS_NUM, NULL, p_PRIORITY_5),
+           decode( p_TODO_DATE_5, FND_API.G_MISS_DATE, TO_DATE(NULL), p_TODO_DATE_5),
+           decode( p_TODO_START_TIME_5, FND_API.G_MISS_CHAR, NULL, p_TODO_START_TIME_5),
+           decode( p_ACTIVITY_CODE_5, FND_API.G_MISS_CHAR, NULL, p_ACTIVITY_CODE_5),
+           decode( p_INTERACTION_NOTES_6, FND_API.G_MISS_CHAR, NULL, p_INTERACTION_NOTES_6),
+           decode( p_PRIORITY_6, FND_API.G_MISS_NUM, NULL, p_PRIORITY_6),
+           decode( p_TODO_DATE_6, FND_API.G_MISS_DATE, TO_DATE(NULL), p_TODO_DATE_6),
+           decode( p_TODO_START_TIME_6, FND_API.G_MISS_CHAR, NULL, p_TODO_START_TIME_6),
+           decode( p_ACTIVITY_CODE_6, FND_API.G_MISS_CHAR, NULL, p_ACTIVITY_CODE_6),
+           decode( p_INTERACTION_NOTES_7, FND_API.G_MISS_CHAR, NULL, p_INTERACTION_NOTES_7),
+           decode( p_PRIORITY_7, FND_API.G_MISS_NUM, NULL, p_PRIORITY_7),
+           decode( p_TODO_DATE_7, FND_API.G_MISS_DATE, TO_DATE(NULL), p_TODO_DATE_7),
+           decode( p_TODO_START_TIME_7, FND_API.G_MISS_CHAR, NULL, p_TODO_START_TIME_7),
+           decode( p_ACTIVITY_CODE_7, FND_API.G_MISS_CHAR, NULL, p_ACTIVITY_CODE_7),
+           decode( p_INTERACTION_NOTES_8, FND_API.G_MISS_CHAR, NULL, p_INTERACTION_NOTES_8),
+           decode( p_PRIORITY_8, FND_API.G_MISS_NUM, NULL, p_PRIORITY_8),
+           decode( p_TODO_DATE_8, FND_API.G_MISS_DATE, TO_DATE(NULL), p_TODO_DATE_8),
+           decode( p_TODO_START_TIME_8, FND_API.G_MISS_CHAR, NULL, p_TODO_START_TIME_8),
+           decode( p_ACTIVITY_CODE_8, FND_API.G_MISS_CHAR, NULL, p_ACTIVITY_CODE_8),
+           decode( p_INTERACTION_NOTES_9, FND_API.G_MISS_CHAR, NULL, p_INTERACTION_NOTES_9),
+           decode( p_PRIORITY_9, FND_API.G_MISS_NUM, NULL, p_PRIORITY_9),
+           decode( p_TODO_DATE_9, FND_API.G_MISS_DATE, TO_DATE(NULL), p_TODO_DATE_9),
+           decode( p_TODO_START_TIME_9, FND_API.G_MISS_CHAR, NULL, p_TODO_START_TIME_9),
+           decode( p_ACTIVITY_CODE_9, FND_API.G_MISS_CHAR, NULL, p_ACTIVITY_CODE_9),
+           decode( p_INTERACTION_NOTES_10, FND_API.G_MISS_CHAR, NULL, p_INTERACTION_NOTES_10),
+           decode( p_PRIORITY_10, FND_API.G_MISS_NUM, NULL, p_PRIORITY_10),
+           decode( p_TODO_DATE_10, FND_API.G_MISS_DATE, TO_DATE(NULL), p_TODO_DATE_10),
+           decode( p_TODO_START_TIME_10, FND_API.G_MISS_CHAR, NULL, p_TODO_START_TIME_10),
+           decode( p_ACTIVITY_CODE_10, FND_API.G_MISS_CHAR, NULL, p_ACTIVITY_CODE_10),
+           decode( p_LEAD_NOTE, FND_API.G_MISS_CHAR, NULL, p_LEAD_NOTE),
+           decode( p_MIDDLE_INITIAL, FND_API.G_MISS_CHAR, NULL, p_MIDDLE_INITIAL),
+           decode( p_FAX_NUMBER, FND_API.G_MISS_CHAR, NULL, p_FAX_NUMBER),
+           decode( p_FAX_AREA_CODE, FND_API.G_MISS_CHAR, NULL, p_FAX_AREA_CODE),
+           decode( p_MAIL_STOP, FND_API.G_MISS_CHAR, NULL, p_MAIL_STOP),
+           decode( p_NUM_ENROLLED, FND_API.G_MISS_NUM, NULL, p_NUM_ENROLLED),
+           decode( p_CONFIRMED_FLAG, FND_API.G_MISS_CHAR, NULL, p_CONFIRMED_FLAG),
+           decode( p_PAYMENT_AMOUNT, FND_API.G_MISS_NUM, NULL, p_PAYMENT_AMOUNT),
+           decode( p_NUM_ATTENDED, FND_API.G_MISS_NUM, NULL, p_NUM_ATTENDED),
+           decode( p_PROMOTION_NAME, FND_API.G_MISS_CHAR, NULL, p_PROMOTION_NAME),
+           decode( p_STATUS_CHANGE_FLAG, FND_API.G_MISS_CHAR, NULL, p_STATUS_CHANGE_FLAG),
+           decode( p_VEHICLE_RESPONSE_CODE, FND_API.G_MISS_CHAR, NULL, p_VEHICLE_RESPONSE_CODE),
+           decode( p_SOURCE_SYSTEM, FND_API.G_MISS_CHAR, NULL, p_SOURCE_SYSTEM),
+           decode( p_CONTACT_PARTY_ID, FND_API.G_MISS_NUM, NULL, p_CONTACT_PARTY_ID),
+           decode( p_PRM_SALES_LEAD_TYPE, FND_API.G_MISS_CHAR, NULL, p_PRM_SALES_LEAD_TYPE),
+           decode( p_PRM_EXEC_SPONSOR_FLAG, FND_API.G_MISS_CHAR, NULL, p_PRM_EXEC_SPONSOR_FLAG),
+           decode( p_PRM_PRJ_LEAD_IN_PLACE_FLAG, FND_API.G_MISS_CHAR, NULL, p_PRM_PRJ_LEAD_IN_PLACE_FLAG),
+           decode( p_INC_PARTNER_PARTY_ID, FND_API.G_MISS_NUM, NULL, p_INC_PARTNER_PARTY_ID),
+           decode( p_INC_PARTNER_RESOURCE_ID, FND_API.G_MISS_NUM, NULL, p_INC_PARTNER_RESOURCE_ID),
+           decode( p_OFFER_ID, FND_API.G_MISS_NUM, NULL, p_OFFER_ID),
+           decode( p_PRM_IND_CLASSIFICATION_CODE, FND_API.G_MISS_CHAR, NULL, p_PRM_IND_CLASSIFICATION_CODE),
+           decode( p_PARTY_TYPE, FND_API.G_MISS_CHAR, NULL, p_PARTY_TYPE),
+           decode( p_BATCH_ID, FND_API.G_MISS_NUM, NULL, p_BATCH_ID),
+           decode( p_PARTY_ID, FND_API.G_MISS_NUM, NULL, p_PARTY_ID),
+           decode( p_PARTY_SITE_ID, FND_API.G_MISS_NUM, NULL, p_PARTY_SITE_ID),
+           decode( p_LOCATION_ID, FND_API.G_MISS_NUM, NULL, p_LOCATION_ID),
+           decode( p_REL_PARTY_ID, FND_API.G_MISS_NUM, NULL, p_REL_PARTY_ID),
+           decode( p_SALES_LEAD_ID, FND_API.G_MISS_NUM, NULL, p_SALES_LEAD_ID),
+           decode( p_ADDRESS_KEY, FND_API.G_MISS_CHAR, NULL, p_ADDRESS_KEY),
+           decode( p_CONTACT_KEY, FND_API.G_MISS_CHAR, NULL, p_CONTACT_KEY),
+           decode( p_JOB_TITLE_CODE, FND_API.G_MISS_CHAR, NULL, p_JOB_TITLE_CODE),
+           decode( p_DO_NOT_PHONE_FLAG, FND_API.G_MISS_CHAR, NULL, p_DO_NOT_PHONE_FLAG),
+           decode( p_DO_NOT_FAX_FLAG, FND_API.G_MISS_CHAR, NULL, p_DO_NOT_FAX_FLAG),
+           decode( p_DO_NOT_EMAIL_FLAG, FND_API.G_MISS_CHAR, NULL, p_DO_NOT_EMAIL_FLAG),
+           decode( p_ORIG_SYSTEM_REFERENCE, FND_API.G_MISS_CHAR, NULL, p_ORIG_SYSTEM_REFERENCE),
+           decode( p_LEAD_RANK_ID, FND_API.G_MISS_NUM, NULL, p_LEAD_RANK_ID),
+           decode( p_NEW_PARTY_FLAG, FND_API.G_MISS_NUM, NULL, p_NEW_PARTY_FLAG),
+           decode( p_NEW_LOC_FLAG, FND_API.G_MISS_NUM, NULL, p_NEW_LOC_FLAG),
+           decode( p_NEW_PS_FLAG, FND_API.G_MISS_NUM, NULL, p_NEW_PS_FLAG),
+           decode( p_NEW_REL_FLAG, FND_API.G_MISS_NUM, NULL, p_NEW_REL_FLAG),
+           decode( p_NEW_CON_FLAG, FND_API.G_MISS_NUM, NULL, p_NEW_CON_FLAG),
+           decode( p_ORIG_SYSTEM_CODE, FND_API.G_MISS_CHAR, NULL, p_ORIG_SYSTEM_CODE),
+           decode( p_URGENT_FLAG, FND_API.G_MISS_CHAR, NULL, p_URGENT_FLAG));
+End Insert_Row;
+
+PROCEDURE Update_Row(
+          p_IMPORT_INTERFACE_ID    NUMBER,
+          p_LAST_UPDATE_DATE    DATE,
+          p_LAST_UPDATED_BY    NUMBER,
+          p_CREATION_DATE    DATE,
+          p_CREATED_BY    NUMBER,
+          p_LAST_UPDATE_LOGIN    NUMBER,
+          p_REQUEST_ID    NUMBER,
+          p_PROGRAM_APPLICATION_ID    NUMBER,
+          p_PROGRAM_ID    NUMBER,
+          p_PROGRAM_UPDATE_DATE    DATE,
+          p_IMP_LIST_HEADER_NUMBER    VARCHAR2,
+          p_LOAD_TYPE    VARCHAR2,
+          p_LOAD_DATE    DATE,
+          p_LOAD_STATUS    VARCHAR2,
+          p_LOAD_ERROR_MESSAGE    VARCHAR2,
+          p_PROMOTION_ID    NUMBER,
+          p_PROMOTION_CODE    VARCHAR2,
+          p_CUSTOMER_ID    NUMBER,
+          p_CUSTOMER_NAME    VARCHAR2,
+          p_CUSTOMER_NUMBER    VARCHAR2,
+          p_CUSTOMER_STATUS    VARCHAR2,
+          p_CUSTOMER_TYPE    VARCHAR2,
+          p_CUSTOMER_PROSPECT_CODE    VARCHAR2,
+          p_CUSTOMER_CLASS_CODE    VARCHAR2,
+          p_SALES_CHANNEL_CODE    VARCHAR2,
+          p_SIC_CODE    VARCHAR2,
+          p_ANALYSIS_FY    VARCHAR2,
+          p_CUSTOMER_CATEGORY_CODE    VARCHAR2,
+          p_CUSTOMER_GROUP_CODE    VARCHAR2,
+          p_CUSTOMER_KEY    VARCHAR2,
+          p_CUSTOMER_SUBGROUP_CODE    VARCHAR2,
+          p_FISCAL_YEAREND_MONTH    VARCHAR2,
+          p_NET_WORTH    NUMBER,
+          p_NUM_OF_EMPLOYEES    NUMBER,
+          p_POTENTIAL_REVENUE_CURR_FY    NUMBER,
+          p_POTENTIAL_REVENUE_NEXT_FY    NUMBER,
+          p_CUSTOMER_RANK    VARCHAR2,
+          p_REFERENCE_USE_FLAG    VARCHAR2,
+          p_TAX_CODE    VARCHAR2,
+          p_TAX_REFERENCE    VARCHAR2,
+          p_THIRD_PARTY_FLAG    VARCHAR2,
+          p_COMPETITOR_FLAG    VARCHAR2,
+          p_YEAR_ESTABLISHED    NUMBER,
+          p_ADDR_DO_NOT_MAIL_FLAG    VARCHAR2,
+          p_URL    VARCHAR2,
+          p_ADDRESS_ID    NUMBER,
+          p_CONT_DO_NOT_MAIL_FLAG    VARCHAR2,
+          p_ADDRESS_STATUS    VARCHAR2,
+          p_COUNTRY    VARCHAR2,
+          p_ADDRESS1    VARCHAR2,
+          p_ADDRESS2    VARCHAR2,
+          p_ADDRESS3    VARCHAR2,
+          p_ADDRESS4    VARCHAR2,
+          p_CITY    VARCHAR2,
+          p_POSTAL_CODE    VARCHAR2,
+          p_STATE    VARCHAR2,
+          p_PROVINCE    VARCHAR2,
+          p_COUNTY    VARCHAR2,
+          p_SITE_CONTACT_ID    NUMBER,
+          p_EMAIL_ADDRESS    VARCHAR2,
+          p_SEX_CODE    VARCHAR2,
+          p_SALUTATION    VARCHAR2,
+          p_LAST_NAME    VARCHAR2,
+          p_TITLE    VARCHAR2,
+          p_FIRST_NAME    VARCHAR2,
+          p_JOB_TITLE    VARCHAR2,
+          p_PHONE_ID    NUMBER,
+          p_PHONE_NUMBER    VARCHAR2,
+          p_PHONE_STATUS    VARCHAR2,
+          p_PHONE_TYPE    VARCHAR2,
+          p_AREA_CODE    VARCHAR2,
+          p_EXTENSION    VARCHAR2,
+          p_LEAD_NUMBER    VARCHAR2,
+          p_STATUS_CODE    VARCHAR2,
+          p_SOURCE_PROMOTION_ID    NUMBER,
+          p_INITIATING_CONTACT_ID    NUMBER,
+          p_CONTACT_ROLE_CODE    VARCHAR2,
+          p_CHANNEL_CODE    VARCHAR2,
+          p_BUDGET_AMOUNT    NUMBER,
+          p_BUDGET_STATUS_CODE    VARCHAR2,
+          p_CURRENCY_CODE    VARCHAR2,
+          p_DECISION_TIMEFRAME_CODE    VARCHAR2,
+          p_CLOSE_REASON    VARCHAR2,
+          p_LEAD_RANK_CODE    VARCHAR2,
+          p_PARENT_PROJECT    VARCHAR2,
+          p_DESCRIPTION    VARCHAR2,
+          p_STATUS_CODE_1    VARCHAR2,
+          p_INTEREST_TYPE_ID_1    NUMBER,
+          p_PRIMARY_INTEREST_CODE_ID_1    NUMBER,
+          p_SECONDARY_INTEREST_CODE_ID_1    NUMBER,
+          p_INVENTORY_ITEM_ID_1    NUMBER,
+          p_ORGANIZATION_ID_1    NUMBER,
+          p_UOM_CODE_1    VARCHAR2,
+          p_QUANTITY_1    NUMBER,
+          p_BUDGET_AMOUNT_1    NUMBER,
+          p_STATUS_CODE_2    VARCHAR2,
+          p_INTEREST_TYPE_ID_2    NUMBER,
+          p_PRIMARY_INTEREST_CODE_ID_2    NUMBER,
+          p_SECONDARY_INTEREST_CODE_ID_2    NUMBER,
+          p_INVENTORY_ITEM_ID_2    NUMBER,
+          p_ORGANIZATION_ID_2    NUMBER,
+          p_UOM_CODE_2    VARCHAR2,
+          p_QUANTITY_2    NUMBER,
+          p_BUDGET_AMOUNT_2    NUMBER,
+          p_STATUS_CODE_3    VARCHAR2,
+          p_INTEREST_TYPE_ID_3    NUMBER,
+          p_PRIMARY_INTEREST_CODE_ID_3    NUMBER,
+          p_SECONDARY_INTEREST_CODE_ID_3    NUMBER,
+          p_INVENTORY_ITEM_ID_3    NUMBER,
+          p_ORGANIZATION_ID_3    NUMBER,
+          p_UOM_CODE_3    VARCHAR2,
+          p_QUANTITY_3    NUMBER,
+          p_BUDGET_AMOUNT_3    NUMBER,
+          p_STATUS_CODE_4    VARCHAR2,
+          p_INTEREST_TYPE_ID_4    NUMBER,
+          p_PRIMARY_INTEREST_CODE_ID_4    NUMBER,
+          p_SECONDARY_INTEREST_CODE_ID_4    NUMBER,
+          p_INVENTORY_ITEM_ID_4    NUMBER,
+          p_ORGANIZATION_ID_4    NUMBER,
+          p_UOM_CODE_4    VARCHAR2,
+          p_QUANTITY_4    NUMBER,
+          p_BUDGET_AMOUNT_4    NUMBER,
+          p_STATUS_CODE_5    VARCHAR2,
+          p_INTEREST_TYPE_ID_5    NUMBER,
+          p_PRIMARY_INTEREST_CODE_ID_5    NUMBER,
+          p_SECONDARY_INTEREST_CODE_ID_5    NUMBER,
+          p_INVENTORY_ITEM_ID_5    NUMBER,
+          p_ORGANIZATION_ID_5    NUMBER,
+          p_UOM_CODE_5    VARCHAR2,
+          p_QUANTITY_5    NUMBER,
+          p_BUDGET_AMOUNT_5    NUMBER,
+          p_INTERACTION_NOTES_1    VARCHAR2,
+          p_PRIORITY_1    NUMBER,
+          p_TODO_DATE_1    DATE,
+          p_TODO_START_TIME_1    VARCHAR2,
+          p_ACTIVITY_CODE_1    VARCHAR2,
+          p_INTERACTION_NOTES_2    VARCHAR2,
+          p_PRIORITY_2    NUMBER,
+          p_TODO_DATE_2    DATE,
+          p_TODO_START_TIME_2    VARCHAR2,
+          p_ACTIVITY_CODE_2    VARCHAR2,
+          p_INTERACTION_NOTES_3    VARCHAR2,
+          p_PRIORITY_3    NUMBER,
+          p_TODO_DATE_3    DATE,
+          p_TODO_START_TIME_3    VARCHAR2,
+          p_ACTIVITY_CODE_3    VARCHAR2,
+          p_INTERACTION_NOTES_4    VARCHAR2,
+          p_PRIORITY_4    NUMBER,
+          p_TODO_DATE_4    DATE,
+          p_TODO_START_TIME_4    VARCHAR2,
+          p_ACTIVITY_CODE_4    VARCHAR2,
+          p_INTERACTION_NOTES_5    VARCHAR2,
+          p_PRIORITY_5    NUMBER,
+          p_TODO_DATE_5    DATE,
+          p_TODO_START_TIME_5    VARCHAR2,
+          p_ACTIVITY_CODE_5    VARCHAR2,
+          p_INTERACTION_NOTES_6    VARCHAR2,
+          p_PRIORITY_6    NUMBER,
+          p_TODO_DATE_6    DATE,
+          p_TODO_START_TIME_6    VARCHAR2,
+          p_ACTIVITY_CODE_6    VARCHAR2,
+          p_INTERACTION_NOTES_7    VARCHAR2,
+          p_PRIORITY_7    NUMBER,
+          p_TODO_DATE_7    DATE,
+          p_TODO_START_TIME_7    VARCHAR2,
+          p_ACTIVITY_CODE_7    VARCHAR2,
+          p_INTERACTION_NOTES_8    VARCHAR2,
+          p_PRIORITY_8    NUMBER,
+          p_TODO_DATE_8    DATE,
+          p_TODO_START_TIME_8    VARCHAR2,
+          p_ACTIVITY_CODE_8    VARCHAR2,
+          p_INTERACTION_NOTES_9    VARCHAR2,
+          p_PRIORITY_9    NUMBER,
+          p_TODO_DATE_9    DATE,
+          p_TODO_START_TIME_9    VARCHAR2,
+          p_ACTIVITY_CODE_9    VARCHAR2,
+          p_INTERACTION_NOTES_10    VARCHAR2,
+          p_PRIORITY_10    NUMBER,
+          p_TODO_DATE_10    DATE,
+          p_TODO_START_TIME_10    VARCHAR2,
+          p_ACTIVITY_CODE_10    VARCHAR2,
+          p_LEAD_NOTE    VARCHAR2,
+          p_MIDDLE_INITIAL    VARCHAR2,
+          p_FAX_NUMBER    VARCHAR2,
+          p_FAX_AREA_CODE    VARCHAR2,
+          p_MAIL_STOP    VARCHAR2,
+          p_NUM_ENROLLED    NUMBER,
+          p_CONFIRMED_FLAG    VARCHAR2,
+          p_PAYMENT_AMOUNT    NUMBER,
+          p_NUM_ATTENDED    NUMBER,
+          p_PROMOTION_NAME    VARCHAR2,
+          p_STATUS_CHANGE_FLAG    VARCHAR2,
+          p_VEHICLE_RESPONSE_CODE    VARCHAR2,
+          p_SOURCE_SYSTEM    VARCHAR2,
+          p_CONTACT_PARTY_ID    NUMBER,
+          p_PRM_SALES_LEAD_TYPE    VARCHAR2,
+          p_PRM_EXEC_SPONSOR_FLAG    VARCHAR2,
+          p_PRM_PRJ_LEAD_IN_PLACE_FLAG    VARCHAR2,
+          p_INC_PARTNER_PARTY_ID    NUMBER,
+          p_INC_PARTNER_RESOURCE_ID    NUMBER,
+          p_OFFER_ID    NUMBER,
+          p_PRM_IND_CLASSIFICATION_CODE    VARCHAR2,
+          p_PARTY_TYPE    VARCHAR2,
+          p_BATCH_ID    NUMBER,
+          p_PARTY_ID    NUMBER,
+          p_PARTY_SITE_ID    NUMBER,
+          p_LOCATION_ID    NUMBER,
+          p_REL_PARTY_ID    NUMBER,
+          p_SALES_LEAD_ID    NUMBER,
+          p_ADDRESS_KEY    VARCHAR2,
+          p_CONTACT_KEY    VARCHAR2,
+          p_JOB_TITLE_CODE    VARCHAR2,
+          p_DO_NOT_PHONE_FLAG    VARCHAR2,
+          p_DO_NOT_FAX_FLAG    VARCHAR2,
+          p_DO_NOT_EMAIL_FLAG    VARCHAR2,
+          p_ORIG_SYSTEM_REFERENCE    VARCHAR2,
+          p_LEAD_RANK_ID    NUMBER,
+          p_NEW_PARTY_FLAG    NUMBER,
+          p_NEW_LOC_FLAG    NUMBER,
+          p_NEW_PS_FLAG    NUMBER,
+          p_NEW_REL_FLAG    NUMBER,
+          p_NEW_CON_FLAG    NUMBER,
+          p_ORIG_SYSTEM_CODE    VARCHAR2,
+          p_URGENT_FLAG    VARCHAR2,
+          p_SIC_CODE_TYPE    VARCHAR2,
+          p_SITE_USE_TYPE    VARCHAR2,
+          p_PRIMARY_CONTACT_FLAG    VARCHAR2,
+          p_RANK    VARCHAR2,
+          p_ADDRESS_STYLE    VARCHAR2,
+          p_PRIMARY_PER_TYPE    VARCHAR2,
+          p_DEPARTMENT_CODE    VARCHAR2)
+
+
+ IS
+ BEGIN
+ Update_Row(
+          p_IMPORT_INTERFACE_ID  ,
+          p_LAST_UPDATE_DATE    ,
+          p_LAST_UPDATED_BY    ,
+          p_CREATION_DATE    ,
+          p_CREATED_BY    ,
+          p_LAST_UPDATE_LOGIN    ,
+          p_REQUEST_ID    ,
+          p_PROGRAM_APPLICATION_ID    ,
+          p_PROGRAM_ID    ,
+          p_PROGRAM_UPDATE_DATE    ,
+          p_IMP_LIST_HEADER_NUMBER    ,
+          p_LOAD_TYPE    ,
+          p_LOAD_DATE    ,
+          p_LOAD_STATUS    ,
+          p_LOAD_ERROR_MESSAGE    ,
+          p_PROMOTION_ID    ,
+          p_PROMOTION_CODE    ,
+          p_CUSTOMER_ID    ,
+          p_CUSTOMER_NAME    ,
+          p_CUSTOMER_NUMBER    ,
+          p_CUSTOMER_STATUS    ,
+          p_CUSTOMER_TYPE    ,
+          p_CUSTOMER_PROSPECT_CODE    ,
+          p_CUSTOMER_CLASS_CODE    ,
+          p_SALES_CHANNEL_CODE    ,
+          p_SIC_CODE    ,
+          p_ANALYSIS_FY    ,
+          p_CUSTOMER_CATEGORY_CODE    ,
+          p_CUSTOMER_GROUP_CODE    ,
+          p_CUSTOMER_KEY    ,
+          p_CUSTOMER_SUBGROUP_CODE    ,
+          p_FISCAL_YEAREND_MONTH    ,
+          p_NET_WORTH    ,
+          p_NUM_OF_EMPLOYEES    ,
+          p_POTENTIAL_REVENUE_CURR_FY    ,
+          p_POTENTIAL_REVENUE_NEXT_FY    ,
+          p_CUSTOMER_RANK    ,
+          p_REFERENCE_USE_FLAG    ,
+          p_TAX_CODE    ,
+          p_TAX_REFERENCE    ,
+          p_THIRD_PARTY_FLAG    ,
+          p_COMPETITOR_FLAG    ,
+          p_YEAR_ESTABLISHED    ,
+          p_ADDR_DO_NOT_MAIL_FLAG    ,
+          p_URL    ,
+          p_ADDRESS_ID    ,
+          p_CONT_DO_NOT_MAIL_FLAG    ,
+          p_ADDRESS_STATUS    ,
+          p_COUNTRY    ,
+          p_ADDRESS1    ,
+          p_ADDRESS2    ,
+          p_ADDRESS3    ,
+          p_ADDRESS4    ,
+          p_CITY    ,
+          p_POSTAL_CODE    ,
+          p_STATE    ,
+          p_PROVINCE    ,
+          p_COUNTY    ,
+          p_SITE_CONTACT_ID    ,
+          p_EMAIL_ADDRESS    ,
+          p_SEX_CODE    ,
+          p_SALUTATION    ,
+          p_LAST_NAME    ,
+          p_TITLE    ,
+          p_FIRST_NAME    ,
+          p_JOB_TITLE    ,
+          p_PHONE_ID    ,
+          p_PHONE_NUMBER    ,
+          p_PHONE_STATUS    ,
+          p_PHONE_TYPE    ,
+          p_AREA_CODE    ,
+          p_EXTENSION    ,
+          p_LEAD_NUMBER    ,
+          p_STATUS_CODE    ,
+          p_SOURCE_PROMOTION_ID    ,
+          p_INITIATING_CONTACT_ID    ,
+          p_CONTACT_ROLE_CODE    ,
+          p_CHANNEL_CODE    ,
+          p_BUDGET_AMOUNT    ,
+          p_BUDGET_STATUS_CODE    ,
+          p_CURRENCY_CODE    ,
+          p_DECISION_TIMEFRAME_CODE    ,
+          p_CLOSE_REASON    ,
+          p_LEAD_RANK_CODE    ,
+          p_PARENT_PROJECT    ,
+          p_DESCRIPTION    ,
+          p_STATUS_CODE_1    ,
+          p_INTEREST_TYPE_ID_1    ,
+          p_PRIMARY_INTEREST_CODE_ID_1    ,
+          p_SECONDARY_INTEREST_CODE_ID_1    ,
+          p_INVENTORY_ITEM_ID_1    ,
+          p_ORGANIZATION_ID_1    ,
+          p_UOM_CODE_1    ,
+          p_QUANTITY_1    ,
+          p_BUDGET_AMOUNT_1    ,
+          p_STATUS_CODE_2    ,
+          p_INTEREST_TYPE_ID_2    ,
+          p_PRIMARY_INTEREST_CODE_ID_2    ,
+          p_SECONDARY_INTEREST_CODE_ID_2    ,
+          p_INVENTORY_ITEM_ID_2    ,
+          p_ORGANIZATION_ID_2    ,
+          p_UOM_CODE_2    ,
+          p_QUANTITY_2    ,
+          p_BUDGET_AMOUNT_2    ,
+          p_STATUS_CODE_3    ,
+          p_INTEREST_TYPE_ID_3    ,
+          p_PRIMARY_INTEREST_CODE_ID_3    ,
+          p_SECONDARY_INTEREST_CODE_ID_3    ,
+          p_INVENTORY_ITEM_ID_3    ,
+          p_ORGANIZATION_ID_3    ,
+          p_UOM_CODE_3    ,
+          p_QUANTITY_3    ,
+          p_BUDGET_AMOUNT_3    ,
+          p_STATUS_CODE_4    ,
+          p_INTEREST_TYPE_ID_4    ,
+          p_PRIMARY_INTEREST_CODE_ID_4    ,
+          p_SECONDARY_INTEREST_CODE_ID_4    ,
+          p_INVENTORY_ITEM_ID_4    ,
+          p_ORGANIZATION_ID_4    ,
+          p_UOM_CODE_4    ,
+          p_QUANTITY_4    ,
+          p_BUDGET_AMOUNT_4    ,
+          p_STATUS_CODE_5    ,
+          p_INTEREST_TYPE_ID_5    ,
+          p_PRIMARY_INTEREST_CODE_ID_5    ,
+          p_SECONDARY_INTEREST_CODE_ID_5    ,
+          p_INVENTORY_ITEM_ID_5    ,
+          p_ORGANIZATION_ID_5    ,
+          p_UOM_CODE_5    ,
+          p_QUANTITY_5    ,
+          p_BUDGET_AMOUNT_5    ,
+          p_INTERACTION_NOTES_1    ,
+          p_PRIORITY_1    ,
+          p_TODO_DATE_1    ,
+          p_TODO_START_TIME_1    ,
+          p_ACTIVITY_CODE_1    ,
+          p_INTERACTION_NOTES_2    ,
+          p_PRIORITY_2    ,
+          p_TODO_DATE_2    ,
+          p_TODO_START_TIME_2    ,
+          p_ACTIVITY_CODE_2    ,
+          p_INTERACTION_NOTES_3    ,
+          p_PRIORITY_3    ,
+          p_TODO_DATE_3    ,
+          p_TODO_START_TIME_3    ,
+          p_ACTIVITY_CODE_3    ,
+          p_INTERACTION_NOTES_4    ,
+          p_PRIORITY_4    ,
+          p_TODO_DATE_4    ,
+          p_TODO_START_TIME_4    ,
+          p_ACTIVITY_CODE_4    ,
+          p_INTERACTION_NOTES_5    ,
+          p_PRIORITY_5    ,
+          p_TODO_DATE_5    ,
+          p_TODO_START_TIME_5    ,
+          p_ACTIVITY_CODE_5    ,
+          p_INTERACTION_NOTES_6    ,
+          p_PRIORITY_6    ,
+          p_TODO_DATE_6    ,
+          p_TODO_START_TIME_6    ,
+          p_ACTIVITY_CODE_6    ,
+          p_INTERACTION_NOTES_7    ,
+          p_PRIORITY_7    ,
+          p_TODO_DATE_7    ,
+          p_TODO_START_TIME_7    ,
+          p_ACTIVITY_CODE_7    ,
+          p_INTERACTION_NOTES_8    ,
+          p_PRIORITY_8    ,
+          p_TODO_DATE_8    ,
+          p_TODO_START_TIME_8    ,
+          p_ACTIVITY_CODE_8    ,
+          p_INTERACTION_NOTES_9    ,
+          p_PRIORITY_9    ,
+          p_TODO_DATE_9    ,
+          p_TODO_START_TIME_9    ,
+          p_ACTIVITY_CODE_9    ,
+          p_INTERACTION_NOTES_10    ,
+          p_PRIORITY_10    ,
+          p_TODO_DATE_10    ,
+          p_TODO_START_TIME_10    ,
+          p_ACTIVITY_CODE_10    ,
+          p_LEAD_NOTE    ,
+          p_MIDDLE_INITIAL    ,
+          p_FAX_NUMBER    ,
+          p_FAX_AREA_CODE    ,
+          p_MAIL_STOP    ,
+          p_NUM_ENROLLED    ,
+          p_CONFIRMED_FLAG    ,
+          p_PAYMENT_AMOUNT    ,
+          p_NUM_ATTENDED    ,
+          p_PROMOTION_NAME    ,
+          p_STATUS_CHANGE_FLAG    ,
+          p_VEHICLE_RESPONSE_CODE    ,
+          p_SOURCE_SYSTEM    ,
+          p_CONTACT_PARTY_ID    ,
+          p_PRM_SALES_LEAD_TYPE    ,
+          p_PRM_EXEC_SPONSOR_FLAG    ,
+          p_PRM_PRJ_LEAD_IN_PLACE_FLAG    ,
+          p_INC_PARTNER_PARTY_ID    ,
+          p_INC_PARTNER_RESOURCE_ID    ,
+          p_OFFER_ID    ,
+          p_PRM_IND_CLASSIFICATION_CODE    ,
+          p_PARTY_TYPE    ,
+          p_BATCH_ID    ,
+          p_PARTY_ID    ,
+          p_PARTY_SITE_ID    ,
+          p_LOCATION_ID    ,
+          p_REL_PARTY_ID    ,
+          p_SALES_LEAD_ID    ,
+          p_ADDRESS_KEY    ,
+          p_CONTACT_KEY    ,
+          p_JOB_TITLE_CODE    ,
+          p_DO_NOT_PHONE_FLAG    ,
+          p_DO_NOT_FAX_FLAG    ,
+          p_DO_NOT_EMAIL_FLAG    ,
+          p_ORIG_SYSTEM_REFERENCE    ,
+          p_LEAD_RANK_ID    ,
+          p_NEW_PARTY_FLAG    ,
+          p_NEW_LOC_FLAG    ,
+          p_NEW_PS_FLAG    ,
+          p_NEW_REL_FLAG    ,
+          p_NEW_CON_FLAG    ,
+          p_ORIG_SYSTEM_CODE    ,
+          p_URGENT_FLAG    ,
+          p_SIC_CODE_TYPE    ,
+          p_SITE_USE_TYPE    ,
+          p_PRIMARY_CONTACT_FLAG    ,
+          p_RANK    ,
+          p_ADDRESS_STYLE    ,
+          p_PRIMARY_PER_TYPE    ,
+          p_DEPARTMENT_CODE    ,
+	  null,
+	  null,
+	  null);
+
+ END Update_Row;
+
+
+
+PROCEDURE Update_Row(
+          p_IMPORT_INTERFACE_ID    NUMBER,
+          p_LAST_UPDATE_DATE    DATE,
+          p_LAST_UPDATED_BY    NUMBER,
+          p_CREATION_DATE    DATE,
+          p_CREATED_BY    NUMBER,
+          p_LAST_UPDATE_LOGIN    NUMBER,
+          p_REQUEST_ID    NUMBER,
+          p_PROGRAM_APPLICATION_ID    NUMBER,
+          p_PROGRAM_ID    NUMBER,
+          p_PROGRAM_UPDATE_DATE    DATE,
+          p_IMP_LIST_HEADER_NUMBER    VARCHAR2,
+          p_LOAD_TYPE    VARCHAR2,
+          p_LOAD_DATE    DATE,
+          p_LOAD_STATUS    VARCHAR2,
+          p_LOAD_ERROR_MESSAGE    VARCHAR2,
+          p_PROMOTION_ID    NUMBER,
+          p_PROMOTION_CODE    VARCHAR2,
+          p_CUSTOMER_ID    NUMBER,
+          p_CUSTOMER_NAME    VARCHAR2,
+          p_CUSTOMER_NUMBER    VARCHAR2,
+          p_CUSTOMER_STATUS    VARCHAR2,
+          p_CUSTOMER_TYPE    VARCHAR2,
+          p_CUSTOMER_PROSPECT_CODE    VARCHAR2,
+          p_CUSTOMER_CLASS_CODE    VARCHAR2,
+          p_SALES_CHANNEL_CODE    VARCHAR2,
+          p_SIC_CODE    VARCHAR2,
+          p_ANALYSIS_FY    VARCHAR2,
+          p_CUSTOMER_CATEGORY_CODE    VARCHAR2,
+          p_CUSTOMER_GROUP_CODE    VARCHAR2,
+          p_CUSTOMER_KEY    VARCHAR2,
+          p_CUSTOMER_SUBGROUP_CODE    VARCHAR2,
+          p_FISCAL_YEAREND_MONTH    VARCHAR2,
+          p_NET_WORTH    NUMBER,
+          p_NUM_OF_EMPLOYEES    NUMBER,
+          p_POTENTIAL_REVENUE_CURR_FY    NUMBER,
+          p_POTENTIAL_REVENUE_NEXT_FY    NUMBER,
+          p_CUSTOMER_RANK    VARCHAR2,
+          p_REFERENCE_USE_FLAG    VARCHAR2,
+          p_TAX_CODE    VARCHAR2,
+          p_TAX_REFERENCE    VARCHAR2,
+          p_THIRD_PARTY_FLAG    VARCHAR2,
+          p_COMPETITOR_FLAG    VARCHAR2,
+          p_YEAR_ESTABLISHED    NUMBER,
+          p_ADDR_DO_NOT_MAIL_FLAG    VARCHAR2,
+          p_URL    VARCHAR2,
+          p_ADDRESS_ID    NUMBER,
+          p_CONT_DO_NOT_MAIL_FLAG    VARCHAR2,
+          p_ADDRESS_STATUS    VARCHAR2,
+          p_COUNTRY    VARCHAR2,
+          p_ADDRESS1    VARCHAR2,
+          p_ADDRESS2    VARCHAR2,
+          p_ADDRESS3    VARCHAR2,
+          p_ADDRESS4    VARCHAR2,
+          p_CITY    VARCHAR2,
+          p_POSTAL_CODE    VARCHAR2,
+          p_STATE    VARCHAR2,
+          p_PROVINCE    VARCHAR2,
+          p_COUNTY    VARCHAR2,
+          p_SITE_CONTACT_ID    NUMBER,
+          p_EMAIL_ADDRESS    VARCHAR2,
+          p_SEX_CODE    VARCHAR2,
+          p_SALUTATION    VARCHAR2,
+          p_LAST_NAME    VARCHAR2,
+          p_TITLE    VARCHAR2,
+          p_FIRST_NAME    VARCHAR2,
+          p_JOB_TITLE    VARCHAR2,
+          p_PHONE_ID    NUMBER,
+          p_PHONE_NUMBER    VARCHAR2,
+          p_PHONE_STATUS    VARCHAR2,
+          p_PHONE_TYPE    VARCHAR2,
+          p_AREA_CODE    VARCHAR2,
+          p_EXTENSION    VARCHAR2,
+          p_LEAD_NUMBER    VARCHAR2,
+          p_STATUS_CODE    VARCHAR2,
+          p_SOURCE_PROMOTION_ID    NUMBER,
+          p_INITIATING_CONTACT_ID    NUMBER,
+          p_CONTACT_ROLE_CODE    VARCHAR2,
+          p_CHANNEL_CODE    VARCHAR2,
+          p_BUDGET_AMOUNT    NUMBER,
+          p_BUDGET_STATUS_CODE    VARCHAR2,
+          p_CURRENCY_CODE    VARCHAR2,
+          p_DECISION_TIMEFRAME_CODE    VARCHAR2,
+          p_CLOSE_REASON    VARCHAR2,
+          p_LEAD_RANK_CODE    VARCHAR2,
+          p_PARENT_PROJECT    VARCHAR2,
+          p_DESCRIPTION    VARCHAR2,
+          p_STATUS_CODE_1    VARCHAR2,
+          p_INTEREST_TYPE_ID_1    NUMBER,
+          p_PRIMARY_INTEREST_CODE_ID_1    NUMBER,
+          p_SECONDARY_INTEREST_CODE_ID_1    NUMBER,
+          p_INVENTORY_ITEM_ID_1    NUMBER,
+          p_ORGANIZATION_ID_1    NUMBER,
+          p_UOM_CODE_1    VARCHAR2,
+          p_QUANTITY_1    NUMBER,
+          p_BUDGET_AMOUNT_1    NUMBER,
+          p_STATUS_CODE_2    VARCHAR2,
+          p_INTEREST_TYPE_ID_2    NUMBER,
+          p_PRIMARY_INTEREST_CODE_ID_2    NUMBER,
+          p_SECONDARY_INTEREST_CODE_ID_2    NUMBER,
+          p_INVENTORY_ITEM_ID_2    NUMBER,
+          p_ORGANIZATION_ID_2    NUMBER,
+          p_UOM_CODE_2    VARCHAR2,
+          p_QUANTITY_2    NUMBER,
+          p_BUDGET_AMOUNT_2    NUMBER,
+          p_STATUS_CODE_3    VARCHAR2,
+          p_INTEREST_TYPE_ID_3    NUMBER,
+          p_PRIMARY_INTEREST_CODE_ID_3    NUMBER,
+          p_SECONDARY_INTEREST_CODE_ID_3    NUMBER,
+          p_INVENTORY_ITEM_ID_3    NUMBER,
+          p_ORGANIZATION_ID_3    NUMBER,
+          p_UOM_CODE_3    VARCHAR2,
+          p_QUANTITY_3    NUMBER,
+          p_BUDGET_AMOUNT_3    NUMBER,
+          p_STATUS_CODE_4    VARCHAR2,
+          p_INTEREST_TYPE_ID_4    NUMBER,
+          p_PRIMARY_INTEREST_CODE_ID_4    NUMBER,
+          p_SECONDARY_INTEREST_CODE_ID_4    NUMBER,
+          p_INVENTORY_ITEM_ID_4    NUMBER,
+          p_ORGANIZATION_ID_4    NUMBER,
+          p_UOM_CODE_4    VARCHAR2,
+          p_QUANTITY_4    NUMBER,
+          p_BUDGET_AMOUNT_4    NUMBER,
+          p_STATUS_CODE_5    VARCHAR2,
+          p_INTEREST_TYPE_ID_5    NUMBER,
+          p_PRIMARY_INTEREST_CODE_ID_5    NUMBER,
+          p_SECONDARY_INTEREST_CODE_ID_5    NUMBER,
+          p_INVENTORY_ITEM_ID_5    NUMBER,
+          p_ORGANIZATION_ID_5    NUMBER,
+          p_UOM_CODE_5    VARCHAR2,
+          p_QUANTITY_5    NUMBER,
+          p_BUDGET_AMOUNT_5    NUMBER,
+          p_INTERACTION_NOTES_1    VARCHAR2,
+          p_PRIORITY_1    NUMBER,
+          p_TODO_DATE_1    DATE,
+          p_TODO_START_TIME_1    VARCHAR2,
+          p_ACTIVITY_CODE_1    VARCHAR2,
+          p_INTERACTION_NOTES_2    VARCHAR2,
+          p_PRIORITY_2    NUMBER,
+          p_TODO_DATE_2    DATE,
+          p_TODO_START_TIME_2    VARCHAR2,
+          p_ACTIVITY_CODE_2    VARCHAR2,
+          p_INTERACTION_NOTES_3    VARCHAR2,
+          p_PRIORITY_3    NUMBER,
+          p_TODO_DATE_3    DATE,
+          p_TODO_START_TIME_3    VARCHAR2,
+          p_ACTIVITY_CODE_3    VARCHAR2,
+          p_INTERACTION_NOTES_4    VARCHAR2,
+          p_PRIORITY_4    NUMBER,
+          p_TODO_DATE_4    DATE,
+          p_TODO_START_TIME_4    VARCHAR2,
+          p_ACTIVITY_CODE_4    VARCHAR2,
+          p_INTERACTION_NOTES_5    VARCHAR2,
+          p_PRIORITY_5    NUMBER,
+          p_TODO_DATE_5    DATE,
+          p_TODO_START_TIME_5    VARCHAR2,
+          p_ACTIVITY_CODE_5    VARCHAR2,
+          p_INTERACTION_NOTES_6    VARCHAR2,
+          p_PRIORITY_6    NUMBER,
+          p_TODO_DATE_6    DATE,
+          p_TODO_START_TIME_6    VARCHAR2,
+          p_ACTIVITY_CODE_6    VARCHAR2,
+          p_INTERACTION_NOTES_7    VARCHAR2,
+          p_PRIORITY_7    NUMBER,
+          p_TODO_DATE_7    DATE,
+          p_TODO_START_TIME_7    VARCHAR2,
+          p_ACTIVITY_CODE_7    VARCHAR2,
+          p_INTERACTION_NOTES_8    VARCHAR2,
+          p_PRIORITY_8    NUMBER,
+          p_TODO_DATE_8    DATE,
+          p_TODO_START_TIME_8    VARCHAR2,
+          p_ACTIVITY_CODE_8    VARCHAR2,
+          p_INTERACTION_NOTES_9    VARCHAR2,
+          p_PRIORITY_9    NUMBER,
+          p_TODO_DATE_9    DATE,
+          p_TODO_START_TIME_9    VARCHAR2,
+          p_ACTIVITY_CODE_9    VARCHAR2,
+          p_INTERACTION_NOTES_10    VARCHAR2,
+          p_PRIORITY_10    NUMBER,
+          p_TODO_DATE_10    DATE,
+          p_TODO_START_TIME_10    VARCHAR2,
+          p_ACTIVITY_CODE_10    VARCHAR2,
+          p_LEAD_NOTE    VARCHAR2,
+          p_MIDDLE_INITIAL    VARCHAR2,
+          p_FAX_NUMBER    VARCHAR2,
+          p_FAX_AREA_CODE    VARCHAR2,
+          p_MAIL_STOP    VARCHAR2,
+          p_NUM_ENROLLED    NUMBER,
+          p_CONFIRMED_FLAG    VARCHAR2,
+          p_PAYMENT_AMOUNT    NUMBER,
+          p_NUM_ATTENDED    NUMBER,
+          p_PROMOTION_NAME    VARCHAR2,
+          p_STATUS_CHANGE_FLAG    VARCHAR2,
+          p_VEHICLE_RESPONSE_CODE    VARCHAR2,
+          p_SOURCE_SYSTEM    VARCHAR2,
+          p_CONTACT_PARTY_ID    NUMBER,
+          p_PRM_SALES_LEAD_TYPE    VARCHAR2,
+          p_PRM_EXEC_SPONSOR_FLAG    VARCHAR2,
+          p_PRM_PRJ_LEAD_IN_PLACE_FLAG    VARCHAR2,
+          p_INC_PARTNER_PARTY_ID    NUMBER,
+          p_INC_PARTNER_RESOURCE_ID    NUMBER,
+          p_OFFER_ID    NUMBER,
+          p_PRM_IND_CLASSIFICATION_CODE    VARCHAR2,
+          p_PARTY_TYPE    VARCHAR2,
+          p_BATCH_ID    NUMBER,
+          p_PARTY_ID    NUMBER,
+          p_PARTY_SITE_ID    NUMBER,
+          p_LOCATION_ID    NUMBER,
+          p_REL_PARTY_ID    NUMBER,
+          p_SALES_LEAD_ID    NUMBER,
+          p_ADDRESS_KEY    VARCHAR2,
+          p_CONTACT_KEY    VARCHAR2,
+          p_JOB_TITLE_CODE    VARCHAR2,
+          p_DO_NOT_PHONE_FLAG    VARCHAR2,
+          p_DO_NOT_FAX_FLAG    VARCHAR2,
+          p_DO_NOT_EMAIL_FLAG    VARCHAR2,
+          p_ORIG_SYSTEM_REFERENCE    VARCHAR2,
+          p_LEAD_RANK_ID    NUMBER,
+          p_NEW_PARTY_FLAG    NUMBER,
+          p_NEW_LOC_FLAG    NUMBER,
+          p_NEW_PS_FLAG    NUMBER,
+          p_NEW_REL_FLAG    NUMBER,
+          p_NEW_CON_FLAG    NUMBER,
+          p_ORIG_SYSTEM_CODE    VARCHAR2,
+          p_URGENT_FLAG    VARCHAR2,
+          p_SIC_CODE_TYPE    VARCHAR2,
+          p_SITE_USE_TYPE    VARCHAR2,
+          p_PRIMARY_CONTACT_FLAG    VARCHAR2,
+          p_RANK    VARCHAR2,
+          p_ADDRESS_STYLE    VARCHAR2,
+          p_PRIMARY_PER_TYPE    VARCHAR2,
+          p_DEPARTMENT_CODE    VARCHAR2,
+	  p_SALES_FORCE_ID NUMBER,
+	  p_GROUP_ID NUMBER,
+	  p_PERSON_ID NUMBER,
+          p_CATEGORY_ID1 NUMBER DEFAULT NULL,
+	  p_CATEGORY_ID2 NUMBER DEFAULT NULL,
+	  p_CATEGORY_ID3 NUMBER DEFAULT NULL,
+	  p_CATEGORY_ID4 NUMBER DEFAULT NULL,
+	  p_CATEGORY_ID5 NUMBER DEFAULT NULL)
+
+
+ IS
+  rosetta_g_mistake_date date := to_date('01/01/+4713', 'MM/DD/SYYYY');
+
+
+ BEGIN
+    Update AS_IMPORT_INTERFACE
+    SET
+              LAST_UPDATE_DATE = decode( p_LAST_UPDATE_DATE, rosetta_g_mistake_date, LAST_UPDATE_DATE, p_LAST_UPDATE_DATE),
+              LAST_UPDATED_BY = decode( p_LAST_UPDATED_BY, FND_API.G_MISS_NUM, LAST_UPDATED_BY, p_LAST_UPDATED_BY),
+              CREATION_DATE = decode( p_CREATION_DATE, rosetta_g_mistake_date, CREATION_DATE, p_CREATION_DATE),
+              CREATED_BY = decode( p_CREATED_BY, FND_API.G_MISS_NUM, CREATED_BY, p_CREATED_BY),
+              LAST_UPDATE_LOGIN = decode( p_LAST_UPDATE_LOGIN, FND_API.G_MISS_NUM, LAST_UPDATE_LOGIN, p_LAST_UPDATE_LOGIN),
+              REQUEST_ID = decode( p_REQUEST_ID, FND_API.G_MISS_NUM, REQUEST_ID, p_REQUEST_ID),
+              PROGRAM_APPLICATION_ID = decode( p_PROGRAM_APPLICATION_ID, FND_API.G_MISS_NUM, PROGRAM_APPLICATION_ID, p_PROGRAM_APPLICATION_ID),
+              PROGRAM_ID = decode( p_PROGRAM_ID, FND_API.G_MISS_NUM, PROGRAM_ID, p_PROGRAM_ID),
+              PROGRAM_UPDATE_DATE = decode( p_PROGRAM_UPDATE_DATE, rosetta_g_mistake_date, PROGRAM_UPDATE_DATE, p_PROGRAM_UPDATE_DATE),
+              IMP_LIST_HEADER_NUMBER = decode( p_IMP_LIST_HEADER_NUMBER, FND_API.G_MISS_CHAR, IMP_LIST_HEADER_NUMBER, p_IMP_LIST_HEADER_NUMBER),
+              LOAD_TYPE = decode( p_LOAD_TYPE, FND_API.G_MISS_CHAR, LOAD_TYPE, p_LOAD_TYPE),
+              LOAD_DATE = decode( p_LOAD_DATE, rosetta_g_mistake_date, LOAD_DATE, p_LOAD_DATE),
+              LOAD_STATUS = decode( p_LOAD_STATUS, FND_API.G_MISS_CHAR, LOAD_STATUS, p_LOAD_STATUS),
+              LOAD_ERROR_MESSAGE = decode( p_LOAD_ERROR_MESSAGE, FND_API.G_MISS_CHAR, LOAD_ERROR_MESSAGE, p_LOAD_ERROR_MESSAGE),
+              PROMOTION_ID = decode( p_PROMOTION_ID, FND_API.G_MISS_NUM, PROMOTION_ID, p_PROMOTION_ID),
+              PROMOTION_CODE = decode( p_PROMOTION_CODE, FND_API.G_MISS_CHAR, PROMOTION_CODE, p_PROMOTION_CODE),
+              CUSTOMER_ID = decode( p_CUSTOMER_ID, FND_API.G_MISS_NUM, CUSTOMER_ID, p_CUSTOMER_ID),
+              CUSTOMER_NAME = decode( p_CUSTOMER_NAME, FND_API.G_MISS_CHAR, CUSTOMER_NAME, p_CUSTOMER_NAME),
+              CUSTOMER_NUMBER = decode( p_CUSTOMER_NUMBER, FND_API.G_MISS_CHAR, CUSTOMER_NUMBER, p_CUSTOMER_NUMBER),
+              CUSTOMER_STATUS = decode( p_CUSTOMER_STATUS, FND_API.G_MISS_CHAR, CUSTOMER_STATUS, p_CUSTOMER_STATUS),
+              CUSTOMER_TYPE = decode( p_CUSTOMER_TYPE, FND_API.G_MISS_CHAR, CUSTOMER_TYPE, p_CUSTOMER_TYPE),
+              CUSTOMER_PROSPECT_CODE = decode( p_CUSTOMER_PROSPECT_CODE, FND_API.G_MISS_CHAR, CUSTOMER_PROSPECT_CODE, p_CUSTOMER_PROSPECT_CODE),
+              CUSTOMER_CLASS_CODE = decode( p_CUSTOMER_CLASS_CODE, FND_API.G_MISS_CHAR, CUSTOMER_CLASS_CODE, p_CUSTOMER_CLASS_CODE),
+              SALES_CHANNEL_CODE = decode( p_SALES_CHANNEL_CODE, FND_API.G_MISS_CHAR, SALES_CHANNEL_CODE, p_SALES_CHANNEL_CODE),
+              SIC_CODE = decode( p_SIC_CODE, FND_API.G_MISS_CHAR, SIC_CODE, p_SIC_CODE),
+              ANALYSIS_FY = decode( p_ANALYSIS_FY, FND_API.G_MISS_CHAR, ANALYSIS_FY, p_ANALYSIS_FY),
+              CUSTOMER_CATEGORY_CODE = decode( p_CUSTOMER_CATEGORY_CODE, FND_API.G_MISS_CHAR, CUSTOMER_CATEGORY_CODE, p_CUSTOMER_CATEGORY_CODE),
+              CUSTOMER_GROUP_CODE = decode( p_CUSTOMER_GROUP_CODE, FND_API.G_MISS_CHAR, CUSTOMER_GROUP_CODE, p_CUSTOMER_GROUP_CODE),
+              CUSTOMER_KEY = decode( p_CUSTOMER_KEY, FND_API.G_MISS_CHAR, CUSTOMER_KEY, p_CUSTOMER_KEY),
+              CUSTOMER_SUBGROUP_CODE = decode( p_CUSTOMER_SUBGROUP_CODE, FND_API.G_MISS_CHAR, CUSTOMER_SUBGROUP_CODE, p_CUSTOMER_SUBGROUP_CODE),
+              FISCAL_YEAREND_MONTH = decode( p_FISCAL_YEAREND_MONTH, FND_API.G_MISS_CHAR, FISCAL_YEAREND_MONTH, p_FISCAL_YEAREND_MONTH),
+              NET_WORTH = decode( p_NET_WORTH, FND_API.G_MISS_NUM, NET_WORTH, p_NET_WORTH),
+              NUM_OF_EMPLOYEES = decode( p_NUM_OF_EMPLOYEES, FND_API.G_MISS_NUM, NUM_OF_EMPLOYEES, p_NUM_OF_EMPLOYEES),
+              POTENTIAL_REVENUE_CURR_FY = decode( p_POTENTIAL_REVENUE_CURR_FY, FND_API.G_MISS_NUM, POTENTIAL_REVENUE_CURR_FY, p_POTENTIAL_REVENUE_CURR_FY),
+              POTENTIAL_REVENUE_NEXT_FY = decode( p_POTENTIAL_REVENUE_NEXT_FY, FND_API.G_MISS_NUM, POTENTIAL_REVENUE_NEXT_FY, p_POTENTIAL_REVENUE_NEXT_FY),
+              CUSTOMER_RANK = decode( p_CUSTOMER_RANK, FND_API.G_MISS_CHAR, CUSTOMER_RANK, p_CUSTOMER_RANK),
+              REFERENCE_USE_FLAG = decode( p_REFERENCE_USE_FLAG, FND_API.G_MISS_CHAR, REFERENCE_USE_FLAG, p_REFERENCE_USE_FLAG),
+              TAX_CODE = decode( p_TAX_CODE, FND_API.G_MISS_CHAR, TAX_CODE, p_TAX_CODE),
+              TAX_REFERENCE = decode( p_TAX_REFERENCE, FND_API.G_MISS_CHAR, TAX_REFERENCE, p_TAX_REFERENCE),
+              THIRD_PARTY_FLAG = decode( p_THIRD_PARTY_FLAG, FND_API.G_MISS_CHAR, THIRD_PARTY_FLAG, p_THIRD_PARTY_FLAG),
+              COMPETITOR_FLAG = decode( p_COMPETITOR_FLAG, FND_API.G_MISS_CHAR, COMPETITOR_FLAG, p_COMPETITOR_FLAG),
+              YEAR_ESTABLISHED = decode( p_YEAR_ESTABLISHED, FND_API.G_MISS_NUM, YEAR_ESTABLISHED, p_YEAR_ESTABLISHED),
+              ADDR_DO_NOT_MAIL_FLAG = decode( p_ADDR_DO_NOT_MAIL_FLAG, FND_API.G_MISS_CHAR, ADDR_DO_NOT_MAIL_FLAG, p_ADDR_DO_NOT_MAIL_FLAG),
+              URL = decode( p_URL, FND_API.G_MISS_CHAR, URL, p_URL),
+              ADDRESS_ID = decode( p_ADDRESS_ID, FND_API.G_MISS_NUM, ADDRESS_ID, p_ADDRESS_ID),
+              CONT_DO_NOT_MAIL_FLAG = decode( p_CONT_DO_NOT_MAIL_FLAG, FND_API.G_MISS_CHAR, CONT_DO_NOT_MAIL_FLAG, p_CONT_DO_NOT_MAIL_FLAG),
+              ADDRESS_STATUS = decode( p_ADDRESS_STATUS, FND_API.G_MISS_CHAR, ADDRESS_STATUS, p_ADDRESS_STATUS),
+              COUNTRY = decode( p_COUNTRY, FND_API.G_MISS_CHAR, COUNTRY, p_COUNTRY),
+              ADDRESS1 = decode( p_ADDRESS1, FND_API.G_MISS_CHAR, ADDRESS1, p_ADDRESS1),
+              ADDRESS2 = decode( p_ADDRESS2, FND_API.G_MISS_CHAR, ADDRESS2, p_ADDRESS2),
+              ADDRESS3 = decode( p_ADDRESS3, FND_API.G_MISS_CHAR, ADDRESS3, p_ADDRESS3),
+              ADDRESS4 = decode( p_ADDRESS4, FND_API.G_MISS_CHAR, ADDRESS4, p_ADDRESS4),
+              CITY = decode( p_CITY, FND_API.G_MISS_CHAR, CITY, p_CITY),
+              POSTAL_CODE = decode( p_POSTAL_CODE, FND_API.G_MISS_CHAR, POSTAL_CODE, p_POSTAL_CODE),
+              STATE = decode( p_STATE, FND_API.G_MISS_CHAR, STATE, p_STATE),
+              PROVINCE = decode( p_PROVINCE, FND_API.G_MISS_CHAR, PROVINCE, p_PROVINCE),
+              COUNTY = decode( p_COUNTY, FND_API.G_MISS_CHAR, COUNTY, p_COUNTY),
+              SITE_CONTACT_ID = decode( p_SITE_CONTACT_ID, FND_API.G_MISS_NUM, SITE_CONTACT_ID, p_SITE_CONTACT_ID),
+              EMAIL_ADDRESS = decode( p_EMAIL_ADDRESS, FND_API.G_MISS_CHAR, EMAIL_ADDRESS, p_EMAIL_ADDRESS),
+              SEX_CODE = decode( p_SEX_CODE, FND_API.G_MISS_CHAR, SEX_CODE, p_SEX_CODE),
+              SALUTATION = decode( p_SALUTATION, FND_API.G_MISS_CHAR, SALUTATION, p_SALUTATION),
+              LAST_NAME = decode( p_LAST_NAME, FND_API.G_MISS_CHAR, LAST_NAME, p_LAST_NAME),
+              TITLE = decode( p_TITLE, FND_API.G_MISS_CHAR, TITLE, p_TITLE),
+              FIRST_NAME = decode( p_FIRST_NAME, FND_API.G_MISS_CHAR, FIRST_NAME, p_FIRST_NAME),
+              JOB_TITLE = decode( p_JOB_TITLE, FND_API.G_MISS_CHAR, JOB_TITLE, p_JOB_TITLE),
+              PHONE_ID = decode( p_PHONE_ID, FND_API.G_MISS_NUM, PHONE_ID, p_PHONE_ID),
+              PHONE_NUMBER = decode( p_PHONE_NUMBER, FND_API.G_MISS_CHAR, PHONE_NUMBER, p_PHONE_NUMBER),
+              PHONE_STATUS = decode( p_PHONE_STATUS, FND_API.G_MISS_CHAR, PHONE_STATUS, p_PHONE_STATUS),
+              PHONE_TYPE = decode( p_PHONE_TYPE, FND_API.G_MISS_CHAR, PHONE_TYPE, p_PHONE_TYPE),
+              AREA_CODE = decode( p_AREA_CODE, FND_API.G_MISS_CHAR, AREA_CODE, p_AREA_CODE),
+              EXTENSION = decode( p_EXTENSION, FND_API.G_MISS_CHAR, EXTENSION, p_EXTENSION),
+              LEAD_NUMBER = decode( p_LEAD_NUMBER, FND_API.G_MISS_CHAR, LEAD_NUMBER, p_LEAD_NUMBER),
+              STATUS_CODE = decode( p_STATUS_CODE, FND_API.G_MISS_CHAR, STATUS_CODE, p_STATUS_CODE),
+              SOURCE_PROMOTION_ID = decode( p_SOURCE_PROMOTION_ID, FND_API.G_MISS_NUM, SOURCE_PROMOTION_ID, p_SOURCE_PROMOTION_ID),
+              INITIATING_CONTACT_ID = decode( p_INITIATING_CONTACT_ID, FND_API.G_MISS_NUM, INITIATING_CONTACT_ID, p_INITIATING_CONTACT_ID),
+              CONTACT_ROLE_CODE = decode( p_CONTACT_ROLE_CODE, FND_API.G_MISS_CHAR, CONTACT_ROLE_CODE, p_CONTACT_ROLE_CODE),
+              CHANNEL_CODE = decode( p_CHANNEL_CODE, FND_API.G_MISS_CHAR, CHANNEL_CODE, p_CHANNEL_CODE),
+              BUDGET_AMOUNT = decode( p_BUDGET_AMOUNT, FND_API.G_MISS_NUM, BUDGET_AMOUNT, p_BUDGET_AMOUNT),
+              BUDGET_STATUS_CODE = decode( p_BUDGET_STATUS_CODE, FND_API.G_MISS_CHAR, BUDGET_STATUS_CODE, p_BUDGET_STATUS_CODE),
+              CURRENCY_CODE = decode( p_CURRENCY_CODE, FND_API.G_MISS_CHAR, CURRENCY_CODE, p_CURRENCY_CODE),
+              DECISION_TIMEFRAME_CODE = decode( p_DECISION_TIMEFRAME_CODE, FND_API.G_MISS_CHAR, DECISION_TIMEFRAME_CODE, p_DECISION_TIMEFRAME_CODE),
+              CLOSE_REASON = decode( p_CLOSE_REASON, FND_API.G_MISS_CHAR, CLOSE_REASON, p_CLOSE_REASON),
+              LEAD_RANK_CODE = decode( p_LEAD_RANK_CODE, FND_API.G_MISS_CHAR, LEAD_RANK_CODE, p_LEAD_RANK_CODE),
+              PARENT_PROJECT = decode( p_PARENT_PROJECT, FND_API.G_MISS_CHAR, PARENT_PROJECT, p_PARENT_PROJECT),
+              DESCRIPTION = decode( p_DESCRIPTION, FND_API.G_MISS_CHAR, DESCRIPTION, p_DESCRIPTION),
+              STATUS_CODE_1 = decode( p_STATUS_CODE_1, FND_API.G_MISS_CHAR, STATUS_CODE_1, p_STATUS_CODE_1),
+              INTEREST_TYPE_ID_1 = decode( p_INTEREST_TYPE_ID_1, FND_API.G_MISS_NUM, INTEREST_TYPE_ID_1, p_INTEREST_TYPE_ID_1),
+              PRIMARY_INTEREST_CODE_ID_1 = decode( p_PRIMARY_INTEREST_CODE_ID_1, FND_API.G_MISS_NUM, PRIMARY_INTEREST_CODE_ID_1, p_PRIMARY_INTEREST_CODE_ID_1),
+              SECONDARY_INTEREST_CODE_ID_1 = decode( p_SECONDARY_INTEREST_CODE_ID_1, FND_API.G_MISS_NUM, SECONDARY_INTEREST_CODE_ID_1, p_SECONDARY_INTEREST_CODE_ID_1),
+              INVENTORY_ITEM_ID_1 = decode( p_INVENTORY_ITEM_ID_1, FND_API.G_MISS_NUM, INVENTORY_ITEM_ID_1, p_INVENTORY_ITEM_ID_1),
+              ORGANIZATION_ID_1 = decode( p_ORGANIZATION_ID_1, FND_API.G_MISS_NUM, ORGANIZATION_ID_1, p_ORGANIZATION_ID_1),
+              UOM_CODE_1 = decode( p_UOM_CODE_1, FND_API.G_MISS_CHAR, UOM_CODE_1, p_UOM_CODE_1),
+              QUANTITY_1 = decode( p_QUANTITY_1, FND_API.G_MISS_NUM, QUANTITY_1, p_QUANTITY_1),
+              BUDGET_AMOUNT_1 = decode( p_BUDGET_AMOUNT_1, FND_API.G_MISS_NUM, BUDGET_AMOUNT_1, p_BUDGET_AMOUNT_1),
+              STATUS_CODE_2 = decode( p_STATUS_CODE_2, FND_API.G_MISS_CHAR, STATUS_CODE_2, p_STATUS_CODE_2),
+              INTEREST_TYPE_ID_2 = decode( p_INTEREST_TYPE_ID_2, FND_API.G_MISS_NUM, INTEREST_TYPE_ID_2, p_INTEREST_TYPE_ID_2),
+              PRIMARY_INTEREST_CODE_ID_2 = decode( p_PRIMARY_INTEREST_CODE_ID_2, FND_API.G_MISS_NUM, PRIMARY_INTEREST_CODE_ID_2, p_PRIMARY_INTEREST_CODE_ID_2),
+              SECONDARY_INTEREST_CODE_ID_2 = decode( p_SECONDARY_INTEREST_CODE_ID_2, FND_API.G_MISS_NUM, SECONDARY_INTEREST_CODE_ID_2, p_SECONDARY_INTEREST_CODE_ID_2),
+              INVENTORY_ITEM_ID_2 = decode( p_INVENTORY_ITEM_ID_2, FND_API.G_MISS_NUM, INVENTORY_ITEM_ID_2, p_INVENTORY_ITEM_ID_2),
+              ORGANIZATION_ID_2 = decode( p_ORGANIZATION_ID_2, FND_API.G_MISS_NUM, ORGANIZATION_ID_2, p_ORGANIZATION_ID_2),
+              UOM_CODE_2 = decode( p_UOM_CODE_2, FND_API.G_MISS_CHAR, UOM_CODE_2, p_UOM_CODE_2),
+              QUANTITY_2 = decode( p_QUANTITY_2, FND_API.G_MISS_NUM, QUANTITY_2, p_QUANTITY_2),
+              BUDGET_AMOUNT_2 = decode( p_BUDGET_AMOUNT_2, FND_API.G_MISS_NUM, BUDGET_AMOUNT_2, p_BUDGET_AMOUNT_2),
+              STATUS_CODE_3 = decode( p_STATUS_CODE_3, FND_API.G_MISS_CHAR, STATUS_CODE_3, p_STATUS_CODE_3),
+              INTEREST_TYPE_ID_3 = decode( p_INTEREST_TYPE_ID_3, FND_API.G_MISS_NUM, INTEREST_TYPE_ID_3, p_INTEREST_TYPE_ID_3),
+              PRIMARY_INTEREST_CODE_ID_3 = decode( p_PRIMARY_INTEREST_CODE_ID_3, FND_API.G_MISS_NUM, PRIMARY_INTEREST_CODE_ID_3, p_PRIMARY_INTEREST_CODE_ID_3),
+              SECONDARY_INTEREST_CODE_ID_3 = decode( p_SECONDARY_INTEREST_CODE_ID_3, FND_API.G_MISS_NUM, SECONDARY_INTEREST_CODE_ID_3, p_SECONDARY_INTEREST_CODE_ID_3),
+              INVENTORY_ITEM_ID_3 = decode( p_INVENTORY_ITEM_ID_3, FND_API.G_MISS_NUM, INVENTORY_ITEM_ID_3, p_INVENTORY_ITEM_ID_3),
+              ORGANIZATION_ID_3 = decode( p_ORGANIZATION_ID_3, FND_API.G_MISS_NUM, ORGANIZATION_ID_3, p_ORGANIZATION_ID_3),
+              UOM_CODE_3 = decode( p_UOM_CODE_3, FND_API.G_MISS_CHAR, UOM_CODE_3, p_UOM_CODE_3),
+              QUANTITY_3 = decode( p_QUANTITY_3, FND_API.G_MISS_NUM, QUANTITY_3, p_QUANTITY_3),
+              BUDGET_AMOUNT_3 = decode( p_BUDGET_AMOUNT_3, FND_API.G_MISS_NUM, BUDGET_AMOUNT_3, p_BUDGET_AMOUNT_3),
+              STATUS_CODE_4 = decode( p_STATUS_CODE_4, FND_API.G_MISS_CHAR, STATUS_CODE_4, p_STATUS_CODE_4),
+              INTEREST_TYPE_ID_4 = decode( p_INTEREST_TYPE_ID_4, FND_API.G_MISS_NUM, INTEREST_TYPE_ID_4, p_INTEREST_TYPE_ID_4),
+              PRIMARY_INTEREST_CODE_ID_4 = decode( p_PRIMARY_INTEREST_CODE_ID_4, FND_API.G_MISS_NUM, PRIMARY_INTEREST_CODE_ID_4, p_PRIMARY_INTEREST_CODE_ID_4),
+              SECONDARY_INTEREST_CODE_ID_4 = decode( p_SECONDARY_INTEREST_CODE_ID_4, FND_API.G_MISS_NUM, SECONDARY_INTEREST_CODE_ID_4, p_SECONDARY_INTEREST_CODE_ID_4),
+              INVENTORY_ITEM_ID_4 = decode( p_INVENTORY_ITEM_ID_4, FND_API.G_MISS_NUM, INVENTORY_ITEM_ID_4, p_INVENTORY_ITEM_ID_4),
+              ORGANIZATION_ID_4 = decode( p_ORGANIZATION_ID_4, FND_API.G_MISS_NUM, ORGANIZATION_ID_4, p_ORGANIZATION_ID_4),
+              UOM_CODE_4 = decode( p_UOM_CODE_4, FND_API.G_MISS_CHAR, UOM_CODE_4, p_UOM_CODE_4),
+              QUANTITY_4 = decode( p_QUANTITY_4, FND_API.G_MISS_NUM, QUANTITY_4, p_QUANTITY_4),
+              BUDGET_AMOUNT_4 = decode( p_BUDGET_AMOUNT_4, FND_API.G_MISS_NUM, BUDGET_AMOUNT_4, p_BUDGET_AMOUNT_4),
+              STATUS_CODE_5 = decode( p_STATUS_CODE_5, FND_API.G_MISS_CHAR, STATUS_CODE_5, p_STATUS_CODE_5),
+              INTEREST_TYPE_ID_5 = decode( p_INTEREST_TYPE_ID_5, FND_API.G_MISS_NUM, INTEREST_TYPE_ID_5, p_INTEREST_TYPE_ID_5),
+              PRIMARY_INTEREST_CODE_ID_5 = decode( p_PRIMARY_INTEREST_CODE_ID_5, FND_API.G_MISS_NUM, PRIMARY_INTEREST_CODE_ID_5, p_PRIMARY_INTEREST_CODE_ID_5),
+              SECONDARY_INTEREST_CODE_ID_5 = decode( p_SECONDARY_INTEREST_CODE_ID_5, FND_API.G_MISS_NUM, SECONDARY_INTEREST_CODE_ID_5, p_SECONDARY_INTEREST_CODE_ID_5),
+              INVENTORY_ITEM_ID_5 = decode( p_INVENTORY_ITEM_ID_5, FND_API.G_MISS_NUM, INVENTORY_ITEM_ID_5, p_INVENTORY_ITEM_ID_5),
+              ORGANIZATION_ID_5 = decode( p_ORGANIZATION_ID_5, FND_API.G_MISS_NUM, ORGANIZATION_ID_5, p_ORGANIZATION_ID_5),
+              UOM_CODE_5 = decode( p_UOM_CODE_5, FND_API.G_MISS_CHAR, UOM_CODE_5, p_UOM_CODE_5),
+              QUANTITY_5 = decode( p_QUANTITY_5, FND_API.G_MISS_NUM, QUANTITY_5, p_QUANTITY_5),
+              BUDGET_AMOUNT_5 = decode( p_BUDGET_AMOUNT_5, FND_API.G_MISS_NUM, BUDGET_AMOUNT_5, p_BUDGET_AMOUNT_5),
+              INTERACTION_NOTES_1 = decode( p_INTERACTION_NOTES_1, FND_API.G_MISS_CHAR, INTERACTION_NOTES_1, p_INTERACTION_NOTES_1),
+              PRIORITY_1 = decode( p_PRIORITY_1, FND_API.G_MISS_NUM, PRIORITY_1, p_PRIORITY_1),
+              TODO_DATE_1 = decode( p_TODO_DATE_1, rosetta_g_mistake_date, TODO_DATE_1, p_TODO_DATE_1),
+              TODO_START_TIME_1 = decode( p_TODO_START_TIME_1, FND_API.G_MISS_CHAR, TODO_START_TIME_1, p_TODO_START_TIME_1),
+              ACTIVITY_CODE_1 = decode( p_ACTIVITY_CODE_1, FND_API.G_MISS_CHAR, ACTIVITY_CODE_1, p_ACTIVITY_CODE_1),
+              INTERACTION_NOTES_2 = decode( p_INTERACTION_NOTES_2, FND_API.G_MISS_CHAR, INTERACTION_NOTES_2, p_INTERACTION_NOTES_2),
+              PRIORITY_2 = decode( p_PRIORITY_2, FND_API.G_MISS_NUM, PRIORITY_2, p_PRIORITY_2),
+              TODO_DATE_2 = decode( p_TODO_DATE_2, rosetta_g_mistake_date, TODO_DATE_2, p_TODO_DATE_2),
+              TODO_START_TIME_2 = decode( p_TODO_START_TIME_2, FND_API.G_MISS_CHAR, TODO_START_TIME_2, p_TODO_START_TIME_2),
+              ACTIVITY_CODE_2 = decode( p_ACTIVITY_CODE_2, FND_API.G_MISS_CHAR, ACTIVITY_CODE_2, p_ACTIVITY_CODE_2),
+              INTERACTION_NOTES_3 = decode( p_INTERACTION_NOTES_3, FND_API.G_MISS_CHAR, INTERACTION_NOTES_3, p_INTERACTION_NOTES_3),
+              PRIORITY_3 = decode( p_PRIORITY_3, FND_API.G_MISS_NUM, PRIORITY_3, p_PRIORITY_3),
+              TODO_DATE_3 = decode( p_TODO_DATE_3, rosetta_g_mistake_date, TODO_DATE_3, p_TODO_DATE_3),
+              TODO_START_TIME_3 = decode( p_TODO_START_TIME_3, FND_API.G_MISS_CHAR, TODO_START_TIME_3, p_TODO_START_TIME_3),
+              ACTIVITY_CODE_3 = decode( p_ACTIVITY_CODE_3, FND_API.G_MISS_CHAR, ACTIVITY_CODE_3, p_ACTIVITY_CODE_3),
+              INTERACTION_NOTES_4 = decode( p_INTERACTION_NOTES_4, FND_API.G_MISS_CHAR, INTERACTION_NOTES_4, p_INTERACTION_NOTES_4),
+              PRIORITY_4 = decode( p_PRIORITY_4, FND_API.G_MISS_NUM, PRIORITY_4, p_PRIORITY_4),
+              TODO_DATE_4 = decode( p_TODO_DATE_4, rosetta_g_mistake_date, TODO_DATE_4, p_TODO_DATE_4),
+              TODO_START_TIME_4 = decode( p_TODO_START_TIME_4, FND_API.G_MISS_CHAR, TODO_START_TIME_4, p_TODO_START_TIME_4),
+              ACTIVITY_CODE_4 = decode( p_ACTIVITY_CODE_4, FND_API.G_MISS_CHAR, ACTIVITY_CODE_4, p_ACTIVITY_CODE_4),
+              INTERACTION_NOTES_5 = decode( p_INTERACTION_NOTES_5, FND_API.G_MISS_CHAR, INTERACTION_NOTES_5, p_INTERACTION_NOTES_5),
+              PRIORITY_5 = decode( p_PRIORITY_5, FND_API.G_MISS_NUM, PRIORITY_5, p_PRIORITY_5),
+              TODO_DATE_5 = decode( p_TODO_DATE_5, rosetta_g_mistake_date, TODO_DATE_5, p_TODO_DATE_5),
+              TODO_START_TIME_5 = decode( p_TODO_START_TIME_5, FND_API.G_MISS_CHAR, TODO_START_TIME_5, p_TODO_START_TIME_5),
+              ACTIVITY_CODE_5 = decode( p_ACTIVITY_CODE_5, FND_API.G_MISS_CHAR, ACTIVITY_CODE_5, p_ACTIVITY_CODE_5),
+              INTERACTION_NOTES_6 = decode( p_INTERACTION_NOTES_6, FND_API.G_MISS_CHAR, INTERACTION_NOTES_6, p_INTERACTION_NOTES_6),
+              PRIORITY_6 = decode( p_PRIORITY_6, FND_API.G_MISS_NUM, PRIORITY_6, p_PRIORITY_6),
+              TODO_DATE_6 = decode( p_TODO_DATE_6, rosetta_g_mistake_date, TODO_DATE_6, p_TODO_DATE_6),
+              TODO_START_TIME_6 = decode( p_TODO_START_TIME_6, FND_API.G_MISS_CHAR, TODO_START_TIME_6, p_TODO_START_TIME_6),
+              ACTIVITY_CODE_6 = decode( p_ACTIVITY_CODE_6, FND_API.G_MISS_CHAR, ACTIVITY_CODE_6, p_ACTIVITY_CODE_6),
+              INTERACTION_NOTES_7 = decode( p_INTERACTION_NOTES_7, FND_API.G_MISS_CHAR, INTERACTION_NOTES_7, p_INTERACTION_NOTES_7),
+              PRIORITY_7 = decode( p_PRIORITY_7, FND_API.G_MISS_NUM, PRIORITY_7, p_PRIORITY_7),
+              TODO_DATE_7 = decode( p_TODO_DATE_7, rosetta_g_mistake_date, TODO_DATE_7, p_TODO_DATE_7),
+              TODO_START_TIME_7 = decode( p_TODO_START_TIME_7, FND_API.G_MISS_CHAR, TODO_START_TIME_7, p_TODO_START_TIME_7),
+              ACTIVITY_CODE_7 = decode( p_ACTIVITY_CODE_7, FND_API.G_MISS_CHAR, ACTIVITY_CODE_7, p_ACTIVITY_CODE_7),
+              INTERACTION_NOTES_8 = decode( p_INTERACTION_NOTES_8, FND_API.G_MISS_CHAR, INTERACTION_NOTES_8, p_INTERACTION_NOTES_8),
+              PRIORITY_8 = decode( p_PRIORITY_8, FND_API.G_MISS_NUM, PRIORITY_8, p_PRIORITY_8),
+              TODO_DATE_8 = decode( p_TODO_DATE_8, rosetta_g_mistake_date, TODO_DATE_8, p_TODO_DATE_8),
+              TODO_START_TIME_8 = decode( p_TODO_START_TIME_8, FND_API.G_MISS_CHAR, TODO_START_TIME_8, p_TODO_START_TIME_8),
+              ACTIVITY_CODE_8 = decode( p_ACTIVITY_CODE_8, FND_API.G_MISS_CHAR, ACTIVITY_CODE_8, p_ACTIVITY_CODE_8),
+              INTERACTION_NOTES_9 = decode( p_INTERACTION_NOTES_9, FND_API.G_MISS_CHAR, INTERACTION_NOTES_9, p_INTERACTION_NOTES_9),
+              PRIORITY_9 = decode( p_PRIORITY_9, FND_API.G_MISS_NUM, PRIORITY_9, p_PRIORITY_9),
+              TODO_DATE_9 = decode( p_TODO_DATE_9, rosetta_g_mistake_date, TODO_DATE_9, p_TODO_DATE_9),
+              TODO_START_TIME_9 = decode( p_TODO_START_TIME_9, FND_API.G_MISS_CHAR, TODO_START_TIME_9, p_TODO_START_TIME_9),
+              ACTIVITY_CODE_9 = decode( p_ACTIVITY_CODE_9, FND_API.G_MISS_CHAR, ACTIVITY_CODE_9, p_ACTIVITY_CODE_9),
+              INTERACTION_NOTES_10 = decode( p_INTERACTION_NOTES_10, FND_API.G_MISS_CHAR, INTERACTION_NOTES_10, p_INTERACTION_NOTES_10),
+              PRIORITY_10 = decode( p_PRIORITY_10, FND_API.G_MISS_NUM, PRIORITY_10, p_PRIORITY_10),
+              TODO_DATE_10 = decode( p_TODO_DATE_10, rosetta_g_mistake_date, TODO_DATE_10, p_TODO_DATE_10),
+              TODO_START_TIME_10 = decode( p_TODO_START_TIME_10, FND_API.G_MISS_CHAR, TODO_START_TIME_10, p_TODO_START_TIME_10),
+              ACTIVITY_CODE_10 = decode( p_ACTIVITY_CODE_10, FND_API.G_MISS_CHAR, ACTIVITY_CODE_10, p_ACTIVITY_CODE_10),
+              LEAD_NOTE = decode( p_LEAD_NOTE, FND_API.G_MISS_CHAR, LEAD_NOTE, p_LEAD_NOTE),
+              MIDDLE_INITIAL = decode( p_MIDDLE_INITIAL, FND_API.G_MISS_CHAR, MIDDLE_INITIAL, p_MIDDLE_INITIAL),
+              FAX_NUMBER = decode( p_FAX_NUMBER, FND_API.G_MISS_CHAR, FAX_NUMBER, p_FAX_NUMBER),
+              FAX_AREA_CODE = decode( p_FAX_AREA_CODE, FND_API.G_MISS_CHAR, FAX_AREA_CODE, p_FAX_AREA_CODE),
+              MAIL_STOP = decode( p_MAIL_STOP, FND_API.G_MISS_CHAR, MAIL_STOP, p_MAIL_STOP),
+              NUM_ENROLLED = decode( p_NUM_ENROLLED, FND_API.G_MISS_NUM, NUM_ENROLLED, p_NUM_ENROLLED),
+              CONFIRMED_FLAG = decode( p_CONFIRMED_FLAG, FND_API.G_MISS_CHAR, CONFIRMED_FLAG, p_CONFIRMED_FLAG),
+              PAYMENT_AMOUNT = decode( p_PAYMENT_AMOUNT, FND_API.G_MISS_NUM, PAYMENT_AMOUNT, p_PAYMENT_AMOUNT),
+              NUM_ATTENDED = decode( p_NUM_ATTENDED, FND_API.G_MISS_NUM, NUM_ATTENDED, p_NUM_ATTENDED),
+              PROMOTION_NAME = decode( p_PROMOTION_NAME, FND_API.G_MISS_CHAR, PROMOTION_NAME, p_PROMOTION_NAME),
+              STATUS_CHANGE_FLAG = decode( p_STATUS_CHANGE_FLAG, FND_API.G_MISS_CHAR, STATUS_CHANGE_FLAG, p_STATUS_CHANGE_FLAG),
+              VEHICLE_RESPONSE_CODE = decode( p_VEHICLE_RESPONSE_CODE, FND_API.G_MISS_CHAR, VEHICLE_RESPONSE_CODE, p_VEHICLE_RESPONSE_CODE),
+              SOURCE_SYSTEM = decode( p_SOURCE_SYSTEM, FND_API.G_MISS_CHAR, SOURCE_SYSTEM, p_SOURCE_SYSTEM),
+              CONTACT_PARTY_ID = decode( p_CONTACT_PARTY_ID, FND_API.G_MISS_NUM, CONTACT_PARTY_ID, p_CONTACT_PARTY_ID),
+              PRM_SALES_LEAD_TYPE = decode( p_PRM_SALES_LEAD_TYPE, FND_API.G_MISS_CHAR, PRM_SALES_LEAD_TYPE, p_PRM_SALES_LEAD_TYPE),
+              PRM_EXEC_SPONSOR_FLAG = decode( p_PRM_EXEC_SPONSOR_FLAG, FND_API.G_MISS_CHAR, PRM_EXEC_SPONSOR_FLAG, p_PRM_EXEC_SPONSOR_FLAG),
+              PRM_PRJ_LEAD_IN_PLACE_FLAG = decode( p_PRM_PRJ_LEAD_IN_PLACE_FLAG, FND_API.G_MISS_CHAR, PRM_PRJ_LEAD_IN_PLACE_FLAG, p_PRM_PRJ_LEAD_IN_PLACE_FLAG),
+              INCUMBENT_PARTNER_PARTY_ID = decode( p_INC_PARTNER_PARTY_ID, FND_API.G_MISS_NUM, INCUMBENT_PARTNER_PARTY_ID, p_INC_PARTNER_PARTY_ID),
+              INCUMBENT_PARTNER_RESOURCE_ID = decode( p_INC_PARTNER_RESOURCE_ID, FND_API.G_MISS_NUM, INCUMBENT_PARTNER_RESOURCE_ID, p_INC_PARTNER_RESOURCE_ID),
+              OFFER_ID = decode( p_OFFER_ID, FND_API.G_MISS_NUM, OFFER_ID, p_OFFER_ID),
+              PRM_IND_CLASSIFICATION_CODE = decode( p_PRM_IND_CLASSIFICATION_CODE, FND_API.G_MISS_CHAR, PRM_IND_CLASSIFICATION_CODE, p_PRM_IND_CLASSIFICATION_CODE),
+              PARTY_TYPE = decode( p_PARTY_TYPE, FND_API.G_MISS_CHAR, PARTY_TYPE, p_PARTY_TYPE),
+              BATCH_ID = decode( p_BATCH_ID, FND_API.G_MISS_NUM, BATCH_ID, p_BATCH_ID),
+              PARTY_ID = decode( p_PARTY_ID, FND_API.G_MISS_NUM, PARTY_ID, p_PARTY_ID),
+              PARTY_SITE_ID = decode( p_PARTY_SITE_ID, FND_API.G_MISS_NUM, PARTY_SITE_ID, p_PARTY_SITE_ID),
+              LOCATION_ID = decode( p_LOCATION_ID, FND_API.G_MISS_NUM, LOCATION_ID, p_LOCATION_ID),
+              REL_PARTY_ID = decode( p_REL_PARTY_ID, FND_API.G_MISS_NUM, REL_PARTY_ID, p_REL_PARTY_ID),
+              SALES_LEAD_ID = decode( p_SALES_LEAD_ID, FND_API.G_MISS_NUM, SALES_LEAD_ID, p_SALES_LEAD_ID),
+              ADDRESS_KEY = decode( p_ADDRESS_KEY, FND_API.G_MISS_CHAR, ADDRESS_KEY, p_ADDRESS_KEY),
+              CONTACT_KEY = decode( p_CONTACT_KEY, FND_API.G_MISS_CHAR, CONTACT_KEY, p_CONTACT_KEY),
+              JOB_TITLE_CODE = decode( p_JOB_TITLE_CODE, FND_API.G_MISS_CHAR, JOB_TITLE_CODE, p_JOB_TITLE_CODE),
+              DO_NOT_PHONE_FLAG = decode( p_DO_NOT_PHONE_FLAG, FND_API.G_MISS_CHAR, DO_NOT_PHONE_FLAG, p_DO_NOT_PHONE_FLAG),
+              DO_NOT_FAX_FLAG = decode( p_DO_NOT_FAX_FLAG, FND_API.G_MISS_CHAR, DO_NOT_FAX_FLAG, p_DO_NOT_FAX_FLAG),
+              DO_NOT_EMAIL_FLAG = decode( p_DO_NOT_EMAIL_FLAG, FND_API.G_MISS_CHAR, DO_NOT_EMAIL_FLAG, p_DO_NOT_EMAIL_FLAG),
+              ORIG_SYSTEM_REFERENCE = decode( p_ORIG_SYSTEM_REFERENCE, FND_API.G_MISS_CHAR, ORIG_SYSTEM_REFERENCE, p_ORIG_SYSTEM_REFERENCE),
+              LEAD_RANK_ID = decode( p_LEAD_RANK_ID, FND_API.G_MISS_NUM, LEAD_RANK_ID, p_LEAD_RANK_ID),
+              NEW_PARTY_FLAG = decode( p_NEW_PARTY_FLAG, FND_API.G_MISS_NUM, NEW_PARTY_FLAG, p_NEW_PARTY_FLAG),
+              NEW_LOC_FLAG = decode( p_NEW_LOC_FLAG, FND_API.G_MISS_NUM, NEW_LOC_FLAG, p_NEW_LOC_FLAG),
+              NEW_PS_FLAG = decode( p_NEW_PS_FLAG, FND_API.G_MISS_NUM, NEW_PS_FLAG, p_NEW_PS_FLAG),
+              NEW_REL_FLAG = decode( p_NEW_REL_FLAG, FND_API.G_MISS_NUM, NEW_REL_FLAG, p_NEW_REL_FLAG),
+              NEW_CON_FLAG = decode( p_NEW_CON_FLAG, FND_API.G_MISS_NUM, NEW_CON_FLAG, p_NEW_CON_FLAG),
+              ORIG_SYSTEM_CODE = decode( p_ORIG_SYSTEM_CODE, FND_API.G_MISS_CHAR, ORIG_SYSTEM_CODE, p_ORIG_SYSTEM_CODE),
+              URGENT_FLAG = decode( p_URGENT_FLAG, FND_API.G_MISS_CHAR, URGENT_FLAG, p_URGENT_FLAG),
+              SIC_CODE_TYPE = decode( p_SIC_CODE_TYPE, FND_API.G_MISS_CHAR, URGENT_FLAG, p_SIC_CODE_TYPE),
+              SITE_USE_TYPE = decode( p_SITE_USE_TYPE, FND_API.G_MISS_CHAR, SITE_USE_TYPE, p_SITE_USE_TYPE),
+              PRIMARY_CONTACT_FLAG = decode( p_PRIMARY_CONTACT_FLAG, FND_API.G_MISS_CHAR, PRIMARY_CONTACT_FLAG, p_PRIMARY_CONTACT_FLAG),
+              RANK = decode( p_RANK, FND_API.G_MISS_CHAR, RANK, p_RANK),
+              ADDRESS_STYLE = decode( p_ADDRESS_STYLE, FND_API.G_MISS_CHAR, ADDRESS_STYLE, p_ADDRESS_STYLE),
+              PRIMARY_PER_TYPE = decode( p_PRIMARY_PER_TYPE, FND_API.G_MISS_CHAR, PRIMARY_PER_TYPE, p_PRIMARY_PER_TYPE),
+              DEPARTMENT_CODE = decode( p_DEPARTMENT_CODE, FND_API.G_MISS_CHAR, DEPARTMENT_CODE, p_DEPARTMENT_CODE),
+	      ASSIGN_TO_SALESFORCE_ID = decode( p_SALES_FORCE_ID, FND_API.G_MISS_NUM,ASSIGN_TO_SALESFORCE_ID,p_SALES_FORCE_ID),
+	      ASSIGN_SALES_GROUP_ID = decode( p_GROUP_ID, FND_API.G_MISS_NUM,ASSIGN_SALES_GROUP_ID,p_GROUP_ID),
+	      ASSIGN_TO_PERSON_ID = decode( p_PERSON_ID, FND_API.G_MISS_NUM,ASSIGN_TO_PERSON_ID,p_PERSON_ID),
+	      CATEGORY_ID_1=decode(p_CATEGORY_ID1,FND_API.G_MISS_NUM,CATEGORY_ID_1,p_CATEGORY_ID1),
+      	      CATEGORY_ID_2=decode(p_CATEGORY_ID2,FND_API.G_MISS_NUM,CATEGORY_ID_2,p_CATEGORY_ID2),
+      	      CATEGORY_ID_3=decode(p_CATEGORY_ID3,FND_API.G_MISS_NUM,CATEGORY_ID_3,p_CATEGORY_ID3),
+      	      CATEGORY_ID_4=decode(p_CATEGORY_ID4,FND_API.G_MISS_NUM,CATEGORY_ID_4,p_CATEGORY_ID4),
+      	      CATEGORY_ID_5=decode(p_CATEGORY_ID5,FND_API.G_MISS_NUM,CATEGORY_ID_5,p_CATEGORY_ID5)
+
+    where IMPORT_INTERFACE_ID = p_IMPORT_INTERFACE_ID;
+
+    If (SQL%NOTFOUND) then
+        RAISE NO_DATA_FOUND;
+    End If;
+END Update_Row;
+
+
+PROCEDURE Delete_Row(
+    p_IMPORT_INTERFACE_ID  NUMBER)
+ IS
+ BEGIN
+   DELETE FROM AS_IMPORT_INTERFACE
+    WHERE IMPORT_INTERFACE_ID = p_IMPORT_INTERFACE_ID;
+   If (SQL%NOTFOUND) then
+       RAISE NO_DATA_FOUND;
+   End If;
+ END Delete_Row;
+
+PROCEDURE Lock_Row(
+          p_IMPORT_INTERFACE_ID    NUMBER,
+          p_LAST_UPDATE_DATE    DATE,
+          p_LAST_UPDATED_BY    NUMBER,
+          p_CREATION_DATE    DATE,
+          p_CREATED_BY    NUMBER,
+          p_LAST_UPDATE_LOGIN    NUMBER,
+          p_REQUEST_ID    NUMBER,
+          p_PROGRAM_APPLICATION_ID    NUMBER,
+          p_PROGRAM_ID    NUMBER,
+          p_PROGRAM_UPDATE_DATE    DATE,
+          p_IMP_LIST_HEADER_NUMBER    VARCHAR2,
+          p_LOAD_TYPE    VARCHAR2,
+          p_LOAD_DATE    DATE,
+          p_LOAD_STATUS    VARCHAR2,
+          p_LOAD_ERROR_MESSAGE    VARCHAR2,
+          p_PROMOTION_ID    NUMBER,
+          p_PROMOTION_CODE    VARCHAR2,
+          p_CUSTOMER_ID    NUMBER,
+          p_CUSTOMER_NAME    VARCHAR2,
+          p_CUSTOMER_NUMBER    VARCHAR2,
+          p_CUSTOMER_STATUS    VARCHAR2,
+          p_CUSTOMER_TYPE    VARCHAR2,
+          p_CUSTOMER_PROSPECT_CODE    VARCHAR2,
+          p_CUSTOMER_CLASS_CODE    VARCHAR2,
+          p_SALES_CHANNEL_CODE    VARCHAR2,
+          p_SIC_CODE    VARCHAR2,
+          p_ANALYSIS_FY    VARCHAR2,
+          p_CUSTOMER_CATEGORY_CODE    VARCHAR2,
+          p_CUSTOMER_GROUP_CODE    VARCHAR2,
+          p_CUSTOMER_KEY    VARCHAR2,
+          p_CUSTOMER_SUBGROUP_CODE    VARCHAR2,
+          p_FISCAL_YEAREND_MONTH    VARCHAR2,
+          p_NET_WORTH    NUMBER,
+          p_NUM_OF_EMPLOYEES    NUMBER,
+          p_POTENTIAL_REVENUE_CURR_FY    NUMBER,
+          p_POTENTIAL_REVENUE_NEXT_FY    NUMBER,
+          p_CUSTOMER_RANK    VARCHAR2,
+          p_REFERENCE_USE_FLAG    VARCHAR2,
+          p_TAX_CODE    VARCHAR2,
+          p_TAX_REFERENCE    VARCHAR2,
+          p_THIRD_PARTY_FLAG    VARCHAR2,
+          p_COMPETITOR_FLAG    VARCHAR2,
+          p_YEAR_ESTABLISHED    NUMBER,
+          p_ADDR_DO_NOT_MAIL_FLAG    VARCHAR2,
+          p_URL    VARCHAR2,
+          p_ADDRESS_ID    NUMBER,
+          p_CONT_DO_NOT_MAIL_FLAG    VARCHAR2,
+          p_ADDRESS_STATUS    VARCHAR2,
+          p_COUNTRY    VARCHAR2,
+          p_ADDRESS1    VARCHAR2,
+          p_ADDRESS2    VARCHAR2,
+          p_ADDRESS3    VARCHAR2,
+          p_ADDRESS4    VARCHAR2,
+          p_CITY    VARCHAR2,
+          p_POSTAL_CODE    VARCHAR2,
+          p_STATE    VARCHAR2,
+          p_PROVINCE    VARCHAR2,
+          p_COUNTY    VARCHAR2,
+          p_SITE_CONTACT_ID    NUMBER,
+          p_EMAIL_ADDRESS    VARCHAR2,
+          p_SEX_CODE    VARCHAR2,
+          p_SALUTATION    VARCHAR2,
+          p_LAST_NAME    VARCHAR2,
+          p_TITLE    VARCHAR2,
+          p_FIRST_NAME    VARCHAR2,
+          p_JOB_TITLE    VARCHAR2,
+          p_PHONE_ID    NUMBER,
+          p_PHONE_NUMBER    VARCHAR2,
+          p_PHONE_STATUS    VARCHAR2,
+          p_PHONE_TYPE    VARCHAR2,
+          p_AREA_CODE    VARCHAR2,
+          p_EXTENSION    VARCHAR2,
+          p_LEAD_NUMBER    VARCHAR2,
+          p_STATUS_CODE    VARCHAR2,
+          p_SOURCE_PROMOTION_ID    NUMBER,
+          p_INITIATING_CONTACT_ID    NUMBER,
+          p_CONTACT_ROLE_CODE    VARCHAR2,
+          p_CHANNEL_CODE    VARCHAR2,
+          p_BUDGET_AMOUNT    NUMBER,
+          p_BUDGET_STATUS_CODE    VARCHAR2,
+          p_CURRENCY_CODE    VARCHAR2,
+          p_DECISION_TIMEFRAME_CODE    VARCHAR2,
+          p_CLOSE_REASON    VARCHAR2,
+          p_LEAD_RANK_CODE    VARCHAR2,
+          p_PARENT_PROJECT    VARCHAR2,
+          p_DESCRIPTION    VARCHAR2,
+          p_STATUS_CODE_1    VARCHAR2,
+          p_INTEREST_TYPE_ID_1    NUMBER,
+          p_PRIMARY_INTEREST_CODE_ID_1    NUMBER,
+          p_SECONDARY_INTEREST_CODE_ID_1    NUMBER,
+          p_INVENTORY_ITEM_ID_1    NUMBER,
+          p_ORGANIZATION_ID_1    NUMBER,
+          p_UOM_CODE_1    VARCHAR2,
+          p_QUANTITY_1    NUMBER,
+          p_BUDGET_AMOUNT_1    NUMBER,
+          p_STATUS_CODE_2    VARCHAR2,
+          p_INTEREST_TYPE_ID_2    NUMBER,
+          p_PRIMARY_INTEREST_CODE_ID_2    NUMBER,
+          p_SECONDARY_INTEREST_CODE_ID_2    NUMBER,
+          p_INVENTORY_ITEM_ID_2    NUMBER,
+          p_ORGANIZATION_ID_2    NUMBER,
+          p_UOM_CODE_2    VARCHAR2,
+          p_QUANTITY_2    NUMBER,
+          p_BUDGET_AMOUNT_2    NUMBER,
+          p_STATUS_CODE_3    VARCHAR2,
+          p_INTEREST_TYPE_ID_3    NUMBER,
+          p_PRIMARY_INTEREST_CODE_ID_3    NUMBER,
+          p_SECONDARY_INTEREST_CODE_ID_3    NUMBER,
+          p_INVENTORY_ITEM_ID_3    NUMBER,
+          p_ORGANIZATION_ID_3    NUMBER,
+          p_UOM_CODE_3    VARCHAR2,
+          p_QUANTITY_3    NUMBER,
+          p_BUDGET_AMOUNT_3    NUMBER,
+          p_STATUS_CODE_4    VARCHAR2,
+          p_INTEREST_TYPE_ID_4    NUMBER,
+          p_PRIMARY_INTEREST_CODE_ID_4    NUMBER,
+          p_SECONDARY_INTEREST_CODE_ID_4    NUMBER,
+          p_INVENTORY_ITEM_ID_4    NUMBER,
+          p_ORGANIZATION_ID_4    NUMBER,
+          p_UOM_CODE_4    VARCHAR2,
+          p_QUANTITY_4    NUMBER,
+          p_BUDGET_AMOUNT_4    NUMBER,
+          p_STATUS_CODE_5    VARCHAR2,
+          p_INTEREST_TYPE_ID_5    NUMBER,
+          p_PRIMARY_INTEREST_CODE_ID_5    NUMBER,
+          p_SECONDARY_INTEREST_CODE_ID_5    NUMBER,
+          p_INVENTORY_ITEM_ID_5    NUMBER,
+          p_ORGANIZATION_ID_5    NUMBER,
+          p_UOM_CODE_5    VARCHAR2,
+          p_QUANTITY_5    NUMBER,
+          p_BUDGET_AMOUNT_5    NUMBER,
+          p_INTERACTION_NOTES_1    VARCHAR2,
+          p_PRIORITY_1    NUMBER,
+          p_TODO_DATE_1    DATE,
+          p_TODO_START_TIME_1    VARCHAR2,
+          p_ACTIVITY_CODE_1    VARCHAR2,
+          p_INTERACTION_NOTES_2    VARCHAR2,
+          p_PRIORITY_2    NUMBER,
+          p_TODO_DATE_2    DATE,
+          p_TODO_START_TIME_2    VARCHAR2,
+          p_ACTIVITY_CODE_2    VARCHAR2,
+          p_INTERACTION_NOTES_3    VARCHAR2,
+          p_PRIORITY_3    NUMBER,
+          p_TODO_DATE_3    DATE,
+          p_TODO_START_TIME_3    VARCHAR2,
+          p_ACTIVITY_CODE_3    VARCHAR2,
+          p_INTERACTION_NOTES_4    VARCHAR2,
+          p_PRIORITY_4    NUMBER,
+          p_TODO_DATE_4    DATE,
+          p_TODO_START_TIME_4    VARCHAR2,
+          p_ACTIVITY_CODE_4    VARCHAR2,
+          p_INTERACTION_NOTES_5    VARCHAR2,
+          p_PRIORITY_5    NUMBER,
+          p_TODO_DATE_5    DATE,
+          p_TODO_START_TIME_5    VARCHAR2,
+          p_ACTIVITY_CODE_5    VARCHAR2,
+          p_INTERACTION_NOTES_6    VARCHAR2,
+          p_PRIORITY_6    NUMBER,
+          p_TODO_DATE_6    DATE,
+          p_TODO_START_TIME_6    VARCHAR2,
+          p_ACTIVITY_CODE_6    VARCHAR2,
+          p_INTERACTION_NOTES_7    VARCHAR2,
+          p_PRIORITY_7    NUMBER,
+          p_TODO_DATE_7    DATE,
+          p_TODO_START_TIME_7    VARCHAR2,
+          p_ACTIVITY_CODE_7    VARCHAR2,
+          p_INTERACTION_NOTES_8    VARCHAR2,
+          p_PRIORITY_8    NUMBER,
+          p_TODO_DATE_8    DATE,
+          p_TODO_START_TIME_8    VARCHAR2,
+          p_ACTIVITY_CODE_8    VARCHAR2,
+          p_INTERACTION_NOTES_9    VARCHAR2,
+          p_PRIORITY_9    NUMBER,
+          p_TODO_DATE_9    DATE,
+          p_TODO_START_TIME_9    VARCHAR2,
+          p_ACTIVITY_CODE_9    VARCHAR2,
+          p_INTERACTION_NOTES_10    VARCHAR2,
+          p_PRIORITY_10    NUMBER,
+          p_TODO_DATE_10    DATE,
+          p_TODO_START_TIME_10    VARCHAR2,
+          p_ACTIVITY_CODE_10    VARCHAR2,
+          p_LEAD_NOTE    VARCHAR2,
+          p_MIDDLE_INITIAL    VARCHAR2,
+          p_FAX_NUMBER    VARCHAR2,
+          p_FAX_AREA_CODE    VARCHAR2,
+          p_MAIL_STOP    VARCHAR2,
+          p_NUM_ENROLLED    NUMBER,
+          p_CONFIRMED_FLAG    VARCHAR2,
+          p_PAYMENT_AMOUNT    NUMBER,
+          p_NUM_ATTENDED    NUMBER,
+          p_PROMOTION_NAME    VARCHAR2,
+          p_STATUS_CHANGE_FLAG    VARCHAR2,
+          p_VEHICLE_RESPONSE_CODE    VARCHAR2,
+          p_SOURCE_SYSTEM    VARCHAR2,
+          p_CONTACT_PARTY_ID    NUMBER,
+          p_PRM_SALES_LEAD_TYPE    VARCHAR2,
+          p_PRM_EXEC_SPONSOR_FLAG    VARCHAR2,
+          p_PRM_PRJ_LEAD_IN_PLACE_FLAG    VARCHAR2,
+          p_INC_PARTNER_PARTY_ID    NUMBER,
+          p_INC_PARTNER_RESOURCE_ID    NUMBER,
+          p_OFFER_ID    NUMBER,
+          p_PRM_IND_CLASSIFICATION_CODE    VARCHAR2,
+          p_PARTY_TYPE    VARCHAR2,
+          p_BATCH_ID    NUMBER,
+          p_PARTY_ID    NUMBER,
+          p_PARTY_SITE_ID    NUMBER,
+          p_LOCATION_ID    NUMBER,
+          p_REL_PARTY_ID    NUMBER,
+          p_SALES_LEAD_ID    NUMBER,
+          p_ADDRESS_KEY    VARCHAR2,
+          p_CONTACT_KEY    VARCHAR2,
+          p_JOB_TITLE_CODE    VARCHAR2,
+          p_DO_NOT_PHONE_FLAG    VARCHAR2,
+          p_DO_NOT_FAX_FLAG    VARCHAR2,
+          p_DO_NOT_EMAIL_FLAG    VARCHAR2,
+          p_ORIG_SYSTEM_REFERENCE    VARCHAR2,
+          p_LEAD_RANK_ID    NUMBER,
+          p_NEW_PARTY_FLAG    NUMBER,
+          p_NEW_LOC_FLAG    NUMBER,
+          p_NEW_PS_FLAG    NUMBER,
+          p_NEW_REL_FLAG    NUMBER,
+          p_NEW_CON_FLAG    NUMBER,
+          p_ORIG_SYSTEM_CODE    VARCHAR2,
+          p_URGENT_FLAG    VARCHAR2,
+          p_SIC_CODE_TYPE    VARCHAR2,
+          p_SITE_USE_TYPE    VARCHAR2,
+          p_PRIMARY_CONTACT_FLAG    VARCHAR2,
+          p_RANK    VARCHAR2,
+          p_ADDRESS_STYLE    VARCHAR2,
+          p_PRIMARY_PER_TYPE    VARCHAR2,
+          p_DEPARTMENT_CODE    VARCHAR2)
+
+ IS
+   CURSOR C IS
+        SELECT *
+         FROM AS_IMPORT_INTERFACE
+        WHERE IMPORT_INTERFACE_ID =  p_IMPORT_INTERFACE_ID
+        FOR UPDATE of IMPORT_INTERFACE_ID NOWAIT;
+   Recinfo C%ROWTYPE;
+ BEGIN
+    OPEN C;
+    FETCH C INTO Recinfo;
+    If (C%NOTFOUND) then
+        CLOSE C;
+        FND_MESSAGE.SET_NAME('FND', 'FORM_RECORD_DELETED');
+        APP_EXCEPTION.RAISE_EXCEPTION;
+    End If;
+    CLOSE C;
+    if (
+           (      Recinfo.IMPORT_INTERFACE_ID = p_IMPORT_INTERFACE_ID)
+       AND (    ( Recinfo.LAST_UPDATE_DATE = p_LAST_UPDATE_DATE)
+            OR (    ( Recinfo.LAST_UPDATE_DATE IS NULL )
+                AND (  p_LAST_UPDATE_DATE IS NULL )))
+       AND (    ( Recinfo.LAST_UPDATED_BY = p_LAST_UPDATED_BY)
+            OR (    ( Recinfo.LAST_UPDATED_BY IS NULL )
+                AND (  p_LAST_UPDATED_BY IS NULL )))
+       AND (    ( Recinfo.CREATION_DATE = p_CREATION_DATE)
+            OR (    ( Recinfo.CREATION_DATE IS NULL )
+                AND (  p_CREATION_DATE IS NULL )))
+       AND (    ( Recinfo.CREATED_BY = p_CREATED_BY)
+            OR (    ( Recinfo.CREATED_BY IS NULL )
+                AND (  p_CREATED_BY IS NULL )))
+       AND (    ( Recinfo.LAST_UPDATE_LOGIN = p_LAST_UPDATE_LOGIN)
+            OR (    ( Recinfo.LAST_UPDATE_LOGIN IS NULL )
+                AND (  p_LAST_UPDATE_LOGIN IS NULL )))
+       AND (    ( Recinfo.REQUEST_ID = p_REQUEST_ID)
+            OR (    ( Recinfo.REQUEST_ID IS NULL )
+                AND (  p_REQUEST_ID IS NULL )))
+       AND (    ( Recinfo.PROGRAM_APPLICATION_ID = p_PROGRAM_APPLICATION_ID)
+            OR (    ( Recinfo.PROGRAM_APPLICATION_ID IS NULL )
+                AND (  p_PROGRAM_APPLICATION_ID IS NULL )))
+       AND (    ( Recinfo.PROGRAM_ID = p_PROGRAM_ID)
+            OR (    ( Recinfo.PROGRAM_ID IS NULL )
+                AND (  p_PROGRAM_ID IS NULL )))
+       AND (    ( Recinfo.PROGRAM_UPDATE_DATE = p_PROGRAM_UPDATE_DATE)
+            OR (    ( Recinfo.PROGRAM_UPDATE_DATE IS NULL )
+                AND (  p_PROGRAM_UPDATE_DATE IS NULL )))
+       AND (    ( Recinfo.IMP_LIST_HEADER_NUMBER = p_IMP_LIST_HEADER_NUMBER)
+            OR (    ( Recinfo.IMP_LIST_HEADER_NUMBER IS NULL )
+                AND (  p_IMP_LIST_HEADER_NUMBER IS NULL )))
+       AND (    ( Recinfo.LOAD_TYPE = p_LOAD_TYPE)
+            OR (    ( Recinfo.LOAD_TYPE IS NULL )
+                AND (  p_LOAD_TYPE IS NULL )))
+       AND (    ( Recinfo.LOAD_DATE = p_LOAD_DATE)
+            OR (    ( Recinfo.LOAD_DATE IS NULL )
+                AND (  p_LOAD_DATE IS NULL )))
+       AND (    ( Recinfo.LOAD_STATUS = p_LOAD_STATUS)
+            OR (    ( Recinfo.LOAD_STATUS IS NULL )
+                AND (  p_LOAD_STATUS IS NULL )))
+       AND (    ( Recinfo.LOAD_ERROR_MESSAGE = p_LOAD_ERROR_MESSAGE)
+            OR (    ( Recinfo.LOAD_ERROR_MESSAGE IS NULL )
+                AND (  p_LOAD_ERROR_MESSAGE IS NULL )))
+       AND (    ( Recinfo.PROMOTION_ID = p_PROMOTION_ID)
+            OR (    ( Recinfo.PROMOTION_ID IS NULL )
+                AND (  p_PROMOTION_ID IS NULL )))
+       AND (    ( Recinfo.PROMOTION_CODE = p_PROMOTION_CODE)
+            OR (    ( Recinfo.PROMOTION_CODE IS NULL )
+                AND (  p_PROMOTION_CODE IS NULL )))
+       AND (    ( Recinfo.CUSTOMER_ID = p_CUSTOMER_ID)
+            OR (    ( Recinfo.CUSTOMER_ID IS NULL )
+                AND (  p_CUSTOMER_ID IS NULL )))
+       AND (    ( Recinfo.CUSTOMER_NAME = p_CUSTOMER_NAME)
+            OR (    ( Recinfo.CUSTOMER_NAME IS NULL )
+                AND (  p_CUSTOMER_NAME IS NULL )))
+       AND (    ( Recinfo.CUSTOMER_NUMBER = p_CUSTOMER_NUMBER)
+            OR (    ( Recinfo.CUSTOMER_NUMBER IS NULL )
+                AND (  p_CUSTOMER_NUMBER IS NULL )))
+       AND (    ( Recinfo.CUSTOMER_STATUS = p_CUSTOMER_STATUS)
+            OR (    ( Recinfo.CUSTOMER_STATUS IS NULL )
+                AND (  p_CUSTOMER_STATUS IS NULL )))
+       AND (    ( Recinfo.CUSTOMER_TYPE = p_CUSTOMER_TYPE)
+            OR (    ( Recinfo.CUSTOMER_TYPE IS NULL )
+                AND (  p_CUSTOMER_TYPE IS NULL )))
+       AND (    ( Recinfo.CUSTOMER_PROSPECT_CODE = p_CUSTOMER_PROSPECT_CODE)
+            OR (    ( Recinfo.CUSTOMER_PROSPECT_CODE IS NULL )
+                AND (  p_CUSTOMER_PROSPECT_CODE IS NULL )))
+       AND (    ( Recinfo.CUSTOMER_CLASS_CODE = p_CUSTOMER_CLASS_CODE)
+            OR (    ( Recinfo.CUSTOMER_CLASS_CODE IS NULL )
+                AND (  p_CUSTOMER_CLASS_CODE IS NULL )))
+       AND (    ( Recinfo.SALES_CHANNEL_CODE = p_SALES_CHANNEL_CODE)
+            OR (    ( Recinfo.SALES_CHANNEL_CODE IS NULL )
+                AND (  p_SALES_CHANNEL_CODE IS NULL )))
+       AND (    ( Recinfo.SIC_CODE = p_SIC_CODE)
+            OR (    ( Recinfo.SIC_CODE IS NULL )
+                AND (  p_SIC_CODE IS NULL )))
+       AND (    ( Recinfo.ANALYSIS_FY = p_ANALYSIS_FY)
+            OR (    ( Recinfo.ANALYSIS_FY IS NULL )
+                AND (  p_ANALYSIS_FY IS NULL )))
+       AND (    ( Recinfo.CUSTOMER_CATEGORY_CODE = p_CUSTOMER_CATEGORY_CODE)
+            OR (    ( Recinfo.CUSTOMER_CATEGORY_CODE IS NULL )
+                AND (  p_CUSTOMER_CATEGORY_CODE IS NULL )))
+       AND (    ( Recinfo.CUSTOMER_GROUP_CODE = p_CUSTOMER_GROUP_CODE)
+            OR (    ( Recinfo.CUSTOMER_GROUP_CODE IS NULL )
+                AND (  p_CUSTOMER_GROUP_CODE IS NULL )))
+       AND (    ( Recinfo.CUSTOMER_KEY = p_CUSTOMER_KEY)
+            OR (    ( Recinfo.CUSTOMER_KEY IS NULL )
+                AND (  p_CUSTOMER_KEY IS NULL )))
+       AND (    ( Recinfo.CUSTOMER_SUBGROUP_CODE = p_CUSTOMER_SUBGROUP_CODE)
+            OR (    ( Recinfo.CUSTOMER_SUBGROUP_CODE IS NULL )
+                AND (  p_CUSTOMER_SUBGROUP_CODE IS NULL )))
+       AND (    ( Recinfo.FISCAL_YEAREND_MONTH = p_FISCAL_YEAREND_MONTH)
+            OR (    ( Recinfo.FISCAL_YEAREND_MONTH IS NULL )
+                AND (  p_FISCAL_YEAREND_MONTH IS NULL )))
+       AND (    ( Recinfo.NET_WORTH = p_NET_WORTH)
+            OR (    ( Recinfo.NET_WORTH IS NULL )
+                AND (  p_NET_WORTH IS NULL )))
+       AND (    ( Recinfo.NUM_OF_EMPLOYEES = p_NUM_OF_EMPLOYEES)
+            OR (    ( Recinfo.NUM_OF_EMPLOYEES IS NULL )
+                AND (  p_NUM_OF_EMPLOYEES IS NULL )))
+       AND (    ( Recinfo.POTENTIAL_REVENUE_CURR_FY = p_POTENTIAL_REVENUE_CURR_FY)
+            OR (    ( Recinfo.POTENTIAL_REVENUE_CURR_FY IS NULL )
+                AND (  p_POTENTIAL_REVENUE_CURR_FY IS NULL )))
+       AND (    ( Recinfo.POTENTIAL_REVENUE_NEXT_FY = p_POTENTIAL_REVENUE_NEXT_FY)
+            OR (    ( Recinfo.POTENTIAL_REVENUE_NEXT_FY IS NULL )
+                AND (  p_POTENTIAL_REVENUE_NEXT_FY IS NULL )))
+       AND (    ( Recinfo.CUSTOMER_RANK = p_CUSTOMER_RANK)
+            OR (    ( Recinfo.CUSTOMER_RANK IS NULL )
+                AND (  p_CUSTOMER_RANK IS NULL )))
+       AND (    ( Recinfo.REFERENCE_USE_FLAG = p_REFERENCE_USE_FLAG)
+            OR (    ( Recinfo.REFERENCE_USE_FLAG IS NULL )
+                AND (  p_REFERENCE_USE_FLAG IS NULL )))
+       AND (    ( Recinfo.TAX_CODE = p_TAX_CODE)
+            OR (    ( Recinfo.TAX_CODE IS NULL )
+                AND (  p_TAX_CODE IS NULL )))
+       AND (    ( Recinfo.TAX_REFERENCE = p_TAX_REFERENCE)
+            OR (    ( Recinfo.TAX_REFERENCE IS NULL )
+                AND (  p_TAX_REFERENCE IS NULL )))
+       AND (    ( Recinfo.THIRD_PARTY_FLAG = p_THIRD_PARTY_FLAG)
+            OR (    ( Recinfo.THIRD_PARTY_FLAG IS NULL )
+                AND (  p_THIRD_PARTY_FLAG IS NULL )))
+       AND (    ( Recinfo.COMPETITOR_FLAG = p_COMPETITOR_FLAG)
+            OR (    ( Recinfo.COMPETITOR_FLAG IS NULL )
+                AND (  p_COMPETITOR_FLAG IS NULL )))
+       AND (    ( Recinfo.YEAR_ESTABLISHED = p_YEAR_ESTABLISHED)
+            OR (    ( Recinfo.YEAR_ESTABLISHED IS NULL )
+                AND (  p_YEAR_ESTABLISHED IS NULL )))
+       AND (    ( Recinfo.ADDR_DO_NOT_MAIL_FLAG = p_ADDR_DO_NOT_MAIL_FLAG)
+            OR (    ( Recinfo.ADDR_DO_NOT_MAIL_FLAG IS NULL )
+                AND (  p_ADDR_DO_NOT_MAIL_FLAG IS NULL )))
+       AND (    ( Recinfo.URL = p_URL)
+            OR (    ( Recinfo.URL IS NULL )
+                AND (  p_URL IS NULL )))
+       AND (    ( Recinfo.ADDRESS_ID = p_ADDRESS_ID)
+            OR (    ( Recinfo.ADDRESS_ID IS NULL )
+                AND (  p_ADDRESS_ID IS NULL )))
+       AND (    ( Recinfo.CONT_DO_NOT_MAIL_FLAG = p_CONT_DO_NOT_MAIL_FLAG)
+            OR (    ( Recinfo.CONT_DO_NOT_MAIL_FLAG IS NULL )
+                AND (  p_CONT_DO_NOT_MAIL_FLAG IS NULL )))
+       AND (    ( Recinfo.ADDRESS_STATUS = p_ADDRESS_STATUS)
+            OR (    ( Recinfo.ADDRESS_STATUS IS NULL )
+                AND (  p_ADDRESS_STATUS IS NULL )))
+       AND (    ( Recinfo.COUNTRY = p_COUNTRY)
+            OR (    ( Recinfo.COUNTRY IS NULL )
+                AND (  p_COUNTRY IS NULL )))
+       AND (    ( Recinfo.ADDRESS1 = p_ADDRESS1)
+            OR (    ( Recinfo.ADDRESS1 IS NULL )
+                AND (  p_ADDRESS1 IS NULL )))
+       AND (    ( Recinfo.ADDRESS2 = p_ADDRESS2)
+            OR (    ( Recinfo.ADDRESS2 IS NULL )
+                AND (  p_ADDRESS2 IS NULL )))
+       AND (    ( Recinfo.ADDRESS3 = p_ADDRESS3)
+            OR (    ( Recinfo.ADDRESS3 IS NULL )
+                AND (  p_ADDRESS3 IS NULL )))
+       AND (    ( Recinfo.ADDRESS4 = p_ADDRESS4)
+            OR (    ( Recinfo.ADDRESS4 IS NULL )
+                AND (  p_ADDRESS4 IS NULL )))
+       AND (    ( Recinfo.CITY = p_CITY)
+            OR (    ( Recinfo.CITY IS NULL )
+                AND (  p_CITY IS NULL )))
+       AND (    ( Recinfo.POSTAL_CODE = p_POSTAL_CODE)
+            OR (    ( Recinfo.POSTAL_CODE IS NULL )
+                AND (  p_POSTAL_CODE IS NULL )))
+       AND (    ( Recinfo.STATE = p_STATE)
+            OR (    ( Recinfo.STATE IS NULL )
+                AND (  p_STATE IS NULL )))
+       AND (    ( Recinfo.PROVINCE = p_PROVINCE)
+            OR (    ( Recinfo.PROVINCE IS NULL )
+                AND (  p_PROVINCE IS NULL )))
+       AND (    ( Recinfo.COUNTY = p_COUNTY)
+            OR (    ( Recinfo.COUNTY IS NULL )
+                AND (  p_COUNTY IS NULL )))
+       AND (    ( Recinfo.SITE_CONTACT_ID = p_SITE_CONTACT_ID)
+            OR (    ( Recinfo.SITE_CONTACT_ID IS NULL )
+                AND (  p_SITE_CONTACT_ID IS NULL )))
+       AND (    ( Recinfo.EMAIL_ADDRESS = p_EMAIL_ADDRESS)
+            OR (    ( Recinfo.EMAIL_ADDRESS IS NULL )
+                AND (  p_EMAIL_ADDRESS IS NULL )))
+       AND (    ( Recinfo.SEX_CODE = p_SEX_CODE)
+            OR (    ( Recinfo.SEX_CODE IS NULL )
+                AND (  p_SEX_CODE IS NULL )))
+       AND (    ( Recinfo.SALUTATION = p_SALUTATION)
+            OR (    ( Recinfo.SALUTATION IS NULL )
+                AND (  p_SALUTATION IS NULL )))
+       AND (    ( Recinfo.LAST_NAME = p_LAST_NAME)
+            OR (    ( Recinfo.LAST_NAME IS NULL )
+                AND (  p_LAST_NAME IS NULL )))
+       AND (    ( Recinfo.TITLE = p_TITLE)
+            OR (    ( Recinfo.TITLE IS NULL )
+                AND (  p_TITLE IS NULL )))
+       AND (    ( Recinfo.FIRST_NAME = p_FIRST_NAME)
+            OR (    ( Recinfo.FIRST_NAME IS NULL )
+                AND (  p_FIRST_NAME IS NULL )))
+       AND (    ( Recinfo.JOB_TITLE = p_JOB_TITLE)
+            OR (    ( Recinfo.JOB_TITLE IS NULL )
+                AND (  p_JOB_TITLE IS NULL )))
+       AND (    ( Recinfo.PHONE_ID = p_PHONE_ID)
+            OR (    ( Recinfo.PHONE_ID IS NULL )
+                AND (  p_PHONE_ID IS NULL )))
+       AND (    ( Recinfo.PHONE_NUMBER = p_PHONE_NUMBER)
+            OR (    ( Recinfo.PHONE_NUMBER IS NULL )
+                AND (  p_PHONE_NUMBER IS NULL )))
+       AND (    ( Recinfo.PHONE_STATUS = p_PHONE_STATUS)
+            OR (    ( Recinfo.PHONE_STATUS IS NULL )
+                AND (  p_PHONE_STATUS IS NULL )))
+       AND (    ( Recinfo.PHONE_TYPE = p_PHONE_TYPE)
+            OR (    ( Recinfo.PHONE_TYPE IS NULL )
+                AND (  p_PHONE_TYPE IS NULL )))
+       AND (    ( Recinfo.AREA_CODE = p_AREA_CODE)
+            OR (    ( Recinfo.AREA_CODE IS NULL )
+                AND (  p_AREA_CODE IS NULL )))
+       AND (    ( Recinfo.EXTENSION = p_EXTENSION)
+            OR (    ( Recinfo.EXTENSION IS NULL )
+                AND (  p_EXTENSION IS NULL )))
+       AND (    ( Recinfo.LEAD_NUMBER = p_LEAD_NUMBER)
+            OR (    ( Recinfo.LEAD_NUMBER IS NULL )
+                AND (  p_LEAD_NUMBER IS NULL )))
+       AND (    ( Recinfo.STATUS_CODE = p_STATUS_CODE)
+            OR (    ( Recinfo.STATUS_CODE IS NULL )
+                AND (  p_STATUS_CODE IS NULL )))
+       AND (    ( Recinfo.SOURCE_PROMOTION_ID = p_SOURCE_PROMOTION_ID)
+            OR (    ( Recinfo.SOURCE_PROMOTION_ID IS NULL )
+                AND (  p_SOURCE_PROMOTION_ID IS NULL )))
+       AND (    ( Recinfo.INITIATING_CONTACT_ID = p_INITIATING_CONTACT_ID)
+            OR (    ( Recinfo.INITIATING_CONTACT_ID IS NULL )
+                AND (  p_INITIATING_CONTACT_ID IS NULL )))
+       AND (    ( Recinfo.CONTACT_ROLE_CODE = p_CONTACT_ROLE_CODE)
+            OR (    ( Recinfo.CONTACT_ROLE_CODE IS NULL )
+                AND (  p_CONTACT_ROLE_CODE IS NULL )))
+       AND (    ( Recinfo.CHANNEL_CODE = p_CHANNEL_CODE)
+            OR (    ( Recinfo.CHANNEL_CODE IS NULL )
+                AND (  p_CHANNEL_CODE IS NULL )))
+       AND (    ( Recinfo.BUDGET_AMOUNT = p_BUDGET_AMOUNT)
+            OR (    ( Recinfo.BUDGET_AMOUNT IS NULL )
+                AND (  p_BUDGET_AMOUNT IS NULL )))
+       AND (    ( Recinfo.BUDGET_STATUS_CODE = p_BUDGET_STATUS_CODE)
+            OR (    ( Recinfo.BUDGET_STATUS_CODE IS NULL )
+                AND (  p_BUDGET_STATUS_CODE IS NULL )))
+       AND (    ( Recinfo.CURRENCY_CODE = p_CURRENCY_CODE)
+            OR (    ( Recinfo.CURRENCY_CODE IS NULL )
+                AND (  p_CURRENCY_CODE IS NULL )))
+       AND (    ( Recinfo.DECISION_TIMEFRAME_CODE = p_DECISION_TIMEFRAME_CODE)
+            OR (    ( Recinfo.DECISION_TIMEFRAME_CODE IS NULL )
+                AND (  p_DECISION_TIMEFRAME_CODE IS NULL )))
+       AND (    ( Recinfo.CLOSE_REASON = p_CLOSE_REASON)
+            OR (    ( Recinfo.CLOSE_REASON IS NULL )
+                AND (  p_CLOSE_REASON IS NULL )))
+       AND (    ( Recinfo.LEAD_RANK_CODE = p_LEAD_RANK_CODE)
+            OR (    ( Recinfo.LEAD_RANK_CODE IS NULL )
+                AND (  p_LEAD_RANK_CODE IS NULL )))
+       AND (    ( Recinfo.PARENT_PROJECT = p_PARENT_PROJECT)
+            OR (    ( Recinfo.PARENT_PROJECT IS NULL )
+                AND (  p_PARENT_PROJECT IS NULL )))
+       AND (    ( Recinfo.DESCRIPTION = p_DESCRIPTION)
+            OR (    ( Recinfo.DESCRIPTION IS NULL )
+                AND (  p_DESCRIPTION IS NULL )))
+       AND (    ( Recinfo.STATUS_CODE_1 = p_STATUS_CODE_1)
+            OR (    ( Recinfo.STATUS_CODE_1 IS NULL )
+                AND (  p_STATUS_CODE_1 IS NULL )))
+       AND (    ( Recinfo.INTEREST_TYPE_ID_1 = p_INTEREST_TYPE_ID_1)
+            OR (    ( Recinfo.INTEREST_TYPE_ID_1 IS NULL )
+                AND (  p_INTEREST_TYPE_ID_1 IS NULL )))
+       AND (    ( Recinfo.PRIMARY_INTEREST_CODE_ID_1 = p_PRIMARY_INTEREST_CODE_ID_1)
+            OR (    ( Recinfo.PRIMARY_INTEREST_CODE_ID_1 IS NULL )
+                AND (  p_PRIMARY_INTEREST_CODE_ID_1 IS NULL )))
+       AND (    ( Recinfo.SECONDARY_INTEREST_CODE_ID_1 = p_SECONDARY_INTEREST_CODE_ID_1)
+            OR (    ( Recinfo.SECONDARY_INTEREST_CODE_ID_1 IS NULL )
+                AND (  p_SECONDARY_INTEREST_CODE_ID_1 IS NULL )))
+       AND (    ( Recinfo.INVENTORY_ITEM_ID_1 = p_INVENTORY_ITEM_ID_1)
+            OR (    ( Recinfo.INVENTORY_ITEM_ID_1 IS NULL )
+                AND (  p_INVENTORY_ITEM_ID_1 IS NULL )))
+       AND (    ( Recinfo.ORGANIZATION_ID_1 = p_ORGANIZATION_ID_1)
+            OR (    ( Recinfo.ORGANIZATION_ID_1 IS NULL )
+                AND (  p_ORGANIZATION_ID_1 IS NULL )))
+       AND (    ( Recinfo.UOM_CODE_1 = p_UOM_CODE_1)
+            OR (    ( Recinfo.UOM_CODE_1 IS NULL )
+                AND (  p_UOM_CODE_1 IS NULL )))
+       AND (    ( Recinfo.QUANTITY_1 = p_QUANTITY_1)
+            OR (    ( Recinfo.QUANTITY_1 IS NULL )
+                AND (  p_QUANTITY_1 IS NULL )))
+       AND (    ( Recinfo.BUDGET_AMOUNT_1 = p_BUDGET_AMOUNT_1)
+            OR (    ( Recinfo.BUDGET_AMOUNT_1 IS NULL )
+                AND (  p_BUDGET_AMOUNT_1 IS NULL )))
+       AND (    ( Recinfo.STATUS_CODE_2 = p_STATUS_CODE_2)
+            OR (    ( Recinfo.STATUS_CODE_2 IS NULL )
+                AND (  p_STATUS_CODE_2 IS NULL )))
+       AND (    ( Recinfo.INTEREST_TYPE_ID_2 = p_INTEREST_TYPE_ID_2)
+            OR (    ( Recinfo.INTEREST_TYPE_ID_2 IS NULL )
+                AND (  p_INTEREST_TYPE_ID_2 IS NULL )))
+       AND (    ( Recinfo.PRIMARY_INTEREST_CODE_ID_2 = p_PRIMARY_INTEREST_CODE_ID_2)
+            OR (    ( Recinfo.PRIMARY_INTEREST_CODE_ID_2 IS NULL )
+                AND (  p_PRIMARY_INTEREST_CODE_ID_2 IS NULL )))
+       AND (    ( Recinfo.SECONDARY_INTEREST_CODE_ID_2 = p_SECONDARY_INTEREST_CODE_ID_2)
+            OR (    ( Recinfo.SECONDARY_INTEREST_CODE_ID_2 IS NULL )
+                AND (  p_SECONDARY_INTEREST_CODE_ID_2 IS NULL )))
+       AND (    ( Recinfo.INVENTORY_ITEM_ID_2 = p_INVENTORY_ITEM_ID_2)
+            OR (    ( Recinfo.INVENTORY_ITEM_ID_2 IS NULL )
+                AND (  p_INVENTORY_ITEM_ID_2 IS NULL )))
+       AND (    ( Recinfo.ORGANIZATION_ID_2 = p_ORGANIZATION_ID_2)
+            OR (    ( Recinfo.ORGANIZATION_ID_2 IS NULL )
+                AND (  p_ORGANIZATION_ID_2 IS NULL )))
+       AND (    ( Recinfo.UOM_CODE_2 = p_UOM_CODE_2)
+            OR (    ( Recinfo.UOM_CODE_2 IS NULL )
+                AND (  p_UOM_CODE_2 IS NULL )))
+       AND (    ( Recinfo.QUANTITY_2 = p_QUANTITY_2)
+            OR (    ( Recinfo.QUANTITY_2 IS NULL )
+                AND (  p_QUANTITY_2 IS NULL )))
+       AND (    ( Recinfo.BUDGET_AMOUNT_2 = p_BUDGET_AMOUNT_2)
+            OR (    ( Recinfo.BUDGET_AMOUNT_2 IS NULL )
+                AND (  p_BUDGET_AMOUNT_2 IS NULL )))
+       AND (    ( Recinfo.STATUS_CODE_3 = p_STATUS_CODE_3)
+            OR (    ( Recinfo.STATUS_CODE_3 IS NULL )
+                AND (  p_STATUS_CODE_3 IS NULL )))
+       AND (    ( Recinfo.INTEREST_TYPE_ID_3 = p_INTEREST_TYPE_ID_3)
+            OR (    ( Recinfo.INTEREST_TYPE_ID_3 IS NULL )
+                AND (  p_INTEREST_TYPE_ID_3 IS NULL )))
+       AND (    ( Recinfo.PRIMARY_INTEREST_CODE_ID_3 = p_PRIMARY_INTEREST_CODE_ID_3)
+            OR (    ( Recinfo.PRIMARY_INTEREST_CODE_ID_3 IS NULL )
+                AND (  p_PRIMARY_INTEREST_CODE_ID_3 IS NULL )))
+       AND (    ( Recinfo.SECONDARY_INTEREST_CODE_ID_3 = p_SECONDARY_INTEREST_CODE_ID_3)
+            OR (    ( Recinfo.SECONDARY_INTEREST_CODE_ID_3 IS NULL )
+                AND (  p_SECONDARY_INTEREST_CODE_ID_3 IS NULL )))
+       AND (    ( Recinfo.INVENTORY_ITEM_ID_3 = p_INVENTORY_ITEM_ID_3)
+            OR (    ( Recinfo.INVENTORY_ITEM_ID_3 IS NULL )
+                AND (  p_INVENTORY_ITEM_ID_3 IS NULL )))
+       AND (    ( Recinfo.ORGANIZATION_ID_3 = p_ORGANIZATION_ID_3)
+            OR (    ( Recinfo.ORGANIZATION_ID_3 IS NULL )
+                AND (  p_ORGANIZATION_ID_3 IS NULL )))
+       AND (    ( Recinfo.UOM_CODE_3 = p_UOM_CODE_3)
+            OR (    ( Recinfo.UOM_CODE_3 IS NULL )
+                AND (  p_UOM_CODE_3 IS NULL )))
+       AND (    ( Recinfo.QUANTITY_3 = p_QUANTITY_3)
+            OR (    ( Recinfo.QUANTITY_3 IS NULL )
+                AND (  p_QUANTITY_3 IS NULL )))
+       AND (    ( Recinfo.BUDGET_AMOUNT_3 = p_BUDGET_AMOUNT_3)
+            OR (    ( Recinfo.BUDGET_AMOUNT_3 IS NULL )
+                AND (  p_BUDGET_AMOUNT_3 IS NULL )))
+       AND (    ( Recinfo.STATUS_CODE_4 = p_STATUS_CODE_4)
+            OR (    ( Recinfo.STATUS_CODE_4 IS NULL )
+                AND (  p_STATUS_CODE_4 IS NULL )))
+       AND (    ( Recinfo.INTEREST_TYPE_ID_4 = p_INTEREST_TYPE_ID_4)
+            OR (    ( Recinfo.INTEREST_TYPE_ID_4 IS NULL )
+                AND (  p_INTEREST_TYPE_ID_4 IS NULL )))
+       AND (    ( Recinfo.PRIMARY_INTEREST_CODE_ID_4 = p_PRIMARY_INTEREST_CODE_ID_4)
+            OR (    ( Recinfo.PRIMARY_INTEREST_CODE_ID_4 IS NULL )
+                AND (  p_PRIMARY_INTEREST_CODE_ID_4 IS NULL )))
+       AND (    ( Recinfo.SECONDARY_INTEREST_CODE_ID_4 = p_SECONDARY_INTEREST_CODE_ID_4)
+            OR (    ( Recinfo.SECONDARY_INTEREST_CODE_ID_4 IS NULL )
+                AND (  p_SECONDARY_INTEREST_CODE_ID_4 IS NULL )))
+       AND (    ( Recinfo.INVENTORY_ITEM_ID_4 = p_INVENTORY_ITEM_ID_4)
+            OR (    ( Recinfo.INVENTORY_ITEM_ID_4 IS NULL )
+                AND (  p_INVENTORY_ITEM_ID_4 IS NULL )))
+       AND (    ( Recinfo.ORGANIZATION_ID_4 = p_ORGANIZATION_ID_4)
+            OR (    ( Recinfo.ORGANIZATION_ID_4 IS NULL )
+                AND (  p_ORGANIZATION_ID_4 IS NULL )))
+       AND (    ( Recinfo.UOM_CODE_4 = p_UOM_CODE_4)
+            OR (    ( Recinfo.UOM_CODE_4 IS NULL )
+                AND (  p_UOM_CODE_4 IS NULL )))
+       AND (    ( Recinfo.QUANTITY_4 = p_QUANTITY_4)
+            OR (    ( Recinfo.QUANTITY_4 IS NULL )
+                AND (  p_QUANTITY_4 IS NULL )))
+       AND (    ( Recinfo.BUDGET_AMOUNT_4 = p_BUDGET_AMOUNT_4)
+            OR (    ( Recinfo.BUDGET_AMOUNT_4 IS NULL )
+                AND (  p_BUDGET_AMOUNT_4 IS NULL )))
+       AND (    ( Recinfo.STATUS_CODE_5 = p_STATUS_CODE_5)
+            OR (    ( Recinfo.STATUS_CODE_5 IS NULL )
+                AND (  p_STATUS_CODE_5 IS NULL )))
+       AND (    ( Recinfo.INTEREST_TYPE_ID_5 = p_INTEREST_TYPE_ID_5)
+            OR (    ( Recinfo.INTEREST_TYPE_ID_5 IS NULL )
+                AND (  p_INTEREST_TYPE_ID_5 IS NULL )))
+       AND (    ( Recinfo.PRIMARY_INTEREST_CODE_ID_5 = p_PRIMARY_INTEREST_CODE_ID_5)
+            OR (    ( Recinfo.PRIMARY_INTEREST_CODE_ID_5 IS NULL )
+                AND (  p_PRIMARY_INTEREST_CODE_ID_5 IS NULL )))
+       AND (    ( Recinfo.SECONDARY_INTEREST_CODE_ID_5 = p_SECONDARY_INTEREST_CODE_ID_5)
+            OR (    ( Recinfo.SECONDARY_INTEREST_CODE_ID_5 IS NULL )
+                AND (  p_SECONDARY_INTEREST_CODE_ID_5 IS NULL )))
+       AND (    ( Recinfo.INVENTORY_ITEM_ID_5 = p_INVENTORY_ITEM_ID_5)
+            OR (    ( Recinfo.INVENTORY_ITEM_ID_5 IS NULL )
+                AND (  p_INVENTORY_ITEM_ID_5 IS NULL )))
+       AND (    ( Recinfo.ORGANIZATION_ID_5 = p_ORGANIZATION_ID_5)
+            OR (    ( Recinfo.ORGANIZATION_ID_5 IS NULL )
+                AND (  p_ORGANIZATION_ID_5 IS NULL )))
+       AND (    ( Recinfo.UOM_CODE_5 = p_UOM_CODE_5)
+            OR (    ( Recinfo.UOM_CODE_5 IS NULL )
+                AND (  p_UOM_CODE_5 IS NULL )))
+       AND (    ( Recinfo.QUANTITY_5 = p_QUANTITY_5)
+            OR (    ( Recinfo.QUANTITY_5 IS NULL )
+                AND (  p_QUANTITY_5 IS NULL )))
+       AND (    ( Recinfo.BUDGET_AMOUNT_5 = p_BUDGET_AMOUNT_5)
+            OR (    ( Recinfo.BUDGET_AMOUNT_5 IS NULL )
+                AND (  p_BUDGET_AMOUNT_5 IS NULL )))
+       AND (    ( Recinfo.INTERACTION_NOTES_1 = p_INTERACTION_NOTES_1)
+            OR (    ( Recinfo.INTERACTION_NOTES_1 IS NULL )
+                AND (  p_INTERACTION_NOTES_1 IS NULL )))
+       AND (    ( Recinfo.PRIORITY_1 = p_PRIORITY_1)
+            OR (    ( Recinfo.PRIORITY_1 IS NULL )
+                AND (  p_PRIORITY_1 IS NULL )))
+       AND (    ( Recinfo.TODO_DATE_1 = p_TODO_DATE_1)
+            OR (    ( Recinfo.TODO_DATE_1 IS NULL )
+                AND (  p_TODO_DATE_1 IS NULL )))
+       AND (    ( Recinfo.TODO_START_TIME_1 = p_TODO_START_TIME_1)
+            OR (    ( Recinfo.TODO_START_TIME_1 IS NULL )
+                AND (  p_TODO_START_TIME_1 IS NULL )))
+       AND (    ( Recinfo.ACTIVITY_CODE_1 = p_ACTIVITY_CODE_1)
+            OR (    ( Recinfo.ACTIVITY_CODE_1 IS NULL )
+                AND (  p_ACTIVITY_CODE_1 IS NULL )))
+       AND (    ( Recinfo.INTERACTION_NOTES_2 = p_INTERACTION_NOTES_2)
+            OR (    ( Recinfo.INTERACTION_NOTES_2 IS NULL )
+                AND (  p_INTERACTION_NOTES_2 IS NULL )))
+       AND (    ( Recinfo.PRIORITY_2 = p_PRIORITY_2)
+            OR (    ( Recinfo.PRIORITY_2 IS NULL )
+                AND (  p_PRIORITY_2 IS NULL )))
+       AND (    ( Recinfo.TODO_DATE_2 = p_TODO_DATE_2)
+            OR (    ( Recinfo.TODO_DATE_2 IS NULL )
+                AND (  p_TODO_DATE_2 IS NULL )))
+       AND (    ( Recinfo.TODO_START_TIME_2 = p_TODO_START_TIME_2)
+            OR (    ( Recinfo.TODO_START_TIME_2 IS NULL )
+                AND (  p_TODO_START_TIME_2 IS NULL )))
+       AND (    ( Recinfo.ACTIVITY_CODE_2 = p_ACTIVITY_CODE_2)
+            OR (    ( Recinfo.ACTIVITY_CODE_2 IS NULL )
+                AND (  p_ACTIVITY_CODE_2 IS NULL )))
+       AND (    ( Recinfo.INTERACTION_NOTES_3 = p_INTERACTION_NOTES_3)
+            OR (    ( Recinfo.INTERACTION_NOTES_3 IS NULL )
+                AND (  p_INTERACTION_NOTES_3 IS NULL )))
+       AND (    ( Recinfo.PRIORITY_3 = p_PRIORITY_3)
+            OR (    ( Recinfo.PRIORITY_3 IS NULL )
+                AND (  p_PRIORITY_3 IS NULL )))
+       AND (    ( Recinfo.TODO_DATE_3 = p_TODO_DATE_3)
+            OR (    ( Recinfo.TODO_DATE_3 IS NULL )
+                AND (  p_TODO_DATE_3 IS NULL )))
+       AND (    ( Recinfo.TODO_START_TIME_3 = p_TODO_START_TIME_3)
+            OR (    ( Recinfo.TODO_START_TIME_3 IS NULL )
+                AND (  p_TODO_START_TIME_3 IS NULL )))
+       AND (    ( Recinfo.ACTIVITY_CODE_3 = p_ACTIVITY_CODE_3)
+            OR (    ( Recinfo.ACTIVITY_CODE_3 IS NULL )
+                AND (  p_ACTIVITY_CODE_3 IS NULL )))
+       AND (    ( Recinfo.INTERACTION_NOTES_4 = p_INTERACTION_NOTES_4)
+            OR (    ( Recinfo.INTERACTION_NOTES_4 IS NULL )
+                AND (  p_INTERACTION_NOTES_4 IS NULL )))
+       AND (    ( Recinfo.PRIORITY_4 = p_PRIORITY_4)
+            OR (    ( Recinfo.PRIORITY_4 IS NULL )
+                AND (  p_PRIORITY_4 IS NULL )))
+       AND (    ( Recinfo.TODO_DATE_4 = p_TODO_DATE_4)
+            OR (    ( Recinfo.TODO_DATE_4 IS NULL )
+                AND (  p_TODO_DATE_4 IS NULL )))
+       AND (    ( Recinfo.TODO_START_TIME_4 = p_TODO_START_TIME_4)
+            OR (    ( Recinfo.TODO_START_TIME_4 IS NULL )
+                AND (  p_TODO_START_TIME_4 IS NULL )))
+       AND (    ( Recinfo.ACTIVITY_CODE_4 = p_ACTIVITY_CODE_4)
+            OR (    ( Recinfo.ACTIVITY_CODE_4 IS NULL )
+                AND (  p_ACTIVITY_CODE_4 IS NULL )))
+       AND (    ( Recinfo.INTERACTION_NOTES_5 = p_INTERACTION_NOTES_5)
+            OR (    ( Recinfo.INTERACTION_NOTES_5 IS NULL )
+                AND (  p_INTERACTION_NOTES_5 IS NULL )))
+       AND (    ( Recinfo.PRIORITY_5 = p_PRIORITY_5)
+            OR (    ( Recinfo.PRIORITY_5 IS NULL )
+                AND (  p_PRIORITY_5 IS NULL )))
+       AND (    ( Recinfo.TODO_DATE_5 = p_TODO_DATE_5)
+            OR (    ( Recinfo.TODO_DATE_5 IS NULL )
+                AND (  p_TODO_DATE_5 IS NULL )))
+       AND (    ( Recinfo.TODO_START_TIME_5 = p_TODO_START_TIME_5)
+            OR (    ( Recinfo.TODO_START_TIME_5 IS NULL )
+                AND (  p_TODO_START_TIME_5 IS NULL )))
+       AND (    ( Recinfo.ACTIVITY_CODE_5 = p_ACTIVITY_CODE_5)
+            OR (    ( Recinfo.ACTIVITY_CODE_5 IS NULL )
+                AND (  p_ACTIVITY_CODE_5 IS NULL )))
+       AND (    ( Recinfo.INTERACTION_NOTES_6 = p_INTERACTION_NOTES_6)
+            OR (    ( Recinfo.INTERACTION_NOTES_6 IS NULL )
+                AND (  p_INTERACTION_NOTES_6 IS NULL )))
+       AND (    ( Recinfo.PRIORITY_6 = p_PRIORITY_6)
+            OR (    ( Recinfo.PRIORITY_6 IS NULL )
+                AND (  p_PRIORITY_6 IS NULL )))
+       AND (    ( Recinfo.TODO_DATE_6 = p_TODO_DATE_6)
+            OR (    ( Recinfo.TODO_DATE_6 IS NULL )
+                AND (  p_TODO_DATE_6 IS NULL )))
+       AND (    ( Recinfo.TODO_START_TIME_6 = p_TODO_START_TIME_6)
+            OR (    ( Recinfo.TODO_START_TIME_6 IS NULL )
+                AND (  p_TODO_START_TIME_6 IS NULL )))
+       AND (    ( Recinfo.ACTIVITY_CODE_6 = p_ACTIVITY_CODE_6)
+            OR (    ( Recinfo.ACTIVITY_CODE_6 IS NULL )
+                AND (  p_ACTIVITY_CODE_6 IS NULL )))
+       AND (    ( Recinfo.INTERACTION_NOTES_7 = p_INTERACTION_NOTES_7)
+            OR (    ( Recinfo.INTERACTION_NOTES_7 IS NULL )
+                AND (  p_INTERACTION_NOTES_7 IS NULL )))
+       AND (    ( Recinfo.PRIORITY_7 = p_PRIORITY_7)
+            OR (    ( Recinfo.PRIORITY_7 IS NULL )
+                AND (  p_PRIORITY_7 IS NULL )))
+       AND (    ( Recinfo.TODO_DATE_7 = p_TODO_DATE_7)
+            OR (    ( Recinfo.TODO_DATE_7 IS NULL )
+                AND (  p_TODO_DATE_7 IS NULL )))
+       AND (    ( Recinfo.TODO_START_TIME_7 = p_TODO_START_TIME_7)
+            OR (    ( Recinfo.TODO_START_TIME_7 IS NULL )
+                AND (  p_TODO_START_TIME_7 IS NULL )))
+       AND (    ( Recinfo.ACTIVITY_CODE_7 = p_ACTIVITY_CODE_7)
+            OR (    ( Recinfo.ACTIVITY_CODE_7 IS NULL )
+                AND (  p_ACTIVITY_CODE_7 IS NULL )))
+       AND (    ( Recinfo.INTERACTION_NOTES_8 = p_INTERACTION_NOTES_8)
+            OR (    ( Recinfo.INTERACTION_NOTES_8 IS NULL )
+                AND (  p_INTERACTION_NOTES_8 IS NULL )))
+       AND (    ( Recinfo.PRIORITY_8 = p_PRIORITY_8)
+            OR (    ( Recinfo.PRIORITY_8 IS NULL )
+                AND (  p_PRIORITY_8 IS NULL )))
+       AND (    ( Recinfo.TODO_DATE_8 = p_TODO_DATE_8)
+            OR (    ( Recinfo.TODO_DATE_8 IS NULL )
+                AND (  p_TODO_DATE_8 IS NULL )))
+       AND (    ( Recinfo.TODO_START_TIME_8 = p_TODO_START_TIME_8)
+            OR (    ( Recinfo.TODO_START_TIME_8 IS NULL )
+                AND (  p_TODO_START_TIME_8 IS NULL )))
+       AND (    ( Recinfo.ACTIVITY_CODE_8 = p_ACTIVITY_CODE_8)
+            OR (    ( Recinfo.ACTIVITY_CODE_8 IS NULL )
+                AND (  p_ACTIVITY_CODE_8 IS NULL )))
+       AND (    ( Recinfo.INTERACTION_NOTES_9 = p_INTERACTION_NOTES_9)
+            OR (    ( Recinfo.INTERACTION_NOTES_9 IS NULL )
+                AND (  p_INTERACTION_NOTES_9 IS NULL )))
+       AND (    ( Recinfo.PRIORITY_9 = p_PRIORITY_9)
+            OR (    ( Recinfo.PRIORITY_9 IS NULL )
+                AND (  p_PRIORITY_9 IS NULL )))
+       AND (    ( Recinfo.TODO_DATE_9 = p_TODO_DATE_9)
+            OR (    ( Recinfo.TODO_DATE_9 IS NULL )
+                AND (  p_TODO_DATE_9 IS NULL )))
+       AND (    ( Recinfo.TODO_START_TIME_9 = p_TODO_START_TIME_9)
+            OR (    ( Recinfo.TODO_START_TIME_9 IS NULL )
+                AND (  p_TODO_START_TIME_9 IS NULL )))
+       AND (    ( Recinfo.ACTIVITY_CODE_9 = p_ACTIVITY_CODE_9)
+            OR (    ( Recinfo.ACTIVITY_CODE_9 IS NULL )
+                AND (  p_ACTIVITY_CODE_9 IS NULL )))
+       AND (    ( Recinfo.INTERACTION_NOTES_10 = p_INTERACTION_NOTES_10)
+            OR (    ( Recinfo.INTERACTION_NOTES_10 IS NULL )
+                AND (  p_INTERACTION_NOTES_10 IS NULL )))
+       AND (    ( Recinfo.PRIORITY_10 = p_PRIORITY_10)
+            OR (    ( Recinfo.PRIORITY_10 IS NULL )
+                AND (  p_PRIORITY_10 IS NULL )))
+       AND (    ( Recinfo.TODO_DATE_10 = p_TODO_DATE_10)
+            OR (    ( Recinfo.TODO_DATE_10 IS NULL )
+                AND (  p_TODO_DATE_10 IS NULL )))
+       AND (    ( Recinfo.TODO_START_TIME_10 = p_TODO_START_TIME_10)
+            OR (    ( Recinfo.TODO_START_TIME_10 IS NULL )
+                AND (  p_TODO_START_TIME_10 IS NULL )))
+       AND (    ( Recinfo.ACTIVITY_CODE_10 = p_ACTIVITY_CODE_10)
+            OR (    ( Recinfo.ACTIVITY_CODE_10 IS NULL )
+                AND (  p_ACTIVITY_CODE_10 IS NULL )))
+       AND (    ( Recinfo.LEAD_NOTE = p_LEAD_NOTE)
+            OR (    ( Recinfo.LEAD_NOTE IS NULL )
+                AND (  p_LEAD_NOTE IS NULL )))
+       AND (    ( Recinfo.MIDDLE_INITIAL = p_MIDDLE_INITIAL)
+            OR (    ( Recinfo.MIDDLE_INITIAL IS NULL )
+                AND (  p_MIDDLE_INITIAL IS NULL )))
+       AND (    ( Recinfo.FAX_NUMBER = p_FAX_NUMBER)
+            OR (    ( Recinfo.FAX_NUMBER IS NULL )
+                AND (  p_FAX_NUMBER IS NULL )))
+       AND (    ( Recinfo.FAX_AREA_CODE = p_FAX_AREA_CODE)
+            OR (    ( Recinfo.FAX_AREA_CODE IS NULL )
+                AND (  p_FAX_AREA_CODE IS NULL )))
+       AND (    ( Recinfo.MAIL_STOP = p_MAIL_STOP)
+            OR (    ( Recinfo.MAIL_STOP IS NULL )
+                AND (  p_MAIL_STOP IS NULL )))
+       AND (    ( Recinfo.NUM_ENROLLED = p_NUM_ENROLLED)
+            OR (    ( Recinfo.NUM_ENROLLED IS NULL )
+                AND (  p_NUM_ENROLLED IS NULL )))
+       AND (    ( Recinfo.CONFIRMED_FLAG = p_CONFIRMED_FLAG)
+            OR (    ( Recinfo.CONFIRMED_FLAG IS NULL )
+                AND (  p_CONFIRMED_FLAG IS NULL )))
+       AND (    ( Recinfo.PAYMENT_AMOUNT = p_PAYMENT_AMOUNT)
+            OR (    ( Recinfo.PAYMENT_AMOUNT IS NULL )
+                AND (  p_PAYMENT_AMOUNT IS NULL )))
+       AND (    ( Recinfo.NUM_ATTENDED = p_NUM_ATTENDED)
+            OR (    ( Recinfo.NUM_ATTENDED IS NULL )
+                AND (  p_NUM_ATTENDED IS NULL )))
+       AND (    ( Recinfo.PROMOTION_NAME = p_PROMOTION_NAME)
+            OR (    ( Recinfo.PROMOTION_NAME IS NULL )
+                AND (  p_PROMOTION_NAME IS NULL )))
+       AND (    ( Recinfo.STATUS_CHANGE_FLAG = p_STATUS_CHANGE_FLAG)
+            OR (    ( Recinfo.STATUS_CHANGE_FLAG IS NULL )
+                AND (  p_STATUS_CHANGE_FLAG IS NULL )))
+       AND (    ( Recinfo.VEHICLE_RESPONSE_CODE = p_VEHICLE_RESPONSE_CODE)
+            OR (    ( Recinfo.VEHICLE_RESPONSE_CODE IS NULL )
+                AND (  p_VEHICLE_RESPONSE_CODE IS NULL )))
+       AND (    ( Recinfo.SOURCE_SYSTEM = p_SOURCE_SYSTEM)
+            OR (    ( Recinfo.SOURCE_SYSTEM IS NULL )
+                AND (  p_SOURCE_SYSTEM IS NULL )))
+       AND (    ( Recinfo.CONTACT_PARTY_ID = p_CONTACT_PARTY_ID)
+            OR (    ( Recinfo.CONTACT_PARTY_ID IS NULL )
+                AND (  p_CONTACT_PARTY_ID IS NULL )))
+       AND (    ( Recinfo.PRM_SALES_LEAD_TYPE = p_PRM_SALES_LEAD_TYPE)
+            OR (    ( Recinfo.PRM_SALES_LEAD_TYPE IS NULL )
+                AND (  p_PRM_SALES_LEAD_TYPE IS NULL )))
+       AND (    ( Recinfo.PRM_EXEC_SPONSOR_FLAG = p_PRM_EXEC_SPONSOR_FLAG)
+            OR (    ( Recinfo.PRM_EXEC_SPONSOR_FLAG IS NULL )
+                AND (  p_PRM_EXEC_SPONSOR_FLAG IS NULL )))
+       AND (    ( Recinfo.PRM_PRJ_LEAD_IN_PLACE_FLAG = p_PRM_PRJ_LEAD_IN_PLACE_FLAG)
+            OR (    ( Recinfo.PRM_PRJ_LEAD_IN_PLACE_FLAG IS NULL )
+                AND (  p_PRM_PRJ_LEAD_IN_PLACE_FLAG IS NULL )))
+       AND (    ( Recinfo.INCUMBENT_PARTNER_PARTY_ID = p_INC_PARTNER_PARTY_ID)
+            OR (    ( Recinfo.INCUMBENT_PARTNER_PARTY_ID IS NULL )
+                AND (  p_INC_PARTNER_PARTY_ID IS NULL )))
+       AND (    ( Recinfo.INCUMBENT_PARTNER_RESOURCE_ID = p_INC_PARTNER_RESOURCE_ID)
+            OR (    ( Recinfo.INCUMBENT_PARTNER_RESOURCE_ID IS NULL )
+                AND (  p_INC_PARTNER_RESOURCE_ID IS NULL )))
+       AND (    ( Recinfo.OFFER_ID = p_OFFER_ID)
+            OR (    ( Recinfo.OFFER_ID IS NULL )
+                AND (  p_OFFER_ID IS NULL )))
+       AND (    ( Recinfo.PRM_IND_CLASSIFICATION_CODE = p_PRM_IND_CLASSIFICATION_CODE)
+            OR (    ( Recinfo.PRM_IND_CLASSIFICATION_CODE IS NULL )
+                AND (  p_PRM_IND_CLASSIFICATION_CODE IS NULL )))
+       AND (    ( Recinfo.PARTY_TYPE = p_PARTY_TYPE)
+            OR (    ( Recinfo.PARTY_TYPE IS NULL )
+                AND (  p_PARTY_TYPE IS NULL )))
+       AND (    ( Recinfo.BATCH_ID = p_BATCH_ID)
+            OR (    ( Recinfo.BATCH_ID IS NULL )
+                AND (  p_BATCH_ID IS NULL )))
+       AND (    ( Recinfo.PARTY_ID = p_PARTY_ID)
+            OR (    ( Recinfo.PARTY_ID IS NULL )
+                AND (  p_PARTY_ID IS NULL )))
+       AND (    ( Recinfo.PARTY_SITE_ID = p_PARTY_SITE_ID)
+            OR (    ( Recinfo.PARTY_SITE_ID IS NULL )
+                AND (  p_PARTY_SITE_ID IS NULL )))
+       AND (    ( Recinfo.LOCATION_ID = p_LOCATION_ID)
+            OR (    ( Recinfo.LOCATION_ID IS NULL )
+                AND (  p_LOCATION_ID IS NULL )))
+       AND (    ( Recinfo.REL_PARTY_ID = p_REL_PARTY_ID)
+            OR (    ( Recinfo.REL_PARTY_ID IS NULL )
+                AND (  p_REL_PARTY_ID IS NULL )))
+       AND (    ( Recinfo.SALES_LEAD_ID = p_SALES_LEAD_ID)
+            OR (    ( Recinfo.SALES_LEAD_ID IS NULL )
+                AND (  p_SALES_LEAD_ID IS NULL )))
+       AND (    ( Recinfo.ADDRESS_KEY = p_ADDRESS_KEY)
+            OR (    ( Recinfo.ADDRESS_KEY IS NULL )
+                AND (  p_ADDRESS_KEY IS NULL )))
+       AND (    ( Recinfo.CONTACT_KEY = p_CONTACT_KEY)
+            OR (    ( Recinfo.CONTACT_KEY IS NULL )
+                AND (  p_CONTACT_KEY IS NULL )))
+       AND (    ( Recinfo.JOB_TITLE_CODE = p_JOB_TITLE_CODE)
+            OR (    ( Recinfo.JOB_TITLE_CODE IS NULL )
+                AND (  p_JOB_TITLE_CODE IS NULL )))
+       AND (    ( Recinfo.DO_NOT_PHONE_FLAG = p_DO_NOT_PHONE_FLAG)
+            OR (    ( Recinfo.DO_NOT_PHONE_FLAG IS NULL )
+                AND (  p_DO_NOT_PHONE_FLAG IS NULL )))
+       AND (    ( Recinfo.DO_NOT_FAX_FLAG = p_DO_NOT_FAX_FLAG)
+            OR (    ( Recinfo.DO_NOT_FAX_FLAG IS NULL )
+                AND (  p_DO_NOT_FAX_FLAG IS NULL )))
+       AND (    ( Recinfo.DO_NOT_EMAIL_FLAG = p_DO_NOT_EMAIL_FLAG)
+            OR (    ( Recinfo.DO_NOT_EMAIL_FLAG IS NULL )
+                AND (  p_DO_NOT_EMAIL_FLAG IS NULL )))
+       AND (    ( Recinfo.ORIG_SYSTEM_REFERENCE = p_ORIG_SYSTEM_REFERENCE)
+            OR (    ( Recinfo.ORIG_SYSTEM_REFERENCE IS NULL )
+                AND (  p_ORIG_SYSTEM_REFERENCE IS NULL )))
+       AND (    ( Recinfo.LEAD_RANK_ID = p_LEAD_RANK_ID)
+            OR (    ( Recinfo.LEAD_RANK_ID IS NULL )
+                AND (  p_LEAD_RANK_ID IS NULL )))
+       AND (    ( Recinfo.NEW_PARTY_FLAG = p_NEW_PARTY_FLAG)
+            OR (    ( Recinfo.NEW_PARTY_FLAG IS NULL )
+                AND (  p_NEW_PARTY_FLAG IS NULL )))
+       AND (    ( Recinfo.NEW_LOC_FLAG = p_NEW_LOC_FLAG)
+            OR (    ( Recinfo.NEW_LOC_FLAG IS NULL )
+                AND (  p_NEW_LOC_FLAG IS NULL )))
+       AND (    ( Recinfo.NEW_PS_FLAG = p_NEW_PS_FLAG)
+            OR (    ( Recinfo.NEW_PS_FLAG IS NULL )
+                AND (  p_NEW_PS_FLAG IS NULL )))
+       AND (    ( Recinfo.NEW_REL_FLAG = p_NEW_REL_FLAG)
+            OR (    ( Recinfo.NEW_REL_FLAG IS NULL )
+                AND (  p_NEW_REL_FLAG IS NULL )))
+       AND (    ( Recinfo.NEW_CON_FLAG = p_NEW_CON_FLAG)
+            OR (    ( Recinfo.NEW_CON_FLAG IS NULL )
+                AND (  p_NEW_CON_FLAG IS NULL )))
+       AND (    ( Recinfo.ORIG_SYSTEM_CODE = p_ORIG_SYSTEM_CODE)
+            OR (    ( Recinfo.ORIG_SYSTEM_CODE IS NULL )
+                AND (  p_ORIG_SYSTEM_CODE IS NULL )))
+       AND (    ( Recinfo.URGENT_FLAG = p_URGENT_FLAG)
+            OR (    ( Recinfo.URGENT_FLAG IS NULL )
+                AND (  p_URGENT_FLAG IS NULL )))
+       ) then
+       return;
+   else
+       FND_MESSAGE.SET_NAME('FND', 'FORM_RECORD_CHANGED');
+       APP_EXCEPTION.RAISE_EXCEPTION;
+   End If;
+END Lock_Row;
+
+End AS_IMPORT_INTERFACE_PKG;
+
+/

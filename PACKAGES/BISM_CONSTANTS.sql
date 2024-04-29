@@ -1,0 +1,17 @@
+--------------------------------------------------------
+--  DDL for Package BISM_CONSTANTS
+--------------------------------------------------------
+
+  CREATE OR REPLACE EDITIONABLE PACKAGE "APPS"."BISM_CONSTANTS" AUTHID CURRENT_USER AS
+/* $Header: bibcnsts.pls 115.4 2004/02/13 00:33:49 gkellner noship $ */
+OK CONSTANT INTEGER := 0;
+PARENT_FOLDER_NOT_FOUND CONSTANT INTEGER := 1;
+INSUFFICIENT_PRIVILEGES CONSTANT INTEGER := 2;
+DATA_NOT_FOUND CONSTANT INTEGER := 3;
+IS_FOLDER CONSTANT INTEGER := 4;
+IS_OBJECT CONSTANT INTEGER := 5;
+END BISM_CONSTANTS;
+
+ 
+
+/

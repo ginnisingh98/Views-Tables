@@ -1,0 +1,1987 @@
+--------------------------------------------------------
+--  DDL for Package Body MRP_MRPRPROP_XMLP_PKG
+--------------------------------------------------------
+
+  CREATE OR REPLACE EDITIONABLE PACKAGE BODY "APPS"."MRP_MRPRPROP_XMLP_PKG" AS
+/* $Header: MRPRPROPB.pls 120.3 2008/01/02 12:53:39 nchinnam noship $ */
+  FUNCTION BEFOREREPORT RETURN BOOLEAN IS
+  DATE_FORMAT varchar2(20):='DD'||'-MON-'||'YY';
+  BEGIN
+    DECLARE
+      CAT_STRUCT_NUM NUMBER;
+      CAL_CODE VARCHAR2(20);
+      EXC_SET_ID NUMBER;
+    BEGIN
+      P_CONC_REQUEST_ID := FND_GLOBAL.CONC_REQUEST_ID;
+      /*SRW.USER_EXIT('FND SRWINIT')*/NULL;
+      IF (P_DEBUG = 'Y') THEN
+        EXECUTE IMMEDIATE
+          'ALTER SESSION SET SQL_TRACE TRUE';
+      END IF;
+      P_REPETITIVE_ITEM := 3;
+      P_LEVEL := 1;
+      P_NET_RSV := 1;
+      P_NET_UNRSV := 1;
+      P_NET_WIP := 1;
+      P_SUBINV := NULL;
+      IF ((P_FIRST_SORT = 2) OR (P_SECOND_SORT = 2) OR (P_THIRD_SORT = 2) OR (P_LOW_CAT IS NOT NULL) OR (P_HIGH_CAT IS NOT NULL)) THEN
+        NULL;
+      END IF;
+      IF ((P_LOW_ITEM IS NOT NULL) OR (P_HIGH_ITEM IS NOT NULL)) THEN
+        NULL;
+      END IF;
+      IF ((P_LOW_CAT IS NOT NULL) OR (P_HIGH_CAT IS NOT NULL)) THEN
+        NULL;
+      END IF;
+      IF ((P_FIRST_SORT = 6) OR (P_SECOND_SORT = 6) OR (P_THIRD_SORT = 6) OR (P_ABC_CLASS IS NOT NULL)) THEN
+        P_DYNAMIC_ABC := 'abc_cls.abc_class_name';
+      ELSE
+        P_DYNAMIC_ABC := ''' || ''';
+      END IF;
+      P_PUR_REVISION := VALUE('INV_PURCHASING_BY_REVISION');
+      IF P_RESTOCK = 1 THEN
+        SELECT_CALENDAR_DEFAULTS(P_ORG_ID
+                                ,CAL_CODE
+                                ,EXC_SET_ID);
+        P_CAL_CODE := CAL_CODE;
+        P_EXC_SET_ID := EXC_SET_ID;
+        P_APPROVAL := TO_NUMBER(NVL(VALUE('INV_MINMAX_REORDER_APPROVED')
+                                   ,'2'));
+        SELECT
+          sysdate
+        INTO P_CURRENT_DATE
+        FROM
+          DUAL;
+        SELECT
+          EMPLOYEE_ID
+        INTO P_EMPLOYEE_ID
+        FROM
+          FND_USER
+        WHERE USER_ID = P_USER_ID;
+        SELECT
+          OPERATING_UNIT
+        INTO P_PO_ORG_ID
+        FROM
+          ORG_ORGANIZATION_DEFINITIONS
+        WHERE ORGANIZATION_ID = P_ORG_ID;
+        SELECT
+          NVL(REQ_ENCUMBRANCE_FLAG
+             ,'N')
+        INTO P_ENCUM_FLAG
+        FROM
+          FINANCIALS_SYSTEM_PARAMS_ALL
+        WHERE NVL(ORG_ID
+           ,-11) = NVL(P_PO_ORG_ID
+           ,-11);
+        SELECT
+          NVL(PO.CUSTOMER_ID
+             ,0)
+        INTO P_CUSTOMER_ID
+        FROM
+          PO_LOCATION_ASSOCIATIONS_ALL PO,
+          HR_LOCATIONS HR
+        WHERE HR.LOCATION_ID = P_DEFAULT_DELIVERY_TO
+          AND HR.LOCATION_ID = po.location_id (+)
+          AND NVL(PO.ORG_ID
+           ,-11) = NVL(P_PO_ORG_ID
+           ,-11);
+        SELECT
+          WIP_JOB_SCHEDULE_INTERFACE_S.NEXTVAL
+        INTO P_WIP_BATCH_ID
+        FROM
+          DUAL;
+      END IF;
+    END;
+	DP_DEMAND_CUTOFF_DATE:=to_char(P_DEMAND_CUTOFF_DATE,DATE_FORMAT);
+	DP_SUPPLY_CUTOFF_DATE:=to_char(P_SUPPLY_CUTOFF_DATE,DATE_FORMAT);
+    RETURN (TRUE);
+  END BEFOREREPORT;
+
+  FUNCTION AFTERREPORT RETURN BOOLEAN IS
+  BEGIN
+    BEGIN
+      /*SRW.USER_EXIT('FND SRWEXIT')*/NULL;
+    END;
+    RETURN (TRUE);
+  END AFTERREPORT;
+
+  FUNCTION C_CATEGORY_WHEREFORMULA RETURN VARCHAR2 IS
+  BEGIN
+    DECLARE
+      CATEGORY_WHERE VARCHAR2(250);
+    BEGIN
+      IF ((P_LOW_CAT IS NOT NULL) OR (P_HIGH_CAT IS NOT NULL) OR (P_FIRST_SORT = 2) OR (P_SECOND_SORT = 2) OR (P_THIRD_SORT = 2)) THEN
+        CATEGORY_WHERE := ' AND cat.structure_id = ' || TO_CHAR(P_CAT_STRUCT_NUM);
+      ELSE
+        CATEGORY_WHERE := ' ';
+      END IF;
+      RETURN (CATEGORY_WHERE);
+    END;
+    RETURN NULL;
+  END C_CATEGORY_WHEREFORMULA;
+
+  FUNCTION C_PLANNER_RANGEFORMULA RETURN VARCHAR2 IS
+  BEGIN
+    DECLARE
+      PLANNER_RANGE VARCHAR2(80);
+    BEGIN
+      IF (P_LOW_PLANNER IS NOT NULL) AND (P_HIGH_PLANNER IS NOT NULL) THEN
+        PLANNER_RANGE := ' AND sys.planner_code BETWEEN ''' || P_LOW_PLANNER || ''' AND ''' || P_HIGH_PLANNER || '''';
+      ELSIF (P_LOW_PLANNER IS NOT NULL) THEN
+        PLANNER_RANGE := ' AND sys.planner_code = ''' || P_LOW_PLANNER || '''';
+      ELSIF (P_HIGH_PLANNER IS NOT NULL) THEN
+        PLANNER_RANGE := ' AND sys.planner_code = ''' || P_HIGH_PLANNER || '''';
+      ELSE
+        PLANNER_RANGE := ' ';
+      END IF;
+      RETURN (PLANNER_RANGE);
+    END;
+    RETURN NULL;
+  END C_PLANNER_RANGEFORMULA;
+
+  FUNCTION C_ORDER_BYFORMULA RETURN VARCHAR2 IS
+  BEGIN
+    DECLARE
+      FIRST_ORDER_BY VARCHAR2(250);
+      SECOND_ORDER_BY VARCHAR2(250);
+      THIRD_ORDER_BY VARCHAR2(250);
+      ORDER_BY VARCHAR2(250);
+    BEGIN
+      IF (P_FIRST_SORT = 1) THEN
+        FIRST_ORDER_BY := 1;
+      ELSIF (P_FIRST_SORT = 2) THEN
+        FIRST_ORDER_BY := 2;
+      ELSIF (P_FIRST_SORT = 3) THEN
+        FIRST_ORDER_BY := 3;
+      ELSIF (P_FIRST_SORT = 4) THEN
+        FIRST_ORDER_BY := 4;
+      ELSIF (P_FIRST_SORT = 6) THEN
+        FIRST_ORDER_BY := 5;
+      ELSE
+        FIRST_ORDER_BY := P_ITEM_ORDER_BY;
+      END IF;
+      IF (P_SECOND_SORT = 1) THEN
+        SECOND_ORDER_BY := ',1';
+      ELSIF (P_SECOND_SORT = 2) THEN
+        SECOND_ORDER_BY := ',2';
+      ELSIF (P_SECOND_SORT = 3) THEN
+        SECOND_ORDER_BY := ',3';
+      ELSIF (P_SECOND_SORT = 4) THEN
+        SECOND_ORDER_BY := ',4';
+      ELSIF (P_SECOND_SORT = 6) THEN
+        SECOND_ORDER_BY := ',5';
+      ELSE
+        SECOND_ORDER_BY := ' ';
+      END IF;
+      IF (P_THIRD_SORT = 1) THEN
+        THIRD_ORDER_BY := ',1';
+      ELSIF (P_THIRD_SORT = 2) THEN
+        THIRD_ORDER_BY := ',2';
+      ELSIF (P_THIRD_SORT = 3) THEN
+        THIRD_ORDER_BY := ',3';
+      ELSIF (P_THIRD_SORT = 4) THEN
+        THIRD_ORDER_BY := ',4';
+      ELSIF (P_THIRD_SORT = 6) THEN
+        THIRD_ORDER_BY := ',5';
+      ELSE
+        THIRD_ORDER_BY := ' ';
+      END IF;
+      ORDER_BY := FIRST_ORDER_BY || SECOND_ORDER_BY || THIRD_ORDER_BY || ',1';
+      RETURN (ORDER_BY);
+    END;
+    RETURN NULL;
+  END C_ORDER_BYFORMULA;
+
+  FUNCTION C_TOT_AVAILFORMULA(C_DEMAND_QTY IN NUMBER) RETURN NUMBER IS
+  BEGIN
+    RETURN (C_ONHAND_QTY + C_SUPPLY_QTY - C_DEMAND_QTY);
+  END C_TOT_AVAILFORMULA;
+
+  FUNCTION C_SAFETY_STOCKFORMULA(C_ITEM_ID IN NUMBER
+                                ,C_ORD_LEAD_TIME IN NUMBER) RETURN NUMBER IS
+  BEGIN
+    DECLARE
+      SAFETY_STOCK NUMBER;
+    BEGIN
+      SELECT
+        NVL(MAX(S1.SAFETY_STOCK_QUANTITY)
+           ,0)
+      INTO SAFETY_STOCK
+      FROM
+        MTL_SAFETY_STOCKS S1
+      WHERE S1.ORGANIZATION_ID = P_ORG_ID
+        AND S1.INVENTORY_ITEM_ID = C_ITEM_ID
+        AND ( S1.EFFECTIVITY_DATE <= ( sysdate + C_ORD_LEAD_TIME )
+        AND S1.EFFECTIVITY_DATE >= (
+        SELECT
+          NVL(MAX(S2.EFFECTIVITY_DATE)
+             ,SYSDATE)
+        FROM
+          MTL_SAFETY_STOCKS S2
+        WHERE S2.ORGANIZATION_ID = P_ORG_ID
+          AND S2.INVENTORY_ITEM_ID = C_ITEM_ID
+          AND S2.EFFECTIVITY_DATE <= sysdate ) );
+      RETURN (SAFETY_STOCK);
+    END;
+    RETURN NULL;
+  END C_SAFETY_STOCKFORMULA;
+
+  FUNCTION C_FIRST_SORT_PFORMULA RETURN VARCHAR2 IS
+  BEGIN
+    DECLARE
+      SORT VARCHAR2(80);
+    BEGIN
+      SELECT
+        MEANING
+      INTO SORT
+      FROM
+        MFG_LOOKUPS
+      WHERE LOOKUP_TYPE = 'MRP_DATA_SELECT'
+        AND LOOKUP_CODE = P_FIRST_SORT;
+      RETURN (SORT);
+    END;
+    RETURN NULL;
+  END C_FIRST_SORT_PFORMULA;
+
+  FUNCTION C_SECOND_SORT_PFORMULA RETURN VARCHAR2 IS
+  BEGIN
+    DECLARE
+      SORT VARCHAR2(80);
+    BEGIN
+      SELECT
+        MEANING
+      INTO SORT
+      FROM
+        MFG_LOOKUPS
+      WHERE LOOKUP_TYPE = 'MRP_DATA_SELECT'
+        AND LOOKUP_CODE = P_SECOND_SORT;
+      RETURN (SORT);
+    END;
+    RETURN NULL;
+  END C_SECOND_SORT_PFORMULA;
+
+  FUNCTION C_THIRD_SORT_PFORMULA RETURN VARCHAR2 IS
+  BEGIN
+    DECLARE
+      SORT VARCHAR2(80);
+    BEGIN
+      SELECT
+        MEANING
+      INTO SORT
+      FROM
+        MFG_LOOKUPS
+      WHERE LOOKUP_TYPE = 'MRP_DATA_SELECT'
+        AND LOOKUP_CODE = P_THIRD_SORT;
+      RETURN (SORT);
+    END;
+    RETURN NULL;
+  END C_THIRD_SORT_PFORMULA;
+
+  FUNCTION C_CATEGORY_SET_PFORMULA RETURN VARCHAR2 IS
+  BEGIN
+    DECLARE
+      CAT_SET VARCHAR2(30);
+    BEGIN
+      SELECT
+        CATEGORY_SET_NAME
+      INTO CAT_SET
+      FROM
+        MTL_CATEGORY_SETS
+      WHERE CATEGORY_SET_ID = P_CATEGORY_SET;
+      RETURN (CAT_SET);
+    END;
+    RETURN NULL;
+  END C_CATEGORY_SET_PFORMULA;
+
+  FUNCTION C_DISPLAY_DESCRIPTION_PFORMULA RETURN VARCHAR2 IS
+  BEGIN
+    DECLARE
+      TEXT VARCHAR2(80);
+    BEGIN
+      SELECT
+        MEANING
+      INTO TEXT
+      FROM
+        MFG_LOOKUPS
+      WHERE LOOKUP_TYPE = 'SYS_YES_NO'
+        AND LOOKUP_CODE = P_DISPLAY_DESCRIPTION;
+      RETURN (TEXT);
+    END;
+    RETURN NULL;
+  END C_DISPLAY_DESCRIPTION_PFORMULA;
+
+  FUNCTION C_RESTOCK_PFORMULA RETURN VARCHAR2 IS
+  BEGIN
+    DECLARE
+      TEXT VARCHAR2(80);
+    BEGIN
+      SELECT
+        MEANING
+      INTO TEXT
+      FROM
+        MFG_LOOKUPS
+      WHERE LOOKUP_TYPE = 'SYS_YES_NO'
+        AND LOOKUP_CODE = P_RESTOCK;
+      RETURN (TEXT);
+    END;
+    RETURN NULL;
+  END C_RESTOCK_PFORMULA;
+
+  FUNCTION C_REORDER_POINTFORMULA(C_SAFETY_STOCK IN NUMBER) RETURN NUMBER IS
+  BEGIN
+    RETURN (C_LEAD_TIME_DEMAND + C_SAFETY_STOCK);
+  END C_REORDER_POINTFORMULA;
+
+  FUNCTION C_DEMAND_QTYFORMULA(C_ITEM_ID IN NUMBER
+                              ,C_ORD_LEAD_TIME IN NUMBER
+                              ,C_LOT_CONTROL IN NUMBER) RETURN NUMBER IS
+  BEGIN
+    C_LEAD_TIME_DEMAND := GET_LEAD_TIME_DEMAND(C_ITEM_ID
+                                              ,P_ORG_ID
+                                              ,P_FORECAST
+                                              ,C_ORD_LEAD_TIME);
+    C_ONHAND_QTY := GET_ONHAND_QTY(C_ITEM_ID
+                                  ,C_LOT_CONTROL
+                                  ,P_ORG_ID
+                                  ,P_SUBINV
+                                  ,P_INCLUDE_NONNET);
+    C_SUPPLY_QTY := GET_SUPPLY(P_SUPPLY_CUTOFF_DATE
+                              ,P_ORG_ID
+                              ,C_ITEM_ID
+                              ,P_INCLUDE_PO
+                              ,P_INCLUDE_NONNET
+                              ,P_INCLUDE_WIP
+                              ,P_INCLUDE_IF
+                              ,P_SUBINV);
+    RETURN (GET_DEMAND(C_ITEM_ID
+                     ,P_ORG_ID
+                     ,P_DEMAND_CUTOFF_DATE
+                     ,P_NET_RSV
+                     ,P_INCLUDE_NONNET
+                     ,P_INCLUDE_WIP
+                     ,P_NET_UNRSV
+                     ,P_NET_WIP
+                     ,P_SUBINV));
+  END C_DEMAND_QTYFORMULA;
+
+  FUNCTION C_REORDER_QTYFORMULA(C_ITEM_ID IN NUMBER
+                               ,C_TOT_AVAIL IN NUMBER
+                               ,C_REORDER_POINT IN NUMBER
+                               ,C_FIX_LOT_MULT IN NUMBER
+                               ,C_MIN_ORD_QTY IN NUMBER
+                               ,C_MAX_ORD_QTY IN NUMBER) RETURN NUMBER IS
+  BEGIN
+    RETURN (GET_REORDER_QTY(C_ITEM_ID
+                          ,C_TOT_AVAIL
+                          ,C_REORDER_POINT
+                          ,P_ORG_ID
+                          ,P_FORECAST
+                          ,C_FIX_LOT_MULT
+                          ,C_MIN_ORD_QTY
+                          ,C_MAX_ORD_QTY));
+  END C_REORDER_QTYFORMULA;
+
+  FUNCTION C_RUN_RESTOCKFORMULA(C_TOT_AVAIL IN NUMBER
+                               ,C_REORDER_POINT IN NUMBER
+                               ,C_REPETITIVE_PLANNED_ITEM IN VARCHAR2
+                               ,C_MAKE_BUY IN NUMBER
+                               ,C_CHARGE_ACCT IN NUMBER
+                               ,C_ACCRUAL_ACCT IN NUMBER
+                               ,C_IPV_ACCT IN NUMBER
+                               ,C_BUDGET_ACCT IN NUMBER
+                               ,C_SRC_TYPE IN NUMBER
+                               ,C_SRC_ORG IN VARCHAR2
+                               ,C_ORDER_FLAG IN VARCHAR2
+                               ,C_PURCH_FLAG IN VARCHAR2
+                               ,C_PROCESS_ENABLED IN VARCHAR2
+                               ,C_BUILD_IN_WIP IN VARCHAR2
+                               ,C_PICK_COMPONENTS IN VARCHAR2
+                               ,C_RECIPE_ENABLED IN VARCHAR2
+                               ,C_EXECUTION_ENABLED IN VARCHAR2
+                               ,C_ITEM_ID IN NUMBER
+                               ,C_REORDER_QTY IN NUMBER
+                               ,C_FIXED_LEAD_TIME IN NUMBER
+                               ,C_VARIABLE_LEAD_TIME IN NUMBER
+                               ,C_PUR_LEAD_TIME IN NUMBER
+                               ,C_PRIMARY_UOM IN VARCHAR2
+                               ,C_UNIT_PRICE IN NUMBER
+                               ,C_DESCRIPTION IN VARCHAR2
+                               ,C_SRC_SUBINV IN VARCHAR2) RETURN VARCHAR2 IS
+  BEGIN
+    DECLARE
+      MAKE_BUY NUMBER;
+      L_RETURN_STATUS VARCHAR2(1);
+      L_MSG_COUNT NUMBER;
+      L_MSG_DATA VARCHAR2(2000);
+      L_MSG VARCHAR2(2000);
+    BEGIN
+      IF ((P_RESTOCK = 1) AND (C_TOT_AVAIL < C_REORDER_POINT)) THEN
+        IF (C_REPETITIVE_PLANNED_ITEM = 'Y' AND P_REPETITIVE_ITEM = 3) THEN
+          RETURN (P_REPETITIVE_MESSAGE);
+        END IF;
+        IF (P_LEVEL = 2) THEN
+          MAKE_BUY := 2;
+        ELSE
+          MAKE_BUY := C_MAKE_BUY;
+        END IF;
+        IF MAKE_BUY = 2 THEN
+          IF (C_CHARGE_ACCT IS NULL) OR (C_ACCRUAL_ACCT IS NULL) OR (C_IPV_ACCT IS NULL) OR ((P_ENCUM_FLAG <> 'N') AND (C_BUDGET_ACCT IS NULL)) THEN
+            RETURN (P_MESSAGE_PO1);
+          ELSIF ((C_SRC_TYPE = 1) AND (C_SRC_ORG IS NULL)) THEN
+            RETURN (P_MESSAGE_PO2);
+          ELSIF ((C_SRC_TYPE = 1) AND (P_CUSTOMER_ID = 0)) THEN
+            RETURN (P_MESSAGE_PO3);
+          ELSIF NOT ((C_SRC_TYPE IS NOT NULL) AND (C_SRC_TYPE <> 1 OR C_ORDER_FLAG = 'Y') AND (C_SRC_TYPE <> 2 OR C_PURCH_FLAG = 'Y') AND (C_SRC_TYPE <> 3)) THEN
+            RETURN (P_MESSAGE_PO4);
+          END IF;
+        ELSIF MAKE_BUY = 1 THEN
+          IF C_PROCESS_ENABLED = 'N' THEN
+            IF C_BUILD_IN_WIP <> 'Y' THEN
+              RETURN (P_MESSAGE_WIP1);
+            ELSIF C_PICK_COMPONENTS <> 'N' THEN
+              RETURN (P_MESSAGE_WIP2);
+            END IF;
+          ELSE
+            IF C_RECIPE_ENABLED <> 'Y' OR C_EXECUTION_ENABLED <> 'Y' THEN
+              RETURN (P_MESSAGE_BATCH);
+            END IF;
+          END IF;
+        END IF;
+      ELSE
+        RETURN ('');
+      END IF;
+      INV_MMX_WRAPPER_PVT.DO_RESTOCK(X_RETURN_STATUS => L_RETURN_STATUS
+                                    ,X_MSG_COUNT => L_MSG_COUNT
+                                    ,X_MSG_DATA => L_MSG_DATA
+                                    ,P_ITEM_ID => C_ITEM_ID
+                                    ,P_MBF => MAKE_BUY
+                                    ,P_HANDLE_REPETITIVE_ITEM => P_REPETITIVE_ITEM
+                                    ,P_REPETITIVE_PLANNED_ITEM => C_REPETITIVE_PLANNED_ITEM
+                                    ,P_QTY => C_REORDER_QTY
+                                    ,P_FIXED_LEAD_TIME => C_FIXED_LEAD_TIME
+                                    ,P_VARIABLE_LEAD_TIME => C_VARIABLE_LEAD_TIME
+                                    ,P_BUYING_LEAD_TIME => C_PUR_LEAD_TIME
+                                    ,P_UOM => C_PRIMARY_UOM
+                                    ,P_ACCRU_ACCT => C_ACCRUAL_ACCT
+                                    ,P_IPV_ACCT => C_IPV_ACCT
+                                    ,P_BUDGET_ACCT => C_BUDGET_ACCT
+                                    ,P_CHARGE_ACCT => C_CHARGE_ACCT
+                                    ,P_PURCH_FLAG => C_PURCH_FLAG
+                                    ,P_ORDER_FLAG => C_ORDER_FLAG
+                                    ,P_TRANSACT_FLAG => 'Y'
+                                    ,P_UNIT_PRICE => C_UNIT_PRICE
+                                    ,P_WIP_ID => P_WIP_BATCH_ID
+                                    ,P_USER_ID => P_USER_ID
+                                    ,P_SYSD => P_CURRENT_DATE
+                                    ,P_ORGANIZATION_ID => P_ORG_ID
+                                    ,P_APPROVAL => P_APPROVAL
+                                    ,P_BUILD_IN_WIP => C_BUILD_IN_WIP
+                                    ,P_PICK_COMPONENTS => C_PICK_COMPONENTS
+                                    ,P_SRC_TYPE => C_SRC_TYPE
+                                    ,P_ENCUM_FLAG => P_ENCUM_FLAG
+                                    ,P_CUSTOMER_ID => P_CUSTOMER_ID
+                                    ,P_CAL_CODE => P_CAL_CODE
+                                    ,P_EXCEPT_ID => P_EXC_SET_ID
+                                    ,P_EMPLOYEE_ID => P_EMPLOYEE_ID
+                                    ,P_DESCRIPTION => C_DESCRIPTION
+                                    ,P_SRC_ORG => TO_NUMBER(C_SRC_ORG)
+                                    ,P_SRC_SUBINV => C_SRC_SUBINV
+                                    ,P_SUBINV => P_SUBINV
+                                    ,P_LOCATION_ID => P_DEFAULT_DELIVERY_TO
+                                    ,P_PO_ORG_ID => P_PO_ORG_ID
+                                    ,P_PUR_REVISION => P_PUR_REVISION);
+      IF (L_RETURN_STATUS <> 'S') THEN
+        IF L_MSG_COUNT > 0 THEN
+          FOR i IN 1 .. L_MSG_COUNT LOOP
+            L_MSG := FND_MSG_PUB.GET(I
+                                    ,'F');
+            /*SRW.MESSAGE(100
+                       ,'INV_MMX_WRAPPER_PVT.do_restock returned error:' || L_MSG)*/NULL;
+            FND_MSG_PUB.DELETE_MSG(I);
+          END LOOP;
+        ELSE
+          /*SRW.MESSAGE(100
+                     ,'INV_MMX_WRAPPER_PVT.do_restock returned an error: ' || L_MSG_DATA)*/NULL;
+        END IF;
+        RETURN (L_RETURN_STATUS);
+      END IF;
+      RETURN NULL;
+    END;
+    RETURN NULL;
+  END C_RUN_RESTOCKFORMULA;
+
+  FUNCTION C_ABC_ASSGN_PFORMULA RETURN VARCHAR2 IS
+  BEGIN
+    DECLARE
+      ABC_ASSGN VARCHAR2(40);
+    BEGIN
+      SELECT
+        ASSIGNMENT_GROUP_NAME
+      INTO ABC_ASSGN
+      FROM
+        MTL_ABC_ASSIGNMENT_GROUPS
+      WHERE ASSIGNMENT_GROUP_ID = P_ABC_ASSGN
+        AND ORGANIZATION_ID = P_ORG_ID;
+      RETURN (ABC_ASSGN);
+    EXCEPTION
+      WHEN NO_DATA_FOUND THEN
+        NULL;
+    END;
+    RETURN NULL;
+  END C_ABC_ASSGN_PFORMULA;
+
+  FUNCTION C_ABC_CLASS_PFORMULA RETURN VARCHAR2 IS
+  BEGIN
+    DECLARE
+      ABC_CLASS VARCHAR2(40);
+    BEGIN
+      IF (P_ABC_CLASS IS NOT NULL) THEN
+        SELECT
+          ABC_CLASS_NAME
+        INTO ABC_CLASS
+        FROM
+          MTL_ABC_CLASSES
+        WHERE ABC_CLASS_ID = P_ABC_CLASS
+          AND ORGANIZATION_ID = P_ORG_ID;
+      END IF;
+      RETURN (ABC_CLASS);
+    END;
+    RETURN NULL;
+  END C_ABC_CLASS_PFORMULA;
+
+  FUNCTION C_DEFAULT_DEL_PFORMULA RETURN VARCHAR2 IS
+  BEGIN
+    DECLARE
+      LOCATION_NAME HR_LOCATIONS.LOCATION_CODE%TYPE;
+    BEGIN
+      IF (P_DEFAULT_DELIVERY_TO IS NOT NULL) THEN
+        SELECT
+          LOCATION_CODE
+        INTO LOCATION_NAME
+        FROM
+          HR_LOCATIONS
+        WHERE LOCATION_ID = P_DEFAULT_DELIVERY_TO;
+        RETURN (LOCATION_NAME);
+      ELSE
+        RETURN (' ');
+      END IF;
+    END;
+    RETURN NULL;
+  END C_DEFAULT_DEL_PFORMULA;
+
+  FUNCTION C_ITEM_SELECTION_PFORMULA RETURN VARCHAR2 IS
+  BEGIN
+    DECLARE
+      ITEM_SEL VARCHAR2(80);
+    BEGIN
+      SELECT
+        MEANING
+      INTO ITEM_SEL
+      FROM
+        MFG_LOOKUPS
+      WHERE LOOKUP_TYPE = 'MTL_REORDER_RPT'
+        AND LOOKUP_CODE = P_ITEM_SELECTION;
+      RETURN (ITEM_SEL);
+    END;
+    RETURN NULL;
+  END C_ITEM_SELECTION_PFORMULA;
+
+  FUNCTION C_ABC_RANGEFORMULA RETURN VARCHAR2 IS
+  BEGIN
+    DECLARE
+      ABC_RANGE VARCHAR2(80);
+    BEGIN
+      IF (P_ABC_CLASS IS NOT NULL) THEN
+        ABC_RANGE := ' AND abc.abc_class_id = ' || P_ABC_CLASS;
+      ELSE
+        ABC_RANGE := ' ';
+      END IF;
+      IF (P_ABC_ASSGN IS NOT NULL) THEN
+        ABC_RANGE := ABC_RANGE || ' AND abc.assignment_group_id = ' || P_ABC_ASSGN;
+      END IF;
+      RETURN (ABC_RANGE);
+    END;
+    RETURN NULL;
+  END C_ABC_RANGEFORMULA;
+
+  FUNCTION C_INCLUDE_PO_PFORMULA RETURN VARCHAR2 IS
+  BEGIN
+    DECLARE
+      TEXT VARCHAR2(80);
+    BEGIN
+      SELECT
+        MEANING
+      INTO TEXT
+      FROM
+        MFG_LOOKUPS
+      WHERE LOOKUP_TYPE = 'SYS_YES_NO'
+        AND LOOKUP_CODE = P_INCLUDE_PO;
+      RETURN (TEXT);
+    END;
+    RETURN NULL;
+  END C_INCLUDE_PO_PFORMULA;
+
+  FUNCTION C_INCLUDE_WIP_PFORMULA RETURN VARCHAR2 IS
+  BEGIN
+    DECLARE
+      TEXT VARCHAR2(80);
+    BEGIN
+      SELECT
+        MEANING
+      INTO TEXT
+      FROM
+        MFG_LOOKUPS
+      WHERE LOOKUP_TYPE = 'SYS_YES_NO'
+        AND LOOKUP_CODE = P_INCLUDE_WIP;
+      RETURN (TEXT);
+    END;
+    RETURN NULL;
+  END C_INCLUDE_WIP_PFORMULA;
+
+  FUNCTION C_INCLUDE_IF_PFORMULA RETURN VARCHAR2 IS
+  BEGIN
+    DECLARE
+      TEXT VARCHAR2(80);
+    BEGIN
+      SELECT
+        MEANING
+      INTO TEXT
+      FROM
+        MFG_LOOKUPS
+      WHERE LOOKUP_TYPE = 'SYS_YES_NO'
+        AND LOOKUP_CODE = P_INCLUDE_IF;
+      RETURN (TEXT);
+    END;
+    RETURN NULL;
+  END C_INCLUDE_IF_PFORMULA;
+
+  FUNCTION C_INCLUDE_NONNET_PFORMULA RETURN VARCHAR2 IS
+  BEGIN
+    DECLARE
+      TEXT VARCHAR2(80);
+    BEGIN
+      SELECT
+        MEANING
+      INTO TEXT
+      FROM
+        MFG_LOOKUPS
+      WHERE LOOKUP_TYPE = 'SYS_YES_NO'
+        AND LOOKUP_CODE = P_INCLUDE_NONNET;
+      RETURN (TEXT);
+    END;
+    RETURN NULL;
+  END C_INCLUDE_NONNET_PFORMULA;
+
+  FUNCTION C_DISPLAY_ADD_INFO_PFORMULA RETURN VARCHAR2 IS
+  BEGIN
+    DECLARE
+      TEXT VARCHAR2(80);
+    BEGIN
+      SELECT
+        MEANING
+      INTO TEXT
+      FROM
+        MFG_LOOKUPS
+      WHERE LOOKUP_TYPE = 'SYS_YES_NO'
+        AND LOOKUP_CODE = P_DISPLAY_ADD_INFO;
+      RETURN (TEXT);
+    END;
+    RETURN NULL;
+  END C_DISPLAY_ADD_INFO_PFORMULA;
+
+  FUNCTION C_BUYER_RANGEFORMULA(C_BUYER_FROM_P IN VARCHAR2
+                               ,C_BUYER_TO_P IN VARCHAR2) RETURN VARCHAR2 IS
+  BEGIN
+    DECLARE
+      BUYER_RANGE VARCHAR2(240);
+    BEGIN
+      IF (P_LOW_BUYER IS NOT NULL) AND (P_HIGH_BUYER IS NOT NULL) THEN
+        BUYER_RANGE := ' AND emp.full_name between ''' || C_BUYER_FROM_P || ''' AND ''' || C_BUYER_TO_P || '''';
+      ELSIF (P_LOW_BUYER IS NOT NULL) THEN
+        BUYER_RANGE := ' AND sys.buyer_id = ' || TO_CHAR(P_LOW_BUYER);
+      ELSIF (P_HIGH_BUYER IS NOT NULL) THEN
+        BUYER_RANGE := ' AND sys.buyer_id = ' || TO_CHAR(P_HIGH_BUYER);
+      ELSE
+        BUYER_RANGE := ' ';
+      END IF;
+      RETURN (BUYER_RANGE);
+    END;
+    RETURN NULL;
+  END C_BUYER_RANGEFORMULA;
+
+  FUNCTION C_BUYER_FROM_PFORMULA RETURN VARCHAR2 IS
+  BEGIN
+    DECLARE
+      VAR_NAME VARCHAR2(240);
+    BEGIN
+      IF (P_LOW_BUYER IS NOT NULL) THEN
+        SELECT
+          FULL_NAME
+        INTO VAR_NAME
+        FROM
+          MTL_EMPLOYEES_VIEW
+        WHERE EMPLOYEE_ID = P_LOW_BUYER
+          AND ORGANIZATION_ID = P_ORG_ID;
+      END IF;
+      RETURN (VAR_NAME);
+    END;
+    RETURN NULL;
+  END C_BUYER_FROM_PFORMULA;
+
+  FUNCTION C_BUYER_TO_PFORMULA RETURN VARCHAR2 IS
+  BEGIN
+    DECLARE
+      VAR_NAME VARCHAR2(240);
+    BEGIN
+      IF (P_HIGH_BUYER IS NOT NULL) THEN
+        SELECT
+          FULL_NAME
+        INTO VAR_NAME
+        FROM
+          MTL_EMPLOYEES_VIEW
+        WHERE EMPLOYEE_ID = P_HIGH_BUYER
+          AND ORGANIZATION_ID = P_ORG_ID;
+      END IF;
+      RETURN (VAR_NAME);
+    END;
+    RETURN NULL;
+  END C_BUYER_TO_PFORMULA;
+
+  FUNCTION C_ABC_WHEREFORMULA RETURN VARCHAR2 IS
+  BEGIN
+    DECLARE
+      ABC_WHERE VARCHAR2(200):=' ';
+    BEGIN
+      IF (P_ABC_CLASS IS NOT NULL) THEN
+        ABC_WHERE := ' AND abc.inventory_item_id = sys.inventory_item_id ' || ' AND abc_cls.abc_class_id = abc.abc_class_id ';
+      ELSIF ((P_FIRST_SORT = 6) OR (P_SECOND_SORT = 6) OR (P_THIRD_SORT = 6)) THEN
+        ABC_WHERE := ' AND abc.inventory_item_id(+) = sys.inventory_item_id ' || ' AND abc_cls.abc_class_id(+) = abc.abc_class_id ';
+      ELSIF (P_ABC_ASSGN IS NOT NULL) THEN
+        ABC_WHERE := ' AND abc.inventory_item_id = sys.inventory_item_id ';
+      END IF;
+      RETURN (ABC_WHERE);
+    END;
+    RETURN NULL;
+  END C_ABC_WHEREFORMULA;
+
+  FUNCTION C_ABC_FROMFORMULA RETURN VARCHAR2 IS
+  BEGIN
+    DECLARE
+      ABC_FROM VARCHAR2(80):=' ';
+    BEGIN
+      IF ((P_ABC_CLASS IS NOT NULL) OR (P_FIRST_SORT = 6) OR (P_SECOND_SORT = 6) OR (P_THIRD_SORT = 6)) THEN
+        ABC_FROM := 'mtl_abc_assignments abc, mtl_abc_classes abc_cls, ';
+      ELSIF (P_ABC_ASSGN IS NOT NULL) THEN
+        ABC_FROM := 'mtl_abc_assignments abc,';
+      END IF;
+      RETURN (ABC_FROM);
+    END;
+    RETURN NULL;
+  END C_ABC_FROMFORMULA;
+
+  FUNCTION C_LEAD_TIME_DEMAND_P RETURN NUMBER IS
+  BEGIN
+    RETURN C_LEAD_TIME_DEMAND;
+  END C_LEAD_TIME_DEMAND_P;
+
+  FUNCTION C_ONHAND_QTY_P RETURN NUMBER IS
+  BEGIN
+    RETURN C_ONHAND_QTY;
+  END C_ONHAND_QTY_P;
+
+  FUNCTION C_SUPPLY_QTY_P RETURN NUMBER IS
+  BEGIN
+    RETURN C_SUPPLY_QTY;
+  END C_SUPPLY_QTY_P;
+
+  FUNCTION NEXT_WORK_DAY(ARG_ORG_ID IN NUMBER
+                        ,ARG_BUCKET IN NUMBER
+                        ,ARG_DATE IN DATE) RETURN DATE IS
+    X0 DATE;
+  BEGIN
+    /*STPROC.INIT('begin :X0 := MRP_CALENDAR.NEXT_WORK_DAY(:ARG_ORG_ID, :ARG_BUCKET, :ARG_DATE); end;');
+    STPROC.BIND_O(X0);
+    STPROC.BIND_I(ARG_ORG_ID);
+    STPROC.BIND_I(ARG_BUCKET);
+    STPROC.BIND_I(ARG_DATE);
+    STPROC.EXECUTE;
+    STPROC.RETRIEVE(1
+                   ,X0);*/
+    X0 := MRP_CALENDAR.NEXT_WORK_DAY(ARG_ORG_ID, ARG_BUCKET, ARG_DATE);
+    RETURN X0;
+  END NEXT_WORK_DAY;
+
+  FUNCTION PREV_WORK_DAY(ARG_ORG_ID IN NUMBER
+                        ,ARG_BUCKET IN NUMBER
+                        ,ARG_DATE IN DATE) RETURN DATE IS
+    X0 DATE;
+  BEGIN
+   /* STPROC.INIT('begin :X0 := MRP_CALENDAR.PREV_WORK_DAY(:ARG_ORG_ID, :ARG_BUCKET, :ARG_DATE); end;');
+    STPROC.BIND_O(X0);
+    STPROC.BIND_I(ARG_ORG_ID);
+    STPROC.BIND_I(ARG_BUCKET);
+    STPROC.BIND_I(ARG_DATE);
+    STPROC.EXECUTE;
+    STPROC.RETRIEVE(1
+                   ,X0);*/
+    X0 := MRP_CALENDAR.PREV_WORK_DAY(ARG_ORG_ID, ARG_BUCKET, ARG_DATE);
+    RETURN X0;
+  END PREV_WORK_DAY;
+
+  FUNCTION DATE_OFFSET(ARG_ORG_ID IN NUMBER
+                      ,ARG_BUCKET IN NUMBER
+                      ,ARG_DATE IN DATE
+                      ,ARG_OFFSET IN NUMBER) RETURN DATE IS
+    X0 DATE;
+  BEGIN
+    /*STPROC.INIT('begin :X0 := MRP_CALENDAR.DATE_OFFSET(:ARG_ORG_ID, :ARG_BUCKET, :ARG_DATE, :ARG_OFFSET); end;');
+    STPROC.BIND_O(X0);
+    STPROC.BIND_I(ARG_ORG_ID);
+    STPROC.BIND_I(ARG_BUCKET);
+    STPROC.BIND_I(ARG_DATE);
+    STPROC.BIND_I(ARG_OFFSET);
+    STPROC.EXECUTE;
+    STPROC.RETRIEVE(1
+                   ,X0);*/
+    X0 := MRP_CALENDAR.DATE_OFFSET(ARG_ORG_ID, ARG_BUCKET, ARG_DATE, ARG_OFFSET);
+    RETURN X0;
+  END DATE_OFFSET;
+
+  FUNCTION DAYS_BETWEEN(ARG_ORG_ID IN NUMBER
+                       ,ARG_BUCKET IN NUMBER
+                       ,ARG_DATE1 IN DATE
+                       ,ARG_DATE2 IN DATE) RETURN NUMBER IS
+    X0 NUMBER;
+  BEGIN
+    /*STPROC.INIT('begin :X0 := MRP_CALENDAR.DAYS_BETWEEN(:ARG_ORG_ID, :ARG_BUCKET, :ARG_DATE1, :ARG_DATE2); end;');
+    STPROC.BIND_O(X0);
+    STPROC.BIND_I(ARG_ORG_ID);
+    STPROC.BIND_I(ARG_BUCKET);
+    STPROC.BIND_I(ARG_DATE1);
+    STPROC.BIND_I(ARG_DATE2);
+    STPROC.EXECUTE;
+    STPROC.RETRIEVE(1
+                   ,X0);*/
+    X0 := MRP_CALENDAR.DAYS_BETWEEN(ARG_ORG_ID, ARG_BUCKET, ARG_DATE1, ARG_DATE2);
+    RETURN X0;
+  END DAYS_BETWEEN;
+
+  PROCEDURE SELECT_CALENDAR_DEFAULTS(ARG_ORG_ID IN NUMBER
+                                    ,ARG_CALENDAR_CODE OUT NOCOPY VARCHAR2
+                                    ,ARG_EXCEPTION_SET_ID OUT NOCOPY NUMBER) IS
+  BEGIN
+    /*STPROC.INIT('begin MRP_CALENDAR.SELECT_CALENDAR_DEFAULTS(:ARG_ORG_ID, :ARG_CALENDAR_CODE, :ARG_EXCEPTION_SET_ID); end;');
+    STPROC.BIND_I(ARG_ORG_ID);
+    STPROC.BIND_O(ARG_CALENDAR_CODE);
+    STPROC.BIND_O(ARG_EXCEPTION_SET_ID);
+    STPROC.EXECUTE;
+    STPROC.RETRIEVE(2
+                   ,ARG_CALENDAR_CODE);
+    STPROC.RETRIEVE(3
+                   ,ARG_EXCEPTION_SET_ID);*/
+    MRP_CALENDAR.SELECT_CALENDAR_DEFAULTS(ARG_ORG_ID, ARG_CALENDAR_CODE, ARG_EXCEPTION_SET_ID);
+  END SELECT_CALENDAR_DEFAULTS;
+
+  PROCEDURE PUT(NAME IN VARCHAR2
+               ,VAL IN VARCHAR2) IS
+  BEGIN
+    /*STPROC.INIT('begin FND_PROFILE.PUT(:NAME, :VAL); end;');
+    STPROC.BIND_I(NAME);
+    STPROC.BIND_I(VAL);
+    STPROC.EXECUTE;*/
+    FND_PROFILE.PUT(NAME, VAL);
+  END PUT;
+
+  FUNCTION DEFINED(NAME IN VARCHAR2) RETURN BOOLEAN IS
+    X0 BOOLEAN;
+    --X0rv BOOLEAN;
+  BEGIN
+    /*STPROC.INIT('declare X0rv BOOLEAN; begin X0rv := FND_PROFILE.DEFINED(:NAME); :X0 := sys.diutil.bool_to_int(X0rv); end;');
+    STPROC.BIND_I(NAME);
+    STPROC.BIND_O(X0);
+    STPROC.EXECUTE;
+    STPROC.RETRIEVE(2
+                   ,X0);*/
+    X0 := FND_PROFILE.DEFINED(NAME);
+    --X0 := sys.diutil.bool_to_int(X0rv);
+    RETURN X0;
+  END DEFINED;
+
+  PROCEDURE GET(NAME IN VARCHAR2
+               ,VAL OUT NOCOPY VARCHAR2) IS
+  BEGIN
+   /* STPROC.INIT('begin FND_PROFILE.GET(:NAME, :VAL); end;');
+    STPROC.BIND_I(NAME);
+    STPROC.BIND_O(VAL);
+    STPROC.EXECUTE;
+    STPROC.RETRIEVE(2
+                   ,VAL);*/
+    FND_PROFILE.GET(NAME, VAL);
+  END GET;
+
+  FUNCTION VALUE(NAME IN VARCHAR2) RETURN VARCHAR2 IS
+    X0 VARCHAR2(2000);
+  BEGIN
+   /* STPROC.INIT('begin :X0 := FND_PROFILE.VALUE(:NAME); end;');
+    STPROC.BIND_O(X0);
+    STPROC.BIND_I(NAME);
+    STPROC.EXECUTE;
+    STPROC.RETRIEVE(1
+                   ,X0);*/
+    X0 := FND_PROFILE.VALUE(NAME);
+    RETURN X0;
+  END VALUE;
+
+  FUNCTION SAVE_USER(X_NAME IN VARCHAR2
+                    ,X_VALUE IN VARCHAR2) RETURN BOOLEAN IS
+    X0 BOOLEAN;
+
+  BEGIN
+   /* STPROC.INIT('declare X0rv BOOLEAN; begin X0rv := FND_PROFILE.SAVE_USER(:X_NAME, :X_VALUE); :X0 := sys.diutil.bool_to_int(X0rv); end;');
+    STPROC.BIND_I(X_NAME);
+    STPROC.BIND_I(X_VALUE);
+    STPROC.BIND_O(X0);
+    STPROC.EXECUTE;
+    STPROC.RETRIEVE(3
+                   ,X0);*/
+     X0 := FND_PROFILE.SAVE_USER(X_NAME, X_VALUE);
+
+    RETURN X0;
+  END SAVE_USER;
+
+  FUNCTION SAVE(X_NAME IN VARCHAR2
+               ,X_VALUE IN VARCHAR2
+               ,X_LEVEL_NAME IN VARCHAR2
+               ,X_LEVEL_VALUE IN VARCHAR2
+               ,X_LEVEL_VALUE_APP_ID IN VARCHAR2) RETURN BOOLEAN IS
+    X0 BOOLEAN;
+    --X0rv BOOLEAN;
+  BEGIN
+    /*STPROC.INIT('declare X0rv BOOLEAN; begin X0rv := FND_PROFILE.SAVE(:X_NAME, :X_VALUE, :X_LEVEL_NAME, :X_LEVEL_VALUE, :X_LEVEL_VALUE_APP_ID); :X0 := sys.diutil.bool_to_int(X0rv); end;');
+    STPROC.BIND_I(X_NAME);
+    STPROC.BIND_I(X_VALUE);
+    STPROC.BIND_I(X_LEVEL_NAME);
+    STPROC.BIND_I(X_LEVEL_VALUE);
+    STPROC.BIND_I(X_LEVEL_VALUE_APP_ID);
+    STPROC.BIND_O(X0);
+    STPROC.EXECUTE;
+    STPROC.RETRIEVE(6
+                   ,X0);*/
+    X0 := FND_PROFILE.SAVE(X_NAME, X_VALUE,X_LEVEL_NAME, X_LEVEL_VALUE, X_LEVEL_VALUE_APP_ID);
+   -- X0 := sys.diutil.bool_to_int(X0rv);
+    RETURN X0;
+  END SAVE;
+
+  PROCEDURE GET_SPECIFIC(NAME_Z IN VARCHAR2
+                        ,USER_ID_Z IN NUMBER
+                        ,RESPONSIBILITY_ID_Z IN NUMBER
+                        ,APPLICATION_ID_Z IN NUMBER
+                        ,VAL_Z OUT NOCOPY VARCHAR2
+                        ,DEFINED_Z OUT NOCOPY BOOLEAN) IS
+
+  BEGIN
+    /*STPROC.INIT('declare DEFINED_Z BOOLEAN; begin DEFINED_Z := sys.diutil.int_to_bool(:DEFINED_Z);
+       FND_PROFILE.GET_SPECIFIC(:NAME_Z, :USER_ID_Z, :RESPONSIBILITY_ID_Z, :APPLICATION_ID_Z, :VAL_Z, DEFINED_Z);
+       :DEFINED_Z := sys.diutil.bool_to_int(DEFINED_Z); end;');
+    STPROC.BIND_O(DEFINED_Z);
+    STPROC.BIND_I(NAME_Z);
+    STPROC.BIND_I(USER_ID_Z);
+    STPROC.BIND_I(RESPONSIBILITY_ID_Z);
+    STPROC.BIND_I(APPLICATION_ID_Z);
+    STPROC.BIND_O(VAL_Z);
+    STPROC.EXECUTE;
+    STPROC.RETRIEVE(1
+                   ,DEFINED_Z);
+    STPROC.RETRIEVE(6
+                   ,VAL_Z);*/
+    --DEFINED_Z1 := sys.diutil.int_to_bool(DEFINED_Z);
+    FND_PROFILE.GET_SPECIFIC(NAME_Z, USER_ID_Z, RESPONSIBILITY_ID_Z, APPLICATION_ID_Z, VAL_Z, DEFINED_Z);
+
+    --DEFINED_Z := sys.diutil.bool_to_int(DEFINED_Z1);
+  END GET_SPECIFIC;
+
+  FUNCTION VALUE_SPECIFIC(NAME IN VARCHAR2
+                         ,USER_ID IN NUMBER
+                         ,RESPONSIBILITY_ID IN NUMBER
+                         ,APPLICATION_ID IN NUMBER) RETURN VARCHAR2 IS
+    X0 VARCHAR2(2000);
+  BEGIN
+    /*STPROC.INIT('begin :X0 := FND_PROFILE.VALUE_SPECIFIC(:NAME, :USER_ID, :RESPONSIBILITY_ID, :APPLICATION_ID); end;');
+    STPROC.BIND_O(X0);
+    STPROC.BIND_I(NAME);
+    STPROC.BIND_I(USER_ID);
+    STPROC.BIND_I(RESPONSIBILITY_ID);
+    STPROC.BIND_I(APPLICATION_ID);
+    STPROC.EXECUTE;
+    STPROC.RETRIEVE(1
+                   ,X0);*/
+    X0 := FND_PROFILE.VALUE_SPECIFIC(NAME, USER_ID, RESPONSIBILITY_ID, APPLICATION_ID);
+    RETURN X0;
+  END VALUE_SPECIFIC;
+
+  PROCEDURE INITIALIZE(USER_ID_Z IN NUMBER
+                      ,RESPONSIBILITY_ID_Z IN NUMBER
+                      ,APPLICATION_ID_Z IN NUMBER
+                      ,SITE_ID_Z IN NUMBER) IS
+  BEGIN
+    /*STPROC.INIT('begin FND_PROFILE.INITIALIZE(:USER_ID_Z, :RESPONSIBILITY_ID_Z, :APPLICATION_ID_Z, :SITE_ID_Z); end;');
+    STPROC.BIND_I(USER_ID_Z);
+    STPROC.BIND_I(RESPONSIBILITY_ID_Z);
+    STPROC.BIND_I(APPLICATION_ID_Z);
+    STPROC.BIND_I(SITE_ID_Z);
+    STPROC.EXECUTE;*/
+    FND_PROFILE.INITIALIZE(USER_ID_Z, RESPONSIBILITY_ID_Z, APPLICATION_ID_Z, SITE_ID_Z);
+  END INITIALIZE;
+
+  PROCEDURE PUTMULTIPLE(NAMES IN VARCHAR2
+                       ,VALS IN VARCHAR2
+                       ,NUM IN NUMBER) IS
+  BEGIN
+    /*STPROC.INIT('begin FND_PROFILE.PUTMULTIPLE(:NAMES, :VALS, :NUM); end;');
+    STPROC.BIND_I(NAMES);
+    STPROC.BIND_I(VALS);
+    STPROC.BIND_I(NUM);
+    STPROC.EXECUTE;*/
+    FND_PROFILE.PUTMULTIPLE(NAMES, VALS, NUM);
+  END PUTMULTIPLE;
+
+  PROCEDURE ESTIMATE_LEADTIME(X_ORG_ID IN NUMBER
+                             ,X_FIXED_LEAD IN NUMBER
+                             ,X_VAR_LEAD IN NUMBER
+                             ,X_QUANTITY IN NUMBER
+                             ,X_PROC_DAYS IN NUMBER
+                             ,X_ENTITY_TYPE IN NUMBER
+                             ,X_FUSD IN DATE
+                             ,X_FUCD IN DATE
+                             ,X_LUSD IN DATE
+                             ,X_LUCD IN DATE
+                             ,X_SCHED_DIR IN NUMBER
+                             ,X_EST_DATE OUT NOCOPY DATE) IS
+  BEGIN
+    /*STPROC.INIT('begin WIP_CALENDAR.ESTIMATE_LEADTIME(:X_ORG_ID, :X_FIXED_LEAD, :X_VAR_LEAD, :X_QUANTITY, :X_PROC_DAYS, :X_ENTITY_TYPE, :X_FUSD, :X_FUCD, :X_LUSD, :X_LUCD, :X_SCHED_DIR, :X_EST_DATE); end;');
+    STPROC.BIND_I(X_ORG_ID);
+    STPROC.BIND_I(X_FIXED_LEAD);
+    STPROC.BIND_I(X_VAR_LEAD);
+    STPROC.BIND_I(X_QUANTITY);
+    STPROC.BIND_I(X_PROC_DAYS);
+    STPROC.BIND_I(X_ENTITY_TYPE);
+    STPROC.BIND_I(X_FUSD);
+    STPROC.BIND_I(X_FUCD);
+    STPROC.BIND_I(X_LUSD);
+    STPROC.BIND_I(X_LUCD);
+    STPROC.BIND_I(X_SCHED_DIR);
+    STPROC.BIND_O(X_EST_DATE);
+    STPROC.EXECUTE;
+    STPROC.RETRIEVE(12
+                   ,X_EST_DATE);*/
+    WIP_CALENDAR.ESTIMATE_LEADTIME(X_ORG_ID, X_FIXED_LEAD, X_VAR_LEAD, X_QUANTITY, X_PROC_DAYS, X_ENTITY_TYPE, X_FUSD, X_FUCD, X_LUSD, X_LUCD, X_SCHED_DIR, X_EST_DATE);
+  END ESTIMATE_LEADTIME;
+
+  FUNCTION GET_FORECAST_QUANTITY(ITEM_ID IN NUMBER
+                                ,ORG_ID IN NUMBER
+                                ,FORECAST_DESIG IN CHAR
+                                ,START_DATE IN DATE
+                                ,END_DATE IN DATE) RETURN NUMBER IS
+    DAY_FC_QTY NUMBER;
+    WEEK_FC_QTY NUMBER;
+    PERIOD_FC_QTY NUMBER;
+    CAL_CODE VARCHAR2(20);
+    EXC_SET_ID NUMBER;
+    START_SEQ_NUM NUMBER;
+    END_SEQ_NUM NUMBER;
+  BEGIN
+    MRP_CALENDAR.SELECT_CALENDAR_DEFAULTS(ORG_ID
+                                         ,CAL_CODE
+                                         ,EXC_SET_ID);
+    SELECT
+      CAL1.NEXT_SEQ_NUM,
+      CAL2.NEXT_SEQ_NUM
+    INTO START_SEQ_NUM,END_SEQ_NUM
+    FROM
+      BOM_CALENDAR_DATES CAL1,
+      BOM_CALENDAR_DATES CAL2
+    WHERE CAL1.CALENDAR_CODE = CAL2.CALENDAR_CODE
+      AND CAL1.CALENDAR_CODE = CAL_CODE
+      AND CAL1.EXCEPTION_SET_ID = CAL2.EXCEPTION_SET_ID
+      AND CAL1.EXCEPTION_SET_ID = EXC_SET_ID
+      AND CAL1.CALENDAR_DATE = START_DATE
+      AND CAL2.CALENDAR_DATE = END_DATE;
+    SELECT
+      NVL(SUM(FC.ORIGINAL_FORECAST_QUANTITY * (DECODE(SIGN(END_SEQ_NUM - CAL2.NEXT_SEQ_NUM)
+                    ,-1
+                    ,END_SEQ_NUM
+                    ,CAL2.NEXT_SEQ_NUM) - DECODE(SIGN(START_SEQ_NUM - CAL1.NEXT_SEQ_NUM)
+                    ,-1
+                    ,CAL1.NEXT_SEQ_NUM
+                    ,START_SEQ_NUM)))
+         ,0)
+    INTO DAY_FC_QTY
+    FROM
+      BOM_CALENDAR_DATES CAL1,
+      BOM_CALENDAR_DATES CAL2,
+      MRP_FORECAST_DATES FC,
+      MRP_FORECAST_DESIGNATORS DESIG1,
+      MRP_FORECAST_DESIGNATORS DESIG2
+    WHERE DESIG2.FORECAST_DESIGNATOR = FORECAST_DESIG
+      AND DESIG1.ORGANIZATION_ID = FC.ORGANIZATION_ID
+      AND DESIG2.ORGANIZATION_ID = FC.ORGANIZATION_ID
+      AND FC.ORGANIZATION_ID = ORG_ID
+      AND DESIG1.FORECAST_SET = NVL(DESIG2.FORECAST_SET
+       ,FORECAST_DESIG)
+      AND DESIG1.FORECAST_DESIGNATOR = DECODE(DESIG2.FORECAST_SET
+          ,NULL
+          ,DESIG1.FORECAST_DESIGNATOR
+          ,FORECAST_DESIG)
+      AND NVL(DESIG1.DISABLE_DATE
+       ,SYSDATE) >= sysdate
+      AND FC.FORECAST_DATE < END_DATE
+      AND FC.INVENTORY_ITEM_ID = ITEM_ID
+      AND FC.FORECAST_DESIGNATOR = DESIG1.FORECAST_DESIGNATOR
+      AND FC.BUCKET_TYPE = 1
+      AND CAL1.CALENDAR_CODE = CAL_CODE
+      AND CAL1.EXCEPTION_SET_ID = EXC_SET_ID
+      AND CAL1.CALENDAR_DATE = FC.FORECAST_DATE
+      AND CAL2.CALENDAR_CODE = CAL1.CALENDAR_CODE
+      AND CAL2.EXCEPTION_SET_ID = CAL1.EXCEPTION_SET_ID
+      AND CAL2.CALENDAR_DATE = NVL(FC.RATE_END_DATE
+       ,FC.FORECAST_DATE) + 1
+      AND CAL2.CALENDAR_DATE > START_DATE;
+    SELECT
+      NVL(SUM(FC.ORIGINAL_FORECAST_QUANTITY / (CAL2.NEXT_SEQ_NUM - CAL1.NEXT_SEQ_NUM) * (DECODE(SIGN(END_SEQ_NUM - CAL2.NEXT_SEQ_NUM)
+                    ,-1
+                    ,END_SEQ_NUM
+                    ,CAL2.NEXT_SEQ_NUM) - DECODE(SIGN(START_SEQ_NUM - CAL1.NEXT_SEQ_NUM)
+                    ,-1
+                    ,CAL1.NEXT_SEQ_NUM
+                    ,START_SEQ_NUM)))
+         ,0)
+    INTO WEEK_FC_QTY
+    FROM
+      BOM_CALENDAR_DATES CAL1,
+      BOM_CALENDAR_DATES CAL2,
+      BOM_CAL_WEEK_START_DATES WEEK,
+      MRP_FORECAST_DATES FC,
+      MRP_FORECAST_DESIGNATORS DESIG1,
+      MRP_FORECAST_DESIGNATORS DESIG2
+    WHERE DESIG2.FORECAST_DESIGNATOR = FORECAST_DESIG
+      AND DESIG1.ORGANIZATION_ID = FC.ORGANIZATION_ID
+      AND DESIG2.ORGANIZATION_ID = FC.ORGANIZATION_ID
+      AND FC.ORGANIZATION_ID = ORG_ID
+      AND DESIG1.FORECAST_SET = NVL(DESIG2.FORECAST_SET
+       ,FORECAST_DESIG)
+      AND DESIG1.FORECAST_DESIGNATOR = DECODE(DESIG2.FORECAST_SET
+          ,NULL
+          ,DESIG1.FORECAST_DESIGNATOR
+          ,FORECAST_DESIG)
+      AND NVL(DESIG1.DISABLE_DATE
+       ,SYSDATE) >= sysdate
+      AND FC.FORECAST_DATE < END_DATE
+      AND FC.INVENTORY_ITEM_ID = ITEM_ID
+      AND FC.FORECAST_DESIGNATOR = DESIG1.FORECAST_DESIGNATOR
+      AND FC.BUCKET_TYPE = 2
+      AND WEEK.CALENDAR_CODE = CAL_CODE
+      AND WEEK.EXCEPTION_SET_ID = EXC_SET_ID
+      AND ( WEEK.WEEK_START_DATE >= FC.FORECAST_DATE
+      AND WEEK.WEEK_START_DATE < END_DATE
+      AND WEEK.WEEK_START_DATE <= NVL(FC.RATE_END_DATE
+       ,FC.FORECAST_DATE) )
+      AND WEEK.NEXT_DATE > START_DATE
+      AND CAL1.CALENDAR_CODE = WEEK.CALENDAR_CODE
+      AND CAL2.CALENDAR_CODE = WEEK.CALENDAR_CODE
+      AND CAL1.EXCEPTION_SET_ID = WEEK.EXCEPTION_SET_ID
+      AND CAL2.EXCEPTION_SET_ID = WEEK.EXCEPTION_SET_ID
+      AND CAL1.CALENDAR_DATE = WEEK.WEEK_START_DATE
+      AND CAL2.CALENDAR_DATE = WEEK.NEXT_DATE;
+    SELECT
+      NVL(SUM(FC.ORIGINAL_FORECAST_QUANTITY / (CAL2.NEXT_SEQ_NUM - CAL1.NEXT_SEQ_NUM) * (DECODE(SIGN(END_SEQ_NUM - CAL2.NEXT_SEQ_NUM)
+                    ,-1
+                    ,END_SEQ_NUM
+                    ,CAL2.NEXT_SEQ_NUM) - DECODE(SIGN(START_SEQ_NUM - CAL1.NEXT_SEQ_NUM)
+                    ,-1
+                    ,CAL1.NEXT_SEQ_NUM
+                    ,START_SEQ_NUM)))
+         ,0)
+    INTO PERIOD_FC_QTY
+    FROM
+      BOM_CALENDAR_DATES CAL1,
+      BOM_CALENDAR_DATES CAL2,
+      BOM_PERIOD_START_DATES PER,
+      MRP_FORECAST_DATES FC,
+      MRP_FORECAST_DESIGNATORS DESIG1,
+      MRP_FORECAST_DESIGNATORS DESIG2
+    WHERE DESIG2.FORECAST_DESIGNATOR = FORECAST_DESIG
+      AND DESIG1.ORGANIZATION_ID = FC.ORGANIZATION_ID
+      AND DESIG2.ORGANIZATION_ID = FC.ORGANIZATION_ID
+      AND FC.ORGANIZATION_ID = ORG_ID
+      AND DESIG1.FORECAST_SET = NVL(DESIG2.FORECAST_SET
+       ,FORECAST_DESIG)
+      AND DESIG1.FORECAST_DESIGNATOR = DECODE(DESIG2.FORECAST_SET
+          ,NULL
+          ,DESIG1.FORECAST_DESIGNATOR
+          ,FORECAST_DESIG)
+      AND NVL(DESIG1.DISABLE_DATE
+       ,SYSDATE) >= sysdate
+      AND FC.FORECAST_DATE < END_DATE
+      AND FC.INVENTORY_ITEM_ID = ITEM_ID
+      AND FC.FORECAST_DESIGNATOR = DESIG1.FORECAST_DESIGNATOR
+      AND FC.BUCKET_TYPE = 3
+      AND PER.CALENDAR_CODE = CAL_CODE
+      AND PER.EXCEPTION_SET_ID = EXC_SET_ID
+      AND ( PER.PERIOD_START_DATE >= FC.FORECAST_DATE
+      AND PER.PERIOD_START_DATE < END_DATE
+      AND PER.PERIOD_START_DATE <= NVL(FC.RATE_END_DATE
+       ,FC.FORECAST_DATE) )
+      AND PER.NEXT_DATE > START_DATE
+      AND CAL1.CALENDAR_CODE = PER.CALENDAR_CODE
+      AND CAL2.CALENDAR_CODE = PER.CALENDAR_CODE
+      AND CAL1.EXCEPTION_SET_ID = PER.EXCEPTION_SET_ID
+      AND CAL2.EXCEPTION_SET_ID = PER.EXCEPTION_SET_ID
+      AND CAL1.CALENDAR_DATE = PER.PERIOD_START_DATE
+      AND CAL2.CALENDAR_DATE = PER.NEXT_DATE;
+    RETURN (DAY_FC_QTY + WEEK_FC_QTY + PERIOD_FC_QTY);
+  END GET_FORECAST_QUANTITY;
+
+  FUNCTION GET_REORDER_QTY(ITEM_ID IN NUMBER
+                          ,TOT_AVAIL IN NUMBER
+                          ,REORDER_POINT IN NUMBER
+                          ,ORG_ID IN NUMBER
+                          ,FORECAST_DESIG IN CHAR
+                          ,FIX_LOT_MULT IN NUMBER
+                          ,MIN_ORD_QTY IN NUMBER
+                          ,MAX_ORD_QTY IN NUMBER) RETURN NUMBER IS
+    MAX_PT NUMBER;
+    COST_RATIO NUMBER;
+    PERIOD_START_DATE DATE;
+    PERIOD_END_DATE DATE;
+    FC_QTY NUMBER;
+    ANNUAL_DEMAND NUMBER;
+    REORDER_QTY NUMBER;
+    QUOTIENT NUMBER;
+    CAL_CODE VARCHAR2(20);
+    EXC_SET_ID NUMBER;
+    L_ROUND NUMBER;
+    C_PROCESS_ENABLED VARCHAR2(5);
+  BEGIN
+    IF (TOT_AVAIL < REORDER_POINT) THEN
+      MRP_CALENDAR.SELECT_CALENDAR_DEFAULTS(ORG_ID
+                                           ,CAL_CODE
+                                           ,EXC_SET_ID);
+      MAX_PT := REORDER_POINT - TOT_AVAIL;
+      SELECT
+        NVL(PROCESS_ENABLED_FLAG
+           ,'N')
+      INTO C_PROCESS_ENABLED
+      FROM
+        MTL_PARAMETERS
+      WHERE ORGANIZATION_ID = ORG_ID;
+      IF C_PROCESS_ENABLED <> 'Y' THEN
+        SELECT
+          DECODE(NVL(CST.ITEM_COST
+                    ,0) * NVL(SYS.CARRYING_COST / 100
+                    ,0)
+                ,0
+                ,0
+                ,NVL(SYS.ORDER_COST
+                   ,0) / (CST.ITEM_COST * (SYS.CARRYING_COST / 100)))
+        INTO COST_RATIO
+        FROM
+          MTL_SYSTEM_ITEMS SYS,
+          CST_ITEM_COSTS_FOR_GL_VIEW CST
+        WHERE cst.organization_id (+) = SYS.ORGANIZATION_ID
+          AND SYS.ORGANIZATION_ID = ORG_ID
+          AND cst.inventory_item_id (+) = SYS.INVENTORY_ITEM_ID
+          AND SYS.INVENTORY_ITEM_ID = ITEM_ID;
+      ELSE
+        SELECT
+          DECODE(NVL(GMP_APS_OUTPUT_PKG.RETRIEVE_ITEM_COST(ITEM_ID
+                                                          ,ORG_ID)
+                    ,0) * NVL(SYS.CARRYING_COST / 100
+                    ,0)
+                ,0
+                ,0
+                ,NVL(SYS.ORDER_COST
+                   ,0) / (GMP_APS_OUTPUT_PKG.RETRIEVE_ITEM_COST(ITEM_ID
+                                                     ,ORG_ID) * (SYS.CARRYING_COST / 100)))
+        INTO COST_RATIO
+        FROM
+          MTL_SYSTEM_ITEMS SYS
+        WHERE SYS.ORGANIZATION_ID = ORG_ID
+          AND SYS.INVENTORY_ITEM_ID = ITEM_ID;
+      END IF;
+      SELECT
+        NVL(MAX(PER.PERIOD_START_DATE)
+           ,TRUNC(SYSDATE)),
+        NVL(MAX(PER.NEXT_DATE)
+           ,TRUNC(SYSDATE))
+      INTO PERIOD_START_DATE,PERIOD_END_DATE
+      FROM
+        BOM_PERIOD_START_DATES PER
+      WHERE PER.CALENDAR_CODE = CAL_CODE
+        AND PER.EXCEPTION_SET_ID = EXC_SET_ID
+        AND PER.PERIOD_START_DATE <= TRUNC(SYSDATE);
+      FC_QTY := GET_FORECAST_QUANTITY(ITEM_ID
+                                     ,ORG_ID
+                                     ,FORECAST_DESIG
+                                     ,PERIOD_START_DATE
+                                     ,PERIOD_END_DATE);
+      SELECT
+        DECODE(CAL.QUARTERLY_CALENDAR_TYPE
+              ,4
+              ,(FC_QTY * 13)
+              ,(FC_QTY * 12))
+      INTO ANNUAL_DEMAND
+      FROM
+        BOM_CALENDARS CAL,
+        MTL_PARAMETERS PARAM
+      WHERE PARAM.ORGANIZATION_ID = ORG_ID
+        AND CAL.CALENDAR_CODE = PARAM.CALENDAR_CODE;
+      SELECT
+        SQRT(2 * ANNUAL_DEMAND * COST_RATIO)
+      INTO REORDER_QTY
+      FROM
+        DUAL;
+      IF (MAX_PT < MIN_ORD_QTY) THEN
+        MAX_PT := MIN_ORD_QTY;
+      END IF;
+      IF (MAX_PT >= REORDER_QTY) THEN
+        REORDER_QTY := MAX_PT;
+      END IF;
+      IF (FIX_LOT_MULT <> 0) THEN
+        SELECT
+          ROUND(REORDER_QTY / FIX_LOT_MULT
+               ,0)
+        INTO QUOTIENT
+        FROM
+          DUAL;
+        REORDER_QTY := FIX_LOT_MULT * QUOTIENT;
+        IF (REORDER_QTY < MAX_PT) THEN
+          REORDER_QTY := REORDER_QTY + FIX_LOT_MULT;
+        END IF;
+      END IF;
+      IF (MAX_ORD_QTY <> 0) THEN
+        IF (REORDER_QTY >= MAX_ORD_QTY) THEN
+          REORDER_QTY := MAX_ORD_QTY;
+        END IF;
+      END IF;
+    ELSE
+      REORDER_QTY := 0;
+    END IF;
+    SELECT
+      ROUNDING_CONTROL_TYPE
+    INTO L_ROUND
+    FROM
+      MTL_SYSTEM_ITEMS
+    WHERE ORGANIZATION_ID = ORG_ID
+      AND INVENTORY_ITEM_ID = ITEM_ID;
+    IF L_ROUND = 1 THEN
+      RETURN (ROUND(REORDER_QTY));
+    ELSE
+      RETURN (REORDER_QTY);
+    END IF;
+  END GET_REORDER_QTY;
+
+  FUNCTION GET_LEAD_TIME_DEMAND(ITEM_ID IN NUMBER
+                               ,ORG_ID IN NUMBER
+                               ,FORECAST_DESIG IN CHAR
+                               ,ORD_LEAD_TIME IN NUMBER) RETURN NUMBER IS
+    START_DATE DATE;
+    END_DATE DATE;
+    CAL_CODE VARCHAR2(20);
+    EXC_SET_ID NUMBER;
+  BEGIN
+    MRP_CALENDAR.SELECT_CALENDAR_DEFAULTS(ORG_ID
+                                         ,CAL_CODE
+                                         ,EXC_SET_ID);
+    BEGIN
+      SELECT
+        TRUNC(SYSDATE),
+        CAL2.CALENDAR_DATE
+      INTO START_DATE,END_DATE
+      FROM
+        BOM_CALENDAR_DATES CAL1,
+        BOM_CALENDAR_DATES CAL2
+      WHERE CAL1.CALENDAR_CODE = CAL_CODE
+        AND CAL1.EXCEPTION_SET_ID = EXC_SET_ID
+        AND CAL1.CALENDAR_CODE = CAL2.CALENDAR_CODE
+        AND CAL1.EXCEPTION_SET_ID = CAL2.EXCEPTION_SET_ID
+        AND CAL1.CALENDAR_DATE = TRUNC(SYSDATE)
+        AND CAL2.SEQ_NUM = ROUND(CAL1.NEXT_SEQ_NUM + ORD_LEAD_TIME);
+    EXCEPTION
+      WHEN OTHERS THEN
+        /*SRW.MESSAGE(100
+                   ,'Error getting data from bom_calendar_dates, make sure calendar is extended ')*/NULL;
+        /*SRW.MESSAGE(100
+                   ,'Calendar_code = ' || CAL_CODE)*/NULL;
+        /*SRW.MESSAGE(100
+                   ,'Organization Id = ' || ORG_ID)*/NULL;
+        /*SRW.MESSAGE(100
+                   ,'Forecast Designator = ' || FORECAST_DESIG)*/NULL;
+        /*SRW.MESSAGE(100
+                   ,'Item Id = ' || ITEM_ID)*/NULL;
+        /*SRW.MESSAGE(100
+                   ,'Lead Time = ' || ORD_LEAD_TIME)*/NULL;
+        /*RAISE SRW.PROGRAM_ABORT*/RAISE_APPLICATION_ERROR(-20101,null);
+    END;
+    RETURN (GET_FORECAST_QUANTITY(ITEM_ID
+                                ,ORG_ID
+                                ,FORECAST_DESIG
+                                ,START_DATE
+                                ,END_DATE));
+  END GET_LEAD_TIME_DEMAND;
+
+  FUNCTION GET_DEMAND(ITEM_ID IN NUMBER
+                     ,ORG_ID IN NUMBER
+                     ,DEMAND_CUTOFF_DATE IN DATE
+                     ,NET_RSV IN NUMBER
+                     ,INCLUDE_NONNET IN NUMBER
+                     ,INCLUDE_WIP IN NUMBER
+                     ,NET_UNRSV IN NUMBER
+                     ,NET_WIP IN NUMBER
+                     ,SUBINV IN CHAR) RETURN NUMBER IS
+    QTY NUMBER;
+    TOTAL NUMBER;
+    LV_ORG_ID NUMBER;
+    C_PROCESS_ENABLED VARCHAR2(5);
+  BEGIN
+    TOTAL := 0;
+    LV_ORG_ID := ORG_ID;
+    IF (NET_RSV = 1) THEN
+      SELECT
+        SUM(PRIMARY_UOM_QUANTITY - GREATEST(NVL(RESERVATION_QUANTITY
+                        ,0)
+                    ,COMPLETED_QUANTITY))
+      INTO QTY
+      FROM
+        MTL_DEMAND
+      WHERE RESERVATION_TYPE = 2
+        AND DEMAND_SOURCE_TYPE NOT IN ( 2 , 8 , 12 )
+        AND ORGANIZATION_ID = ORG_ID
+        AND INVENTORY_ITEM_ID = ITEM_ID
+        AND PRIMARY_UOM_QUANTITY > GREATEST(NVL(RESERVATION_QUANTITY
+                  ,0)
+              ,COMPLETED_QUANTITY)
+        AND REQUIREMENT_DATE <= DEMAND_CUTOFF_DATE
+        AND ( NVL(SUBINVENTORY
+         ,'x') = DECODE(SUBINV
+            ,NULL
+            ,NVL(SUBINVENTORY
+               ,'x')
+            ,SUBINV)
+      OR EXISTS (
+        SELECT
+          1
+        FROM
+          MTL_SECONDARY_INVENTORIES S
+        WHERE S.ORGANIZATION_ID = ORG_ID
+          AND S.SECONDARY_INVENTORY_NAME = NVL(SUBINV
+           ,SUBINVENTORY)
+          AND S.AVAILABILITY_TYPE = DECODE(INCLUDE_NONNET
+              ,1
+              ,S.AVAILABILITY_TYPE
+              ,1) ) )
+        AND ( LOCATOR_ID IS NULL
+      OR EXISTS (
+        SELECT
+          1
+        FROM
+          MTL_ITEM_LOCATIONS MIL
+        WHERE MIL.ORGANIZATION_ID = ORG_ID
+          AND MIL.INVENTORY_LOCATION_ID = LOCATOR_ID
+          AND MIL.SUBINVENTORY_CODE = NVL(SUBINVENTORY
+           ,MIL.SUBINVENTORY_CODE)
+          AND MIL.AVAILABILITY_TYPE = DECODE(INCLUDE_NONNET
+              ,1
+              ,MIL.AVAILABILITY_TYPE
+              ,1) ) )
+        AND ( LOT_NUMBER IS NULL
+      OR EXISTS (
+        SELECT
+          1
+        FROM
+          MTL_LOT_NUMBERS MLN
+        WHERE MLN.ORGANIZATION_ID = ORG_ID
+          AND MLN.LOT_NUMBER = LOT_NUMBER
+          AND MLN.INVENTORY_ITEM_ID = ITEM_ID
+          AND MLN.AVAILABILITY_TYPE = DECODE(INCLUDE_NONNET
+              ,1
+              ,MLN.AVAILABILITY_TYPE
+              ,1) ) );
+      TOTAL := TOTAL + NVL(QTY
+                  ,0);
+    END IF;
+    IF (NET_UNRSV = 1) THEN
+      SELECT
+        SUM(DECODE(OOL.ORDERED_QUANTITY
+                  ,NULL
+                  ,0
+                  ,INV_DECIMALS_PUB.GET_PRIMARY_QUANTITY(OOL.SHIP_FROM_ORG_ID
+                                                       ,OOL.INVENTORY_ITEM_ID
+                                                       ,OOL.ORDER_QUANTITY_UOM
+                                                       ,OOL.ORDERED_QUANTITY)))
+      INTO QTY
+      FROM
+        OE_ORDER_LINES_ALL OOL
+      WHERE OPEN_FLAG = 'Y'
+        AND VISIBLE_DEMAND_FLAG = 'Y'
+        AND SHIPPED_QUANTITY IS NULL
+        AND SHIP_FROM_ORG_ID = LV_ORG_ID
+        AND INVENTORY_ITEM_ID = ITEM_ID
+        AND SCHEDULE_SHIP_DATE <= DEMAND_CUTOFF_DATE
+        AND ( NVL(SUBINVENTORY
+         ,1) = DECODE(SUBINV
+            ,NULL
+            ,NVL(SUBINVENTORY
+               ,1)
+            ,SUBINV)
+      OR EXISTS (
+        SELECT
+          1
+        FROM
+          MTL_SECONDARY_INVENTORIES S
+        WHERE S.ORGANIZATION_ID = LV_ORG_ID
+          AND S.SECONDARY_INVENTORY_NAME = NVL(SUBINV
+           ,SUBINVENTORY)
+          AND S.AVAILABILITY_TYPE = DECODE(INCLUDE_NONNET
+              ,1
+              ,S.AVAILABILITY_TYPE
+              ,1) ) );
+      TOTAL := TOTAL + NVL(QTY
+                  ,0);
+    END IF;
+    IF (NET_WIP = 1) THEN
+      SELECT
+        NVL(PROCESS_ENABLED_FLAG
+           ,'N')
+      INTO C_PROCESS_ENABLED
+      FROM
+        MTL_PARAMETERS
+      WHERE ORGANIZATION_ID = ORG_ID;
+      IF C_PROCESS_ENABLED = 'Y' THEN
+        SELECT
+          SUM((NVL((NVL(D.WIP_PLAN_QTY
+                     ,D.PLAN_QTY) - D.ACTUAL_QTY)
+                 ,0) * (D.ORIGINAL_PRIMARY_QTY / D.ORIGINAL_QTY)) - NVL(MTR.PRIMARY_RESERVATION_QUANTITY
+                 ,0))
+        INTO QTY
+        FROM
+          GME_MATERIAL_DETAILS D,
+          GME_BATCH_HEADER H,
+          MTL_RESERVATIONS MTR
+        WHERE H.BATCH_TYPE IN ( 0 , 10 )
+          AND H.BATCH_STATUS IN ( 1 , 2 )
+          AND H.BATCH_ID = D.BATCH_ID
+          AND D.LINE_TYPE = - 1
+          AND NVL(D.ORIGINAL_QTY
+           ,0) <> 0
+          AND D.ORGANIZATION_ID = ORG_ID
+          AND D.INVENTORY_ITEM_ID = ITEM_ID
+          AND D.BATCH_ID = mtr.demand_source_header_id (+)
+          AND D.MATERIAL_DETAIL_ID = mtr.demand_source_line_id (+)
+          AND D.INVENTORY_ITEM_ID = mtr.inventory_item_id (+)
+          AND D.ORGANIZATION_ID = mtr.organization_id (+)
+          AND ( ( NVL((NVL(D.WIP_PLAN_QTY
+               ,D.PLAN_QTY) - D.ACTUAL_QTY)
+           ,0) * ( D.ORIGINAL_PRIMARY_QTY / D.ORIGINAL_QTY ) ) - NVL(MTR.PRIMARY_RESERVATION_QUANTITY
+           ,0) ) > 0
+          AND NVL(MTR.DEMAND_SOURCE_TYPE_ID
+           ,5) = 5
+          AND D.MATERIAL_REQUIREMENT_DATE <= DEMAND_CUTOFF_DATE
+          AND ( MTR.SUBINVENTORY_CODE IS NULL
+        OR EXISTS (
+          SELECT
+            1
+          FROM
+            MTL_SECONDARY_INVENTORIES S
+          WHERE S.ORGANIZATION_ID = ORG_ID
+            AND S.SECONDARY_INVENTORY_NAME = MTR.SUBINVENTORY_CODE
+            AND S.AVAILABILITY_TYPE = DECODE(INCLUDE_NONNET
+                ,1
+                ,S.AVAILABILITY_TYPE
+                ,1) ) )
+          AND ( MTR.LOCATOR_ID IS NULL
+        OR EXISTS (
+          SELECT
+            1
+          FROM
+            MTL_ITEM_LOCATIONS MIL
+          WHERE MIL.ORGANIZATION_ID = ORG_ID
+            AND MIL.INVENTORY_LOCATION_ID = MTR.LOCATOR_ID
+            AND MIL.SUBINVENTORY_CODE = NVL(MTR.SUBINVENTORY_CODE
+             ,MIL.SUBINVENTORY_CODE)
+            AND MIL.AVAILABILITY_TYPE = DECODE(INCLUDE_NONNET
+                ,1
+                ,MIL.AVAILABILITY_TYPE
+                ,1) ) )
+          AND ( MTR.LOT_NUMBER IS NULL
+        OR EXISTS (
+          SELECT
+            1
+          FROM
+            MTL_LOT_NUMBERS MLN
+          WHERE MLN.ORGANIZATION_ID = ORG_ID
+            AND MLN.LOT_NUMBER = MTR.LOT_NUMBER
+            AND MLN.INVENTORY_ITEM_ID = ITEM_ID
+            AND MLN.AVAILABILITY_TYPE = DECODE(INCLUDE_NONNET
+                ,1
+                ,MLN.AVAILABILITY_TYPE
+                ,1) ) );
+        TOTAL := TOTAL + NVL(QTY
+                    ,0);
+      ELSE
+        SELECT
+          SUM(O.REQUIRED_QUANTITY - O.QUANTITY_ISSUED)
+        INTO QTY
+        FROM
+          WIP_DISCRETE_JOBS D,
+          WIP_REQUIREMENT_OPERATIONS O
+        WHERE O.WIP_ENTITY_ID = D.WIP_ENTITY_ID
+          AND O.ORGANIZATION_ID = D.ORGANIZATION_ID
+          AND D.ORGANIZATION_ID = ORG_ID
+          AND O.INVENTORY_ITEM_ID = ITEM_ID
+          AND O.DATE_REQUIRED <= DEMAND_CUTOFF_DATE
+          AND O.REQUIRED_QUANTITY > 0
+          AND O.OPERATION_SEQ_NUM > 0
+          AND D.STATUS_TYPE in ( 1 , 3 , 4 , 6 )
+          AND O.WIP_SUPPLY_TYPE NOT IN ( 5 , 6 )
+          AND NVL(O.SUPPLY_SUBINVENTORY
+           ,1) = DECODE(SUBINV
+              ,NULL
+              ,NVL(O.SUPPLY_SUBINVENTORY
+                 ,1)
+              ,SUBINV)
+          AND NOT EXISTS (
+          SELECT
+            WIP.WIP_ENTITY_ID
+          FROM
+            WIP_SO_ALLOCATIONS WIP,
+            MTL_DEMAND MTL
+          WHERE WIP_ENTITY_ID = O.WIP_ENTITY_ID
+            AND WIP.ORGANIZATION_ID = ORG_ID
+            AND WIP.ORGANIZATION_ID = MTL.ORGANIZATION_ID
+            AND WIP.DEMAND_SOURCE_HEADER_ID = MTL.DEMAND_SOURCE_HEADER_ID
+            AND WIP.DEMAND_SOURCE_LINE = MTL.DEMAND_SOURCE_LINE
+            AND WIP.DEMAND_SOURCE_DELIVERY = MTL.DEMAND_SOURCE_DELIVERY
+            AND MTL.INVENTORY_ITEM_ID = ITEM_ID );
+        TOTAL := TOTAL + NVL(QTY
+                    ,0);
+      END IF;
+    END IF;
+    SELECT
+      SUM(MTRL.QUANTITY - NVL(MTRL.QUANTITY_DELIVERED
+             ,0))
+    INTO QTY
+    FROM
+      MTL_TXN_REQUEST_LINES MTRL,
+      MTL_TRANSACTION_TYPES MTT
+    WHERE MTT.TRANSACTION_TYPE_ID = MTRL.TRANSACTION_TYPE_ID
+      AND MTRL.ORGANIZATION_ID = ORG_ID
+      AND MTRL.INVENTORY_ITEM_ID = ITEM_ID
+      AND MTRL.LINE_STATUS NOT IN ( 5 , 6 )
+      AND MTT.TRANSACTION_ACTION_ID = 1
+      AND ( P_LEVEL = 1
+    OR MTRL.FROM_SUBINVENTORY_CODE = SUBINV )
+      AND ( MTRL.FROM_SUBINVENTORY_CODE IS NULL
+    OR P_LEVEL = 2
+    OR EXISTS (
+      SELECT
+        1
+      FROM
+        MTL_SECONDARY_INVENTORIES S
+      WHERE S.ORGANIZATION_ID = ORG_ID
+        AND S.SECONDARY_INVENTORY_NAME = MTRL.FROM_SUBINVENTORY_CODE
+        AND S.AVAILABILITY_TYPE = DECODE(INCLUDE_NONNET
+            ,1
+            ,S.AVAILABILITY_TYPE
+            ,1) ) )
+      AND MTRL.DATE_REQUIRED <= DEMAND_CUTOFF_DATE
+      AND ( MTRL.FROM_LOCATOR_ID IS NULL
+    OR EXISTS (
+      SELECT
+        1
+      FROM
+        MTL_ITEM_LOCATIONS MIL
+      WHERE MIL.ORGANIZATION_ID = ORG_ID
+        AND MIL.INVENTORY_LOCATION_ID = MTRL.FROM_LOCATOR_ID
+        AND MIL.SUBINVENTORY_CODE = NVL(MTRL.FROM_SUBINVENTORY_CODE
+         ,MIL.SUBINVENTORY_CODE)
+        AND MIL.AVAILABILITY_TYPE = DECODE(INCLUDE_NONNET
+            ,1
+            ,MIL.AVAILABILITY_TYPE
+            ,1) ) )
+      AND ( MTRL.LOT_NUMBER IS NULL
+    OR EXISTS (
+      SELECT
+        1
+      FROM
+        MTL_LOT_NUMBERS MLN
+      WHERE MLN.ORGANIZATION_ID = ORG_ID
+        AND MLN.LOT_NUMBER = MTRL.LOT_NUMBER
+        AND MLN.INVENTORY_ITEM_ID = ITEM_ID
+        AND MLN.AVAILABILITY_TYPE = DECODE(INCLUDE_NONNET
+            ,1
+            ,MLN.AVAILABILITY_TYPE
+            ,1) ) );
+    TOTAL := TOTAL + NVL(QTY
+                ,0);
+    RETURN (ROUND(TOTAL
+                ,2));
+  EXCEPTION
+    WHEN OTHERS THEN
+      /*SRW.MESSAGE(91
+                 ,'Error while calculating DemandQty')*/NULL;
+      RETURN (0);
+  END GET_DEMAND;
+
+  FUNCTION GET_SUPPLY(SUPPLY_CUTOFF_DATE IN DATE
+                     ,ORG_ID IN NUMBER
+                     ,CURRENT_ITEM_ID IN NUMBER
+                     ,INCLUDE_PO IN NUMBER
+                     ,INCLUDE_NONNET IN NUMBER
+                     ,INCLUDE_WIP IN NUMBER
+                     ,INCLUDE_IF IN NUMBER
+                     ,SUBINV IN CHAR) RETURN NUMBER IS
+    QTY NUMBER;
+    TOTAL NUMBER;
+    L_VMI_ENABLED VARCHAR2(1);
+    L_STMT VARCHAR2(4000);
+    L_VMI_STMT VARCHAR2(2000);
+    SCD VARCHAR2(20);
+    ORG_ID1 NUMBER;
+    C_PROCESS_ENABLED VARCHAR2(5);
+  BEGIN
+    TOTAL := 0;
+    QTY := 0;
+    ORG_ID1 := ORG_ID;
+    L_VMI_ENABLED := NVL(FND_PROFILE.VALUE('PO_VMI_ENABLED')
+                        ,'N');
+    SCD := TO_CHAR(SUPPLY_CUTOFF_DATE
+                  ,'DD-MON-RRRR');
+    L_STMT := 'SELECT to_char(nvl(sum(to_org_primary_quantity), 0))
+                    INTO :char_qty
+                    FROM   mtl_supply sup, mtl_system_items items
+                    WHERE  sup.supply_type_code in (''PO'',''REQ'',''ASN'',''SHIPMENT'',''RECEIVING'')
+                    AND    sup.destination_type_code =''INVENTORY''
+                    AND    sup.to_organization_id =' || TO_CHAR(ORG_ID) || '
+		    AND    sup.item_id =' || TO_CHAR(CURRENT_ITEM_ID) || '
+		    AND items.organization_id = sup.to_organization_id' || '
+		    AND items.inventory_item_id = sup.item_id' || '
+		    AND    TRUNC(DECODE(NVL(items.postprocessing_lead_time,0),0,MRP_CALENDAR.NEXT_WORK_DAY(items.organization_id,1,
+						DECODE(sup.supply_type_code,''PO'',sup.need_by_date,
+									   ''REQ'',sup.need_by_date,
+									   ''ASN'',sup.need_by_date,''RECEIVING'',sup.receipt_date,''SHIPMENT'',
+									   sup.receipt_date)),' || ' MRP_CALENDAR.DATE_OFFSET(items.organization_id,1,DECODE(sup.supply_type_code,''PO'',sup.need_by_date,
+									   ''REQ'',sup.need_by_date,''ASN'',sup.need_by_date,''RECEIVING'',sup.receipt_date,''SHIPMENT'',sup.receipt_date),
+									   items.postprocessing_lead_time))) <=
+									   TO_DATE(''' || SCD || ''',''DD-MON-RRRR'')' || ' AND    (NVL(sup.FROM_organization_id,-1) <>' || TO_CHAR(ORG_ID) || '
+									                       OR     (sup.FROM_organization_id =' || TO_CHAR(ORG_ID) || ' AND ' || TO_CHAR(INCLUDE_NONNET) || '= 2' || ' AND    EXISTS (SELECT ''x''
+                        FROM   mtl_secondary_inventories sub1
+                        WHERE  sub1.organization_id = sup.FROM_organization_id
+                         AND    sup.FROM_subinventory = sub1.secondary_inventory_name
+                         AND    sub1.availability_type <> 1)))' || ' AND NOT EXISTS (select ''y''
+                            from oe_drop_ship_sources  odss
+                           where sup.po_header_id is null and sup.req_line_id = odss.requisition_line_id ) ' || '  AND NOT EXISTS (select ''y''
+                          from  oe_drop_ship_sources odss
+                          where  sup.req_line_id is null and  sup.po_line_location_id = odss.line_location_id)';
+    L_VMI_STMT := ' AND    (sup.po_line_location_id is NULL
+                                         OR EXISTS (SELECT ''x''
+                                                    FROM po_line_locations_all lilo
+                                                    WHERE lilo.line_location_id = sup.po_line_location_id
+                                                    AND NVL(lilo.vmi_flag,''N'') =''N''
+                                                   )
+                                    )
+                             AND    (sup.req_line_id IS NULL
+                                     OR EXISTS (SELECT ''x''
+                                                FROM po_requisition_lines_all prl
+                                                WHERE prl.requisition_line_id = sup.req_line_id
+                                                AND NVL(prl.vmi_flag,''N'') =''N''
+                                                )
+                                    )';
+    IF (INCLUDE_PO = 1) THEN
+      IF L_VMI_ENABLED = 'Y' THEN
+        L_STMT := L_STMT || L_VMI_STMT;
+      END IF;
+      EXECUTE IMMEDIATE
+        L_STMT;
+      QTY := TO_NUMBER(CHAR_QTY);
+      TOTAL := TOTAL + NVL(QTY
+                  ,0);
+    END IF;
+    IF (INCLUDE_WIP = 1) THEN
+      SELECT
+        NVL(PROCESS_ENABLED_FLAG
+           ,'N')
+      INTO C_PROCESS_ENABLED
+      FROM
+        MTL_PARAMETERS
+      WHERE ORGANIZATION_ID = ORG_ID;
+      IF C_PROCESS_ENABLED = 'Y' THEN
+        SELECT
+          SUM(NVL((NVL(D.WIP_PLAN_QTY
+                     ,D.PLAN_QTY) - D.ACTUAL_QTY)
+                 ,0) * (ORIGINAL_PRIMARY_QTY / ORIGINAL_QTY))
+        INTO QTY
+        FROM
+          GME_MATERIAL_DETAILS D,
+          GME_BATCH_HEADER H
+        WHERE H.BATCH_TYPE IN ( 0 , 10 )
+          AND H.BATCH_STATUS IN ( 1 , 2 )
+          AND H.BATCH_ID = D.BATCH_ID
+          AND D.INVENTORY_ITEM_ID = CURRENT_ITEM_ID
+          AND D.ORGANIZATION_ID = ORG_ID
+          AND D.MATERIAL_REQUIREMENT_DATE <= SUPPLY_CUTOFF_DATE
+          AND D.LINE_TYPE > 0;
+        TOTAL := TOTAL + NVL(QTY
+                    ,0);
+      ELSE
+        SELECT
+          SUM(NVL(START_QUANTITY
+                 ,0) - NVL(QUANTITY_COMPLETED
+                 ,0) - NVL(QUANTITY_SCRAPPED
+                 ,0))
+        INTO QTY
+        FROM
+          WIP_DISCRETE_JOBS
+        WHERE ORGANIZATION_ID = ORG_ID
+          AND PRIMARY_ITEM_ID = CURRENT_ITEM_ID
+          AND STATUS_TYPE in ( 1 , 3 , 4 , 6 )
+          AND JOB_TYPE in ( 1 , 3 )
+          AND SCHEDULED_COMPLETION_DATE <= TO_DATE(TO_CHAR(SUPPLY_CUTOFF_DATE)
+               ,'DD-MON-RR')
+          AND NVL(COMPLETION_SUBINVENTORY
+           ,1) = DECODE(SUBINV
+              ,NULL
+              ,NVL(COMPLETION_SUBINVENTORY
+                 ,1)
+              ,SUBINV);
+        TOTAL := TOTAL + NVL(QTY
+                    ,0);
+        SELECT
+          SUM(DAILY_PRODUCTION_RATE * LEAST(0
+                   ,GREATEST(PROCESSING_WORK_DAYS
+                           ,SUPPLY_CUTOFF_DATE - FIRST_UNIT_COMPLETION_DATE)) - QUANTITY_COMPLETED)
+        INTO QTY
+        FROM
+          WIP_REPETITIVE_SCHEDULES WRS,
+          WIP_REPETITIVE_ITEMS WRI
+        WHERE WRS.ORGANIZATION_ID = ORG_ID
+          AND WRS.STATUS_TYPE IN ( 1 , 3 , 4 , 6 )
+          AND WRI.ORGANIZATION_ID = ORG_ID
+          AND WRI.PRIMARY_ITEM_ID = CURRENT_ITEM_ID
+          AND WRI.WIP_ENTITY_ID = WRS.WIP_ENTITY_ID
+          AND WRI.LINE_ID = WRS.LINE_ID
+          AND NVL(WRI.COMPLETION_SUBINVENTORY
+           ,1) = DECODE(SUBINV
+              ,NULL
+              ,NVL(WRI.COMPLETION_SUBINVENTORY
+                 ,1)
+              ,SUBINV);
+        TOTAL := TOTAL + NVL(QTY
+                    ,0);
+      END IF;
+    END IF;
+    IF (INCLUDE_IF = 1) THEN
+      SELECT
+        SUM(QUANTITY)
+      INTO QTY
+      FROM
+        PO_REQUISITIONS_INTERFACE_ALL
+      WHERE ITEM_ID = CURRENT_ITEM_ID
+        AND DESTINATION_ORGANIZATION_ID = ORG_ID1
+        AND INCLUDE_PO = 1
+        AND ( PROCESS_FLAG <> 'ERROR'
+      OR PROCESS_FLAG IS NULL )
+        AND NEED_BY_DATE <= SUPPLY_CUTOFF_DATE
+        AND ( NVL(DESTINATION_SUBINVENTORY
+         ,1) = DECODE(SUBINV
+            ,NULL
+            ,NVL(DESTINATION_SUBINVENTORY
+               ,1)
+            ,SUBINV)
+      OR EXISTS (
+        SELECT
+          1
+        FROM
+          MTL_SECONDARY_INVENTORIES SUB2
+        WHERE SECONDARY_INVENTORY_NAME = DESTINATION_SUBINVENTORY
+          AND DESTINATION_SUBINVENTORY = NVL(SUBINV
+           ,DESTINATION_SUBINVENTORY)
+          AND SUB2.ORGANIZATION_ID = ORG_ID1
+          AND SUB2.AVAILABILITY_TYPE = DECODE(INCLUDE_NONNET
+              ,1
+              ,SUB2.AVAILABILITY_TYPE
+              ,1) ) );
+      TOTAL := ROUND(TOTAL + NVL(QTY
+                        ,0)
+                    ,2);
+      IF C_PROCESS_ENABLED = 'N' THEN
+        SELECT
+          SUM(START_QUANTITY)
+        INTO QTY
+        FROM
+          WIP_JOB_SCHEDULE_INTERFACE
+        WHERE PRIMARY_ITEM_ID = CURRENT_ITEM_ID
+          AND ORGANIZATION_ID = ORG_ID
+          AND INCLUDE_WIP = 1
+          AND PROCESS_STATUS <> 3
+          AND LAST_UNIT_COMPLETION_DATE <= SUPPLY_CUTOFF_DATE;
+        TOTAL := ROUND(TOTAL + NVL(QTY
+                          ,0)
+                      ,2);
+      END IF;
+    END IF;
+    RETURN (TOTAL);
+  END GET_SUPPLY;
+
+  FUNCTION GET_ONHAND_QTY(ITEM_ID IN NUMBER
+                         ,LOT_CONTROL IN NUMBER
+                         ,ORG_ID IN NUMBER
+                         ,SUBINV IN CHAR
+                         ,INCLUDE_NONNET IN NUMBER) RETURN NUMBER IS
+    L_IS_LOT_CONTROL VARCHAR2(20) := 'TRUE';
+    X_RETURN_STATUS VARCHAR2(30);
+    X_MSG_COUNT NUMBER;
+    X_MSG_DATA VARCHAR2(1000);
+    L_ONHAND_SOURCE NUMBER := 3;
+    L_SUBINVENTORY_CODE VARCHAR2(30);
+    L_SYSDATE DATE;
+    L_CURSOR_STMT VARCHAR2(1000);
+    X_QOH NUMBER;
+    X_RQOH NUMBER;
+    X_QR NUMBER;
+    X_QS NUMBER;
+    X_ATT NUMBER;
+    X_ATR NUMBER;
+    X_VOH NUMBER;
+    X_VATT NUMBER;
+    L_QOH NUMBER;
+  BEGIN
+    SELECT
+      sysdate
+    INTO L_SYSDATE
+    FROM
+      SYS.DUAL;
+    IF (INCLUDE_NONNET = 1) THEN
+      L_ONHAND_SOURCE := NULL;
+    ELSE
+      L_ONHAND_SOURCE := 2;
+    END IF;
+    MRP_GET_ONHAND.GET_OH_QTY(ITEM_ID => ITEM_ID
+                             ,ORG_ID => ORG_ID
+                             ,INCLUDE_NONNET => INCLUDE_NONNET
+                             ,X_QOH => X_QOH
+                             ,X_RETURN_STATUS => X_RETURN_STATUS
+                             ,X_MSG_DATA => X_MSG_DATA);
+    IF X_RETURN_STATUS = 'S' THEN
+      RETURN (X_QOH);
+    ELSE
+      /*SRW.MESSAGE(92
+                 ,'Error while calculating OnHandQty')*/NULL;
+      RETURN (0);
+    END IF;
+  END GET_ONHAND_QTY;
+
+END MRP_MRPRPROP_XMLP_PKG;
+
+
+
+/
